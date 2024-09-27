@@ -1,0 +1,4 @@
+[submodule "dependencies"]
+	path = dependencies
+	url = https://github.com/cool2528/vendor.git
+	branch = main
