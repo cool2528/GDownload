@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/mainWindow.qml</file>
+        <file>qml/titlebar/TitleBar.qml</file>
+    </qresource>
+</RCC>
