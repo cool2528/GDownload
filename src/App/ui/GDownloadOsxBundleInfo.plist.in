@@ -6,7 +6,7 @@
     <string>en</string>
     <key>CFBundleExecutable</key>
     <string>${PROJECT_NAME}</string>
-    <key>CFBundleTypeIconFile</key>
+    <key>CFBundleIconFile</key>
     <string>${MACOSX_BUNDLE_ICON_FILE}</string>
     <key>CFBundleIdentifier</key>
     <string>${MACOSX_BUNDLE_GUI_IDENTIFIER}</string>
