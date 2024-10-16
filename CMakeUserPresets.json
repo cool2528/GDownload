@@ -1,0 +1,24 @@
+{
+    "version": 9,
+    "include":[
+        "CMakePresets.json"
+    ],
+    "configurePresets": [
+      {
+        "name": "macOS",
+        "inherits": "vcpkg-macOS",
+        "environment": {
+          "VCPKG_ROOT": "/Users/liuming/Desktop/workspace/tools/vcpkg",
+          "QT_ROOT":"/Applications/qt/6.5.2/macos"
+        }
+      },
+      {
+        "name": "windows",
+        "inherits": "vcpkg-windows",
+        "environment": {
+          "VCPKG_ROOT": "D:/tools/vcpkg",
+          "QT_ROOT":"C:\\Qt\\6.5.2\\msvc2019_64"
+        }
+      }
+    ]
+  }

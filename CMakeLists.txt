@@ -19,7 +19,8 @@ elseif(UNIX AND NOT APPLE)
     set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/linux")
 endif()
 project(GDownload LANGUAGES CXX C)
-
+message(STATUS "CMAKE_PREFIX_PATH:${CMAKE_PREFIX_PATH}")
+message(STATUS "CMAKE_TOOLCHAIN_FILE:${CMAKE_TOOLCHAIN_FILE}")
 add_subdirectory(src)
 
 # 安装规则

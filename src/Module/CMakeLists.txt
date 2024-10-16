@@ -1,2 +1,2 @@
-add_subdirectory(logger)
+add_subdirectory(GDLCore)
 add_subdirectory(plugin)

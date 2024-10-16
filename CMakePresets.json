@@ -1,0 +1,23 @@
+{
+    "version": 9,
+    "configurePresets": [
+      {
+        "name": "vcpkg-macOS",
+        "generator": "Unix Makefiles",
+        "binaryDir": "${sourceDir}/build",
+        "cacheVariables": {
+          "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+          "CMAKE_PREFIX_PATH":"$env{QT_ROOT}"
+        }
+      },
+      {
+        "name": "vcpkg-windows",
+        "generator": "Visual Studio 16 2022",
+        "binaryDir": "${sourceDir}/build",
+        "cacheVariables": {
+          "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+          "CMAKE_PREFIX_PATH":"$env{QT_ROOT}"
+        }
+      }
+    ]
+  }
