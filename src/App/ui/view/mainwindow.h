@@ -16,9 +16,10 @@ namespace gd
             private:
             void InitQmlEngine(QQmlEngine* engine);
             void InitTranslation(QGuiApplication* app);
-            void InitFont(QGuiApplication* app);
+            void InitFont(QQmlEngine* engine);
             void InitIcon(QGuiApplication* app);
             private:
+            int fluent_icons_font_id_{-1};
         };
     }
 }

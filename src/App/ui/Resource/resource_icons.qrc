@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>images/titlebar/icon.svg</file>
+        <file>font/SegoeFluentIcons.ttf</file>
     </qresource>
 </RCC>

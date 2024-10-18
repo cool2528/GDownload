@@ -1,8 +1,13 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QUrl>
+#include <QFontDatabase>
+#include <QQmlContext>
 #include "FramelessHelper/Core/private/framelessconfig_p.h"
 #include "FramelessHelper/Quick/framelessquickmodule.h"
+#include "Definitions/fluentEnumDef.h"
+#include "GDLCore/logger.h"
+
 FRAMELESSHELPER_USE_NAMESPACE
 namespace gd
 {
@@ -43,9 +48,15 @@ namespace gd
         {
 
         }
-        void MainWindow::InitFont(QGuiApplication* app)
+        void MainWindow::InitFont(QQmlEngine* engine)
         {
-
+           fluent_icons_font_id_= QFontDatabase::addApplicationFont("qrc:/font/SegoeFluentIcons.ttf");
+            if(fluent_icons_font_id_ == -1){
+               LOG_ERR("init fluenticons font fail");
+                return;
+            }
+            const auto font_family_name = QFontDatabase::applicationFontFamilies(fluent_icons_font_id_).at(0);
+            engine->rootContext()->setContextProperty("SegoeFluentIcons",font_family_name);
         }
         
         void MainWindow::InitIcon(QGuiApplication* app)

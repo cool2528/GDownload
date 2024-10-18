@@ -36,7 +36,7 @@ list(REMOVE_DUPLICATES QML_IMPORT_PATH)
 set(QML_IMPORT_PATH ${QML_IMPORT_PATH} CACHE STRING "Qt Creator extra QML import paths" FORCE)
 
 # set dependencies library
-set(DEPENDENCIES_LIBRARIES FramelessHelper::Core FramelessHelper::Widgets FramelessHelper::Quick)
+set(DEPENDENCIES_LIBRARIES FramelessHelper::Core FramelessHelper::Widgets FramelessHelper::Quick GDLCore)
 list(APPEND DEPENDENCIES_LIBRARIES ${QT_PREFIXED_MODULES})
 
 if(APPLE)
@@ -59,7 +59,7 @@ if(APPLE)
 elseif(WIN32)
     add_executable(${PROJECT_NAME} ${SOURCES_FILES} ${HEADERS_FILES} ${QT_RESOURCE_FILES} ${QT_QML_FILES})
 endif()
-
+target_include_directories(${PROJECT_NAME} PRIVATE ${MODULE_INCLUDE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${DEPENDENCIES_LIBRARIES})
 target_compile_definitions(${PROJECT_NAME} PRIVATE
    $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>

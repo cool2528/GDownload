@@ -10,17 +10,28 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/debug/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/release/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/debug/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/release/bin)
+if(NOT CMAKE_TOOLCHAIN_FILE)
+    set(CMAKE_TOOLCHAIN_FILE "/Users/liuming/Desktop/workspace/tools/vcpkg/scripts/buildsystems/vcpkg.cmake"  CACHE STRING "A cached variable")
+endif()
+
 # 设置依赖库的根路径
 if(APPLE)
     set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/osx")
+    # 查询系统芯片架构
+    cmake_host_system_information(RESULT OSX_ARCHITECTURES QUERY  OS_PLATFORM)
+    message(STATUS "OSX_ARCHITECTURES:${OSX_ARCHITECTURES}")
+    set(CMAKE_OSX_ARCHITECTURES ${OSX_ARCHITECTURES})
+
 elseif(WIN32)
     set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/windows")
 elseif(UNIX AND NOT APPLE)
     set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/linux")
 endif()
 project(GDownload LANGUAGES CXX C)
+
 message(STATUS "CMAKE_PREFIX_PATH:${CMAKE_PREFIX_PATH}")
 message(STATUS "CMAKE_TOOLCHAIN_FILE:${CMAKE_TOOLCHAIN_FILE}")
+set(MODULE_INCLUDE_PATH "${CMAKE_SOURCE_DIR}/src/Module")
 add_subdirectory(src)
 
 # 安装规则
@@ -62,4 +73,3 @@ elseif(UNIX AND NOT APPLE)
         set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Installation prefix" FORCE)
     endif()
 endif()
-

@@ -24,4 +24,4 @@ fi
 # Create build directory if it doesn't exist
 mkdir -p "$BUILD_DIR"
 
-cmake -S . -B build -DQt6_DIR="$QT_DIR/lib/cmake/Qt6" -DCMAKE_PREFIX_PATH=$QT_DIR
+cmake -S . -B build -DQt6_DIR="$QT_DIR/lib/cmake/Qt6" -DCMAKE_PREFIX_PATH=$QT_DIR -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake

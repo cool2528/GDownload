@@ -1,23 +1,26 @@
 {
-    "version": 9,
-    "configurePresets": [
-      {
-        "name": "vcpkg-macOS",
-        "generator": "Unix Makefiles",
-        "binaryDir": "${sourceDir}/build",
-        "cacheVariables": {
-          "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-          "CMAKE_PREFIX_PATH":"$env{QT_ROOT}"
-        }
+  "version": 9,
+  "configurePresets": [
+    {
+      "name": "vcpkg-macOS-arm64-osx",
+      "generator": "Unix Makefiles",
+      "description": "Build using vcpkg for macOS arm64",
+      "binaryDir": "${sourceDir}/build_osx",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "architecture": {
+        "value": "arm64"
       },
-      {
-        "name": "vcpkg-windows",
-        "generator": "Visual Studio 16 2022",
-        "binaryDir": "${sourceDir}/build",
-        "cacheVariables": {
-          "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-          "CMAKE_PREFIX_PATH":"$env{QT_ROOT}"
-        }
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "$env{QT_ROOT}",
+        "CMAKE_C_COMPILER": "/usr/bin/clang",
+        "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
+        "CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG":"${sourceDir}/build_osx/debug/bin",
+        "CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE":"${sourceDir}/build_osx/release/bin",
+        "CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG":"${sourceDir}/build_osx/debug/bin",
+        "CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE":"${sourceDir}/build_osx/release/bin",
+        "CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG":"${sourceDir}/build_osx/debug/bin",
+        "CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE":"${sourceDir}/build_osx/release/bin"
       }
-    ]
-  }
+    }
+  ]
+}
