@@ -1,12 +1,25 @@
-
-
-project(gdownload LANGUAGES CXX C)
-
-file(GLOB_RECURSE SOURCES_FILES
+if(APPLE)
+    project(gdownload LANGUAGES CXX C OBJCXX)
+    project(gdownload LANGUAGES CXX C)
+    file(GLOB_RECURSE SOURCES_FILES
     *.cpp
     *.cxx
     *.c
-)
+    *.mm
+    )
+    foreach(file ${SOURCES_FILES})
+    if(file MATCHES "\\.mm$")
+        set_property(SOURCE ${file} PROPERTY SKIP_AUTOMOC ON)
+    endif()
+endforeach()
+else()
+    project(gdownload LANGUAGES CXX C)
+    file(GLOB_RECURSE SOURCES_FILES
+    *.cpp
+    *.cxx
+    *.c
+    )
+endif()
 file(GLOB_RECURSE HEADERS_FILES
     *.h
     *.hpp

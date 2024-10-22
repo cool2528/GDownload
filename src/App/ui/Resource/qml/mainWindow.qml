@@ -1,33 +1,58 @@
 import QtQuick
 import org.wangwenx190.FramelessHelper
-import "./titlebar"
+import QtQuick.Controls
+import "Navigator"
+import "titlebar"
+import "Browser"
 FramelessWindow{
     id: mainWindow
-    width: 800
-    height: 600
+    width: 1024
+    height: 768
     title: qsTr("GDownload title")
-    color: "#242424"
-    visible: false // Hide the window before we sets up it's correct size and position.
+    visible: false
+    property var helper: FramelessHelper
     FramelessHelper.onReady: {
-        FramelessHelper.titleBarItem = titleBar;
-        if (Qt.platform.os === "windows") {
-            FramelessHelper.setSystemButton(titleBar.minimizeButton, FramelessHelperConstants.Minimize);
-            FramelessHelper.setSystemButton(titleBar.maximizeButton, FramelessHelperConstants.Maximize);
-            FramelessHelper.setSystemButton(titleBar.closeButton, FramelessHelperConstants.Close);
-        }
-
+        FramelessHelper.titleBarItem = title_bar;
         FramelessHelper.moveWindowToDesktopCenter()
         mainWindow.visible = true;
-        console.log("titleBar ",titleBar.hideWhenClose)
-        
+        UtilsToolsManager.HideMacOsxWindowStandardButtons(mainWindow)
     }
-
+    onVisibilityChanged: {
+        UtilsToolsManager.HideMacOsxWindowStandardButtons(mainWindow)
+    }
     TitleBar{
-        id:titleBar
+        id:title_bar
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
     }
+    SplitView{
+        id:main_splitview
+        anchors.top: title_bar.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 10
+        handle: Rectangle{
+            id:handleDelegate
+            implicitWidth: 5
+            color: "#1b1b1b"
+        }
+        NavigatorView{
+            id:navigator_view
+            SplitView.minimumWidth: 274
+        }
+        BrowserView{
+            id:brower_view
+            color: "#ffffff"
+            SplitView.fillWidth: true
+            SplitView.fillHeight: true
+            SplitView.minimumWidth: 380
+        }
+
+    }
+
+
 }
 
 
