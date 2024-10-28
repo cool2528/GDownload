@@ -14,8 +14,8 @@ Item {
         anchors.topMargin: 10
         ImageButton{
             id:close
-            width: 12
-            height: 12
+            width: 8
+            height: 8
             backgroundColor:"transparent"
             normalImage: "/images/titlebar/macos-close.svg"
             hoverImage: "/images/titlebar/macos-clos-hover.svg"
@@ -26,8 +26,8 @@ Item {
 
         ImageButton{
             id:minsize
-            width: 12
-            height: 12
+            width: 8
+            height: 8
             backgroundColor:"transparent"
             normalImage: "/images/titlebar/macos-minimize.svg"
             hoverImage: "/images/titlebar/macos-minimize-hover.svg"
@@ -38,8 +38,8 @@ Item {
 
         ImageButton{
             id:maxsize
-            width: 12
-            height: 12
+            width: 8
+            height: 8
             backgroundColor:"transparent"
             normalImage: "/images/titlebar/macos-maximize.svg"
             hoverImage: "/images/titlebar/macos-maximize-hover.svg"

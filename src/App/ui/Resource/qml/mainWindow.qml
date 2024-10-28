@@ -35,12 +35,13 @@ FramelessWindow{
         anchors.bottomMargin: 10
         handle: Rectangle{
             id:handleDelegate
-            implicitWidth: 5
-            color: "#1b1b1b"
+            implicitWidth: 0
+            color: "transparent"
         }
         NavigatorView{
             id:navigator_view
             SplitView.minimumWidth: 274
+            SplitView.maximumWidth: 274
         }
         BrowserView{
             id:brower_view

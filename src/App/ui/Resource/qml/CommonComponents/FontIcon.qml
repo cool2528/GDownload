@@ -3,12 +3,13 @@ import QtQuick
 Item {
     id:control
     property int iconSource
-    property size iconSize
+    property int iconSize
+    property alias color: icon.color
     Text{
         id:icon
         text: String.fromCharCode(iconSource).toString(16)
-        width: iconSize.width
-        height: iconSize.height
-        font.family: SegoeFluentIcons
+        font.pixelSize:iconSize
+        font.family: FluentIcons
     }
+
 }

@@ -26,6 +26,7 @@ namespace gd
             QGuiApplication app(argc, argv);
             QQmlApplicationEngine engine;
             InitQmlEngine(&engine);
+            InitFont(&engine);
             QObject::connect(
                 &engine,
                 &QQmlApplicationEngine::objectCreationFailed,
@@ -52,13 +53,14 @@ namespace gd
         }
         void MainWindow::InitFont(QQmlEngine* engine)
         {
-           fluent_icons_font_id_= QFontDatabase::addApplicationFont("qrc:/font/SegoeFluentIcons.ttf");
+           fluent_icons_font_id_= QFontDatabase::addApplicationFont("://font/SegoeFluentIcons.ttf");
             if(fluent_icons_font_id_ == -1){
                LOG_ERR("init fluenticons font fail");
                 return;
             }
             const auto font_family_name = QFontDatabase::applicationFontFamilies(fluent_icons_font_id_).at(0);
-            engine->rootContext()->setContextProperty("SegoeFluentIcons",font_family_name);
+            engine->rootContext()->setContextProperty("FluentIcons",font_family_name);
+            qmlRegisterUncreatableMetaObject(SegoeFluentIcons::staticMetaObject,"fluentIcons",1,0,"SegoeFluentIcons","SegoeFluentIcons enum");
         }
         
         void MainWindow::InitIcon(QGuiApplication* app)

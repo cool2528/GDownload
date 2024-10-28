@@ -1,17 +1,24 @@
 import QtQuick
-import QtQuick.Controls
-
+import QtQuick.Controls.Basic
 Button{
     id:control
     property int iconSource
-    property size iconSize
-    property color backgroundColor:backgroundRect.color
-    anchors.fill: parent
-    contentItem: FontIcon{
-        iconSize: iconSize
-        iconSource: iconSource
-    }
+    property int iconSize
+    property color backgroundColor:"transparent"
+    property alias iconColor: icon.color
     background: Rectangle{
         id:backgroundRect
+        color: control.backgroundColor
+    }
+    FontIcon{
+        id:icon
+        anchors.fill: parent
+        iconSize: control.iconSize
+        iconSource: control.iconSource
+        HoverHandler{
+            id:mouse
+            acceptedDevices: PointerDevice.Mouse
+            cursorShape: Qt.PointingHandCursor
+        }
     }
 }
