@@ -6,8 +6,14 @@ Button{
     property int iconSize
     property color backgroundColor:"transparent"
     property alias iconColor: icon.color
+    implicitHeight: {
+        return textMetrics.height
+    }
+    implicitWidth: {
+        return textMetrics.width
+    }
+
     background: Rectangle{
-        id:backgroundRect
         color: control.backgroundColor
     }
     FontIcon{
@@ -21,4 +27,11 @@ Button{
             cursorShape: Qt.PointingHandCursor
         }
     }
+    TextMetrics{
+        id:textMetrics
+        font.family: FluentIcons
+        font.pixelSize: iconSize
+        text: String.fromCharCode(iconSource).toString(16)
+    }
+
 }
