@@ -7,5 +7,8 @@
         <file>qml/CommonComponents/ImageButton.qml</file>
         <file>qml/Navigator/NavigatorView.qml</file>
         <file>qml/Browser/BrowserView.qml</file>
+        <file>qml/Browser/DownloadPageView.qml</file>
+        <file>qml/Browser/SettingsPageView.qml</file>
+        <file>qml/CommonComponents/TttleButton.qml</file>
     </qresource>
 </RCC>

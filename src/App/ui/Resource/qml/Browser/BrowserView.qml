@@ -1,5 +1,18 @@
 import QtQuick
-
+import QtQuick.Layouts
 Rectangle{
     id:control
+    property alias index: browsesStack.currentIndex
+    StackLayout{
+        id:browsesStack
+        anchors.fill: parent
+        DownloadPageView{
+            id:downloadPage
+        }
+
+        SettingsPageView{
+            id:settingPage
+
+        }
+    }
 }

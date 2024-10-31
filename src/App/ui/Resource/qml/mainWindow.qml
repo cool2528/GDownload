@@ -33,6 +33,7 @@ FramelessWindow{
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
+
         handle: Rectangle{
             id:handleDelegate
             implicitWidth: 0
@@ -40,15 +41,15 @@ FramelessWindow{
         }
         NavigatorView{
             id:navigator_view
-            SplitView.minimumWidth: 274
-            SplitView.maximumWidth: 274
+            SplitView.minimumWidth: 74
+            SplitView.maximumWidth: 74
         }
+
         BrowserView{
             id:brower_view
-            color: "#ffffff"
             SplitView.fillWidth: true
-            SplitView.fillHeight: true
-            SplitView.minimumWidth: 380
+            SplitView.minimumWidth: 600
+            SplitView.preferredWidth: 600
         }
 
     }
