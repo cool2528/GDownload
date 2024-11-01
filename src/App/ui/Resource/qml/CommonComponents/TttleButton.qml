@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
-
+import gdl.sdk 1.0
 Button {
     id: control
     property int iconSource
@@ -15,7 +15,7 @@ Button {
             anchors.leftMargin: 5
             anchors.top: parent.top
             anchors.topMargin: 7
-            color: (control.hovered || control.checked) ? "#5151f9" : "#494c55"
+            color: GTheme.dark ? (control.hovered || control.checked) ? "#ffffff" : "#a0a0a0" : (control.hovered || control.checked) ? "#5151f9" : "#494c55"
         }
         Text {
             id: text
@@ -23,7 +23,7 @@ Button {
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: icon.right
             anchors.leftMargin: 20
-            color: (control.hovered || control.checked) ? "#5151f9" : "#494c55"
+            color: GTheme.dark ? (control.hovered || control.checked) ? "#ffffff" : "#a0a0a0" : (control.hovered || control.checked) ? "#5151f9" : "#494c55"
         }
         HoverHandler{
             id:mouse
@@ -33,7 +33,7 @@ Button {
     }
 
     background: Rectangle {
-        color: (control.hovered || control.checked) ? "#e7e9ee" : "transparent"
+        color: GTheme.dark ? (control.hovered || control.checked) ? "#3c3c3c" : "transparent" : (control.hovered || control.checked) ? "#e7e9ee" : "transparent"
         radius: 2
     }
 }

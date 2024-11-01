@@ -9,6 +9,7 @@
 #include "Definitions/fluentEnumDef.h"
 #include "GDLCore/logger.h"
 #include "utils/utils.h"
+#include "theme/theme.h"
 FRAMELESSHELPER_USE_NAMESPACE
 namespace gd
 {
@@ -46,6 +47,7 @@ namespace gd
             FramelessHelper::Core::setApplicationOSThemeAware();
             FramelessHelper::Quick::registerTypes(engine);
             gdl::ui::utils::RegisterTypes(engine);
+            gdl::ui::theme::RegisterTypes(engine);
             qmlRegisterUncreatableMetaObject(SegoeFluentIcons::staticMetaObject,GEXPORT_MODULE_URL,1,0,"SegoeFluentIcons","SegoeFluentIcons enum");
 
         }

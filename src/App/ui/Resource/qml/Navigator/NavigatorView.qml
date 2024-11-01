@@ -9,7 +9,21 @@ Item{
     Rectangle{
         id:systemNavigator
         anchors.fill: parent
-        color: "#484848"
+        gradient: Gradient{
+            GradientStop{
+                position: 0.0
+                color: "#414141"
+            }
+            GradientStop{
+                position: 0.33
+                color: "#444444"
+            }
+            GradientStop{
+                position: 1.0
+                color: "#484848"
+            }
+        }
+
         implicitWidth: 74
         SplitView.minimumWidth: 74
         // topLayout
@@ -36,7 +50,7 @@ Item{
                 iconSize: 30
                 iconColor: "#ffffff"
                 onClicked: {
-                    console.log("open add task dialog")
+                    console.debug("open add task dialog")
                     brower_view.index = 0
                 }
             }
@@ -55,7 +69,7 @@ Item{
                 iconSize: 30
                 iconColor: "#ffffff"
                 onClicked: {
-                    console.log("open settings dialog")
+                    console.debug("open settings dialog")
                     brower_view.index = 1
                 }
             }
@@ -66,7 +80,7 @@ Item{
                 iconSize: 30
                 iconColor: "#ffffff"
                 onClicked: {
-                    console.log("open help dialog")
+                    console.debug("open help dialog")
 
                 }
             }

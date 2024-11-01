@@ -10,5 +10,6 @@
         <file>qml/Browser/DownloadPageView.qml</file>
         <file>qml/Browser/SettingsPageView.qml</file>
         <file>qml/CommonComponents/TttleButton.qml</file>
+        <file>qml/Browser/DownloadPageTitle.qml</file>
     </qresource>
 </RCC>
