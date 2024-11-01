@@ -5,6 +5,7 @@
 #include <QQmlContext>
 #include "FramelessHelper/Core/private/framelessconfig_p.h"
 #include "FramelessHelper/Quick/framelessquickmodule.h"
+#include "Definitions/appDef.h"
 #include "Definitions/fluentEnumDef.h"
 #include "GDLCore/logger.h"
 #include "utils/utils.h"
@@ -45,6 +46,7 @@ namespace gd
             FramelessHelper::Core::setApplicationOSThemeAware();
             FramelessHelper::Quick::registerTypes(engine);
             gdl::ui::utils::RegisterTypes(engine);
+            qmlRegisterUncreatableMetaObject(SegoeFluentIcons::staticMetaObject,GEXPORT_MODULE_URL,1,0,"SegoeFluentIcons","SegoeFluentIcons enum");
 
         }
         void MainWindow::InitTranslation(QGuiApplication* app)
@@ -60,7 +62,7 @@ namespace gd
             }
             const auto font_family_name = QFontDatabase::applicationFontFamilies(fluent_icons_font_id_).at(0);
             engine->rootContext()->setContextProperty("FluentIcons",font_family_name);
-            qmlRegisterUncreatableMetaObject(SegoeFluentIcons::staticMetaObject,"fluentIcons",1,0,"SegoeFluentIcons","SegoeFluentIcons enum");
+
         }
         
         void MainWindow::InitIcon(QGuiApplication* app)

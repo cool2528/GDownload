@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import "../CommonComponents"
-import fluentIcons 1.0
+import gdl.sdk 1.0
 import QtQuick.Layouts
 
 Item{

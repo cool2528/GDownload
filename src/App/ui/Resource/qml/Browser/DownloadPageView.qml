@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import "../CommonComponents"
-import fluentIcons 1.0
+import gdl.sdk 1.0
 Item {
     id:control
     RowLayout{
