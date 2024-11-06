@@ -1,0 +1,7 @@
+<svg width="24" height="24" viewBox="0 0 24 24">
+  <circle cx="12" cy="12" r="12" fill="#585858"/>
+  <g stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <line fill="none" stroke-miterlimit="10" x1="12" y1="2" x2="12" y2="22" />
+    <line fill="none" stroke-miterlimit="10" x1="22" y1="12" x2="2" y2="12" />
+  </g>
+</svg>

@@ -8,5 +8,7 @@
         <file>images/titlebar/macos-maximize.svg</file>
         <file>images/titlebar/macos-minimize-hover.svg</file>
         <file>images/titlebar/macos-minimize.svg</file>
+        <file>images/navigator/menu-add.svg</file>
+        <file>images/navigator/menu-add_hover.svg</file>
     </qresource>
 </RCC>

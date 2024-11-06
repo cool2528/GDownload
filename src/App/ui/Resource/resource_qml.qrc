@@ -11,5 +11,6 @@
         <file>qml/Browser/SettingsPageView.qml</file>
         <file>qml/CommonComponents/TttleButton.qml</file>
         <file>qml/Browser/DownloadPageTitle.qml</file>
+        <file>qml/CommonComponents/TaskDialogPage.qml</file>
     </qresource>
 </RCC>

@@ -33,9 +33,12 @@ Item{
             anchors.topMargin: 20
             anchors.left: parent.left
             anchors.leftMargin: 20
-            spacing: 10
+            spacing: 30
             IconButton{
                 id:home
+                Layout.minimumHeight: 30
+                Layout.maximumHeight: 30
+                Layout.fillWidth: true
                 iconSource: SegoeFluentIcons.HomeSolid
                 iconSize: 30
                 iconColor: "#ffffff"
@@ -44,14 +47,34 @@ Item{
                 }
             }
             IconButton{
-                id:addTask
-                Layout.topMargin: 40
+                id:download
+                Layout.minimumHeight: 30
+                Layout.maximumHeight: 30
+                Layout.fillWidth: true
                 iconSource: SegoeFluentIcons.SubscriptionAdd
                 iconSize: 30
                 iconColor: "#ffffff"
                 onClicked: {
-                    console.debug("open add task dialog")
+                    console.debug("select download page")
                     brower_view.index = 0
+                }
+            }
+
+            ImageButton{
+                id:addTask
+                Layout.minimumHeight: 30
+                Layout.maximumHeight: 30
+                Layout.fillWidth: true
+                //backgroundColor:"red"
+                hoverImage: "/images/navigator/menu-add_hover.svg"
+                normalImage: "/images/navigator/menu-add.svg"
+                imageSize: Qt.size(30,30)
+                onClicked: {
+                    console.debug("open add task dialog")
+                    let task = addDownloadTask()
+                    if(task){
+                        task.open()
+                    }
                 }
             }
         }
@@ -85,6 +108,21 @@ Item{
                 }
             }
         }
+
+    }
+
+    function addDownloadTask(){
+        let component = Qt.createComponent("qrc:/qml/CommonComponents/TaskDialogPage.qml")
+        if(component.status == Component.Error){
+            console.error("Error loading component:", component.errorString());
+            return null;
+        }
+        let task = component.createObject(mainWindow)
+        if(task === null){
+            console.error("Error creating object")
+            return null
+        }
+        return task
 
     }
 
