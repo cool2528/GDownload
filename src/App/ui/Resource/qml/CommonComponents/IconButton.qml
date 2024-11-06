@@ -6,7 +6,6 @@ Button{
     property int iconSize
     property color backgroundColor:"transparent"
     property alias iconColor: icon.color
-    property color selectColor: iconColor
     implicitHeight: {
         return textMetrics.height
     }
@@ -22,7 +21,7 @@ Button{
         anchors.fill: parent
         iconSize: control.iconSize
         iconSource: control.iconSource
-        color: control.hovered ? selectColor :icon.color
+        color:icon.color
         HoverHandler{
             id:mouse
             acceptedDevices: PointerDevice.Mouse
