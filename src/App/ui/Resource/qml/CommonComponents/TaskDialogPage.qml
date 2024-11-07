@@ -3,6 +3,7 @@ import QtQuick.Controls.Basic
 import gdl.sdk
 import QtQuick.Layouts
 import QtQuick.Controls
+
 Popup {
     id:taskPage
     width: 640
@@ -171,79 +172,19 @@ Popup {
                 font.pixelSize: 14
                 color:GTheme.dark ? "#d9d9d9" : "#68696d"
             }
-            SpinBox{
-                id:slicesNum
-                height: 30
+            GSpinBox{
+                id:spinbox
+                from: 1
+                to:64
+                value: 64
                 anchors{
                     left: splits.right
                     leftMargin: 20
                     top: renameEdit.top
                 }
-
-                value: 64
-                from: 1
-                to:64
-                editable: true
-
-                contentItem: TextInput {
-                    z: 2
-                    text: slicesNum.textFromValue(slicesNum.value, slicesNum.locale)
-
-                    font: slicesNum.font
-                    color: GTheme.dark ? "#d9d9d9" : "#68696d"
-                    selectionColor: GTheme.dark ? "#d9d9d9" : "#68696d"
-                    selectedTextColor: "#ffffff"
-                    horizontalAlignment: Qt.AlignHCenter
-                    verticalAlignment: Qt.AlignVCenter
-
-                    readOnly: !slicesNum.editable
-                    validator: slicesNum.validator
-                    inputMethodHints: Qt.ImhFormattedNumbersOnly
-                }
-
-                up.indicator: Rectangle {
-                    x: slicesNum.mirrored ? 0 : parent.width - width
-                    height: parent.height
-                    implicitWidth: 40
-                    implicitHeight: 40
-                    color: slicesNum.up.pressed ? "#e4e4e4" : "#f6f6f6"
-                    border.color: GTheme.dark ? enabled ? "#5151f9" : "#545454" : enabled ? "#5151f9" : "#b8bcc5"
-
-                    Text {
-                        text: "+"
-                        font.pixelSize: slicesNum.font.pixelSize * 2
-                        color:  GTheme.dark ? "#d9d9d9" : "#68696d"
-                        anchors.fill: parent
-                        fontSizeMode: Text.Fit
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-                }
-
-                down.indicator: Rectangle {
-                    x: slicesNum.mirrored ? parent.width - width : 0
-                    height: parent.height
-                    implicitWidth: 40
-                    implicitHeight: 40
-                    color: slicesNum.down.pressed ? "#e4e4e4" : "#f6f6f6"
-                    border.color: GTheme.dark ? enabled ? "#5151f9" : "#545454" : enabled ? "#5151f9" : "#b8bcc5"
-
-                    Text {
-                        text: "-"
-                        font.pixelSize: slicesNum.font.pixelSize * 2
-                        color: GTheme.dark ? "#d9d9d9" : "#68696d"
-                        anchors.fill: parent
-                        fontSizeMode: Text.Fit
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-                }
-
-                background: Rectangle {
-                    implicitWidth: 140
-                    border.color: GTheme.dark ? enabled ? "#5151f9" : "#545454" : enabled ? "#5151f9" : "#b8bcc5"
-                }
+                focus: true
             }
+
             // save to
 
             Label{
@@ -263,7 +204,7 @@ Popup {
                     top: save.top
                     left: renameEdit.left
                 }
-                width: 440
+                width: 480
                 height: 30
             }
             IconButton{
@@ -283,7 +224,6 @@ Popup {
                     }
                 }
             }
-
         }
     }
 }

@@ -12,5 +12,6 @@
         <file>qml/CommonComponents/TttleButton.qml</file>
         <file>qml/Browser/DownloadPageTitle.qml</file>
         <file>qml/CommonComponents/TaskDialogPage.qml</file>
+        <file>qml/CommonComponents/GSpinBox.qml</file>
     </qresource>
 </RCC>
