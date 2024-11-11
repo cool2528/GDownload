@@ -13,5 +13,6 @@
         <file>qml/Browser/DownloadPageTitle.qml</file>
         <file>qml/CommonComponents/TaskDialogPage.qml</file>
         <file>qml/CommonComponents/GSpinBox.qml</file>
+        <file>qml/CommonComponents/FolderSelector.qml</file>
     </qresource>
 </RCC>

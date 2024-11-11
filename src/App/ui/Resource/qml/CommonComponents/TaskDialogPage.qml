@@ -138,146 +138,122 @@ Popup {
                 }
 
                 //General Configuration
-                RowLayout{
+                ColumnLayout{
                     id:generalConfig
+                    Layout.fillWidth: true
                     Layout.margins: 10
-                    spacing: 20
-                    // rename
-                    RowLayout{
-                        id:renameLayout
+                    GridLayout{
+                        Layout.fillWidth: true
+                        columns: 2
+                        columnSpacing: 30
+                        rowSpacing: 10
+                        // rename
                         Label{
                             id:rename
+                            Layout.leftMargin: 10
                             text: qsTr("Rename:")
                             font.pixelSize: 14
                             color:GTheme.dark ? "#d9d9d9" : "#68696d"
                         }
-                        TextField{
-                            id:renameEdit
-                            placeholderText: qsTr("Optional")
-                            Layout.fillWidth: true
-                            Layout.maximumHeight: 30
-                            Layout.preferredHeight: 30
+                        RowLayout{
+                            id:renameLayout
+                            TextField{
+                                id:renameEdit
+                                placeholderText: qsTr("Optional")
+                                Layout.fillWidth: true
+                                Layout.maximumHeight: 30
+                                Layout.preferredHeight: 30
+                            }
+                            Label{
+                                id:splits
+                                text: qsTr("Splits:")
+                                font.pixelSize: 14
+                                color:GTheme.dark ? "#d9d9d9" : "#68696d"
+                            }
+                            GSpinBox{
+                                id:spinbox
+                                from: 1
+                                to:64
+                                value: 64
+                                focus: true
+                            }
                         }
-                    }
-                    // Splits section
-                    RowLayout{
-                        id:splitsLayout
                         Label{
-                            id:splits
-                            text: qsTr("Splits:")
+                            id:save
+                            Layout.leftMargin: 10
+                            text: qsTr("Save to:")
                             font.pixelSize: 14
                             color:GTheme.dark ? "#d9d9d9" : "#68696d"
                         }
-                        GSpinBox{
-                            id:spinbox
-                            from: 1
-                            to:64
-                            value: 64
-                            focus: true
-                        }
-                    }
-
-                }
-
-                // save to
-                RowLayout{
-                    id:saveTo
-                    Layout.margins: 10
-                    Label{
-                        id:save
-                        text: qsTr("Save to:")
-                        font.pixelSize: 14
-                        color:GTheme.dark ? "#d9d9d9" : "#68696d"
-                    }
-                    TextField{
-                        id:savePath
-                        Layout.fillWidth: true
-                        Layout.maximumHeight: 30
-                        Layout.preferredHeight: 30
-                    }
-                    IconButton{
-                        id:selectFolder
-                        iconSource: SegoeFluentIcons.FolderOpen
-                        iconSize: 20
-                        iconColor: GTheme.dark ? "#c4c4c4" : "#8d9096"
-                        onHoveredChanged: {
-                            if(hovered){
-                                selectFolder.iconColor =  "#5151f9"
-                            }else{
-                                selectFolder.iconColor = GTheme.dark ? "#c4c4c4" : "#8d9096"
-                            }
+                        FolderSelector{
+                            id:savePath
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 30
                         }
                     }
                 }
 
 
                 //Additional Configuration
-                ColumnLayout{
-                    id:additionalConfig
-                    visible: false
-                    RowLayout{
-                        // User-Agent
-                        Layout.margins: 10
+                ColumnLayout {
+                    id: additionalConfig
+                    visible: true
+                    Layout.fillWidth: true
+                    Layout.margins: 10
+
+                    GridLayout {
+                        Layout.fillWidth: true
+                        columns: 2
+                        columnSpacing: 10
+                        rowSpacing: 10
+
                         Label {
                             text: qsTr("User-Agent:")
                             font.pixelSize: 14
-                            color:GTheme.dark ? "#d9d9d9" : "#68696d"
+                            color: GTheme.dark ? "#d9d9d9" : "#68696d"
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                         }
                         TextField {
                             Layout.fillWidth: true
-                            Layout.maximumHeight: 50
-                            Layout.preferredHeight: 50
+                            Layout.preferredHeight: 30
                             placeholderText: qsTr("User-Agent")
                         }
 
-                    }
-                    RowLayout{
-                        // Authorization
-                        Layout.margins: 10
                         Label {
                             text: qsTr("Authorization:")
                             font.pixelSize: 14
-                            color:GTheme.dark ? "#d9d9d9" : "#68696d"
+                            color: GTheme.dark ? "#d9d9d9" : "#68696d"
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                         }
                         TextField {
                             Layout.fillWidth: true
-                            Layout.maximumHeight: 50
-                            Layout.preferredHeight: 50
+                            Layout.preferredHeight: 30
                             placeholderText: qsTr("Authorization")
                         }
 
-                    }
-                    RowLayout{
-                        // Referer
-                        Layout.margins: 10
                         Label {
                             text: qsTr("Referer:")
                             font.pixelSize: 14
-                            color:GTheme.dark ? "#d9d9d9" : "#68696d"
+                            color: GTheme.dark ? "#d9d9d9" : "#68696d"
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                         }
                         TextField {
                             Layout.fillWidth: true
-                            Layout.maximumHeight: 50
-                            Layout.preferredHeight: 50
+                            Layout.preferredHeight: 30
                             placeholderText: qsTr("Referer")
                         }
 
-                    }
-                    RowLayout{
-                        // Cookie
-                        Layout.margins: 10
                         Label {
                             text: qsTr("Cookie:")
                             font.pixelSize: 14
-                            color:GTheme.dark ? "#d9d9d9" : "#68696d"
+                            color: GTheme.dark ? "#d9d9d9" : "#68696d"
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                         }
                         TextField {
                             Layout.fillWidth: true
-                            Layout.maximumHeight: 50
-                            Layout.preferredHeight: 50
+                            Layout.preferredHeight: 30
                             placeholderText: qsTr("Cookie")
                         }
-
                     }
                 }
 
