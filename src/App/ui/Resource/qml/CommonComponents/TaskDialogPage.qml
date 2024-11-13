@@ -57,7 +57,7 @@ Popup {
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: modelData
-                                color: index === tabTitle.currentIndex || parent.hovered ? "#5151f9" : "#2a2b2d"
+                                color: index === tabTitle.currentIndex || parent.hovered ? "#5151f9" : GTheme.dark ? "#ffffff" :"#2a2b2d"
                                 verticalAlignment: Text.AlignVCenter
                                 horizontalAlignment: Text.AlignHCenter
                             }
@@ -105,7 +105,7 @@ Popup {
                     Layout.rightMargin: 10
                     height: 2
                     z:tabTitle.z - 1
-                    color: "#e0e3ea"
+                    color:  GTheme.dark ? "#555555" : "#e0e3ea"
                 }
                 // tab Page
                 StackLayout{
@@ -128,6 +128,7 @@ Popup {
                             background: Rectangle{
                                 implicitHeight: taskPageLayout.height
                                 implicitWidth: taskPageLayout.width
+                                color: GTheme.dark  ? "#303030" : "#ffffff"
                                 border.color: GTheme.dark ? input.enabled ? "#5151f9" : "#545454" : input.enabled ? "#5151f9" : "#b8bcc5"
                             }
                         }

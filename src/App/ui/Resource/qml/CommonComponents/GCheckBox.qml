@@ -12,6 +12,7 @@ CheckBox {
         x: control.leftPadding
         y: parent.height / 2 - height / 2
         radius: 3
+        color:GTheme.dark ? "#525354" : "#ffffff"
         border.color: control.hovered || control.down ? "#5f5ff9" : GTheme.dark ? "transparent" : "#dadde4"
 
         Rectangle {

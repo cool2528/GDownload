@@ -16,7 +16,7 @@ Item {
         readOnly: true
         padding: 0
         leftPadding: 10
-        color: GTheme.dark ? "#ffffff" : "#6b6d70"
+        color: GTheme.dark ? "#ffffff" : "#303030"
         text: path
         selectByMouse: true
         selectionColor: "#3078BB"
