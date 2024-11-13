@@ -7,7 +7,7 @@ import QtQuick.Controls
 Popup {
     id:taskPage
     width: 640
-    height: 385
+    height: flick.contentHeight
     x: (parent.width - width) / 2
     y: (parent.height - height) / 2
     modal: true
@@ -36,7 +36,7 @@ Popup {
                     orientation: ListView.Horizontal
                     Layout.fillWidth: true
                     Layout.leftMargin: 10
-                    Layout.rightMargin: 10
+                    Layout.rightMargin: 20
                     Layout.topMargin: 10
                     spacing: 20
                     Layout.maximumHeight: 40
@@ -112,6 +112,7 @@ Popup {
                     id:taskPageLayout
                     currentIndex: tabTitle.currentIndex
                     Layout.margins: 10
+                    Layout.rightMargin: 20
                     height: 120
                     Rectangle{
                         id:linkingPage
@@ -133,6 +134,11 @@ Popup {
                     }
                     Rectangle{
                         id:seedPage
+                        GDropArea{
+                            anchors.fill: parent
+                            id:dropTorent
+                        }
+
                         color: GTheme.dark ? "#2e2e2e" : "#ffffff"
                     }
                 }
@@ -142,6 +148,7 @@ Popup {
                     id:generalConfig
                     Layout.fillWidth: true
                     Layout.margins: 10
+                    Layout.rightMargin: 20
                     GridLayout{
                         Layout.fillWidth: true
                         columns: 2
@@ -157,7 +164,7 @@ Popup {
                         }
                         RowLayout{
                             id:renameLayout
-                            TextField{
+                            GTextField{
                                 id:renameEdit
                                 placeholderText: qsTr("Optional")
                                 Layout.fillWidth: true
@@ -197,10 +204,10 @@ Popup {
                 //Additional Configuration
                 ColumnLayout {
                     id: additionalConfig
-                    visible: true
+                    visible: advanced.checked
                     Layout.fillWidth: true
                     Layout.margins: 10
-
+                    Layout.rightMargin: 20
                     GridLayout {
                         Layout.fillWidth: true
                         columns: 2
@@ -213,7 +220,7 @@ Popup {
                             color: GTheme.dark ? "#d9d9d9" : "#68696d"
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                         }
-                        TextField {
+                        GTextField {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 30
                             placeholderText: qsTr("User-Agent")
@@ -225,7 +232,7 @@ Popup {
                             color: GTheme.dark ? "#d9d9d9" : "#68696d"
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                         }
-                        TextField {
+                        GTextField {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 30
                             placeholderText: qsTr("Authorization")
@@ -237,7 +244,7 @@ Popup {
                             color: GTheme.dark ? "#d9d9d9" : "#68696d"
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                         }
-                        TextField {
+                        GTextField {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 30
                             placeholderText: qsTr("Referer")
@@ -249,7 +256,7 @@ Popup {
                             color: GTheme.dark ? "#d9d9d9" : "#68696d"
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                         }
-                        TextField {
+                        GTextField {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 30
                             placeholderText: qsTr("Cookie")
@@ -257,7 +264,44 @@ Popup {
                     }
                 }
 
-                //
+                // submit layout
+                RowLayout{
+                    id:submitLayout
+                    spacing: 10
+                    Layout.bottomMargin: 20
+                    GCheckBox{
+                        id:advanced
+                        Layout.maximumWidth: 150
+                        Layout.alignment: Qt.AlignLeft
+                        Layout.leftMargin: 10
+                        Layout.preferredHeight: 15
+                        text: qsTr("Advanced Options")
+                    }
+                    Item {
+                        id: placeholder
+                        Layout.fillWidth: true
+                    }
+                    GButton{
+                        id:cancel
+                        type: 0
+                        Layout.alignment: Qt.AlignRight
+                        Layout.preferredHeight: 26
+                        Layout.preferredWidth: 70
+                        text: qsTr("Cancel")
+                        onClicked:taskPage.close()
+                    }
+
+                    GButton{
+                        id:submit
+                        type: 1
+                        Layout.alignment: Qt.AlignRight
+                        Layout.rightMargin: 10
+                        Layout.preferredHeight: 26
+                        Layout.preferredWidth: 70
+                        text: qsTr("Submit")
+                    }
+
+                }
             }
         }
     }

@@ -1,27 +1,29 @@
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Controls.Basic
 import QtQuick.Layouts
 import Qt.labs.platform
 import gdl.sdk
+import "../Utils/utils.js" as Utils
 Item {
     id:folderSelector
+    property string path:""
     TextField {
         id: textField
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         width: parent.width - 30
-        readOnly: !editable
+        readOnly: true
         padding: 0
         leftPadding: 10
-        color: "#DBDBDB"
+        color: GTheme.dark ? "#ffffff" : "#6b6d70"
         text: path
         selectByMouse: true
         selectionColor: "#3078BB"
         font.pixelSize: 14
         background: Rectangle {
-            color: GTheme.dark ? parent.hovered ? Qt.lighter("#2E2E2E") : "#2E2E2E" : parent.hovered ? Qt.lighter("#ffffff") : "#ffffff"
-            border.color: GTheme.dark ? parent.hovered ? "#5151f9" :"#545454" : parent.hovered ? "#5151f9" :"#a9a9a9"
+            color: GTheme.dark ? parent.activeFocus ? Qt.lighter("#2E2E2E") : "#2E2E2E" : parent.activeFocus ? Qt.lighter("#ffffff") : "#ffffff"
+            border.color: GTheme.dark ? parent.activeFocus ? "#5151f9" :"#545454" : parent.activeFocus ? "#5151f9" :"#a9a9a9"
             radius: 2
         }
         onEditingFinished: {
@@ -73,5 +75,16 @@ Item {
                 icon.color = GTheme.dark ? "#c4c4c4" : "#8d9096"
             }
         }
+        onClicked: {
+            folderDialog.open()
+        }
     }
+
+   FolderDialog{
+       id:folderDialog
+       folder: Qt.resolvedUrl(path)
+       onAccepted: {
+           path = Utils.urlToLocalPath(folder)
+       }
+   }
 }

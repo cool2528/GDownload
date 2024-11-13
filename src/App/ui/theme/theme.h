@@ -18,7 +18,6 @@ class GTheme :public QObject,public Singleton<GTheme>{
     Q_PROPERTY(bool dark READ dark  NOTIFY darkChanged)
     QML_AUTO_PROPERTY(GThemeType::ThemeMode,theme)
     QML_AUTO_PROPERTY(QColor,backgroundColor)
-
     QML_NAMED_ELEMENT(GTheme)
     QML_SINGLETON
     SINGLETON_DECLARE(GTheme)

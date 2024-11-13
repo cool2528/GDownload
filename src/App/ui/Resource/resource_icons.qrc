@@ -10,5 +10,6 @@
         <file>images/titlebar/macos-minimize.svg</file>
         <file>images/navigator/menu-add.svg</file>
         <file>images/navigator/menu-add_hover.svg</file>
+        <file>images/taskdialog/drop-image-icon.svg</file>
     </qresource>
 </RCC>

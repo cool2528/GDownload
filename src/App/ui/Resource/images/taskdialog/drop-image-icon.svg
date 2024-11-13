@@ -1,0 +1,11 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#666666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Draw the dashed border box -->
+  <rect x="4" y="4" width="24" height="24" stroke-dasharray="4" />
+  
+  <!-- Draw the down arrow -->
+  <line x1="16" y1="8" x2="16" y2="20" />
+  <polyline points="10,14 16,20 22,14" />
+  
+  <!-- Draw the file icon -->
+  <path d="M12,24 L12,22 L20,22 L20,24" fill="none" />
+</svg>

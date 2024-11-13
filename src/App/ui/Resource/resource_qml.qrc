@@ -14,5 +14,10 @@
         <file>qml/CommonComponents/TaskDialogPage.qml</file>
         <file>qml/CommonComponents/GSpinBox.qml</file>
         <file>qml/CommonComponents/FolderSelector.qml</file>
+        <file>qml/Utils/utils.js</file>
+        <file>qml/CommonComponents/GCheckBox.qml</file>
+        <file>qml/CommonComponents/GButton.qml</file>
+        <file>qml/CommonComponents/GTextField.qml</file>
+        <file>qml/CommonComponents/GDropArea.qml</file>
     </qresource>
 </RCC>
