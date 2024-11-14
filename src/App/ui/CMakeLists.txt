@@ -75,6 +75,7 @@ if(APPLE)
 elseif(WIN32)
     add_executable(${PROJECT_NAME} ${SOURCES_FILES} ${HEADERS_FILES} ${QT_RESOURCE_FILES} ${QT_QML_FILES})
 endif()
+register_target(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PRIVATE ${MODULE_INCLUDE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${DEPENDENCIES_LIBRARIES})
 target_compile_definitions(${PROJECT_NAME} PRIVATE

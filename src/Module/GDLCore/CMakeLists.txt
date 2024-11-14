@@ -16,4 +16,5 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "source" FILES ${SOURCES_FI
 
 find_package(spdlog CONFIG REQUIRED)
 add_library(${PROJECT_NAME} SHARED ${SOURCES_FILES} ${HEADERS_FILES})
+register_target(${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
