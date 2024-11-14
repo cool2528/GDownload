@@ -95,7 +95,8 @@ proguard/
 .settings/
 *.sublime-workspace
 .vscode/*
-
+build_osx/*
+build/*
 # System Files
 .DS_Store
 Thumbs.db
@@ -129,3 +130,5 @@ Thumbs.db
 *.exe
 *.out
 *.app
+# cmake 
+CMakeUserPresets.json

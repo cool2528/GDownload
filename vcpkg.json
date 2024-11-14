@@ -1,0 +1,11 @@
+{
+  "dependencies": [
+    "spdlog",
+    "boost-property-tree",
+    {
+      "name":"boost-asio",
+      "features":["ssl"]
+    },
+    "boost-system"
+  ]
+}

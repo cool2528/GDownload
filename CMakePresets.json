@@ -3,13 +3,9 @@
   "configurePresets": [
     {
       "name": "vcpkg-macOS-arm64-osx",
-      "generator": "Unix Makefiles",
       "description": "Build using vcpkg for macOS arm64",
       "binaryDir": "${sourceDir}/build_osx",
       "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-      "architecture": {
-        "value": "arm64"
-      },
       "cacheVariables": {
         "CMAKE_PREFIX_PATH": "$env{QT_ROOT}",
         "CMAKE_C_COMPILER": "/usr/bin/clang",
