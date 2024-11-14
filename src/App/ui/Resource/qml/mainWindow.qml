@@ -32,7 +32,7 @@ FramelessWindow{
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 10
+        anchors.bottomMargin: 0
 
         handle: Rectangle{
             id:handleDelegate

@@ -19,5 +19,7 @@
         <file>qml/CommonComponents/GButton.qml</file>
         <file>qml/CommonComponents/GTextField.qml</file>
         <file>qml/CommonComponents/GDropArea.qml</file>
+        <file>qml/CommonComponents/GDownloadViewPage.qml</file>
+        <file>qml/CommonComponents/GProgressBar.qml</file>
     </qresource>
 </RCC>

@@ -1,9 +1,11 @@
 import QtQuick
 import QtQuick.Layouts
 import "../CommonComponents"
-Item {
+import gdl.sdk
+Rectangle {
     id: titleBar
     width: parent.width
+    color: GTheme.dark ? "#242424" : "#ffffff"
     height: 32
     visible: Qt.platform.os === "osx" ? (mainWindow.fullScreen ? false : true) : true
     RowLayout{

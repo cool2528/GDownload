@@ -37,7 +37,9 @@ Item {
                 ButtonGroup{
                     id:titleGroup
                     onCheckedButtonChanged: {
-                        bar.currentIndex = bar.buttonsArr.indexOf(titleGroup.checkedButton)
+                        let index  = bar.buttonsArr.indexOf(titleGroup.checkedButton)
+                        bar.currentIndex = index
+                        console.debug("index ",index)
                     }
                 }
                 TttleButton{
@@ -112,17 +114,26 @@ Item {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 currentIndex: bar.currentIndex
-                Rectangle{
-                    id:downloadPage
-                    color: "red"
+
+                GDownloadViewPage {
+                    id: downloadPage
+                    objectName: "downloadPage"
+                    property var pageModel: ["1","2","3"]
+                    model: pageModel
                 }
-                Rectangle{
-                    id:waitingPage
-                    color: "green"
+                
+                GDownloadViewPage {
+                    id: waitingPage
+                    objectName: "waitingPage"
+                    property var pageModel: ["4","5","6"]
+                    model: pageModel
                 }
-                Rectangle{
-                    id:completedPage
-                    color: "blue"
+                
+                GDownloadViewPage {
+                    id: completedPage
+                    objectName: "completedPage"
+                    property var pageModel: ["7","8","9"]
+                    model: pageModel
                 }
             }
         }
