@@ -18,7 +18,7 @@ Item {
             Layout.maximumWidth: 200
             Text {
                 id: title
-                text: qsTr("Task List")
+                text: qsTr("Task")
                 anchors.left: parent.left
                 anchors.leftMargin: 15
                 anchors.top: parent.top
