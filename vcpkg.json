@@ -6,6 +6,13 @@
       "name":"boost-asio",
       "features":["ssl"]
     },
-    "boost-system"
+    "boost-system",
+    "boost-locale",
+    "boost-url",
+    {
+      "name":"cpp-httplib",
+      "features":["zlib","openssl"]
+    },
+    "nlohmann-json"
   ]
 }

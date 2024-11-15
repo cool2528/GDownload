@@ -5,37 +5,29 @@
 #include "GDLCore/logger.h"
 namespace gdl {
 
-namespace ui {
-namespace utils {
+	namespace ui {
+		namespace utils {
 #ifdef __APPLE__
-UtilsToolsManager::~UtilsToolsManager()
-{
+			UtilsToolsManager::~UtilsToolsManager() {}
 
-}
-
-void UtilsToolsManager::HideMacOsxWindowStandardButtons(QQuickWindow* window)
-{
-    if(window){
-        hideWindowStandardButtons(window->winId());
-    }
-}
+			void UtilsToolsManager::HideMacOsxWindowStandardButtons(QQuickWindow* window) {
+				if (window) {
+					hideWindowStandardButtons(window->winId());
+				}
+			}
 #endif
 
-UtilsToolsManager::UtilsToolsManager(QObject *parent)
-{
+			UtilsToolsManager::UtilsToolsManager(QObject* parent) {}
 
-}
+			void RegisterTypes(QQmlEngine* engine) {
+				if (!engine) {
+					LOG_ERR("invalid QQmlEngine");
+					return;
+				}
+				engine->rootContext()->setContextProperty("UtilsToolsManager", &UtilsToolsManager::Instance());
+			}
+		}  // namespace utils
 
-void RegisterTypes(QQmlEngine *engine)
-{
-    if(!engine){
-        LOG_ERR("invalid QQmlEngine");
-        return;
-    }
-     engine->rootContext()->setContextProperty("UtilsToolsManager",&UtilsToolsManager::Instance());
-}
-} // utils
+	}  // namespace ui
 
-} // ui
-
-} // gdl
+}  // namespace gdl
