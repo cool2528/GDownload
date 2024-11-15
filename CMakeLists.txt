@@ -20,6 +20,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/debug/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/release/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/debug/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/release/bin)
+# 引入cmake
+include(${CMAKE_SOURCE_DIR}/cmake/shareLibraryDefined.cmake)
+
 if(NOT CMAKE_TOOLCHAIN_FILE)
     set(CMAKE_TOOLCHAIN_FILE "/Users/liuming/Desktop/workspace/tools/vcpkg/scripts/buildsystems/vcpkg.cmake"  CACHE STRING "A cached variable")
 endif()
@@ -38,10 +41,12 @@ elseif(UNIX AND NOT APPLE)
     set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/linux")
 endif()
 project(GDownload LANGUAGES CXX C)
-
 message(STATUS "CMAKE_PREFIX_PATH:${CMAKE_PREFIX_PATH}")
 message(STATUS "CMAKE_TOOLCHAIN_FILE:${CMAKE_TOOLCHAIN_FILE}")
 set(MODULE_INCLUDE_PATH "${CMAKE_SOURCE_DIR}/src/Module")
+include_directories(${CMAKE_SOURCE_DIR}/src
+    ${MODULE_INCLUDE_PATH}
+)
 add_subdirectory(src)
 # 安装规则
 if(WIN32)

@@ -1,0 +1,13 @@
+#ifdef _WIN32
+#ifdef @PROJECT_NAME@_EXPORTS
+#define @PROJECT_NAME@_API __declspec(dllexport)
+#else
+#define @PROJECT_NAME@_API __declspec(dllimport)
+#endif
+#else
+#ifdef @PROJECT_NAME@_EXPORTS
+#define @PROJECT_NAME@_API __attribute__((visibility("default")))
+#else
+#define @PROJECT_NAME@_API __attribute__((visibility("hidden")))
+#endif
+#endif
