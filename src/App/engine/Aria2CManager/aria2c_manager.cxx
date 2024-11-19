@@ -1,9 +1,4 @@
 #include "aria2c_manager.h"
-#define CPPHTTPLIB_OPENSSL_SUPPORT
-#ifdef __APPLE__
-#define CPPHTTPLIB_USE_CERTS_FROM_MACOSX_KEYCHAIN
-#endif
-#include <httplib.h>
 namespace gdl {
 	namespace engine {
 
