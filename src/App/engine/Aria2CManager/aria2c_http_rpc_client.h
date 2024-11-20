@@ -16,10 +16,10 @@ namespace gdl {
 			std::variant<SucceedResult, ErrorResult> result;
 		};
 		using Aria2Options = std::unordered_multimap<std::string, std::string>;
-		class Aria2cClient {
+		class Aria2cHttpClient {
 		   public:
-			explicit Aria2cClient(std::string_view host);
-			~Aria2cClient() = default;
+			explicit Aria2cHttpClient(std::string_view host);
+			~Aria2cHttpClient() = default;
 			Result<Response> AddUri(const std::vector<std::string>& uris, const Aria2Options& options);
 			Result<Response> AddTorrent(const std::string& torrent, const Aria2Options& options);
 			Result<Response> AddMetalink(const std::string& metalink, const Aria2Options& options);

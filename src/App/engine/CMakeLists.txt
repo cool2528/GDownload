@@ -30,5 +30,6 @@ if(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE
         ${COREFOUNDATION_FRAMEWORK}
         ${SECURITY_FRAMEWORK}
+        Qt6::WebSockets
     )
 endif()

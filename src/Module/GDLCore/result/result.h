@@ -4,6 +4,7 @@
  */
 
 #include <string>
+#include <type_traits>
 namespace gdl {
 
 	enum class ErrorType : int {
@@ -38,11 +39,18 @@ namespace gdl {
 	template <typename T>
 	class Result {
 	   public:
-		Result(const T value) : value_(value) {}
+		Result(const T& value) : value_(value) {}
 		Result(T&& value) : value_(std::move(value)) {}
 		Result(Error&& err) : err_(std::move(err)) {}
 		Result(const Error& err) : err_(err) {}
-		explicit operator bool() const { return err_.Code() == 0; }
+		explicit operator bool() const {
+			if constexpr (std::is_same_v<T, bool>) {
+				return err_.Code() == 0 && value_ == true;
+			}
+			else {
+				return err_.Code() == 0;
+			}
+		}
 		Result(const Result& other) { *this = other; }
 		Result& operator=(const Result& other) {
 			this->err_	 = other.err_;
@@ -66,7 +74,7 @@ namespace gdl {
 
 	   private:
 		T value_;
-		Error err_;
+		Error err_{0, ""};
 	};
 
 	template <>
