@@ -2,7 +2,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <Foundation/Foundation.h>
 namespace gdl {
-namespace osx {
+namespace os {
 namespace mac {
 static String GetDirectory(NSSearchPathDirectory directoryType) {
     @autoreleasepool {

@@ -1,7 +1,7 @@
 #pragma once
 #include "globalTypes.h"
 namespace gdl {
-	namespace osx {
+	namespace os {
 		namespace mac {
 			String GetUserHomeDir();
 			String GetUserDocumentsDir();
@@ -16,5 +16,5 @@ namespace gdl {
 			String GetExecutableDir();
 			String GetCurrentWorkingDir();
 		}  // namespace mac
-	}  // namespace osx
+	}  // namespace os
 }  // namespace gdl

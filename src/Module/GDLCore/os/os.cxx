@@ -7,7 +7,7 @@
 #include "os_linux.h"
 #endif
 namespace gdl {
-	namespace osx {
+	namespace os {
 		String GetUserHomeDir() {
 #ifdef _WIN32
 			return win::GetUserHomeDir();
@@ -117,6 +117,6 @@ namespace gdl {
 			return linux::GetCurrentWorkingDir();
 #endif
 		}
-	}  // namespace osx
+	}  // namespace os
 
 }  // namespace gdl

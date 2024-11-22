@@ -1,7 +1,7 @@
 #include "os_win.h"
 
 namespace gdl {
-	namespace osx {
+	namespace os {
 		namespace win {
 			String GetUserHomeDir() {
 				return String();
@@ -48,6 +48,6 @@ namespace gdl {
 			}
 
 		}  // namespace win
-	}  // namespace osx
+	}  // namespace os
 
 }  // namespace gdl

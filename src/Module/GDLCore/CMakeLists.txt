@@ -15,6 +15,7 @@ file(GLOB_RECURSE HEADERS_FILES
     *.hxx
 )
 find_package(spdlog CONFIG REQUIRED)
+find_package(boost_property_tree CONFIG REQUIRED)
 if(APPLE)
     file(GLOB_RECURSE SOURCE_OBJ_FILES
         *.mm
@@ -31,7 +32,7 @@ endif()
 
 register_target(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
+target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog Boost::property_tree)
 
 if(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE

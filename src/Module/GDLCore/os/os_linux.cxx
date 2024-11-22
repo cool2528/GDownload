@@ -1,7 +1,7 @@
 #include "os_linux.h"
 
 namespace gdl {
-	namespace osx {
+	namespace os {
 		namespace linux {
 			String GetUserHomeDir() {
 				return String();
@@ -47,6 +47,6 @@ namespace gdl {
 				return String();
 			}
 		}  // namespace linux
-	}  // namespace osx
+	}  // namespace os
 
 }  // namespace gdl
