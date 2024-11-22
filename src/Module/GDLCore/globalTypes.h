@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <string_view>
+#include <vector>
 
 namespace gdl {
 #ifdef _WIN32

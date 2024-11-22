@@ -5,8 +5,8 @@
 #endif
 #include <httplib.h>
 #include <format>
-#include "GDLCore/logger.h"
-const static std::string_view kDefaultRpcSecret = "GDownload_secret";
+#include "engine_def.h"
+#include "logger.h"
 namespace gdl {
 	namespace engine {
 

@@ -1,7 +1,7 @@
 #include "aria2c_websocket_rpc_client.h"
-#include "GDLCore/logger.h"
+#include "engine_def.h"
+#include "logger.h"
 namespace gdl {
-	const static std::string_view kDefaultRpcSecret = "GDownload_secret";
 	namespace engine {
 
 		Aria2cWebSocketClient::Aria2cWebSocketClient(const QString& url, QObject* parent) : url_(url), QObject(parent) {

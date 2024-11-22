@@ -1,0 +1,20 @@
+#pragma once
+#include "globalTypes.h"
+namespace gdl {
+	namespace osx {
+		namespace linux {
+			String GetUserHomeDir();
+			String GetUserDocumentsDir();
+			String GetUserDownloadsDir();
+			String GetUserDesktopDir();
+			String GetUserVideosDir();
+			String GetUserMusicDir();
+			String GetUserPicturesDir();
+
+			String GetAppDataDir();
+			String GetTempDir();
+			String GetExecutableDir();
+			String GetCurrentWorkingDir();
+		}  // namespace linux
+	}  // namespace osx
+}  // namespace gdl

@@ -1,21 +1,41 @@
+if(APPLE)
+    project(GDLCore LANGUAGES CXX C OBJCXX)
+else()
+    project(GDLCore LANGUAGES CXX C)
+endif()
 
-project(GDLCore LANGUAGES CXX C)
-
-file(GLOB_RECURSE SOURCES_FILES 
-*.cpp
-*.cxx
-*.c
+file(GLOB_RECURSE SOURCES_FILES
+    *.cpp
+    *.cxx
+    *.c
 )
-file(GLOB_RECURSE HEADERS_FILES 
-*.h
-*.hpp
-*.hxx
+file(GLOB_RECURSE HEADERS_FILES
+    *.h
+    *.hpp
+    *.hxx
 )
-
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "source" FILES ${SOURCES_FILES} ${HEADERS_FILES})
-
 find_package(spdlog CONFIG REQUIRED)
-add_library(${PROJECT_NAME} SHARED ${SOURCES_FILES} ${HEADERS_FILES})
+if(APPLE)
+    file(GLOB_RECURSE SOURCE_OBJ_FILES
+        *.mm
+    )
+    find_library(COREFOUNDATION_FRAMEWORK CoreFoundation)
+    find_library(FOUNDATION_FRAMEWORK Foundation)
+    source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "source" FILES ${SOURCES_FILES} ${HEADERS_FILES} ${SOURCE_OBJ_FILES})
+    add_library(${PROJECT_NAME} SHARED ${SOURCES_FILES} ${HEADERS_FILES} ${SOURCE_OBJ_FILES})
+else()
+    source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "source" FILES ${SOURCES_FILES} ${HEADERS_FILES})
+    add_library(${PROJECT_NAME} SHARED ${SOURCES_FILES} ${HEADERS_FILES})
+endif()
+
+
 register_target(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
+
+if(APPLE)
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        ${COREFOUNDATION_FRAMEWORK}
+        ${FOUNDATION_FRAMEWORK}
+    )
+endif()

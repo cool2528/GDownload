@@ -1,6 +1,5 @@
 if(APPLE)
     project(gdownload LANGUAGES CXX C OBJCXX)
-    project(gdownload LANGUAGES CXX C)
     file(GLOB_RECURSE SOURCES_FILES
     *.cpp
     *.cxx

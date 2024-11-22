@@ -1,5 +1,4 @@
 #pragma once
-#include <vector>
 #include "export.h"
 #include "globalTypes.h"
 namespace gdl {
