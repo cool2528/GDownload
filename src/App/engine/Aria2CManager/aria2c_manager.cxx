@@ -8,6 +8,8 @@
 #else
 #include <unistd.h>
 #endif
+
+#include "config/config.h"
 namespace gdl {
 	namespace engine {
 
@@ -28,12 +30,12 @@ namespace gdl {
 			aria2c_settings["dht-file-path"]		  = GetDhtPath(IP_VERSION::V4);
 			aria2c_settings["dht-file-path6"]		  = GetDhtPath(IP_VERSION::V6);
 
-			aria2c_settings["dht-listen-port"]			  = "26701";
-			aria2c_settings["dir"]						  = os::GetUserDownloadsDir();
-			aria2c_settings["enable-dht6"]				  = "true";
-			aria2c_settings["follow-metalink"]			  = "true";
-			aria2c_settings["follow-torrent"]			  = "true";
-			aria2c_settings["listen-port"]				  = "21301";
+			aria2c_settings["dht-listen-port"] = config::GetValue(config::Keys::DhtListenPort).AsString();	//"26701";
+			aria2c_settings["dir"]			   = config::GetValue(config::Keys::Dir).AsString();
+			aria2c_settings["enable-dht6"]	   = "true";
+			aria2c_settings["follow-metalink"] = "true";
+			aria2c_settings["follow-torrent"]  = "true";
+			aria2c_settings["listen-port"]	   = config::GetValue(config::Keys::ListenPort).AsString();	 //"21301"
 			aria2c_settings["max-concurrent-downloads"]	  = "5";
 			aria2c_settings["max-connection-per-server"]  = "64";
 			aria2c_settings["max-download-limit"]		  = "0";

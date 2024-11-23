@@ -13,6 +13,7 @@ namespace gdl {
 		bool ApplicationConfig::Load() {
 			try {
 				pt::read_ini(config_file_path_, ptree_root_);
+
 			} catch (...) {
 				return false;
 			}
