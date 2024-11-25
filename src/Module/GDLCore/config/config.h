@@ -38,7 +38,7 @@ namespace gdl {
 			operator bool() const { return AsBool(); }
 			operator std::string() const { return AsString(); }
 			operator double() const { return AsDouble(); }
-
+			operator int() const { return AsInt(); }
 			ConfigValue& operator=(const std::string& v) {
 				value_ = v;
 				return *this;

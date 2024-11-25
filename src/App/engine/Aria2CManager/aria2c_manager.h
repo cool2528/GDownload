@@ -1,5 +1,6 @@
 #pragma once
 #include <atomic>
+#include <boost/asio.hpp>
 #include "Engine_export.h"
 #include "globalTypes.h"
 #include "singleton.hpp"
@@ -22,6 +23,10 @@ namespace gdl {
 		   private:
 			String aria2c_path_;
 			std::atomic_bool engine_is_runing_{false};
+			boost::asio::executor_work_guard<boost::asio::io_context::executor_type> work_;
+			boost::asio::io_context io_context_;
+			std::thread worker_;
+			boost::asio::steady_timer update_aria2c_task_timer_;
 		};
 	}  // namespace engine
 

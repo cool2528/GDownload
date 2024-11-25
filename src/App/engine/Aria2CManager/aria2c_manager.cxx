@@ -14,7 +14,9 @@ namespace gdl {
 	namespace engine {
 
 		namespace detail {}
-		Aria2cDownloadManager::Aria2cDownloadManager() {}
+		Aria2cDownloadManager::Aria2cDownloadManager() : work_(boost::asio::make_work_guard(io_context_)) {
+			worker_ = std::thread([this] { io_context_.run(); });
+		}
 
 		std::vector<String_View> Aria2cDownloadManager::InitAria2cSettingsArgs() {
 			std::vector<String_View> result;
@@ -76,7 +78,12 @@ namespace gdl {
 			return os::GetAppDataDir() + "/" + name;
 		}
 
-		Aria2cDownloadManager::~Aria2cDownloadManager() {}
+		Aria2cDownloadManager::~Aria2cDownloadManager() {
+			work_.reset();
+			io_context_.stop();
+			worker_.join();
+			UninitAria2cEngine();
+		}
 
 		bool Aria2cDownloadManager::InitAria2cEngine(const String_View& aria2c_path) {
 			// todo 初始化aria2c
@@ -87,11 +94,13 @@ namespace gdl {
 				LOG_ERR("Failed to initialise aria2c Failed to start the process");
 				return false;
 			}
+			engine_is_runing_ = true;
 			return true;
 		}
 
 		void Aria2cDownloadManager::UninitAria2cEngine() {
 			// todo 卸载aria2c
+			engine_is_runing_ = false;
 		}
 
 	}  // namespace engine
