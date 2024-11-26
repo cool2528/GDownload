@@ -14,8 +14,14 @@ namespace gdl {
 	namespace engine {
 
 		namespace detail {}
-		Aria2cDownloadManager::Aria2cDownloadManager() : work_(boost::asio::make_work_guard(io_context_)) {
+		Aria2cDownloadManager::Aria2cDownloadManager()
+			: work_(boost::asio::make_work_guard(io_context_)),
+			  daily_task_timer_(io_context_),
+			  update_aria2c_tasks_timer_(io_context_) {
 			worker_ = std::thread([this] { io_context_.run(); });
+			daily_task_timer_.Start([this] {
+				// 更新 磁力链接 每日列表
+			});
 		}
 
 		std::vector<String_View> Aria2cDownloadManager::InitAria2cSettingsArgs() {
@@ -78,11 +84,15 @@ namespace gdl {
 			return os::GetAppDataDir() + "/" + name;
 		}
 
+		void Aria2cDownloadManager::UpdateAria2cTasks() {
+			// 更新当前aria2c 的所有 暂停 正在下载 停止的任务状态列表
+		}
+
 		Aria2cDownloadManager::~Aria2cDownloadManager() {
+			UninitAria2cEngine();
 			work_.reset();
 			io_context_.stop();
 			worker_.join();
-			UninitAria2cEngine();
 		}
 
 		bool Aria2cDownloadManager::InitAria2cEngine(const String_View& aria2c_path) {
@@ -95,12 +105,16 @@ namespace gdl {
 				return false;
 			}
 			engine_is_runing_ = true;
+			// 启动 更新当前aria2c 的所有 暂停 正在下载 停止的任务状态列表 定时器
+			update_aria2c_tasks_timer_.Start(std::bind(&Aria2cDownloadManager::UpdateAria2cTasks, this),
+											 std::chrono::seconds(2), true);
 			return true;
 		}
 
 		void Aria2cDownloadManager::UninitAria2cEngine() {
 			// todo 卸载aria2c
 			engine_is_runing_ = false;
+			daily_task_timer_.Stop();
 		}
 
 	}  // namespace engine
