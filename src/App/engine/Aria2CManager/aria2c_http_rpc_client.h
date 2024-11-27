@@ -1,7 +1,7 @@
 #pragma once
 #include <nlohmann/json.hpp>
 #include <variant>
-#include "GDLCore/result/result.h"
+#include "result/result.h"
 namespace gdl {
 	namespace engine {
 		struct SucceedResult {

@@ -1,7 +1,7 @@
 #pragma once
 #include <QWebSocket>
 #include <nlohmann/json.hpp>
-#include "GDLCore/result/result.h"
+#include "result/result.h"
 namespace gdl {
 	namespace engine {
 		using Options = std::unordered_multimap<std::string, std::string>;
@@ -12,6 +12,7 @@ namespace gdl {
 			~Aria2cWebSocketClient() override;
 
 		   public:
+			void Open();
 			Result<bool> AddUri(const std::vector<std::string>& uris, const Options& options);
 			Result<bool> AddTorrent(const std::string& torrent, const Options& options);
 			Result<bool> AddMetalink(const std::string& metalink, const Options& options);

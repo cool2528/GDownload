@@ -8,8 +8,9 @@
 // Interface for download plugins that handle URL parsing and metadata
 class IDownloadPlugin {
    public:
-	using IDownloadPluginPtr   = std::shared_ptr<IDownloadPlugin>;
-	virtual ~IDownloadPlugin() = default;
+	using IDownloadPluginPtr	 = std::shared_ptr<IDownloadPlugin>;
+	using IDownloadPluginOptions = std::unordered_multimap<std::string, std::string>;
+	virtual ~IDownloadPlugin()	 = default;
 
 	// Metadata structure containing plugin information
 	struct PluginMetadata {
@@ -22,18 +23,18 @@ class IDownloadPlugin {
 
 	// Structure containing parsed URL information and download parameters
 	struct ParseResult {
-		std::string real_url;						 // Actual download URL after parsing/redirects
-		std::string file_name;						 // Suggested filename for the download
-		size_t file_size{0};						 // Expected file size in bytes (0 if unknown)
-		std::map<std::string, std::string> headers;	 // Custom HTTP headers for download
-		std::map<std::string, std::string> options;	 // Additional download options
-		std::vector<std::string> mirrors;			 // Alternative download URLs
+		std::string real_url;										// Actual download URL after parsing/redirects
+		std::string file_name;										// Suggested filename for the download
+		size_t file_size{0};										// Expected file size in bytes (0 if unknown)
+		std::unordered_multimap<std::string, std::string> headers;	// Custom HTTP headers for download
+		std::unordered_multimap<std::string, std::string> options;	// Additional download options
+		std::vector<std::string> mirrors;							// Alternative download URLs
 	};
 
 	// Parse the given URL and return download information
 	// @param url The URL to parse
 	// @return ParseResult if successful, nullopt if parsing fails
-	virtual std::optional<ParseResult> ParseUrl(std::string_view url) = 0;
+	virtual std::optional<ParseResult> ParseUrl(std::string_view url, const IDownloadPluginOptions& options = {}) = 0;
 
 	// Get metadata information about this plugin
 	// @return PluginMetadata structure containing plugin information

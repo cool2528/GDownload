@@ -8,6 +8,7 @@
 namespace gdl {
 	namespace plugin {
 		class PluginManager_API DownloadPluginManager : public Singleton<DownloadPluginManager> {
+			SINGLETON_DECLARE(DownloadPluginManager)
 		   public:
 			~DownloadPluginManager() override;
 			struct LoadPluginOptions {

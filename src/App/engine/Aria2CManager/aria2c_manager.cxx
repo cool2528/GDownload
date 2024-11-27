@@ -8,8 +8,8 @@
 #else
 #include <unistd.h>
 #endif
-
 #include "config/config.h"
+#include "plugin_manager.h"
 namespace gdl {
 	namespace engine {
 
@@ -17,10 +17,16 @@ namespace gdl {
 		Aria2cDownloadManager::Aria2cDownloadManager()
 			: work_(boost::asio::make_work_guard(io_context_)),
 			  daily_task_timer_(io_context_),
-			  update_aria2c_tasks_timer_(io_context_) {
+			  update_aria2c_tasks_timer_(io_context_),
+			  pub_sub_system_(io_context_),
+			  websocket_client_(QString("wss://127.0.0.1/") + kEngineRpcPort + "/jsonrpc") {
 			worker_ = std::thread([this] { io_context_.run(); });
 			daily_task_timer_.Start([this] {
 				// 更新 磁力链接 每日列表
+			});
+			QObject::connect(&websocket_client_, &Aria2cWebSocketClient::MessageReceived, [this](QString msg) {
+				// 直接收到的所有消息 通过发布订阅回客户端
+				pub_sub_system_.Publish(kAria2Responce, msg.toStdString());
 			});
 		}
 
@@ -108,6 +114,8 @@ namespace gdl {
 			// 启动 更新当前aria2c 的所有 暂停 正在下载 停止的任务状态列表 定时器
 			update_aria2c_tasks_timer_.Start(std::bind(&Aria2cDownloadManager::UpdateAria2cTasks, this),
 											 std::chrono::seconds(2), true);
+			// 链接 aria2c websocket
+			websocket_client_.Open();
 			return true;
 		}
 
@@ -115,6 +123,53 @@ namespace gdl {
 			// todo 卸载aria2c
 			engine_is_runing_ = false;
 			daily_task_timer_.Stop();
+		}
+
+		Result<bool> Aria2cDownloadManager::AddHttpTask(
+			const String& url, const std::unordered_multimap<std::string, std::string>& options) {
+			auto plugin_vector = plugin::DownloadPluginManager::Instance().GetPluginsForUrl(url);
+			IDownloadPlugin::IDownloadPluginPtr plugin					   = nullptr;
+			std::string real_url										   = url;
+			std::unordered_multimap<std::string, std::string> real_options = options;
+			if (!plugin_vector.empty()) {
+				plugin = plugin_vector.front();
+			}
+			if (plugin) {
+				// 使用下载插件解析真实下载链接
+				auto result = plugin->ParseUrl(url, options);
+				IDownloadPlugin::ParseResult parse_result;
+				if (result.has_value()) {
+					parse_result = result.value();
+					real_url	 = parse_result.real_url;
+					real_options = parse_result.options;
+					real_options.merge(parse_result.headers);
+				}
+				else {
+					return MakeFail(1, "Failed to parse download link");
+				}
+			}
+
+			// 直接添加到下载引擎任务队列中
+			return websocket_client_.AddUri({real_url}, real_options);
+		}
+
+		Result<bool> Aria2cDownloadManager::AddTorrentTask(
+			const String& tarrent, const std::unordered_multimap<std::string, std::string>& options) {
+			return websocket_client_.AddTorrent(tarrent, options);
+		}
+
+		Result<bool> Aria2cDownloadManager::AddMetalinkTask(
+			const String& metalink, const std::unordered_multimap<std::string, std::string>& options) {
+			return websocket_client_.AddMetalink(metalink, options);
+		}
+
+		Result<Subscription> Aria2cDownloadManager::SubscriptionAria2Message(
+			const std::string& topic, std::function<void(const std::string&)> handler) {
+			return pub_sub_system_.Subscribe(topic, handler);
+		}
+
+		void Aria2cDownloadManager::UnSubscribeAria2Message(Subscription subscription) {
+			return pub_sub_system_.Unsubscribe(subscription);
 		}
 
 	}  // namespace engine

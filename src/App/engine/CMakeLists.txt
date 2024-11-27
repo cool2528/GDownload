@@ -25,7 +25,7 @@ endif()
 add_library(${PROJECT_NAME} SHARED ${SOURCES_FILES} ${HEADERS_FILES})
 register_target(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PRIVATE ${MODULE_INCLUDE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system Boost::property_tree Boost::asio httplib::httplib nlohmann_json::nlohmann_json Boost::url GDLCore)
+target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system Boost::property_tree Boost::asio httplib::httplib nlohmann_json::nlohmann_json Boost::url GDLCore PluginManager)
 if(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE
         ${COREFOUNDATION_FRAMEWORK}

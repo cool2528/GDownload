@@ -7,10 +7,13 @@ namespace gdl {
 		Aria2cWebSocketClient::Aria2cWebSocketClient(const QString& url, QObject* parent) : url_(url), QObject(parent) {
 			connect(&websocket_, &QWebSocket::connected, this, &Aria2cWebSocketClient::onConnected);
 			connect(&websocket_, &QWebSocket::disconnected, this, &Aria2cWebSocketClient::onClosed);
-			websocket_.open(url);
 		}
 
 		Aria2cWebSocketClient::~Aria2cWebSocketClient() {}
+
+		void Aria2cWebSocketClient::Open() {
+			websocket_.open(url_);
+		}
 
 		Result<bool> Aria2cWebSocketClient::AddUri(const std::vector<std::string>& uris, const Options& options) {
 			nlohmann::json params = nlohmann::json::array();
