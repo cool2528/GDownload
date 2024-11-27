@@ -46,7 +46,7 @@ class IDownloadPlugin {
 };
 
 // Function pointer type for creating plugin instances
-typedef IDownloadPlugin* (*CreatePlugin)();
+typedef IDownloadPlugin* (*CreatePluginFunc)();
 
 // Function pointer type for destroying plugin instances
-typedef void (*DestroyPlugin)(IDownloadPlugin*);
+typedef void (*DestroyPluginFunc)(IDownloadPlugin*);
