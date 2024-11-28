@@ -28,7 +28,7 @@ namespace gdl {
 					auto key_path	  = all_paths[i];
 					std::string value = all_values[i].data();
 					if (ptree_root_.find(key_path.data()) == ptree_root_.not_found()) {
-						if (key_path == "aria2c.dir") {
+						if (key_path == "aria2c.dir" && value.empty()) {
 							value = os::GetUserDownloadsDir();
 						}
 						ptree_root_.put(key_path.data(), value.data());

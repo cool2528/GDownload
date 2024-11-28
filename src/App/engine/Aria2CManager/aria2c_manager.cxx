@@ -19,7 +19,7 @@ namespace gdl {
 			  daily_task_timer_(io_context_),
 			  update_aria2c_tasks_timer_(io_context_),
 			  pub_sub_system_(io_context_),
-			  websocket_client_(QString("wss://127.0.0.1/") + kEngineRpcPort + "/jsonrpc") {
+			  websocket_client_(QString("ws://127.0.0.1:") + kEngineRpcPort + "/jsonrpc") {
 			daily_task_timer_.Start([this] {
 				// 更新 磁力链接 每日列表
 			});
@@ -98,6 +98,13 @@ namespace gdl {
 
 		void Aria2cDownloadManager::UpdateAria2cTasks() {
 			// 更新当前aria2c 的所有 暂停 正在下载 停止的任务状态列表
+			static const std::vector<std::string> keys = {
+				"status",	"totalLength", "completedLength", "uploadLength", "downloadSpeed", "uploadSpeed",
+				"infoHash", "numSeeders",  "seeder",		  "connections",  "errorCode",	   "errorMessage",
+				"dir",		"files",	   "bittorrent"};
+			websocket_client_.TellStopped(0, 100, keys);
+			websocket_client_.TellActive(keys);
+			websocket_client_.TellWaiting(0, 100, keys);
 		}
 
 		Aria2cDownloadManager::~Aria2cDownloadManager() {

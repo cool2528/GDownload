@@ -7,6 +7,11 @@ namespace gdl {
 		Aria2cWebSocketClient::Aria2cWebSocketClient(const QString& url, QObject* parent) : url_(url), QObject(parent) {
 			connect(&websocket_, &QWebSocket::connected, this, &Aria2cWebSocketClient::onConnected);
 			connect(&websocket_, &QWebSocket::disconnected, this, &Aria2cWebSocketClient::onClosed);
+			connect(&websocket_, &QWebSocket::errorOccurred, this, [this](QAbstractSocket::SocketError error) {
+				int err_code = static_cast<int>(error);
+				LOG_ERR("connect websocket faild error code  {}", err_code);
+			});
+			connect(&websocket_, &QWebSocket::textMessageReceived, this, &Aria2cWebSocketClient::onTextMessageReceived);
 		}
 
 		Aria2cWebSocketClient::~Aria2cWebSocketClient() {}

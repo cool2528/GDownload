@@ -23,10 +23,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/release/bin)
 # 引入cmake
 include(${CMAKE_SOURCE_DIR}/cmake/shareLibraryDefined.cmake)
 
-#if(NOT CMAKE_TOOLCHAIN_FILE)
-#    set(CMAKE_TOOLCHAIN_FILE "/Users/liuming/Desktop/workspace/tools/vcpkg/scripts/buildsystems/vcpkg.cmake"  CACHE STRING "A cached variable")
-#endif()
-
 # 设置依赖库的根路径
 if(APPLE)
     set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/osx")
