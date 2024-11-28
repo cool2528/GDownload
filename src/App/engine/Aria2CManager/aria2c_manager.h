@@ -36,15 +36,15 @@ namespace gdl {
 
 		   private:
 			explicit Aria2cDownloadManager();
-			std::vector<String_View> InitAria2cSettingsArgs();
+			std::vector<String> InitAria2cSettingsArgs();
 			String GetDhtPath(IP_VERSION protocol);
 			void UpdateAria2cTasks();
 
 		   private:
 			String aria2c_path_;
+			boost::asio::io_context io_context_;
 			std::atomic_bool engine_is_runing_{false};
 			boost::asio::executor_work_guard<boost::asio::io_context::executor_type> work_;
-			boost::asio::io_context io_context_;
 			DailyTaskTimer daily_task_timer_;
 			AsyncTimer update_aria2c_tasks_timer_;
 			std::thread worker_;

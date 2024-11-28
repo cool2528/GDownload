@@ -5,6 +5,8 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <spawn.h>
+extern char **environ;  // Add this declaration
 #endif
 #include <thread>
 #include "logger.h"
@@ -30,51 +32,39 @@ namespace gdl {
 				return pids;
 			}
 		}  // namespace detail
-		std::int64_t Execute(const String_View& command, const std::vector<String_View>& arguments,
+		std::int64_t Execute(const String_View& command, const std::vector<String>& arguments,
 							 const String_View& working_directory) {
 			std::int64_t pid{-1};
 #ifdef _WIN32
 
 #else
-			pid = vfork();
-			if (pid < 0) {
-				LOG_ERR("fork fail {}", command);
-				return pid;
+			pid_t native_pid;
+			std::vector<char*> argv;
+			argv.push_back(const_cast<char*>(command.data()));
+			for (const auto& arg : arguments) {
+				argv.push_back(const_cast<char*>(arg.data()));
 			}
-			else if (pid == 0) {
-				if (!working_directory.empty()) {
-					if (chdir(working_directory.data()) != 0) {
-						_exit(1);
-					}
-				}
-				std::vector<char*> c_args;
-				for (const auto& arg : arguments) {
-					c_args.push_back(const_cast<char*>(arg.data()));
-				}
-				c_args.push_back(nullptr);
-				auto ret = execvp(c_args[0], c_args.data());
-				_exit(1);
+			argv.push_back(nullptr);
+
+			posix_spawn_file_actions_t actions;
+			posix_spawn_file_actions_init(&actions);
+			
+			posix_spawnattr_t attr;
+			posix_spawnattr_init(&attr);
+
+			int ret = posix_spawn(&native_pid, command.data(), &actions, &attr, argv.data(), environ);
+			
+			posix_spawn_file_actions_destroy(&actions);
+			posix_spawnattr_destroy(&attr);
+
+			if (ret != 0) {
+				LOG_ERR("posix_spawn failed: {}", strerror(ret));
+				return -1;
 			}
-			else {
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
-				int status;
-				pid_t result = waitpid(pid, &status, WNOHANG);
-				if (result == 0) {
-					return pid;
-				}
-				else if (result == pid) {
-					if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
-						LOG_ERR("Command {} failed to start properly", command);
-					}
-					return pid;
-				}
-				else {
-					LOG_ERR("Error checking child process status: {}", strerror(errno));
-					return pid;
-				}
-			}
-#endif
+
+			pid = native_pid;
 			return pid;
+#endif
 		}
 
 		void Kill(std::int64_t process_id) {

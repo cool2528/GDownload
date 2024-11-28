@@ -26,6 +26,7 @@ namespace gdl {
 			explicit ApplicationConfig();
 			bool Load();
 			bool Save();
+			bool EnsureConfigFileExists();
 
 		   private:
 			boost::property_tree::ptree ptree_root_;

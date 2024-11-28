@@ -23,9 +23,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/release/bin)
 # 引入cmake
 include(${CMAKE_SOURCE_DIR}/cmake/shareLibraryDefined.cmake)
 
-if(NOT CMAKE_TOOLCHAIN_FILE)
-    set(CMAKE_TOOLCHAIN_FILE "/Users/liuming/Desktop/workspace/tools/vcpkg/scripts/buildsystems/vcpkg.cmake"  CACHE STRING "A cached variable")
-endif()
+#if(NOT CMAKE_TOOLCHAIN_FILE)
+#    set(CMAKE_TOOLCHAIN_FILE "/Users/liuming/Desktop/workspace/tools/vcpkg/scripts/buildsystems/vcpkg.cmake"  CACHE STRING "A cached variable")
+#endif()
 
 # 设置依赖库的根路径
 if(APPLE)
@@ -63,7 +63,8 @@ if(WIN32)
         LIBRARY DESTINATION bin
         ARCHIVE DESTINATION lib
     )
-    install(FILES README.md LICENSE DESTINATION .)
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/extra/${CMAKE_SYSTEM_NAME}/${CMAKE_SYSTEM_PROCESSOR}/engine DESTINATION engine)
+    install(FILES README.md LICENSE.txt DESTINATION .)
     # 设置默认安装前缀为程序文件目录
     if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
         set(CMAKE_INSTALL_PREFIX "C:/Program Files/GDownload" CACHE PATH "Installation prefix" FORCE)
@@ -132,7 +133,8 @@ elseif(UNIX AND NOT APPLE)
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
     )
-    install(FILES README.md LICENSE DESTINATION share/GDownload)
+    install(FILES README.md LICENSE.txt DESTINATION share/GDownload)
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/extra/${CMAKE_SYSTEM_NAME}/${CMAKE_SYSTEM_PROCESSOR}/engine DESTINATION engine)
     # 设置默认安装前缀为 /usr/local
     if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
         set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Installation prefix" FORCE)

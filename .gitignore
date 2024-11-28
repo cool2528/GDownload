@@ -132,3 +132,5 @@ Thumbs.db
 *.app
 # cmake 
 CMakeUserPresets.json
+!extra/win32/ia32/engine/aria2c.exe
+!extra/win32/x64/engine/aria2c.exe

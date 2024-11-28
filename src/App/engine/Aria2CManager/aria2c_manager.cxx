@@ -20,7 +20,6 @@ namespace gdl {
 			  update_aria2c_tasks_timer_(io_context_),
 			  pub_sub_system_(io_context_),
 			  websocket_client_(QString("wss://127.0.0.1/") + kEngineRpcPort + "/jsonrpc") {
-			worker_ = std::thread([this] { io_context_.run(); });
 			daily_task_timer_.Start([this] {
 				// 更新 磁力链接 每日列表
 			});
@@ -28,10 +27,17 @@ namespace gdl {
 				// 直接收到的所有消息 通过发布订阅回客户端
 				pub_sub_system_.Publish(kAria2Responce, msg.toStdString());
 			});
+
+			// io 线程放在最后
+			worker_ = std::thread([this] { io_context_.run(); });
 		}
 
-		std::vector<String_View> Aria2cDownloadManager::InitAria2cSettingsArgs() {
-			std::vector<String_View> result;
+		std::vector<String> Aria2cDownloadManager::InitAria2cSettingsArgs() {
+			std::vector<String> result;
+			// 处理包含空格的路径
+			auto quote_path = [](const String& path) {
+				return "\"" + path + "\"";
+			};
 			std::unordered_map<std::string, std::string> aria2c_settings;
 			aria2c_settings["allow-overwrite"]		  = "false";
 			aria2c_settings["auto-file-renaming"]	  = "true";
@@ -41,11 +47,11 @@ namespace gdl {
 			aria2c_settings["bt-save-metadata"]		  = "true";
 			aria2c_settings["bt-tracker"]			  = "";
 			aria2c_settings["continue"]				  = "true";
-			aria2c_settings["dht-file-path"]		  = GetDhtPath(IP_VERSION::V4);
-			aria2c_settings["dht-file-path6"]		  = GetDhtPath(IP_VERSION::V6);
+			aria2c_settings["dht-file-path"]		  = quote_path(GetDhtPath(IP_VERSION::V4));
+			aria2c_settings["dht-file-path6"]		  = quote_path(GetDhtPath(IP_VERSION::V6));
 
 			aria2c_settings["dht-listen-port"] = config::GetValue(config::Keys::DhtListenPort).AsString();	//"26701";
-			aria2c_settings["dir"]			   = config::GetValue(config::Keys::Dir).AsString();
+			aria2c_settings["dir"]			   = quote_path(config::GetValue(config::Keys::Dir).AsString());
 			aria2c_settings["enable-dht6"]	   = "true";
 			aria2c_settings["follow-metalink"] = "true";
 			aria2c_settings["follow-torrent"]  = "true";
@@ -87,7 +93,7 @@ namespace gdl {
 
 		String Aria2cDownloadManager::GetDhtPath(IP_VERSION protocol) {
 			const String name = protocol == IP_VERSION::V4 ? "dht.dat" : "dht6.dat";
-			return os::GetAppDataDir() + "/" + name;
+			return os::GetAppDataDir() + "/gdownload/" + name;
 		}
 
 		void Aria2cDownloadManager::UpdateAria2cTasks() {
@@ -103,10 +109,10 @@ namespace gdl {
 
 		bool Aria2cDownloadManager::InitAria2cEngine(const String_View& aria2c_path) {
 			// todo 初始化aria2c
-			aria2c_path_				  = String(aria2c_path);
-			std::vector<String_View> args = InitAria2cSettingsArgs();
-			auto pid					  = process::Execute(aria2c_path, args);
-			if (pid >= 0) {
+			aria2c_path_			 = String(aria2c_path);
+			std::vector<String> args = InitAria2cSettingsArgs();
+			auto pid				 = process::Execute(aria2c_path, args);
+			if (pid <= 0) {
 				LOG_ERR("Failed to initialise aria2c Failed to start the process");
 				return false;
 			}
@@ -121,6 +127,7 @@ namespace gdl {
 
 		void Aria2cDownloadManager::UninitAria2cEngine() {
 			// todo 卸载aria2c
+			websocket_client_.Shutdown();
 			engine_is_runing_ = false;
 			daily_task_timer_.Stop();
 		}
