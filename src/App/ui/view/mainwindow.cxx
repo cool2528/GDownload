@@ -41,7 +41,9 @@ namespace gd {
 			const QUrl url(QStringLiteral("qrc:/qml/mainWindow.qml"));
 			engine.addImportPath(QStringLiteral("qrc:/qml"));
 			engine.load(url);
-			return app.exec();
+			const auto code = app.exec();
+			gdl::engine::Aria2cDownloadManager::Instance().UninitAria2cEngine();
+			return code;
 		}
 
 		void MainWindow::InitQmlEngine(QQmlEngine* engine) {

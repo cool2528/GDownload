@@ -9,10 +9,12 @@ namespace gdl {
 	static const std::string_view kDefaultLoggerName = "core";
 	// Global Log Sinks
 	static std::vector<spdlog::sink_ptr> kGlobakLoggerSinks;
+	static std::atomic_bool kIsShutdown{false};
 	Logger::Logger(const std::string& name) : logger_name_(name) {}
 	Logger::~Logger() {}
 
 	void Logger::LogMessage(LogLevel level, const std::string& message, const std::source_location& loc) {
+		if (kIsShutdown.load()) return;
 		auto logger = spdlog::get(this->logger_name_);
 		spdlog::source_loc local_source(loc.file_name(), loc.line(), loc.function_name());
 		if (logger) {
@@ -20,6 +22,7 @@ namespace gdl {
 		}
 	}
 	std::shared_ptr<Logger> RegisterLogger(const std::string& name) {
+		if (kIsShutdown.load()) return nullptr;
 		auto logger = std::make_shared<spdlog::logger>(name, kGlobakLoggerSinks.begin(), kGlobakLoggerSinks.end());
 		logger->set_level(spdlog::get_level());
 		logger->flush_on(spdlog::get_level());
@@ -36,14 +39,18 @@ namespace gdl {
 			spdlog::initialize_logger(std::make_shared<spdlog::logger>(
 				std::string(kDefaultLoggerName), kGlobakLoggerSinks.begin(), kGlobakLoggerSinks.end()));
 		}
+		kIsShutdown = false;
 		return true;
 	}
 	bool ShutdownLoggers() {
 		spdlog::apply_all([](std::shared_ptr<spdlog::logger> logger) { logger->flush(); });
+		spdlog::shutdown();
+		kIsShutdown = true;
 		return true;
 	}
 
 	void LogMessage(LogLevel level, const std::source_location& loc, const std::string& message) {
+		if (kIsShutdown.load()) return;
 		auto logger = spdlog::get(std::string(kDefaultLoggerName));
 		spdlog::source_loc local_source(loc.file_name(), loc.line(), loc.function_name());
 		if (logger) {
@@ -52,10 +59,16 @@ namespace gdl {
 	}
 
 	void LogMessage(LogLevel level, const std::string& message) {
+		if (kIsShutdown.load()) return;
 		auto logger = spdlog::get(std::string(kDefaultLoggerName));
 		if (logger) {
 			logger->log(static_cast<spdlog::level::level_enum>(level), message);
 		}
+	}
+
+	void SetLoggerLevel(LogLevel level) {
+		spdlog::set_level(static_cast<spdlog::level::level_enum>(level));
+		spdlog::flush_on(spdlog::get_level());
 	}
 
 }  // namespace gdl

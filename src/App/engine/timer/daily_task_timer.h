@@ -12,10 +12,10 @@ namespace gdl {
 		using DailyTaskTimeOutCallback = std::function<void()>;
 		class DailyTaskTimer {
 		   public:
-			explicit DailyTaskTimer(boost::asio::io_context& io) : timer_(io) {}
+			explicit DailyTaskTimer(boost::asio::io_context& io) : io_context_(io), timer_(io_context_) {}
 			void Start(const DailyTaskTimeOutCallback& cb) {
 				timeout_callback_ = cb;
-				timeout_callback_();
+				boost::asio::post(io_context_, [this] { timeout_callback_(); });
 				Next();
 			}
 			void Stop() { timer_.cancel(); }
@@ -34,6 +34,7 @@ namespace gdl {
 			}
 
 		   private:
+			boost::asio::io_context& io_context_;
 			DailyTaskTimeOutCallback timeout_callback_{nullptr};
 			boost::asio::steady_timer timer_;
 		};

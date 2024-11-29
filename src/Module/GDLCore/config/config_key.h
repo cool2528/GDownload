@@ -1,6 +1,11 @@
 #pragma once
 #include <array>
 #include <string>
+#define DEFAULT_TRACKER_SOURCE_URLS                                                                                  \
+	"[\"https://cdn.jsdelivr.net/gh/ngosang/trackerslist/trackers_best.txt\",\"https://cdn.jsdelivr.net/gh/ngosang/" \
+	"trackerslist/trackers_best_ip.txt\",\"https://cdn.jsdelivr.net/gh/ngosang/trackerslist/"                        \
+	"trackers_all.txt\",\"https://"                                                                                  \
+	"cdn.jsdelivr.net/gh/ngosang/trackerslist/trackers_all_ip.txt\"]"
 namespace gdl {
 	namespace config {
 		template <std::size_t N>
@@ -43,20 +48,21 @@ namespace gdl {
 			CONFIG_PATH(AllProxy, "aria2c.all-proxy", "");
 			CONFIG_PATH(DhtListenPort, "aria2c.dht-listen-port", "26701");
 			CONFIG_PATH(MaxConcurrentDownloads, "aria2c.max-concurrent-downloads", "64");
-
+			CONFIG_PATH(ConfPath, "aria2c.conf-path", "");
+			CONFIG_PATH(TrackerSourceUrls, "aria2c.tracker_source_urls", DEFAULT_TRACKER_SOURCE_URLS);
 			// static function all keys
 			static constexpr auto GetAllKeys() {
 				return ConfigKeys(std::array{WindowSize.get(), Theme.get(), Language.get(), BtExludeTracker.get(),
 											 Dir.get(), ListenPort.get(), RpcListenPort.get(), Split.get(),
 											 UserAgent.get(), AllProxy.get(), DhtListenPort.get(),
-											 MaxConcurrentDownloads.get()});
+											 MaxConcurrentDownloads.get(), ConfPath.get(), TrackerSourceUrls.get()});
 			}
 			// static function all values
 			static constexpr auto GetAllValues() {
 				return ConfigKeys(std::array{WindowSize.val(), Theme.val(), Language.val(), BtExludeTracker.val(),
 											 Dir.val(), ListenPort.val(), RpcListenPort.val(), Split.val(),
 											 UserAgent.val(), AllProxy.val(), DhtListenPort.val(),
-											 MaxConcurrentDownloads.val()});
+											 MaxConcurrentDownloads.val(), ConfPath.val(), TrackerSourceUrls.val()});
 			}
 		};
 	}  // namespace config

@@ -30,6 +30,7 @@ namespace gdl {
 	GDLCore_API std::shared_ptr<Logger> RegisterLogger(const std::string& name);
 	GDLCore_API bool InitializeLoggers(const std::string& file_path);
 	GDLCore_API bool ShutdownLoggers();
+	GDLCore_API void SetLoggerLevel(LogLevel level);
 	GDLCore_API void LogMessage(LogLevel level, const std::source_location& loc, const std::string& message);
 	GDLCore_API void LogMessage(LogLevel level, const std::string& message);
 

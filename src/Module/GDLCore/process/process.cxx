@@ -3,10 +3,10 @@
 #include <windows.h>
 #elif defined(__APPLE__)
 #include <signal.h>
+#include <spawn.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <spawn.h>
-extern char **environ;  // Add this declaration
+extern char** environ;	// Add this declaration
 #endif
 #include <thread>
 #include "logger.h"
@@ -40,7 +40,6 @@ namespace gdl {
 #else
 			pid_t native_pid;
 			std::vector<char*> argv;
-			argv.push_back(const_cast<char*>(command.data()));
 			for (const auto& arg : arguments) {
 				argv.push_back(const_cast<char*>(arg.data()));
 			}
@@ -48,12 +47,15 @@ namespace gdl {
 
 			posix_spawn_file_actions_t actions;
 			posix_spawn_file_actions_init(&actions);
-			
+
 			posix_spawnattr_t attr;
 			posix_spawnattr_init(&attr);
-
+			// 如果有工作目录，设置它
+			if (!working_directory.empty()) {
+				posix_spawn_file_actions_addchdir_np(&actions, working_directory.data());
+			}
 			int ret = posix_spawn(&native_pid, command.data(), &actions, &attr, argv.data(), environ);
-			
+
 			posix_spawn_file_actions_destroy(&actions);
 			posix_spawnattr_destroy(&attr);
 

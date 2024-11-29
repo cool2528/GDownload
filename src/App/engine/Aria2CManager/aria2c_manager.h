@@ -39,6 +39,9 @@ namespace gdl {
 			std::vector<String> InitAria2cSettingsArgs();
 			String GetDhtPath(IP_VERSION protocol);
 			void UpdateAria2cTasks();
+			void SyncMagnetServerList();
+			std::string ParseTextUrls(const std::string& input);
+			std::string GetBitTorrentUrl(const std::string& url);
 
 		   private:
 			String aria2c_path_;
