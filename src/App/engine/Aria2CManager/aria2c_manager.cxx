@@ -3,6 +3,12 @@
 #include "logger.h"
 #include "os/os.h"
 #include "process/process.h"
+#define CPPHTTPLIB_OPENSSL_SUPPORT
+#ifdef __APPLE__
+#define CPPHTTPLIB_USE_CERTS_FROM_MACOSX_KEYCHAIN
+#endif
+#include <httplib.h>
+#include <boost/url.hpp>
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -20,13 +26,21 @@ namespace gdl {
 			  update_aria2c_tasks_timer_(io_context_),
 			  pub_sub_system_(io_context_),
 			  websocket_client_(QString("ws://127.0.0.1:") + kEngineRpcPort + "/jsonrpc") {
-			daily_task_timer_.Start([this] {
-				// 更新 磁力链接 每日列表
-			});
+
 			QObject::connect(&websocket_client_, &Aria2cWebSocketClient::MessageReceived, [this](QString msg) {
 				// 直接收到的所有消息 通过发布订阅回客户端
 				pub_sub_system_.Publish(kAria2Responce, msg.toStdString());
 			});
+			QObject::connect(
+				&websocket_client_, &Aria2cWebSocketClient::StateChanged, [this](QAbstractSocket::SocketState state) {
+					// 只有web socket 链接上 aria2c 服务端后才去同步BitTorrent 服务器列表这样才能设置上去
+					if (engine_is_runing_ && state == QAbstractSocket::ConnectedState) {
+						daily_task_timer_.Start(std::bind(&Aria2cDownloadManager::SyncMagnetServerList, this));
+					}
+					else {
+						LOG_WARN("websocket_client_ state {}", static_cast<int>(state));
+					}
+				});
 
 			// io 线程放在最后
 			worker_ = std::thread([this] { io_context_.run(); });
@@ -69,14 +83,15 @@ namespace gdl {
 			aria2c_settings["seed-ratio"]				  = "2";
 			aria2c_settings["seed-time"]				  = "2880";
 			aria2c_settings["split"]					  = "64";
-			aria2c_settings["user-agent"] =
+			aria2c_settings["user-agent"]				  = quote_path(
 				"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) "
-				"Chrome/111.0.0.0 Safari/537.36";
+								"Chrome/111.0.0.0 Safari/537.36");
 			aria2c_settings["all-proxy"]		 = "";
 			aria2c_settings["check-certificate"] = "false";
 			aria2c_settings["quiet"]			 = "true";
 			aria2c_settings["enable-rpc"]		 = "true";
 			aria2c_settings["rpc-listen-all"]	 = "true";
+			aria2c_settings["conf-path"]		 = quote_path(config::GetValue(config::Keys::ConfPath).AsString());
 #ifdef _WIN32
 			DWORD processId = GetCurrentProcessId();
 #else
@@ -107,12 +122,93 @@ namespace gdl {
 			websocket_client_.TellWaiting(0, 100, keys);
 		}
 
-		Aria2cDownloadManager::~Aria2cDownloadManager() {
-			UninitAria2cEngine();
-			work_.reset();
-			io_context_.stop();
-			worker_.join();
+		void Aria2cDownloadManager::SyncMagnetServerList() {
+
+			// 磁力链接服务器黑名单
+			const std::string trackers_black_url(
+				"https://cdn.jsdelivr.net/gh/XIU2/TrackersListCollection/blacklist.txt");
+			auto bt_exclude_tracker = GetBitTorrentUrl(trackers_black_url);
+			if (!bt_exclude_tracker.empty()) {
+				// 如获取的黑名单列表不为空则设置
+				websocket_client_.ChangeGlobalOption({std::make_pair("bt-exclude-tracker", bt_exclude_tracker)});
+			}
+			else {
+				LOG_WARN("If the list of blacklists is empty, then");
+			}
+			// 获取磁力链接服务器列表 从配置文件中读取
+			try {
+				auto json_data					   = config::GetValue(config::Keys::TrackerSourceUrls).AsString();
+				nlohmann::json tracker_source_urls = nlohmann::json::parse(json_data.c_str());
+				if (!tracker_source_urls.is_array()) {
+					LOG_ERR("Invalid tracker_source_urls {}", json_data);
+					return;
+				}
+				std::string bt_tracker;
+				for (const auto& url : tracker_source_urls) {
+					if (url.is_string()) {
+						std::string source_url = url.get<std::string>();
+						auto bt_tracker_urls   = GetBitTorrentUrl(source_url);
+						bt_tracker += "," + bt_tracker_urls;
+					}
+					if (!engine_is_runing_) break;
+				}
+				if (!bt_tracker.empty()) {
+					// 如获取的 BitTorrent url列表不为空则设置
+					websocket_client_.ChangeGlobalOption({std::make_pair("bt-tracker", bt_tracker)});
+				}
+
+			} catch (std::exception& e) {
+				LOG_ERR("Failed to parse tracker_source_urls {}", e.what());
+			}
 		}
+
+		std::string Aria2cDownloadManager::ParseTextUrls(const std::string& inputText) {
+			std::vector<std::string> result;
+			std::istringstream input(inputText);
+			std::string line;
+			while (std::getline(input, line)) {
+				line.erase(0, line.find_first_not_of(" \t"));
+				line.erase(line.find_last_not_of(" \t") + 1);
+				if (line.empty() || line[0] == '#') {
+					continue;
+				}
+				result.push_back(line);
+			}
+			std::ostringstream oss;
+			for (size_t i = 0; i < result.size(); ++i) {
+				if (i > 0) {
+					oss << ",";
+				}
+				oss << result[i];
+			}
+			return oss.str();
+		}
+
+		std::string Aria2cDownloadManager::GetBitTorrentUrl(const std::string& url) {
+			std::string result;
+			try {
+				if (url.empty() || !engine_is_runing_) return result;
+				boost::urls::url trackers_black_url(url);
+				std::string base_url = std::move(trackers_black_url.scheme());
+				base_url += "://";
+				base_url += std::move(trackers_black_url.host());
+				httplib::Client cli(base_url);
+				cli.set_connection_timeout(std::chrono::seconds(30));
+				cli.set_read_timeout(std::chrono::seconds(5));
+				cli.set_write_timeout(std::chrono::seconds(5));
+				auto reply = cli.Get(trackers_black_url.path());
+				if (!reply) {
+					LOG_ERR("sync manget trackers server list faild error {}", httplib::to_string(reply.error()));
+					return result;
+				}
+				result = ParseTextUrls(reply->body);
+			} catch (std::exception& e) {
+				LOG_ERR("{}", e.what());
+			}
+			return result;
+		}
+
+		Aria2cDownloadManager::~Aria2cDownloadManager() {}
 
 		bool Aria2cDownloadManager::InitAria2cEngine(const String_View& aria2c_path) {
 			// todo 初始化aria2c
@@ -123,12 +219,13 @@ namespace gdl {
 				LOG_ERR("Failed to initialise aria2c Failed to start the process");
 				return false;
 			}
-			engine_is_runing_ = true;
 			// 启动 更新当前aria2c 的所有 暂停 正在下载 停止的任务状态列表 定时器
 			update_aria2c_tasks_timer_.Start(std::bind(&Aria2cDownloadManager::UpdateAria2cTasks, this),
 											 std::chrono::seconds(2), true);
 			// 链接 aria2c websocket
 			websocket_client_.Open();
+			engine_is_runing_ = true;
+
 			return true;
 		}
 
@@ -136,7 +233,12 @@ namespace gdl {
 			// todo 卸载aria2c
 			websocket_client_.Shutdown();
 			engine_is_runing_ = false;
+			update_aria2c_tasks_timer_.Stop();
 			daily_task_timer_.Stop();
+			websocket_client_.disconnect();
+			work_.reset();
+			io_context_.stop();
+			worker_.join();
 		}
 
 		Result<bool> Aria2cDownloadManager::AddHttpTask(

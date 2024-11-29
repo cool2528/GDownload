@@ -64,6 +64,7 @@ namespace gdl {
 
 		   public:
 			Q_SIGNAL void MessageReceived(QString message);
+			Q_SIGNAL void StateChanged(QAbstractSocket::SocketState state);
 
 		   private Q_SLOTS:
 

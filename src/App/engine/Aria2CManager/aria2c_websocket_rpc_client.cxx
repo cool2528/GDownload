@@ -12,9 +12,14 @@ namespace gdl {
 				LOG_ERR("connect websocket faild error code  {}", err_code);
 			});
 			connect(&websocket_, &QWebSocket::textMessageReceived, this, &Aria2cWebSocketClient::onTextMessageReceived);
+			connect(&websocket_, &QWebSocket::binaryMessageReceived, this,
+					&Aria2cWebSocketClient::onTextMessageReceived);
+			connect(&websocket_, &QWebSocket::stateChanged, this, &Aria2cWebSocketClient::StateChanged);
 		}
 
-		Aria2cWebSocketClient::~Aria2cWebSocketClient() {}
+		Aria2cWebSocketClient::~Aria2cWebSocketClient() {
+			websocket_.close();
+		}
 
 		void Aria2cWebSocketClient::Open() {
 			websocket_.open(url_);

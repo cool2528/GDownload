@@ -25,11 +25,24 @@ namespace gdl {
 				auto all_paths	= config::Keys::GetAllKeys();
 				auto all_values = config::Keys::GetAllValues();
 				for (auto i = 0; i < all_paths.size(); ++i) {
-					auto key_path	  = all_paths[i];
-					std::string value = all_values[i].data();
-					if (ptree_root_.find(key_path.data()) == ptree_root_.not_found()) {
+					auto key_path		= all_paths[i];
+					std::string value	= all_values[i].data();
+					auto child_optional = ptree_root_.get_optional<std::string>(key_path.data());
+					if (!child_optional.has_value()) {
 						if (key_path == "aria2c.dir" && value.empty()) {
 							value = os::GetUserDownloadsDir();
+						}
+						else if (key_path == "aria2c.conf-path" && value.empty()) {
+							std::string conf_path;
+#ifdef __APPLE__
+							conf_path = os::GetExecutableDir() + "/../Resources/engine/aria2.conf";
+#else
+							conf_path = os::GetExecutableDir() + "/engine/aria2.conf";
+#endif
+							value = conf_path;
+						}
+						else if (key_path == "aria2c.tracker_source_urls" && value.empty()) {
+							value = DEFAULT_TRACKER_SOURCE_URLS;
 						}
 						ptree_root_.put(key_path.data(), value.data());
 					}
