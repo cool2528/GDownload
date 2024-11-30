@@ -46,6 +46,11 @@ namespace gdl {
 			String GetCurrentWorkingDir() {
 				return String();
 			}
+
+			std::optional<std::pair<String, int>> GetSystemHTTPProxy() {
+				return std::nullopt;
+			}
+
 		}  // namespace linux
 	}  // namespace os
 

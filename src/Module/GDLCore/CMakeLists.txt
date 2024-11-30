@@ -22,6 +22,7 @@ if(APPLE)
     )
     find_library(COREFOUNDATION_FRAMEWORK CoreFoundation)
     find_library(FOUNDATION_FRAMEWORK Foundation)
+      find_library(CFNETWORK_FRAMEWORK CFNetwork)
     source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "source" FILES ${SOURCES_FILES} ${HEADERS_FILES} ${SOURCE_OBJ_FILES})
     add_library(${PROJECT_NAME} SHARED ${SOURCES_FILES} ${HEADERS_FILES} ${SOURCE_OBJ_FILES})
 else()
@@ -38,5 +39,6 @@ if(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE
         ${COREFOUNDATION_FRAMEWORK}
         ${FOUNDATION_FRAMEWORK}
+        ${CFNETWORK_FRAMEWORK}
     )
 endif()

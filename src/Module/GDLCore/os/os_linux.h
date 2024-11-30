@@ -15,6 +15,7 @@ namespace gdl {
 			String GetTempDir();
 			String GetExecutableDir();
 			String GetCurrentWorkingDir();
+			std::optional<std::pair<String, int>> GetSystemHTTPProxy();
 		}  // namespace linux
 	}  // namespace os
 }  // namespace gdl

@@ -20,9 +20,7 @@ namespace gdl {
 				lws_set_log_level(LLL_ERR | LLL_WARN, nullptr);
 			}
 
-			~WebSocketClient() {
-				disconnect();
-			}
+			~WebSocketClient() { disconnect(); }
 
 			// 连接到WebSocket服务器
 			bool connect(const std::string& url, int port, const std::string& path = "/") {
@@ -32,7 +30,7 @@ namespace gdl {
 				LOG_INFO("Attempting to connect to Aria2 RPC at {}:{}{}", url, port, path);
 
 				// 保存连接参数供重连使用
-				lastUrl_ = url;
+				lastUrl_  = url;
 				lastPort_ = port;
 				lastPath_ = path;
 
@@ -118,27 +116,27 @@ namespace gdl {
 				});
 
 				// 等待连接建立或超时
-				const int TIMEOUT_MS		= 5000;
-				const int SLEEP_INTERVAL_MS = 100;
-				int waited_ms				= 0;
+				// const int TIMEOUT_MS		= 5000;
+				// const int SLEEP_INTERVAL_MS = 100;
+				// int waited_ms				= 0;
 
-				while (!isConnected_ && waited_ms < TIMEOUT_MS) {
-					std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_INTERVAL_MS));
-					waited_ms += SLEEP_INTERVAL_MS;
+				// while (!isConnected_ && waited_ms < TIMEOUT_MS) {
+				// 	std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_INTERVAL_MS));
+				// 	waited_ms += SLEEP_INTERVAL_MS;
 
-					// 检查是否发生了错误
-					if (lastError_.length() > 0) {
-						LOG_ERR("Connection failed: {}", lastError_);
-						disconnect();
-						return false;
-					}
-				}
+				// 	// 检查是否发生了错误
+				// 	if (lastError_.length() > 0) {
+				// 		LOG_ERR("Connection failed: {}", lastError_);
+				// 		disconnect();
+				// 		return false;
+				// 	}
+				// }
 
-				if (!isConnected_) {
-					LOG_ERR("Connection timeout after {} ms", TIMEOUT_MS);
-					disconnect();
-					return false;
-				}
+				// if (!isConnected_) {
+				// 	LOG_ERR("Connection timeout after {} ms", TIMEOUT_MS);
+				// 	disconnect();
+				// 	return false;
+				// }
 
 				LOG_INFO("Successfully connected to Aria2 RPC");
 				return true;
@@ -148,13 +146,13 @@ namespace gdl {
 			void disconnect() {
 				LOG_DBG("Disconnecting websocket...");
 				shouldStop_ = true;
-				
+
 				// 清除最后的错误信息
 				{
 					std::lock_guard<std::mutex> lock(errorMutex_);
 					lastError_.clear();
 				}
-				
+
 				// 等待服务线程结束
 				if (serviceThread_.joinable()) {
 					serviceThread_.join();
@@ -173,20 +171,20 @@ namespace gdl {
 				}
 
 				isConnected_ = false;
-				
+
 				// 清空消息队列
 				std::lock_guard<std::mutex> lock(messageMutex_);
 				std::queue<std::string> empty;
 				std::swap(messageQueue_, empty);
-				
+
 				LOG_DBG("Websocket disconnected");
 			}
 
 			// 发送消息
 			bool send(const std::string& message) {
 				if (!isConnected_ || !websocket_) {
-						LOG_ERR("Not connected");
-						return false;
+					LOG_ERR("Not connected");
+					return false;
 				}
 
 				std::lock_guard<std::mutex> lock(messageMutex_);
@@ -226,9 +224,9 @@ namespace gdl {
 							client->errorCallback_(error);
 						}
 						// 尝试自动重连
-						if (!client->shouldStop_) {  // 只在非主动断开的情况下重连
+						if (!client->shouldStop_) {	 // 只在非主动断开的情况下重连
 							std::thread([client]() {
-								std::this_thread::sleep_for(std::chrono::seconds(5));  // 等待5秒后重连
+								std::this_thread::sleep_for(std::chrono::seconds(2));  // 等待2秒后重连
 								if (!client->shouldStop_ && !client->isConnected_) {
 									client->reconnect();
 								}
@@ -245,14 +243,14 @@ namespace gdl {
 					case LWS_CALLBACK_CLIENT_CLOSED:
 						LOG_INFO("Connection closed");
 						client->isConnected_ = false;
-						client->websocket_ = nullptr;  // 清除 websocket 指针
+						client->websocket_	 = nullptr;	 // 清除 websocket 指针
 						if (client->disconnectCallback_) {
 							client->disconnectCallback_();
 						}
 						// 尝试自动重连
-						if (!client->shouldStop_) {  // 只在非主动断开的情况下重连
+						if (!client->shouldStop_) {	 // 只在非主动断开的情况下重连
 							std::thread([client]() {
-								std::this_thread::sleep_for(std::chrono::seconds(5));  // 等待5秒后重连
+								std::this_thread::sleep_for(std::chrono::seconds(2));  // 等待2秒后重连
 								if (!client->shouldStop_ && !client->isConnected_) {
 									client->reconnect();
 								}
@@ -291,13 +289,13 @@ namespace gdl {
 				std::lock_guard<std::mutex> lock(messageMutex_);
 				while (!messageQueue_.empty() && isConnected_) {
 					const std::string& message = messageQueue_.front();
-					
+
 					// LWS_PRE 是必需的预留空间
 					std::vector<uint8_t> buf(LWS_PRE + message.size());
 					memcpy(buf.data() + LWS_PRE, message.data(), message.size());
-					
+
 					int sent = lws_write(websocket_, buf.data() + LWS_PRE, message.size(), LWS_WRITE_TEXT);
-					
+
 					if (sent < 0) {
 						LOG_ERR("Error writing to socket");
 						setLastError("Write error occurred");
@@ -312,7 +310,7 @@ namespace gdl {
 						// 保留消息以便重试
 						break;
 					}
-					
+
 					messageQueue_.pop();
 				}
 			}
@@ -347,10 +345,10 @@ namespace gdl {
 			bool reconnect() {
 				LOG_INFO("Attempting to reconnect...");
 				disconnect();  // 确保之前的连接完全关闭
-				
+
 				// 等待一段时间再重连
 				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-				
+
 				return connect(lastUrl_, lastPort_, lastPath_);
 			}
 
