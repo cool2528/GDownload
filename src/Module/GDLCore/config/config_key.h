@@ -1,11 +1,10 @@
 #pragma once
 #include <array>
 #include <string>
-#define DEFAULT_TRACKER_SOURCE_URLS                                                                                  \
-	"[\"https://cdn.jsdelivr.net/gh/ngosang/trackerslist/trackers_best.txt\",\"https://cdn.jsdelivr.net/gh/ngosang/" \
-	"trackerslist/trackers_best_ip.txt\",\"https://cdn.jsdelivr.net/gh/ngosang/trackerslist/"                        \
-	"trackers_all.txt\",\"https://"                                                                                  \
-	"cdn.jsdelivr.net/gh/ngosang/trackerslist/trackers_all_ip.txt\"]"
+#define DEFAULT_TRACKER_SOURCE_URLS                                                                                 \
+	"[\"https://ngosang.github.io/trackerslist/trackers_best.txt\",\"https://ngosang.github.io/trackerslist/"       \
+	"trackers_all.txt\",\"https://ngosang/trackerslist/master/trackers_all_http.txt\",\"https://ngosang.github.io/" \
+	"trackerslist/trackers_all_https.txt\"]"
 namespace gdl {
 	namespace config {
 		template <std::size_t N>

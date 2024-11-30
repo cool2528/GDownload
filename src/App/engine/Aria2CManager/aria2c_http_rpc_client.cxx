@@ -1,9 +1,5 @@
 #include "aria2c_http_rpc_client.h"
-#define CPPHTTPLIB_OPENSSL_SUPPORT
-#ifdef __APPLE__
-#define CPPHTTPLIB_USE_CERTS_FROM_MACOSX_KEYCHAIN
-#endif
-#include <httplib.h>
+#include <cpr/cpr.h>
 #include <format>
 #include "engine_def.h"
 #include "logger.h"
@@ -231,25 +227,25 @@ namespace gdl {
 			doc["method"]  = method;
 			doc["params"]  = params;
 			doc["id"]	   = std::to_string(++id_);
-			httplib::Client cli(host_);
-			httplib::Headers headers;
-			headers.insert(std::make_pair("Content-Type", "application/json"));
+			// httplib::Client cli(host_);
+			// httplib::Headers headers;
+			// headers.insert(std::make_pair("Content-Type", "application/json"));
 
-			auto reply = cli.Post("/jsonrpc", headers, doc.dump(), "application/json");
-			if (!reply) {
-				LOG_ERR("request aria2c method fail error {}", httplib::to_string(reply.error()));
-				result.result = ErrorResult{.err_msg  = httplib::to_string(reply.error()),
-											.err_code = static_cast<std::int64_t>(reply.error())};
-				return result;
-			}
-			else if (reply.value().status != 200) {
-				LOG_ERR("request aria2c method fail error {}", httplib::to_string(reply.error()));
-				result.result = ErrorResult{.err_msg  = httplib::to_string(reply.error()),
-											.err_code = static_cast<std::int64_t>(reply.error())};
-				return result;
-			}
+			// auto reply = cli.Post("/jsonrpc", headers, doc.dump(), "application/json");
+			// if (!reply) {
+			// 	LOG_ERR("request aria2c method fail error {}", httplib::to_string(reply.error()));
+			// 	result.result = ErrorResult{.err_msg  = httplib::to_string(reply.error()),
+			// 								.err_code = static_cast<std::int64_t>(reply.error())};
+			// 	return result;
+			// }
+			// else if (reply.value().status != 200) {
+			// 	LOG_ERR("request aria2c method fail error {}", httplib::to_string(reply.error()));
+			// 	result.result = ErrorResult{.err_msg  = httplib::to_string(reply.error()),
+			// 								.err_code = static_cast<std::int64_t>(reply.error())};
+			// 	return result;
+			// }
 			result.is_succeed = true;
-			result.result	  = SucceedResult{.body = std::move(reply.value().body)};
+			//result.result	  = SucceedResult{.body = std::move(reply.value().body)};
 			return result;
 		}
 

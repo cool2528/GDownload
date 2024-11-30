@@ -1,18 +1,20 @@
 #pragma once
-#include <QWebSocket>
 #include <nlohmann/json.hpp>
 #include "result/result.h"
+#include "websocket_client.h"
 namespace gdl {
 	namespace engine {
 		using Options = std::unordered_multimap<std::string, std::string>;
-		class Aria2cWebSocketClient : public QObject {
-			Q_OBJECT
+		enum class State : int { kError = -1, kConnected, kClosed };
+		class Aria2cWebSocketClient {
+
 		   public:
-			explicit Aria2cWebSocketClient(const QString& url, QObject* parent = nullptr);
-			~Aria2cWebSocketClient() override;
+			explicit Aria2cWebSocketClient(const std::string& url);
+			~Aria2cWebSocketClient();
 
 		   public:
 			void Open();
+			void Disconnect();
 			Result<bool> AddUri(const std::vector<std::string>& uris, const Options& options);
 			Result<bool> AddTorrent(const std::string& torrent, const Options& options);
 			Result<bool> AddMetalink(const std::string& metalink, const Options& options);
@@ -63,21 +65,22 @@ namespace gdl {
 			Result<bool> ForceShutdown();
 
 		   public:
-			Q_SIGNAL void MessageReceived(QString message);
-			Q_SIGNAL void StateChanged(QAbstractSocket::SocketState state);
+			void SetMessageCallback(const std::function<void(const std::string&)>& cb);
+			void SetStateChanageCallback(const std::function<void(const State&, std::string)>&);
 
-		   private Q_SLOTS:
-
+		   private:
 			void onConnected();
 			void onClosed();
-			void onTextMessageReceived(QString message);
+			void onTextMessageReceived(std::string message);
 
 		   private:
 			Result<bool> Send(const std::string_view& method, const nlohmann::json& params);
 
 		   private:
-			QString url_;
-			QWebSocket websocket_;
+			std::string url_;
+			WebSocketClient websocket_;
+			std::function<void(const State&, std::string)> state_chanage_callback_{nullptr};
+			std::function<void(const std::string&)> text_message_callback_{nullptr};
 		};
 	}  // namespace engine
 }  // namespace gdl

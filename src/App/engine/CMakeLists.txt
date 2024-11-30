@@ -15,7 +15,8 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "source" FILES ${SOURCES_FI
 find_package(boost_system CONFIG REQUIRED)
 find_package(boost_property_tree CONFIG REQUIRED)
 find_package(boost_asio CONFIG REQUIRED)
-find_package(httplib CONFIG REQUIRED)
+find_package(cpr CONFIG REQUIRED)
+find_package(libwebsockets CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(boost_url CONFIG REQUIRED)
 if(APPLE)
@@ -25,11 +26,10 @@ endif()
 add_library(${PROJECT_NAME} SHARED ${SOURCES_FILES} ${HEADERS_FILES})
 register_target(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PRIVATE ${MODULE_INCLUDE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system Boost::property_tree Boost::asio httplib::httplib nlohmann_json::nlohmann_json Boost::url GDLCore PluginManager)
+target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system Boost::property_tree Boost::asio nlohmann_json::nlohmann_json Boost::url cpr::cpr websockets GDLCore PluginManager)
 if(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE
         ${COREFOUNDATION_FRAMEWORK}
         ${SECURITY_FRAMEWORK}
-        Qt6::WebSockets
     )
 endif()
