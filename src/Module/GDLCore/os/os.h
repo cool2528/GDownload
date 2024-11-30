@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include "export.h"
 #include "globalTypes.h"
 /**
@@ -19,6 +20,8 @@ namespace gdl {
 		GDLCore_API String GetTempDir();
 		GDLCore_API String GetExecutableDir();
 		GDLCore_API String GetCurrentWorkingDir();
+
+		GDLCore_API std::optional<std::pair<String, int>> GetSystemHTTPProxy();
 
 	}  // namespace os
 

@@ -117,6 +117,17 @@ namespace gdl {
 			return linux::GetCurrentWorkingDir();
 #endif
 		}
+
+		std::optional<std::pair<String, int>> GetSystemHTTPProxy() {
+#ifdef _WIN32
+			return win::GetSystemHTTPProxy();
+#elif defined(__APPLE__)
+			return mac::GetSystemHTTPProxy();
+#else
+			return linux::GetSystemHTTPProxy();
+#endif
+		}
+
 	}  // namespace os
 
 }  // namespace gdl

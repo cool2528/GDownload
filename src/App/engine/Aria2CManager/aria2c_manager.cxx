@@ -184,8 +184,13 @@ namespace gdl {
 			std::string result;
 			try {
 				if (url.empty() || !engine_is_runing_) return result;
-
-				auto reply = cpr::Get(cpr::Url(url));
+				auto system_proxy = os::GetSystemHTTPProxy();
+				std::string proxy_str;
+				if (system_proxy.has_value()) {
+					proxy_str =
+						"http://" + system_proxy.value().first + ":" + std::to_string(system_proxy.value().second);
+				}
+				auto reply = cpr::Get(cpr::Url(url), cpr::Proxies({{"http", proxy_str}, {"https", proxy_str}}));
 				if (reply.status_code != 200) {
 					LOG_ERR("sync manget trackers server list faild error {}", reply.error.message);
 					return result;
