@@ -1,14 +1,10 @@
 #include "aria2c_manager.h"
+#include <cpr/cpr.h>
+#include <boost/url.hpp>
 #include "engine_def.h"
 #include "logger.h"
 #include "os/os.h"
 #include "process/process.h"
-#define CPPHTTPLIB_OPENSSL_SUPPORT
-#ifdef __APPLE__
-#define CPPHTTPLIB_USE_CERTS_FROM_MACOSX_KEYCHAIN
-#endif
-#include <httplib.h>
-#include <boost/url.hpp>
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -25,23 +21,23 @@ namespace gdl {
 			  daily_task_timer_(io_context_),
 			  update_aria2c_tasks_timer_(io_context_),
 			  pub_sub_system_(io_context_),
-			  websocket_client_(QString("ws://127.0.0.1:") + kEngineRpcPort + "/jsonrpc") {
+			  websocket_client_(std::string("ws://127.0.0.1:") + kEngineRpcPort + "/jsonrpc") {
 
-			QObject::connect(&websocket_client_, &Aria2cWebSocketClient::MessageReceived, [this](QString msg) {
+			websocket_client_.SetMessageCallback([this](const std::string& msg) {
 				// 直接收到的所有消息 通过发布订阅回客户端
-				pub_sub_system_.Publish(kAria2Responce, msg.toStdString());
+				pub_sub_system_.Publish(kAria2Responce, msg);
 			});
-			QObject::connect(
-				&websocket_client_, &Aria2cWebSocketClient::StateChanged, [this](QAbstractSocket::SocketState state) {
-					// 只有web socket 链接上 aria2c 服务端后才去同步BitTorrent 服务器列表这样才能设置上去
-					if (engine_is_runing_ && state == QAbstractSocket::ConnectedState) {
-						daily_task_timer_.Start(std::bind(&Aria2cDownloadManager::SyncMagnetServerList, this));
-					}
-					else {
-						LOG_WARN("websocket_client_ state {}", static_cast<int>(state));
-					}
-				});
-
+			websocket_client_.SetStateChanageCallback([this](const State& state, std::string msg) {
+				// 只有web socket 链接上 aria2c 服务端后才去同步BitTorrent 服务器列表这样才能设置上去
+				if (!daily_task_timer_is_runing.load() && state == State::kConnected) {
+					LOG_DBG("start daily_task_timer");
+					daily_task_timer_.Start(std::bind(&Aria2cDownloadManager::SyncMagnetServerList, this));
+					daily_task_timer_is_runing.store(true);
+				}
+				else {
+					LOG_WARN("websocket_client_ state {} error {}", static_cast<int>(state), msg);
+				}
+			});
 			// io 线程放在最后
 			worker_ = std::thread([this] { io_context_.run(); });
 		}
@@ -126,7 +122,7 @@ namespace gdl {
 
 			// 磁力链接服务器黑名单
 			const std::string trackers_black_url(
-				"https://cdn.jsdelivr.net/gh/XIU2/TrackersListCollection/blacklist.txt");
+				"https://bitbucket.org/xiu2/trackerslistcollection/raw/master/blacklist.txt");
 			auto bt_exclude_tracker = GetBitTorrentUrl(trackers_black_url);
 			if (!bt_exclude_tracker.empty()) {
 				// 如获取的黑名单列表不为空则设置
@@ -188,20 +184,13 @@ namespace gdl {
 			std::string result;
 			try {
 				if (url.empty() || !engine_is_runing_) return result;
-				boost::urls::url trackers_black_url(url);
-				std::string base_url = std::move(trackers_black_url.scheme());
-				base_url += "://";
-				base_url += std::move(trackers_black_url.host());
-				httplib::Client cli(base_url);
-				cli.set_connection_timeout(std::chrono::seconds(30));
-				cli.set_read_timeout(std::chrono::seconds(5));
-				cli.set_write_timeout(std::chrono::seconds(5));
-				auto reply = cli.Get(trackers_black_url.path());
-				if (!reply) {
-					LOG_ERR("sync manget trackers server list faild error {}", httplib::to_string(reply.error()));
+
+				auto reply = cpr::Get(cpr::Url(url));
+				if (reply.status_code != 200) {
+					LOG_ERR("sync manget trackers server list faild error {}", reply.error.message);
 					return result;
 				}
-				result = ParseTextUrls(reply->body);
+				result = ParseTextUrls(reply.text);
 			} catch (std::exception& e) {
 				LOG_ERR("{}", e.what());
 			}
@@ -235,7 +224,7 @@ namespace gdl {
 			engine_is_runing_ = false;
 			update_aria2c_tasks_timer_.Stop();
 			daily_task_timer_.Stop();
-			websocket_client_.disconnect();
+			websocket_client_.Disconnect();
 			work_.reset();
 			io_context_.stop();
 			worker_.join();

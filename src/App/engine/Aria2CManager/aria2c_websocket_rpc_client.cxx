@@ -1,28 +1,54 @@
 #include "aria2c_websocket_rpc_client.h"
+#include <boost/url.hpp>
 #include "engine_def.h"
 #include "logger.h"
 namespace gdl {
 	namespace engine {
 
-		Aria2cWebSocketClient::Aria2cWebSocketClient(const QString& url, QObject* parent) : url_(url), QObject(parent) {
-			connect(&websocket_, &QWebSocket::connected, this, &Aria2cWebSocketClient::onConnected);
-			connect(&websocket_, &QWebSocket::disconnected, this, &Aria2cWebSocketClient::onClosed);
-			connect(&websocket_, &QWebSocket::errorOccurred, this, [this](QAbstractSocket::SocketError error) {
-				int err_code = static_cast<int>(error);
-				LOG_ERR("connect websocket faild error code  {}", err_code);
+		Aria2cWebSocketClient::Aria2cWebSocketClient(const std::string& url) : url_(url) {
+			// connected
+			websocket_.setConnectCallback([this] {
+				if (state_chanage_callback_) {
+					state_chanage_callback_(State::kConnected, "");
+				}
 			});
-			connect(&websocket_, &QWebSocket::textMessageReceived, this, &Aria2cWebSocketClient::onTextMessageReceived);
-			connect(&websocket_, &QWebSocket::binaryMessageReceived, this,
-					&Aria2cWebSocketClient::onTextMessageReceived);
-			connect(&websocket_, &QWebSocket::stateChanged, this, &Aria2cWebSocketClient::StateChanged);
+			// closed
+			websocket_.setDisconnectCallback([this] {
+				if (state_chanage_callback_) {
+					state_chanage_callback_(State::kClosed, "");
+				}
+			});
+			// error message
+			websocket_.setErrorCallback([this](const std::string& error) {
+				if (state_chanage_callback_) {
+					state_chanage_callback_(State::kClosed, error);
+				}
+			});
+			// receive message
+			websocket_.setMessageCallback([this](const std::string& msg) {
+				if (text_message_callback_) {
+					text_message_callback_(msg);
+				}
+			});
 		}
 
 		Aria2cWebSocketClient::~Aria2cWebSocketClient() {
-			websocket_.close();
+			websocket_.disconnect();
 		}
 
 		void Aria2cWebSocketClient::Open() {
-			websocket_.open(url_);
+			boost::urls::url ws_server_url(url_);
+			auto host	   = ws_server_url.host();
+			auto port	   = ws_server_url.port();
+			auto path	   = ws_server_url.path();
+			const auto res = websocket_.connect(host, std::stol(port), path);
+			if (!res) {
+				LOG_ERR("connect websocket server faild {}", url_);
+			}
+		}
+
+		void Aria2cWebSocketClient::Disconnect() {
+			websocket_.disconnect();
 		}
 
 		Result<bool> Aria2cWebSocketClient::AddUri(const std::vector<std::string>& uris, const Options& options) {
@@ -237,17 +263,12 @@ namespace gdl {
 			return Send("aria2.forceShutdown", params);
 		}
 
-		void Aria2cWebSocketClient::onConnected() {
-			if (websocket_.state() == QAbstractSocket::ConnectedState) {
-				GetVersion();
-			}
+		void Aria2cWebSocketClient::SetMessageCallback(const std::function<void(const std::string&)>& cb) {
+			text_message_callback_ = cb;
 		}
 
-		void Aria2cWebSocketClient::onClosed() {}
-
-		void Aria2cWebSocketClient::onTextMessageReceived(QString message) {
-			LOG_DBG("Received websocket msg {}", message.toStdString());
-			Q_EMIT MessageReceived(std::move(message));
+		void Aria2cWebSocketClient::SetStateChanageCallback(const std::function<void(const State&, std::string)>& cb) {
+			state_chanage_callback_ = cb;
 		}
 
 		Result<bool> Aria2cWebSocketClient::Send(const std::string_view& method, const nlohmann::json& params) {
@@ -258,12 +279,11 @@ namespace gdl {
 			doc["method"]  = method;
 			doc["params"]  = params;
 			doc["id"]	   = std::to_string(++id);
-			if (websocket_.state() != QAbstractSocket::ConnectedState) {
+			if (!websocket_.isConnect()) {
 				return MakeFail(static_cast<std::int64_t>(gdl::ErrorType::kUnknownError));
 			}
-			const auto data = QString::fromStdString(doc.dump());
-			const auto len	= websocket_.sendTextMessage(data);
-			return len == data.size();
+			const auto data = doc.dump();
+			return websocket_.send(data);
 		}
 
 	}  // namespace engine

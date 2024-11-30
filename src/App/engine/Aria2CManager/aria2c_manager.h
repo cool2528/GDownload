@@ -47,6 +47,7 @@ namespace gdl {
 			String aria2c_path_;
 			boost::asio::io_context io_context_;
 			std::atomic_bool engine_is_runing_{false};
+			std::atomic_bool daily_task_timer_is_runing{false};
 			boost::asio::executor_work_guard<boost::asio::io_context::executor_type> work_;
 			DailyTaskTimer daily_task_timer_;
 			AsyncTimer update_aria2c_tasks_timer_;

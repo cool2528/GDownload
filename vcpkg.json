@@ -10,9 +10,10 @@
     "boost-locale",
     "boost-url",
     {
-      "name":"cpp-httplib",
-      "features":["zlib","openssl"]
+      "name":"cpr",
+      "features":["ssl"]
     },
+    "libwebsockets",
     "nlohmann-json"
   ]
 }
