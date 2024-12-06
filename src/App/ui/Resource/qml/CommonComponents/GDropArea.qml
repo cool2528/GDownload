@@ -5,7 +5,7 @@ import Qt.labs.platform
 import gdl.sdk
 Item {
     id: control
-
+    property string path: ""
     Rectangle {
         id: dropArea
         property bool hoverd: false
@@ -97,6 +97,7 @@ Item {
     }
 
     function handleFile(fileUrl) {
+        path = fileUrl
         console.log("Processing file:", fileUrl)
     }
 }
