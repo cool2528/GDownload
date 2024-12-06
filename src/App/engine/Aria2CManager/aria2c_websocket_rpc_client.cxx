@@ -10,6 +10,7 @@ namespace gdl {
 			websocket_.setConnectCallback([this] {
 				if (state_chanage_callback_) {
 					state_chanage_callback_(State::kConnected, "");
+					GetVersion();
 				}
 			});
 			// closed

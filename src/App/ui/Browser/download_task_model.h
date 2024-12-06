@@ -18,7 +18,8 @@ namespace gdl {
 					  task_save_path_(other.task_save_path_),
 					  task_total_size_(other.task_total_size_),
 					  task_current_size_(other.task_current_size_),
-					  task_download_speed_(other.task_download_speed_) {}
+					  task_download_speed_(other.task_download_speed_),
+					  task_connections_(other.task_connections_) {}
 
 				DownloadTaskInfo(DownloadTaskInfo&& other) noexcept
 					: task_id_(std::move(other.task_id_)),
@@ -27,7 +28,8 @@ namespace gdl {
 					  task_save_path_(std::move(other.task_save_path_)),
 					  task_total_size_(other.task_total_size_),
 					  task_current_size_(other.task_current_size_),
-					  task_download_speed_(other.task_download_speed_) {}
+					  task_download_speed_(other.task_download_speed_),
+					  task_connections_(other.task_connections_) {}
 
 				DownloadTaskInfo& operator=(const DownloadTaskInfo& other) {
 					if (this != &other) {
@@ -38,6 +40,7 @@ namespace gdl {
 						task_total_size_	 = other.task_total_size_;
 						task_current_size_	 = other.task_current_size_;
 						task_download_speed_ = other.task_download_speed_;
+						task_connections_	 = other.task_connections_;
 					}
 					return *this;
 				}
@@ -51,6 +54,7 @@ namespace gdl {
 						task_total_size_	 = other.task_total_size_;
 						task_current_size_	 = other.task_current_size_;
 						task_download_speed_ = other.task_download_speed_;
+						task_connections_	 = other.task_connections_;
 					}
 					return *this;
 				}
@@ -62,6 +66,7 @@ namespace gdl {
 				std::int64_t task_total_size() const { return task_total_size_; }
 				std::int64_t task_current_size() const { return task_current_size_; }
 				std::int64_t task_download_speed() const { return task_download_speed_; }
+				std::int64_t task_connections() const { return task_connections_; }
 
 				void set_task_id(const QString& task_id) { task_id_ = task_id; }
 				void set_task_state(TaskState state) { task_state_ = state; }
@@ -70,6 +75,7 @@ namespace gdl {
 				void set_task_total_size(std::int64_t total_size) { task_total_size_ = total_size; }
 				void set_task_current_size(std::int64_t current_size) { task_current_size_ = current_size; }
 				void set_task_download_speed(std::int64_t download_speed) { task_download_speed_ = download_speed; }
+				void set_task_connections(std::int64_t task_connections) { task_connections_ = task_connections; }
 
 				double progress() const {
 					if (task_total_size_ <= 0) return 0.0;
@@ -149,6 +155,7 @@ namespace gdl {
 				std::int64_t task_total_size_;
 				std::int64_t task_current_size_;
 				std::int64_t task_download_speed_;
+				std::int64_t task_connections_;
 			};
 
 			class DownloadTaskModel : public QAbstractListModel {
@@ -163,7 +170,8 @@ namespace gdl {
 					kTaskCurrentSize,
 					kTaskDownloadSpeed,
 					kTaskProgress,
-					kTaskRemainingTime
+					kTaskRemainingTime,
+					kTaskConnections
 				};
 
 			   public:

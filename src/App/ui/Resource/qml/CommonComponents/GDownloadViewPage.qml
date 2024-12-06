@@ -52,7 +52,7 @@ Rectangle{
                         spacing: 10
                         Text {
                             id: titleName
-                            text: modelData
+                            text: model.fileName
                             Layout.leftMargin: 20
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
@@ -119,7 +119,7 @@ Rectangle{
                             Layout.preferredHeight: 6
                             from: 0
                             to:100
-                            value: 50
+                            value: model.progress
                             bkColor: GTheme.dark ? "#ffffff" : "#e8ebf3"
                         }
                     }
@@ -134,7 +134,7 @@ Rectangle{
                             Layout.margins: 10
                             Layout.alignment:  Qt.AlignLeft
                             Layout.fillWidth: true
-                            text: qsTr("7.38MB/5.43GB")
+                            text: model.currentSize + "/" + model.totalSize //qsTr("7.38MB/5.43GB")
                             color: GTheme.dark ? "#878787" : "#a0a0a0"
                             font.pixelSize: 14
                         }
@@ -151,7 +151,7 @@ Rectangle{
                                 Layout.rightMargin: 10
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                text: qsTr("↓973.4 KB/s")
+                                text: model.downloadSpeed //qsTr("↓973.4 KB/s")
                                 color: GTheme.dark ? "#878787" : "#a0a0a0"
                                 font.pixelSize: 14
                             }
@@ -162,7 +162,7 @@ Rectangle{
                                 Layout.rightMargin: 10
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                text: qsTr("Remaining 1h 37m 21s")
+                                text: qsTr("Remaining ") + model.remainingTime //qsTr("Remaining 1h 37m 21s")
                                 color: GTheme.dark ? "#878787" : "#a0a0a0"
                                 font.pixelSize: 14
                             }
@@ -185,7 +185,7 @@ Rectangle{
                                 Layout.rightMargin: 10
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                text: qsTr("64")
+                                text: String("%1").arg(model.connections) //qsTr("64")
                                 color: GTheme.dark ? "#878787" : "#a0a0a0"
                                 font.pixelSize: 14
                             }

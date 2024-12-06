@@ -15,347 +15,198 @@ namespace gdl {
 			using DisconnectCallback = std::function<void()>;
 			using ErrorCallback		 = std::function<void(const std::string&)>;
 
-			WebSocketClient() : context_(nullptr), websocket_(nullptr), isConnected_(false) {
-				// 设置日志级别
-				lws_set_log_level(LLL_ERR | LLL_WARN, nullptr);
-			}
+			WebSocketClient() { lws_set_log_level(LLL_ERR | LLL_WARN, nullptr); }
 
 			~WebSocketClient() { disconnect(); }
 
-			// 连接到WebSocket服务器
 			bool connect(const std::string& url, int port, const std::string& path = "/") {
-				disconnect();
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				server_address_ = url;
+				port_			= port;
+				path_			= path;
+				memset(&info_, 0, sizeof(info_));
+				info_.options			  = LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
+				info_.port				  = CONTEXT_PORT_NO_LISTEN;
+				protocols_				  = {{"json", globalCallback, 0, 0, 0, nullptr, 0}, LWS_PROTOCOL_LIST_TERM};
+				info_.protocols			  = protocols_.data();
+				info_.fd_limit_per_thread = 1 + 1 + 1;
 
-				LOG_INFO("Attempting to connect to Aria2 RPC at {}:{}{}", url, port, path);
-
-				// 保存连接参数供重连使用
-				lastUrl_  = url;
-				lastPort_ = port;
-				lastPath_ = path;
-
-				struct lws_context_creation_info info;
-				memset(&info, 0, sizeof(info));
-
-				protocols_ = {{
-								  "ws",								 // name
-								  &WebSocketClient::globalCallback,	 // callback
-								  0,								 // per_session_data_size
-								  32768,							 // rx_buffer_size
-								  0,								 // id
-								  this,								 // user
-								  32768								 // tx_packet_size
-							  },
-							  {nullptr, nullptr, 0, 0, 0, nullptr, 0}};
-
-				info.port = CONTEXT_PORT_NO_LISTEN;
-
-				info.protocols			   = protocols_.data();
-				info.gid				   = -1;
-				info.uid				   = -1;
-				info.options			   = 0;
-				info.ka_time			   = 10;  // keepalive 时间
-				info.ka_probes			   = 3;	  // keepalive 探测次数
-				info.ka_interval		   = 10;  // keepalive 间隔
-				info.retry_and_idle_policy = NULL;
-
-				LOG_DBG("Creating context...");
-				context_ = lws_create_context(&info);
+				context_ = lws_create_context(&info_);
 				if (!context_) {
-					LOG_ERR("Failed to create context");
+					LOG_ERR("init context faild");
 					return false;
 				}
-
-				struct lws_client_connect_info conn_info;
-				memset(&conn_info, 0, sizeof(conn_info));
-
-				conn_info.context					= context_;
-				conn_info.address					= url.c_str();
-				conn_info.port						= port;
-				conn_info.path						= path.c_str();
-				conn_info.host						= url.c_str();
-				conn_info.origin					= url.c_str();
-				conn_info.protocol					= protocols_[0].name;
-				conn_info.pwsi						= &websocket_;
-				conn_info.ssl_connection			= 0;
-				conn_info.ietf_version_or_minus_one = -1;
-				conn_info.userdata					= this;
-				conn_info.retry_and_idle_policy		= NULL;
-
-				LOG_DBG("Connecting to {}:{}{}", url, port, path);
-				websocket_ = lws_client_connect_via_info(&conn_info);
-				if (!websocket_) {
-					LOG_ERR("Failed to create websocket connection");
-					return false;
-				}
-
-				// 启动服务线程
-				shouldStop_	   = false;
-				serviceThread_ = std::thread([this]() {
-					int retry_count		  = 0;
-					const int MAX_RETRIES = 5;
-
-					while (!shouldStop_) {
-						if (context_) {
-							int n = lws_service(context_, 50);
-							if (n < 0) {
-								LOG_ERR("lws_service error: {}", n);
-								retry_count++;
-								if (retry_count >= MAX_RETRIES) {
-									LOG_ERR("Max retries reached, stopping service thread");
-									break;
-								}
-								std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-								continue;
-							}
-							retry_count = 0;  // 重置重试计数
-						}
-						std::this_thread::sleep_for(std::chrono::milliseconds(10));
+				is_init_context_ = true;
+				lws_sul_schedule(context_, 0, &sul_, &sulCallback, 1);
+				loop_thread_ = std::thread([this] {
+					int n = 0;
+					while (n >= 0 && !interrupted_) {
+						n = lws_service(context_, 0);
 					}
-					LOG_INFO("Service thread stopped");
 				});
 
-				// 等待连接建立或超时
-				// const int TIMEOUT_MS		= 5000;
-				// const int SLEEP_INTERVAL_MS = 100;
-				// int waited_ms				= 0;
-
-				// while (!isConnected_ && waited_ms < TIMEOUT_MS) {
-				// 	std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_INTERVAL_MS));
-				// 	waited_ms += SLEEP_INTERVAL_MS;
-
-				// 	// 检查是否发生了错误
-				// 	if (lastError_.length() > 0) {
-				// 		LOG_ERR("Connection failed: {}", lastError_);
-				// 		disconnect();
-				// 		return false;
-				// 	}
-				// }
-
-				// if (!isConnected_) {
-				// 	LOG_ERR("Connection timeout after {} ms", TIMEOUT_MS);
-				// 	disconnect();
-				// 	return false;
-				// }
-
-				LOG_INFO("Successfully connected to Aria2 RPC");
 				return true;
 			}
 
-			// 断开连接
 			void disconnect() {
-				LOG_DBG("Disconnecting websocket...");
-				shouldStop_ = true;
-
-				// 清除最后的错误信息
-				{
-					std::lock_guard<std::mutex> lock(errorMutex_);
-					lastError_.clear();
+				interrupted_ = true;
+				if (loop_thread_.joinable()) {
+					loop_thread_.join();
 				}
-
-				// 等待服务线程结束
-				if (serviceThread_.joinable()) {
-					serviceThread_.join();
-				}
-
-				// 关闭 websocket 连接
-				if (websocket_) {
-					lws_callback_on_writable(websocket_);
-					websocket_ = nullptr;
-				}
-
-				// 清理 context
 				if (context_) {
 					lws_context_destroy(context_);
 					context_ = nullptr;
 				}
-
-				isConnected_ = false;
-
-				// 清空消息队列
-				std::lock_guard<std::mutex> lock(messageMutex_);
-				std::queue<std::string> empty;
-				std::swap(messageQueue_, empty);
-
-				LOG_DBG("Websocket disconnected");
+				is_connected_ = false;
 			}
 
-			// 发送消息
 			bool send(const std::string& message) {
-				if (!isConnected_ || !websocket_) {
+				if (interrupted_ || !wsi_) {
 					LOG_ERR("Not connected");
 					return false;
 				}
-
-				std::lock_guard<std::mutex> lock(messageMutex_);
-				messageQueue_.push(message);
-				lws_callback_on_writable(websocket_);
+				std::lock_guard lock(message_mutex_);
+				message_queue_.push(message);
+				lws_callback_on_writable(wsi_);
 				return true;
 			}
 
 			// 设置回调
-			void setMessageCallback(MessageCallback cb) { messageCallback_ = std::move(cb); }
-			void setConnectCallback(ConnectCallback cb) { connectCallback_ = std::move(cb); }
-			void setDisconnectCallback(DisconnectCallback cb) { disconnectCallback_ = std::move(cb); }
-			void setErrorCallback(ErrorCallback cb) { errorCallback_ = std::move(cb); }
-			bool isConnect() const { return isConnected_; }
+			void setMessageCallback(MessageCallback cb) { message_mallback_ = std::move(cb); }
+			void setConnectCallback(ConnectCallback cb) { connect_callback_ = std::move(cb); }
+			void setDisconnectCallback(DisconnectCallback cb) { disconnect_callback_ = std::move(cb); }
+			void setErrorCallback(ErrorCallback cb) { error_callback_ = std::move(cb); }
+			bool isConnect() const { return is_connected_; }
 
 		   private:
 			static int globalCallback(struct lws* wsi, enum lws_callback_reasons reason, void* user, void* in,
 									  size_t len) {
-				auto protocol_ptr = lws_get_protocol(wsi);
-				if (!protocol_ptr) return -1;
-				auto client = static_cast<WebSocketClient*>(protocol_ptr->user);
-				if (!client) {
-					LOG_ERR("Client pointer is null");
-					return -1;
-				}
-
+				WebSocketClient* self = static_cast<WebSocketClient*>(user);
 				switch (reason) {
 					case LWS_CALLBACK_CLIENT_CONNECTION_ERROR: {
-						std::string error = "Connection error";
-						if (in) {
-							error += ": " + std::string(static_cast<char*>(in), len);
+						std::string msg(static_cast<char*>(in), len);
+						LOG_ERR("CLIENT_CONNECTION_ERROR: {}", msg);
+						if (self->error_callback_) {
+							self->error_callback_(msg);
 						}
-						LOG_ERR(error);
-						client->setLastError(error);
-						client->isConnected_ = false;
-						if (client->errorCallback_) {
-							client->errorCallback_(error);
-						}
-						// 尝试自动重连
-						if (!client->shouldStop_) {	 // 只在非主动断开的情况下重连
-							std::thread([client]() {
-								std::this_thread::sleep_for(std::chrono::seconds(2));  // 等待2秒后重连
-								if (!client->shouldStop_ && !client->isConnected_) {
-									client->reconnect();
-								}
-							}).detach();
-						}
+						self->is_connected_ = false;
+						goto do_retry;
 						break;
 					}
-
-					case LWS_CALLBACK_WSI_DESTROY:
-						LOG_DBG("WSI destroyed");
-						client->websocket_ = nullptr;  // 清除 websocket 指针
-						break;
-
-					case LWS_CALLBACK_CLIENT_CLOSED:
-						LOG_INFO("Connection closed");
-						client->isConnected_ = false;
-						client->websocket_	 = nullptr;	 // 清除 websocket 指针
-						if (client->disconnectCallback_) {
-							client->disconnectCallback_();
+					case LWS_CALLBACK_CLIENT_RECEIVE: {
+						std::string msg(static_cast<char*>(in), len);
+						if (self->message_mallback_) {
+							self->message_mallback_(msg);
 						}
-						// 尝试自动重连
-						if (!client->shouldStop_) {	 // 只在非主动断开的情况下重连
-							std::thread([client]() {
-								std::this_thread::sleep_for(std::chrono::seconds(2));  // 等待2秒后重连
-								if (!client->shouldStop_ && !client->isConnected_) {
-									client->reconnect();
-								}
-							}).detach();
+					} break;
+					case LWS_CALLBACK_CLIENT_ESTABLISHED: {
+						self->is_connected_ = true;
+						if (self->connect_callback_) {
+							self->connect_callback_();
 						}
-						break;
-
-					case LWS_CALLBACK_CLIENT_ESTABLISHED:
-						LOG_INFO("Connection established");
-						client->isConnected_ = true;
-						if (client->connectCallback_) {
-							client->connectCallback_();
-						}
-						break;
-
-					case LWS_CALLBACK_CLIENT_RECEIVE:
-						if (client->messageCallback_ && in && len > 0) {
-							std::string message(static_cast<char*>(in), len);
-							LOG_DBG("Received message: {}", message);
-							client->messageCallback_(message);
-						}
-						break;
-
+					} break;
+					case LWS_CALLBACK_CLIENT_CLOSED: {
+						self->is_connected_ = false;
+						std::string msg(static_cast<char*>(in), len);
+						LOG_WARN("LWS_CALLBACK_CLIENT_CLOSED:{}", msg);
+						goto do_retry;
+					} break;
 					case LWS_CALLBACK_CLIENT_WRITEABLE:
-						client->sendPendingMessages();
+						self->sendPendingMessages(wsi);
 						break;
-
 					default:
-						// 其他回调不需要特别处理
 						break;
+				}
+				return lws_callback_http_dummy(wsi, reason, user, in, len);
+			do_retry:
+				if (lws_retry_sul_schedule_retry_wsi(wsi, &self->sul_, sulCallback, &self->retry_count)) {
+					LOG_WARN("connection attempts exhausted");
+					self->interrupted_ = true;
 				}
 				return 0;
 			}
 
-			void sendPendingMessages() {
-				std::lock_guard<std::mutex> lock(messageMutex_);
-				while (!messageQueue_.empty() && isConnected_) {
-					const std::string& message = messageQueue_.front();
+			static void sulCallback(lws_sorted_usec_list_t* sul) {
+				WebSocketClient* self = lws_container_of(sul, WebSocketClient, sul_);
+				struct lws_client_connect_info info;
+				memset(&info, 0, sizeof(info));
 
-					// LWS_PRE 是必需的预留空间
+				info.context = self->context_;
+				info.port	 = self->port_;
+				info.address = self->server_address_.c_str();
+				info.path	 = self->path_.c_str();
+				info.host	 = info.address;
+				info.origin	 = info.address;
+				//info.ssl_connection				   = ~LCCSCF_USE_SSL;
+				info.protocol					   = "ws";
+				info.local_protocol_name		   = "json";
+				info.pwsi						   = &self->wsi_;
+				static const uint32_t backoff_ms[] = {1000, 2000, 3000, 4000, 5000};
+
+				static const lws_retry_bo_t retry = {
+					.retry_ms_table		  = backoff_ms,
+					.retry_ms_table_count = LWS_ARRAY_SIZE(backoff_ms),
+					.conceal_count		  = LWS_ARRAY_SIZE(backoff_ms),
+
+					.secs_since_valid_ping	 = 3,
+					.secs_since_valid_hangup = 10,
+
+					.jitter_percent = 20,
+				};
+				info.retry_and_idle_policy = &retry;
+				info.userdata			   = self;
+				if (!lws_client_connect_via_info(&info)) {
+					if (lws_retry_sul_schedule(self->context_, 0, sul, &retry, sulCallback, &self->retry_count)) {
+						LOG_WARN("connection attempts exhausted");
+						self->interrupted_ = true;
+					}
+				}
+			}
+			void sendPendingMessages(struct lws* wsi) {
+				if (!wsi) return;
+				std::lock_guard lock(message_mutex_);
+				while (!message_queue_.empty() && is_connected_) {
+					const std::string& message = message_queue_.front();
 					std::vector<uint8_t> buf(LWS_PRE + message.size());
 					memcpy(buf.data() + LWS_PRE, message.data(), message.size());
-
-					int sent = lws_write(websocket_, buf.data() + LWS_PRE, message.size(), LWS_WRITE_TEXT);
-
+					int sent = lws_write(wsi, buf.data() + LWS_PRE, message.size(), LWS_WRITE_TEXT);
 					if (sent < 0) {
 						LOG_ERR("Error writing to socket");
-						setLastError("Write error occurred");
-						isConnected_ = false;  // 标记连接已断开
-						if (errorCallback_) {
-							errorCallback_("Write error occurred");
+						if (error_callback_) {
+							error_callback_("Write error occurred");
 						}
 						break;
 					}
 					else if (static_cast<size_t>(sent) < message.size()) {
 						LOG_ERR("Partial write");
-						// 保留消息以便重试
 						break;
 					}
 
-					messageQueue_.pop();
+					message_queue_.pop();
 				}
 			}
 
 		   private:
-			struct lws_context* context_;
-			struct lws* websocket_;
 			std::vector<lws_protocols> protocols_;
+			struct lws_context* context_{nullptr};
+			struct lws_context_creation_info info_;
+			lws_sorted_usec_list_t sul_;
+			struct lws* wsi_{nullptr};
+			unsigned short retry_count;
+			std::thread loop_thread_;
+			std::atomic_bool interrupted_{false};
+			std::queue<std::string> message_queue_;
+			std::mutex message_mutex_;
 
-			std::thread serviceThread_;
-			std::atomic<bool> shouldStop_{false};
-			std::atomic<bool> isConnected_{false};
-
-			std::queue<std::string> messageQueue_;
-			std::mutex messageMutex_;
-
-			MessageCallback messageCallback_;
-			ConnectCallback connectCallback_;
-			DisconnectCallback disconnectCallback_;
-			ErrorCallback errorCallback_;
-
-			// 添加错误消息存储
-			std::string lastError_;
-			std::mutex errorMutex_;
-
-			void setLastError(const std::string& error) {
-				std::lock_guard<std::mutex> lock(errorMutex_);
-				lastError_ = error;
-			}
-
-			// 添加重连机制
-			bool reconnect() {
-				LOG_INFO("Attempting to reconnect...");
-				disconnect();  // 确保之前的连接完全关闭
-
-				// 等待一段时间再重连
-				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-				return connect(lastUrl_, lastPort_, lastPath_);
-			}
-
-			// 存储最后的连接信息，用于重连
-			std::string lastUrl_;
-			int lastPort_{0};
-			std::string lastPath_;
+		   private:
+			MessageCallback message_mallback_;
+			ConnectCallback connect_callback_;
+			DisconnectCallback disconnect_callback_;
+			ErrorCallback error_callback_;
+			std::atomic_bool is_connected_{false};
+			std::string server_address_;
+			unsigned int port_;
+			std::atomic_bool is_init_context_{false};
+			std::string path_;
 		};
 	}  // namespace engine
 }  // namespace gdl

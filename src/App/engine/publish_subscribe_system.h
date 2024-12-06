@@ -19,7 +19,7 @@ namespace gdl {
 
 		   public:
 			explicit PubSubSystem(boost::asio::io_context& io_context) : io_context_(io_context), strand_(io_context) {}
-
+			~PubSubSystem() {}
 			void Publish(const std::string& topic, T message) {
 				boost::asio::post(strand_, [this, topic, message = std::move(message)]() {
 					auto it = subscribers_.find(topic);
