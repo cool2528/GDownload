@@ -36,7 +36,7 @@ namespace gdl {
 					}
 					pub_sub_system_.Publish(kAria2Responce, msg);
 				} catch (std::exception& e) {
-					LOG_ERR("{}", e.what());
+					LOG_ERR("data {}  error: {}", msg, e.what());
 				} catch (...) {
 					LOG_ERR("MessageCallback exception");
 				}
@@ -75,7 +75,7 @@ namespace gdl {
 			aria2c_settings["dht-file-path6"]		  = quote_path(GetDhtPath(IP_VERSION::V6));
 
 			aria2c_settings["dht-listen-port"] = config::GetValue(config::Keys::DhtListenPort).AsString();	//"26701";
-			aria2c_settings["dir"]			   = quote_path(config::GetValue(config::Keys::Dir).AsString());
+			aria2c_settings["dir"]			   = config::GetValue(config::Keys::Dir).AsString();
 			aria2c_settings["enable-dht6"]	   = "true";
 			aria2c_settings["follow-metalink"] = "true";
 			aria2c_settings["follow-torrent"]  = "true";
@@ -126,7 +126,7 @@ namespace gdl {
 			static const std::vector<std::string> keys = {
 				"status",	"totalLength", "completedLength", "uploadLength", "downloadSpeed", "uploadSpeed",
 				"infoHash", "numSeeders",  "seeder",		  "connections",  "errorCode",	   "errorMessage",
-				"dir",		"files",	   "bittorrent"};
+				"dir",		"bittorrent"};
 			websocket_client_.TellStopped(0, 100, keys);
 			websocket_client_.TellActive(keys);
 			websocket_client_.TellWaiting(0, 100, keys);

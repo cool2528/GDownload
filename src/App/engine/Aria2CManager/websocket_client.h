@@ -93,9 +93,12 @@ namespace gdl {
 						break;
 					}
 					case LWS_CALLBACK_CLIENT_RECEIVE: {
+						static std::string msg_buf;
 						std::string msg(static_cast<char*>(in), len);
-						if (self->message_mallback_) {
-							self->message_mallback_(msg);
+						msg_buf += msg;
+						if (self->message_mallback_ && lws_is_final_fragment(wsi)) {
+							self->message_mallback_(msg_buf);
+							msg_buf.clear();
 						}
 					} break;
 					case LWS_CALLBACK_CLIENT_ESTABLISHED: {

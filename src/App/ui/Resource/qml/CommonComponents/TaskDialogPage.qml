@@ -142,6 +142,14 @@ Popup {
 
                         color: GTheme.dark ? "#2e2e2e" : "#ffffff"
                     }
+                    function geturls(){
+                        if(currentIndex == 0){
+                            return input.text
+                        }else{
+                           return dropTorent.path
+                        }
+
+                    }
                 }
 
                 //General Configuration
@@ -300,6 +308,9 @@ Popup {
                         Layout.preferredHeight: 26
                         Layout.preferredWidth: 70
                         text: qsTr("Submit")
+                        onClicked: {
+                            BrowserManager.AddHttpTask(taskPageLayout.geturls(),{})
+                        }
                     }
 
                 }
