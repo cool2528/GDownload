@@ -118,22 +118,19 @@ Item {
                 GDownloadViewPage {
                     id: downloadPage
                     objectName: "downloadPage"
-                    property var pageModel: ["1","2","3"]
-                    model: pageModel
+                    model: BrowserManager.GetActiveDownloadModel()
                 }
                 
                 GDownloadViewPage {
                     id: waitingPage
                     objectName: "waitingPage"
-                    property var pageModel: ["4","5","6"]
-                    model: pageModel
+                    model: BrowserManager.GetWaitingDownloadModel()
                 }
                 
                 GDownloadViewPage {
                     id: completedPage
                     objectName: "completedPage"
-                    property var pageModel: ["7","8","9"]
-                    model: pageModel
+                    model: BrowserManager.GetStopedDownloadModel()
                 }
             }
         }

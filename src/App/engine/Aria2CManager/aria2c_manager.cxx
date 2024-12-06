@@ -25,7 +25,21 @@ namespace gdl {
 
 			websocket_client_.SetMessageCallback([this](const std::string& msg) {
 				// 直接收到的所有消息 通过发布订阅回客户端
-				pub_sub_system_.Publish(kAria2Responce, msg);
+				try {
+					nlohmann::json doc = nlohmann::json::parse(msg.data());
+					if (doc.find("error") != doc.end() && doc["error"].is_object()) {
+						auto error_object = doc["error"];
+						if (error_object.find("code") != error_object.end() && error_object["code"].is_number()) {
+							auto code = error_object["code"].get<std::int64_t>();
+							if (code == -32600) return;
+						}
+					}
+					pub_sub_system_.Publish(kAria2Responce, msg);
+				} catch (std::exception& e) {
+					LOG_ERR("{}", e.what());
+				} catch (...) {
+					LOG_ERR("MessageCallback exception");
+				}
 			});
 			websocket_client_.SetStateChanageCallback([this](const State& state, std::string msg) {
 				// 只有web socket 链接上 aria2c 服务端后才去同步BitTorrent 服务器列表这样才能设置上去
@@ -225,10 +239,11 @@ namespace gdl {
 
 		void Aria2cDownloadManager::UninitAria2cEngine() {
 			// todo 卸载aria2c
-			websocket_client_.Shutdown();
 			engine_is_runing_ = false;
 			update_aria2c_tasks_timer_.Stop();
 			daily_task_timer_.Stop();
+			websocket_client_.Shutdown();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			websocket_client_.Disconnect();
 			work_.reset();
 			io_context_.stop();
@@ -275,7 +290,11 @@ namespace gdl {
 
 		Result<Subscription> Aria2cDownloadManager::SubscriptionAria2Message(
 			const std::string& topic, std::function<void(const std::string&)> handler) {
-			return pub_sub_system_.Subscribe(topic, handler);
+			auto sub = pub_sub_system_.Subscribe(topic, handler);
+			if (sub) {
+				return sub;
+			}
+			return MakeFail(1, "Subscribe failed");
 		}
 
 		void Aria2cDownloadManager::UnSubscribeAria2Message(Subscription subscription) {

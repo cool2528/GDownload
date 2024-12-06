@@ -3,8 +3,7 @@
 #include <QFontDatabase>
 #include <QQmlContext>
 #include <QUrl>
-
-#include "Aria2CManager/aria2c_manager.h"
+#include "Browser/browser_manager.h"
 #include "Definitions/appDef.h"
 #include "Definitions/fluentEnumDef.h"
 #include "FramelessHelper/Core/private/framelessconfig_p.h"
@@ -20,18 +19,6 @@ namespace gd {
 		int MainWindow::Exec(int argc, char* argv[]) {
 			FramelessHelper::Quick::initialize();
 			QGuiApplication app(argc, argv);
-			const QString app_path = QCoreApplication::applicationDirPath();
-			QString aria2c_engine_path;
-#ifdef __APPLE__
-			QString app_path_dir =
-				QString::fromStdString(std::filesystem::path(app_path.toStdString()).parent_path().string());
-			aria2c_engine_path = app_path_dir + "/Resources/engine/aria2c";
-#elif _WIN32 || defined(_WIN64)
-			aria2c_engine_path = app_path + "/engine/aria2c.exe";
-#else
-			aria2c_engine_path = app_path + "/engine/aria2c";
-#endif
-			gdl::engine::Aria2cDownloadManager::Instance().InitAria2cEngine(aria2c_engine_path.toStdString());
 			QQmlApplicationEngine engine;
 			InitQmlEngine(&engine);
 			InitFont(&engine);
@@ -42,7 +29,7 @@ namespace gd {
 			engine.addImportPath(QStringLiteral("qrc:/qml"));
 			engine.load(url);
 			const auto code = app.exec();
-			gdl::engine::Aria2cDownloadManager::Instance().UninitAria2cEngine();
+			UnInitEngine();
 			return code;
 		}
 
@@ -53,6 +40,7 @@ namespace gd {
 			gdl::ui::theme::RegisterTypes(engine);
 			qmlRegisterUncreatableMetaObject(SegoeFluentIcons::staticMetaObject, GEXPORT_MODULE_URL, 1, 0,
 											 "SegoeFluentIcons", "SegoeFluentIcons enum");
+			gdl::ui::browser::RegisterTypes(engine);
 		}
 		void MainWindow::InitTranslation(QGuiApplication* app) {}
 		void MainWindow::InitFont(QQmlEngine* engine) {
@@ -66,6 +54,11 @@ namespace gd {
 		}
 
 		void MainWindow::InitIcon(QGuiApplication* app) {}
+
+		void MainWindow::UnInitEngine() {
+			gdl::ui::browser::BrowserManager::Instance().UnInit();
+			gdl::engine::Aria2cDownloadManager::Instance().UninitAria2cEngine();
+		}
 
 	}  // namespace ui
 }  // namespace gd

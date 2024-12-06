@@ -1,10 +1,12 @@
 #include "download_task_model.h"
-
+#include <QJSEngine>
 namespace gdl {
 	namespace ui {
 		namespace browser {
 
-			DownloadTaskModel::DownloadTaskModel(QObject* parent) : QAbstractListModel(parent) {}
+			DownloadTaskModel::DownloadTaskModel(QObject* parent) : QAbstractListModel(parent) {
+				QJSEngine::setObjectOwnership(this, QJSEngine::CppOwnership);
+			}
 
 			DownloadTaskModel::~DownloadTaskModel() {}
 
@@ -32,6 +34,8 @@ namespace gdl {
 						return task.progress();
 					case kTaskRemainingTime:
 						return task.FormatRemainingTime();
+					case kTaskConnections:
+						return task.task_connections();
 					default:
 						return QVariant();
 				}
@@ -52,6 +56,7 @@ namespace gdl {
 				roles[kTaskDownloadSpeed] = "downloadSpeed";
 				roles[kTaskProgress]	  = "progress";
 				roles[kTaskRemainingTime] = "remainingTime";
+				roles[kTaskConnections]	  = "connections";
 				return roles;
 			}
 
@@ -77,6 +82,12 @@ namespace gdl {
 					case kTaskDownloadSpeed:
 						if (value.canConvert<qint64>()) {
 							task.set_task_download_speed(value.toLongLong());
+							changed = true;
+						}
+						break;
+					case kTaskConnections:
+						if (value.canConvert<qint64>()) {
+							task.set_task_connections(value.toLongLong());
 							changed = true;
 						}
 						break;
