@@ -53,7 +53,10 @@ namespace gdl {
 				}
 			});
 			// io 线程放在最后
-			worker_ = std::thread([this] { io_context_.run(); });
+			auto max_thread_number = std::thread::hardware_concurrency() * 3 / 2;
+			for (auto i = 0; i < max_thread_number; ++i) {
+				worker_threads_.emplace_back(std::thread([this] { io_context_.run(); }));
+			}
 		}
 
 		std::vector<String> Aria2cDownloadManager::InitAria2cSettingsArgs() {
@@ -63,6 +66,8 @@ namespace gdl {
 				return "\"" + path + "\"";
 			};
 			std::unordered_map<std::string, std::string> aria2c_settings;
+			aria2c_settings["no-conf"]				  = "false";  //no-conf
+			aria2c_settings["conf-path"]			  = config::GetValue(config::Keys::ConfPath).AsString();
 			aria2c_settings["allow-overwrite"]		  = "false";
 			aria2c_settings["auto-file-renaming"]	  = "true";
 			aria2c_settings["bt-exclude-tracker"]	  = "";
@@ -71,8 +76,8 @@ namespace gdl {
 			aria2c_settings["bt-save-metadata"]		  = "true";
 			aria2c_settings["bt-tracker"]			  = "";
 			aria2c_settings["continue"]				  = "true";
-			aria2c_settings["dht-file-path"]		  = quote_path(GetDhtPath(IP_VERSION::V4));
-			aria2c_settings["dht-file-path6"]		  = quote_path(GetDhtPath(IP_VERSION::V6));
+			aria2c_settings["dht-file-path"]		  = GetDhtPath(IP_VERSION::V4);
+			aria2c_settings["dht-file-path6"]		  = GetDhtPath(IP_VERSION::V6);
 
 			aria2c_settings["dht-listen-port"] = config::GetValue(config::Keys::DhtListenPort).AsString();	//"26701";
 			aria2c_settings["dir"]			   = config::GetValue(config::Keys::Dir).AsString();
@@ -93,15 +98,15 @@ namespace gdl {
 			aria2c_settings["seed-ratio"]				  = "2";
 			aria2c_settings["seed-time"]				  = "2880";
 			aria2c_settings["split"]					  = "64";
-			aria2c_settings["user-agent"]				  = quote_path(
+			aria2c_settings["user-agent"] =
 				"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) "
-								"Chrome/111.0.0.0 Safari/537.36");
-			aria2c_settings["all-proxy"]		 = "";
-			aria2c_settings["check-certificate"] = "false";
-			aria2c_settings["quiet"]			 = "true";
-			aria2c_settings["enable-rpc"]		 = "true";
-			aria2c_settings["rpc-listen-all"]	 = "true";
-			aria2c_settings["conf-path"]		 = quote_path(config::GetValue(config::Keys::ConfPath).AsString());
+				"Chrome/111.0.0.0 Safari/537.36";
+			aria2c_settings["check-certificate"]	= "false";
+			aria2c_settings["quiet"]				= "true";
+			aria2c_settings["enable-rpc"]			= "true";
+			aria2c_settings["rpc-listen-all"]		= "true";
+			aria2c_settings["rpc-allow-origin-all"] = "true";
+
 #ifdef _WIN32
 			DWORD processId = GetCurrentProcessId();
 #else
@@ -124,9 +129,9 @@ namespace gdl {
 		void Aria2cDownloadManager::UpdateAria2cTasks() {
 			// 更新当前aria2c 的所有 暂停 正在下载 停止的任务状态列表
 			static const std::vector<std::string> keys = {
-				"status",	"totalLength", "completedLength", "uploadLength", "downloadSpeed", "uploadSpeed",
-				"infoHash", "numSeeders",  "seeder",		  "connections",  "errorCode",	   "errorMessage",
-				"dir",		"bittorrent"};
+				"status", "totalLength", "completedLength", "downloadSpeed", "infoHash", "numSeeders",
+				"seeder", "connections", "errorCode",		"errorMessage",	 "dir",		 "files",
+				"gid",	  "bittorrent"};
 			websocket_client_.TellStopped(0, 100, keys);
 			websocket_client_.TellActive(keys);
 			websocket_client_.TellWaiting(0, 100, keys);
@@ -229,7 +234,7 @@ namespace gdl {
 			}
 			// 启动 更新当前aria2c 的所有 暂停 正在下载 停止的任务状态列表 定时器
 			update_aria2c_tasks_timer_.Start(std::bind(&Aria2cDownloadManager::UpdateAria2cTasks, this),
-											 std::chrono::seconds(2), true);
+											 std::chrono::milliseconds(200), true);
 			// 链接 aria2c websocket
 			websocket_client_.Open();
 			engine_is_runing_ = true;
@@ -247,7 +252,11 @@ namespace gdl {
 			websocket_client_.Disconnect();
 			work_.reset();
 			io_context_.stop();
-			worker_.join();
+			for (auto& t : worker_threads_) {
+				if (t.joinable()) {
+					t.join();
+				}
+			}
 		}
 
 		Result<bool> Aria2cDownloadManager::AddHttpTask(

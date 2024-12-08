@@ -10,6 +10,7 @@ class QJSEngine;
 namespace gdl {
 	namespace ui {
 		namespace browser {
+
 			Q_NAMESPACE
 			class BrowserManager : public QObject, public Singleton<BrowserManager> {
 				Q_OBJECT
@@ -33,6 +34,11 @@ namespace gdl {
 				Q_INVOKABLE bool AddMetalinkTask(const QString& metalink, const QVariantMap& options);
 				bool Init();
 				void UnInit();
+
+			   public:
+			   Q_SIGNALS:
+				void sigErrorMessage(const QString& error);
+				void sigUpdateTasksMessage(const QString& data);
 
 			   private:
 				explicit BrowserManager(QObject* parent = nullptr);

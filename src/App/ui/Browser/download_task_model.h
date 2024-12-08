@@ -5,7 +5,7 @@ namespace gdl {
 	namespace ui {
 		namespace browser {
 
-			enum class TaskState : int { kStoped = 0, kActive, kPause };
+			enum class TaskState : int { kComplete = 0, kActive, kPause, kWaiting, kError };
 
 			class DownloadTaskInfo {
 			   public:
@@ -101,24 +101,21 @@ namespace gdl {
 
 					QString result;
 					if (hour > 0) {
-						result +=
-							QString::number(hour) + " " + (hour == 1 ? QObject::tr("hour") : QObject::tr("hours"));
+						result += QString::number(hour) + " " + (hour == 1 ? QObject::tr("h") : QObject::tr("h"));
 						if (minute > 0) {
 							result += " " + QString::number(minute) + " " +
-									  (minute == 1 ? QObject::tr("minute") : QObject::tr("minutes"));
+									  (minute == 1 ? QObject::tr("m") : QObject::tr("m"));
 						}
 					}
 					else if (minute > 0) {
-						result += QString::number(minute) + " " +
-								  (minute == 1 ? QObject::tr("minute") : QObject::tr("minutes"));
+						result += QString::number(minute) + " " + (minute == 1 ? QObject::tr("m") : QObject::tr("m"));
 						if (seconds > 0) {
 							result += " " + QString::number(seconds) + " " +
-									  (seconds == 1 ? QObject::tr("second") : QObject::tr("seconds"));
+									  (seconds == 1 ? QObject::tr("s") : QObject::tr("s"));
 						}
 					}
 					else {
-						result = QString::number(seconds) + " " +
-								 (seconds == 1 ? QObject::tr("second") : QObject::tr("seconds"));
+						result = QString::number(seconds) + " " + (seconds == 1 ? QObject::tr("s") : QObject::tr("s"));
 					}
 
 					return result;

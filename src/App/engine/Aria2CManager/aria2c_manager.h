@@ -51,7 +51,7 @@ namespace gdl {
 			boost::asio::executor_work_guard<boost::asio::io_context::executor_type> work_;
 			DailyTaskTimer daily_task_timer_;
 			AsyncTimer update_aria2c_tasks_timer_;
-			std::thread worker_;
+			std::vector<std::thread> worker_threads_;
 			PubSubSystem<std::string> pub_sub_system_;
 			Aria2cWebSocketClient websocket_client_;
 		};
