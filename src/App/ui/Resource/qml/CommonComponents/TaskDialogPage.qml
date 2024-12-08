@@ -310,6 +310,7 @@ Popup {
                         text: qsTr("Submit")
                         onClicked: {
                             BrowserManager.AddHttpTask(taskPageLayout.geturls(),{})
+                            taskPage.close()
                         }
                     }
 

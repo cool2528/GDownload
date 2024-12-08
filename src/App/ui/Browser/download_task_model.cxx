@@ -102,8 +102,8 @@ namespace gdl {
 			}
 
 			void DownloadTaskModel::AddTask(const DownloadTaskInfo& task) {
-				beginInsertRows(QModelIndex(), task_lists_.size(), task_lists_.size());
-				task_lists_.append(task);
+				beginInsertRows(QModelIndex(), 0, 0);
+				task_lists_.insert(0, task);
 				endInsertRows();
 			}
 
