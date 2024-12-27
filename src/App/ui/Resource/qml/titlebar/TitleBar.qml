@@ -8,12 +8,22 @@ Rectangle {
     color: GTheme.dark ? "#242424" : "#ffffff"
     height: 32
     visible: Qt.platform.os === "osx" ? (mainWindow.fullScreen ? false : true) : true
+    Component.onCompleted: {
+       if(Qt.platform.os !== "osx"){
+           helper.setHitTestVisible(win_close)
+           helper.setHitTestVisible(win_minsize)
+           helper.setHitTestVisible(win_maxsize)
+       }
+    }
+
     RowLayout{
+        id:macosTitleBar
         spacing: 5
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.leftMargin: 10
         anchors.topMargin: 10
+        visible: Qt.platform.os === "osx"
         ImageButton{
             id:close
             width: 8
@@ -49,6 +59,56 @@ Rectangle {
                 mainWindow.toggleFullScreen()
             }
         }
+    }
+
+    // windows title bar
+    RowLayout{
+        id:winTitleBar
+        spacing: 0
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        visible: Qt.platform.os === "windows"
+        ImageButton{
+            id:win_minsize
+            Layout.preferredHeight: 32
+            Layout.preferredWidth: 40
+            imageSize:Qt.size(16,16)
+            backgroundColor: hovered ? "#c0c0c0" : "transparent"
+            normalImage: "/images/titlebar/windows-minimize.svg"
+            hoverImage: "/images/titlebar/windows-minimize-hover.svg"
+            onClicked: {
+                mainWindow.showMinimized2()
+            }
+        }
+        ImageButton{
+            id:win_maxsize
+            Layout.preferredHeight: 32
+            Layout.preferredWidth: 40
+            imageSize:Qt.size(16,16)
+            backgroundColor: hovered ? "#c0c0c0" : "transparent"
+            normalImage: "/images/titlebar/windows-maximize.svg"
+            hoverImage: "/images/titlebar/windows-maximize-hover.svg"
+            onClicked: {
+                mainWindow.toggleMaximized()
+            }
+        }
+
+        ImageButton{
+            id:win_close
+            Layout.preferredHeight: 32
+            Layout.preferredWidth: 40
+            imageSize:Qt.size(16,16)
+            backgroundColor: hovered ? "#e81123" :"transparent"
+            normalImage: "/images/titlebar/windows-close.svg"
+            hoverImage: "/images/titlebar/windows-close-hover.svg"
+            onClicked: {
+                Qt.quit()
+            }
+        }
+
+
+
     }
 
 }

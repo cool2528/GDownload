@@ -11,5 +11,11 @@
         <file>images/navigator/menu-add.svg</file>
         <file>images/navigator/menu-add_hover.svg</file>
         <file>images/taskdialog/drop-image-icon.svg</file>
+        <file>images/titlebar/windows-close.svg</file>
+        <file>images/titlebar/windows-close-hover.svg</file>
+        <file>images/titlebar/windows-maximize.svg</file>
+        <file>images/titlebar/windows-maximize-hover.svg</file>
+        <file>images/titlebar/windows-minimize.svg</file>
+        <file>images/titlebar/windows-minimize-hover.svg</file>
     </qresource>
 </RCC>

@@ -20,10 +20,10 @@ Button{
         height: imageSize.height
         mipmap: true
         smooth: true
-        HoverHandler{
-            id:mouse
-            acceptedDevices: PointerDevice.Mouse
-            cursorShape: Qt.PointingHandCursor
-        }
+    }
+    HoverHandler{
+        id:mouse
+        acceptedDevices: PointerDevice.Mouse
+        cursorShape: Qt.PointingHandCursor
     }
 }
