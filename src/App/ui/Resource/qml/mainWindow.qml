@@ -15,10 +15,14 @@ FramelessWindow{
         FramelessHelper.titleBarItem = title_bar;
         FramelessHelper.moveWindowToDesktopCenter()
         mainWindow.visible = true;
-        UtilsToolsManager.HideMacOsxWindowStandardButtons(mainWindow)
+        if(Qt.platform.os === "osx"){
+            UtilsToolsManager.HideMacOsxWindowStandardButtons(mainWindow)
+        }
     }
     onVisibilityChanged: {
-        UtilsToolsManager.HideMacOsxWindowStandardButtons(mainWindow)
+        if(Qt.platform.os === "osx"){
+            UtilsToolsManager.HideMacOsxWindowStandardButtons(mainWindow)
+        }
     }
     TitleBar{
         id:title_bar
