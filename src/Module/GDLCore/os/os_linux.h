@@ -1,4 +1,6 @@
 #pragma once
+#include <optional>
+
 #include "globalTypes.h"
 namespace gdl {
 	namespace os {

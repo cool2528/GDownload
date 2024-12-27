@@ -17,6 +17,20 @@
         "CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG":"${sourceDir}/build_osx/debug/bin",
         "CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE":"${sourceDir}/build_osx/release/bin"
       }
+    },
+    {
+      "name": "vcpkg-windows-x64-vs2022",
+      "description": "Build using vcpkg for windows x64",
+      "binaryDir": "${sourceDir}/build_win",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG":"${sourceDir}/build_win/debug/bin",
+        "CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE":"${sourceDir}/build_win/release/bin",
+        "CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG":"${sourceDir}/build_win/debug/bin",
+        "CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE":"${sourceDir}/build_win/release/bin",
+        "CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG":"${sourceDir}/build_win/debug/bin",
+        "CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE":"${sourceDir}/build_win/release/bin"
+      }
     }
   ]
 }
