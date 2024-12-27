@@ -52,24 +52,37 @@ namespace gdl {
 			}
 
 			std::optional<std::pair<String, int>> GetSystemHTTPProxy() {
-#ifdef _WIN32 || defined(_WIN64)
-				WINHTTP_PROXY_INFO proxyInfo;
+#if defined(_WIN32) || defined(_WIN64)
+				WINHTTP_CURRENT_USER_IE_PROXY_CONFIG proxyInfo;
 
 				if (WinHttpGetIEProxyConfigForCurrentUser(&proxyInfo)) {
-					if (proxyInfo.dwAccessType == WINHTTP_ACCESS_TYPE_NAMED_PROXY) {
-						String proxyServer = proxyInfo.lpszProxy;
-						int proxyPort	   = 0;
-						size_t colonPos	   = proxyServer.find(":");
-						if (colonPos != std::string::npos) {
-							proxyPort	= std::stoi(proxyServer.substr(colonPos + 1));
-							proxyServer = proxyServer.substr(0, colonPos);
+					if (proxyInfo.lpszProxy) {
+						mbstate_t state = {};
+						char buffer[256];
+						const wchar_t* src = proxyInfo.lpszProxy;
+						size_t len = wcsrtombs(buffer, &src, sizeof(buffer), &state);
+						if (len != (size_t)-1) {
+							String proxyServer = buffer;
+							int proxyPort	   = 0;
+							size_t colonPos	   = proxyServer.find(":");
+							if (colonPos != std::wstring::npos) {
+								proxyPort	= std::stoi(proxyServer.substr(colonPos + 1));
+								proxyServer = proxyServer.substr(0, colonPos);
+							}
+							if (proxyInfo.lpszProxy) {
+								GlobalFree(proxyInfo.lpszProxy);
+							}
+							if (proxyInfo.lpszProxyBypass) {
+								GlobalFree(proxyInfo.lpszProxyBypass);
+							}
+							if (proxyInfo.lpszAutoConfigUrl) {
+								GlobalFree(proxyInfo.lpszAutoConfigUrl);
+							}
+							return std::make_pair(proxyServer, proxyPort);
 						}
-						if (proxyInfo.lpszProxy) {
-							GlobalFree(proxyInfo.lpszProxy);
-						}
-						return std::make_pair(proxyServer, proxyPort);
 					}
 				}
+				return std::nullopt;
 #else
 				return std::nullopt;
 #endif

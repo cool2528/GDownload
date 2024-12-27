@@ -7,9 +7,8 @@ namespace gdl {
 
 	namespace ui {
 		namespace utils {
-#ifdef __APPLE__
 			UtilsToolsManager::~UtilsToolsManager() {}
-
+#ifdef __APPLE__
 			void UtilsToolsManager::HideMacOsxWindowStandardButtons(QQuickWindow* window) {
 				if (window) {
 					hideWindowStandardButtons(window->winId());

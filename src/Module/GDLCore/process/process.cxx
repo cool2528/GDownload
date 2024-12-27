@@ -36,7 +36,7 @@ namespace gdl {
 							 const String_View& working_directory) {
 			std::int64_t pid{-1};
 #ifdef _WIN32
-
+			return pid;
 #else
 			pid_t native_pid;
 			std::vector<char*> argv;
@@ -96,7 +96,7 @@ namespace gdl {
 		}
 		bool IsProcessExist(std::int64_t pid) {
 #ifdef _WIN32
-
+			return false;
 #else
 			return kill(static_cast<pid_t>(pid), 0) == 0;
 #endif

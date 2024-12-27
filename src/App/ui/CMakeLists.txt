@@ -58,6 +58,8 @@ message("Operating System: ${CMAKE_SYSTEM_NAME}")
 
 # 打印系统架构
 message("System Architecture: ${CMAKE_SYSTEM_PROCESSOR}")
+set(QT_ROOT "${Qt6_DIR}/../../..")
+message("QT_ROOT: ${QT_ROOT}")
 if(APPLE)
     add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${SOURCES_FILES} ${HEADERS_FILES} ${QT_RESOURCE_FILES} ${QT_QML_FILES})
     set_target_properties(${PROJECT_NAME} PROPERTIES 
@@ -82,6 +84,23 @@ if(APPLE)
     )
 elseif(WIN32)
     add_executable(${PROJECT_NAME} ${SOURCES_FILES} ${HEADERS_FILES} ${QT_RESOURCE_FILES} ${QT_QML_FILES})
+    add_custom_command(
+        TARGET ${PROJECT_NAME}
+        PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}> $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        # 复制 FramelessHelper DLL
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${DEPENDENCIES_ROOT_PATH}/FramelessHelper/bin"
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        COMMAND_EXPAND_LISTS
+    )
+    #增加调用qt的 windeployqt
+    add_custom_command(TARGET ${PROJECT_NAME} 
+        POST_BUILD
+        COMMAND ${QT_ROOT}/bin/windeployqt.exe $<TARGET_FILE:${PROJECT_NAME}>
+        --qmlimport ${QT_ROOT}/qml
+        --qmldir ${CMAKE_CURRENT_SOURCE_DIR}/Resource/qml
+    )
 endif()
 register_target(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PRIVATE ${MODULE_INCLUDE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}

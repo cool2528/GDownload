@@ -97,6 +97,8 @@ proguard/
 .vscode/*
 build_osx/*
 build/*
+build_win/*
+build_unix/*
 # System Files
 .DS_Store
 Thumbs.db

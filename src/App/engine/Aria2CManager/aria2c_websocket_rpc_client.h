@@ -1,9 +1,9 @@
 #pragma once
 #include <nlohmann/json.hpp>
 #include "result/result.h"
-#include "websocket_client.h"
 namespace gdl {
 	namespace engine {
+		class WebSocketClient;
 		using Options = std::unordered_multimap<std::string, std::string>;
 		enum class State : int { kError = -1, kConnected, kClosed };
 		class Aria2cWebSocketClient {
@@ -78,7 +78,7 @@ namespace gdl {
 
 		   private:
 			std::string url_;
-			WebSocketClient websocket_;
+			std::unique_ptr<WebSocketClient> websocket_;
 			std::function<void(const State&, std::string)> state_chanage_callback_{nullptr};
 			std::function<void(const std::string&)> text_message_callback_{nullptr};
 		};

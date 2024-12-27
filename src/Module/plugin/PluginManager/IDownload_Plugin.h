@@ -3,6 +3,7 @@
 #include <memory>
 #include <optional>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 // Interface for download plugins that handle URL parsing and metadata

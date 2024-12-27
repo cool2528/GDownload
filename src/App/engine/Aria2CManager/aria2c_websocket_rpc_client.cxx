@@ -1,4 +1,5 @@
 #include "aria2c_websocket_rpc_client.h"
+#include "websocket_client.h"
 #include <boost/url.hpp>
 #include "engine_def.h"
 #include "logger.h"
@@ -6,27 +7,28 @@ namespace gdl {
 	namespace engine {
 
 		Aria2cWebSocketClient::Aria2cWebSocketClient(const std::string& url) : url_(url) {
+			websocket_ = std::make_unique<WebSocketClient>();
 			// connected
-			websocket_.setConnectCallback([this] {
+			websocket_->setConnectCallback([this] {
 				if (state_chanage_callback_) {
 					state_chanage_callback_(State::kConnected, "");
 					GetVersion();
 				}
 			});
 			// closed
-			websocket_.setDisconnectCallback([this] {
+			websocket_->setDisconnectCallback([this] {
 				if (state_chanage_callback_) {
 					state_chanage_callback_(State::kClosed, "");
 				}
 			});
 			// error message
-			websocket_.setErrorCallback([this](const std::string& error) {
+			websocket_->setErrorCallback([this](const std::string& error) {
 				if (state_chanage_callback_) {
 					state_chanage_callback_(State::kClosed, error);
 				}
 			});
 			// receive message
-			websocket_.setMessageCallback([this](const std::string& msg) {
+			websocket_->setMessageCallback([this](const std::string& msg) {
 				if (text_message_callback_) {
 					text_message_callback_(msg);
 				}
@@ -34,7 +36,7 @@ namespace gdl {
 		}
 
 		Aria2cWebSocketClient::~Aria2cWebSocketClient() {
-			websocket_.disconnect();
+			websocket_->disconnect();
 		}
 
 		void Aria2cWebSocketClient::Open() {
@@ -42,14 +44,14 @@ namespace gdl {
 			auto host	   = ws_server_url.host();
 			auto port	   = ws_server_url.port();
 			auto path	   = ws_server_url.path();
-			const auto res = websocket_.connect(host, std::stol(port), path);
+			const auto res = websocket_->connect(host, std::stol(port), path);
 			if (!res) {
 				LOG_ERR("connect websocket server faild {}", url_);
 			}
 		}
 
 		void Aria2cWebSocketClient::Disconnect() {
-			websocket_.disconnect();
+			websocket_->disconnect();
 		}
 
 		Result<bool> Aria2cWebSocketClient::AddUri(const std::vector<std::string>& uris, const Options& options) {
@@ -280,11 +282,11 @@ namespace gdl {
 			doc["method"]  = method;
 			doc["params"]  = params;
 			doc["id"]	   = std::to_string(++id);
-			if (!websocket_.isConnect()) {
+			if (!websocket_->isConnect()) {
 				return MakeFail(static_cast<std::int64_t>(gdl::ErrorType::kUnknownError));
 			}
 			const auto data = doc.dump();
-			return websocket_.send(data);
+			return websocket_->send(data);
 		}
 
 	}  // namespace engine

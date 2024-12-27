@@ -32,7 +32,7 @@ if(APPLE)
     set(CMAKE_OSX_ARCHITECTURES ${OSX_ARCHITECTURES})
 
 elseif(WIN32)
-    set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/windows")
+    set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/win")
 elseif(UNIX AND NOT APPLE)
     set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/linux")
 endif()
