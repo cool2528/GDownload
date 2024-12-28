@@ -125,6 +125,7 @@ Popup {
                             font.pixelSize: 12
                             placeholderText: qsTr("One task url per line (supports magnet)")
                             color: GTheme.dark ? "#9a9a9a" : "#bababa"
+                            placeholderTextColor: color
                             background: Rectangle{
                                 implicitHeight: taskPageLayout.height
                                 implicitWidth: taskPageLayout.width

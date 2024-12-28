@@ -13,6 +13,7 @@ Rectangle {
            helper.setHitTestVisible(win_close)
            helper.setHitTestVisible(win_minsize)
            helper.setHitTestVisible(win_maxsize)
+           helper.setHitTestVisible(win_restore)
        }
     }
 
@@ -26,8 +27,8 @@ Rectangle {
         visible: Qt.platform.os === "osx"
         ImageButton{
             id:close
-            width: 8
-            height: 8
+            Layout.preferredHeight: 8
+            Layout.preferredWidth: 8
             backgroundColor:"transparent"
             normalImage: "/images/titlebar/macos-close.svg"
             hoverImage: "/images/titlebar/macos-clos-hover.svg"
@@ -38,8 +39,8 @@ Rectangle {
 
         ImageButton{
             id:minsize
-            width: 8
-            height: 8
+            Layout.preferredHeight: 8
+            Layout.preferredWidth: 8
             backgroundColor:"transparent"
             normalImage: "/images/titlebar/macos-minimize.svg"
             hoverImage: "/images/titlebar/macos-minimize-hover.svg"
@@ -50,8 +51,8 @@ Rectangle {
 
         ImageButton{
             id:maxsize
-            width: 8
-            height: 8
+            Layout.preferredHeight: 8
+            Layout.preferredWidth: 8
             backgroundColor:"transparent"
             normalImage: "/images/titlebar/macos-maximize.svg"
             hoverImage: "/images/titlebar/macos-maximize-hover.svg"
@@ -83,6 +84,7 @@ Rectangle {
         }
         ImageButton{
             id:win_maxsize
+            visible: !mainWindow.maximized
             Layout.preferredHeight: 32
             Layout.preferredWidth: 40
             imageSize:Qt.size(16,16)
@@ -93,7 +95,21 @@ Rectangle {
                 mainWindow.toggleMaximized()
             }
         }
+        //windows-restore
 
+        ImageButton{
+            id:win_restore
+             visible: mainWindow.maximized
+            Layout.preferredHeight: 32
+            Layout.preferredWidth: 40
+            imageSize:Qt.size(16,16)
+            backgroundColor: hovered ? "#c0c0c0" : "transparent"
+            normalImage: "/images/titlebar/windows-restore.svg"
+            hoverImage: "/images/titlebar/windows-restore-hover.svg"
+            onClicked: {
+                mainWindow.toggleMaximized()
+            }
+        }
         ImageButton{
             id:win_close
             Layout.preferredHeight: 32

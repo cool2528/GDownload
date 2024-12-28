@@ -27,7 +27,7 @@ namespace gdl {
 
 				Q_INVOKABLE DownloadTaskModel* GetWaitingDownloadModel();
 
-				Q_INVOKABLE bool AddHttpTask(const QString& url, const QVariantMap& options);
+				Q_INVOKABLE bool AddHttpTask(const QVariantList& urls, const QVariantMap& options);
 
 				Q_INVOKABLE bool AddTorrentTask(const QString& tarrent, const QVariantMap& options);
 
