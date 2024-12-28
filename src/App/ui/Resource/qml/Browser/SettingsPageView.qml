@@ -8,6 +8,7 @@ Item {
     RowLayout{
         id:browserLayout
         anchors.fill: parent
+        spacing: 0
         Rectangle{
             id:leftMenuBar
             color: GTheme.dark ? "#282828" :"#f2f3f6"

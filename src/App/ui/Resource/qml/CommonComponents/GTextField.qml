@@ -10,4 +10,5 @@ TextField {
         color: GTheme.dark  ? "#303030" : "#ffffff"
     }
     color: GTheme.dark ? "#ffffff" : "#303133"
+    placeholderTextColor: color
 }

@@ -29,15 +29,25 @@ namespace gdl {
 				return waiting_model_.get();
 			}
 
-			bool BrowserManager::AddHttpTask(const QString& url, const QVariantMap& options) {
+			bool BrowserManager::AddHttpTask(const QVariantList& urls, const QVariantMap& options) {
 				std::unordered_multimap<std::string, std::string> opt;
 				for (auto it = options.cbegin(); it != options.cend(); ++it) {
 					auto key   = it.key();
 					auto value = it.value().toString();
 					opt.emplace(key.toStdString(), value.toStdString());
 				}
-				auto res = engine::Aria2cDownloadManager::Instance().AddHttpTask(url.toStdString(), opt);
-				return res.IsOk();
+				int count	   = 0;
+				for (const auto& url : urls) {
+					if(url.canConvert<QString>()){
+						auto res = engine::Aria2cDownloadManager::Instance().AddHttpTask(url.toString().toStdString(), opt);
+						if(res.HasError()){
+							LOG_ERR("Failed to add HTTP download task Download address {} error {}", url.toString().toStdString(),res.GetError().what());
+							continue;
+						}
+						count++;
+					}
+				}
+				return count > 0;
 			}
 
 			bool BrowserManager::AddTorrentTask(const QString& tarrent, const QVariantMap& options) {
