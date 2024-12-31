@@ -45,3 +45,6 @@ elseif(WIN32)
         _UNICODE
     )
 endif()
+set_target_properties(${PROJECT_NAME} PROPERTIES
+FOLDER "App"
+)

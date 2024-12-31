@@ -49,6 +49,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src
     ${PLUGIN_INCLUDE_PATH}
     ${PLUGIN_MANAGER_INCLUDE}
 )
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 add_subdirectory(src)
 # 安装规则
 if(WIN32)
