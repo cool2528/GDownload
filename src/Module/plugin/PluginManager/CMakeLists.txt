@@ -29,4 +29,9 @@ if(APPLE)
         ${COREFOUNDATION_FRAMEWORK}
         ${SECURITY_FRAMEWORK}
     )
+elseif(WIN32)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE 
+        UNICODE 
+        _UNICODE
+    )
 endif()

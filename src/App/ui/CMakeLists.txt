@@ -100,6 +100,11 @@ elseif(WIN32)
         COMMAND ${QT_ROOT}/bin/windeployqt.exe $<TARGET_FILE:${PROJECT_NAME}>
         --qmlimport ${QT_ROOT}/qml
         --qmldir ${CMAKE_CURRENT_SOURCE_DIR}/Resource/qml
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+        ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/engine
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/extra/win32/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,ia32>/engine/
+        ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/engine
     )
 endif()
 register_target(${PROJECT_NAME})
@@ -113,6 +118,13 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system)
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::property_tree)
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::asio)
+
+if(WIN32)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE 
+        UNICODE 
+        _UNICODE
+    )
+endif()
 
 
 

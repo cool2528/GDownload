@@ -11,3 +11,8 @@ function urlToLocalPath(url) {
     }
     return str
 }
+
+// Splits string paths by newlines Returns a list of string paths
+function splitPath(path) {
+    return path.split(/\r\n|\r|\n/)
+}

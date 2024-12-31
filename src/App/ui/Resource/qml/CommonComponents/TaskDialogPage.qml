@@ -3,7 +3,7 @@ import QtQuick.Controls.Basic
 import gdl.sdk
 import QtQuick.Layouts
 import QtQuick.Controls
-
+import "../Utils/utils.js" as Utils
 Popup {
     id:taskPage
     width: 640
@@ -144,10 +144,10 @@ Popup {
                         color: GTheme.dark ? "#2e2e2e" : "#ffffff"
                     }
                     function geturls(){
-                        if(currentIndex == 0){
-                            return input.text
+                        if(currentIndex === 0){
+                            return Utils.splitPath(input.text)
                         }else{
-                           return dropTorent.path
+                           return [dropTorent.path]
                         }
 
                     }
