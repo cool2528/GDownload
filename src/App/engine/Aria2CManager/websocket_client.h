@@ -15,7 +15,11 @@ namespace gdl {
 			using DisconnectCallback = std::function<void()>;
 			using ErrorCallback		 = std::function<void(const std::string&)>;
 
-			WebSocketClient() { lws_set_log_level(LLL_ERR | LLL_WARN, nullptr); }
+			WebSocketClient() {
+				lws_set_log_level(LLL_ERR | LLL_WARN, nullptr);
+				memset(&sul_, 0, sizeof(sul_));
+				memset(&info_, 0, sizeof(info_));
+			}
 
 			~WebSocketClient() { disconnect(); }
 
@@ -24,6 +28,7 @@ namespace gdl {
 				port_			= port;
 				path_			= path;
 				memset(&info_, 0, sizeof(info_));
+				memset(&sul_, 0, sizeof(sul_));
 				info_.options			  = LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
 				info_.port				  = CONTEXT_PORT_NO_LISTEN;
 				protocols_				  = {{"json", globalCallback, 0, 0, 0, nullptr, 0}, LWS_PROTOCOL_LIST_TERM};
@@ -36,7 +41,7 @@ namespace gdl {
 					return false;
 				}
 				is_init_context_ = true;
-				lws_sul_schedule(context_, 0, &sul_, &sulCallback, 1);
+				lws_sul_schedule(context_, 0, &sul_, sulCallback, 1);
 				loop_thread_ = std::thread([this] {
 					int n = 0;
 					while (n >= 0 && !interrupted_) {
@@ -139,7 +144,7 @@ namespace gdl {
 				info.path	 = self->path_.c_str();
 				info.host	 = info.address;
 				info.origin	 = info.address;
-				//info.ssl_connection				   = ~LCCSCF_USE_SSL;
+				info.ssl_connection				   = 0;
 				info.protocol					   = "ws";
 				info.local_protocol_name		   = "json";
 				info.pwsi						   = &self->wsi_;
@@ -194,7 +199,7 @@ namespace gdl {
 			struct lws_context_creation_info info_;
 			lws_sorted_usec_list_t sul_;
 			struct lws* wsi_{nullptr};
-			unsigned short retry_count;
+			unsigned short retry_count{0};
 			std::thread loop_thread_;
 			std::atomic_bool interrupted_{false};
 			std::queue<std::string> message_queue_;
@@ -207,7 +212,7 @@ namespace gdl {
 			ErrorCallback error_callback_;
 			std::atomic_bool is_connected_{false};
 			std::string server_address_;
-			unsigned int port_;
+			unsigned int port_{0};
 			std::atomic_bool is_init_context_{false};
 			std::string path_;
 		};

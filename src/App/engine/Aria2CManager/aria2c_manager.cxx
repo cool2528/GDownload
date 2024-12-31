@@ -63,7 +63,12 @@ namespace gdl {
 			std::vector<String> result;
 			// 处理包含空格的路径
 			auto quote_path = [](const String& path) {
+#if defined(_WIN32) || defined(_WIN64)
 				return "\"" + path + "\"";
+#else
+				return path;
+#endif
+
 			};
 			std::unordered_map<std::string, std::string> aria2c_settings;
 			aria2c_settings["no-conf"]				  = "false";  //no-conf
@@ -76,8 +81,8 @@ namespace gdl {
 			aria2c_settings["bt-save-metadata"]		  = "true";
 			aria2c_settings["bt-tracker"]			  = "";
 			aria2c_settings["continue"]				  = "true";
-			aria2c_settings["dht-file-path"]		  = GetDhtPath(IP_VERSION::V4);
-			aria2c_settings["dht-file-path6"]		  = GetDhtPath(IP_VERSION::V6);
+			aria2c_settings["dht-file-path"]		  = quote_path(GetDhtPath(IP_VERSION::V4));
+			aria2c_settings["dht-file-path6"]		  = quote_path(GetDhtPath(IP_VERSION::V6));
 
 			aria2c_settings["dht-listen-port"] = config::GetValue(config::Keys::DhtListenPort).AsString();	//"26701";
 			aria2c_settings["dir"]			   = config::GetValue(config::Keys::Dir).AsString();
@@ -98,9 +103,9 @@ namespace gdl {
 			aria2c_settings["seed-ratio"]				  = "2";
 			aria2c_settings["seed-time"]				  = "2880";
 			aria2c_settings["split"]					  = "64";
-			aria2c_settings["user-agent"] =
+			aria2c_settings["user-agent"] = quote_path(
 				"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) "
-				"Chrome/111.0.0.0 Safari/537.36";
+				"Chrome/111.0.0.0 Safari/537.36");
 			aria2c_settings["check-certificate"]	= "false";
 			aria2c_settings["quiet"]				= "true";
 			aria2c_settings["enable-rpc"]			= "true";

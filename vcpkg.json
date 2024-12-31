@@ -9,6 +9,7 @@
     "boost-system",
     "boost-locale",
     "boost-url",
+    "boost-beast",
     {
       "name":"cpr",
       "features":["ssl"]
