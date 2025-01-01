@@ -1,5 +1,3 @@
-# Google C/C++ Code Style settings
-
 Language: Cpp
 BasedOnStyle: Google
 AccessModifierOffset: -1
@@ -44,7 +42,7 @@ ColumnLimit: 120
 CompactNamespaces: false
 ContinuationIndentWidth: 4
 Cpp11BracedListStyle: true
-DerivePointerAlignment: false  # Make sure the * or & align on the left
+DerivePointerAlignment: false  
 EmptyLineBeforeAccessModifier: LogicalBlock
 FixNamespaceComments: true
 IncludeBlocks: Preserve
@@ -58,7 +56,6 @@ ObjCSpaceAfterProperty: false
 ObjCSpaceBeforeProtocolList: true
 PointerAlignment: Left
 ReflowComments: false
-# SeparateDefinitionBlocks: Always   # Only support since clang-format 14
 SpaceAfterCStyleCast: false
 SpaceAfterLogicalNot: false
 SpaceAfterTemplateKeyword: true
