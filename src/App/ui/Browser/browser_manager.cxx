@@ -36,18 +36,20 @@ namespace gdl {
 					auto value = it.value().toString();
 					opt.emplace(key.toStdString(), value.toStdString());
 				}
-				int count	   = 0;
+                int count = 0;
 				for (const auto& url : urls) {
-					if(url.canConvert<QString>()){
-						auto res = engine::Aria2cDownloadManager::Instance().AddHttpTask(url.toString().toStdString(), opt);
-						if(res.HasError()){
-							LOG_ERR("Failed to add HTTP download task Download address {} error {}", url.toString().toStdString(),res.GetError().what());
+                    if (url.canConvert<QString>()) {
+                        auto res =
+                            engine::Aria2cDownloadManager::Instance().AddHttpTask(url.toString().toStdString(), opt);
+                        if (res.HasError()) {
+                            LOG_ERR("Failed to add HTTP download task Download address {} error {}",
+                                    url.toString().toStdString(), res.GetError().what());
 							continue;
 						}
-						count++;
+                        count++;
 					}
 				}
-				return count > 0;
+                return count > 0;
 			}
 
 			bool BrowserManager::AddTorrentTask(const QString& tarrent, const QVariantMap& options) {
@@ -57,6 +59,54 @@ namespace gdl {
 			bool BrowserManager::AddMetalinkTask(const QString& metalink, const QVariantMap& options) {
 				return false;
 			}
+
+            bool BrowserManager::PauseTask(const QString& gid) {
+                return false;
+            }
+
+            bool BrowserManager::PauseAllTask() {
+                return false;
+            }
+
+            bool BrowserManager::ForcePauseTask(const QString& gid) {
+                return false;
+            }
+
+            bool BrowserManager::ForcePauseAllTask() {
+                return false;
+            }
+
+            bool BrowserManager::UnpauseTask(const QString& gid) {
+                return false;
+            }
+
+            bool BrowserManager::UnpauseAllTask() {
+                return false;
+            }
+
+            bool BrowserManager::RemoveTask(const QString& gid) {
+                return false;
+            }
+
+            bool BrowserManager::ForceRemoveTask(const QString& gid) {
+                return false;
+            }
+
+            bool BrowserManager::RemoveDownloadResult(const QString& gid) {
+                return false;
+            }
+
+            bool BrowserManager::PurgeDownloadResult() {
+                return false;
+            }
+
+            bool BrowserManager::ChangeOption(const QString& gid, const QVariantMap& options) {
+                return false;
+            }
+
+            bool BrowserManager::ChangeGlobalOption(const QVariantMap& options) {
+                return false;
+            }
 
 			bool BrowserManager::Init() {
 				auto res = engine::Aria2cDownloadManager::Instance().SubscriptionAria2Message(
