@@ -227,25 +227,17 @@ namespace gdl {
 			doc["method"]  = method;
 			doc["params"]  = params;
 			doc["id"]	   = std::to_string(++id_);
-			// httplib::Client cli(host_);
-			// httplib::Headers headers;
-			// headers.insert(std::make_pair("Content-Type", "application/json"));
-
-			// auto reply = cli.Post("/jsonrpc", headers, doc.dump(), "application/json");
-			// if (!reply) {
-			// 	LOG_ERR("request aria2c method fail error {}", httplib::to_string(reply.error()));
-			// 	result.result = ErrorResult{.err_msg  = httplib::to_string(reply.error()),
-			// 								.err_code = static_cast<std::int64_t>(reply.error())};
-			// 	return result;
-			// }
-			// else if (reply.value().status != 200) {
-			// 	LOG_ERR("request aria2c method fail error {}", httplib::to_string(reply.error()));
-			// 	result.result = ErrorResult{.err_msg  = httplib::to_string(reply.error()),
-			// 								.err_code = static_cast<std::int64_t>(reply.error())};
-			// 	return result;
-			// }
+			const std::string body = doc.dump();
+			auto reply			   = cpr::Post(cpr::Url(host_ + "/jsonrpc"), cpr::Body(body),
+											   cpr::Header{{"Content-Type", "application/json"}});
+			if (reply.status_code != 200) {
+				LOG_ERR("request aria2c method fail error {}", reply.error.message);
+				result.result = ErrorResult{.err_msg  = reply.error.message,
+											.err_code = static_cast<std::int64_t>(reply.status_code)};
+				return result;
+			}
+			result.result = SucceedResult{.body = std::move(reply.text)};
 			result.is_succeed = true;
-			//result.result	  = SucceedResult{.body = std::move(reply.value().body)};
 			return result;
 		}
 

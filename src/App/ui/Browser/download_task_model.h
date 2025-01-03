@@ -1,11 +1,13 @@
 #pragma once
 #include <QAbstractListModel>
 #include <QVector>
+#include <mutex>
+
 namespace gdl {
 	namespace ui {
 		namespace browser {
 
-			enum class TaskState : int { kComplete = 0, kActive, kPause, kWaiting, kError };
+			enum class TaskState : int { kComplete = 0, kActive, kPause, kWaiting, kError,kRemoved };
 
 			class DownloadTaskInfo {
 			   public:
@@ -186,12 +188,15 @@ namespace gdl {
 				bool UpdateTaskById(const QString& task_id, const DownloadTaskInfo& task);
 				DownloadTaskInfo* GetTask(int index);
 				DownloadTaskInfo* GetTaskById(const QString& task_id);
+				QStringList GetTaskIds() const;
 				void ClearAllTasks();
 				int GetTaskCount() const;
 				bool ContainsTask(const QString& task_id) const;
 
 			   private:
 				QVector<DownloadTaskInfo> task_lists_;
+				QHash<QString, QString> remove_task_id_;
+				std::mutex mutex_;
 			};
 		}  // namespace browser
 	}  // namespace ui

@@ -1,5 +1,6 @@
 #include "browser_manager.h"
 #include <QApplication>
+#include <QDesktopServices>
 #include <QFileInfo>
 #include <QQmlEngine>
 #include <nlohmann/json.hpp>
@@ -36,20 +37,20 @@ namespace gdl {
 					auto value = it.value().toString();
 					opt.emplace(key.toStdString(), value.toStdString());
 				}
-                int count = 0;
+				int count = 0;
 				for (const auto& url : urls) {
-                    if (url.canConvert<QString>()) {
-                        auto res =
-                            engine::Aria2cDownloadManager::Instance().AddHttpTask(url.toString().toStdString(), opt);
-                        if (res.HasError()) {
-                            LOG_ERR("Failed to add HTTP download task Download address {} error {}",
-                                    url.toString().toStdString(), res.GetError().what());
+					if (url.canConvert<QString>()) {
+						auto res =
+							engine::Aria2cDownloadManager::Instance().AddHttpTask(url.toString().toStdString(), opt);
+						if (res.HasError()) {
+							LOG_ERR("Failed to add HTTP download task Download address {} error {}",
+									url.toString().toStdString(), res.GetError().what());
 							continue;
 						}
-                        count++;
+						count++;
 					}
 				}
-                return count > 0;
+				return count > 0;
 			}
 
 			bool BrowserManager::AddTorrentTask(const QString& tarrent, const QVariantMap& options) {
@@ -60,53 +61,134 @@ namespace gdl {
 				return false;
 			}
 
-            bool BrowserManager::PauseTask(const QString& gid) {
-                return false;
-            }
+			bool BrowserManager::PauseTask(const QString& gid) {
+				if (gid.isEmpty()) return false;
+				const auto res = engine::Aria2cDownloadManager::Instance()
+									 .CallAria2cMethod(engine::Aria2Method::kPause, gid.toStdString())
+									 .IsOk();
+				return res;
+			}
 
-            bool BrowserManager::PauseAllTask() {
-                return false;
-            }
+			bool BrowserManager::PauseAllTask() {
+				return engine::Aria2cDownloadManager::Instance()
+					.CallAria2cMethod(engine::Aria2Method::kPauseAll)
+					.IsOk();
+			}
 
-            bool BrowserManager::ForcePauseTask(const QString& gid) {
-                return false;
-            }
+			bool BrowserManager::ForcePauseTask(const QString& gid) {
+				if (gid.isEmpty()) return false;
+				return engine::Aria2cDownloadManager::Instance()
+					.CallAria2cMethod(engine::Aria2Method::kForcePause, gid.toStdString())
+					.IsOk();
+			}
 
-            bool BrowserManager::ForcePauseAllTask() {
-                return false;
-            }
+			bool BrowserManager::ForcePauseAllTask() {
+				return engine::Aria2cDownloadManager::Instance()
+					.CallAria2cMethod(engine::Aria2Method::kForcePauseAll)
+					.IsOk();
+			}
 
-            bool BrowserManager::UnpauseTask(const QString& gid) {
-                return false;
-            }
+			bool BrowserManager::UnpauseTask(const QString& gid) {
+				if (gid.isEmpty()) return false;
+				return engine::Aria2cDownloadManager::Instance()
+					.CallAria2cMethod(engine::Aria2Method::kUnpause, gid.toStdString())
+					.IsOk();
+			}
 
-            bool BrowserManager::UnpauseAllTask() {
-                return false;
-            }
+			bool BrowserManager::UnpauseAllTask() {
+				return engine::Aria2cDownloadManager::Instance()
+					.CallAria2cMethod(engine::Aria2Method::kUnpauseAll)
+					.IsOk();
+			}
 
-            bool BrowserManager::RemoveTask(const QString& gid) {
-                return false;
-            }
+			bool BrowserManager::RemoveTask(const QString& gid) {
+				if (gid.isEmpty()) return false;
+				const auto res = engine::Aria2cDownloadManager::Instance()
+									 .CallAria2cMethod(engine::Aria2Method::kRemove, gid.toStdString())
+									 .IsOk();
+				if (res) {
+					engine::Aria2cDownloadManager::Instance().CallAria2cMethod(
+						engine::Aria2Method::kRemoveDownloadResult, gid.toStdString());
+					if (active_model_) {
+						active_model_->RemoveTaskById(gid);
+					}
+				}
+			}
 
-            bool BrowserManager::ForceRemoveTask(const QString& gid) {
-                return false;
-            }
+			bool BrowserManager::RemoveAllTask() {
+				if (!active_model_) {
+					return false;
+				}
+				for (const auto& task : active_model_->GetTaskIds()) {
+					RemoveTask(task);
+				}
+				active_model_->ClearAllTasks();
+				return true;
+			}
 
-            bool BrowserManager::RemoveDownloadResult(const QString& gid) {
-                return false;
-            }
+			bool BrowserManager::ForceRemoveTask(const QString& gid) {
+				if (gid.isEmpty()) return false;
+				const auto res = engine::Aria2cDownloadManager::Instance()
+									 .CallAria2cMethod(engine::Aria2Method::kForceRemove, gid.toStdString())
+									 .IsOk();
+				if (res) {
+					engine::Aria2cDownloadManager::Instance().CallAria2cMethod(
+						engine::Aria2Method::kRemoveDownloadResult, gid.toStdString());
+					if (active_model_) {
+						active_model_->RemoveTaskById(gid);
+					}
+				}
+			}
 
-            bool BrowserManager::PurgeDownloadResult() {
-                return false;
-            }
+			bool BrowserManager::RemoveDownloadResult(const QString& gid) {
+				if (gid.isEmpty()) return false;
+				return engine::Aria2cDownloadManager::Instance()
+					.CallAria2cMethod(engine::Aria2Method::kRemoveDownloadResult, gid.toStdString())
+					.IsOk();
+			}
 
-            bool BrowserManager::ChangeOption(const QString& gid, const QVariantMap& options) {
-                return false;
-            }
+			bool BrowserManager::PurgeDownloadResult() {
+				return engine::Aria2cDownloadManager::Instance()
+					.CallAria2cMethod(engine::Aria2Method::kPurgeDownloadResult)
+					.IsOk();
+			}
 
-            bool BrowserManager::ChangeGlobalOption(const QVariantMap& options) {
-                return false;
-            }
+			bool BrowserManager::ChangeOption(const QString& gid, const QVariantMap& options) {
+				if (gid.isEmpty()) return false;
+				std::unordered_multimap<std::string, std::string> opt;
+				for (auto it = options.cbegin(); it != options.cend(); ++it) {
+					auto key   = it.key();
+					auto value = it.value().toString();
+					opt.emplace(key.toStdString(), value.toStdString());
+				}
+				return engine::Aria2cDownloadManager::Instance()
+					.CallAria2cMethod(engine::Aria2Method::kChangeOption, gid.toStdString(), opt)
+					.IsOk();
+			}
+
+			bool BrowserManager::ChangeGlobalOption(const QVariantMap& options) {
+				std::unordered_multimap<std::string, std::string> opt;
+				for (auto it = options.cbegin(); it != options.cend(); ++it) {
+					auto key   = it.key();
+					auto value = it.value().toString();
+					opt.emplace(key.toStdString(), value.toStdString());
+				}
+				return engine::Aria2cDownloadManager::Instance()
+					.CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption, opt)
+					.IsOk();
+			}
+
+			void BrowserManager::OpenFileLocation(const QString& file_path) {
+				QFileInfo fileInfo(file_path);
+				if (!fileInfo.exists()) {
+					LOG_WARN("File does not exist:{}", file_path.toStdString());
+					return;
+				}
+				QUrl url = QUrl::fromLocalFile(fileInfo.absoluteFilePath());
+				if (!QDesktopServices::openUrl(url)) {
+					LOG_WARN("Failed to open file location:{}", file_path.toStdString());
+				}
+			}
 
 			bool BrowserManager::Init() {
 				auto res = engine::Aria2cDownloadManager::Instance().SubscriptionAria2Message(
@@ -126,103 +208,62 @@ namespace gdl {
 				active_model_  = std::make_unique<DownloadTaskModel>();
 				waiting_model_ = std::make_unique<DownloadTaskModel>();
 				stoped_model_  = std::make_unique<DownloadTaskModel>();
-				connect(this, &BrowserManager::sigUpdateTasksMessage, [this](const QString& result) {
+				connect(this, &BrowserManager::sigUpdateTasksMessage, [this](const DownloadTaskInfo& task_info) {
 					try {
-						nlohmann::json array = nlohmann::json::parse(result.toStdString());
-						if (!array.is_array()) {
-							return;
-						}
-						for (const auto& object : array) {
-							std::string status = object["status"].get<std::string>();
-							DownloadTaskInfo task_info;
-							QString task_id		  = QString::fromStdString(object["gid"].get<std::string>());
-							auto completed_length = std::stoll(object["completedLength"].get<std::string>());
-							auto connections	  = std::stoll(object["connections"].get<std::string>());
-							auto download_speed	  = std::stoll(object["downloadSpeed"].get<std::string>());
-							auto totalLength	  = std::stoll(object["totalLength"].get<std::string>());
-							auto files			  = object["files"];
-							QString file_path;
-							for (const auto& file : files) {
-								file_path = QString::fromStdString(file["path"].get<std::string>());
-								if (!file_path.isEmpty()) break;
-							}
-							if (file_path.isEmpty()) return;
-							task_info.set_task_download_speed(download_speed);
-							task_info.set_task_id(task_id);
-							task_info.set_task_current_size(completed_length);
-							task_info.set_task_total_size(totalLength);
-							task_info.set_task_connections(connections);
-							task_info.set_task_file_name(QFileInfo(file_path).fileName());
-							task_info.set_task_save_path(file_path);
-							if (status == "active") {
-								task_info.set_task_state(TaskState::kActive);
-							}
-							else if (status == "waiting") {
-								task_info.set_task_state(TaskState::kWaiting);
-							}
-							else if (status == "complete") {
-								task_info.set_task_state(TaskState::kComplete);
-							}
-							else if (status == "paused") {
-								task_info.set_task_state(TaskState::kPause);
-							}
-							else if (status == "error") {
-								task_info.set_task_state(TaskState::kError);
-							}
-							else {}
+						const auto task_id = task_info.task_id();
+						switch (task_info.task_state()) {
+							case TaskState::kActive: {
+								if (active_model_->ContainsTask(task_id)) {
+									active_model_->UpdateTaskById(task_id, task_info);
+								}
+								else {
+									active_model_->AddTask(task_info);
+								}
+							} break;
+							case TaskState::kWaiting: {
+								if (waiting_model_->ContainsTask(task_id)) {
+									waiting_model_->UpdateTaskById(task_id, task_info);
+								}
+								else {
+									waiting_model_->AddTask(task_info);
+								}
+							} break;
+							case TaskState::kPause: {
+								if (active_model_->ContainsTask(task_id)) {
+									active_model_->UpdateTaskById(task_id, task_info);
+								}
+								else {
+									active_model_->AddTask(task_info);
+								}
 
-							switch (task_info.task_state()) {
-								case TaskState::kActive: {
-									if (active_model_->ContainsTask(task_id)) {
-										active_model_->UpdateTaskById(task_id, task_info);
-									}
-									else {
-										active_model_->AddTask(task_info);
-									}
-								} break;
-								case TaskState::kWaiting: {
-									if (waiting_model_->ContainsTask(task_id)) {
-										waiting_model_->UpdateTaskById(task_id, task_info);
-									}
-									else {
-										waiting_model_->AddTask(task_info);
-									}
-								} break;
-								case TaskState::kPause: {
-									if (active_model_->ContainsTask(task_id)) {
-										active_model_->UpdateTaskById(task_id, task_info);
-									}
-									else {
-										active_model_->AddTask(task_info);
-									}
+								if (waiting_model_->ContainsTask(task_id)) {
+									waiting_model_->UpdateTaskById(task_id, task_info);
+								}
+								else {
+									waiting_model_->AddTask(task_info);
+								}
+							} break;
+							case TaskState::kComplete:
+							case TaskState::kRemoved:
+							case TaskState::kError: {
+								if (active_model_->ContainsTask(task_id)) {
+									active_model_->RemoveTaskById(task_id);
+								}
+								if (waiting_model_->ContainsTask(task_id)) {
+									waiting_model_->RemoveTaskById(task_id);
+								}
+								if (stoped_model_->ContainsTask(task_id)) {
+									stoped_model_->UpdateTaskById(task_id, task_info);
+								}
+								else {
+									stoped_model_->AddTask(task_info);
+								}
 
-									if (waiting_model_->ContainsTask(task_id)) {
-										waiting_model_->UpdateTaskById(task_id, task_info);
-									}
-									else {
-										waiting_model_->AddTask(task_info);
-									}
-								} break;
-								case TaskState::kComplete:
-								case TaskState::kError: {
-									if (active_model_->ContainsTask(task_id)) {
-										active_model_->RemoveTaskById(task_id);
-									}
-									if (waiting_model_->ContainsTask(task_id)) {
-										waiting_model_->RemoveTaskById(task_id);
-									}
-									if (stoped_model_->ContainsTask(task_id)) {
-										stoped_model_->UpdateTaskById(task_id, task_info);
-									}
-									else {
-										stoped_model_->AddTask(task_info);
-									}
+							} break;
 
-								} break;
-
-								default:
-									break;
-							}
+							default:
+								LOG_WARN("Unknown task state:{}", static_cast<int>(task_info.task_state()));
+								break;
 						}
 					} catch (std::exception& e) {
 						LOG_ERR("{}", e.what());
@@ -240,13 +281,58 @@ namespace gdl {
 						if (result.is_array()) {
 							// array
 							if (!result.empty()) {
-								Q_EMIT sigUpdateTasksMessage(QString::fromStdString(result.dump()));
+								// task result array
+								for (const auto& object : result) {
+									std::string status = object["status"].get<std::string>();
+									DownloadTaskInfo task_info;
+									QString task_id		  = QString::fromStdString(object["gid"].get<std::string>());
+									auto completed_length = std::stoll(object["completedLength"].get<std::string>());
+									auto connections	  = std::stoll(object["connections"].get<std::string>());
+									auto download_speed	  = std::stoll(object["downloadSpeed"].get<std::string>());
+									auto totalLength	  = std::stoll(object["totalLength"].get<std::string>());
+									auto files			  = object["files"];
+									QString file_path;
+									for (const auto& file : files) {
+										file_path = QString::fromStdString(file["path"].get<std::string>());
+										if (!file_path.isEmpty()) break;
+									}
+									if (file_path.isEmpty()) return;
+									task_info.set_task_download_speed(download_speed);
+									task_info.set_task_id(task_id);
+									task_info.set_task_current_size(completed_length);
+									task_info.set_task_total_size(totalLength);
+									task_info.set_task_connections(connections);
+									task_info.set_task_file_name(QFileInfo(file_path).fileName());
+									task_info.set_task_save_path(file_path);
+									if (status == "active") {
+										task_info.set_task_state(TaskState::kActive);
+									}
+									else if (status == "waiting") {
+										task_info.set_task_state(TaskState::kWaiting);
+									}
+									else if (status == "complete") {
+										task_info.set_task_state(TaskState::kComplete);
+									}
+									else if (status == "paused") {
+										task_info.set_task_state(TaskState::kPause);
+									}
+									else if (status == "error") {
+										task_info.set_task_state(TaskState::kError);
+									}
+									else if (status == "removed") {
+										task_info.set_task_state(TaskState::kRemoved);
+									}
+									else {
+										LOG_WARN("Unknown state type: {}", status);
+									}
+									Q_EMIT sigUpdateTasksMessage(task_info);
+								}
 								//LOG_DBG("OnHandleAria2Message  array {}", result.dump());
 							}
 						}
 						else if (result.is_object()) {
 							// object
-							LOG_DBG("OnHandleAria2Message  object {}", result.dump());
+							LOG_INFO("OnHandleAria2Message  object {}", result.dump());
 						}
 						else if (result.is_string()) {
 							// string
@@ -267,6 +353,8 @@ namespace gdl {
 					}
 					else if (doc.find("method") != doc.end()) {
 						// method message
+						// todo: 这里需要改进 通过 aria2.onDownloadStart aria2.onDownloadPause aria2.onDownloadStop aria2.onDownloadComplete aria2.onDownloadError aria2.onBtDownloadComplete 来处理
+						LOG_DBG("OnHandleAria2Message  method {}", doc.dump());
 					}
 				} catch (std::exception& e) {
 					LOG_ERR("{}", e.what());

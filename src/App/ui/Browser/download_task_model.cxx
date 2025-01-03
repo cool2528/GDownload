@@ -102,6 +102,12 @@ namespace gdl {
 			}
 
 			void DownloadTaskModel::AddTask(const DownloadTaskInfo& task) {
+				{
+					std::lock_guard lock(mutex_);
+					if (remove_task_id_.contains(task.task_id())) {
+						return;
+					}
+				}
 				beginInsertRows(QModelIndex(), 0, 0);
 				task_lists_.insert(0, task);
 				endInsertRows();
@@ -109,7 +115,11 @@ namespace gdl {
 
 			bool DownloadTaskModel::RemoveTask(int index) {
 				if (index < 0 || index >= task_lists_.size()) return false;
-
+				{
+					std::unique_lock lock(mutex_);
+					QString task_id								  = task_lists_[index].task_id();
+					remove_task_id_.insert(task_id, task_id);
+				}
 				beginRemoveRows(QModelIndex(), index, index);
 				task_lists_.removeAt(index);
 				endRemoveRows();
@@ -153,6 +163,14 @@ namespace gdl {
 					}
 				}
 				return nullptr;
+			}
+
+			QStringList DownloadTaskModel::GetTaskIds() const {
+				QStringList task_ids;
+				for (const auto& task : task_lists_) {
+					task_ids.append(task.task_id());
+				}
+				return task_ids;
 			}
 
 			void DownloadTaskModel::ClearAllTasks() {

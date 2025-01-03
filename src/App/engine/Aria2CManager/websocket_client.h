@@ -15,7 +15,14 @@ namespace gdl {
 			using DisconnectCallback = std::function<void()>;
 			using ErrorCallback		 = std::function<void(const std::string&)>;
 
-			WebSocketClient() {
+			WebSocketClient() : 
+				context_(nullptr),
+				wsi_(nullptr),
+				retry_count(0),
+				interrupted_(false),
+				is_connected_(false),
+				port_(0),
+				is_init_context_(false) {
 				lws_set_log_level(LLL_ERR | LLL_WARN, nullptr);
 				memset(&sul_, 0, sizeof(sul_));
 				memset(&info_, 0, sizeof(info_));
@@ -76,7 +83,7 @@ namespace gdl {
 			}
 
 			// 设置回调
-			void setMessageCallback(MessageCallback cb) { message_mallback_ = std::move(cb); }
+			void setMessageCallback(MessageCallback cb) { message_callback_ = std::move(cb); }
 			void setConnectCallback(ConnectCallback cb) { connect_callback_ = std::move(cb); }
 			void setDisconnectCallback(DisconnectCallback cb) { disconnect_callback_ = std::move(cb); }
 			void setErrorCallback(ErrorCallback cb) { error_callback_ = std::move(cb); }
@@ -101,8 +108,9 @@ namespace gdl {
 						static std::string msg_buf;
 						std::string msg(static_cast<char*>(in), len);
 						msg_buf += msg;
-						if (self->message_mallback_ && lws_is_final_fragment(wsi)) {
-							self->message_mallback_(msg_buf);
+						if (self->message_callback_ && lws_is_final_fragment(wsi)) {
+							
+							self->message_callback_(msg_buf);
 							msg_buf.clear();
 						}
 					} break;
@@ -126,6 +134,7 @@ namespace gdl {
 				}
 				return lws_callback_http_dummy(wsi, reason, user, in, len);
 			do_retry:
+
 				if (lws_retry_sul_schedule_retry_wsi(wsi, &self->sul_, sulCallback, &self->retry_count)) {
 					LOG_WARN("connection attempts exhausted");
 					self->interrupted_ = true;
@@ -135,9 +144,8 @@ namespace gdl {
 
 			static void sulCallback(lws_sorted_usec_list_t* sul) {
 				WebSocketClient* self = lws_container_of(sul, WebSocketClient, sul_);
-				struct lws_client_connect_info info;
-				memset(&info, 0, sizeof(info));
-
+				lws_client_connect_info info;
+				ZeroMemory(&info, sizeof(lws_client_connect_info));
 				info.context = self->context_;
 				info.port	 = self->port_;
 				info.address = self->server_address_.c_str();
@@ -149,7 +157,7 @@ namespace gdl {
 				info.local_protocol_name		   = "json";
 				info.pwsi						   = &self->wsi_;
 				static const uint32_t backoff_ms[] = {1000, 2000, 3000, 4000, 5000};
-
+				LOG_INFO("sulCallback address {} port {} ", info.address, info.port);
 				static const lws_retry_bo_t retry = {
 					.retry_ms_table		  = backoff_ms,
 					.retry_ms_table_count = LWS_ARRAY_SIZE(backoff_ms),
@@ -206,7 +214,7 @@ namespace gdl {
 			std::mutex message_mutex_;
 
 		   private:
-			MessageCallback message_mallback_;
+			MessageCallback message_callback_;
 			ConnectCallback connect_callback_;
 			DisconnectCallback disconnect_callback_;
 			ErrorCallback error_callback_;
