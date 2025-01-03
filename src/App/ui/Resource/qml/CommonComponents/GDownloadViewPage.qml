@@ -5,6 +5,7 @@ import gdl.sdk
 Rectangle{
     id:downloadView
     property alias model: listViewdownload.model
+    property int pageType: -1 // 0 downloadPage 1 waitingPage  2 completedPage
     width: parent.width
     height: parent.height
     color: GTheme.dark ? "#2e2e2e" :"#ffffff"
@@ -64,7 +65,8 @@ Rectangle{
                             id:controlRect
                             Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                             Layout.rightMargin: 10
-                            width: 55
+                            Layout.fillWidth: true
+                            implicitWidth: 100
                             radius: 5
                             Layout.preferredHeight: 25
                             color: GTheme.dark ? mouse.hovered ? "#5151f9" : "#414141" : mouse.hovered ? "#5151f9" : "#ffffff"
@@ -74,19 +76,41 @@ Rectangle{
                                 acceptedDevices: PointerDevice.Mouse
                                 cursorShape: Qt.ArrowCursor
                             }
+                            // download page
                             RowLayout{
                                 spacing: 10
+                                visible: downloadView.pageType == 0
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                width: 70
+                                height: parent.height
                                 IconButton{
-                                    id:pauseButton
+                                    id:revocerButton
+                                    visible: model.taskState !== 1
                                     Layout.margins: 5
                                     Layout.fillWidth: true
                                     Layout.minimumHeight: 20
                                     Layout.maximumHeight: 20
-                                    iconSource: SegoeFluentIcons.PauseBadge12
+                                    iconSource: SegoeFluentIcons.Play
+
+                                    iconColor:GTheme.dark ? mouse.hovered ? "#ffffff" : "#7c7c7c": mouse.hovered ? "#ffffff" : "#acacac"
+                                    onClicked: {
+                                        console.debug("revocer all task")
+                                        BrowserManager.UnpauseTask(model.taskId)
+                                    }
+                                }
+                                IconButton{
+                                    id:pauseButton
+                                    visible: model.taskState === 1
+                                    Layout.margins: 5
+                                    Layout.fillWidth: true
+                                    Layout.minimumHeight: 20
+                                    Layout.maximumHeight: 20
+                                    iconSource: SegoeFluentIcons.Pause
 
                                     iconColor:GTheme.dark ? mouse.hovered ? "#ffffff" : "#7c7c7c": mouse.hovered ? "#ffffff" : "#acacac"
                                     onClicked: {
                                         console.debug("pause all task")
+                                        BrowserManager.PauseTask(model.taskId)
                                     }
                                 }
                                 IconButton{
@@ -99,10 +123,26 @@ Rectangle{
                                     iconColor:GTheme.dark ? mouse.hovered ? "#ffffff" : "#7c7c7c": mouse.hovered ? "#ffffff" : "#acacac"
                                     onClicked: {
                                         console.debug("delete all task")
+                                        BrowserManager.RemoveTask(model.taskId)
+                                    }
+                                }
+
+                                IconButton{
+                                    id:openFolderButton
+                                    Layout.margins: 5
+                                    Layout.fillWidth: true
+                                    Layout.minimumHeight: 20
+                                    Layout.maximumHeight: 20
+                                    iconSource: SegoeFluentIcons.Folder
+                                    iconColor:GTheme.dark ? mouse.hovered ? "#ffffff" : "#7c7c7c": mouse.hovered ? "#ffffff" : "#acacac"
+                                    onClicked: {
+                                        console.debug("open folder")
+                                        BrowserManager.OpenFileLocation(model.savePath)
                                     }
                                 }
                             }
-
+                            // waitingPage
+                            // completedPage
                         }
                     }
 

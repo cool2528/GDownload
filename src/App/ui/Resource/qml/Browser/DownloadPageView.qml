@@ -117,18 +117,21 @@ Item {
 
                 GDownloadViewPage {
                     id: downloadPage
+                    pageType: 0
                     objectName: "downloadPage"
                     model: BrowserManager.GetActiveDownloadModel()
                 }
                 
                 GDownloadViewPage {
                     id: waitingPage
+                    pageType: 1
                     objectName: "waitingPage"
                     model: BrowserManager.GetWaitingDownloadModel()
                 }
                 
                 GDownloadViewPage {
                     id: completedPage
+                    pageType: 2
                     objectName: "completedPage"
                     model: BrowserManager.GetStopedDownloadModel()
                 }

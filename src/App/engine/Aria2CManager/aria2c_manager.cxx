@@ -12,6 +12,7 @@
 #endif
 #include "config/config.h"
 #include "plugin_manager.h"
+#include "aria2c_http_rpc_client.h"
 namespace gdl {
 	namespace engine {
 
@@ -21,24 +22,40 @@ namespace gdl {
 			  daily_task_timer_(io_context_),
 			  update_aria2c_tasks_timer_(io_context_),
 			  pub_sub_system_(io_context_),
-			  websocket_client_(std::string("ws://127.0.0.1:") + kEngineRpcPort + "/jsonrpc") {
+			  flush_timer_(io_context_),
+			  websocket_client_(std::string("ws://127.0.0.1:") + kEngineRpcPort + "/jsonrpc")
+		{
 
 			websocket_client_.SetMessageCallback([this](const std::string& msg) {
 				// 直接收到的所有消息 通过发布订阅回客户端
 				try {
-					nlohmann::json doc = nlohmann::json::parse(msg.data());
-					if (doc.find("error") != doc.end() && doc["error"].is_object()) {
-						auto error_object = doc["error"];
-						if (error_object.find("code") != error_object.end() && error_object["code"].is_number()) {
-							auto code = error_object["code"].get<std::int64_t>();
-							if (code == -32600) return;
+					std::string_view msg_view(msg);
+					nlohmann::json doc = nlohmann::json::parse(msg_view, nullptr, false);
+					if (doc.contains("error")) {
+						const auto& error = doc["error"];
+						if (error.is_object() && error.contains("code")) {
+							if (error["code"].get<std::int64_t>() == -32600) {
+								return;
+							}
 						}
 					}
+					if (doc.contains("result")) {
+						const auto& result = doc["result"];
+						if (result.contains("numActive") && result.contains("numWaiting") &&
+							result.contains("numStopped")) {
+							active_num_ = std::stoll(result["numActive"].get<std::string>());
+							waiting_num_ = std::stoll(result["numWaiting"].get<std::string>());
+							stopped_num_ = std::stoll(result["numStopped"].get<std::string>());
+							return;
+						}
+					}
+
 					pub_sub_system_.Publish(kAria2Responce, msg);
-				} catch (std::exception& e) {
-					LOG_ERR("data {}  error: {}", msg, e.what());
-				} catch (...) {
-					LOG_ERR("MessageCallback exception");
+
+				} catch (const nlohmann::json::exception& e) {
+					LOG_ERR("JSON parse error: {} for data: {}", e.what(), msg);
+				} catch (const std::exception& e) {
+					LOG_ERR("General error: {} for data: {}", e.what(), msg);
 				}
 			});
 			websocket_client_.SetStateChanageCallback([this](const State& state, std::string msg) {
@@ -137,10 +154,23 @@ namespace gdl {
 				"status", "totalLength", "completedLength", "downloadSpeed", "infoHash", "numSeeders",
 				"seeder", "connections", "errorCode",		"errorMessage",	 "dir",		 "files",
 				"gid",	  "bittorrent"};
-			websocket_client_.TellStopped(0, 100, keys);
-			websocket_client_.TellActive(keys);
-			websocket_client_.TellWaiting(0, 100, keys);
+			try {
+				websocket_client_.GetGlobalStat();
+				if (active_num_ > 0) {
+					websocket_client_.TellActive(keys);
+				}
+				if (waiting_num_ > 0) {
+					websocket_client_.TellWaiting(0, 100, keys);
+				}
+				if (stopped_num_ > 0 && (active_num_ > 0 || waiting_num_ > 0)) {
+					websocket_client_.TellStopped(0, 100, keys);
+				}
+
+			} catch (std::exception & e) {
+				LOG_ERR("{}", e.what());
+			}
 		}
+
 
 		void Aria2cDownloadManager::SyncMagnetServerList() {
 
@@ -225,6 +255,7 @@ namespace gdl {
 			}
 			return result;
 		}
+
 
 		Aria2cDownloadManager::~Aria2cDownloadManager() {}
 

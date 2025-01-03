@@ -1,12 +1,13 @@
 #pragma once
 #include <nlohmann/json.hpp>
 #include "result/result.h"
+#include "Engine_export.h"
 namespace gdl {
 	namespace engine {
 		class WebSocketClient;
 		using Options = std::unordered_multimap<std::string, std::string>;
 		enum class State : int { kError = -1, kConnected, kClosed };
-		class Aria2cWebSocketClient {
+		class Engine_API Aria2cWebSocketClient {
 
 		   public:
 			explicit Aria2cWebSocketClient(const std::string& url);

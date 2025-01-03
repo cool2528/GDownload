@@ -47,6 +47,8 @@ namespace gdl {
 
                 Q_INVOKABLE bool RemoveTask(const QString& gid);
 
+				Q_INVOKABLE bool RemoveAllTask();
+
                 Q_INVOKABLE bool ForceRemoveTask(const QString& gid);
 
                 Q_INVOKABLE bool RemoveDownloadResult(const QString& gid);
@@ -57,13 +59,14 @@ namespace gdl {
 
                 Q_INVOKABLE bool ChangeGlobalOption(const QVariantMap& options);
 
+                Q_INVOKABLE void OpenFileLocation(const QString& file_path);
                 bool Init();
                 void UnInit();
 
                public:
                Q_SIGNALS:
                 void sigErrorMessage(const QString& error);
-                void sigUpdateTasksMessage(const QString& data);
+				void sigUpdateTasksMessage(const DownloadTaskInfo& info);
 
                private:
                 explicit BrowserManager(QObject* parent = nullptr);

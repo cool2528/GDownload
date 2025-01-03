@@ -2,6 +2,7 @@
 #include <nlohmann/json.hpp>
 #include <variant>
 #include "result/result.h"
+#include "Engine_export.h"
 namespace gdl {
 	namespace engine {
 		struct SucceedResult {
@@ -16,7 +17,7 @@ namespace gdl {
 			std::variant<SucceedResult, ErrorResult> result;
 		};
 		using Aria2Options = std::unordered_multimap<std::string, std::string>;
-		class Aria2cHttpClient {
+		class Engine_API Aria2cHttpClient {
 		   public:
 			explicit Aria2cHttpClient(std::string_view host);
 			~Aria2cHttpClient() = default;
