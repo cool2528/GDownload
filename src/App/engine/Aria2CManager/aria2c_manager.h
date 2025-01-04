@@ -13,7 +13,7 @@ namespace gdl {
 	namespace engine {
 		using Subscription = std::shared_ptr<PubSubSystem<std::string>::Subscription>;
 		enum class IP_VERSION : int { V4 = 4, V6 = 6 };
-		enum class Aria2Method : int{
+        enum class Aria2Method : int {
 			kAddUri,
 			kAddTorrent,
 			kAddMetalink,
@@ -43,7 +43,8 @@ namespace gdl {
 			kRemoveDownloadResult,
 			kGetVersion,
 			kShutdown,
-			kForceShutdown
+            kForceShutdown,
+            kMulticall
 		};
 
 		class Engine_API Aria2cDownloadManager : public Singleton<Aria2cDownloadManager> {
@@ -64,7 +65,7 @@ namespace gdl {
 
 			Result<Subscription> SubscriptionAria2Message(const std::string& topic,
 														  std::function<void(const std::string&)> handler);
-			template<typename... Args>
+            template <typename... Args>
 			Result<bool> CallAria2cMethod(const Aria2Method& method, Args&&... args) {
 				using TupleType = std::tuple<Args...>;
 				if constexpr (sizeof...(Args) == 0) {
@@ -91,8 +92,8 @@ namespace gdl {
 							return MakeFail(1, "Invalid method or arguments");
 					}
 				}
-				else if constexpr (sizeof ...(Args) == 1) {
-					  using FirstType = std::decay_t<std::tuple_element_t<0, TupleType>>;
+                else if constexpr (sizeof...(Args) == 1) {
+                    using FirstType = std::decay_t<std::tuple_element_t<0, TupleType>>;
 					if constexpr (std::is_same_v<FirstType, std::string>) {
 						switch (method) {
 							case Aria2Method::kRemove:
@@ -117,7 +118,7 @@ namespace gdl {
 								return MakeFail(1, "Invalid method or arguments");
 						}
 					}
-					else if constexpr(std::is_same_v<FirstType,std::vector<std::string>>) {
+                    else if constexpr (std::is_same_v<FirstType, std::vector<std::string>>) {
 						switch (method) {
 							case Aria2Method::kTellActive:
 								return websocket_client_.TellActive(std::forward<Args>(args)...);
@@ -129,14 +130,16 @@ namespace gdl {
 						switch (method) {
 							case Aria2Method::kChangeGlobalOption:
 								return websocket_client_.ChangeGlobalOption(std::forward<Args>(args)...);
+                            case Aria2Method::kMulticall:
+                                return websocket_client_.Multicall(std::forward<Args>(args)...);
 							default:
 								return MakeFail(1, "Invalid method or arguments");
 						}
 					}
 					return MakeFail(1, "Invalid method or arguments");
 				}
-				else if constexpr (sizeof ...(Args) == 2) {
-					using FirstType = std::decay_t<std::tuple_element_t<0, TupleType>>;
+                else if constexpr (sizeof...(Args) == 2) {
+                    using FirstType	 = std::decay_t<std::tuple_element_t<0, TupleType>>;
 					using SecondType = std::decay_t<std::tuple_element_t<1, TupleType>>;
 					if constexpr (std::is_same_v<FirstType, std::string> && std::is_same_v<SecondType, Options>) {
 						switch (method) {
@@ -152,7 +155,8 @@ namespace gdl {
 								return MakeFail(1, "Invalid method or arguments");
 						}
 					}
-					else if constexpr (std::is_same_v<FirstType, std::string> && std::is_same_v<SecondType, std::vector<std::string>>) {
+                    else if constexpr (std::is_same_v<FirstType, std::string> &&
+                                       std::is_same_v<SecondType, std::vector<std::string>>) {
 						switch (method) {
 							case Aria2Method::kTellStatus:
 								return websocket_client_.TellStatus(std::forward<Args>(args)...);
@@ -199,6 +203,7 @@ namespace gdl {
 			void SyncMagnetServerList();
 			std::string ParseTextUrls(const std::string& input);
 			std::string GetBitTorrentUrl(const std::string& url);
+
 		   private:
 			String aria2c_path_;
 			boost::asio::io_context io_context_;

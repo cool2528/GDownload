@@ -1,7 +1,7 @@
 #pragma once
 #include <nlohmann/json.hpp>
-#include "result/result.h"
 #include "Engine_export.h"
+#include "result/result.h"
 namespace gdl {
 	namespace engine {
 		class WebSocketClient;
@@ -64,6 +64,8 @@ namespace gdl {
 			Result<bool> Shutdown();
 			//forceShutdown
 			Result<bool> ForceShutdown();
+            // multicall
+            Result<bool> Multicall(const Options& methods);
 
 		   public:
 			void SetMessageCallback(const std::function<void(const std::string&)>& cb);

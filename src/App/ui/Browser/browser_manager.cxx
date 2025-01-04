@@ -10,6 +10,12 @@
 namespace gdl {
 	namespace ui {
 		namespace browser {
+			const  static std::string kAria2OnDownloadStart = "aria2.onDownloadStart";
+			const  static std::string kAria2OnDownloadPause = "aria2.onDownloadPause";
+			const static std::string kAria2OnDownloadStop	= "aria2.onDownloadStop";
+			const static std::string kAria2OnDownloadComplete = "aria2.onDownloadComplete";
+			const static std::string kAria2OnDownloadError	  = "aria2.onDownloadError";
+			const static std::string kAria2onBtDownloadComplete = "aria2.onBtDownloadComplete";
 			BrowserManager* BrowserManager::create(QQmlEngine* qmlengine, QJSEngine* jsengine) {
 				Q_UNUSED(qmlengine)
 				Q_UNUSED(jsengine);
@@ -353,14 +359,162 @@ namespace gdl {
 					}
 					else if (doc.find("method") != doc.end()) {
 						// method message
-						// todo: 这里需要改进 通过 aria2.onDownloadStart aria2.onDownloadPause aria2.onDownloadStop aria2.onDownloadComplete aria2.onDownloadError aria2.onBtDownloadComplete 来处理
 						LOG_DBG("OnHandleAria2Message  method {}", doc.dump());
+						const auto method = doc["method"].get<std::string>();
+						const auto params = doc["params"];
+						auto get_params_task = [](const nlohmann::json& param) {
+							for (const auto& item : param) {
+								std::string gid = item["gid"].get<std::string>();
+								auto task_infos = Aria2QueryByGidTaskInfo(gid);
+								return task_infos;
+							}
+						};
+
+						if (method == kAria2OnDownloadStart)
+						{
+							//aria2.onDownloadStart
+							auto task = get_params_task(params);
+							if (task.task_id().isEmpty()) {
+								LOG_WARN("Failed to get task info by gid");
+								return;
+							}
+							Q_EMIT sigUpdateTasksMessage(task);
+
+						}
+						else if (method == kAria2OnDownloadPause) {
+							//aria2.onDownloadPause
+							auto task = get_params_task(params);
+							if (task.task_id().isEmpty()) {
+								LOG_WARN("Failed to get task info by gid");
+								engine::Aria2cDownloadManager::Instance().CallAria2cMethod(
+									engine::Aria2Method::kTellActive);
+								return;
+							}
+							Q_EMIT sigUpdateTasksMessage(task);
+							
+						}
+						else if (method == kAria2OnDownloadStop) {
+							//aria2.onDownloadStop
+							auto task = get_params_task(params);
+							if (task.task_id().isEmpty()) {
+								LOG_WARN("Failed to get task info by gid");
+								return;
+							}
+							task.set_task_state(TaskState::kRemoved);
+							Q_EMIT sigUpdateTasksMessage(task);
+						}
+						else if (method == kAria2OnDownloadComplete || method == kAria2onBtDownloadComplete) {
+							// aria2.onDownloadComplete
+							auto task = get_params_task(params);
+							if (task.task_id().isEmpty()) {
+								LOG_WARN("Failed to get task info by gid");
+								return;
+							}
+							task.set_task_state(TaskState::kComplete);
+							Q_EMIT sigUpdateTasksMessage(task);
+							
+						}
+						else if (method == kAria2OnDownloadError) {
+							// aria2.onDownloadError
+							auto task = get_params_task(params);
+							if (task.task_id().isEmpty()) {
+								LOG_WARN("Failed to get task info by gid");
+								return;
+							}
+							task.set_task_state(TaskState::kError);
+							Q_EMIT sigUpdateTasksMessage(task);
+						}
+						else {
+							LOG_WARN("Unknown method type: {}", method);
+						}
 					}
 				} catch (std::exception& e) {
 					LOG_ERR("{}", e.what());
 				} catch (...) {
 					LOG_ERR("OnHandleAria2Message exception");
 				}
+			}
+
+			DownloadTaskInfo BrowserManager::Aria2QueryByGidTaskInfo(const std::string& gid) {
+				DownloadTaskInfo task_info;
+				const std::string host = std::string("http://127.0.0.1:") + kEngineRpcPort;
+				engine::Aria2cHttpClient client(host);
+				static const std::vector<std::string> keys = {
+					"status", "totalLength", "completedLength", "downloadSpeed", "infoHash", "numSeeders",
+					"seeder", "connections", "errorCode",		"errorMessage",	 "dir",		 "files",
+					"gid",	  "bittorrent"};
+				auto http_result = client.TellStatus(gid,keys);
+				if (http_result.HasError()) {
+					LOG_ERR("Failed to query task info by gid:{} error:{}", gid, http_result.GetError().what())
+					return task_info;
+				}
+				if (auto res = std::get_if<engine::ErrorResult>(&http_result.Value().result)) {
+					LOG_ERR("Failed to query task info by gid:{} error:{}", gid, res->err_msg)
+					return task_info;
+				}
+				else if(auto res = std::get_if<engine::SucceedResult>(&http_result.Value().result)) {
+					try {
+						nlohmann::json doc = nlohmann::json::parse(res->body);
+						if (doc.find("result") != doc.end()) {
+							// succeed messgae
+							auto object = doc["result"];
+							if (object.is_object()) {
+								std::string status = object["status"].get<std::string>();
+								QString task_id		  = QString::fromStdString(object["gid"].get<std::string>());
+								auto completed_length = std::stoll(object["completedLength"].get<std::string>());
+								auto connections	  = std::stoll(object["connections"].get<std::string>());
+								auto download_speed	  = std::stoll(object["downloadSpeed"].get<std::string>());
+								auto totalLength	  = std::stoll(object["totalLength"].get<std::string>());
+								auto files			  = object["files"];
+								QString file_path;
+								for (const auto& file : files) {
+									file_path = QString::fromStdString(file["path"].get<std::string>());
+									if (!file_path.isEmpty()) break;
+								}
+								if (file_path.isEmpty()) {
+									LOG_WARN("Failed to get file path by gid:{}", gid)
+									return task_info;
+
+								}
+								task_info.set_task_download_speed(download_speed);
+								task_info.set_task_id(task_id);
+								task_info.set_task_current_size(completed_length);
+								task_info.set_task_total_size(totalLength);
+								task_info.set_task_connections(connections);
+								task_info.set_task_file_name(QFileInfo(file_path).fileName());
+								task_info.set_task_save_path(file_path);
+								if (status == "active") {
+									task_info.set_task_state(TaskState::kActive);
+								}
+								else if (status == "waiting") {
+									task_info.set_task_state(TaskState::kWaiting);
+								}
+								else if (status == "complete") {
+									task_info.set_task_state(TaskState::kComplete);
+								}
+								else if (status == "paused") {
+									task_info.set_task_state(TaskState::kPause);
+								}
+								else if (status == "error") {
+									task_info.set_task_state(TaskState::kError);
+								}
+								else if (status == "removed") {
+									task_info.set_task_state(TaskState::kRemoved);
+								}
+								else {
+									LOG_WARN("Unknown state type: {}", status);
+								}
+								
+							}
+						}
+						else {
+							LOG_INFO("TellStatus result parse fail {}", res->body);
+						}
+					} catch (std::exception& e) {
+						LOG_ERR("{}", e.what())
+					}
+				}
+				return task_info;
 			}
 
 			void RegisterTypes(QQmlEngine* engine) {

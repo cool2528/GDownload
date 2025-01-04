@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QVariantMap>
 #include "Aria2CManager/aria2c_manager.h"
+#include "Aria2CManager/aria2c_http_rpc_client.h"
 #include "download_task_model.h"
 #include "singleton.hpp"
 class QQmlEngine;
@@ -71,6 +72,8 @@ namespace gdl {
                private:
                 explicit BrowserManager(QObject* parent = nullptr);
                 void OnHandleAria2Message(const std::string& msg);
+
+				static DownloadTaskInfo Aria2QueryByGidTaskInfo(const std::string& gid);
 
                private:
                 std::unique_ptr<DownloadTaskModel> active_model_{nullptr};
