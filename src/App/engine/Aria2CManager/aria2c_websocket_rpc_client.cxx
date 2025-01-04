@@ -1,8 +1,8 @@
 #include "aria2c_websocket_rpc_client.h"
-#include "websocket_client.h"
 #include <boost/url.hpp>
 #include "engine_def.h"
 #include "logger.h"
+#include "websocket_client.h"
 namespace gdl {
 	namespace engine {
 
@@ -265,6 +265,25 @@ namespace gdl {
 			params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			return Send("aria2.forceShutdown", params);
 		}
+
+        Result<bool> Aria2cWebSocketClient::Multicall(const Options& methods) {
+            try {
+                nlohmann::json params = nlohmann::json::array();
+                params.push_back(std::format("token:{}", kDefaultRpcSecret));
+                for (const auto& method : methods) {
+                    nlohmann::json method_object;
+                    std::string sub_method_name, sub_method_param;
+                    sub_method_name				= method.first;
+                    sub_method_param			= method.second;
+                    nlohmann::json sub_params	= nlohmann::json::parse(sub_method_param);
+                    method_object["methodName"] = sub_method_name;
+                    method_object["params"]		= sub_params;
+                    params.push_back(method_object);
+                }
+                return Send("system.multicall", params);
+            } catch (...) {}
+            return false;
+        }
 
 		void Aria2cWebSocketClient::SetMessageCallback(const std::function<void(const std::string&)>& cb) {
 			text_message_callback_ = cb;

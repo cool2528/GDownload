@@ -79,6 +79,7 @@ namespace gdl {
 				std::lock_guard lock(message_mutex_);
 				message_queue_.push(message);
 				lws_callback_on_writable(wsi_);
+				LOG_INFO("send Websocket message")
 				return true;
 			}
 
@@ -109,7 +110,7 @@ namespace gdl {
 						std::string msg(static_cast<char*>(in), len);
 						msg_buf += msg;
 						if (self->message_callback_ && lws_is_final_fragment(wsi)) {
-							
+							LOG_INFO("reveove Websocket message {}",msg_buf)
 							self->message_callback_(msg_buf);
 							msg_buf.clear();
 						}
@@ -196,8 +197,8 @@ namespace gdl {
 						LOG_ERR("Partial write");
 						break;
 					}
-
 					message_queue_.pop();
+					lws_callback_on_writable(wsi);
 				}
 			}
 

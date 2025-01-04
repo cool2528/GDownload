@@ -148,13 +148,13 @@ namespace gdl {
 
 			   private:
 				QString task_id_;
-				TaskState task_state_;
+				TaskState task_state_{TaskState::kError};
 				QString task_file_name_;
 				QString task_save_path_;
-				std::int64_t task_total_size_;
-				std::int64_t task_current_size_;
-				std::int64_t task_download_speed_;
-				std::int64_t task_connections_;
+				std::int64_t task_total_size_{0};
+				std::int64_t task_current_size_{0};
+				std::int64_t task_download_speed_{0};
+				std::int64_t task_connections_{0};
 			};
 
 			class DownloadTaskModel : public QAbstractListModel {
