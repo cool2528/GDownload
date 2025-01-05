@@ -1,229 +1,177 @@
-#include <libwebsockets.h>
+#pragma once
+#include <boost/asio/strand.hpp>
+#include <boost/beast/core.hpp>
+#include <boost/beast/websocket.hpp>
 #include <functional>
+#include <memory>
 #include <mutex>
 #include <queue>
 #include <string>
-#include <thread>
-#include "logger.h"
+
 namespace gdl {
 	namespace engine {
-		class WebSocketClient {
+
+		namespace beast		= boost::beast;
+		namespace http		= beast::http;
+		namespace websocket = beast::websocket;
+		namespace net		= boost::asio;
+		using tcp			= boost::asio::ip::tcp;
+
+		class WebSocketClient : public std::enable_shared_from_this<WebSocketClient> {
 		   public:
-			// 回调函数类型定义
 			using MessageCallback	 = std::function<void(const std::string&)>;
 			using ConnectCallback	 = std::function<void()>;
 			using DisconnectCallback = std::function<void()>;
 			using ErrorCallback		 = std::function<void(const std::string&)>;
 
-			WebSocketClient() : 
-				context_(nullptr),
-				wsi_(nullptr),
-				retry_count(0),
-				interrupted_(false),
-				is_connected_(false),
-				port_(0),
-				is_init_context_(false) {
-				lws_set_log_level(LLL_ERR | LLL_WARN, nullptr);
-				memset(&sul_, 0, sizeof(sul_));
-				memset(&info_, 0, sizeof(info_));
-			}
+			WebSocketClient(net::io_context& ioc) : resolver_(net::make_strand(ioc)), ws_(net::make_strand(ioc)) {}
 
 			~WebSocketClient() { disconnect(); }
 
-			bool connect(const std::string& url, int port, const std::string& path = "/") {
-				server_address_ = url;
-				port_			= port;
-				path_			= path;
-				memset(&info_, 0, sizeof(info_));
-				memset(&sul_, 0, sizeof(sul_));
-				info_.options			  = LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
-				info_.port				  = CONTEXT_PORT_NO_LISTEN;
-				protocols_				  = {{"json", globalCallback, 0, 0, 0, nullptr, 0}, LWS_PROTOCOL_LIST_TERM};
-				info_.protocols			  = protocols_.data();
-				info_.fd_limit_per_thread = 1 + 1 + 1;
-
-				context_ = lws_create_context(&info_);
-				if (!context_) {
-					LOG_ERR("init context faild");
-					return false;
-				}
-				is_init_context_ = true;
-				lws_sul_schedule(context_, 0, &sul_, sulCallback, 1);
-				loop_thread_ = std::thread([this] {
-					int n = 0;
-					while (n >= 0 && !interrupted_) {
-						n = lws_service(context_, 0);
-					}
-				});
-
+			bool connect(const std::string& host, const std::string& port, const std::string& path) {
+				host_ = host;
+				port_ = port;
+				path_ = path;
+				resolver_.async_resolve(host_, port_,
+										beast::bind_front_handler(&WebSocketClient::onResolve, shared_from_this()));
 				return true;
 			}
 
 			void disconnect() {
-				interrupted_ = true;
-				if (loop_thread_.joinable()) {
-					loop_thread_.join();
+				if (ws_.is_open()) {
+					ws_.async_close(websocket::close_code::normal,
+									beast::bind_front_handler(&WebSocketClient::onClose, shared_from_this()));
 				}
-				if (context_) {
-					lws_context_destroy(context_);
-					context_ = nullptr;
-				}
-				is_connected_ = false;
 			}
 
 			bool send(const std::string& message) {
-				if (interrupted_ || !wsi_) {
-					LOG_ERR("Not connected");
-					return false;
-				}
-				std::lock_guard lock(message_mutex_);
-				message_queue_.push(message);
-				lws_callback_on_writable(wsi_);
-				LOG_INFO("send Websocket message")
+				net::post(ws_.get_executor(), [self = shared_from_this(), message]() { self->onSend(message); });
 				return true;
 			}
 
-			// 设置回调
 			void setMessageCallback(MessageCallback cb) { message_callback_ = std::move(cb); }
 			void setConnectCallback(ConnectCallback cb) { connect_callback_ = std::move(cb); }
 			void setDisconnectCallback(DisconnectCallback cb) { disconnect_callback_ = std::move(cb); }
 			void setErrorCallback(ErrorCallback cb) { error_callback_ = std::move(cb); }
-			bool isConnect() const { return is_connected_; }
+			bool isConnected() const { return ws_.is_open(); }
 
 		   private:
-			static int globalCallback(struct lws* wsi, enum lws_callback_reasons reason, void* user, void* in,
-									  size_t len) {
-				WebSocketClient* self = static_cast<WebSocketClient*>(user);
-				switch (reason) {
-					case LWS_CALLBACK_CLIENT_CONNECTION_ERROR: {
-						std::string msg(static_cast<char*>(in), len);
-						LOG_ERR("CLIENT_CONNECTION_ERROR: {}", msg);
-						if (self->error_callback_) {
-							self->error_callback_(msg);
-						}
-						self->is_connected_ = false;
-						goto do_retry;
-						break;
-					}
-					case LWS_CALLBACK_CLIENT_RECEIVE: {
-						static std::string msg_buf;
-						std::string msg(static_cast<char*>(in), len);
-						msg_buf += msg;
-						if (self->message_callback_ && lws_is_final_fragment(wsi)) {
-							LOG_INFO("reveove Websocket message {}",msg_buf)
-							self->message_callback_(msg_buf);
-							msg_buf.clear();
-						}
-					} break;
-					case LWS_CALLBACK_CLIENT_ESTABLISHED: {
-						self->is_connected_ = true;
-						if (self->connect_callback_) {
-							self->connect_callback_();
-						}
-					} break;
-					case LWS_CALLBACK_CLIENT_CLOSED: {
-						self->is_connected_ = false;
-						std::string msg(static_cast<char*>(in), len);
-						LOG_WARN("LWS_CALLBACK_CLIENT_CLOSED:{}", msg);
-						goto do_retry;
-					} break;
-					case LWS_CALLBACK_CLIENT_WRITEABLE:
-						self->sendPendingMessages(wsi);
-						break;
-					default:
-						break;
+			void onResolve(beast::error_code ec, tcp::resolver::results_type results) {
+				if (ec) {
+					handleError("Resolve failed: " + ec.message());
+					return;
 				}
-				return lws_callback_http_dummy(wsi, reason, user, in, len);
-			do_retry:
-
-				if (lws_retry_sul_schedule_retry_wsi(wsi, &self->sul_, sulCallback, &self->retry_count)) {
-					LOG_WARN("connection attempts exhausted");
-					self->interrupted_ = true;
-				}
-				return 0;
+				beast::get_lowest_layer(ws_).async_connect(
+					results, beast::bind_front_handler(&WebSocketClient::onConnect, shared_from_this()));
 			}
 
-			static void sulCallback(lws_sorted_usec_list_t* sul) {
-				WebSocketClient* self = lws_container_of(sul, WebSocketClient, sul_);
-				lws_client_connect_info info;
-				ZeroMemory(&info, sizeof(lws_client_connect_info));
-				info.context = self->context_;
-				info.port	 = self->port_;
-				info.address = self->server_address_.c_str();
-				info.path	 = self->path_.c_str();
-				info.host	 = info.address;
-				info.origin	 = info.address;
-				info.ssl_connection				   = 0;
-				info.protocol					   = "ws";
-				info.local_protocol_name		   = "json";
-				info.pwsi						   = &self->wsi_;
-				static const uint32_t backoff_ms[] = {1000, 2000, 3000, 4000, 5000};
-				LOG_INFO("sulCallback address {} port {} ", info.address, info.port);
-				static const lws_retry_bo_t retry = {
-					.retry_ms_table		  = backoff_ms,
-					.retry_ms_table_count = LWS_ARRAY_SIZE(backoff_ms),
-					.conceal_count		  = LWS_ARRAY_SIZE(backoff_ms),
-
-					.secs_since_valid_ping	 = 3,
-					.secs_since_valid_hangup = 10,
-
-					.jitter_percent = 20,
-				};
-				info.retry_and_idle_policy = &retry;
-				info.userdata			   = self;
-				if (!lws_client_connect_via_info(&info)) {
-					if (lws_retry_sul_schedule(self->context_, 0, sul, &retry, sulCallback, &self->retry_count)) {
-						LOG_WARN("connection attempts exhausted");
-						self->interrupted_ = true;
-					}
+			void onConnect(beast::error_code ec, tcp::resolver::results_type::endpoint_type) {
+				if (ec) {
+					handleError("Connect failed: " + ec.message());
+					return;
 				}
+
+				ws_.async_handshake(host_, path_,
+									beast::bind_front_handler(&WebSocketClient::onHandshake, shared_from_this()));
 			}
-			void sendPendingMessages(struct lws* wsi) {
-				if (!wsi) return;
-				std::lock_guard lock(message_mutex_);
-				while (!message_queue_.empty() && is_connected_) {
-					const std::string& message = message_queue_.front();
-					std::vector<uint8_t> buf(LWS_PRE + message.size());
-					memcpy(buf.data() + LWS_PRE, message.data(), message.size());
-					int sent = lws_write(wsi, buf.data() + LWS_PRE, message.size(), LWS_WRITE_TEXT);
-					if (sent < 0) {
-						LOG_ERR("Error writing to socket");
-						if (error_callback_) {
-							error_callback_("Write error occurred");
-						}
-						break;
-					}
-					else if (static_cast<size_t>(sent) < message.size()) {
-						LOG_ERR("Partial write");
-						break;
-					}
+
+			void onHandshake(beast::error_code ec) {
+				if (ec) {
+					handleError("WebSocket handshake failed: " + ec.message());
+					return;
+				}
+
+				if (connect_callback_) {
+					connect_callback_();
+				}
+				asyncRead();
+			}
+
+			void asyncRead() {
+				ws_.async_read(read_buffer_, beast::bind_front_handler(&WebSocketClient::onRead, shared_from_this()));
+			}
+
+			void onRead(beast::error_code ec, std::size_t bytes_transferred) {
+				if (ec) {
+					handleError("Read failed: " + ec.message());
+					return;
+				}
+
+				if (message_callback_) {
+					std::string message(beast::buffers_to_string(read_buffer_.data()));
+					message_callback_(message);
+				}
+
+				read_buffer_.consume(bytes_transferred);
+
+				asyncRead();
+			}
+
+			void onSend(const std::string& message) {
+				std::lock_guard<std::mutex> lock(queue_mutex_);
+				message_queue_.push(message);
+
+				if (message_queue_.size() > 1) {
+					return;	 
+				}
+
+				asyncWrite();
+			}
+
+			void asyncWrite() {
+				ws_.async_write(net::buffer(message_queue_.front()),
+								beast::bind_front_handler(&WebSocketClient::onWrite, shared_from_this()));
+			}
+
+			void onWrite(beast::error_code ec, std::size_t) {
+				if (ec) {
+					handleError("Write failed: " + ec.message());
+					return;
+				}
+
+				{
+					std::lock_guard<std::mutex> lock(queue_mutex_);
 					message_queue_.pop();
-					lws_callback_on_writable(wsi);
+				}
+
+				if (!message_queue_.empty()) {
+					asyncWrite();
 				}
 			}
 
-		   private:
-			std::vector<lws_protocols> protocols_;
-			struct lws_context* context_{nullptr};
-			struct lws_context_creation_info info_;
-			lws_sorted_usec_list_t sul_;
-			struct lws* wsi_{nullptr};
-			unsigned short retry_count{0};
-			std::thread loop_thread_;
-			std::atomic_bool interrupted_{false};
-			std::queue<std::string> message_queue_;
-			std::mutex message_mutex_;
+			void onClose(beast::error_code ec) {
+				if (ec) {
+					handleError("Close failed: " + ec.message());
+				}
+
+				if (disconnect_callback_) {
+					disconnect_callback_();
+				}
+			}
+
+			void handleError(const std::string& error) {
+				if (error_callback_) {
+					error_callback_(error);
+				}
+				disconnect();
+			}
 
 		   private:
+			tcp::resolver resolver_;
+			websocket::stream<beast::tcp_stream> ws_;
+			beast::flat_buffer read_buffer_;
+			std::queue<std::string> message_queue_;
+			std::mutex queue_mutex_;
+
+			std::string host_;
+			std::string port_;
+			std::string path_;
+
 			MessageCallback message_callback_;
 			ConnectCallback connect_callback_;
 			DisconnectCallback disconnect_callback_;
 			ErrorCallback error_callback_;
-			std::atomic_bool is_connected_{false};
-			std::string server_address_;
-			unsigned int port_{0};
-			std::atomic_bool is_init_context_{false};
-			std::string path_;
 		};
+
 	}  // namespace engine
 }  // namespace gdl

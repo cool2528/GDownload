@@ -6,8 +6,8 @@
 namespace gdl {
 	namespace engine {
 
-		Aria2cWebSocketClient::Aria2cWebSocketClient(const std::string& url) : url_(url) {
-			websocket_ = std::make_unique<WebSocketClient>();
+		Aria2cWebSocketClient::Aria2cWebSocketClient(const std::string& url, boost::asio::io_context& ioc) : url_(url) {
+			websocket_ = std::make_shared<WebSocketClient>(ioc);
 			// connected
 			websocket_->setConnectCallback([this] {
 				if (state_chanage_callback_) {
@@ -44,7 +44,7 @@ namespace gdl {
 			auto host	   = ws_server_url.host();
 			auto port	   = ws_server_url.port();
 			auto path	   = ws_server_url.path();
-			const auto res = websocket_->connect(host, std::stol(port), path);
+			const auto res = websocket_->connect(host, port, path);
 			if (!res) {
 				LOG_ERR("connect websocket server faild {}", url_);
 			}
@@ -301,7 +301,7 @@ namespace gdl {
 			doc["method"]  = method;
 			doc["params"]  = params;
 			doc["id"]	   = std::to_string(++id);
-			if (!websocket_->isConnect()) {
+			if (!websocket_->isConnected()) {
 				return MakeFail(static_cast<std::int64_t>(gdl::ErrorType::kUnknownError));
 			}
 			const auto data = doc.dump();

@@ -14,7 +14,6 @@
       "name":"cpr",
       "features":["ssl"]
     },
-    "libwebsockets",
     "nlohmann-json"
   ]
 }

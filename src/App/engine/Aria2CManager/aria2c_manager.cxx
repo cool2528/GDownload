@@ -23,7 +23,7 @@ namespace gdl {
 			  update_aria2c_tasks_timer_(io_context_),
 			  pub_sub_system_(io_context_),
 			  flush_timer_(io_context_),
-			  websocket_client_(std::string("ws://127.0.0.1:") + kEngineRpcPort + "/jsonrpc")
+			  websocket_client_(std::string("ws://127.0.0.1:") + kEngineRpcPort + "/jsonrpc",io_context_)
 		{
 
 			websocket_client_.SetMessageCallback([this](const std::string& msg) {
@@ -155,7 +155,7 @@ namespace gdl {
 				"seeder", "connections", "errorCode",		"errorMessage",	 "dir",		 "files",
 				"gid",	  "bittorrent"};
 			try {
-				websocket_client_.GetGlobalStat();
+				SyncGlobalStatInfo();
 				if (active_num_ > 0) {
 					websocket_client_.TellActive(keys);
 				}
@@ -209,6 +209,28 @@ namespace gdl {
 
 			} catch (std::exception& e) {
 				LOG_ERR("Failed to parse tracker_source_urls {}", e.what());
+			}
+		}
+
+		void Aria2cDownloadManager::SyncGlobalStatInfo() {
+			const std::string host = std::string("http://127.0.0.1:") + kEngineRpcPort;
+			Aria2cHttpClient client(host);
+			auto http_result = client.GetGlobalStat();
+			if (auto res = std::get_if<ErrorResult>(&http_result.Value().result)) {
+				LOG_WARN("SyncGlobalStatInfo fail: {}",res->err_msg)
+				return;
+			}
+			else if (auto succeed_res = std::get_if<SucceedResult>(&http_result.Value().result)) {
+				nlohmann::json doc = nlohmann::json::parse(succeed_res->body, nullptr, false);
+				if (doc.contains("result")) {
+					const auto& result = doc["result"];
+					if (result.contains("numActive") && result.contains("numWaiting") &&
+						result.contains("numStopped")) {
+						active_num_	 = std::stoll(result["numActive"].get<std::string>());
+						waiting_num_ = std::stoll(result["numWaiting"].get<std::string>());
+						stopped_num_ = std::stoll(result["numStopped"].get<std::string>());
+					}
+				}
 			}
 		}
 
@@ -270,7 +292,7 @@ namespace gdl {
 			}
 			// 启动 更新当前aria2c 的所有 暂停 正在下载 停止的任务状态列表 定时器
 			update_aria2c_tasks_timer_.Start(std::bind(&Aria2cDownloadManager::UpdateAria2cTasks, this),
-											 std::chrono::milliseconds(200), true);
+											 std::chrono::milliseconds(300), true);
 			// 链接 aria2c websocket
 			websocket_client_.Open();
 			engine_is_runing_ = true;
