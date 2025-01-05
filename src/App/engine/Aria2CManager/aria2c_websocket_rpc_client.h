@@ -2,15 +2,15 @@
 #include <nlohmann/json.hpp>
 #include "Engine_export.h"
 #include "result/result.h"
+#include "websocket_client.h"
 namespace gdl {
 	namespace engine {
-		class WebSocketClient;
 		using Options = std::unordered_multimap<std::string, std::string>;
 		enum class State : int { kError = -1, kConnected, kClosed };
 		class Engine_API Aria2cWebSocketClient {
 
 		   public:
-			explicit Aria2cWebSocketClient(const std::string& url);
+			explicit Aria2cWebSocketClient(const std::string& url,boost::asio::io_context& ioc);
 			~Aria2cWebSocketClient();
 
 		   public:
@@ -81,7 +81,8 @@ namespace gdl {
 
 		   private:
 			std::string url_;
-			std::unique_ptr<WebSocketClient> websocket_;
+			std::shared_ptr<WebSocketClient> websocket_;
+
 			std::function<void(const State&, std::string)> state_chanage_callback_{nullptr};
 			std::function<void(const std::string&)> text_message_callback_{nullptr};
 		};
