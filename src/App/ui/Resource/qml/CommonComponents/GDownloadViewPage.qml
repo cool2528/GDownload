@@ -78,10 +78,9 @@ Rectangle{
                             }
                             // download page
                             RowLayout{
-                                spacing: 10
-                                visible: downloadView.pageType == 0
+                                spacing: 5
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                width: 70
+                                width: parent.width
                                 height: parent.height
                                 IconButton{
                                     id:revocerButton
@@ -94,8 +93,14 @@ Rectangle{
 
                                     iconColor:GTheme.dark ? mouse.hovered ? "#ffffff" : "#7c7c7c": mouse.hovered ? "#ffffff" : "#acacac"
                                     onClicked: {
-                                        console.debug("revocer all task")
-                                        BrowserManager.UnpauseTask(model.taskId)
+                                        if(downloadView.pageType == 0)
+                                        {
+                                            BrowserManager.UnpauseTask(model.taskId)
+                                        }else if(downloadView.pageType == 1){
+                                            //
+                                        }else if(downloadView.pageType == 2){
+                                            //
+                                        }
                                     }
                                 }
                                 IconButton{
@@ -109,8 +114,14 @@ Rectangle{
 
                                     iconColor:GTheme.dark ? mouse.hovered ? "#ffffff" : "#7c7c7c": mouse.hovered ? "#ffffff" : "#acacac"
                                     onClicked: {
-                                        console.debug("pause all task")
-                                        BrowserManager.PauseTask(model.taskId)
+                                        if(downloadView.pageType == 0)
+                                        {
+                                            BrowserManager.PauseTask(model.taskId)
+                                        }else if(downloadView.pageType == 1){
+                                            //
+                                        }else if(downloadView.pageType == 2){
+                                            //
+                                        }
                                     }
                                 }
                                 IconButton{
@@ -122,8 +133,13 @@ Rectangle{
                                     iconSource: SegoeFluentIcons.Delete
                                     iconColor:GTheme.dark ? mouse.hovered ? "#ffffff" : "#7c7c7c": mouse.hovered ? "#ffffff" : "#acacac"
                                     onClicked: {
-                                        console.debug("delete all task")
-                                        BrowserManager.RemoveTask(model.taskId)
+                                        if(downloadView.pageType == 0){
+                                            BrowserManager.RemoveTask(model.taskId)
+                                        }else if(downloadView.pageType == 1){
+                                            //
+                                        }else if(downloadView.pageType == 2){
+                                            //
+                                        }
                                     }
                                 }
 
@@ -136,13 +152,25 @@ Rectangle{
                                     iconSource: SegoeFluentIcons.Folder
                                     iconColor:GTheme.dark ? mouse.hovered ? "#ffffff" : "#7c7c7c": mouse.hovered ? "#ffffff" : "#acacac"
                                     onClicked: {
-                                        console.debug("open folder")
                                         BrowserManager.OpenFileLocation(model.savePath)
                                     }
                                 }
+
+                                IconButton{
+                                    id:copyUrlButton
+                                    Layout.margins: 5
+                                    Layout.fillWidth: true
+                                    Layout.minimumHeight: 20
+                                    Layout.maximumHeight: 20
+                                    iconSource: SegoeFluentIcons.Link
+                                    iconColor:GTheme.dark ? mouse.hovered ? "#ffffff" : "#7c7c7c": mouse.hovered ? "#ffffff" : "#acacac"
+                                    onClicked: {
+                                        console.debug("copy download link ",model.downloadLink)
+                                        UtilsToolsManager.SetClipboardText(model.downloadLink)
+                                    }
+                                }
                             }
-                            // waitingPage
-                            // completedPage
+
                         }
                     }
 

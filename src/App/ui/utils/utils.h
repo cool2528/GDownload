@@ -22,6 +22,8 @@ namespace gdl {
 #if defined(__APPLE__)
 				Q_INVOKABLE void HideMacOsxWindowStandardButtons(QQuickWindow* window);
 #endif
+                Q_INVOKABLE bool SetClipboardText(const QString& text);
+
 			   private:
 				explicit UtilsToolsManager(QObject* parent = nullptr);
 			};

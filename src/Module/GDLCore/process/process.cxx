@@ -60,6 +60,13 @@ namespace gdl {
 			ZeroMemory(&si, sizeof(si));
 			si.cb = sizeof(si);
 			ZeroMemory(&pi, sizeof(pi));
+			si.dwFlags				  = STARTF_USESHOWWINDOW;
+#if (defined(_WIN32) || defined(_WIN64)) && (defined(DEBUG) || defined(_DEBUG) || !defined(QT_NO_DEBUG))
+			si.wShowWindow = TRUE;
+#else
+			si.wShowWindow = FALSE;
+#endif
+
 			std::wstring command_line = gdl::encoding::Utf8ToWString(command.data());
 			for (const auto& args : arguments) {
 				command_line += L" " + gdl::encoding::Utf8ToWString(args.data());

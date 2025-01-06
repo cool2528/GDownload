@@ -84,6 +84,9 @@ if(APPLE)
     )
 elseif(WIN32)
     add_executable(${PROJECT_NAME} ${SOURCES_FILES} ${HEADERS_FILES} ${QT_RESOURCE_FILES} ${QT_QML_FILES})
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        WIN32_EXECUTABLE TRUE
+    )
     add_custom_command(
         TARGET ${PROJECT_NAME}
         PRE_BUILD
