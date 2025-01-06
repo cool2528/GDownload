@@ -7,7 +7,7 @@ namespace gdl {
 	namespace ui {
 		namespace browser {
 
-			enum class TaskState : int { kComplete = 0, kActive, kPause, kWaiting, kError,kRemoved };
+            enum class TaskState : int { kComplete = 0, kActive, kPause, kWaiting, kError, kRemoved };
 
 			class DownloadTaskInfo {
 			   public:
@@ -18,6 +18,7 @@ namespace gdl {
 					  task_state_(other.task_state_),
 					  task_file_name_(other.task_file_name_),
 					  task_save_path_(other.task_save_path_),
+					  task_download_link_(other.task_download_link_),
 					  task_total_size_(other.task_total_size_),
 					  task_current_size_(other.task_current_size_),
 					  task_download_speed_(other.task_download_speed_),
@@ -28,6 +29,7 @@ namespace gdl {
 					  task_state_(other.task_state_),
 					  task_file_name_(std::move(other.task_file_name_)),
 					  task_save_path_(std::move(other.task_save_path_)),
+					  task_download_link_(std::move(other.task_download_link_)),
 					  task_total_size_(other.task_total_size_),
 					  task_current_size_(other.task_current_size_),
 					  task_download_speed_(other.task_download_speed_),
@@ -39,6 +41,7 @@ namespace gdl {
 						task_state_			 = other.task_state_;
 						task_file_name_		 = other.task_file_name_;
 						task_save_path_		 = other.task_save_path_;
+						task_download_link_	 = other.task_download_link_;
 						task_total_size_	 = other.task_total_size_;
 						task_current_size_	 = other.task_current_size_;
 						task_download_speed_ = other.task_download_speed_;
@@ -53,6 +56,7 @@ namespace gdl {
 						task_state_			 = other.task_state_;
 						task_file_name_		 = std::move(other.task_file_name_);
 						task_save_path_		 = std::move(other.task_save_path_);
+						task_download_link_	 = std::move(other.task_download_link_);
 						task_total_size_	 = other.task_total_size_;
 						task_current_size_	 = other.task_current_size_;
 						task_download_speed_ = other.task_download_speed_;
@@ -65,6 +69,7 @@ namespace gdl {
 				TaskState task_state() const { return task_state_; }
 				QString task_file_name() const { return task_file_name_; }
 				QString task_save_path() const { return task_save_path_; }
+                QString task_download_link() const { return task_download_link_; }
 				std::int64_t task_total_size() const { return task_total_size_; }
 				std::int64_t task_current_size() const { return task_current_size_; }
 				std::int64_t task_download_speed() const { return task_download_speed_; }
@@ -74,6 +79,10 @@ namespace gdl {
 				void set_task_state(TaskState state) { task_state_ = state; }
 				void set_task_file_name(const QString& file_name) { task_file_name_ = file_name; }
 				void set_task_save_path(const QString& save_path) { task_save_path_ = save_path; }
+				void set_task_download_link(const QString& link) {
+					if (link.isEmpty()) return;
+					task_download_link_ = link;
+				}
 				void set_task_total_size(std::int64_t total_size) { task_total_size_ = total_size; }
 				void set_task_current_size(std::int64_t current_size) { task_current_size_ = current_size; }
 				void set_task_download_speed(std::int64_t download_speed) { task_download_speed_ = download_speed; }
@@ -151,6 +160,7 @@ namespace gdl {
 				TaskState task_state_{TaskState::kError};
 				QString task_file_name_;
 				QString task_save_path_;
+                QString task_download_link_;
 				std::int64_t task_total_size_{0};
 				std::int64_t task_current_size_{0};
 				std::int64_t task_download_speed_{0};
@@ -170,7 +180,8 @@ namespace gdl {
 					kTaskDownloadSpeed,
 					kTaskProgress,
 					kTaskRemainingTime,
-					kTaskConnections
+                    kTaskConnections,
+                    kTaskDownloadLink
 				};
 
 			   public:

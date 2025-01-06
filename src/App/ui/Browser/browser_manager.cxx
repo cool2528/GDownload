@@ -1,7 +1,9 @@
 #include "browser_manager.h"
 #include <QApplication>
-#include <QDesktopServices>
+#include <QDir>
 #include <QFileInfo>
+#include <QOperatingSystemVersion>
+#include <QProcess>
 #include <QQmlEngine>
 #include <nlohmann/json.hpp>
 #include "Aria2CManager/engine_def.h"
@@ -10,11 +12,11 @@
 namespace gdl {
 	namespace ui {
 		namespace browser {
-			const  static std::string kAria2OnDownloadStart = "aria2.onDownloadStart";
-			const  static std::string kAria2OnDownloadPause = "aria2.onDownloadPause";
-			const static std::string kAria2OnDownloadStop	= "aria2.onDownloadStop";
-			const static std::string kAria2OnDownloadComplete = "aria2.onDownloadComplete";
-			const static std::string kAria2OnDownloadError	  = "aria2.onDownloadError";
+            const static std::string kAria2OnDownloadStart		= "aria2.onDownloadStart";
+            const static std::string kAria2OnDownloadPause		= "aria2.onDownloadPause";
+            const static std::string kAria2OnDownloadStop		= "aria2.onDownloadStop";
+            const static std::string kAria2OnDownloadComplete	= "aria2.onDownloadComplete";
+            const static std::string kAria2OnDownloadError		= "aria2.onDownloadError";
 			const static std::string kAria2onBtDownloadComplete = "aria2.onBtDownloadComplete";
 			BrowserManager* BrowserManager::create(QQmlEngine* qmlengine, QJSEngine* jsengine) {
 				Q_UNUSED(qmlengine)
@@ -185,15 +187,26 @@ namespace gdl {
 			}
 
 			void BrowserManager::OpenFileLocation(const QString& file_path) {
-				QFileInfo fileInfo(file_path);
-				if (!fileInfo.exists()) {
-					LOG_WARN("File does not exist:{}", file_path.toStdString());
-					return;
-				}
-				QUrl url = QUrl::fromLocalFile(fileInfo.absoluteFilePath());
-				if (!QDesktopServices::openUrl(url)) {
-					LOG_WARN("Failed to open file location:{}", file_path.toStdString());
-				}
+                QFileInfo fileInfo(file_path);
+                if (!fileInfo.exists()) return;
+
+                QStringList args;
+                QString program;
+
+                if (QOperatingSystemVersion::currentType() == QOperatingSystemVersion::Windows) {
+                    program = "explorer";
+                    args << "/select," << QDir::toNativeSeparators(fileInfo.filePath());
+                }
+                else if (QOperatingSystemVersion::currentType() == QOperatingSystemVersion::MacOS) {
+                    program = "open";
+                    args << "-R" << fileInfo.filePath();
+                }
+                else {
+                    program = "xdg-open";
+                    args << fileInfo.path();
+                }
+
+                QProcess::startDetached(program, args);
 			}
 
 			bool BrowserManager::Init() {
@@ -297,9 +310,16 @@ namespace gdl {
 									auto download_speed	  = std::stoll(object["downloadSpeed"].get<std::string>());
 									auto totalLength	  = std::stoll(object["totalLength"].get<std::string>());
 									auto files			  = object["files"];
-									QString file_path;
+                                    QString file_path, download_url;
 									for (const auto& file : files) {
 										file_path = QString::fromStdString(file["path"].get<std::string>());
+                                        if (file.contains("uris") && file["uris"].is_array()) {
+                                            auto uris = file["uris"];
+                                            for (const auto& uri : uris) {
+                                                download_url = QString::fromStdString(uri["uri"].get<std::string>());
+                                                break;
+                                            }
+                                        }
 										if (!file_path.isEmpty()) break;
 									}
 									if (file_path.isEmpty()) return;
@@ -310,6 +330,7 @@ namespace gdl {
 									task_info.set_task_connections(connections);
 									task_info.set_task_file_name(QFileInfo(file_path).fileName());
 									task_info.set_task_save_path(file_path);
+                                    task_info.set_task_download_link(download_url);
 									if (status == "active") {
 										task_info.set_task_state(TaskState::kActive);
 									}
@@ -360,8 +381,8 @@ namespace gdl {
 					else if (doc.find("method") != doc.end()) {
 						// method message
 						LOG_DBG("OnHandleAria2Message  method {}", doc.dump());
-						const auto method = doc["method"].get<std::string>();
-						const auto params = doc["params"];
+                        const auto method	 = doc["method"].get<std::string>();
+                        const auto params	 = doc["params"];
 						auto get_params_task = [](const nlohmann::json& param) {
 							for (const auto& item : param) {
 								std::string gid = item["gid"].get<std::string>();
@@ -370,8 +391,7 @@ namespace gdl {
 							}
 						};
 
-						if (method == kAria2OnDownloadStart)
-						{
+                        if (method == kAria2OnDownloadStart) {
 							//aria2.onDownloadStart
 							auto task = get_params_task(params);
 							if (task.task_id().isEmpty()) {
@@ -379,7 +399,6 @@ namespace gdl {
 								return;
 							}
 							Q_EMIT sigUpdateTasksMessage(task);
-
 						}
 						else if (method == kAria2OnDownloadPause) {
 							//aria2.onDownloadPause
@@ -391,7 +410,6 @@ namespace gdl {
 								return;
 							}
 							Q_EMIT sigUpdateTasksMessage(task);
-							
 						}
 						else if (method == kAria2OnDownloadStop) {
 							//aria2.onDownloadStop
@@ -412,7 +430,6 @@ namespace gdl {
 							}
 							task.set_task_state(TaskState::kComplete);
 							Q_EMIT sigUpdateTasksMessage(task);
-							
 						}
 						else if (method == kAria2OnDownloadError) {
 							// aria2.onDownloadError
@@ -443,7 +460,7 @@ namespace gdl {
 					"status", "totalLength", "completedLength", "downloadSpeed", "infoHash", "numSeeders",
 					"seeder", "connections", "errorCode",		"errorMessage",	 "dir",		 "files",
 					"gid",	  "bittorrent"};
-				auto http_result = client.TellStatus(gid,keys);
+                auto http_result = client.TellStatus(gid, keys);
 				if (http_result.HasError()) {
 					LOG_ERR("Failed to query task info by gid:{} error:{}", gid, http_result.GetError().what())
 					return task_info;
@@ -452,29 +469,39 @@ namespace gdl {
 					LOG_ERR("Failed to query task info by gid:{} error:{}", gid, res->err_msg)
 					return task_info;
 				}
-				else if(auto res = std::get_if<engine::SucceedResult>(&http_result.Value().result)) {
+                else if (auto res = std::get_if<engine::SucceedResult>(&http_result.Value().result)) {
 					try {
 						nlohmann::json doc = nlohmann::json::parse(res->body);
 						if (doc.find("result") != doc.end()) {
 							// succeed messgae
 							auto object = doc["result"];
 							if (object.is_object()) {
-								std::string status = object["status"].get<std::string>();
+                                std::string status	  = object["status"].get<std::string>();
 								QString task_id		  = QString::fromStdString(object["gid"].get<std::string>());
 								auto completed_length = std::stoll(object["completedLength"].get<std::string>());
 								auto connections	  = std::stoll(object["connections"].get<std::string>());
 								auto download_speed	  = std::stoll(object["downloadSpeed"].get<std::string>());
 								auto totalLength	  = std::stoll(object["totalLength"].get<std::string>());
 								auto files			  = object["files"];
-								QString file_path;
+                                QString file_path, download_url;
 								for (const auto& file : files) {
 									file_path = QString::fromStdString(file["path"].get<std::string>());
+                                    for (const auto& file : files) {
+                                        file_path = QString::fromStdString(file["path"].get<std::string>());
+                                        if (file.contains("uris") && file["uris"].is_array()) {
+                                            auto uris = file["uris"];
+                                            for (const auto& uri : uris) {
+                                                download_url = QString::fromStdString(uri["uri"].get<std::string>());
+                                                break;
+                                            }
+                                        }
+                                        if (!file_path.isEmpty()) break;
+                                    }
 									if (!file_path.isEmpty()) break;
 								}
 								if (file_path.isEmpty()) {
 									LOG_WARN("Failed to get file path by gid:{}", gid)
 									return task_info;
-
 								}
 								task_info.set_task_download_speed(download_speed);
 								task_info.set_task_id(task_id);
@@ -483,6 +510,7 @@ namespace gdl {
 								task_info.set_task_connections(connections);
 								task_info.set_task_file_name(QFileInfo(file_path).fileName());
 								task_info.set_task_save_path(file_path);
+                                task_info.set_task_download_link(download_url);
 								if (status == "active") {
 									task_info.set_task_state(TaskState::kActive);
 								}
@@ -503,8 +531,7 @@ namespace gdl {
 								}
 								else {
 									LOG_WARN("Unknown state type: {}", status);
-								}
-								
+                                }
 							}
 						}
 						else {

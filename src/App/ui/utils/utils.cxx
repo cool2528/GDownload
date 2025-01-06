@@ -1,4 +1,6 @@
 #include "utils.h"
+#include <QClipboard>
+#include <QGuiApplication>
 #include <QQmlContext>
 #include <QQmlEngine>
 #include <QQuickWindow>
@@ -8,6 +10,12 @@ namespace gdl {
 	namespace ui {
 		namespace utils {
 			UtilsToolsManager::~UtilsToolsManager() {}
+
+            bool UtilsToolsManager::SetClipboardText(const QString& text) {
+                QClipboard* clipboard = QGuiApplication::clipboard();
+                clipboard->setText(text);
+                return true;
+            }
 #ifdef __APPLE__
 			void UtilsToolsManager::HideMacOsxWindowStandardButtons(QQuickWindow* window) {
 				if (window) {

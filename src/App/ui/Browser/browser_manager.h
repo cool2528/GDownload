@@ -2,8 +2,8 @@
 #include <QtQml/qqml.h>
 #include <QObject>
 #include <QVariantMap>
-#include "Aria2CManager/aria2c_manager.h"
 #include "Aria2CManager/aria2c_http_rpc_client.h"
+#include "Aria2CManager/aria2c_manager.h"
 #include "download_task_model.h"
 #include "singleton.hpp"
 class QQmlEngine;
@@ -61,6 +61,7 @@ namespace gdl {
                 Q_INVOKABLE bool ChangeGlobalOption(const QVariantMap& options);
 
                 Q_INVOKABLE void OpenFileLocation(const QString& file_path);
+
                 bool Init();
                 void UnInit();
 

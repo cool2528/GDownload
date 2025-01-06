@@ -124,7 +124,11 @@ namespace gdl {
 				"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) "
 				"Chrome/111.0.0.0 Safari/537.36");
 			aria2c_settings["check-certificate"]	= "false";
-			aria2c_settings["quiet"]				= "true";
+#if (defined(DEBUG) || defined(_DEBUG))
+			aria2c_settings["quiet"] = "false";
+#else
+			aria2c_settings["quiet"] = "true";
+#endif
 			aria2c_settings["enable-rpc"]			= "true";
 			aria2c_settings["rpc-listen-all"]		= "true";
 			aria2c_settings["rpc-allow-origin-all"] = "true";

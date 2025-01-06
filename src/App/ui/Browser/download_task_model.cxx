@@ -36,6 +36,8 @@ namespace gdl {
 						return task.FormatRemainingTime();
 					case kTaskConnections:
 						return task.task_connections();
+                    case kTaskDownloadLink:
+                        return task.task_download_link();
 					default:
 						return QVariant();
 				}
@@ -57,6 +59,7 @@ namespace gdl {
 				roles[kTaskProgress]	  = "progress";
 				roles[kTaskRemainingTime] = "remainingTime";
 				roles[kTaskConnections]	  = "connections";
+                roles[kTaskDownloadLink]  = "downloadLink";
 				return roles;
 			}
 
@@ -91,6 +94,12 @@ namespace gdl {
 							changed = true;
 						}
 						break;
+                    case kTaskDownloadLink:
+                        if (value.canConvert<QString>()) {
+                            task.set_task_download_link(value.toString());
+                            changed = true;
+                        }
+                        break;
 				}
 
 				if (changed) {
@@ -117,7 +126,7 @@ namespace gdl {
 				if (index < 0 || index >= task_lists_.size()) return false;
 				{
 					std::unique_lock lock(mutex_);
-					QString task_id								  = task_lists_[index].task_id();
+                    QString task_id = task_lists_[index].task_id();
 					remove_task_id_.insert(task_id, task_id);
 				}
 				beginRemoveRows(QModelIndex(), index, index);

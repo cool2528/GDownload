@@ -22,11 +22,11 @@ Button{
         iconSize: control.iconSize
         iconSource: control.iconSource
         color:icon.color
-        HoverHandler{
-            id:mouse
-            acceptedDevices: PointerDevice.Mouse
-            cursorShape: Qt.PointingHandCursor
-        }
+    }
+    HoverHandler{
+        id:mouse
+        acceptedDevices: PointerDevice.Mouse
+        cursorShape: Qt.PointingHandCursor
     }
     TextMetrics{
         id:textMetrics
