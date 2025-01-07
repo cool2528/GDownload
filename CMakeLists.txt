@@ -22,7 +22,20 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/debug/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/release/bin)
 # 引入cmake
 include(${CMAKE_SOURCE_DIR}/cmake/shareLibraryDefined.cmake)
-
+# 获取版本信息
+include(${CMAKE_SOURCE_DIR}/cmake/get_version.cmake)
+get_version_info(MAJOR MINOR BUILD COMMIT)
+message(STATUS "MAJOR:${MAJOR}")
+message(STATUS "MINOR:${MINOR}")
+message(STATUS "BUILD:${BUILD}")
+message(STATUS "COMMIT:${COMMIT}")
+# 设置版本信息
+set(CURRENT_VERSION_MAJOR ${MAJOR})
+set(CURRENT_VERSION_MINOR ${MINOR})
+set(CURRENT_VERSION_BUILD ${BUILD})
+set(CURRENT_VERSION_COMMIT ${COMMIT})
+# 生成版本头文件
+configure_file(${CMAKE_SOURCE_DIR}/version.h.in ${CMAKE_SOURCE_DIR}/src/version.h)
 # 设置依赖库的根路径
 if(APPLE)
     set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/osx")
@@ -49,6 +62,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src
     ${CORE_INCLUDE_PATH}
     ${PLUGIN_INCLUDE_PATH}
     ${PLUGIN_MANAGER_INCLUDE}
+    ${CMAKE_BINARY_DIR}/src
 )
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 add_subdirectory(src)

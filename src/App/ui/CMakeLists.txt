@@ -18,6 +18,8 @@ else()
     *.cxx
     *.c
     )
+   
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/WindowsResourceTemplate.rc.in ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.rc) 
 endif()
 file(GLOB_RECURSE HEADERS_FILES
     *.h
@@ -83,6 +85,9 @@ if(APPLE)
             ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/${PROJECT_NAME}.app/Contents/Resources/engine
     )
 elseif(WIN32)
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.rc)
+    list(APPEND QT_RESOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.rc)
+    endif()
     add_executable(${PROJECT_NAME} ${SOURCES_FILES} ${HEADERS_FILES} ${QT_RESOURCE_FILES} ${QT_QML_FILES})
     set_target_properties(${PROJECT_NAME} PROPERTIES
         WIN32_EXECUTABLE TRUE

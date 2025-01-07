@@ -1,6 +1,6 @@
 #include "mainwindow.h"
-#include <QGuiApplication>
 #include <QFontDatabase>
+#include <QGuiApplication>
 #include <QQmlContext>
 #include <QUrl>
 #include "Browser/browser_manager.h"
@@ -19,6 +19,9 @@ namespace gd {
 		int MainWindow::Exec(int argc, char* argv[]) {
 			FramelessHelper::Quick::initialize();
 			QGuiApplication app(argc, argv);
+#if defined(_WIN32) || defined(_WIN64)
+            app.setWindowIcon(QIcon(":/images/logo/icon.ico"));
+#endif
 			QQmlApplicationEngine engine;
 			InitQmlEngine(&engine);
 			InitFont(&engine);
