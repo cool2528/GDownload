@@ -27,8 +27,8 @@ Rectangle {
         visible: Qt.platform.os === "osx"
         ImageButton{
             id:close
-            Layout.preferredHeight: 8
-            Layout.preferredWidth: 8
+            Layout.preferredHeight: 15
+            Layout.preferredWidth: 15
             backgroundColor:"transparent"
             normalImage: "/images/titlebar/macos-close.svg"
             hoverImage: "/images/titlebar/macos-clos-hover.svg"
@@ -39,8 +39,8 @@ Rectangle {
 
         ImageButton{
             id:minsize
-            Layout.preferredHeight: 8
-            Layout.preferredWidth: 8
+            Layout.preferredHeight: 15
+            Layout.preferredWidth: 15
             backgroundColor:"transparent"
             normalImage: "/images/titlebar/macos-minimize.svg"
             hoverImage: "/images/titlebar/macos-minimize-hover.svg"
@@ -51,8 +51,8 @@ Rectangle {
 
         ImageButton{
             id:maxsize
-            Layout.preferredHeight: 8
-            Layout.preferredWidth: 8
+            Layout.preferredHeight: 15
+            Layout.preferredWidth: 15
             backgroundColor:"transparent"
             normalImage: "/images/titlebar/macos-maximize.svg"
             hoverImage: "/images/titlebar/macos-maximize-hover.svg"

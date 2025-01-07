@@ -10,9 +10,9 @@
 #else
 #include <unistd.h>
 #endif
+#include "aria2c_http_rpc_client.h"
 #include "config/config.h"
 #include "plugin_manager.h"
-#include "aria2c_http_rpc_client.h"
 namespace gdl {
 	namespace engine {
 
@@ -23,8 +23,7 @@ namespace gdl {
 			  update_aria2c_tasks_timer_(io_context_),
 			  pub_sub_system_(io_context_),
 			  flush_timer_(io_context_),
-			  websocket_client_(std::string("ws://127.0.0.1:") + kEngineRpcPort + "/jsonrpc",io_context_)
-		{
+			  websocket_client_(std::string("ws://127.0.0.1:") + kEngineRpcPort + "/jsonrpc", io_context_) {
 
 			websocket_client_.SetMessageCallback([this](const std::string& msg) {
 				// 直接收到的所有消息 通过发布订阅回客户端
@@ -43,7 +42,7 @@ namespace gdl {
 						const auto& result = doc["result"];
 						if (result.contains("numActive") && result.contains("numWaiting") &&
 							result.contains("numStopped")) {
-							active_num_ = std::stoll(result["numActive"].get<std::string>());
+							active_num_	 = std::stoll(result["numActive"].get<std::string>());
 							waiting_num_ = std::stoll(result["numWaiting"].get<std::string>());
 							stopped_num_ = std::stoll(result["numStopped"].get<std::string>());
 							return;
@@ -85,7 +84,6 @@ namespace gdl {
 #else
 				return path;
 #endif
-
 			};
 			std::unordered_map<std::string, std::string> aria2c_settings;
 			aria2c_settings["no-conf"]				  = "false";  //no-conf
@@ -120,10 +118,10 @@ namespace gdl {
 			aria2c_settings["seed-ratio"]				  = "2";
 			aria2c_settings["seed-time"]				  = "2880";
 			aria2c_settings["split"]					  = "64";
-			aria2c_settings["user-agent"] = quote_path(
+			aria2c_settings["user-agent"]				  = quote_path(
 				"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) "
-				"Chrome/111.0.0.0 Safari/537.36");
-			aria2c_settings["check-certificate"]	= "false";
+								"Chrome/111.0.0.0 Safari/537.36");
+			aria2c_settings["check-certificate"] = "false";
 #if (defined(DEBUG) || defined(_DEBUG))
 			aria2c_settings["quiet"] = "false";
 #else
@@ -170,11 +168,10 @@ namespace gdl {
 					websocket_client_.TellStopped(0, 100, keys);
 				}
 
-			} catch (std::exception & e) {
+			} catch (std::exception& e) {
 				LOG_ERR("{}", e.what());
 			}
 		}
-
 
 		void Aria2cDownloadManager::SyncMagnetServerList() {
 
@@ -221,7 +218,7 @@ namespace gdl {
 			Aria2cHttpClient client(host);
 			auto http_result = client.GetGlobalStat();
 			if (auto res = std::get_if<ErrorResult>(&http_result.Value().result)) {
-				LOG_WARN("SyncGlobalStatInfo fail: {}",res->err_msg)
+				LOG_WARN("SyncGlobalStatInfo fail: {}", res->err_msg)
 				return;
 			}
 			else if (auto succeed_res = std::get_if<SucceedResult>(&http_result.Value().result)) {
@@ -281,7 +278,6 @@ namespace gdl {
 			}
 			return result;
 		}
-
 
 		Aria2cDownloadManager::~Aria2cDownloadManager() {}
 
