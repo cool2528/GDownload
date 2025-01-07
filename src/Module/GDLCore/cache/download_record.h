@@ -7,15 +7,7 @@ namespace gdl {
 namespace cache {
 
 // Download task status enumeration
-enum class DownloadState {
-    kUnknown = 0,
-    kWaiting,
-    kDownloading,
-    kPaused,
-    kCompleted,
-    kError,
-    kCanceled
-};
+enum class DownloadState { kComplete = 0, kActive, kPause, kWaiting, kError, kRemoved };
 
 // Pure data structure, not dependent on any UI components
 struct DownloadRecord {
@@ -27,7 +19,7 @@ struct DownloadRecord {
     int64_t downloaded_size{0};   // Downloaded size
     int32_t download_speed{0};    // Download speed
     int32_t connections{0};       // Number of connections
-    DownloadState state{DownloadState::kUnknown}; // Task status
+    DownloadState state{DownloadState::kComplete}; // Task status
     time_t created_time{0};       // Creation time
     time_t completed_time{0};     // Completion time
     std::string error_message;    // Error message
