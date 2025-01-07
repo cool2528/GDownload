@@ -19,5 +19,6 @@
         <file>images/titlebar/windows-minimize-hover.svg</file>
         <file>images/titlebar/windows-restore.svg</file>
         <file>images/titlebar/windows-restore-hover.svg</file>
+        <file>images/logo/icon.ico</file>
     </qresource>
 </RCC>
