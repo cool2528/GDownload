@@ -139,6 +139,7 @@ Rectangle{
                                             //
                                         }else if(downloadView.pageType == 2){
                                             //
+                                            BrowserManager.RemoveStopTask(model.taskId)
                                         }
                                     }
                                 }

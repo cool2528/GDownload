@@ -121,6 +121,7 @@ namespace gdl {
 						active_model_->RemoveTaskById(gid);
 					}
 				}
+				return true;
 			}
 
 			bool BrowserManager::RemoveAllTask() {
@@ -146,6 +147,7 @@ namespace gdl {
 						active_model_->RemoveTaskById(gid);
 					}
 				}
+				return res;
 			}
 
 			bool BrowserManager::RemoveDownloadResult(const QString& gid) {
@@ -209,6 +211,58 @@ namespace gdl {
                 QProcess::startDetached(program, args);
 			}
 
+			bool BrowserManager::RemoveStopTask(const QString& gid, bool is_remove_file) const {
+				if (gid.isEmpty()) return false;
+				if (stoped_model_) {
+					const auto task	   = stoped_model_->GetTaskById(gid);
+					if (!task) {
+						return false;
+					}
+					QString save_path = task->task_save_path();
+					const auto res = stoped_model_->RemoveTaskById(gid);
+					gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
+					if (is_remove_file) {
+						if (QFile::exists(save_path)) {
+							QFile::remove(save_path);
+						}
+					}
+					return res;
+				}
+				return false;
+			}
+
+			bool BrowserManager::RemoveStopTask(int index, bool is_remove_file) const {
+				if (stoped_model_) {
+					auto task	   = stoped_model_->GetTask(index);
+					if (!task) {
+						return false;
+					}
+					QString gid	   = task->task_id();
+					QString save_path = task->task_save_path();
+					const auto res = stoped_model_->RemoveTask(index);
+					gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
+					if (is_remove_file) {
+						if (QFile::exists(save_path)) {
+							QFile::remove(save_path);
+						}
+					}
+					return res;
+				}
+				return false;
+			}
+
+			bool BrowserManager::RemoveAllStopTask(bool is_remove_file) const {
+				if (stoped_model_) {
+					auto tasks = stoped_model_->GetTaskIds();
+					bool res = false;
+					for (const auto& task : tasks) {
+						res = RemoveStopTask(task, is_remove_file);
+					}
+					return res;
+				}
+				return false;
+			}
+
 			bool BrowserManager::Init() {
 				auto res = engine::Aria2cDownloadManager::Instance().SubscriptionAria2Message(
 					kAria2Responce, [this](const std::string& msg) { OnHandleAria2Message(msg); });
@@ -223,73 +277,129 @@ namespace gdl {
 				}
 			}
 
+			gdl::cache::DownloadRecord BrowserManager::DownloadTaskInfoToRecord(const DownloadTaskInfo& info) {
+				gdl::cache::DownloadRecord record;
+				record.completed_time = std::time(nullptr);
+				record.created_time	  = std::time(nullptr);
+				record.connections	  = info.task_connections();
+				record.download_speed = info.task_download_speed();
+				record.download_url	  = info.task_download_link().toStdString();
+				record.downloaded_size = info.task_current_size();
+				record.task_id		   = info.task_id().toStdString();
+				record.file_name	   = info.task_file_name().toStdString();
+				record.save_path	   = info.task_save_path().toStdString();
+				record.total_size	   = info.task_total_size();
+				record.state = static_cast<gdl::cache::DownloadState>(info.task_state());
+				return record;
+			}
+
+			DownloadTaskInfo BrowserManager::DownloadRecordToTaskInfo(const gdl::cache::DownloadRecord& record) {
+				DownloadTaskInfo info;
+				info.set_task_id(QString::fromStdString(record.task_id));
+				info.set_task_file_name(QString::fromStdString(record.file_name));
+				info.set_task_save_path(QString::fromStdString(record.save_path));
+				info.set_task_download_link(QString::fromStdString(record.download_url));
+				info.set_task_current_size(record.downloaded_size);
+				info.set_task_total_size(record.total_size);
+				info.set_task_connections(record.connections);
+				info.set_task_download_speed(record.download_speed);
+				info.set_task_state(static_cast<TaskState>(record.state));
+				return info;
+			}
+
 			BrowserManager::BrowserManager(QObject* parent) : QObject(parent) {
 				active_model_  = std::make_unique<DownloadTaskModel>();
 				waiting_model_ = std::make_unique<DownloadTaskModel>();
 				stoped_model_  = std::make_unique<DownloadTaskModel>();
-				connect(this, &BrowserManager::sigUpdateTasksMessage, [this](const DownloadTaskInfo& task_info) {
-					try {
-						const auto task_id = task_info.task_id();
-						switch (task_info.task_state()) {
-							case TaskState::kActive: {
-								if (active_model_->ContainsTask(task_id)) {
-									active_model_->UpdateTaskById(task_id, task_info);
-								}
-								else {
-									active_model_->AddTask(task_info);
-								}
-							} break;
-							case TaskState::kWaiting: {
-								if (waiting_model_->ContainsTask(task_id)) {
-									waiting_model_->UpdateTaskById(task_id, task_info);
-								}
-								else {
-									waiting_model_->AddTask(task_info);
-								}
-							} break;
-							case TaskState::kPause: {
-								if (active_model_->ContainsTask(task_id)) {
-									active_model_->UpdateTaskById(task_id, task_info);
-								}
-								else {
-									active_model_->AddTask(task_info);
-								}
+				InitDownloadHistoryCache();
+				connect(
+					this, &BrowserManager::sigUpdateTasksMessage, this,
+					[this](const DownloadTaskInfo& task_info) {
+						try {
+							const auto task_id = task_info.task_id();
+							switch (task_info.task_state()) {
+								case TaskState::kActive: {
+									if (active_model_->ContainsTask(task_id)) {
+										active_model_->UpdateTaskById(task_id, task_info);
+									}
+									else {
+										active_model_->AddTask(task_info);
+									}
+								} break;
+								case TaskState::kWaiting: {
+									if (waiting_model_->ContainsTask(task_id)) {
+										waiting_model_->UpdateTaskById(task_id, task_info);
+									}
+									else {
+										waiting_model_->AddTask(task_info);
+									}
+								} break;
+								case TaskState::kPause: {
+									if (active_model_->ContainsTask(task_id)) {
+										active_model_->UpdateTaskById(task_id, task_info);
+									}
+									else {
+										active_model_->AddTask(task_info);
+									}
 
-								if (waiting_model_->ContainsTask(task_id)) {
-									waiting_model_->UpdateTaskById(task_id, task_info);
-								}
-								else {
-									waiting_model_->AddTask(task_info);
-								}
-							} break;
-							case TaskState::kComplete:
-							case TaskState::kRemoved:
-							case TaskState::kError: {
-								if (active_model_->ContainsTask(task_id)) {
-									active_model_->RemoveTaskById(task_id);
-								}
-								if (waiting_model_->ContainsTask(task_id)) {
-									waiting_model_->RemoveTaskById(task_id);
-								}
-								if (stoped_model_->ContainsTask(task_id)) {
-									stoped_model_->UpdateTaskById(task_id, task_info);
-								}
-								else {
-									stoped_model_->AddTask(task_info);
-								}
+									if (waiting_model_->ContainsTask(task_id)) {
+										waiting_model_->UpdateTaskById(task_id, task_info);
+									}
+									else {
+										waiting_model_->AddTask(task_info);
+									}
+								} break;
+								case TaskState::kComplete:
+								case TaskState::kRemoved:
+								case TaskState::kError: {
+									if (active_model_->ContainsTask(task_id)) {
+										active_model_->RemoveTaskById(task_id);
+									}
+									if (waiting_model_->ContainsTask(task_id)) {
+										waiting_model_->RemoveTaskById(task_id);
+									}
+									if (stoped_model_->ContainsTask(task_id)) {
+										stoped_model_->UpdateTaskById(task_id, task_info);
+										gdl::cache::DownloadRecord record = DownloadTaskInfoToRecord(task_info);
+										if (!gdl::cache::DownloadHistoryCache::Instance().UpdateRecord(record)) {
+											LOG_ERR("Failed to UPDATE record to history cache {}", record.save_path);
+										}
+									}
+									else {
+										stoped_model_->AddTask(task_info);
+										gdl::cache::DownloadRecord record = DownloadTaskInfoToRecord(task_info);
+										if (!gdl::cache::DownloadHistoryCache::Instance().AddRecord(record)) {
+											LOG_ERR("Failed to add record to history cache {}", record.save_path);
+										}
+									}
 
-							} break;
+								} break;
 
-							default:
-								LOG_WARN("Unknown task state:{}", static_cast<int>(task_info.task_state()));
-								break;
-						}
-					} catch (std::exception& e) {
-						LOG_ERR("{}", e.what());
-					} catch (...) {}
-				});
+								default:
+									LOG_WARN("Unknown task state:{}", static_cast<int>(task_info.task_state()));
+									break;
+							}
+						} catch (std::exception& e) {
+							LOG_ERR("{}", e.what());
+						} catch (...) {}
+					},
+					Qt::QueuedConnection);
 			}
-
+			void BrowserManager::InitDownloadHistoryCache() const {
+				const auto records = gdl::cache::DownloadHistoryCache::Instance().GetRecords();
+				for (const auto& record : records) {
+					DownloadTaskInfo info = DownloadRecordToTaskInfo(record);
+					if (stoped_model_ && !stoped_model_->ContainsTask(info.task_id())) {
+						if (QFile::exists(info.task_save_path())) {
+							stoped_model_->AddTask(info);
+						}
+						else {
+							gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(info.task_id().toStdString());
+						}
+						
+					}
+				}
+			}
 			void BrowserManager::OnHandleAria2Message(const std::string& msg) {
 				try {
 
@@ -384,11 +494,12 @@ namespace gdl {
                         const auto method	 = doc["method"].get<std::string>();
                         const auto params	 = doc["params"];
 						auto get_params_task = [](const nlohmann::json& param) {
+							DownloadTaskInfo task_info;
 							for (const auto& item : param) {
 								std::string gid = item["gid"].get<std::string>();
-								auto task_infos = Aria2QueryByGidTaskInfo(gid);
-								return task_infos;
+								task_info = Aria2QueryByGidTaskInfo(gid);
 							}
+							return task_info;
 						};
 
                         if (method == kAria2OnDownloadStart) {

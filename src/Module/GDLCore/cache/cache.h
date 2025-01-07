@@ -5,17 +5,16 @@
 #include "download_record.h"
 #include "export.h"
 #include "globalTypes.h"
-
+#include "singleton.hpp"
 namespace gdl {
 	namespace cache {
 
-		class GDLCore_API DownloadHistoryCache {
+        class GDLCore_API DownloadHistoryCache : public Singleton<DownloadHistoryCache> {
+            SINGLETON_DECLARE(DownloadHistoryCache)
 		   public:
-			static DownloadHistoryCache& Instance();
-
 			bool Initialize(const String& db_path);
 			void Uninitialize();
-
+            ~DownloadHistoryCache();
 			// 基础CRUD操作
 			bool AddRecord(const DownloadRecord& record);
 			bool UpdateRecord(const DownloadRecord& record);
@@ -37,11 +36,6 @@ namespace gdl {
 
 		   private:
 			DownloadHistoryCache();
-			~DownloadHistoryCache();
-
-			DownloadHistoryCache(const DownloadHistoryCache&)			 = delete;
-			DownloadHistoryCache& operator=(const DownloadHistoryCache&) = delete;
-
 			class Impl;
 			std::unique_ptr<Impl> impl_;
 		};

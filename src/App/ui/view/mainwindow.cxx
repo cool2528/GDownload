@@ -9,6 +9,8 @@
 #include "FramelessHelper/Core/private/framelessconfig_p.h"
 #include "FramelessHelper/Quick/framelessquickmodule.h"
 #include "GDLCore/logger.h"
+#include "logger.h"
+#include "os/os.h"
 #include "theme/theme.h"
 #include "utils/utils.h"
 FRAMELESSHELPER_USE_NAMESPACE
@@ -19,9 +21,7 @@ namespace gd {
 		int MainWindow::Exec(int argc, char* argv[]) {
 			FramelessHelper::Quick::initialize();
 			QGuiApplication app(argc, argv);
-#if defined(_WIN32) || defined(_WIN64)
-            app.setWindowIcon(QIcon(":/images/logo/icon.ico"));
-#endif
+            InitIcon(&app);
 			QQmlApplicationEngine engine;
 			InitQmlEngine(&engine);
 			InitFont(&engine);
@@ -43,7 +43,11 @@ namespace gd {
 			gdl::ui::theme::RegisterTypes(engine);
 			qmlRegisterUncreatableMetaObject(SegoeFluentIcons::staticMetaObject, GEXPORT_MODULE_URL, 1, 0,
 											 "SegoeFluentIcons", "SegoeFluentIcons enum");
-			gdl::ui::browser::RegisterTypes(engine);
+            if (!gdl::cache::DownloadHistoryCache::Instance().Initialize(gdl::os::GetAppDataDir() +
+                                                                         "/gdownload/db/gdownload.db")) {
+                LOG_ERR("init download history cache fail")
+            }
+            gdl::ui::browser::RegisterTypes(engine);
 		}
 		void MainWindow::InitTranslation(QGuiApplication* app) {}
 		void MainWindow::InitFont(QQmlEngine* engine) {
@@ -56,11 +60,16 @@ namespace gd {
 			engine->rootContext()->setContextProperty("FluentIcons", font_family_name);
 		}
 
-		void MainWindow::InitIcon(QGuiApplication* app) {}
+        void MainWindow::InitIcon(QGuiApplication* app) {
+#if defined(_WIN32) || defined(_WIN64)
+            app->setWindowIcon(QIcon(":/images/logo/icon.ico"));
+#endif
+        }
 
 		void MainWindow::UnInitEngine() {
 			gdl::ui::browser::BrowserManager::Instance().UnInit();
 			gdl::engine::Aria2cDownloadManager::Instance().UninitAria2cEngine();
+            gdl::cache::DownloadHistoryCache::Instance().Uninitialize();
 		}
 
 	}  // namespace ui

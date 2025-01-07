@@ -2,7 +2,7 @@
 #include <QAbstractListModel>
 #include <QVector>
 #include <mutex>
-
+#include "cache/cache.h"
 namespace gdl {
 	namespace ui {
 		namespace browser {

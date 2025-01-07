@@ -340,11 +340,6 @@ namespace gdl {
 		DownloadHistoryCache::DownloadHistoryCache() : impl_(std::make_unique<Impl>()) {}
 		DownloadHistoryCache::~DownloadHistoryCache() = default;
 
-		DownloadHistoryCache& DownloadHistoryCache::Instance() {
-			static DownloadHistoryCache instance;
-			return instance;
-		}
-
 		bool DownloadHistoryCache::Initialize(const String& db_path) {
 			return impl_->Initialize(db_path);
 		}
