@@ -18,6 +18,10 @@ namespace gdl {
             const static std::string kAria2OnDownloadComplete	= "aria2.onDownloadComplete";
             const static std::string kAria2OnDownloadError		= "aria2.onDownloadError";
 			const static std::string kAria2onBtDownloadComplete = "aria2.onBtDownloadComplete";
+            static const std::vector<std::string> keys			= {
+                 "status", "totalLength", "completedLength", "downloadSpeed", "infoHash", "numSeeders",
+                 "seeder", "connections", "errorCode",		 "errorMessage",  "dir",	  "files",
+                 "gid",	   "bittorrent"};
 			BrowserManager* BrowserManager::create(QQmlEngine* qmlengine, QJSEngine* jsengine) {
 				Q_UNUSED(qmlengine)
 				Q_UNUSED(jsengine);
@@ -77,10 +81,27 @@ namespace gdl {
 				return res;
 			}
 
-			bool BrowserManager::PauseAllTask() {
-				return engine::Aria2cDownloadManager::Instance()
-					.CallAria2cMethod(engine::Aria2Method::kPauseAll)
-					.IsOk();
+            bool BrowserManager::PauseAllTask(int page_index) {
+                if (page_index == 0) {
+                    if (active_model_) {
+                        for (const auto& task : active_model_->GetTaskIds()) {
+                            PauseTask(task);
+                        }
+                        return true;
+                    }
+                }
+                else if (page_index == 1) {
+                    if (waiting_model_) {
+                        for (const auto& task : waiting_model_->GetTaskIds()) {
+                            PauseTask(task);
+                        }
+                        return true;
+                    }
+                }
+                else {
+                    LOG_ERR("PauseAllTask error: page_index is invalid");
+                }
+                return false;
 			}
 
 			bool BrowserManager::ForcePauseTask(const QString& gid) {
@@ -103,10 +124,27 @@ namespace gdl {
 					.IsOk();
 			}
 
-			bool BrowserManager::UnpauseAllTask() {
-				return engine::Aria2cDownloadManager::Instance()
-					.CallAria2cMethod(engine::Aria2Method::kUnpauseAll)
-					.IsOk();
+            bool BrowserManager::UnpauseAllTask(int page_index) {
+                if (page_index == 0) {
+                    if (active_model_) {
+                        for (const auto& task : active_model_->GetTaskIds()) {
+                            UnpauseTask(task);
+                        }
+                        return true;
+                    }
+                }
+                else if (page_index == 1) {
+                    if (waiting_model_) {
+                        for (const auto& task : waiting_model_->GetTaskIds()) {
+                            UnpauseTask(task);
+                        }
+                        return true;
+                    }
+                }
+                else {
+                    LOG_ERR("UnpauseAllTask error: page_index is invalid");
+                }
+                return false;
 			}
 
 			bool BrowserManager::RemoveTask(const QString& gid) {
@@ -124,15 +162,46 @@ namespace gdl {
 				return true;
 			}
 
-			bool BrowserManager::RemoveAllTask() {
-				if (!active_model_) {
-					return false;
-				}
-				for (const auto& task : active_model_->GetTaskIds()) {
-					RemoveTask(task);
-				}
-				active_model_->ClearAllTasks();
-				return true;
+            bool BrowserManager::RemoveAllTask(int page_index, bool is_remove_file) {
+                if (page_index == 0) {
+                    if (active_model_) {
+                        for (const auto& task : active_model_->GetTaskIds()) {
+                            auto task_info = active_model_->GetTaskById(task);
+                            if (!task_info) {
+                                continue;
+                            }
+                            QString save_path = task_info->task_save_path();
+                            RemoveTask(task);
+                            if (is_remove_file && QFile::exists(save_path)) {
+                                QFile::remove(save_path);
+                            }
+                        }
+                        return true;
+                    }
+                }
+                else if (page_index == 1) {
+                    if (waiting_model_) {
+                        for (const auto& task : waiting_model_->GetTaskIds()) {
+                            auto task_info = waiting_model_->GetTaskById(task);
+                            if (!task_info) {
+                                continue;
+                            }
+                            QString save_path = task_info->task_save_path();
+                            RemoveTask(task);
+                            if (is_remove_file && QFile::exists(save_path)) {
+                                QFile::remove(save_path);
+                            }
+                        }
+                        return true;
+                    }
+                }
+                else if (page_index == 2) {
+                    return RemoveAllStopTask(is_remove_file);
+                }
+                else {
+                    LOG_ERR("RemoveAllTask error: page_index is invalid");
+                }
+                return false;
 			}
 
 			bool BrowserManager::ForceRemoveTask(const QString& gid) {
@@ -214,12 +283,12 @@ namespace gdl {
 			bool BrowserManager::RemoveStopTask(const QString& gid, bool is_remove_file) const {
 				if (gid.isEmpty()) return false;
 				if (stoped_model_) {
-					const auto task	   = stoped_model_->GetTaskById(gid);
+                    const auto task = stoped_model_->GetTaskById(gid);
 					if (!task) {
 						return false;
 					}
 					QString save_path = task->task_save_path();
-					const auto res = stoped_model_->RemoveTaskById(gid);
+                    const auto res	  = stoped_model_->RemoveTaskById(gid);
 					gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
 					if (is_remove_file) {
 						if (QFile::exists(save_path)) {
@@ -233,13 +302,13 @@ namespace gdl {
 
 			bool BrowserManager::RemoveStopTask(int index, bool is_remove_file) const {
 				if (stoped_model_) {
-					auto task	   = stoped_model_->GetTask(index);
+                    auto task = stoped_model_->GetTask(index);
 					if (!task) {
 						return false;
 					}
-					QString gid	   = task->task_id();
+                    QString gid		  = task->task_id();
 					QString save_path = task->task_save_path();
-					const auto res = stoped_model_->RemoveTask(index);
+                    const auto res	  = stoped_model_->RemoveTask(index);
 					gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
 					if (is_remove_file) {
 						if (QFile::exists(save_path)) {
@@ -254,7 +323,7 @@ namespace gdl {
 			bool BrowserManager::RemoveAllStopTask(bool is_remove_file) const {
 				if (stoped_model_) {
 					auto tasks = stoped_model_->GetTaskIds();
-					bool res = false;
+                    bool res   = false;
 					for (const auto& task : tasks) {
 						res = RemoveStopTask(task, is_remove_file);
 					}
@@ -262,6 +331,30 @@ namespace gdl {
 				}
 				return false;
 			}
+
+            void BrowserManager::RefreshTaskList(int page_index) {
+                if (page_index == 0) {
+                    if (active_model_) {
+                        engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kTellActive,
+                                                                                   keys);
+                    }
+                }
+                else if (page_index == 1) {
+                    if (waiting_model_) {
+                        engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kTellWaiting,
+                                                                                   keys);
+                    }
+                }
+                else if (page_index == 2) {
+                    if (stoped_model_) {
+                        engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kTellStopped,
+                                                                                   keys);
+                    }
+                }
+                else {
+                    LOG_ERR("RefreshTaskList error: page_index is invalid");
+                }
+            }
 
 			bool BrowserManager::Init() {
 				auto res = engine::Aria2cDownloadManager::Instance().SubscriptionAria2Message(
@@ -279,17 +372,17 @@ namespace gdl {
 
 			gdl::cache::DownloadRecord BrowserManager::DownloadTaskInfoToRecord(const DownloadTaskInfo& info) {
 				gdl::cache::DownloadRecord record;
-				record.completed_time = std::time(nullptr);
-				record.created_time	  = std::time(nullptr);
-				record.connections	  = info.task_connections();
-				record.download_speed = info.task_download_speed();
-				record.download_url	  = info.task_download_link().toStdString();
+                record.completed_time  = std::time(nullptr);
+                record.created_time	   = std::time(nullptr);
+                record.connections	   = info.task_connections();
+                record.download_speed  = info.task_download_speed();
+                record.download_url	   = info.task_download_link().toStdString();
 				record.downloaded_size = info.task_current_size();
 				record.task_id		   = info.task_id().toStdString();
 				record.file_name	   = info.task_file_name().toStdString();
 				record.save_path	   = info.task_save_path().toStdString();
 				record.total_size	   = info.task_total_size();
-				record.state = static_cast<gdl::cache::DownloadState>(info.task_state());
+                record.state		   = static_cast<gdl::cache::DownloadState>(info.task_state());
 				return record;
 			}
 
@@ -325,6 +418,9 @@ namespace gdl {
 									else {
 										active_model_->AddTask(task_info);
 									}
+                                    if (waiting_model_->ContainsTask(task_id)) {
+                                        waiting_model_->RemoveTaskById(task_id);
+                                    }
 								} break;
 								case TaskState::kWaiting: {
 									if (waiting_model_->ContainsTask(task_id)) {
@@ -396,7 +492,6 @@ namespace gdl {
 						else {
 							gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(info.task_id().toStdString());
 						}
-						
 					}
 				}
 			}
@@ -497,7 +592,7 @@ namespace gdl {
 							DownloadTaskInfo task_info;
 							for (const auto& item : param) {
 								std::string gid = item["gid"].get<std::string>();
-								task_info = Aria2QueryByGidTaskInfo(gid);
+                                task_info		= Aria2QueryByGidTaskInfo(gid);
 							}
 							return task_info;
 						};
@@ -517,7 +612,7 @@ namespace gdl {
 							if (task.task_id().isEmpty()) {
 								LOG_WARN("Failed to get task info by gid");
 								engine::Aria2cDownloadManager::Instance().CallAria2cMethod(
-									engine::Aria2Method::kTellActive);
+                                    engine::Aria2Method::kTellActive, keys);
 								return;
 							}
 							Q_EMIT sigUpdateTasksMessage(task);
@@ -567,10 +662,6 @@ namespace gdl {
 				DownloadTaskInfo task_info;
 				const std::string host = std::string("http://127.0.0.1:") + kEngineRpcPort;
 				engine::Aria2cHttpClient client(host);
-				static const std::vector<std::string> keys = {
-					"status", "totalLength", "completedLength", "downloadSpeed", "infoHash", "numSeeders",
-					"seeder", "connections", "errorCode",		"errorMessage",	 "dir",		 "files",
-					"gid",	  "bittorrent"};
                 auto http_result = client.TellStatus(gid, keys);
 				if (http_result.HasError()) {
 					LOG_ERR("Failed to query task info by gid:{} error:{}", gid, http_result.GetError().what())

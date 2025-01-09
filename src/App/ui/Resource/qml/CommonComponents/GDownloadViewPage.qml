@@ -65,8 +65,8 @@ Rectangle{
                             id:controlRect
                             Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                             Layout.rightMargin: 10
-                            Layout.fillWidth: true
-                            implicitWidth: 100
+                            //Layout.fillWidth: true
+                            implicitWidth: 150
                             radius: 5
                             Layout.preferredHeight: 25
                             color: GTheme.dark ? mouse.hovered ? "#5151f9" : "#414141" : mouse.hovered ? "#5151f9" : "#ffffff"
@@ -79,14 +79,15 @@ Rectangle{
                             // download page
                             RowLayout{
                                 spacing: 5
-                                anchors.horizontalCenter: parent.horizontalCenter
+                                Layout.alignment: Qt.AlignVCenter
                                 width: parent.width
                                 height: parent.height
                                 IconButton{
                                     id:revocerButton
                                     visible: model.taskState !== 1
+                                    Layout.leftMargin: 10
                                     Layout.margins: 5
-                                    Layout.fillWidth: true
+                                    //Layout.fillWidth: true
                                     Layout.minimumHeight: 20
                                     Layout.maximumHeight: 20
                                     iconSource: SegoeFluentIcons.Play
@@ -100,14 +101,16 @@ Rectangle{
                                             //
                                         }else if(downloadView.pageType == 2){
                                             //
+                                            Qt.openUrlExternally(model.savePath)
                                         }
                                     }
                                 }
                                 IconButton{
                                     id:pauseButton
                                     visible: model.taskState === 1
+                                    Layout.leftMargin: 10
                                     Layout.margins: 5
-                                    Layout.fillWidth: true
+                                    //Layout.fillWidth: true
                                     Layout.minimumHeight: 20
                                     Layout.maximumHeight: 20
                                     iconSource: SegoeFluentIcons.Pause
@@ -127,7 +130,7 @@ Rectangle{
                                 IconButton{
                                     id:delButton
                                     Layout.margins: 5
-                                    Layout.fillWidth: true
+                                    //Layout.fillWidth: true
                                     Layout.minimumHeight: 20
                                     Layout.maximumHeight: 20
                                     iconSource: SegoeFluentIcons.Delete
@@ -147,7 +150,7 @@ Rectangle{
                                 IconButton{
                                     id:openFolderButton
                                     Layout.margins: 5
-                                    Layout.fillWidth: true
+                                    //Layout.fillWidth: true
                                     Layout.minimumHeight: 20
                                     Layout.maximumHeight: 20
                                     iconSource: SegoeFluentIcons.Folder
@@ -159,8 +162,9 @@ Rectangle{
 
                                 IconButton{
                                     id:copyUrlButton
+                                    Layout.topMargin: 8
                                     Layout.margins: 5
-                                    Layout.fillWidth: true
+                                    //Layout.fillWidth: true
                                     Layout.minimumHeight: 20
                                     Layout.maximumHeight: 20
                                     iconSource: SegoeFluentIcons.Link
