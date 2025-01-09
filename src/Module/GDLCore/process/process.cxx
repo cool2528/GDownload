@@ -61,7 +61,7 @@ namespace gdl {
 			si.cb = sizeof(si);
 			ZeroMemory(&pi, sizeof(pi));
 			si.dwFlags				  = STARTF_USESHOWWINDOW;
-#if (defined(_WIN32) || defined(_WIN64)) && (defined(DEBUG) || defined(_DEBUG) || !defined(QT_NO_DEBUG))
+#if (defined(_WIN32) || defined(_WIN64)) && (defined(DEBUG) || defined(_DEBUG))
 			si.wShowWindow = TRUE;
 #else
 			si.wShowWindow = FALSE;

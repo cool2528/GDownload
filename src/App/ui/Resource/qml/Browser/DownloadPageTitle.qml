@@ -16,9 +16,9 @@ Item {
             if(type === 0){
                 return qsTr("Downloading")
             }else if(type === 1){
-                 return qsTr("Waiting")
+                return qsTr("Waiting")
             }else{
-                 return qsTr("Stopped")
+                return qsTr("Stopped")
             }
         }
         font.pixelSize: 14
@@ -32,46 +32,72 @@ Item {
         spacing: 20
         IconButton{
             id:delButton
-            Layout.fillWidth: true
+            Layout.preferredWidth: 20
             Layout.minimumHeight: 40
             Layout.maximumHeight: 40
             iconSource: SegoeFluentIcons.Delete
             iconColor: GTheme.dark ? hovered ? "#5151f9" : "#ffffff": hovered ? "#5151f9" : "#8a8c91"
             onClicked: {
-                console.debug("delete all task")
+                if(type ===0){
+                    BrowserManager.RemoveAllTask(0,true)
+                }else if(type ===1){
+                    BrowserManager.RemoveAllTask(1,true)
+                }else if(type === 2){
+                    BrowserManager.RemoveAllTask(2,true)
+                }
             }
         }
         IconButton{
             id:refreshButton
-            Layout.fillWidth: true
+            Layout.preferredWidth: 20
             Layout.minimumHeight: 40
             Layout.maximumHeight: 40
             iconSource: SegoeFluentIcons.Refresh
             iconColor: GTheme.dark ? hovered ? "#5151f9" : "#ffffff": hovered ? "#5151f9" : "#8a8c91"
             onClicked: {
-                console.debug("refresh all task")
+                if(type ===0){
+                    BrowserManager.RefreshTaskList(0)
+                }else if(type ===1){
+                    BrowserManager.RefreshTaskList(1)
+                }else if(type === 2){
+                    BrowserManager.RefreshTaskList(2)
+                }
             }
         }
         IconButton{
             id:recoveryButton
-            Layout.fillWidth: true
+            Layout.preferredWidth: 20
             Layout.minimumHeight: 40
             Layout.maximumHeight: 40
+            visible: type !== 2
             iconSource: SegoeFluentIcons.PlayBadge12
             iconColor: GTheme.dark ? hovered ? "#5151f9" : "#ffffff": hovered ? "#5151f9" : "#8a8c91"
             onClicked: {
-                console.debug("recovery all task")
+                if(type ===0){
+                    BrowserManager.UnpauseAllTask(0)
+                }else if(type ===1){
+                    BrowserManager.UnpauseAllTask(1)
+                }else if(type === 2){
+                    BrowserManager.UnpauseAllTask(2)
+                }
             }
         }
         IconButton{
             id:pauseButton
-            Layout.fillWidth: true
+            Layout.preferredWidth: 20
             Layout.minimumHeight: 40
             Layout.maximumHeight: 40
+            visible: type !== 2
             iconSource: SegoeFluentIcons.PauseBadge12
             iconColor:GTheme.dark ? hovered ? "#5151f9" : "#ffffff": hovered ? "#5151f9" : "#8a8c91"
             onClicked: {
-                console.debug("pause all task")
+                if(type ===0){
+                    BrowserManager.PauseAllTask(0)
+                }else if(type ===1){
+                    BrowserManager.PauseAllTask(1)
+                }else if(type === 2){
+                    BrowserManager.PauseAllTask(2)
+                }
             }
         }
     }

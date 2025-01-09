@@ -36,7 +36,7 @@ namespace gdl {
 
 				Q_INVOKABLE bool PauseTask(const QString& gid);
 
-				Q_INVOKABLE bool PauseAllTask();
+                Q_INVOKABLE bool PauseAllTask(int page_index);
 
 				Q_INVOKABLE bool ForcePauseTask(const QString& gid);
 
@@ -44,11 +44,11 @@ namespace gdl {
 
 				Q_INVOKABLE bool UnpauseTask(const QString& gid);
 
-				Q_INVOKABLE bool UnpauseAllTask();
+                Q_INVOKABLE bool UnpauseAllTask(int page_index);
 
 				Q_INVOKABLE bool RemoveTask(const QString& gid);
 
-				Q_INVOKABLE bool RemoveAllTask();
+                Q_INVOKABLE bool RemoveAllTask(int page_index, bool is_remove_file = true);
 
 				Q_INVOKABLE bool ForceRemoveTask(const QString& gid);
 
@@ -62,11 +62,13 @@ namespace gdl {
 
 				Q_INVOKABLE void OpenFileLocation(const QString& file_path);
 
-                Q_INVOKABLE bool RemoveStopTask(const QString& gid,bool is_remove_file = true) const;
+                Q_INVOKABLE bool RemoveStopTask(const QString& gid, bool is_remove_file = true) const;
 
                 Q_INVOKABLE bool RemoveStopTask(int index, bool is_remove_file = true) const;
-                
+
                 Q_INVOKABLE bool RemoveAllStopTask(bool is_remove_file = true) const;
+
+                Q_INVOKABLE void RefreshTaskList(int page_index);
 				bool Init();
 				void UnInit();
 
