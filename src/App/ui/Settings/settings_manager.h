@@ -1,6 +1,7 @@
 #pragma once
 #include <QtQml/qqml.h>
 #include <QObject>
+#include <QReadWriteLock>
 #include "setting.h"
 #include "singleton.hpp"
 class QQmlEngine;
@@ -13,6 +14,22 @@ namespace gdl {
                 SINGLETON_DECLARE(Settings)
                 Q_OBJECT
                 QML_SINGLETON
+                SETTING_PROPERTY(QSize, WindowSize)
+                SETTING_PROPERTY(QString, Theme)
+                SETTING_PROPERTY(QString, Language)
+                SETTING_PROPERTY(QString, BtExludeTracker)
+                SETTING_PROPERTY(QString, BtTracker)
+                SETTING_PROPERTY(QString, Dir)
+                SETTING_PROPERTY(int, ListenPort)
+                SETTING_PROPERTY(int, RpcListenPort)
+                SETTING_PROPERTY(int, Split)
+                SETTING_PROPERTY(QString, UserAgent)
+                SETTING_PROPERTY(QString, AllProxy)
+                SETTING_PROPERTY(int, DhtListenPort)
+                SETTING_PROPERTY(int, MaxConcurrentDownloads)
+                SETTING_PROPERTY(QString, ConfPath)
+				SETTING_PROPERTY(QString, TrackerSourceUrls)
+
                public:
                 ~Settings() override;
                 static Settings* create(QQmlEngine*, QJSEngine*);
@@ -29,8 +46,10 @@ namespace gdl {
                         return;
                     }
                     if (auto setting_ptr = dynamic_cast<SETTING*>(match.value()); setting_ptr) {
+                        lock_.lockForWrite();
                         setting_ptr->Put(value);
                         Save();
+                        lock_.unlock();
                     }
                 }
 
@@ -41,9 +60,16 @@ namespace gdl {
                         return VALUE_TYPE();
                     }
                     if (auto setting_ptr = dynamic_cast<SETTING*>(match.value()); setting_ptr) {
-                        return setting_ptr->Get();
+                        lock_.lockForRead();
+                        VALUE_TYPE res = setting_ptr->Get();
+                        lock_.unlock();
+                        return res;
                     }
+                    return VALUE_TYPE();
                 }
+
+               private:
+                mutable QReadWriteLock lock_;
             };
             void RegisterTypes(QQmlEngine* engine);
         }  // namespace settings

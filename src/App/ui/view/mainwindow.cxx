@@ -9,6 +9,7 @@
 #include "FramelessHelper/Core/private/framelessconfig_p.h"
 #include "FramelessHelper/Quick/framelessquickmodule.h"
 #include "GDLCore/logger.h"
+#include "Settings/settings_manager.h"
 #include "logger.h"
 #include "os/os.h"
 #include "theme/theme.h"
@@ -21,7 +22,7 @@ namespace gd {
 		}
 		MainWindow::~MainWindow() {}
 		int MainWindow::Exec(int argc, char* argv[]) {
-			
+
 			FramelessHelper::Quick::initialize();
 			QGuiApplication app(argc, argv);
             InitIcon(&app);
@@ -40,6 +41,7 @@ namespace gd {
 		}
 
 		void MainWindow::InitQmlEngine(QQmlEngine* engine) {
+            gdl::ui::settings::RegisterTypes(engine);
 			FramelessHelper::Core::setApplicationOSThemeAware();
 			FramelessHelper::Quick::registerTypes(engine);
 			gdl::ui::utils::RegisterTypes(engine);
@@ -73,6 +75,7 @@ namespace gd {
 			gdl::ui::browser::BrowserManager::Instance().UnInit();
 			gdl::engine::Aria2cDownloadManager::Instance().UninitAria2cEngine();
             gdl::cache::DownloadHistoryCache::Instance().Uninitialize();
+            gdl::ui::settings::Settings::Instance().UnInit();
 		}
 
 		void MainWindow::InitQtMessageHandler() const {

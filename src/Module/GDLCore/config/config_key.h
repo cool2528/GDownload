@@ -52,15 +52,15 @@ namespace gdl {
 			// static function all keys
 			static constexpr auto GetAllKeys() {
 				return ConfigKeys(std::array{WindowSize.get(), Theme.get(), Language.get(), BtExludeTracker.get(),
-											 Dir.get(), ListenPort.get(), RpcListenPort.get(), Split.get(),
-											 UserAgent.get(), AllProxy.get(), DhtListenPort.get(),
+                                             BtTracker.get(), Dir.get(), ListenPort.get(), RpcListenPort.get(),
+                                             Split.get(), UserAgent.get(), AllProxy.get(), DhtListenPort.get(),
 											 MaxConcurrentDownloads.get(), ConfPath.get(), TrackerSourceUrls.get()});
 			}
 			// static function all values
 			static constexpr auto GetAllValues() {
 				return ConfigKeys(std::array{WindowSize.val(), Theme.val(), Language.val(), BtExludeTracker.val(),
-											 Dir.val(), ListenPort.val(), RpcListenPort.val(), Split.val(),
-											 UserAgent.val(), AllProxy.val(), DhtListenPort.val(),
+                                             BtTracker.val(), Dir.val(), ListenPort.val(), RpcListenPort.val(),
+                                             Split.val(), UserAgent.val(), AllProxy.val(), DhtListenPort.val(),
 											 MaxConcurrentDownloads.val(), ConfPath.val(), TrackerSourceUrls.val()});
 			}
 		};

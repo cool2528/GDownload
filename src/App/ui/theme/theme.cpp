@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QPalette>
 #include <QQmlEngine>
+#include "Settings/settings_manager.h"
 namespace gdl {
 
 	namespace ui {
@@ -24,9 +25,31 @@ namespace gdl {
 			}
 
 			GTheme::GTheme(QObject* parent) : QObject(parent), system_is_dark_theme_(SystemIsDarkTheme()) {
-				theme_ = GThemeType::ThemeMode::kLight;
+                QString theme_string = settings::Settings::Instance().GetTheme().toLower();
+                if (theme_string == "system") {
+                    Settheme(GThemeType::ThemeMode::kSystem);
+                }
+                else if (theme_string == "light") {
+                    Settheme(GThemeType::ThemeMode::kLight);
+                }
+                else {
+                    Settheme(GThemeType::ThemeMode::kDark);
+                }
 				qApp->installEventFilter(this);
                 connect(this, &GTheme::themeChanged, this, [this]() {
+                    QString theme_string;
+                    switch (theme_) {
+                        case GThemeType::ThemeMode::kSystem:
+                            theme_string = "system";
+                            break;
+                        case GThemeType::ThemeMode::kLight:
+                            theme_string = "light";
+                            break;
+                        case GThemeType::ThemeMode::kDark:
+                            theme_string = "dark";
+                            break;
+                    }
+                    settings::Settings::Instance().SetTheme(theme_string);
                     Q_EMIT darkChanged();
                 });
 			}

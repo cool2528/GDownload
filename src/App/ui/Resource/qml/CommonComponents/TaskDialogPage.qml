@@ -206,6 +206,7 @@ Popup {
                             id:savePath
                             Layout.fillWidth: true
                             Layout.preferredHeight: 30
+                            path:SettingsManager.qDir
                         }
                     }
                 }
