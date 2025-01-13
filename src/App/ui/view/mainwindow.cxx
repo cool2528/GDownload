@@ -16,9 +16,12 @@
 FRAMELESSHELPER_USE_NAMESPACE
 namespace gd {
 	namespace ui {
-		MainWindow::MainWindow(QObject* parent) : QObject(parent) {}
+		MainWindow::MainWindow(QObject* parent) : QObject(parent) {
+			InitQtMessageHandler();
+		}
 		MainWindow::~MainWindow() {}
 		int MainWindow::Exec(int argc, char* argv[]) {
+			
 			FramelessHelper::Quick::initialize();
 			QGuiApplication app(argc, argv);
             InitIcon(&app);
@@ -70,6 +73,31 @@ namespace gd {
 			gdl::ui::browser::BrowserManager::Instance().UnInit();
 			gdl::engine::Aria2cDownloadManager::Instance().UninitAria2cEngine();
             gdl::cache::DownloadHistoryCache::Instance().Uninitialize();
+		}
+
+		void MainWindow::InitQtMessageHandler() const {
+			qInstallMessageHandler([](QtMsgType type, const QMessageLogContext& context, const QString& msg) {
+				QByteArray localMsg	 = msg.toLocal8Bit();
+				const char* file	 = context.file ? context.file : "";
+				const char* function = context.function ? context.function : "";
+				switch (type) {
+					case QtDebugMsg:
+						LOG_DBG("Debug: {} ({}, {}, {})", localMsg.constData(), file, context.line, function)
+						break;
+					case QtInfoMsg:
+						LOG_INFO("Info: {} ({}, {}, {})", localMsg.constData(), file, context.line, function)
+						break;
+					case QtWarningMsg:
+						LOG_WARN("Warning: {} ({}, {}, {})", localMsg.constData(), file, context.line, function)
+						break;
+					case QtCriticalMsg:
+						LOG_CRIT("Critical: {} ({}, {}, {})", localMsg.constData(), file, context.line, function)
+						break;
+					case QtFatalMsg:
+						LOG_ERR("Fatal: {} ({}, {}, {})", localMsg.constData(), file, context.line, function)
+						break;
+				}
+			});
 		}
 
 	}  // namespace ui

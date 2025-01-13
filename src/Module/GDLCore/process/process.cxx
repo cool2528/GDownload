@@ -62,7 +62,7 @@ namespace gdl {
 			ZeroMemory(&pi, sizeof(pi));
 			si.dwFlags				  = STARTF_USESHOWWINDOW;
 #if (defined(_WIN32) || defined(_WIN64)) && (defined(DEBUG) || defined(_DEBUG))
-			si.wShowWindow = TRUE;
+			si.wShowWindow = FALSE;
 #else
 			si.wShowWindow = FALSE;
 #endif

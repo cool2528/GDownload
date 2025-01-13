@@ -21,5 +21,11 @@
         <file>qml/CommonComponents/GDropArea.qml</file>
         <file>qml/CommonComponents/GDownloadViewPage.qml</file>
         <file>qml/CommonComponents/GProgressBar.qml</file>
+        <file>qml/Browser/SettingPageTitle.qml</file>
+        <file>qml/Browser/BasicSettingPage.qml</file>
+        <file>qml/Browser/AdvancedSettingPage.qml</file>
+        <file>qml/Browser/LabSettingPage.qml</file>
+        <file>qml/CommonComponents/ThemeSwitch.qml</file>
+        <file>qml/CommonComponents/ThemeButton.qml</file>
     </qresource>
 </RCC>

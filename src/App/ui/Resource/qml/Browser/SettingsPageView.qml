@@ -102,26 +102,30 @@ Item {
             Layout.fillHeight: true
             Layout.minimumWidth: 380
             Layout.preferredWidth: 380
+            SettingPageTitle{
+                id:settingTitle
+                type: bar.currentIndex
+            }
+
             StackLayout{
                 id:settingsStack
-                anchors.top: parent.top
+                anchors.top: settingTitle.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 currentIndex: bar.currentIndex
 
-                Rectangle{
+                BasicSettingPage{
                     id:basicSetting
-                    color: GTheme.dark ? "#2e2e2e" :"#ffffff"
+
                 }
 
-                Rectangle{
+                AdvancedSettingPage{
                     id:advancedSetting
-                    color: GTheme.dark ? "#2e2e2e" :"#ffffff"
                 }
-                Rectangle{
+
+                LabSettingPage{
                     id:labSetting
-                    color: GTheme.dark ? "#2e2e2e" :"#ffffff"
                 }
             }
         }
