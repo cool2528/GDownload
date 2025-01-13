@@ -17,6 +17,7 @@ namespace gd {
 			void InitFont(QQmlEngine* engine);
 			void InitIcon(QGuiApplication* app);
 			void UnInitEngine();
+			void InitQtMessageHandler() const;
 
 		   private:
 			int fluent_icons_font_id_{-1};

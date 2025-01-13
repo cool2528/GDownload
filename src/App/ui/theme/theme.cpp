@@ -26,7 +26,9 @@ namespace gdl {
 			GTheme::GTheme(QObject* parent) : QObject(parent), system_is_dark_theme_(SystemIsDarkTheme()) {
 				theme_ = GThemeType::ThemeMode::kLight;
 				qApp->installEventFilter(this);
-				connect(this, &GTheme::themeChanged, this, [&]() { Q_EMIT darkChanged(); });
+                connect(this, &GTheme::themeChanged, this, [this]() {
+                    Q_EMIT darkChanged();
+                });
 			}
 
 			bool GTheme::SystemIsDarkTheme() const {
