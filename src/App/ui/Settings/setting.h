@@ -1,7 +1,9 @@
 #pragma once
 #include <qvariant.h>
+#include <QHash>
 #include <QObject>
 #include <QSize>
+#include <nlohmann/json.hpp>
 namespace gdl {
     namespace ui {
         namespace settings {
@@ -22,7 +24,7 @@ namespace gdl {
 #define SETTING_IMP_BEGIN(CLASS_NAME, KEY, TYPE)      \
     class CLASS_NAME : public Setting {               \
        public:                                        \
-        explicit CLASS_NAME() : Setting(KEY) {}       \
+        CLASS_NAME() : Setting(KEY) {}                \
         using VALUE_TYPE					  = TYPE; \
         inline static const char* setting_key = KEY;  \
                                                       \
@@ -31,9 +33,23 @@ namespace gdl {
                                                       \
        public:
 
-#define SETTING_IMP_END() \
-    }                     \
-    ;
+#define SETTING_IMP_END(CLASS_NAME) \
+    }                               \
+    ;                               \
+    inline static CLASS_NAME CLASS_NAME##Instance;
+
+#define SETTING_PROPERTY(TYPE, NAME)                                             \
+   private:                                                                      \
+    Q_PROPERTY(TYPE q##NAME READ Get##NAME WRITE Set##NAME NOTIFY NAME##Changed) \
+   public:                                                                       \
+    TYPE Get##NAME() const {                                                     \
+        return GetValue<NAME, TYPE>(NAME::setting_key);                          \
+    }                                                                            \
+    void Set##NAME(TYPE value) {                                                 \
+        SetValue<NAME, TYPE>(NAME::setting_key, value);                          \
+        Q_EMIT NAME##Changed();                                                  \
+    }                                                                            \
+    Q_SIGNAL void NAME##Changed();
 
             // WindowSize
             SETTING_IMP_BEGIN(WindowSize, "general.window_size", QSize)
@@ -41,7 +57,10 @@ namespace gdl {
                 value_ = QSize(1024, 768);
             }
             void Put(const QVariant& value) override {
-                value_ = value.toSize();
+                QString size = value.toString();
+                int width = size.section(',', 0, 0).toInt();
+                int height = size.section(',', 1, 1).toInt();
+                value_ = QSize(width, height);
             }
             VALUE_TYPE Get() const {
                 return value_;
@@ -49,7 +68,7 @@ namespace gdl {
             QString ToString() override {
                 return QString("%1,%2").arg(value_.width()).arg(value_.height());
             }
-            SETTING_IMP_END()
+            SETTING_IMP_END(WindowSize)
 
             // Theme
             SETTING_IMP_BEGIN(Theme, "general.theme", QString)
@@ -65,7 +84,7 @@ namespace gdl {
             QString ToString() override {
                 return value_;
             }
-            SETTING_IMP_END()
+            SETTING_IMP_END(Theme)
 
             // Language
             SETTING_IMP_BEGIN(Language, "general.language", QString)
@@ -81,7 +100,7 @@ namespace gdl {
             QString ToString() override {
                 return value_;
             }
-            SETTING_IMP_END()
+            SETTING_IMP_END(Language)
 
             // BtExludeTracker
             SETTING_IMP_BEGIN(BtExludeTracker, "aria2c.bt-exclude-tracker", QString)
@@ -97,7 +116,7 @@ namespace gdl {
             QString ToString() override {
                 return value_;
             }
-            SETTING_IMP_END()
+            SETTING_IMP_END(BtExludeTracker)
 
             // BtTracker
             SETTING_IMP_BEGIN(BtTracker, "aria2c.bt-tracker", QString)
@@ -113,7 +132,7 @@ namespace gdl {
             QString ToString() override {
                 return value_;
             }
-            SETTING_IMP_END()
+            SETTING_IMP_END(BtTracker)
 
             // Dir
             SETTING_IMP_BEGIN(Dir, "aria2c.dir", QString)
@@ -129,7 +148,7 @@ namespace gdl {
             QString ToString() override {
                 return value_;
             }
-            SETTING_IMP_END()
+            SETTING_IMP_END(Dir)
 
             // ListenPort
             SETTING_IMP_BEGIN(ListenPort, "aria2c.listen-port", int)
@@ -145,7 +164,7 @@ namespace gdl {
             QString ToString() override {
                 return QString::number(value_);
             }
-            SETTING_IMP_END()
+            SETTING_IMP_END(ListenPort)
 
             // RpcListenPort
             SETTING_IMP_BEGIN(RpcListenPort, "aria2c.rpc-listen-port", int)
@@ -161,7 +180,7 @@ namespace gdl {
             QString ToString() override {
                 return QString::number(value_);
             }
-            SETTING_IMP_END()
+            SETTING_IMP_END(RpcListenPort)
 
             // Split
             SETTING_IMP_BEGIN(Split, "aria2c.split", int)
@@ -177,7 +196,7 @@ namespace gdl {
             QString ToString() override {
                 return QString::number(value_);
             }
-            SETTING_IMP_END()
+            SETTING_IMP_END(Split)
 
             // UserAgent
             SETTING_IMP_BEGIN(UserAgent, "aria2c.user-agent", QString)
@@ -193,7 +212,7 @@ namespace gdl {
             QString ToString() override {
                 return value_;
             }
-            SETTING_IMP_END()
+            SETTING_IMP_END(UserAgent)
 
             // AllProxy
             SETTING_IMP_BEGIN(AllProxy, "aria2c.all-proxy", QString)
@@ -209,7 +228,7 @@ namespace gdl {
             QString ToString() override {
                 return value_;
             }
-            SETTING_IMP_END()
+            SETTING_IMP_END(AllProxy)
 
             // DhtListenPort
             SETTING_IMP_BEGIN(DhtListenPort, "aria2c.dht-listen-port", int)
@@ -225,7 +244,7 @@ namespace gdl {
             QString ToString() override {
                 return QString::number(value_);
             }
-            SETTING_IMP_END()
+            SETTING_IMP_END(DhtListenPort)
 
             // MaxConcurrentDownloads
             SETTING_IMP_BEGIN(MaxConcurrentDownloads, "aria2c.max-concurrent-downloads", int)
@@ -242,7 +261,7 @@ namespace gdl {
             QString ToString() override {
                 return QString::number(value_);
             }
-            SETTING_IMP_END()
+            SETTING_IMP_END(MaxConcurrentDownloads)
 
             //ConfPath
             SETTING_IMP_BEGIN(ConfPath, "aria2c.conf-path", QString)
@@ -258,23 +277,23 @@ namespace gdl {
             QString ToString() override {
                 return value_;
             }
-            SETTING_IMP_END()
+            SETTING_IMP_END(ConfPath)
 
             // TrackerSourceUrls
-            SETTING_IMP_BEGIN(TrackerSourceUrls, "aria2c.tracker-source-urls", QStringList)
+            SETTING_IMP_BEGIN(TrackerSourceUrls, "aria2c.tracker_source_urls", QString)
             void Default() override {
-                value_ = QStringList();
+				value_ = QString();
             }
             void Put(const QVariant& value) override {
-                value_ = value.toStringList();
+				value_ = value.toString();
             }
             VALUE_TYPE Get() const {
                 return value_;
             }
             QString ToString() override {
-                return value_.join(";");
+                return value_;
             }
-            SETTING_IMP_END()
+            SETTING_IMP_END(TrackerSourceUrls)
 
         }  // namespace settings
     }  // namespace ui

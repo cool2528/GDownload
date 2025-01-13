@@ -22,7 +22,7 @@ Item {
             }
         }
         font.pixelSize: 14
-        color: GTheme.dark ? "#ffffff" : tipText.color
+        color: GTheme.dark ? "#ffffff" :  "#3b3b3b"
     }
 
     RowLayout{

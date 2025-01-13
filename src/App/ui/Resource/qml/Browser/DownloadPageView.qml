@@ -24,7 +24,7 @@ Item {
                 anchors.top: parent.top
                 anchors.topMargin: 30
                 font.pixelSize: 14
-                color: GTheme.dark ? "#ffffff" : title.color
+                color: GTheme.dark ? "#ffffff" : "#3b3b3b"
 
             }
             ColumnLayout{

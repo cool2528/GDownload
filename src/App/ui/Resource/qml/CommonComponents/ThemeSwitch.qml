@@ -65,4 +65,14 @@ Item {
         }
     }
 
+    Component.onCompleted: {
+        let checkedButtonIndex = GTheme.theme
+        if (checkedButtonIndex === GThemeType.ThemeMode.kSystem) {
+            systemThemeButton.checked = true
+        } else if (checkedButtonIndex === GThemeType.ThemeMode.kLight) {
+            lightThemeButton.checked = true
+        } else if (checkedButtonIndex === GThemeType.ThemeMode.kDark) {
+            darkThemeButton.checked = true
+        }
+    }
 }
