@@ -29,10 +29,10 @@ namespace gdl {
 					std::string value	= all_values[i].data();
 					auto child_optional = ptree_root_.get_optional<std::string>(key_path.data());
 					if (!child_optional.has_value()) {
-						if (key_path == "aria2c.dir" && value.empty()) {
+                        if (key_path == config::Keys::Dir.get() && value.empty()) {
 							value = os::GetUserDownloadsDir();
 						}
-						else if (key_path == "aria2c.conf-path" && value.empty()) {
+                        else if (key_path == config::Keys::ConfPath.get() && value.empty()) {
 							std::string conf_path;
 #ifdef __APPLE__
 							conf_path = os::GetExecutableDir() + "/../Resources/engine/aria2.conf";
@@ -41,9 +41,17 @@ namespace gdl {
 #endif
 							value = conf_path;
 						}
-						else if (key_path == "aria2c.tracker_source_urls" && value.empty()) {
+                        else if (key_path == config::Keys::TrackerSourceUrls.get() && value.empty()) {
 							value = DEFAULT_TRACKER_SOURCE_URLS;
-						}
+                        }
+                        else if (key_path == config::Keys::SaveSession.get() && value.empty()) {
+                            value = os::GetAppDataDir() + "/gdownload/session/aria2.session";
+                            std::error_code ec;
+                            const auto session_dir = std::filesystem::path(value).parent_path();
+                            if (!std::filesystem::exists(session_dir, ec)) {
+                                std::filesystem::create_directories(session_dir, ec);
+                            }
+                        }
 						ptree_root_.put(key_path.data(), value.data());
 					}
 				}

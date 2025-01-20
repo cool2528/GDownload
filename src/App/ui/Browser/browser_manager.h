@@ -34,15 +34,15 @@ namespace gdl {
 
 				Q_INVOKABLE bool AddMetalinkTask(const QString& metalink, const QVariantMap& options);
 
-				Q_INVOKABLE bool PauseTask(const QString& gid);
+                Q_INVOKABLE bool PauseTask(int page_index, const QString& gid);
 
                 Q_INVOKABLE bool PauseAllTask(int page_index);
 
-				Q_INVOKABLE bool ForcePauseTask(const QString& gid);
+                Q_INVOKABLE bool ForcePauseTask(int page_index, const QString& gid);
 
-				Q_INVOKABLE bool ForcePauseAllTask();
+                Q_INVOKABLE bool ForcePauseAllTask();
 
-				Q_INVOKABLE bool UnpauseTask(const QString& gid);
+                Q_INVOKABLE bool UnpauseTask(int page_index, const QString& gid);
 
                 Q_INVOKABLE bool UnpauseAllTask(int page_index);
 
@@ -76,10 +76,12 @@ namespace gdl {
 			   Q_SIGNALS:
 				void sigErrorMessage(const QString& error);
 				void sigUpdateTasksMessage(const DownloadTaskInfo& info);
+                void sigUpdateActiveProgress(const double& progress);
 
 			   private:
 				explicit BrowserManager(QObject* parent = nullptr);
 				void OnHandleAria2Message(const std::string& msg);
+                void OnHandleAria2ActiveProgress(const std::string& msg);
 				void InitDownloadHistoryCache() const;
 				static gdl::cache::DownloadRecord DownloadTaskInfoToRecord(const DownloadTaskInfo& info);
 				static DownloadTaskInfo DownloadRecordToTaskInfo(const gdl::cache::DownloadRecord& record);
@@ -89,7 +91,8 @@ namespace gdl {
 				std::unique_ptr<DownloadTaskModel> active_model_{nullptr};
 				std::unique_ptr<DownloadTaskModel> stoped_model_{nullptr};
 				std::unique_ptr<DownloadTaskModel> waiting_model_{nullptr};
-				engine::Subscription subcription_{nullptr};
+                engine::Subscription aria2_responce_subcription_{nullptr};
+                engine::Subscription aria2_active_progress_subcription_{nullptr};
 			};
 			void RegisterTypes(QQmlEngine* engine);
 		}  // namespace browser

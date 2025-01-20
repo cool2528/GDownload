@@ -58,9 +58,9 @@ namespace gdl {
             }
             void Put(const QVariant& value) override {
                 QString size = value.toString();
-                int width = size.section(',', 0, 0).toInt();
-                int height = size.section(',', 1, 1).toInt();
-                value_ = QSize(width, height);
+                int width	 = size.section(',', 0, 0).toInt();
+                int height	 = size.section(',', 1, 1).toInt();
+                value_		 = QSize(width, height);
             }
             VALUE_TYPE Get() const {
                 return value_;
@@ -285,7 +285,7 @@ namespace gdl {
 				value_ = QString();
             }
             void Put(const QVariant& value) override {
-				value_ = value.toString();
+                value_ = value.toString();
             }
             VALUE_TYPE Get() const {
                 return value_;
@@ -294,6 +294,38 @@ namespace gdl {
                 return value_;
             }
             SETTING_IMP_END(TrackerSourceUrls)
+
+            //SaveSession
+            SETTING_IMP_BEGIN(SaveSession, "aria2c.save-session", QString)
+            void Default() override {
+                value_ = "";
+            }
+            void Put(const QVariant& value) override {
+				value_ = value.toString();
+            }
+            VALUE_TYPE Get() const {
+                return value_;
+            }
+            QString ToString() override {
+                return value_;
+            }
+            SETTING_IMP_END(SaveSession)
+
+            // IsSaveSession
+            SETTING_IMP_BEGIN(IsSaveSession, "aria2c.is-save-session", bool)
+            void Default() override {
+                value_ = false;
+            }
+            void Put(const QVariant& value) override {
+                value_ = value.toString() == "true" || value.toString() == "1";
+            }
+            VALUE_TYPE Get() const {
+                return value_;
+            }
+            QString ToString() override {
+                return value_ ? "true" : "false";
+            }
+            SETTING_IMP_END(IsSaveSession)
 
         }  // namespace settings
     }  // namespace ui

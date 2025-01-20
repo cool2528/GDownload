@@ -23,6 +23,7 @@ namespace gdl {
                     std::string value = config::GetValue(key.toStdString()).AsString();
                     setting->Put(QString::fromStdString(value));
                 }
+                Save();
                 return true;
             }
 

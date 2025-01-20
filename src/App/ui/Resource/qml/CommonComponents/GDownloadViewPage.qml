@@ -96,9 +96,10 @@ Rectangle{
                                     onClicked: {
                                         if(downloadView.pageType == 0)
                                         {
-                                            BrowserManager.UnpauseTask(model.taskId)
+                                            BrowserManager.UnpauseTask(0,model.taskId)
                                         }else if(downloadView.pageType == 1){
                                             //
+                                             BrowserManager.UnpauseTask(1,model.taskId)
                                         }else if(downloadView.pageType == 2){
                                             //
                                             Qt.openUrlExternally(model.savePath)
@@ -119,9 +120,10 @@ Rectangle{
                                     onClicked: {
                                         if(downloadView.pageType == 0)
                                         {
-                                            BrowserManager.PauseTask(model.taskId)
+                                            BrowserManager.PauseTask(0,model.taskId)
                                         }else if(downloadView.pageType == 1){
                                             //
+                                               BrowserManager.PauseTask(1,model.taskId)
                                         }else if(downloadView.pageType == 2){
                                             //
                                         }

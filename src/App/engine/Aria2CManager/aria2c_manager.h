@@ -202,6 +202,7 @@ namespace gdl {
 			void UpdateAria2cTasks();
 			void SyncMagnetServerList();
 			void SyncGlobalStatInfo();
+            std::string SyncActiveTaskInfo();
 			std::string ParseTextUrls(const std::string& input);
 			std::string GetBitTorrentUrl(const std::string& url);
 

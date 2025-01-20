@@ -49,19 +49,23 @@ namespace gdl {
 			CONFIG_PATH(MaxConcurrentDownloads, "aria2c.max-concurrent-downloads", "64");
 			CONFIG_PATH(ConfPath, "aria2c.conf-path", "");
 			CONFIG_PATH(TrackerSourceUrls, "aria2c.tracker_source_urls", DEFAULT_TRACKER_SOURCE_URLS);
+            CONFIG_PATH(SaveSession, "aria2c.save-session", "");
+            CONFIG_PATH(IsSaveSession, "aria2c.is-save-session", "true");
 			// static function all keys
 			static constexpr auto GetAllKeys() {
 				return ConfigKeys(std::array{WindowSize.get(), Theme.get(), Language.get(), BtExludeTracker.get(),
                                              BtTracker.get(), Dir.get(), ListenPort.get(), RpcListenPort.get(),
                                              Split.get(), UserAgent.get(), AllProxy.get(), DhtListenPort.get(),
-											 MaxConcurrentDownloads.get(), ConfPath.get(), TrackerSourceUrls.get()});
+                                             MaxConcurrentDownloads.get(), ConfPath.get(), TrackerSourceUrls.get(),
+                                             SaveSession.get(), IsSaveSession.get()});
 			}
 			// static function all values
 			static constexpr auto GetAllValues() {
 				return ConfigKeys(std::array{WindowSize.val(), Theme.val(), Language.val(), BtExludeTracker.val(),
                                              BtTracker.val(), Dir.val(), ListenPort.val(), RpcListenPort.val(),
                                              Split.val(), UserAgent.val(), AllProxy.val(), DhtListenPort.val(),
-											 MaxConcurrentDownloads.val(), ConfPath.val(), TrackerSourceUrls.val()});
+                                             MaxConcurrentDownloads.val(), ConfPath.val(), TrackerSourceUrls.val(),
+                                             SaveSession.val(), IsSaveSession.val()});
 			}
 		};
 	}  // namespace config

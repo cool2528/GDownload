@@ -1,7 +1,7 @@
 #include "utils.h"
 #include <QWindow>
 #import <Cocoa/Cocoa.h>
-
+#import <AppKit/AppKit.h>
 namespace gdl {
 
 namespace ui {
@@ -19,6 +19,18 @@ void hideWindowStandardButtons(WId wid) {
             }
         }
     }
+}
+void setTaskbarProgress(double progress)
+{
+    @autoreleasepool {
+        if (progress < 0.0) {
+    
+        [[NSApp dockTile] setShowsApplicationBadge:NO];
+    } else {
+        [[NSApp dockTile] setShowsApplicationBadge:YES];
+        [[NSApp dockTile] setBadgeLabel:[NSString stringWithFormat:@"%.0f%%", progress * 100]];
+    }
+ }
 }
 }//utils
 }//ui
