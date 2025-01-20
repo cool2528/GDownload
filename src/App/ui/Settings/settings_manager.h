@@ -29,6 +29,8 @@ namespace gdl {
                 SETTING_PROPERTY(int, MaxConcurrentDownloads)
                 SETTING_PROPERTY(QString, ConfPath)
 				SETTING_PROPERTY(QString, TrackerSourceUrls)
+                SETTING_PROPERTY(QString, SaveSession)
+                SETTING_PROPERTY(bool, IsSaveSession)
 
                public:
                 ~Settings() override;

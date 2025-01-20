@@ -130,6 +130,13 @@ namespace gdl {
 			aria2c_settings["enable-rpc"]			= "true";
 			aria2c_settings["rpc-listen-all"]		= "true";
 			aria2c_settings["rpc-allow-origin-all"] = "true";
+            auto is_save_session					= config::GetValue(config::Keys::IsSaveSession).AsBool();
+            auto session_path						= config::GetValue(config::Keys::SaveSession).AsString();
+            if (is_save_session) aria2c_settings["save-session"] = quote_path(session_path);
+            std::error_code ec;
+            if (std::filesystem::exists(session_path, ec) && std::filesystem::file_size(session_path) != 0) {
+                aria2c_settings["input-file"] = quote_path(session_path);
+            }
 
 #ifdef _WIN32
 			DWORD processId = GetCurrentProcessId();
@@ -160,7 +167,15 @@ namespace gdl {
 				SyncGlobalStatInfo();
 				if (active_num_ > 0) {
 					websocket_client_.TellActive(keys);
-				}
+                    auto active_all_progress = SyncActiveTaskInfo();
+                    pub_sub_system_.Publish(kAria2ActiveProgress, active_all_progress);
+                }
+                else {
+                    nlohmann::json active_tasks;
+                    active_tasks["totalLength"]		= 0;
+                    active_tasks["completedLength"] = 0;
+                    pub_sub_system_.Publish(kAria2ActiveProgress, active_tasks.dump());
+                }
 				if (waiting_num_ > 0) {
 					websocket_client_.TellWaiting(0, 100, keys);
 				}
@@ -187,7 +202,7 @@ namespace gdl {
 			}
 			// Get BitTorrent tracker server list from configuration file
 			try {
-				auto json_data = config::GetValue(config::Keys::TrackerSourceUrls).AsString();
+                auto json_data					   = config::GetValue(config::Keys::TrackerSourceUrls).AsString();
 				nlohmann::json tracker_source_urls = nlohmann::json::parse(json_data.c_str());
 				if (!tracker_source_urls.is_array()) {
 					LOG_ERR("Invalid tracker_source_urls {}", json_data);
@@ -197,7 +212,7 @@ namespace gdl {
 				for (const auto& url : tracker_source_urls) {
 					if (url.is_string()) {
 						std::string source_url = url.get<std::string>();
-						auto bt_tracker_urls = GetBitTorrentUrl(source_url);
+                        auto bt_tracker_urls   = GetBitTorrentUrl(source_url);
 						bt_tracker += "," + bt_tracker_urls;
 					}
 					if (!engine_is_runing_) break;
@@ -233,6 +248,38 @@ namespace gdl {
 				}
 			}
 		}
+
+        std::string Aria2cDownloadManager::SyncActiveTaskInfo() {
+            std::string result_string				   = "{}";
+            static const std::vector<std::string> keys = {"status", "totalLength", "completedLength"};
+            const std::string host					   = std::string("http://127.0.0.1:") + kEngineRpcPort;
+            Aria2cHttpClient client(host);
+            auto http_result = client.TellActive(keys);
+            if (auto res = std::get_if<ErrorResult>(&http_result.Value().result)) {
+                LOG_WARN("SyncActiveTaskInfo fail: {}", res->err_msg)
+                return result_string;
+            }
+            else if (auto succeed_res = std::get_if<SucceedResult>(&http_result.Value().result)) {
+                nlohmann::json doc = nlohmann::json::parse(succeed_res->body, nullptr, false);
+                if (doc.contains("result") && doc["result"].is_array()) {
+                    const auto& result					= doc["result"];
+                    std::int64_t active_totalLength		= 0;
+                    std::int64_t active_completedLength = 0;
+                    nlohmann::json active_tasks;
+                    for (const auto& object_doc : result) {
+                        if (object_doc.contains("totalLength") && object_doc.contains("completedLength") &&
+                            object_doc.contains("status")) {
+                            active_totalLength += std::stoll(object_doc["totalLength"].get<std::string>());
+                            active_completedLength += std::stoll(object_doc["completedLength"].get<std::string>());
+                        }
+                    }
+                    active_tasks["totalLength"]		= active_totalLength;
+                    active_tasks["completedLength"] = active_completedLength;
+                    result_string					= active_tasks.dump();
+                }
+            }
+            return result_string;
+        }
 
 		std::string Aria2cDownloadManager::ParseTextUrls(const std::string& inputText) {
 			std::vector<std::string> result;

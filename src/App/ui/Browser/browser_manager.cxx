@@ -9,6 +9,7 @@
 #include "Aria2CManager/engine_def.h"
 #include "Definitions/appDef.h"
 #include "logger.h"
+#include "utils/utils.h"
 namespace gdl {
 	namespace ui {
 		namespace browser {
@@ -73,19 +74,31 @@ namespace gdl {
 				return false;
 			}
 
-			bool BrowserManager::PauseTask(const QString& gid) {
+            bool BrowserManager::PauseTask(int page_index, const QString& gid) {
 				if (gid.isEmpty()) return false;
-				const auto res = engine::Aria2cDownloadManager::Instance()
-									 .CallAria2cMethod(engine::Aria2Method::kPause, gid.toStdString())
-									 .IsOk();
-				return res;
+                if (page_index == 0) {
+
+                    return engine::Aria2cDownloadManager::Instance()
+                        .CallAria2cMethod(engine::Aria2Method::kPause, gid.toStdString())
+                        .IsOk();
+                }
+                else if (page_index == 1) {
+
+                    return engine::Aria2cDownloadManager::Instance()
+                        .CallAria2cMethod(engine::Aria2Method::kPause, gid.toStdString())
+                        .IsOk();
+                }
+                else {
+                    LOG_ERR("PauseTask error: page_index is invalid");
+                }
+                return false;
 			}
 
             bool BrowserManager::PauseAllTask(int page_index) {
                 if (page_index == 0) {
                     if (active_model_) {
                         for (const auto& task : active_model_->GetTaskIds()) {
-                            PauseTask(task);
+                            PauseTask(page_index, task);
                         }
                         return true;
                     }
@@ -93,7 +106,7 @@ namespace gdl {
                 else if (page_index == 1) {
                     if (waiting_model_) {
                         for (const auto& task : waiting_model_->GetTaskIds()) {
-                            PauseTask(task);
+                            PauseTask(page_index, task);
                         }
                         return true;
                     }
@@ -104,31 +117,61 @@ namespace gdl {
                 return false;
 			}
 
-			bool BrowserManager::ForcePauseTask(const QString& gid) {
+            bool BrowserManager::ForcePauseTask(int page_index, const QString& gid) {
 				if (gid.isEmpty()) return false;
-				return engine::Aria2cDownloadManager::Instance()
-					.CallAria2cMethod(engine::Aria2Method::kForcePause, gid.toStdString())
-					.IsOk();
+                if (page_index == 0) {
+                    if (active_model_) {
+                        return engine::Aria2cDownloadManager::Instance()
+                            .CallAria2cMethod(engine::Aria2Method::kForcePause, gid.toStdString())
+                            .IsOk();
+                    }
+                }
+                else if (page_index == 1) {
+                    if (waiting_model_) {
+                        return engine::Aria2cDownloadManager::Instance()
+                            .CallAria2cMethod(engine::Aria2Method::kForcePause, gid.toStdString())
+                            .IsOk();
+                    }
+                }
+                else {
+                    LOG_ERR("ForcePauseTask error: page_index is invalid");
+                }
+                return false;
 			}
 
-			bool BrowserManager::ForcePauseAllTask() {
-				return engine::Aria2cDownloadManager::Instance()
-					.CallAria2cMethod(engine::Aria2Method::kForcePauseAll)
-					.IsOk();
-			}
+            bool BrowserManager::ForcePauseAllTask() {
+                return engine::Aria2cDownloadManager::Instance()
+                    .CallAria2cMethod(engine::Aria2Method::kForcePauseAll)
+                    .IsOk();
+            }
 
-			bool BrowserManager::UnpauseTask(const QString& gid) {
+            bool BrowserManager::UnpauseTask(int page_index, const QString& gid) {
 				if (gid.isEmpty()) return false;
-				return engine::Aria2cDownloadManager::Instance()
-					.CallAria2cMethod(engine::Aria2Method::kUnpause, gid.toStdString())
-					.IsOk();
+                if (page_index == 0) {
+                    if (active_model_) {
+                        return engine::Aria2cDownloadManager::Instance()
+                            .CallAria2cMethod(engine::Aria2Method::kUnpause, gid.toStdString())
+                            .IsOk();
+                    }
+                }
+                else if (page_index == 1) {
+                    if (waiting_model_) {
+                        return engine::Aria2cDownloadManager::Instance()
+                            .CallAria2cMethod(engine::Aria2Method::kUnpause, gid.toStdString())
+                            .IsOk();
+                    }
+                }
+                else {
+                    LOG_ERR("UnpauseTask error: page_index is invalid");
+                }
+                return false;
 			}
 
             bool BrowserManager::UnpauseAllTask(int page_index) {
                 if (page_index == 0) {
                     if (active_model_) {
                         for (const auto& task : active_model_->GetTaskIds()) {
-                            UnpauseTask(task);
+                            UnpauseTask(page_index, task);
                         }
                         return true;
                     }
@@ -136,7 +179,7 @@ namespace gdl {
                 else if (page_index == 1) {
                     if (waiting_model_) {
                         for (const auto& task : waiting_model_->GetTaskIds()) {
-                            UnpauseTask(task);
+                            UnpauseTask(page_index, task);
                         }
                         return true;
                     }
@@ -357,17 +400,27 @@ namespace gdl {
             }
 
 			bool BrowserManager::Init() {
+                // subscribe aria2 responce
 				auto res = engine::Aria2cDownloadManager::Instance().SubscriptionAria2Message(
 					kAria2Responce, [this](const std::string& msg) { OnHandleAria2Message(msg); });
 				if (res.HasError()) return false;
-				subcription_ = res.Value();
+                aria2_responce_subcription_ = res.Value();
+                // subscribe active progress
+                res = engine::Aria2cDownloadManager::Instance().SubscriptionAria2Message(
+                    kAria2ActiveProgress, [this](const std::string& msg) { OnHandleAria2ActiveProgress(msg); });
+                if (res.HasError()) return false;
+                aria2_active_progress_subcription_ = res.Value();
 				return true;
 			}
 
 			void BrowserManager::UnInit() {
-				if (subcription_) {
-					engine::Aria2cDownloadManager::Instance().UnSubscribeAria2Message(subcription_);
+                if (aria2_responce_subcription_) {
+                    engine::Aria2cDownloadManager::Instance().UnSubscribeAria2Message(aria2_responce_subcription_);
 				}
+                if (aria2_active_progress_subcription_) {
+                    engine::Aria2cDownloadManager::Instance().UnSubscribeAria2Message(
+                        aria2_active_progress_subcription_);
+                }
 			}
 
 			gdl::cache::DownloadRecord BrowserManager::DownloadTaskInfoToRecord(const DownloadTaskInfo& info) {
@@ -480,6 +533,19 @@ namespace gdl {
 						} catch (...) {}
 					},
 					Qt::QueuedConnection);
+
+                connect(
+                    this, &BrowserManager::sigUpdateActiveProgress, this,
+                    [this](double progress) {
+#if defined(_WIN32)
+                        auto nativeWindowHandle = reinterpret_cast<void*>(qApp->allWindows().first()->winId());
+                        utils::UtilsToolsManager::Instance().SetTaskbarProgress(progress, nativeWindowHandle);
+
+#elif defined(__APPLE__)
+                        utils::UtilsToolsManager::Instance().SetTaskbarProgress(progress);
+#endif
+                    },
+                    Qt::QueuedConnection);
 			}
 			void BrowserManager::InitDownloadHistoryCache() const {
 				const auto records = gdl::cache::DownloadHistoryCache::Instance().GetRecords();
@@ -658,36 +724,57 @@ namespace gdl {
 				}
 			}
 
-			DownloadTaskInfo BrowserManager::Aria2QueryByGidTaskInfo(const std::string& gid) {
-				DownloadTaskInfo task_info;
-				const std::string host = std::string("http://127.0.0.1:") + kEngineRpcPort;
-				engine::Aria2cHttpClient client(host);
+            void BrowserManager::OnHandleAria2ActiveProgress(const std::string& msg) {
+                try {
+                    nlohmann::json doc = nlohmann::json::parse(msg);
+                    if (doc.is_object()) {
+                        if (doc.contains("totalLength") && doc.contains("completedLength")) {
+                            std::int64_t total_length	  = doc["totalLength"].get<std::int64_t>();
+                            std::int64_t completed_length = doc["completedLength"].get<std::int64_t>();
+                            double progress				  = 0.0;
+                            if (total_length > 0) {
+                                progress = completed_length * 1.0 / total_length;
+                            }
+                            Q_EMIT sigUpdateActiveProgress(progress);
+                        }
+                    }
+                } catch (std::exception& e) {
+                    LOG_ERR("{}", e.what())
+                } catch (...) {
+                    LOG_ERR("OnHandleAria2ActiveProgress exception");
+				}
+            }
+
+            DownloadTaskInfo BrowserManager::Aria2QueryByGidTaskInfo(const std::string& gid) {
+                DownloadTaskInfo task_info;
+                const std::string host = std::string("http://127.0.0.1:") + kEngineRpcPort;
+                engine::Aria2cHttpClient client(host);
                 auto http_result = client.TellStatus(gid, keys);
-				if (http_result.HasError()) {
-					LOG_ERR("Failed to query task info by gid:{} error:{}", gid, http_result.GetError().what())
-					return task_info;
-				}
-				if (auto res = std::get_if<engine::ErrorResult>(&http_result.Value().result)) {
-					LOG_ERR("Failed to query task info by gid:{} error:{}", gid, res->err_msg)
-					return task_info;
-				}
+                if (http_result.HasError()) {
+                    LOG_ERR("Failed to query task info by gid:{} error:{}", gid, http_result.GetError().what())
+                    return task_info;
+                }
+                if (auto res = std::get_if<engine::ErrorResult>(&http_result.Value().result)) {
+                    LOG_ERR("Failed to query task info by gid:{} error:{}", gid, res->err_msg)
+                    return task_info;
+                }
                 else if (auto res = std::get_if<engine::SucceedResult>(&http_result.Value().result)) {
-					try {
-						nlohmann::json doc = nlohmann::json::parse(res->body);
-						if (doc.find("result") != doc.end()) {
-							// succeed messgae
-							auto object = doc["result"];
-							if (object.is_object()) {
+                    try {
+                        nlohmann::json doc = nlohmann::json::parse(res->body);
+                        if (doc.find("result") != doc.end()) {
+                            // succeed messgae
+                            auto object = doc["result"];
+                            if (object.is_object()) {
                                 std::string status	  = object["status"].get<std::string>();
-								QString task_id		  = QString::fromStdString(object["gid"].get<std::string>());
-								auto completed_length = std::stoll(object["completedLength"].get<std::string>());
-								auto connections	  = std::stoll(object["connections"].get<std::string>());
-								auto download_speed	  = std::stoll(object["downloadSpeed"].get<std::string>());
-								auto totalLength	  = std::stoll(object["totalLength"].get<std::string>());
-								auto files			  = object["files"];
+                                QString task_id		  = QString::fromStdString(object["gid"].get<std::string>());
+                                auto completed_length = std::stoll(object["completedLength"].get<std::string>());
+                                auto connections	  = std::stoll(object["connections"].get<std::string>());
+                                auto download_speed	  = std::stoll(object["downloadSpeed"].get<std::string>());
+                                auto totalLength	  = std::stoll(object["totalLength"].get<std::string>());
+                                auto files			  = object["files"];
                                 QString file_path, download_url;
-								for (const auto& file : files) {
-									file_path = QString::fromStdString(file["path"].get<std::string>());
+                                for (const auto& file : files) {
+                                    file_path = QString::fromStdString(file["path"].get<std::string>());
                                     for (const auto& file : files) {
                                         file_path = QString::fromStdString(file["path"].get<std::string>());
                                         if (file.contains("uris") && file["uris"].is_array()) {
@@ -699,71 +786,71 @@ namespace gdl {
                                         }
                                         if (!file_path.isEmpty()) break;
                                     }
-									if (!file_path.isEmpty()) break;
-								}
-								if (file_path.isEmpty()) {
-									LOG_WARN("Failed to get file path by gid:{}", gid)
-									return task_info;
-								}
-								task_info.set_task_download_speed(download_speed);
-								task_info.set_task_id(task_id);
-								task_info.set_task_current_size(completed_length);
-								task_info.set_task_total_size(totalLength);
-								task_info.set_task_connections(connections);
-								task_info.set_task_file_name(QFileInfo(file_path).fileName());
-								task_info.set_task_save_path(file_path);
-                                task_info.set_task_download_link(download_url);
-								if (status == "active") {
-									task_info.set_task_state(TaskState::kActive);
-								}
-								else if (status == "waiting") {
-									task_info.set_task_state(TaskState::kWaiting);
-								}
-								else if (status == "complete") {
-									task_info.set_task_state(TaskState::kComplete);
-								}
-								else if (status == "paused") {
-									task_info.set_task_state(TaskState::kPause);
-								}
-								else if (status == "error") {
-									task_info.set_task_state(TaskState::kError);
-								}
-								else if (status == "removed") {
-									task_info.set_task_state(TaskState::kRemoved);
-								}
-								else {
-									LOG_WARN("Unknown state type: {}", status);
+                                    if (!file_path.isEmpty()) break;
                                 }
+                                if (file_path.isEmpty()) {
+                                    LOG_WARN("Failed to get file path by gid:{}", gid)
+                                    return task_info;
+                                }
+                                task_info.set_task_download_speed(download_speed);
+                                task_info.set_task_id(task_id);
+                                task_info.set_task_current_size(completed_length);
+                                task_info.set_task_total_size(totalLength);
+                                task_info.set_task_connections(connections);
+                                task_info.set_task_file_name(QFileInfo(file_path).fileName());
+                                task_info.set_task_save_path(file_path);
+                                task_info.set_task_download_link(download_url);
+                                if (status == "active") {
+                                    task_info.set_task_state(TaskState::kActive);
+                                }
+                                else if (status == "waiting") {
+                                    task_info.set_task_state(TaskState::kWaiting);
+                                }
+                                else if (status == "complete") {
+                                    task_info.set_task_state(TaskState::kComplete);
+                                }
+                                else if (status == "paused") {
+                                    task_info.set_task_state(TaskState::kPause);
+                                }
+                                else if (status == "error") {
+                                    task_info.set_task_state(TaskState::kError);
+                                }
+                                else if (status == "removed") {
+                                    task_info.set_task_state(TaskState::kRemoved);
+                                }
+                                else {
+                                    LOG_WARN("Unknown state type: {}", status);
+								}
 							}
-						}
-						else {
-							LOG_INFO("TellStatus result parse fail {}", res->body);
-						}
-					} catch (std::exception& e) {
-						LOG_ERR("{}", e.what())
+                        }
+                        else {
+                            LOG_INFO("TellStatus result parse fail {}", res->body);
+                        }
+                    } catch (std::exception& e) {
+                        LOG_ERR("{}", e.what())
 					}
-				}
-				return task_info;
-			}
+                }
+                return task_info;
+            }
 
-			void RegisterTypes(QQmlEngine* engine) {
-				qmlRegisterSingletonInstance<BrowserManager>(GEXPORT_MODULE_URL, 1, 0, "BrowserManager",
-															 &BrowserManager::Instance());
-				const QString app_path = QCoreApplication::applicationDirPath();
-				QString aria2c_engine_path;
+            void RegisterTypes(QQmlEngine* engine) {
+                qmlRegisterSingletonInstance<BrowserManager>(GEXPORT_MODULE_URL, 1, 0, "BrowserManager",
+                                                             &BrowserManager::Instance());
+                const QString app_path = QCoreApplication::applicationDirPath();
+                QString aria2c_engine_path;
 #ifdef __APPLE__
-				QString app_path_dir =
-					QString::fromStdString(std::filesystem::path(app_path.toStdString()).parent_path().string());
-				aria2c_engine_path = app_path_dir + "/Resources/engine/aria2c";
+                QString app_path_dir =
+                    QString::fromStdString(std::filesystem::path(app_path.toStdString()).parent_path().string());
+                aria2c_engine_path = app_path_dir + "/Resources/engine/aria2c";
 #elif _WIN32 || defined(_WIN64)
-				aria2c_engine_path = app_path + "/engine/aria2c.exe";
+                aria2c_engine_path = app_path + "/engine/aria2c.exe";
 #else
-				aria2c_engine_path = app_path + "/engine/aria2c";
+                aria2c_engine_path = app_path + "/engine/aria2c";
 #endif
-				gdl::engine::Aria2cDownloadManager::Instance().InitAria2cEngine(aria2c_engine_path.toStdString());
-				BrowserManager::Instance().Init();
-			}
+                gdl::engine::Aria2cDownloadManager::Instance().InitAria2cEngine(aria2c_engine_path.toStdString());
+                BrowserManager::Instance().Init();
+            }
 
-		}  // namespace browser
-	}  // namespace ui
+        }  // namespace browser
+    }  // namespace ui
 }  // namespace gdl

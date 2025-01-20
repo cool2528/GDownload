@@ -13,6 +13,7 @@ namespace gdl {
 		namespace utils {
 #if defined(__APPLE__)
 			void hideWindowStandardButtons(WId wid);
+            void setTaskbarProgress(double progress);
 #endif
 			class UtilsToolsManager : public QObject, public Singleton<UtilsToolsManager> {
 				Q_OBJECT
@@ -23,6 +24,8 @@ namespace gdl {
 				Q_INVOKABLE void HideMacOsxWindowStandardButtons(QQuickWindow* window);
 #endif
                 Q_INVOKABLE bool SetClipboardText(const QString& text);
+
+                Q_INVOKABLE void SetTaskbarProgress(double progress, void* nativeWindowHandle = nullptr);
 
 			   private:
 				explicit UtilsToolsManager(QObject* parent = nullptr);
