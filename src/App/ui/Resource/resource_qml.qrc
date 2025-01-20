@@ -27,5 +27,7 @@
         <file>qml/Browser/LabSettingPage.qml</file>
         <file>qml/CommonComponents/ThemeSwitch.qml</file>
         <file>qml/CommonComponents/ThemeButton.qml</file>
+        <file>qml/CommonComponents/GButtonSwitch.qml</file>
+        <file>qml/CommonComponents/GComBoBox.qml</file>
     </qresource>
 </RCC>

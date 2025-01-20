@@ -7,6 +7,7 @@ import "../Utils/utils.js" as Utils
 Item {
     id:folderSelector
     property string path:""
+    signal actived
     TextField {
         id: textField
         anchors.left: parent.left
@@ -84,7 +85,11 @@ Item {
        id:folderDialog
        folder: Qt.resolvedUrl(path)
        onAccepted: {
-           path = Utils.urlToLocalPath(folder)
+           if(folderDialog.folder !== ""){
+               folderSelector.path = Utils.urlToLocalPath(folderDialog.folder)
+           }
+           folder = Qt.binding(function(){Qt.resolvedUrl(folderSelector.path)})
+          folderSelector.actived()
        }
    }
 }
