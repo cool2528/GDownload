@@ -2,13 +2,29 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import gdl.sdk
-Rectangle{
+Control{
     id:downloadView
     property alias model: listViewdownload.model
     property int pageType: -1 // 0 downloadPage 1 waitingPage  2 completedPage
     width: parent.width
     height: parent.height
-    color: GTheme.dark ? "#2e2e2e" :"#ffffff"
+    background: Rectangle{
+        color: GTheme.dark ? "#2e2e2e" :"#ffffff"
+        Item {
+            anchors.fill: parent
+            opacity: listViewdownload.count > 0 ? 0 : 1
+            onOpacityChanged: {
+                console.log("page_background opacity ",opacity)
+            }
+            Image {
+                id: backgroundImage
+                anchors.centerIn: parent
+                source: "/images/browser/no-task.svg"
+            }
+        }
+
+    }
+
     ScrollView{
         id:scroView
         ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
@@ -99,7 +115,7 @@ Rectangle{
                                             BrowserManager.UnpauseTask(0,model.taskId)
                                         }else if(downloadView.pageType == 1){
                                             //
-                                             BrowserManager.UnpauseTask(1,model.taskId)
+                                            BrowserManager.UnpauseTask(1,model.taskId)
                                         }else if(downloadView.pageType == 2){
                                             //
                                             Qt.openUrlExternally(model.savePath)
@@ -123,7 +139,7 @@ Rectangle{
                                             BrowserManager.PauseTask(0,model.taskId)
                                         }else if(downloadView.pageType == 1){
                                             //
-                                               BrowserManager.PauseTask(1,model.taskId)
+                                            BrowserManager.PauseTask(1,model.taskId)
                                         }else if(downloadView.pageType == 2){
                                             //
                                         }

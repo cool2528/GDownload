@@ -23,5 +23,6 @@
         <file>images/theme/theme-auto@2x.png</file>
         <file>images/theme/theme-dark@2x.png</file>
         <file>images/theme/theme-light@2x.png</file>
+        <file>images/browser/no-task.svg</file>
     </qresource>
 </RCC>

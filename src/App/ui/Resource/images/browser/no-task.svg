@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="504" height="309" viewBox="0 0 504 309">
+  <defs>
+    <!-- 渐变定义 -->
+    <linearGradient id="gradient-a" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#5B5AEA" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#E7D1AF" stop-opacity="0.2"/>
+    </linearGradient>
+    <linearGradient id="gradient-b" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#6D6D6D" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#1B1B1B" stop-opacity="0.2"/>
+    </linearGradient>
+    <linearGradient id="gradient-c" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#BBB" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#1B1B1B" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 动态线条 -->
+  <g transform="translate(50 100)">
+    <path d="M0 0Q50 30 100 0T200 0" fill="none" stroke="url(#gradient-a)" stroke-width="3" stroke-linecap="round"/>
+    <path d="M0 20Q50 50 100 20T200 20" fill="none" stroke="url(#gradient-b)" stroke-width="2" stroke-linecap="round"/>
+    <path d="M0 40Q50 70 100 40T200 40" fill="none" stroke="url(#gradient-c)" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- 下载箭头 -->
+  <g transform="translate(200 150)">
+    <!-- 箭头主体 -->
+    <path d="M0 0L50 50L100 0" fill="none" stroke="url(#gradient-a)" stroke-width="4" stroke-linecap="round"/>
+    <!-- 底座 -->
+    <rect x="30" y="60" width="40" height="10" fill="url(#gradient-b)" rx="5"/>
+  </g>
+
+  <!-- 云存储图标 -->
+  <g transform="translate(300 50)">
+    <!-- 云主体 -->
+    <path d="M50 20C60 20 70 30 70 40C80 40 90 50 90 60C90 70 80 80 70 80H30C20 80 10 70 10 60C10 50 20 40 30 40C30 30 40 20 50 20Z" fill="url(#gradient-a)"/>
+    <!-- 云阴影 -->
+    <path d="M50 20C60 20 70 30 70 40C80 40 90 50 90 60C90 70 80 80 70 80H30C20 80 10 70 10 60C10 50 20 40 30 40C30 30 40 20 50 20Z" fill="none" stroke="url(#gradient-b)" stroke-width="2"/>
+  </g>
+
+  <!-- 文件图标 -->
+  <g transform="translate(400 200)">
+    <!-- 文件主体 -->
+    <rect x="0" y="0" width="60" height="80" fill="url(#gradient-a)" rx="5"/>
+    <!-- 文件标签 -->
+    <rect x="10" y="10" width="40" height="10" fill="url(#gradient-b)" rx="2"/>
+    <!-- 文件内容 -->
+    <rect x="10" y="30" width="40" height="40" fill="url(#gradient-c)" rx="2"/>
+  </g>
+
+  <!-- 光影效果 -->
+  <g transform="translate(100 200)">
+    <circle cx="50" cy="50" r="40" fill="none" stroke="url(#gradient-a)" stroke-width="4" stroke-dasharray="8 8"/>
+    <circle cx="50" cy="50" r="30" fill="none" stroke="url(#gradient-b)" stroke-width="3" stroke-dasharray="6 6"/>
+    <circle cx="50" cy="50" r="20" fill="none" stroke="url(#gradient-c)" stroke-width="2" stroke-dasharray="4 4"/>
+  </g>
+</svg>

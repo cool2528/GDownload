@@ -4,6 +4,7 @@
 #include <QVariantMap>
 #include "Aria2CManager/aria2c_http_rpc_client.h"
 #include "Aria2CManager/aria2c_manager.h"
+#include "Parser/file_preview_model.h"
 #include "download_task_model.h"
 #include "singleton.hpp"
 class QQmlEngine;
@@ -69,6 +70,7 @@ namespace gdl {
                 Q_INVOKABLE bool RemoveAllStopTask(bool is_remove_file = true) const;
 
                 Q_INVOKABLE void RefreshTaskList(int page_index);
+                Q_INVOKABLE parser::FilePreviewModel* GetFilePreviewModel(const QString& file_path);
 				bool Init();
 				void UnInit();
 

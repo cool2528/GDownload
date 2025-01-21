@@ -8,6 +8,7 @@
 #include <nlohmann/json.hpp>
 #include "Aria2CManager/engine_def.h"
 #include "Definitions/appDef.h"
+#include "Parser/file_parser.h"
 #include "logger.h"
 #include "utils/utils.h"
 namespace gdl {
@@ -67,11 +68,53 @@ namespace gdl {
 			}
 
 			bool BrowserManager::AddTorrentTask(const QString& tarrent, const QVariantMap& options) {
-				return false;
+                std::unordered_multimap<std::string, std::string> opt;
+                for (auto it = options.cbegin(); it != options.cend(); ++it) {
+                    auto key   = it.key();
+                    auto value = it.value().toString();
+                    opt.emplace(key.toStdString(), value.toStdString());
+                }
+                if (!QFile::exists(tarrent)) return false;
+				// 读取tarrent文件到base64
+				QFile file(tarrent);
+				if (!file.open(QIODevice::ReadOnly)) return false;
+				QByteArray data = file.readAll();
+				file.close();
+				std::string base64_data = data.toBase64().toStdString();
+
+                auto res = engine::Aria2cDownloadManager::Instance().AddTorrentTask(base64_data, opt);
+                if (res.HasError()) {
+                    LOG_ERR("Failed to add Torrent download task Download address {} error {}", tarrent.toStdString(),
+                            res.GetError().what());
+                    return false;
+                }
+
+                return true;
 			}
 
 			bool BrowserManager::AddMetalinkTask(const QString& metalink, const QVariantMap& options) {
-				return false;
+                std::unordered_multimap<std::string, std::string> opt;
+                for (auto it = options.cbegin(); it != options.cend(); ++it) {
+                    auto key   = it.key();
+                    auto value = it.value().toString();
+                    opt.emplace(key.toStdString(), value.toStdString());
+                }
+                if (!QFile::exists(metalink)) return false;
+                // 读取metalink文件到base64
+                QFile file(metalink);
+                if (!file.open(QIODevice::ReadOnly)) return false;
+                QByteArray data = file.readAll();
+                file.close();
+                std::string base64_data = data.toBase64().toStdString();
+
+                auto res = engine::Aria2cDownloadManager::Instance().AddMetalinkTask(base64_data, opt);
+                if (res.HasError()) {
+                    LOG_ERR("Failed to add metalink download task Download address {} error {}", metalink.toStdString(),
+                            res.GetError().what());
+                    return false;
+                }
+
+                return true;
 			}
 
             bool BrowserManager::PauseTask(int page_index, const QString& gid) {
@@ -397,6 +440,49 @@ namespace gdl {
                 else {
                     LOG_ERR("RefreshTaskList error: page_index is invalid");
                 }
+            }
+
+            parser::FilePreviewModel* BrowserManager::GetFilePreviewModel(const QString& file_path) {
+                QFileInfo file_info(file_path);
+                if (!file_info.exists()) return nullptr;
+                const auto suffix = file_info.suffix().toLower();
+                if (suffix == "torrent") {
+                    parser::TorrentParser torrent;
+                    if (!torrent.Parse(file_path)) {
+                        return nullptr;
+                    }
+                    parser::FilePreviewModel* file_preview_model = new parser::FilePreviewModel();
+                    auto file_list_info							 = torrent.GetTorrentInfo();
+                    QVector<parser::PreviewFileInfo> file_model_list;
+                    for (const auto& file : file_list_info.files) {
+                        parser::PreviewFileInfo info;
+                        info.file_name		= file.file_name;
+                        info.file_extension = QFileInfo(file.file_path).suffix();
+                        info.file_size		= parser::PreviewFileInfo::FormatFileSize(file.file_size);
+                        file_model_list.append(info);
+                    }
+                    file_preview_model->setFiles(file_model_list);
+                    return file_preview_model;
+                }
+                else if (suffix == "meta4" || suffix == "metalink") {
+                    parser::MetalinkParser metallink;
+                    if (!metallink.Parse(file_path)) {
+                        return nullptr;
+                    }
+                    parser::FilePreviewModel* file_preview_model = new parser::FilePreviewModel();
+                    auto file_list_info							 = metallink.GetMetalinkInfo();
+                    QVector<parser::PreviewFileInfo> file_model_list;
+                    for (const auto& file : file_list_info.files) {
+                        parser::PreviewFileInfo info;
+                        info.file_name		= file.file_name;
+                        info.file_extension = QFileInfo(file.file_path).suffix();
+                        info.file_size		= parser::PreviewFileInfo::FormatFileSize(file.file_size);
+                        file_model_list.append(info);
+                    }
+                    file_preview_model->setFiles(file_model_list);
+                    return file_preview_model;
+                }
+                return nullptr;
             }
 
 			bool BrowserManager::Init() {

@@ -29,5 +29,6 @@
         <file>qml/CommonComponents/ThemeButton.qml</file>
         <file>qml/CommonComponents/GButtonSwitch.qml</file>
         <file>qml/CommonComponents/GComBoBox.qml</file>
+        <file>qml/CommonComponents/FilePreviewList.qml</file>
     </qresource>
 </RCC>
