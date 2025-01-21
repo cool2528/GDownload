@@ -48,6 +48,8 @@ find_package(FramelessHelper REQUIRED COMPONENTS Core Widgets Quick)
 find_package(boost_system CONFIG REQUIRED)
 find_package(boost_property_tree CONFIG REQUIRED)
 find_package(boost_asio CONFIG REQUIRED)
+find_package(LibtorrentRasterbar CONFIG REQUIRED)
+find_package(pugixml CONFIG REQUIRED)
 list(APPEND QML_IMPORT_PATH "${FRAMELESSHELPER_IMPORT_DIR}")
 list(REMOVE_DUPLICATES QML_IMPORT_PATH)
 set(QML_IMPORT_PATH ${QML_IMPORT_PATH} CACHE STRING "Qt Creator extra QML import paths" FORCE)
@@ -126,7 +128,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system)
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::property_tree)
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::asio)
-
+target_link_libraries(${PROJECT_NAME} PRIVATE LibtorrentRasterbar::torrent-rasterbar pugixml::shared pugixml::pugixml)
 if(WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE 
         UNICODE 

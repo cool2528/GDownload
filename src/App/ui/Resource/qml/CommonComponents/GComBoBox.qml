@@ -35,6 +35,11 @@ ComboBox {
             function onPressedChanged() { canvas.requestPaint(); }
         }
 
+        Connections {
+            target: GTheme
+            function onDarkChanged() { canvas.requestPaint(); }
+        }
+
         onPaint: {
             context.reset();
             context.moveTo(0, 0);
@@ -43,7 +48,7 @@ ComboBox {
             context.closePath();
             context.fillStyle = GTheme.dark ? 
                 (control.pressed ? "#808080" : "#ffffff") :
-                (control.pressed ? "#4141e9" : "#5151f9")
+                (control.pressed ? "#666666" : "#55575b")
             context.fill();
         }
     }

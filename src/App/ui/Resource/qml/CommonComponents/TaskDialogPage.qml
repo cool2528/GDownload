@@ -113,7 +113,8 @@ Popup {
                     currentIndex: tabTitle.currentIndex
                     Layout.margins: 10
                     Layout.rightMargin: 20
-                    height: 120
+                    height: 200
+
                     Rectangle{
                         id:linkingPage
                         color: GTheme.dark ? "#2e2e2e" : "#ffffff"
@@ -138,16 +139,33 @@ Popup {
                         id:seedPage
                         GDropArea{
                             anchors.fill: parent
+                            visible: true
                             id:dropTorent
+                            onAccepted: {
+                                let model =  BrowserManager.GetFilePreviewModel(dropTorent.path)
+                                if(model){
+                                    dropTorent.visible = false
+                                    filePreview.previewModel = model
+                                }
+                            }
                         }
-
+                        FilePreviewList {
+                            id: filePreview
+                            anchors.fill: parent
+                            visible: !dropTorent.visible
+                            onClearRequested: {
+                                filePreview.previewModel.clear()
+                                filePreview.previewModel = null
+                                dropTorent.visible = true
+                            }
+                        }
                         color: GTheme.dark ? "#2e2e2e" : "#ffffff"
                     }
                     function geturls(){
                         if(currentIndex === 0){
                             return Utils.splitPath(input.text)
                         }else{
-                           return [dropTorent.path]
+                            return [dropTorent.path]
                         }
 
                     }

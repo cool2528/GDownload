@@ -3,9 +3,11 @@ import QtQuick
 import QtQuick.Controls
 import Qt.labs.platform
 import gdl.sdk
+import "../Utils/utils.js" as Utils
 Item {
     id: control
     property string path: ""
+    signal accepted()
     Rectangle {
         id: dropArea
         property bool hoverd: false
@@ -90,14 +92,15 @@ Item {
     FileDialog {
         id: fileDialog
         title: "Please choose a torrent file"
-        nameFilters: ["Torrent files (*.torrent)"]
+        nameFilters: ["Torrent files (*.torrent)","Metalink Files (*.metalink)","Meta4 Files (*.meta4)"]
         onAccepted: {
-            handleFile(fileDialog.selectedFile)
+            handleFile(fileDialog.currentFile)
         }
     }
 
     function handleFile(fileUrl) {
-        path = fileUrl
-        console.log("Processing file:", fileUrl)
+        path = Utils.urlToLocalPath(fileUrl)
+        console.log("Processing file:", path)
+        control.accepted()
     }
 }
