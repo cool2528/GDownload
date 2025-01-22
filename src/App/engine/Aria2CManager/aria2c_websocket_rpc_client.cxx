@@ -66,6 +66,7 @@ namespace gdl {
 			nlohmann::json params = nlohmann::json::array();
 			params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			params.push_back(torrent);
+            params.push_back(nlohmann::json::array());
 			params.push_back(options);
 			return Send("aria2.addTorrent", params);
 		}
@@ -305,6 +306,7 @@ namespace gdl {
 				return MakeFail(static_cast<std::int64_t>(gdl::ErrorType::kUnknownError));
 			}
 			const auto data = doc.dump();
+            //LOG_DBG("Send: {}", data);
 			return websocket_->send(data);
 		}
 

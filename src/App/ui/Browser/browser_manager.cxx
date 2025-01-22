@@ -233,8 +233,17 @@ namespace gdl {
                 return false;
 			}
 
-			bool BrowserManager::RemoveTask(const QString& gid) {
+            bool BrowserManager::RemoveTask(int page_index, const QString& gid) {
 				if (gid.isEmpty()) return false;
+                if (page_index != 0 || page_index != 1) {
+                    return false;
+                }
+                if (active_model_) {
+                    active_model_->RemoveTaskById(gid);
+                }
+                if (waiting_model_) {
+                    waiting_model_->RemoveTaskById(gid);
+                }
 				const auto res = engine::Aria2cDownloadManager::Instance()
 									 .CallAria2cMethod(engine::Aria2Method::kRemove, gid.toStdString())
 									 .IsOk();
@@ -257,7 +266,7 @@ namespace gdl {
                                 continue;
                             }
                             QString save_path = task_info->task_save_path();
-                            RemoveTask(task);
+                            RemoveTask(page_index, task);
                             if (is_remove_file && QFile::exists(save_path)) {
                                 QFile::remove(save_path);
                             }
@@ -273,7 +282,7 @@ namespace gdl {
                                 continue;
                             }
                             QString save_path = task_info->task_save_path();
-                            RemoveTask(task);
+                            RemoveTask(page_index, task);
                             if (is_remove_file && QFile::exists(save_path)) {
                                 QFile::remove(save_path);
                             }
@@ -730,6 +739,7 @@ namespace gdl {
 					else if (doc.find("error") != doc.end()) {
 						// error message
 						auto error_object = doc["error"];
+                        LOG_ERR("OnHandleAria2Message  error {}", error_object.dump());
 						if (error_object.is_object() && error_object.find("message") != error_object.end()) {
 							QString error_message = QString::fromStdString(error_object["message"].get<std::string>());
 							Q_EMIT sigErrorMessage(error_message);

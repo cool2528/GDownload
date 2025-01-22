@@ -47,7 +47,7 @@ namespace gdl {
 
                 Q_INVOKABLE bool UnpauseAllTask(int page_index);
 
-				Q_INVOKABLE bool RemoveTask(const QString& gid);
+                Q_INVOKABLE bool RemoveTask(int page_index, const QString& gid);
 
                 Q_INVOKABLE bool RemoveAllTask(int page_index, bool is_remove_file = true);
 

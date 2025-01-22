@@ -97,9 +97,9 @@ namespace gdl {
 
             QStringList FilePreviewModel::getSelectedFiles() const {
                 QStringList result;
-                for (const auto& file : files_) {
-                    if (file.is_selected) {
-                        result.append(file.file_name);
+                for (int i = 0; i < files_.size(); ++i) {
+                    if (files_[i].is_selected) {
+                        result << QString::number(i + 1);
                     }
                 }
                 return result;

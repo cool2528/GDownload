@@ -114,7 +114,7 @@ Popup {
                     Layout.margins: 10
                     Layout.rightMargin: 20
                     height: 200
-
+                    property int urlType: 0
                     Rectangle{
                         id:linkingPage
                         color: GTheme.dark ? "#2e2e2e" : "#ffffff"
@@ -163,11 +163,28 @@ Popup {
                     }
                     function geturls(){
                         if(currentIndex === 0){
+                            taskPageLayout.urlType = 0
                             return Utils.splitPath(input.text)
                         }else{
-                            return [dropTorent.path]
+                            taskPageLayout.urlType = 1
+                            let ext = dropTorent.path.split('.').pop()
+                            if(ext === "metalink" || ext === "meta4"){
+                                taskPageLayout.urlType = 1
+                            }else{
+                                taskPageLayout.urlType = 2
+                            }
+                            return dropTorent.path
                         }
+                    }
 
+                    function getOptions(){
+                        let options = {}
+                        if(currentIndex === 0){
+                        }else{
+                            let select_files = filePreview.previewModel.getSelectedFiles()
+                            options["select-file"] = select_files.join()
+                        }
+                         return options
                     }
                 }
 
@@ -329,7 +346,17 @@ Popup {
                         Layout.preferredWidth: 70
                         text: qsTr("Submit")
                         onClicked: {
-                            BrowserManager.AddHttpTask(taskPageLayout.geturls(),{})
+                            let url = taskPageLayout.geturls()
+                            let options = taskPageLayout.getOptions()
+                            if(taskPageLayout.urlType === 0)
+                            {
+                                BrowserManager.AddHttpTask(url,options)
+                            }else if(taskPageLayout.urlType === 1){
+                                BrowserManager.AddMetalinkTask(url,options)
+                            }else if(taskPageLayout.urlType === 2){
+                                BrowserManager.AddTorrentTask(url,options)
+                            }
+
                             taskPage.close()
                         }
                     }

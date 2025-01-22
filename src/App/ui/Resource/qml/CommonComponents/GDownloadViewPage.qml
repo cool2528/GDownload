@@ -155,9 +155,9 @@ Control{
                                     iconColor:GTheme.dark ? mouse.hovered ? "#ffffff" : "#7c7c7c": mouse.hovered ? "#ffffff" : "#acacac"
                                     onClicked: {
                                         if(downloadView.pageType == 0){
-                                            BrowserManager.RemoveTask(model.taskId)
+                                            BrowserManager.RemoveTask(0,model.taskId)
                                         }else if(downloadView.pageType == 1){
-                                            //
+                                            BrowserManager.RemoveTask(1,model.taskId)
                                         }else if(downloadView.pageType == 2){
                                             //
                                             BrowserManager.RemoveStopTask(model.taskId)

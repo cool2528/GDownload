@@ -78,7 +78,10 @@ namespace gdl {
 				void set_task_id(const QString& task_id) { task_id_ = task_id; }
 				void set_task_state(TaskState state) { task_state_ = state; }
 				void set_task_file_name(const QString& file_name) { task_file_name_ = file_name; }
-				void set_task_save_path(const QString& save_path) { task_save_path_ = save_path; }
+                void set_task_save_path(const QString& save_path) {
+                    task_save_path_ = save_path;
+                    task_save_path_ = task_save_path_.replace("//", "/");
+                }
 				void set_task_download_link(const QString& link) {
 					if (link.isEmpty()) return;
 					task_download_link_ = link;
