@@ -113,7 +113,7 @@ Item{
 
     function addDownloadTask(){
         let component = Qt.createComponent("qrc:/qml/CommonComponents/TaskDialogPage.qml")
-        if(component.status == Component.Error){
+        if(component.status === Component.Error){
             console.error("Error loading component:", component.errorString());
             return null;
         }

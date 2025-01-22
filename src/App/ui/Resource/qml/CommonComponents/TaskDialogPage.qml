@@ -179,12 +179,33 @@ Popup {
 
                     function getOptions(){
                         let options = {}
-                        if(currentIndex === 0){
-                        }else{
+                        if(renameEdit.text.length > 0){
+                            options["out"] = renameEdit.text
+                        }
+                        if(spinbox.value > 0){
+                            options["max-concurrent-downloads"] = String("%1").arg(spinbox.value)
+                        }
+                        if(savePath.path.length > 0){
+                            options["dir"] = savePath.path
+                        }
+                        if(userAgent.text.length > 0){
+                            options["user-agent"] = userAgent.text
+                        }
+                        if(authorization.text.length > 0){
+                            options["http-auth-challenge"] = "true"
+                            options["--header"] = String("Authorization: %1").arg(authorization.text)
+                        }
+                        if(cookie.text.length > 0){
+                            options["header"] = String("Cookie: %1").arg(cookie.text)
+                        }
+                        if(referrer.text.length > 0){
+                            options["referer"] = referrer.text
+                        }
+                        if(currentIndex === 1){
                             let select_files = filePreview.previewModel.getSelectedFiles()
                             options["select-file"] = select_files.join()
                         }
-                         return options
+                        return options
                     }
                 }
 
@@ -267,6 +288,7 @@ Popup {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                         }
                         GTextField {
+                            id: userAgent
                             Layout.fillWidth: true
                             Layout.preferredHeight: 30
                             placeholderText: qsTr("User-Agent")
@@ -279,6 +301,7 @@ Popup {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                         }
                         GTextField {
+                            id: authorization
                             Layout.fillWidth: true
                             Layout.preferredHeight: 30
                             placeholderText: qsTr("Authorization")
@@ -291,6 +314,7 @@ Popup {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                         }
                         GTextField {
+                            id: referrer
                             Layout.fillWidth: true
                             Layout.preferredHeight: 30
                             placeholderText: qsTr("Referer")
@@ -303,6 +327,7 @@ Popup {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                         }
                         GTextField {
+                            id: cookie
                             Layout.fillWidth: true
                             Layout.preferredHeight: 30
                             placeholderText: qsTr("Cookie")

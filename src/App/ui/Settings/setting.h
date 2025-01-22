@@ -2,6 +2,7 @@
 #include <qvariant.h>
 #include <QHash>
 #include <QObject>
+#include <QRect>
 #include <QSize>
 #include <nlohmann/json.hpp>
 namespace gdl {
@@ -301,7 +302,7 @@ namespace gdl {
                 value_ = "";
             }
             void Put(const QVariant& value) override {
-				value_ = value.toString();
+                value_ = value.toString();
             }
             VALUE_TYPE Get() const {
                 return value_;
@@ -326,6 +327,190 @@ namespace gdl {
                 return value_ ? "true" : "false";
             }
             SETTING_IMP_END(IsSaveSession)
+
+            //EnableGlobalProxy
+            SETTING_IMP_BEGIN(EnableGlobalProxy, "aria2c.enable-global-proxy", bool)
+            void Default() override {
+                value_ = false;
+            }
+            void Put(const QVariant& value) override {
+                value_ = value.toString() == "true" || value.toString() == "1";
+            }
+            VALUE_TYPE Get() const {
+                return value_;
+            }
+            QString ToString() override {
+                return value_ ? "true" : "false";
+            }
+            SETTING_IMP_END(EnableGlobalProxy)
+
+            //GlobalProxy
+            SETTING_IMP_BEGIN(GlobalProxy, "aria2c.global-proxy", QString)
+            void Default() override {
+                value_ = "";
+            }
+            void Put(const QVariant& value) override {
+				value_ = value.toString();
+            }
+            VALUE_TYPE Get() const {
+                return value_;
+            }
+            QString ToString() override {
+                return value_;
+            }
+            SETTING_IMP_END(GlobalProxy)
+
+            // ListenClipboard
+            SETTING_IMP_BEGIN(ListenClipboard, "general.listen-clipboard", bool)
+            void Default() override {
+                value_ = true;
+            }
+            void Put(const QVariant& value) override {
+                value_ = value.toString() == "true" || value.toString() == "1";
+            }
+            VALUE_TYPE Get() const {
+                return value_;
+            }
+            QString ToString() override {
+                return value_ ? "true" : "false";
+            }
+            SETTING_IMP_END(ListenClipboard)
+
+            // AutoResumeTask
+            SETTING_IMP_BEGIN(AutoResumeTask, "aria2c.auto-resume-task", bool)
+            void Default() override {
+                value_ = false;
+            }
+            void Put(const QVariant& value) override {
+                value_ = value.toString() == "true" || value.toString() == "1";
+            }
+            VALUE_TYPE Get() const {
+                return value_;
+            }
+            QString ToString() override {
+                return value_ ? "true" : "false";
+            }
+            SETTING_IMP_END(AutoResumeTask)
+
+            //AutoStart
+            SETTING_IMP_BEGIN(AutoStart, "general.auto-start", bool)
+            void Default() override {
+                value_ = false;
+            }
+            void Put(const QVariant& value) override {
+                value_ = value.toString() == "true" || value.toString() == "1";
+            }
+            VALUE_TYPE Get() const {
+                return value_;
+            }
+
+            QString ToString() override {
+                return value_ ? "true" : "false";
+            }
+            SETTING_IMP_END(AutoStart)
+
+            //RememberWindowPosition
+            SETTING_IMP_BEGIN(RememberWindowPosition, "general.remember-window-position", bool)
+            void Default() override {
+                value_ = true;
+            }
+
+            void Put(const QVariant& value) override {
+                value_ = value.toString() == "true" || value.toString() == "1";
+            }
+            VALUE_TYPE Get() const {
+                return value_;
+            }
+            QString ToString() override {
+                return value_ ? "true" : "false";
+            }
+            SETTING_IMP_END(RememberWindowPosition)
+
+            // WindowPosition
+            SETTING_IMP_BEGIN(WindowPosition, "general.window-position", QPoint)
+            void Default() override {
+                value_ = QPoint(0, 0);
+            }
+            void Put(const QVariant& value) override {
+                // 这里传进来的永远是QString 所以需要转换
+                QString str		 = value.toString();
+                QStringList list = str.split(",");
+                if (list.size() == 2) {
+                    value_ = QPoint(list[0].toInt(), list[1].toInt());
+                }
+            }
+            VALUE_TYPE Get() const {
+                return value_;
+            }
+            QString ToString() override {
+                return QString("%1,%2").arg(value_.x()).arg(value_.y());
+            }
+            SETTING_IMP_END(WindowPosition)
+
+            // EnableTrayIcon
+            SETTING_IMP_BEGIN(EnableTrayIcon, "general.enable-tray-icon", bool)
+            void Default() override {
+                value_ = true;
+            }
+            void Put(const QVariant& value) override {
+                value_ = value.toString() == "true" || value.toString() == "1";
+            }
+            VALUE_TYPE Get() const {
+                return value_;
+            }
+            QString ToString() override {
+                return value_ ? "true" : "false";
+            }
+            SETTING_IMP_END(EnableTrayIcon)
+
+            // EnableNotification
+            SETTING_IMP_BEGIN(EnableNotification, "general.enable-notification", bool)
+            void Default() override {
+                value_ = true;
+            }
+            void Put(const QVariant& value) override {
+                value_ = value.toString() == "true" || value.toString() == "1";
+            }
+            VALUE_TYPE Get() const {
+                return value_;
+            }
+            QString ToString() override {
+                return value_ ? "true" : "false";
+            }
+            SETTING_IMP_END(EnableNotification)
+
+            // EnableAutoShutdown
+            SETTING_IMP_BEGIN(EnableAutoShutdown, "general.enable-auto-shutdown", bool)
+            void Default() override {
+                value_ = false;
+            }
+            void Put(const QVariant& value) override {
+                value_ = value.toString() == "true" || value.toString() == "1";
+            }
+
+            VALUE_TYPE Get() const {
+                return value_;
+            }
+            QString ToString() override {
+                return value_ ? "true" : "false";
+            }
+            SETTING_IMP_END(EnableAutoShutdown)
+
+            // EnableAutoUpdate
+            SETTING_IMP_BEGIN(EnableAutoUpdate, "general.enable-auto-update", bool)
+            void Default() override {
+                value_ = true;
+            }
+            void Put(const QVariant& value) override {
+                value_ = value.toString() == "true" || value.toString() == "1";
+            }
+            VALUE_TYPE Get() const {
+                return value_;
+            }
+            QString ToString() override {
+                return value_ ? "true" : "false";
+            }
+            SETTING_IMP_END(EnableAutoUpdate)
 
         }  // namespace settings
     }  // namespace ui
