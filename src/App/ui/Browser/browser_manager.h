@@ -29,11 +29,11 @@ namespace gdl {
 
 				Q_INVOKABLE DownloadTaskModel* GetWaitingDownloadModel();
 
-				Q_INVOKABLE bool AddHttpTask(const QVariantList& urls, const QVariantMap& options);
+                Q_INVOKABLE bool AddHttpTask(const QVariantList& urls, const QVariantMap& options);
 
-				Q_INVOKABLE bool AddTorrentTask(const QString& tarrent, const QVariantMap& options);
+                Q_INVOKABLE bool AddTorrentTask(const QString& tarrent, const QVariantMap& options);
 
-				Q_INVOKABLE bool AddMetalinkTask(const QString& metalink, const QVariantMap& options);
+                Q_INVOKABLE bool AddMetalinkTask(const QString& metalink, const QVariantMap& options);
 
                 Q_INVOKABLE bool PauseTask(int page_index, const QString& gid);
 

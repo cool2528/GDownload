@@ -51,21 +51,79 @@ namespace gdl {
 			CONFIG_PATH(TrackerSourceUrls, "aria2c.tracker_source_urls", DEFAULT_TRACKER_SOURCE_URLS);
             CONFIG_PATH(SaveSession, "aria2c.save-session", "");
             CONFIG_PATH(IsSaveSession, "aria2c.is-save-session", "true");
+            CONFIG_PATH(EnableGlobalProxy, "aria2c.enable-global-proxy", "false");
+            CONFIG_PATH(GlobalProxy, "aria2c.global-proxy", "");
+            CONFIG_PATH(ListenClipboard, "general.listen-clipboard", "true");
+            CONFIG_PATH(AutoResumeTask, "aria2c.auto-resume-task", "true");
+            CONFIG_PATH(AutoStart, "general.auto-start", "false");
+            CONFIG_PATH(RememberWindowPosition, "general.remember-window-position", "true");
+            CONFIG_PATH(EnableTrayIcon, "general.enable-tray-icon", "true");
+            CONFIG_PATH(EnableNotification, "general.enable-notification", "true");
+            CONFIG_PATH(EnableAutoShutdown, "general.enable-auto-shutdown", "false");
+            CONFIG_PATH(EnableAutoUpdate, "general.enable-auto-update", "true");
+            CONFIG_PATH(WindowPosition, "general.window-position", "");
+
 			// static function all keys
 			static constexpr auto GetAllKeys() {
-				return ConfigKeys(std::array{WindowSize.get(), Theme.get(), Language.get(), BtExludeTracker.get(),
-                                             BtTracker.get(), Dir.get(), ListenPort.get(), RpcListenPort.get(),
-                                             Split.get(), UserAgent.get(), AllProxy.get(), DhtListenPort.get(),
-                                             MaxConcurrentDownloads.get(), ConfPath.get(), TrackerSourceUrls.get(),
-                                             SaveSession.get(), IsSaveSession.get()});
+                return ConfigKeys(std::array{WindowSize.get(),
+                                             Theme.get(),
+                                             Language.get(),
+                                             BtExludeTracker.get(),
+                                             BtTracker.get(),
+                                             Dir.get(),
+                                             ListenPort.get(),
+                                             RpcListenPort.get(),
+                                             Split.get(),
+                                             UserAgent.get(),
+                                             AllProxy.get(),
+                                             DhtListenPort.get(),
+                                             MaxConcurrentDownloads.get(),
+                                             ConfPath.get(),
+                                             TrackerSourceUrls.get(),
+                                             SaveSession.get(),
+                                             IsSaveSession.get(),
+                                             EnableGlobalProxy.get(),
+                                             GlobalProxy.get(),
+                                             ListenClipboard.get(),
+                                             AutoResumeTask.get(),
+                                             AutoStart.get(),
+                                             RememberWindowPosition.get(),
+                                             EnableTrayIcon.get(),
+                                             EnableNotification.get(),
+                                             EnableAutoShutdown.get(),
+                                             EnableAutoUpdate.get(),
+                                             WindowPosition.get()});
 			}
 			// static function all values
 			static constexpr auto GetAllValues() {
-				return ConfigKeys(std::array{WindowSize.val(), Theme.val(), Language.val(), BtExludeTracker.val(),
-                                             BtTracker.val(), Dir.val(), ListenPort.val(), RpcListenPort.val(),
-                                             Split.val(), UserAgent.val(), AllProxy.val(), DhtListenPort.val(),
-                                             MaxConcurrentDownloads.val(), ConfPath.val(), TrackerSourceUrls.val(),
-                                             SaveSession.val(), IsSaveSession.val()});
+                return ConfigKeys(std::array{WindowSize.val(),
+                                             Theme.val(),
+                                             Language.val(),
+                                             BtExludeTracker.val(),
+                                             BtTracker.val(),
+                                             Dir.val(),
+                                             ListenPort.val(),
+                                             RpcListenPort.val(),
+                                             Split.val(),
+                                             UserAgent.val(),
+                                             AllProxy.val(),
+                                             DhtListenPort.val(),
+                                             MaxConcurrentDownloads.val(),
+                                             ConfPath.val(),
+                                             TrackerSourceUrls.val(),
+                                             SaveSession.val(),
+                                             IsSaveSession.val(),
+                                             EnableGlobalProxy.val(),
+                                             GlobalProxy.val(),
+                                             ListenClipboard.val(),
+                                             AutoResumeTask.val(),
+                                             AutoStart.val(),
+                                             RememberWindowPosition.val(),
+                                             EnableTrayIcon.val(),
+                                             EnableNotification.val(),
+                                             EnableAutoShutdown.val(),
+                                             EnableAutoUpdate.val(),
+                                             WindowPosition.val()});
 			}
 		};
 	}  // namespace config

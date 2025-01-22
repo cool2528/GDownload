@@ -31,6 +31,17 @@ namespace gdl {
 				SETTING_PROPERTY(QString, TrackerSourceUrls)
                 SETTING_PROPERTY(QString, SaveSession)
                 SETTING_PROPERTY(bool, IsSaveSession)
+                SETTING_PROPERTY(bool, EnableGlobalProxy)
+                SETTING_PROPERTY(QString, GlobalProxy)
+                SETTING_PROPERTY(bool, ListenClipboard)
+                SETTING_PROPERTY(bool, AutoResumeTask)
+                SETTING_PROPERTY(bool, AutoStart)
+                SETTING_PROPERTY(bool, RememberWindowPosition)
+                SETTING_PROPERTY(bool, EnableTrayIcon)
+                SETTING_PROPERTY(bool, EnableNotification)
+                SETTING_PROPERTY(bool, EnableAutoShutdown)
+                SETTING_PROPERTY(bool, EnableAutoUpdate)
+                SETTING_PROPERTY(QPoint, WindowPosition)
 
                public:
                 ~Settings() override;

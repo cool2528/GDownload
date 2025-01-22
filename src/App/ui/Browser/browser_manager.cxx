@@ -44,30 +44,30 @@ namespace gdl {
 				return waiting_model_.get();
 			}
 
-			bool BrowserManager::AddHttpTask(const QVariantList& urls, const QVariantMap& options) {
-				std::unordered_multimap<std::string, std::string> opt;
-				for (auto it = options.cbegin(); it != options.cend(); ++it) {
-					auto key   = it.key();
-					auto value = it.value().toString();
-					opt.emplace(key.toStdString(), value.toStdString());
-				}
-				int count = 0;
-				for (const auto& url : urls) {
-					if (url.canConvert<QString>()) {
-						auto res =
-							engine::Aria2cDownloadManager::Instance().AddHttpTask(url.toString().toStdString(), opt);
-						if (res.HasError()) {
-							LOG_ERR("Failed to add HTTP download task Download address {} error {}",
-									url.toString().toStdString(), res.GetError().what());
-							continue;
-						}
-						count++;
-					}
-				}
-				return count > 0;
+            bool BrowserManager::AddHttpTask(const QVariantList& urls, const QVariantMap& options) {
+                std::unordered_multimap<std::string, std::string> opt;
+                for (auto it = options.cbegin(); it != options.cend(); ++it) {
+                    auto key   = it.key();
+                    auto value = it.value().toString();
+                    opt.emplace(key.toStdString(), value.toStdString());
+                }
+                int count = 0;
+                for (const auto& url : urls) {
+                    if (url.canConvert<QString>()) {
+                        auto res =
+                            engine::Aria2cDownloadManager::Instance().AddHttpTask(url.toString().toStdString(), opt);
+                        if (res.HasError()) {
+                            LOG_ERR("Failed to add HTTP download task Download address {} error {}",
+                                    url.toString().toStdString(), res.GetError().what());
+                            continue;
+                        }
+                        count++;
+                    }
+                }
+                return count > 0;
 			}
 
-			bool BrowserManager::AddTorrentTask(const QString& tarrent, const QVariantMap& options) {
+            bool BrowserManager::AddTorrentTask(const QString& tarrent, const QVariantMap& options) {
                 std::unordered_multimap<std::string, std::string> opt;
                 for (auto it = options.cbegin(); it != options.cend(); ++it) {
                     auto key   = it.key();
@@ -75,12 +75,12 @@ namespace gdl {
                     opt.emplace(key.toStdString(), value.toStdString());
                 }
                 if (!QFile::exists(tarrent)) return false;
-				// 读取tarrent文件到base64
-				QFile file(tarrent);
-				if (!file.open(QIODevice::ReadOnly)) return false;
-				QByteArray data = file.readAll();
-				file.close();
-				std::string base64_data = data.toBase64().toStdString();
+                // 读取tarrent文件到base64
+                QFile file(tarrent);
+                if (!file.open(QIODevice::ReadOnly)) return false;
+                QByteArray data = file.readAll();
+                file.close();
+                std::string base64_data = data.toBase64().toStdString();
 
                 auto res = engine::Aria2cDownloadManager::Instance().AddTorrentTask(base64_data, opt);
                 if (res.HasError()) {
@@ -92,7 +92,7 @@ namespace gdl {
                 return true;
 			}
 
-			bool BrowserManager::AddMetalinkTask(const QString& metalink, const QVariantMap& options) {
+            bool BrowserManager::AddMetalinkTask(const QString& metalink, const QVariantMap& options) {
                 std::unordered_multimap<std::string, std::string> opt;
                 for (auto it = options.cbegin(); it != options.cend(); ++it) {
                     auto key   = it.key();
