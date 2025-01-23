@@ -29,17 +29,24 @@ namespace gdl {
 					std::string value	= all_values[i].data();
 					auto child_optional = ptree_root_.get_optional<std::string>(key_path.data());
 					if (!child_optional.has_value()) {
-                        if (key_path == config::Keys::Dir.get() && value.empty()) {
-							value = os::GetUserDownloadsDir();
+                        if (key_path == config::Keys::Dir.get()) {
+							std::error_code ec;
+							if (value.empty() || !std::filesystem::exists(value,ec)) {
+								value = os::GetUserDownloadsDir();
+							}
 						}
-                        else if (key_path == config::Keys::ConfPath.get() && value.empty()) {
-							std::string conf_path;
+                        else if (key_path == config::Keys::ConfPath.get()) {
+							std::error_code ec;
+							if (value.empty() || !std::filesystem::exists(value,ec)) {
+								std::string conf_path;
 #ifdef __APPLE__
-							conf_path = os::GetExecutableDir() + "/../Resources/engine/aria2.conf";
+								conf_path = os::GetExecutableDir() + "/../Resources/engine/aria2.conf";
 #else
-							conf_path = os::GetExecutableDir() + "/engine/aria2.conf";
+								conf_path = os::GetExecutableDir() + "/engine/aria2.conf";
 #endif
-							value = conf_path;
+								value = conf_path;
+							}
+
 						}
                         else if (key_path == config::Keys::TrackerSourceUrls.get() && value.empty()) {
 							value = DEFAULT_TRACKER_SOURCE_URLS;
