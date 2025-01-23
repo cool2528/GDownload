@@ -71,4 +71,8 @@ namespace gdl {
 		spdlog::flush_on(spdlog::get_level());
 	}
 
+    LogLevel GetLoggerLevel() {
+        return static_cast<LogLevel>(spdlog::get_level());
+    }
+
 }  // namespace gdl

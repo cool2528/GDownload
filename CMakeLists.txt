@@ -46,6 +46,7 @@ if(APPLE)
 
 elseif(WIN32)
     set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/win")
+    add_compile_options(/EHsc)
 elseif(UNIX AND NOT APPLE)
     set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/linux")
 endif()

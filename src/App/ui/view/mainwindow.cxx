@@ -85,7 +85,9 @@ namespace gd {
 				const char* function = context.function ? context.function : "";
 				switch (type) {
 					case QtDebugMsg:
-						LOG_DBG("Debug: {} ({}, {}, {})", localMsg.constData(), file, context.line, function)
+#if defined(_DEBUG)
+                        LOG_DBG("Debug: {} ({}, {}, {})", localMsg.constData(), file, context.line, function)
+#endif
 						break;
 					case QtInfoMsg:
 						LOG_INFO("Info: {} ({}, {}, {})", localMsg.constData(), file, context.line, function)

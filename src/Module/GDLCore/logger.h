@@ -33,6 +33,7 @@ namespace gdl {
 	GDLCore_API void SetLoggerLevel(LogLevel level);
 	GDLCore_API void LogMessage(LogLevel level, const std::source_location& loc, const std::string& message);
 	GDLCore_API void LogMessage(LogLevel level, const std::string& message);
+    GDLCore_API LogLevel GetLoggerLevel();
 
 	template <typename... Args>
 	void LogDebug(const std::string& fmt, Args... args) {
