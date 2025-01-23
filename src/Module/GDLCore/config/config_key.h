@@ -36,7 +36,7 @@ namespace gdl {
 		struct Keys {
 			CONFIG_PATH(WindowSize, "general.window_size", "1024,768");
 			CONFIG_PATH(Theme, "general.theme", "Light");
-			CONFIG_PATH(Language, "general.language", "zh-cn");
+			CONFIG_PATH(Language, "general.language", "en_zh");
 			CONFIG_PATH(BtExludeTracker, "aria2c.bt-exclude-tracker", "");
 			CONFIG_PATH(BtTracker, "aria2c.bt-tracker", "");
 			CONFIG_PATH(Dir, "aria2c.dir", "");
@@ -96,34 +96,34 @@ namespace gdl {
 			}
 			// static function all values
 			static constexpr auto GetAllValues() {
-                return ConfigKeys(std::array{WindowSize.val(),
-                                             Theme.val(),
-                                             Language.val(),
-                                             BtExludeTracker.val(),
-                                             BtTracker.val(),
-                                             Dir.val(),
-                                             ListenPort.val(),
-                                             RpcListenPort.val(),
-                                             Split.val(),
-                                             UserAgent.val(),
-                                             AllProxy.val(),
-                                             DhtListenPort.val(),
-                                             MaxConcurrentDownloads.val(),
-                                             ConfPath.val(),
-                                             TrackerSourceUrls.val(),
-                                             SaveSession.val(),
-                                             IsSaveSession.val(),
-                                             EnableGlobalProxy.val(),
-                                             GlobalProxy.val(),
-                                             ListenClipboard.val(),
-                                             AutoResumeTask.val(),
-                                             AutoStart.val(),
-                                             RememberWindowPosition.val(),
-                                             EnableTrayIcon.val(),
-                                             EnableNotification.val(),
-                                             EnableAutoShutdown.val(),
-                                             EnableAutoUpdate.val(),
-                                             WindowPosition.val()});
+				return ConfigKeys(std::array{WindowSize.val(),
+											 Theme.val(),
+											 Language.val(),
+											 BtExludeTracker.val(),
+											 BtTracker.val(),
+											 Dir.val(),
+											 ListenPort.val(),
+											 RpcListenPort.val(),
+											 Split.val(),
+											 UserAgent.val(),
+											 AllProxy.val(),
+											 DhtListenPort.val(),
+											 MaxConcurrentDownloads.val(),
+											 ConfPath.val(),
+											 TrackerSourceUrls.val(),
+											 SaveSession.val(),
+											 IsSaveSession.val(),
+											 EnableGlobalProxy.val(),
+											 GlobalProxy.val(),
+											 ListenClipboard.val(),
+											 AutoResumeTask.val(),
+											 AutoStart.val(),
+											 RememberWindowPosition.val(),
+											 EnableTrayIcon.val(),
+											 EnableNotification.val(),
+											 EnableAutoShutdown.val(),
+											 EnableAutoUpdate.val(),
+											 WindowPosition.val()});
 			}
 		};
 	}  // namespace config

@@ -34,6 +34,8 @@ set(CURRENT_VERSION_MAJOR ${MAJOR})
 set(CURRENT_VERSION_MINOR ${MINOR})
 set(CURRENT_VERSION_BUILD ${BUILD})
 set(CURRENT_VERSION_COMMIT ${COMMIT})
+# 设置vcpkg的manifest模式
+set(VCPKG_MANIFEST_MODE ON)
 # 生成版本头文件
 configure_file(${CMAKE_SOURCE_DIR}/version.h.in ${CMAKE_SOURCE_DIR}/src/version.h)
 # 设置依赖库的根路径
@@ -46,7 +48,10 @@ if(APPLE)
 
 elseif(WIN32)
     set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/win")
+    # 当使用visual studio 以文件夹方式打开cmake 项目通过 QT visual studio tool 生成的cmake 预设时，设置编译选项
+    if(CMAKE_GENERATOR STREQUAL "Ninja" OR CMAKE_GENERATOR STREQUAL "Ninja Multi-Config")
     add_compile_options(/EHsc)
+    endif()
 elseif(UNIX AND NOT APPLE)
     set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/linux")
 endif()
