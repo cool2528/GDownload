@@ -1,5 +1,5 @@
 import QtQuick
-import QtQuick.Controls.Basic
+import QtQuick.Controls
 import Qt5Compat.GraphicalEffects
 import gdl.sdk
 

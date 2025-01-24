@@ -37,6 +37,11 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "source" FILES ${SOURCES_FI
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "resource" FILES ${QT_RESOURCE_FILES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "qml" FILES ${QT_QML_FILES})
 
+# 如果 resource/docs 不存在notice 文件则复制到这个目录下
+if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/Resource/docs/NOTICE)
+    file(COPY ${CMAKE_SOURCE_DIR}/NOTICE DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/Resource/docs)
+endif()
+
 # 输出CMAKE_BINARY_DIR 的路径
 message("CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")
 

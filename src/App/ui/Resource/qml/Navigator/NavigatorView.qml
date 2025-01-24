@@ -104,7 +104,10 @@ Item{
                 iconColor: "#ffffff"
                 onClicked: {
                     console.debug("open help dialog")
-
+                    let about = showAboutDialog()
+                    if(about){
+                        about.open()
+                    }
                 }
             }
         }
@@ -123,7 +126,20 @@ Item{
             return null
         }
         return task
+    }
 
+    function showAboutDialog(){
+        let component = Qt.createComponent("qrc:/qml/CommonComponents/HelpDialog.qml")
+        if(component.status === Component.Error){
+            console.error("Error loading component:", component.errorString());
+            return null;
+        }
+        let about = component.createObject(mainWindow)
+        if(about === null){
+            console.error("Error creating object")
+            return null
+        }
+        return about
     }
 
 }

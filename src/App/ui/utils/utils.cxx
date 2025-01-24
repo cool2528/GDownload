@@ -1,4 +1,5 @@
 #include "utils.h"
+#include <qdir.h>
 #include <QClipboard>
 #include <QGuiApplication>
 #include <QQmlContext>
@@ -9,6 +10,7 @@
 #include <shobjidl.h>
 #include <windows.h>
 #endif
+#include "version.h"
 namespace gdl {
 
 	namespace ui {
@@ -45,6 +47,24 @@ namespace gdl {
                 Q_UNUSED(nativeWindowHandle);
                 LOG_ERR("SetTaskbarProgress not implemented for this platform")
 #endif
+            }
+
+            QString UtilsToolsManager::Version() const
+            {
+                return GDownload_VERSION_STRING;
+            }
+
+            QString UtilsToolsManager::GetNoticeContent() const
+            {
+                QFile file(":/docs/NOTICE");
+                if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+                {
+                    return "";
+                }
+                QTextStream in(&file);
+                QString content = in.readAll();
+                file.close();
+                return content;
             }
 
 #ifdef __APPLE__
