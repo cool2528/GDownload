@@ -1,5 +1,6 @@
 import QtQuick
 import org.wangwenx190.FramelessHelper
+import QtQuick.Controls.Basic
 import QtQuick.Controls
 import "Navigator"
 import "titlebar"

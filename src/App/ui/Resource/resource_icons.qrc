@@ -24,5 +24,10 @@
         <file>images/theme/theme-dark@2x.png</file>
         <file>images/theme/theme-light@2x.png</file>
         <file>images/browser/no-task.svg</file>
+        <file>images/dialog/dialog_close_hover.svg</file>
+        <file>images/dialog/dialog_close_normol.svg</file>
+        <file>docs/NOTICE</file>
+        <file>payee/dialog_sponsorship_alipay.jpg</file>
+        <file>payee/dialog_sponsorship_wechat.jpg</file>
     </qresource>
 </RCC>

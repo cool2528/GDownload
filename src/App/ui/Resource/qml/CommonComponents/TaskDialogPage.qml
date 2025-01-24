@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls.Basic
 import gdl.sdk
 import QtQuick.Layouts
 import QtQuick.Controls
