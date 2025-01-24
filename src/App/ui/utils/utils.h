@@ -26,7 +26,8 @@ namespace gdl {
                 Q_INVOKABLE bool SetClipboardText(const QString& text);
 
                 Q_INVOKABLE void SetTaskbarProgress(double progress, void* nativeWindowHandle = nullptr);
-
+                Q_INVOKABLE QString Version() const;
+                Q_INVOKABLE QString GetNoticeContent() const;
 			   private:
 				explicit UtilsToolsManager(QObject* parent = nullptr);
 			};
