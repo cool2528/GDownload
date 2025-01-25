@@ -134,24 +134,14 @@ Popup{
                         text: qsTr("If you like GDownloader, you can sponsor us on the following platforms:")
                         font.pixelSize: 14
                         color: GTheme.dark ?  "#ffffff" : "#3b3b3b"
+                        Layout.margins: 10
                     }
-                    RowLayout{
-                        spacing: 10
+                    Image {
+                        fillMode: Image.PreserveAspectFit
+                        source: "/payee/sponsor.jpg"
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        Image {
-
-                            fillMode: Image.PreserveAspectFit
-                            source: "/payee/dialog_sponsorship_alipay.jpg"
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 200
-                        }
-                        Image {
-                            fillMode: Image.PreserveAspectFit
-                            source: "/payee/dialog_sponsorship_wechat.jpg"
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 200
-                        }
+                        Layout.margins: 10
                     }
                 }
             }
