@@ -133,7 +133,14 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system)
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::property_tree)
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::asio)
-target_link_libraries(${PROJECT_NAME} PRIVATE LibtorrentRasterbar::torrent-rasterbar pugixml::shared pugixml::pugixml)
+if(WIN32)
+    set(PUGIXML_TARGET pugixml::shared pugixml::pugixml)
+elseif(APPLE)
+    set(PUGIXML_TARGET pugixml::static pugixml::pugixml)
+else()
+    set(PUGIXML_TARGET pugixml::shared pugixml::pugixml)
+endif()
+target_link_libraries(${PROJECT_NAME} PRIVATE LibtorrentRasterbar::torrent-rasterbar ${PUGIXML_TARGET})
 if(WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE 
         UNICODE 
