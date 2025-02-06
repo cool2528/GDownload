@@ -37,6 +37,61 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "source" FILES ${SOURCES_FI
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "resource" FILES ${QT_RESOURCE_FILES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "qml" FILES ${QT_QML_FILES})
 
+find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
+# 生成翻译ts文件
+set(QT_TS_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations/gdownload_ja_JP.ts"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations/gdownload_zh_CN.ts"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations/gdownload_zh_TW.ts"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations/gdownload_ko_KR.ts"
+)
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "ts" FILES ${QT_TS_FILES})
+set(QT_ROOT "${Qt6_DIR}/../../..")
+# 使用foreach遍历所有ts文件
+if(WIN32)
+    message("update ts file for windows QT_ROOT: ${QT_ROOT}")
+    foreach(TS_FILE ${QT_TS_FILES})
+        message("update ts file: ${TS_FILE}")
+        execute_process(
+            COMMAND ${QT_ROOT}/bin/lupdate.exe 
+            ${CMAKE_CURRENT_SOURCE_DIR}
+            -ts ${TS_FILE}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        )
+        # 获取不带后缀的文件名
+        get_filename_component(QM_FILE ${TS_FILE} NAME_WE)
+        # 根据ts文件生成qm文件
+        execute_process(
+            COMMAND ${QT_ROOT}/bin/lrelease
+            ${TS_FILE}
+            -qm ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations/${QM_FILE}.qm
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations
+        )
+    endforeach()
+else()
+    message("update ts file for linux QT_ROOT: ${QT_ROOT}")
+    foreach(TS_FILE ${QT_TS_FILES})
+        message("update ts file: ${TS_FILE}")
+        execute_process(
+            COMMAND ${QT_ROOT}/bin/lupdate
+            ${CMAKE_CURRENT_SOURCE_DIR}
+            -ts ${TS_FILE}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        )
+        # 获取不带后缀的文件名
+        get_filename_component(QM_FILE ${TS_FILE} NAME_WE)
+        # 根据ts文件生成qm文件
+        execute_process(
+            COMMAND ${QT_ROOT}/bin/lrelease
+            ${TS_FILE}
+            -qm ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations/${QM_FILE}.qm
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations
+        )
+        
+
+    endforeach()
+endif()
+
 # 如果 resource/docs 不存在notice 文件则复制到这个目录下
 if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/Resource/docs/NOTICE)
     file(COPY ${CMAKE_SOURCE_DIR}/NOTICE DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/Resource/docs)
@@ -67,8 +122,7 @@ message("Operating System: ${CMAKE_SYSTEM_NAME}")
 
 # 打印系统架构
 message("System Architecture: ${CMAKE_SYSTEM_PROCESSOR}")
-set(QT_ROOT "${Qt6_DIR}/../../..")
-message("QT_ROOT: ${QT_ROOT}")
+
 if(APPLE)
     add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${SOURCES_FILES} ${HEADERS_FILES} ${QT_RESOURCE_FILES} ${QT_QML_FILES})
     set_target_properties(${PROJECT_NAME} PROPERTIES 
@@ -90,9 +144,13 @@ if(APPLE)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${CMAKE_SOURCE_DIR}/extra/${CMAKE_SYSTEM_NAME}/${CMAKE_SYSTEM_PROCESSOR}/engine/
             ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/${PROJECT_NAME}.app/Contents/Resources/engine
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations
+            ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/${PROJECT_NAME}.app/Contents/Resources/translations
     )
 elseif(WIN32)
     if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.rc)
+
     list(APPEND QT_RESOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.rc)
     endif()
     add_executable(${PROJECT_NAME} ${SOURCES_FILES} ${HEADERS_FILES} ${QT_RESOURCE_FILES} ${QT_QML_FILES})
@@ -120,9 +178,16 @@ elseif(WIN32)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/extra/win32/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,ia32>/engine/
         ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/engine
+        # 复制qm文件
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations
+        ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/translations
     )
 endif()
 register_target(${PROJECT_NAME})
+
+
+
 target_include_directories(${PROJECT_NAME} PRIVATE ${MODULE_INCLUDE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src/App/engine
 )

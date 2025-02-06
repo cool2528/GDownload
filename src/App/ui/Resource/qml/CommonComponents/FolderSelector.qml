@@ -9,7 +9,9 @@ Item {
     id: folderSelector
     property string path: ""
     property bool readOnly: true
-    property var historyPaths: ["C:/Users/Administrator/Downloads/Compressed","C:/Users/Administrator/Downloads/"]
+    property FolderHistoryModel historyModel: FolderHistoryModel {
+        maxHistoryCount: 10
+    }
     signal actived
     signal textChanged(string text)
     signal historySelected(string path)
@@ -230,7 +232,7 @@ Item {
         contentItem: ListView {
             id: historyList
             implicitHeight: Math.min(contentHeight, 200)
-            model: folderSelector.historyPaths
+            model: folderSelector.historyModel
             clip: true
             
             delegate: ItemDelegate {
@@ -252,7 +254,7 @@ Item {
                     
                     Text {
                         Layout.fillWidth: true
-                        text: modelData
+                        text: model.path
                         color: colors.text
                         elide: Text.ElideMiddle
                         font.pixelSize: 14
@@ -267,21 +269,16 @@ Item {
                         iconColor: colors.historyIcon
                         
                         onClicked: {
-                            let index = folderSelector.historyPaths.indexOf(modelData)
-                            if (index !== -1) {
-                                let newPaths = folderSelector.historyPaths.slice()
-                                newPaths.splice(index, 1)
-                                folderSelector.historyPaths = newPaths
-                            }
+                            folderSelector.historyModel.removePath(index)
                         }
                     }
                 }
                 
                 onClicked: {
-                    // 直接修改path属性，这会触发文本框的更新
-                    folderSelector.path = modelData
+                    folderSelector.path = model.path
                     historyPopup.close()
                     folderSelector.actived()
+                    folderSelector.historySelected(model.path)
                 }
             }
             
@@ -297,15 +294,7 @@ Item {
             if (folder !== "") {
                 let newPath = Utils.urlToLocalPath(folder)
                 folderSelector.path = newPath
-                
-                if (!folderSelector.historyPaths.includes(newPath)) {
-                    let newPaths = folderSelector.historyPaths.slice()
-                    newPaths.unshift(newPath)
-                    if (newPaths.length > 10) {
-                        newPaths.pop()
-                    }
-                    folderSelector.historyPaths = newPaths
-                }
+                folderSelector.historyModel.addPath(newPath)
             }
             folder = Qt.binding(function() { return Qt.resolvedUrl(folderSelector.path) })
             folderSelector.actived()

@@ -9,7 +9,7 @@ FramelessWindow{
     id: mainWindow
     width: 1024
     height: 768
-    title: qsTr("GDownload title")
+    title:"GDownload"
     visible: false
     property var helper: FramelessHelper
     FramelessHelper.onReady: {
