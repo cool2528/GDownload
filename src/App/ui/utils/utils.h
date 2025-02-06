@@ -28,8 +28,19 @@ namespace gdl {
                 Q_INVOKABLE void SetTaskbarProgress(double progress, void* nativeWindowHandle = nullptr);
                 Q_INVOKABLE QString Version() const;
                 Q_INVOKABLE QString GetNoticeContent() const;
+
+                // 设置开机自启动
+                Q_INVOKABLE bool SetAutoStart(bool enable);
+                
+                // 获取当前自启动状态
+                Q_INVOKABLE bool IsAutoStartEnabled() const;
+
 			   private:
 				explicit UtilsToolsManager(QObject* parent = nullptr);
+				
+				// 内部平台相关的自启动实现
+				bool SetAutoStartImpl(bool enable);
+				bool IsAutoStartEnabledImpl() const;
 			};
 			void RegisterTypes(QQmlEngine* engine);
 		}  // namespace utils

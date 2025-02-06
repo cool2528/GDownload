@@ -81,6 +81,7 @@ Rectangle{
                     checked: SettingsManager.qAutoStart
                     onClicked: {
                         SettingsManager.SetAutoStart(checked)
+                        UtilsToolsManager.SetAutoStart(checked)
                     }
                 }
 
