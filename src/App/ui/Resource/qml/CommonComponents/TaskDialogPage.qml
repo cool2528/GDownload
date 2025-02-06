@@ -288,7 +288,7 @@ Popup {
                         rowSpacing: 10
 
                         Label {
-                            text: qsTr("User-Agent:")
+                            text: "User-Agent:"
                             font.pixelSize: 14
                             color: GTheme.dark ? "#d9d9d9" : "#68696d"
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
@@ -297,11 +297,11 @@ Popup {
                             id: userAgent
                             Layout.fillWidth: true
                             Layout.preferredHeight: 30
-                            placeholderText: qsTr("User-Agent")
+                            placeholderText: "User-Agent"
                         }
 
                         Label {
-                            text: qsTr("Authorization:")
+                            text: "Authorization:"
                             font.pixelSize: 14
                             color: GTheme.dark ? "#d9d9d9" : "#68696d"
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
@@ -310,11 +310,11 @@ Popup {
                             id: authorization
                             Layout.fillWidth: true
                             Layout.preferredHeight: 30
-                            placeholderText: qsTr("Authorization")
+                            placeholderText: "Authorization"
                         }
 
                         Label {
-                            text: qsTr("Referer:")
+                            text: "Referer:"
                             font.pixelSize: 14
                             color: GTheme.dark ? "#d9d9d9" : "#68696d"
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
@@ -323,11 +323,11 @@ Popup {
                             id: referrer
                             Layout.fillWidth: true
                             Layout.preferredHeight: 30
-                            placeholderText: qsTr("Referer")
+                            placeholderText: "Referer"
                         }
 
                         Label {
-                            text: qsTr("Cookie:")
+                            text: "Cookie:"
                             font.pixelSize: 14
                             color: GTheme.dark ? "#d9d9d9" : "#68696d"
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
@@ -336,7 +336,7 @@ Popup {
                             id: cookie
                             Layout.fillWidth: true
                             Layout.preferredHeight: 30
-                            placeholderText: qsTr("Cookie")
+                            placeholderText: "Cookie"
                         }
                     }
                 }
