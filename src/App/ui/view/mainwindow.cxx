@@ -9,6 +9,7 @@
 #include "FramelessHelper/Core/private/framelessconfig_p.h"
 #include "FramelessHelper/Quick/framelessquickmodule.h"
 #include "GDLCore/logger.h"
+#include "Models/folder_history_model.h"
 #include "Settings/settings_manager.h"
 #include "logger.h"
 #include "os/os.h"
@@ -29,6 +30,8 @@ namespace gd {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
+            QCoreApplication::setOrganizationName("gdl");
+            QCoreApplication::setApplicationName("gdownload");
             QGuiApplication app(argc, argv);
             InitIcon(&app);
             QQmlApplicationEngine engine;
@@ -46,6 +49,7 @@ namespace gd {
         }
 
         void MainWindow::InitQmlEngine(QQmlEngine* engine) {
+            qmlRegisterType<gdl::ui::models::FolderHistoryModel>("gdl.sdk", 1, 0, "FolderHistoryModel");
             gdl::ui::settings::RegisterTypes(engine);
             FramelessHelper::Core::setApplicationOSThemeAware();
             FramelessHelper::Quick::registerTypes(engine);

@@ -44,8 +44,8 @@ Rectangle{
                         Layout.preferredWidth: 140
                         Layout.preferredHeight: 30
                         Layout.margins: 10
-                        property var values: ["en_zh","zh_CN","zh_TW","ja","ko","ru","de"]
-                        model: ["English","简体中文","繁體中文","日本語","한국어","русский","Deutsch"]
+                        property var values: ["en_zh","zh_CN","zh_TW","ja","ko"]
+                        model: ["English","简体中文","繁體中文","日本語","한국어"]
                         onActivated: function(selectIndex){
                             let index = selectIndex
                             let value = languageComBoBox.values[index]
