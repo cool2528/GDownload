@@ -133,6 +133,13 @@ Popup {
                                 border.color: GTheme.dark ? input.enabled ? "#5151f9" : "#545454" : input.enabled ? "#5151f9" : "#b8bcc5"
                             }
                         }
+                        Component.onCompleted: {
+                            // 监听剪贴板
+                            ClipboardWatcher.clipboardChanged.connect(function(text){
+                                 input.text = text
+                            })
+                            input.text = ClipboardWatcher.GetClipboardText()
+                        }
                     }
                     Rectangle{
                         id:seedPage
