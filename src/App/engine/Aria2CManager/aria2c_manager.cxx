@@ -95,7 +95,7 @@ namespace gdl {
 			aria2c_settings["bt-load-saved-metadata"] = "true";
 			aria2c_settings["bt-save-metadata"]		  = "true";
 			aria2c_settings["bt-tracker"]			  = "";
-			aria2c_settings["continue"]				  = "true";
+            aria2c_settings["continue"]				  = config::GetValue(config::Keys::AutoResumeTask).AsString();
 			aria2c_settings["dht-file-path"]		  = quote_path(GetDhtPath(IP_VERSION::V4));
 			aria2c_settings["dht-file-path6"]		  = quote_path(GetDhtPath(IP_VERSION::V6));
 
@@ -137,7 +137,12 @@ namespace gdl {
             if (std::filesystem::exists(session_path, ec) && std::filesystem::file_size(session_path) != 0) {
                 aria2c_settings["input-file"] = quote_path(session_path);
             }
-
+            // 检查是否开启全局代理
+            auto is_proxy_enable	 = config::GetValue(config::Keys::EnableGlobalProxy).AsBool();
+            auto global_proxy_string = config::GetValue(config::Keys::GlobalProxy).AsString();
+            if (is_proxy_enable && !global_proxy_string.empty()) {
+                aria2c_settings["all-proxy"] = global_proxy_string;
+            }
 #ifdef _WIN32
 			DWORD processId = GetCurrentProcessId();
 #else
