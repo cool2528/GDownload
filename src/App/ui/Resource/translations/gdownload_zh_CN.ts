@@ -122,6 +122,14 @@
     </message>
 </context>
 <context>
+    <name>GDropArea</name>
+    <message>
+        <location filename="../qml/CommonComponents/GDropArea.qml" line="53"/>
+        <source>Drag a torrent or metalink file here, or click to select.</source>
+        <translation>将 torrent 或 metalink 文件拖到此处，或单击进行选择。</translation>
+    </message>
+</context>
+<context>
     <name>HelpDialog</name>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="78"/>

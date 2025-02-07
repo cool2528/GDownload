@@ -6,47 +6,47 @@
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="37"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>言語</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="67"/>
         <source>Auto Update</source>
-        <translation type="unfinished"></translation>
+        <translation>自動更新</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="80"/>
         <source>Open at Login</source>
-        <translation type="unfinished"></translation>
+        <translation>起動時自動開始</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="94"/>
         <source>Remember Window Position</source>
-        <translation type="unfinished"></translation>
+        <translation>ウィンドウ位置を記憶</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="107"/>
         <source>Auto Resume Unfinished Download</source>
-        <translation type="unfinished"></translation>
+        <translation>未完了のダウンロードを自動再開</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="118"/>
         <source>Download Path</source>
-        <translation type="unfinished"></translation>
+        <translation>ダウンロードパス</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="145"/>
         <source>Enable Global Proxy</source>
-        <translation type="unfinished"></translation>
+        <translation>グローバルプロキシを有効にする</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="173"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="187"/>
         <source>Auto Listen Clipboard Link</source>
-        <translation type="unfinished"></translation>
+        <translation>クリップボードリンクを自動でリッスン</translation>
     </message>
 </context>
 <context>
@@ -54,17 +54,17 @@
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="17"/>
         <source>Downloading</source>
-        <translation type="unfinished"></translation>
+        <translation>ダウンロード中</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="19"/>
         <source>Waiting</source>
-        <translation type="unfinished"></translation>
+        <translation>待機中</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="21"/>
         <source>Stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>停止しました</translation>
     </message>
 </context>
 <context>
@@ -72,22 +72,22 @@
     <message>
         <location filename="../qml/Browser/DownloadPageView.qml" line="21"/>
         <source>Task</source>
-        <translation type="unfinished"></translation>
+        <translation>タスク</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageView.qml" line="56"/>
         <source>Downloading</source>
-        <translation type="unfinished"></translation>
+        <translation>ダウンロード中</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageView.qml" line="72"/>
         <source>Waiting</source>
-        <translation type="unfinished"></translation>
+        <translation>待機中</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageView.qml" line="88"/>
         <source>Stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>停止しました</translation>
     </message>
 </context>
 <context>
@@ -95,22 +95,22 @@
     <message>
         <location filename="../qml/CommonComponents/FilePreviewList.qml" line="38"/>
         <source>File Name</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル名</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/FilePreviewList.qml" line="46"/>
         <source>Extension</source>
-        <translation type="unfinished"></translation>
+        <translation>拡張子</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/FilePreviewList.qml" line="54"/>
         <source>Size</source>
-        <translation type="unfinished"></translation>
+        <translation>サイズ</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/FilePreviewList.qml" line="170"/>
         <source>Selected: %1 files, Total %2</source>
-        <translation type="unfinished"></translation>
+        <translation>選択済み: %1 ファイル, 合計 %2</translation>
     </message>
 </context>
 <context>
@@ -118,7 +118,15 @@
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="256"/>
         <source>Remaining </source>
-        <translation type="unfinished"></translation>
+        <translation>残り</translation>
+    </message>
+</context>
+<context>
+    <name>GDropArea</name>
+    <message>
+        <location filename="../qml/CommonComponents/GDropArea.qml" line="53"/>
+        <source>Drag a torrent or metalink file here, or click to select.</source>
+        <translation>トレントまたはメタリンクファイルをここにドラッグするか、クリックして選択します。</translation>
     </message>
 </context>
 <context>
@@ -126,22 +134,22 @@
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="78"/>
         <source>Sponsorship</source>
-        <translation type="unfinished"></translation>
+        <translation>スポンサーシップ</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="78"/>
         <source>License</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンス</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="78"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>アバウト</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="134"/>
         <source>If you like GDownloader, you can sponsor us on the following platforms:</source>
-        <translation type="unfinished"></translation>
+        <translation>GDownloader を気に入っていただけましたら、以下のプラットフォームでスポンサーになることができます:</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="165"/>
@@ -188,7 +196,49 @@ Copyright © 2024 GDownload Team
 Licensed under the Apache License 2.0
 
 *Thanks to all developers and users who have contributed to this project!*</source>
-        <translation type="unfinished"></translation>
+        <translation># GDownloadについて
+
+GDownloadは、C++とQtで構築されたクロスプラットフォームのダウンロードマネージャーです。最新の技術スタックと優れたオープンソースコンポーネントを組み合わせ、ユーザーに効率的で安定したダウンロード体験を提供します。
+
+## コア機能
+
+- クロスプラットフォーム対応（Windows、macOS、Linux）
+- aria2cを搭載した効率的なダウンロードエンジン
+- マルチスレッド同時ダウンロード
+- 複数のプロトコル対応（HTTP、HTTPS、FTP、BitTorrent、Metalink）
+- ダウンロードの再開機能
+- ユーザーフレンドリーなグラフィカルインターフェース
+
+## 技術スタック
+
+- UIフレームワーク: Qt Quick（QML）+ Qt C++
+- コアエンジン: aria2c
+- ネットワークライブラリ: Boost.Asio
+- BTダウンロード: LibtorrentRasterbar
+- XMLパーサー: PugiXML
+- フレームレスウィンドウ: FramelessHelper
+
+## 開発チーム
+
+GDownloadは、技術に情熱を持つ開発者によってメンテナンスされているオープンソースプロジェクトです。コミュニティの貢献を歓迎します。以下に限定されません：
+
+- コードの貢献
+- バグ報告
+- 機能の提案
+- ドキュメントの改善
+
+## お問い合わせ
+
+- [GitHub:](https://github.com/cool2528/GDownload)
+- [Issue Tracking:](https://github.com/cool2528/GDownload/issues)
+- [ホームページ: ](https://github.com/cool2528/GDownload)
+
+## 著作権表示
+
+Copyright © 2024 GDownload Team
+Apache License 2.0でライセンスされています
+
+*このプロジェクトに貢献してくれたすべての開発者とユーザーに感謝します！*</translation>
     </message>
 </context>
 <context>
@@ -196,24 +246,24 @@ Licensed under the Apache License 2.0
     <message>
         <location filename="../../Browser/download_task_model.h" line="108"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>不明</translation>
     </message>
     <message>
         <location filename="../../Browser/download_task_model.h" line="118"/>
         <source>h</source>
-        <translation type="unfinished"></translation>
+        <translation>h</translation>
     </message>
     <message>
         <location filename="../../Browser/download_task_model.h" line="121"/>
         <location filename="../../Browser/download_task_model.h" line="125"/>
         <source>m</source>
-        <translation type="unfinished"></translation>
+        <translation>m</translation>
     </message>
     <message>
         <location filename="../../Browser/download_task_model.h" line="128"/>
         <location filename="../../Browser/download_task_model.h" line="132"/>
         <source>s</source>
-        <translation type="unfinished"></translation>
+        <translation>s</translation>
     </message>
 </context>
 <context>
@@ -221,17 +271,17 @@ Licensed under the Apache License 2.0
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="17"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>基本設定</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="19"/>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>詳細設定</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="21"/>
         <source>Lab</source>
-        <translation type="unfinished"></translation>
+        <translation>ラボ機能</translation>
     </message>
 </context>
 <context>
@@ -239,22 +289,22 @@ Licensed under the Apache License 2.0
     <message>
         <location filename="../qml/Browser/SettingsPageView.qml" line="21"/>
         <source>Preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>プリファレンス</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingsPageView.qml" line="57"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>基本設定</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingsPageView.qml" line="73"/>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>詳細設定</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingsPageView.qml" line="89"/>
         <source>Lab</source>
-        <translation type="unfinished"></translation>
+        <translation>ラボ機能</translation>
     </message>
 </context>
 <context>
@@ -262,52 +312,52 @@ Licensed under the Apache License 2.0
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="46"/>
         <source>URL</source>
-        <translation type="unfinished"></translation>
+        <translation>タスクのリンク</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="46"/>
         <source>Torent</source>
-        <translation type="unfinished"></translation>
+        <translation>シード・ミッション</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="126"/>
         <source>One task url per line (supports magnet)</source>
-        <translation type="unfinished"></translation>
+        <translation>1行に1つのタスクURL（マグネットをサポート）</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="233"/>
         <source>Rename:</source>
-        <translation type="unfinished"></translation>
+        <translation>リネーム</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="241"/>
         <source>Optional</source>
-        <translation type="unfinished"></translation>
+        <translation>選択可能</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="248"/>
         <source>Splits:</source>
-        <translation type="unfinished"></translation>
+        <translation>スライス数</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="263"/>
         <source>Save to:</source>
-        <translation type="unfinished"></translation>
+        <translation>保存先</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="355"/>
         <source>Advanced Options</source>
-        <translation type="unfinished"></translation>
+        <translation>高度なオプション</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="367"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="378"/>
         <source>Submit</source>
-        <translation type="unfinished"></translation>
+        <translation>投稿する</translation>
     </message>
 </context>
 <context>
@@ -315,22 +365,22 @@ Licensed under the Apache License 2.0
     <message>
         <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="12"/>
         <source>Theme Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>テーマモード：</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="32"/>
         <source>System</source>
-        <translation type="unfinished"></translation>
+        <translation>システム</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="47"/>
         <source>Light</source>
-        <translation type="unfinished"></translation>
+        <translation>薄い色</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="59"/>
         <source>Dark</source>
-        <translation type="unfinished"></translation>
+        <translation>暗い</translation>
     </message>
 </context>
 </TS>
