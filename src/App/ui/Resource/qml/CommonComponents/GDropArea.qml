@@ -50,9 +50,10 @@ Item {
             anchors.top: icon.bottom
             anchors.topMargin: 10
             anchors.horizontalCenter: parent.horizontalCenter
-            text: "Drag torrent file here, or click to select"
+            text: qsTr("Drag a torrent or metalink file here, or click to select.")
             color: GTheme.dark ? "#939495" : "#666666"
         }
+
 
         DropArea {
             id: dropZone

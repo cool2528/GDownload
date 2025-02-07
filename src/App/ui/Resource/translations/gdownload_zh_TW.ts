@@ -6,47 +6,47 @@
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="37"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>語言</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="67"/>
         <source>Auto Update</source>
-        <translation type="unfinished"></translation>
+        <translation>自動更新</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="80"/>
         <source>Open at Login</source>
-        <translation type="unfinished"></translation>
+        <translation>開機自動啟動</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="94"/>
         <source>Remember Window Position</source>
-        <translation type="unfinished"></translation>
+        <translation>記住視窗位置</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="107"/>
         <source>Auto Resume Unfinished Download</source>
-        <translation type="unfinished"></translation>
+        <translation>自動恢復未完成的下載</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="118"/>
         <source>Download Path</source>
-        <translation type="unfinished"></translation>
+        <translation>下載路徑</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="145"/>
         <source>Enable Global Proxy</source>
-        <translation type="unfinished"></translation>
+        <translation>啟用全域代理</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="173"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="187"/>
         <source>Auto Listen Clipboard Link</source>
-        <translation type="unfinished"></translation>
+        <translation>自動監聽剪貼簿連結</translation>
     </message>
 </context>
 <context>
@@ -54,17 +54,17 @@
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="17"/>
         <source>Downloading</source>
-        <translation type="unfinished"></translation>
+        <translation>下載中</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="19"/>
         <source>Waiting</source>
-        <translation type="unfinished"></translation>
+        <translation>等待中</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="21"/>
         <source>Stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>已停止</translation>
     </message>
 </context>
 <context>
@@ -72,22 +72,22 @@
     <message>
         <location filename="../qml/Browser/DownloadPageView.qml" line="21"/>
         <source>Task</source>
-        <translation type="unfinished"></translation>
+        <translation>任務</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageView.qml" line="56"/>
         <source>Downloading</source>
-        <translation type="unfinished"></translation>
+        <translation>下載中</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageView.qml" line="72"/>
         <source>Waiting</source>
-        <translation type="unfinished"></translation>
+        <translation>等待中</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageView.qml" line="88"/>
         <source>Stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>已停止</translation>
     </message>
 </context>
 <context>
@@ -95,22 +95,22 @@
     <message>
         <location filename="../qml/CommonComponents/FilePreviewList.qml" line="38"/>
         <source>File Name</source>
-        <translation type="unfinished"></translation>
+        <translation>檔案名稱</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/FilePreviewList.qml" line="46"/>
         <source>Extension</source>
-        <translation type="unfinished"></translation>
+        <translation>副檔名</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/FilePreviewList.qml" line="54"/>
         <source>Size</source>
-        <translation type="unfinished"></translation>
+        <translation>大小</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/FilePreviewList.qml" line="170"/>
         <source>Selected: %1 files, Total %2</source>
-        <translation type="unfinished"></translation>
+        <translation>已選擇：%1 個檔案，共 %2</translation>
     </message>
 </context>
 <context>
@@ -118,7 +118,15 @@
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="256"/>
         <source>Remaining </source>
-        <translation type="unfinished"></translation>
+        <translation>剩餘</translation>
+    </message>
+</context>
+<context>
+    <name>GDropArea</name>
+    <message>
+        <location filename="../qml/CommonComponents/GDropArea.qml" line="53"/>
+        <source>Drag a torrent or metalink file here, or click to select.</source>
+        <translation>將torrent或metalink檔案拖到此處，或單擊選擇。</translation>
     </message>
 </context>
 <context>
@@ -126,22 +134,22 @@
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="78"/>
         <source>Sponsorship</source>
-        <translation type="unfinished"></translation>
+        <translation>贊助</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="78"/>
         <source>License</source>
-        <translation type="unfinished"></translation>
+        <translation>許可證</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="78"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>關於</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="134"/>
         <source>If you like GDownloader, you can sponsor us on the following platforms:</source>
-        <translation type="unfinished"></translation>
+        <translation>如果你喜歡 GDownloader，你可以在以下平台贊助我們：</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="165"/>
@@ -188,7 +196,50 @@ Copyright © 2024 GDownload Team
 Licensed under the Apache License 2.0
 
 *Thanks to all developers and users who have contributed to this project!*</source>
-        <translation type="unfinished"></translation>
+        <translation># 關於 GDownload
+
+GDownload 是一個跨平台的下載管理器，使用 C++ 和 Qt 開發。它結合了現代技術堆棧和優秀的開源組件，為用戶提供高效且穩定的下載體驗。
+
+## 核心功能
+
+- 跨平台支持（Windows、macOS、Linux）
+- 由 aria2c 提供支持的高效下載引擎
+- 多線程並發下載
+- 支援多種協議（HTTP、HTTPS、FTP、BitTorrent、Metalink）
+- 支援下載續傳
+- 用戶友好的圖形界面
+
+## 技術堆棧
+
+- UI 框架：Qt Quick (QML) + Qt C++
+- 核心引擎：aria2c
+- 網絡庫：Boost.Asio
+- BT 下載：LibtorrentRasterbar
+- XML 解析器：PugiXML
+- 無邊框窗口：FramelessHelper
+
+## 開發團隊
+
+GDownload 是一個開源項目，由熱衷於技術的開發者維護。我們歡迎社區貢獻，包括但不限於：
+
+- 代碼貢獻
+- 錯誤報告
+- 功能建議
+- 文檔改進
+
+## 聯繫我們
+
+- [GitHub:](https://github.com/cool2528/GDownload)
+- [問題追蹤:](https://github.com/cool2528/GDownload/issues)
+- [首頁: ](https://github.com/cool2528/GDownload)
+
+## 版權聲明
+
+版權 © 2024 GDownload 團隊  
+許可證：Apache 許可證 2.0
+
+*感謝所有貢獻於此項目的開發者和用戶！*
+</translation>
     </message>
 </context>
 <context>
@@ -196,24 +247,24 @@ Licensed under the Apache License 2.0
     <message>
         <location filename="../../Browser/download_task_model.h" line="108"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>未知</translation>
     </message>
     <message>
         <location filename="../../Browser/download_task_model.h" line="118"/>
         <source>h</source>
-        <translation type="unfinished"></translation>
+        <translation>時</translation>
     </message>
     <message>
         <location filename="../../Browser/download_task_model.h" line="121"/>
         <location filename="../../Browser/download_task_model.h" line="125"/>
         <source>m</source>
-        <translation type="unfinished"></translation>
+        <translation>分</translation>
     </message>
     <message>
         <location filename="../../Browser/download_task_model.h" line="128"/>
         <location filename="../../Browser/download_task_model.h" line="132"/>
         <source>s</source>
-        <translation type="unfinished"></translation>
+        <translation>秒</translation>
     </message>
 </context>
 <context>
@@ -221,17 +272,17 @@ Licensed under the Apache License 2.0
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="17"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>基本設定</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="19"/>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>進階設定</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="21"/>
         <source>Lab</source>
-        <translation type="unfinished"></translation>
+        <translation>實驗性功能</translation>
     </message>
 </context>
 <context>
@@ -239,22 +290,22 @@ Licensed under the Apache License 2.0
     <message>
         <location filename="../qml/Browser/SettingsPageView.qml" line="21"/>
         <source>Preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>偏好設定</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingsPageView.qml" line="57"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>基本設定</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingsPageView.qml" line="73"/>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>進階設定</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingsPageView.qml" line="89"/>
         <source>Lab</source>
-        <translation type="unfinished"></translation>
+        <translation>實驗性功能</translation>
     </message>
 </context>
 <context>
@@ -262,52 +313,52 @@ Licensed under the Apache License 2.0
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="46"/>
         <source>URL</source>
-        <translation type="unfinished"></translation>
+        <translation>連結任務</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="46"/>
         <source>Torent</source>
-        <translation type="unfinished"></translation>
+        <translation>種子任務</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="126"/>
         <source>One task url per line (supports magnet)</source>
-        <translation type="unfinished"></translation>
+        <translation>每行一個任務網址（支援磁力鏈接）</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="233"/>
         <source>Rename:</source>
-        <translation type="unfinished"></translation>
+        <translation>重新命名:</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="241"/>
         <source>Optional</source>
-        <translation type="unfinished"></translation>
+        <translation>可選的</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="248"/>
         <source>Splits:</source>
-        <translation type="unfinished"></translation>
+        <translation>分片數</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="263"/>
         <source>Save to:</source>
-        <translation type="unfinished"></translation>
+        <translation>儲存至:</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="355"/>
         <source>Advanced Options</source>
-        <translation type="unfinished"></translation>
+        <translation>進階選項</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="367"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>取消</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="378"/>
         <source>Submit</source>
-        <translation type="unfinished"></translation>
+        <translation>提交</translation>
     </message>
 </context>
 <context>
@@ -315,22 +366,22 @@ Licensed under the Apache License 2.0
     <message>
         <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="12"/>
         <source>Theme Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>主題模式:</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="32"/>
         <source>System</source>
-        <translation type="unfinished"></translation>
+        <translation>系統</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="47"/>
         <source>Light</source>
-        <translation type="unfinished"></translation>
+        <translation>淺色</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="59"/>
         <source>Dark</source>
-        <translation type="unfinished"></translation>
+        <translation>深色</translation>
     </message>
 </context>
 </TS>

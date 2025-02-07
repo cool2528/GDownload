@@ -11,6 +11,7 @@
 #include "GDLCore/logger.h"
 #include "Models/folder_history_model.h"
 #include "Settings/settings_manager.h"
+#include "language/language_manager.h"
 #include "logger.h"
 #include "os/os.h"
 #include "theme/theme.h"
@@ -49,8 +50,9 @@ namespace gd {
         }
 
         void MainWindow::InitQmlEngine(QQmlEngine* engine) {
-            qmlRegisterType<gdl::ui::models::FolderHistoryModel>("gdl.sdk", 1, 0, "FolderHistoryModel");
             gdl::ui::settings::RegisterTypes(engine);
+            qmlRegisterType<gdl::ui::models::FolderHistoryModel>("gdl.sdk", 1, 0, "FolderHistoryModel");
+            gdl::ui::language::RegisterTypes(engine);
             FramelessHelper::Core::setApplicationOSThemeAware();
             FramelessHelper::Quick::registerTypes(engine);
             gdl::ui::utils::RegisterTypes(engine);
