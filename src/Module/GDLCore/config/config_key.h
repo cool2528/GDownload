@@ -36,7 +36,7 @@ namespace gdl {
 		struct Keys {
 			CONFIG_PATH(WindowSize, "general.window_size", "1024,768");
 			CONFIG_PATH(Theme, "general.theme", "Light");
-			CONFIG_PATH(Language, "general.language", "en_zh");
+            CONFIG_PATH(Language, "general.language", "en_US");
 			CONFIG_PATH(BtExludeTracker, "aria2c.bt-exclude-tracker", "");
 			CONFIG_PATH(BtTracker, "aria2c.bt-tracker", "");
 			CONFIG_PATH(Dir, "aria2c.dir", "");
