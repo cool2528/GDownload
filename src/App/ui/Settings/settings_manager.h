@@ -48,7 +48,8 @@ namespace gdl {
                 static Settings* create(QQmlEngine*, QJSEngine*);
                 bool Init();
                 void UnInit();
-
+                Q_INVOKABLE void SetAria2GlobalProxy(const QString& proxy);
+                Q_INVOKABLE void SetAria2AutoResumeTask(bool enable);
                private:
                 explicit Settings(QObject* parent = nullptr);
                 void Save();

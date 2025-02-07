@@ -2,6 +2,7 @@ import QtQuick
 import org.wangwenx190.FramelessHelper
 import QtQuick.Controls.Basic
 import QtQuick.Controls
+import gdl.sdk
 import "Navigator"
 import "titlebar"
 import "Browser"
@@ -15,10 +16,38 @@ FramelessWindow{
     FramelessHelper.onReady: {
         FramelessHelper.titleBarItem = title_bar;
         FramelessHelper.moveWindowToDesktopCenter()
+        if(SettingsManager.qRememberWindowPosition && (SettingsManager.qWindowPosition.x > 0 || SettingsManager.qWindowPosition.y > 0)){
+            mainWindow.x = SettingsManager.qWindowPosition.x
+            mainWindow.y = SettingsManager.qWindowPosition.y
+            mainWindow.width = SettingsManager.qWindowSize.width
+            mainWindow.height = SettingsManager.qWindowSize.height
+        }
         mainWindow.visible = true;
         if(Qt.platform.os === "osx"){
             UtilsToolsManager.HideMacOsxWindowStandardButtons(mainWindow)
         }
+    }
+
+    function onWindowResize(){
+        // 记录窗口当前 x y width height
+        var x = mainWindow.x;
+        var y = mainWindow.y;
+        var width = mainWindow.width;
+        var height = mainWindow.height;
+        SettingsManager.qWindowPosition = Qt.point(x,y)
+        SettingsManager.qWindowSize = Qt.size(width,height)
+    }
+    onWidthChanged: {
+        Qt.callLater(onWindowResize)
+    }
+    onHeightChanged: {
+        Qt.callLater(onWindowResize)
+    }
+    onXChanged: {
+         Qt.callLater(onWindowResize)
+    }
+    onYChanged: {
+        Qt.callLater(onWindowResize)
     }
     onVisibilityChanged: {
         if(Qt.platform.os === "osx"){

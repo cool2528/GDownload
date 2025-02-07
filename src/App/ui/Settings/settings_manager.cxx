@@ -2,6 +2,7 @@
 #include <QQmlEngine>
 #include "Definitions/appDef.h"
 #include "config/config.h"
+#include "Aria2CManager/aria2c_manager.h"
 namespace gdl {
     namespace ui {
         namespace settings {
@@ -31,6 +32,22 @@ namespace gdl {
                 Save();
             }
             Settings::Settings(QObject* parent) {}
+
+            void Settings::SetAria2GlobalProxy(const QString &proxy)
+            {
+                SetGlobalProxy(proxy);
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"all-proxy", proxy.toStdString()});
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
+            }
+
+            void Settings::SetAria2AutoResumeTask(bool enable)
+            {
+                SetAutoResumeTask(enable);
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"continue", enable ? "true" : "false"});
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
+            }
 
             void Settings::Save() {
                 QHashIterator<QString, Setting*> i(Setting::settings_);

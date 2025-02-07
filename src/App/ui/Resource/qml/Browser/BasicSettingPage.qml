@@ -106,6 +106,9 @@ Rectangle{
                     Layout.margins: 10
                     text: qsTr("Auto Resume Unfinished Download")
                     checked: SettingsManager.qAutoResumeTask
+                    onClicked: {
+                        SettingsManager.SetAria2AutoResumeTask(checked)
+                    }
                 }
 
                 // 设置全局下载保存路径
@@ -146,6 +149,9 @@ Rectangle{
                         checked: SettingsManager.qEnableGlobalProxy
                         onClicked: {
                             SettingsManager.SetEnableGlobalProxy(checked)
+                            if(!checked){
+                                SettingsManager.SetAria2GlobalProxy("")
+                            }
                         }
                     }
                     // 代理设置
@@ -172,7 +178,7 @@ Rectangle{
                             type: 1
                             text: qsTr("Save")
                             onClicked: {
-                                SettingsManager.SetGlobalProxy(proxySetting.text)
+                                SettingsManager.SetAria2GlobalProxy(proxySetting.text)
                             }
                         }
                     }

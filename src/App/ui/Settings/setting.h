@@ -58,10 +58,15 @@ namespace gdl {
                 value_ = QSize(1024, 768);
             }
             void Put(const QVariant& value) override {
-                QString size = value.toString();
-                int width	 = size.section(',', 0, 0).toInt();
-                int height	 = size.section(',', 1, 1).toInt();
-                value_		 = QSize(width, height);
+                if (value.canConvert<QSize>()) {
+                    value_ = value.toSize();
+                }
+                else if (value.canConvert<QString>()) {
+                    QString size = value.toString();
+                    int width	 = size.section(',', 0, 0).toInt();
+                    int height	 = size.section(',', 1, 1).toInt();
+                    value_		 = QSize(width, height);
+                }
             }
             VALUE_TYPE Get() const {
                 return value_;
@@ -318,7 +323,15 @@ namespace gdl {
                 value_ = false;
             }
             void Put(const QVariant& value) override {
-                value_ = value.toString() == "true" || value.toString() == "1";
+                if (value.canConvert<bool>()) {
+                    value_ = value.toBool();
+                }
+                else if (value.canConvert<QString>()) {
+                    value_ = value.toString() == "true" || value.toString() == "1";
+                }
+                else if (value.canConvert<int>()) {
+                    value_ = value.toInt() == 1;
+                }
             }
             VALUE_TYPE Get() const {
                 return value_;
@@ -334,7 +347,15 @@ namespace gdl {
                 value_ = false;
             }
             void Put(const QVariant& value) override {
-                value_ = value.toString() == "true" || value.toString() == "1";
+                if (value.canConvert<bool>()) {
+                    value_ = value.toBool();
+                }
+                else if (value.canConvert<QString>()) {
+                    value_ = value.toString() == "true" || value.toString() == "1";
+                }
+                else if (value.canConvert<int>()) {
+                    value_ = value.toInt() == 1;
+                }
             }
             VALUE_TYPE Get() const {
                 return value_;
@@ -366,7 +387,15 @@ namespace gdl {
                 value_ = true;
             }
             void Put(const QVariant& value) override {
-                value_ = value.toString() == "true" || value.toString() == "1";
+                if (value.canConvert<bool>()) {
+                    value_ = value.toBool();
+                }
+                else if (value.canConvert<QString>()) {
+                    value_ = value.toString() == "true" || value.toString() == "1";
+                }
+                else if (value.canConvert<int>()) {
+                    value_ = value.toInt() == 1;
+                }
             }
             VALUE_TYPE Get() const {
                 return value_;
@@ -382,7 +411,15 @@ namespace gdl {
                 value_ = false;
             }
             void Put(const QVariant& value) override {
-                value_ = value.toString() == "true" || value.toString() == "1";
+                if (value.canConvert<bool>()) {
+                    value_ = value.toBool();
+                }
+                else if (value.canConvert<QString>()) {
+                    value_ = value.toString() == "true" || value.toString() == "1";
+                }
+                else if (value.canConvert<int>()) {
+                    value_ = value.toInt() == 1;
+                }
             }
             VALUE_TYPE Get() const {
                 return value_;
@@ -398,7 +435,15 @@ namespace gdl {
                 value_ = false;
             }
             void Put(const QVariant& value) override {
-                value_ = value.toString() == "true" || value.toString() == "1";
+                if (value.canConvert<bool>()) {
+                    value_ = value.toBool();
+                }
+                else if (value.canConvert<QString>()) {
+                    value_ = value.toString() == "true" || value.toString() == "1";
+                }
+                else if (value.canConvert<int>()) {
+                    value_ = value.toInt() == 1;
+                }
             }
             VALUE_TYPE Get() const {
                 return value_;
@@ -416,7 +461,15 @@ namespace gdl {
             }
 
             void Put(const QVariant& value) override {
-                value_ = value.toString() == "true" || value.toString() == "1";
+                if (value.canConvert<bool>()) {
+                    value_ = value.toBool();
+                }
+                else if (value.canConvert<QString>()) {
+                    value_ = value.toString() == "true" || value.toString() == "1";
+                }
+                else if (value.canConvert<int>()) {
+                    value_ = value.toInt() == 1;
+                }
             }
             VALUE_TYPE Get() const {
                 return value_;
@@ -432,11 +485,15 @@ namespace gdl {
                 value_ = QPoint(0, 0);
             }
             void Put(const QVariant& value) override {
-                // 这里传进来的永远是QString 所以需要转换
-                QString str		 = value.toString();
-                QStringList list = str.split(",");
-                if (list.size() == 2) {
-                    value_ = QPoint(list[0].toInt(), list[1].toInt());
+                if (value.canConvert<QPoint>()) {
+                    value_ = value.toPoint();
+                }
+                else if (value.canConvert<QString>()) {
+                    QString str		 = value.toString();
+                    QStringList list = str.split(",");
+                    if (list.size() == 2) {
+                        value_ = QPoint(list[0].toInt(), list[1].toInt());
+                    }
                 }
             }
             VALUE_TYPE Get() const {
@@ -453,7 +510,15 @@ namespace gdl {
                 value_ = true;
             }
             void Put(const QVariant& value) override {
-                value_ = value.toString() == "true" || value.toString() == "1";
+                if (value.canConvert<bool>()) {
+                    value_ = value.toBool();
+                }
+                else if (value.canConvert<QString>()) {
+                    value_ = value.toString() == "true" || value.toString() == "1";
+                }
+                else if (value.canConvert<int>()) {
+                    value_ = value.toInt() == 1;
+                }
             }
             VALUE_TYPE Get() const {
                 return value_;
@@ -469,7 +534,15 @@ namespace gdl {
                 value_ = true;
             }
             void Put(const QVariant& value) override {
-                value_ = value.toString() == "true" || value.toString() == "1";
+                if (value.canConvert<bool>()) {
+                    value_ = value.toBool();
+                }
+                else if (value.canConvert<QString>()) {
+                    value_ = value.toString() == "true" || value.toString() == "1";
+                }
+                else if (value.canConvert<int>()) {
+                    value_ = value.toInt() == 1;
+                }
             }
             VALUE_TYPE Get() const {
                 return value_;
@@ -485,7 +558,15 @@ namespace gdl {
                 value_ = false;
             }
             void Put(const QVariant& value) override {
-                value_ = value.toString() == "true" || value.toString() == "1";
+                if (value.canConvert<bool>()) {
+                    value_ = value.toBool();
+                }
+                else if (value.canConvert<QString>()) {
+                    value_ = value.toString() == "true" || value.toString() == "1";
+                }
+                else if (value.canConvert<int>()) {
+                    value_ = value.toInt() == 1;
+                }
             }
 
             VALUE_TYPE Get() const {
@@ -502,7 +583,15 @@ namespace gdl {
                 value_ = true;
             }
             void Put(const QVariant& value) override {
-                value_ = value.toString() == "true" || value.toString() == "1";
+                if (value.canConvert<bool>()) {
+                    value_ = value.toBool();
+                }
+                else if (value.canConvert<QString>()) {
+                    value_ = value.toString() == "true" || value.toString() == "1";
+                }
+                else if (value.canConvert<int>()) {
+                    value_ = value.toInt() == 1;
+                }
             }
             VALUE_TYPE Get() const {
                 return value_;
