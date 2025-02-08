@@ -29,22 +29,22 @@
         <translation>恢复未完成的任务</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="118"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="121"/>
         <source>Download Path</source>
         <translation>下载路径</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="145"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="148"/>
         <source>Enable Global Proxy</source>
         <translation>启用全局代理</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="173"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="179"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="187"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="193"/>
         <source>Auto Listen Clipboard Link</source>
         <translation>自动监听剪切板链接</translation>
     </message>
