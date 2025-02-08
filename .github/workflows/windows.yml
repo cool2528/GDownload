@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -15,23 +14,20 @@ jobs:
           - qt_version: 6.5.2
             qt_arch: win64_msvc2019_64
             msvc_arch: x64
+            package_name: gdownloader_windows
     steps:
       - name: checkout-branch
         uses: actions/checkout@v4
+
         with:
           submodules: recursive
-
-      - name: Setup Ninja
-        uses: ashutoshvarma/setup-ninja@v1.1
-        with:
-          version: 1.10.0
 
       - name: setup-QT  
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ matrix.qt_version }}
           arch: ${{ matrix.qt_arch }}
-          modules: 'qt5compat qtwebsockets'
+          modules: 'qt5compat qtwebsockets qt3d qtshadertools'
           
       - name: vcpkg build
         id: vcpkg
@@ -48,12 +44,46 @@ jobs:
         run: |
           echo "vcpkg-cmake-config: ${{ steps.vcpkg.outputs.vcpkg-cmake-config }}"
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.msvc_arch }}
-          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S ${{ github.workspace }}  -DCMAKE_BUILD_TYPE=Release -G Ninja
-          cmake --build build --config Release
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S ${{ github.workspace }} -DCMAKE_BUILD_TYPE=Release -GNinja -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00"
+          cmake --build build --config Release --parallel
+
       - name: package
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.qt_version }}-${{ matrix.msvc_arch }}-release
-          path: build/release
+          name: ${{ matrix.package_name }}-${{ matrix.qt_version }}-${{ matrix.msvc_arch }}
+          path: build/release/
+
+      - name: Install NSIS
+        uses: repolevedavaj/install-nsis@v1.0.2
+        with:
+          nsis-version: '3.10'
+
+      - name: Build Installer
+        shell: cmd
+        run: |
+          dir build/release
+          dir build/release/bin
+          makensis -V4 "${{github.workspace}}/build/release/windows_installer.nsi"
+          echo ${{ github.workspace }}/build/release/
+
+      - name: Upload Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-Installer
+          path: build/release/*.exe
+
+      - name: uploadRelease
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.RELEASE_TOKEN }}
+          file: build/release/GDownloader_windows_msvc2019_x64.exe
+          asset_name: GDownloader_windows_${{ github.sha }}_${{ matrix.qt_arch }}.exe
+          tag: auto-release-${{ github.sha }}
+          overwrite: true
+
+
+
+
+
           
           

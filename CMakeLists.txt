@@ -34,6 +34,7 @@ set(CURRENT_VERSION_MAJOR ${MAJOR})
 set(CURRENT_VERSION_MINOR ${MINOR})
 set(CURRENT_VERSION_BUILD ${BUILD})
 set(CURRENT_VERSION_COMMIT ${COMMIT})
+set(APP_VERSION "${CURRENT_VERSION_MAJOR}.${CURRENT_VERSION_MINOR}.${CURRENT_VERSION_BUILD}")
 # 设置vcpkg的manifest模式
 set(VCPKG_MANIFEST_MODE ON)
 # 生成版本头文件
@@ -52,6 +53,8 @@ elseif(WIN32)
     if(CMAKE_GENERATOR STREQUAL "Ninja" OR CMAKE_GENERATOR STREQUAL "Ninja Multi-Config")
     add_compile_options(/EHsc)
     endif()
+    # 设置Windows目标版本
+    add_compile_definitions(_WIN32_WINNT=0x0A00)  # Windows 10
 elseif(UNIX AND NOT APPLE)
     set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/linux")
 endif()

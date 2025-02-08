@@ -1,0 +1,38 @@
+!include MUI2.nsh
+
+# 安装包元数据
+Name "GDownloader"
+OutFile "GDownloader_windows_msvc2019_x64.exe"
+InstallDir "$PROGRAMFILES64\GDownloader"
+RequestExecutionLevel admin
+# 界面配置
+!insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_INSTFILES
+!insertmacro MUI_LANGUAGE "SimpChinese"
+
+Section "Main Application"
+    SetOutPath $INSTDIR
+    File /r bin\*.*
+    
+    # 创建快捷方式
+    CreateShortcut "$SMPROGRAMS\GDownloader.lnk" "$INSTDIR\@EXECUTABLE@"
+    CreateShortcut "$DESKTOP\GDownloader.lnk" "$INSTDIR\@EXECUTABLE@"
+    WriteUninstaller "$INSTDIR\Uninstall.exe"
+    
+    # 注册表项（添加更多元数据）
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\GDownloader" \
+        "DisplayName" "GDownloader"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\GDownloader" \
+        "DisplayVersion" "@APP_VERSION@"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\GDownloader" \
+        "Publisher" "GDownloader"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\GDownloader" \
+        "UninstallString" "$\"$INSTDIR\Uninstall.exe$\""
+SectionEnd
+
+Section "Uninstall"
+    RMDir /r $INSTDIR
+    Delete "$SMPROGRAMS\GDownloader.lnk"
+    Delete "$DESKTOP\GDownloader.lnk"
+    DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\GDownloader"
+SectionEnd 
