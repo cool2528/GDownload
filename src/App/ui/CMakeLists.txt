@@ -150,6 +150,14 @@ if(APPLE)
     )
 elseif(WIN32)
     if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.rc)
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(EXECUTABLE ${PROJECT_NAME}.exe)
+    configure_file(
+        ${CMAKE_SOURCE_DIR}/package/windows_installer.nsi.in
+        ${CMAKE_BINARY_DIR}/release/windows_installer.nsi
+        @ONLY
+    )
+    endif()
 
     list(APPEND QT_RESOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.rc)
     endif()
