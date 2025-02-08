@@ -29,22 +29,22 @@
         <translation>완료되지 않은 다운로드 자동 재개</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="118"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="121"/>
         <source>Download Path</source>
         <translation>다운로드 경로</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="145"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="148"/>
         <source>Enable Global Proxy</source>
         <translation>글로벌 프록시 사용</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="173"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="179"/>
         <source>Save</source>
         <translation>저장</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="187"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="193"/>
         <source>Auto Listen Clipboard Link</source>
         <translation>자동 듣기 클립보드 링크</translation>
     </message>

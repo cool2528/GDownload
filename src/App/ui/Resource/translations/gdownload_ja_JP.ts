@@ -29,22 +29,22 @@
         <translation>未完了のダウンロードを自動再開</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="118"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="121"/>
         <source>Download Path</source>
         <translation>ダウンロードパス</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="145"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="148"/>
         <source>Enable Global Proxy</source>
         <translation>グローバルプロキシを有効にする</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="173"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="179"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="187"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="193"/>
         <source>Auto Listen Clipboard Link</source>
         <translation>クリップボードリンクを自動でリッスン</translation>
     </message>
