@@ -1,6 +1,7 @@
 #include "aria2c_manager.h"
 #include <cpr/cpr.h>
 #include <boost/url.hpp>
+#include <nlohmann/json.hpp>
 #include "engine_def.h"
 #include "logger.h"
 #include "os/os.h"

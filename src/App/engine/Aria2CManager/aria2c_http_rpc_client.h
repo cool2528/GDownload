@@ -1,8 +1,9 @@
 #pragma once
-#include <nlohmann/json.hpp>
+#include <rapidjson/document.h>
+#include <unordered_map>
 #include <variant>
-#include "result/result.h"
 #include "Engine_export.h"
+#include "result/result.h"
 namespace gdl {
 	namespace engine {
 		struct SucceedResult {
@@ -71,11 +72,12 @@ namespace gdl {
 			Result<Response> ForceShutdown();
 
 		   private:
-			Result<Response> Send(const std::string_view& method, const nlohmann::json& params);
+			Result<Response> Send(const std::string_view& method, rapidjson::Value& params);
 
 		   private:
 			std::string host_;
 			std::int64_t id_{1};
+			rapidjson::Document doc_;
 		};
 	}  // namespace engine
 }  // namespace gdl

@@ -17,6 +17,7 @@
     "nlohmann-json",
     "sqlite3",
     "libtorrent",
-    "pugixml"
+    "pugixml",
+    "rapidjson"
   ]
 }

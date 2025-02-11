@@ -80,11 +80,12 @@ if(WIN32)
     get_property(PROJECT_TARGETS GLOBAL PROPERTY PROJECT_TARGETS)
     # Windows 安装规则
     install(TARGETS ${PROJECT_TARGETS}
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION bin
-        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION .
+        LIBRARY DESTINATION .
+        ARCHIVE DESTINATION .
     )
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/extra/win32/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,ia32>/engine/ DESTINATION engine)
+    install(DIRECTORY ${CMAKE_BINARY_DIR}/$<IF:$<CONFIG:Debug>,debug,release>/bin/ DESTINATION .)
     install(FILES README.md LICENSE.txt DESTINATION .)
     # 设置默认安装前缀为程序文件目录
     if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
