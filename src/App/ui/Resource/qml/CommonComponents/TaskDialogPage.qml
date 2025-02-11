@@ -136,7 +136,9 @@ Popup {
                         Component.onCompleted: {
                             // 监听剪贴板
                             ClipboardWatcher.clipboardChanged.connect(function(text){
-                                 input.text = text
+                                 if(text.length > 3){
+                                     input.text = text
+                                 }
                             })
                             input.text = ClipboardWatcher.GetClipboardText()
                         }
@@ -185,6 +187,7 @@ Popup {
 
                     function getOptions(){
                         let options = {}
+                        let headers = []
                         if(renameEdit.text.length > 0){
                             options["out"] = renameEdit.text
                         }
@@ -199,10 +202,10 @@ Popup {
                         }
                         if(authorization.text.length > 0){
                             options["http-auth-challenge"] = "true"
-                            options["--header"] = String("Authorization: %1").arg(authorization.text)
+                            headers.push(String("Authorization: %1").arg(authorization.text))
                         }
                         if(cookie.text.length > 0){
-                            options["header"] = String("Cookie: %1").arg(cookie.text)
+                            headers.push(String("Cookie: %1").arg(cookie.text))
                         }
                         if(referrer.text.length > 0){
                             options["referer"] = referrer.text
@@ -210,6 +213,15 @@ Popup {
                         if(currentIndex === 1){
                             let select_files = filePreview.previewModel.getSelectedFiles()
                             options["select-file"] = select_files.join()
+                        }
+                        // 添加自定义请求头
+                        let customHeaders = customRequestHeaderList.getRequestHeaderList()
+                        if (customHeaders.length > 0) {
+                            headers = headers.concat(customHeaders)
+                        }
+                        // 设置所有headers
+                        if (headers.length > 0) {
+                            options["header"] = headers
                         }
                         return options
                     }
@@ -337,6 +349,47 @@ Popup {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 30
                             placeholderText: "Cookie"
+                        }
+
+                        Label{
+                            text: qsTr("Custom Request Header List:")
+                            font.pixelSize: 14
+                            color: GTheme.dark ? "#d9d9d9" : "#68696d"
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+                        }
+                        TextArea{
+                            id:customRequestHeaderList
+                            font.pixelSize: 12
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 100
+                            placeholderText: qsTr("Custom request header list (one per line in the format KEY:VALUE)")
+                            color: GTheme.dark ? "#9a9a9a" : "#bababa"
+                            placeholderTextColor: color
+                            background: Rectangle{
+                                implicitHeight: taskPageLayout.height
+                                implicitWidth: taskPageLayout.width
+                                color: GTheme.dark  ? "#303030" : "#ffffff"
+                                border.color: GTheme.dark ? input.enabled ? "#5151f9" : "#545454" : input.enabled ? "#5151f9" : "#b8bcc5"
+                            }
+
+                            function getRequestHeaderList() {
+                                let headers = []
+                                if (customRequestHeaderList.text.trim().length === 0) {
+                                    return headers
+                                }
+                                let lines = customRequestHeaderList.text.split('\n')
+                                for (let line of lines) {
+                                    line = line.trim()
+                                    if (line.length === 0) continue
+                                    let colonIndex = line.indexOf(':')
+                                    if (colonIndex === -1) continue
+                                    let key = line.substring(0, colonIndex).trim()
+                                    let value = line.substring(colonIndex + 1).trim()
+                                    if (key.length === 0 || value.length === 0) continue
+                                    headers.push(key + ": " + value)
+                                }
+                                return headers
+                            }
                         }
                     }
                 }

@@ -325,37 +325,47 @@ GDownload는 기술에 대한 열정을 가진 개발자들이 관리하는 오�
         <translation>한 줄당 하나의 작업 URL(자석 지원)</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="233"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="245"/>
         <source>Rename:</source>
         <translation>이름 바꾸기:</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="241"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="253"/>
         <source>Optional</source>
         <translation>선택 사항</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="248"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="260"/>
         <source>Splits:</source>
         <translation>슬라이스 개수:</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="263"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="275"/>
         <source>Save to:</source>
         <translation>저장 위치:</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="355"/>
+        <source>Custom Request Header List:</source>
+        <translation>사용자 지정 요청 헤더 목록:</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="365"/>
+        <source>Custom request header list (one per line in the format KEY:VALUE)</source>
+        <translation>사용자 지정 요청 헤더 목록(한 줄에 하나씩, KEY:VALUE 형식)</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="408"/>
         <source>Advanced Options</source>
         <translation>고급 옵션</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="367"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="420"/>
         <source>Cancel</source>
         <translation>취소</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="378"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="431"/>
         <source>Submit</source>
         <translation>제출하기</translation>
     </message>

@@ -48,8 +48,16 @@ namespace gdl {
                 std::unordered_multimap<std::string, std::string> opt;
                 for (auto it = options.cbegin(); it != options.cend(); ++it) {
                     auto key   = it.key();
-                    auto value = it.value().toString();
-                    opt.emplace(key.toStdString(), value.toStdString());
+                    auto value = it.value();
+                    if (value.canConvert<QStringList>()) {
+                        auto value_list = value.toStringList();
+                        for (const auto& value_item : value_list) {
+                            opt.emplace(key.toStdString(), value_item.toStdString());
+                        }
+                    }
+                    else if (value.canConvert<QString>()) {
+                        opt.emplace(key.toStdString(), value.toString().toStdString());
+                    }
                 }
                 int count = 0;
                 for (const auto& url : urls) {
@@ -71,8 +79,16 @@ namespace gdl {
                 std::unordered_multimap<std::string, std::string> opt;
                 for (auto it = options.cbegin(); it != options.cend(); ++it) {
                     auto key   = it.key();
-                    auto value = it.value().toString();
-                    opt.emplace(key.toStdString(), value.toStdString());
+                    auto value = it.value();
+                    if (value.canConvert<QStringList>()) {
+                        auto value_list = value.toStringList();
+                        for (const auto& value_item : value_list) {
+                            opt.emplace(key.toStdString(), value_item.toStdString());
+                        }
+                    }
+                    else if (value.canConvert<QString>()) {
+                        opt.emplace(key.toStdString(), value.toString().toStdString());
+                    }
                 }
                 if (!QFile::exists(tarrent)) return false;
                 // 读取tarrent文件到base64
@@ -96,8 +112,16 @@ namespace gdl {
                 std::unordered_multimap<std::string, std::string> opt;
                 for (auto it = options.cbegin(); it != options.cend(); ++it) {
                     auto key   = it.key();
-                    auto value = it.value().toString();
-                    opt.emplace(key.toStdString(), value.toStdString());
+                    auto value = it.value();
+                    if (value.canConvert<QStringList>()) {
+                        auto value_list = value.toStringList();
+                        for (const auto& value_item : value_list) {
+                            opt.emplace(key.toStdString(), value_item.toStdString());
+                        }
+                    }
+                    else if (value.canConvert<QString>()) {
+                        opt.emplace(key.toStdString(), value.toString().toStdString());
+                    }
                 }
                 if (!QFile::exists(metalink)) return false;
                 // 读取metalink文件到base64

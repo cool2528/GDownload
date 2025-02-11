@@ -325,37 +325,47 @@ Apache License 2.0でライセンスされています
         <translation>1行に1つのタスクURL（マグネットをサポート）</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="233"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="245"/>
         <source>Rename:</source>
         <translation>リネーム</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="241"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="253"/>
         <source>Optional</source>
         <translation>選択可能</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="248"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="260"/>
         <source>Splits:</source>
         <translation>スライス数</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="263"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="275"/>
         <source>Save to:</source>
         <translation>保存先</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="355"/>
+        <source>Custom Request Header List:</source>
+        <translation>カスタムリクエストヘッダーリスト：</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="365"/>
+        <source>Custom request header list (one per line in the format KEY:VALUE)</source>
+        <translation>カスタムリクエストヘッダーリスト（KEY:VALUE形式で1行につき1つ）</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="408"/>
         <source>Advanced Options</source>
         <translation>高度なオプション</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="367"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="420"/>
         <source>Cancel</source>
         <translation>キャンセル</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="378"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="431"/>
         <source>Submit</source>
         <translation>投稿する</translation>
     </message>
