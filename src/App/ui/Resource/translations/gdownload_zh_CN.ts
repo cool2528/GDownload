@@ -326,37 +326,47 @@ Copyright © 2024 GDownload 团队
         <translation>每行一个任务 url（支持磁铁）</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="233"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="245"/>
         <source>Rename:</source>
         <translation>重命名</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="241"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="253"/>
         <source>Optional</source>
         <translation>可选</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="248"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="260"/>
         <source>Splits:</source>
         <translation>分片数:</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="263"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="275"/>
         <source>Save to:</source>
         <translation>存储位置:</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="355"/>
+        <source>Custom Request Header List:</source>
+        <translation>自定义请求协议头列表:</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="365"/>
+        <source>Custom request header list (one per line in the format KEY:VALUE)</source>
+        <translation>自定义请求协议头列表（每行一个，格式为 KEY:VALUE）</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="408"/>
         <source>Advanced Options</source>
         <translation>高级选项</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="367"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="420"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="378"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="431"/>
         <source>Submit</source>
         <translation>提交</translation>
     </message>

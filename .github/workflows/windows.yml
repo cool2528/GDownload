@@ -44,14 +44,21 @@ jobs:
         run: |
           echo "vcpkg-cmake-config: ${{ steps.vcpkg.outputs.vcpkg-cmake-config }}"
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.msvc_arch }}
-          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S ${{ github.workspace }} -DCMAKE_BUILD_TYPE=Release -GNinja -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00"
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S ${{ github.workspace }} -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/windows_package -DCMAKE_BUILD_TYPE=Release -GNinja -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00"
           cmake --build build --config Release --parallel
-
+          mkdir windows_pdb
+          copy /Y build\Release\bin\*.pdb windows_pdb
+          del /S /Q build\Release\bin\*.pdb
+          del /S /Q build\Release\bin\*.lib
+          del /S /Q build\Release\bin\*.exp
+          cmake --install build --config Release 
+    
       - name: package
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.package_name }}-${{ matrix.qt_version }}-${{ matrix.msvc_arch }}
-          path: build/release/
+        id: package
+        shell: pwsh
+        run: |
+           Compress-Archive -Path windows_pdb -DestinationPath ${{ matrix.package_name }}-${{ matrix.qt_version }}-${{ matrix.msvc_arch }}.zip -Force
+           echo "::set-output name=package_name::${{ matrix.package_name }}-${{ matrix.qt_version }}-${{ matrix.msvc_arch }}.zip"
 
       - name: Install NSIS
         uses: repolevedavaj/install-nsis@v1.0.2
@@ -67,16 +74,20 @@ jobs:
           echo ${{ github.workspace }}/build/release/
 
       - name: Upload Installer
+        if: startsWith(github.event.ref, 'refs/tags/')
         uses: actions/upload-artifact@v4
         with:
           name: Windows-Installer
           path: build/release/*.exe
 
       - name: uploadRelease
+        if: startsWith(github.event.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.RELEASE_TOKEN }}
-          file: build/release/GDownloader_windows_msvc2019_x64.exe
+          file: |
+            ${{ steps.package.outputs.package_name }}
+            build/release/GDownloader_windows_msvc2019_x64.exe
           asset_name: GDownloader_windows_${{ github.ref }}_${{ matrix.qt_arch }}.exe
           overwrite: true
 

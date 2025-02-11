@@ -1,5 +1,5 @@
 #pragma once
-#include <nlohmann/json.hpp>
+#include <rapidjson/document.h>
 #include "Engine_export.h"
 #include "result/result.h"
 #include "websocket_client.h"
@@ -10,7 +10,7 @@ namespace gdl {
 		class Engine_API Aria2cWebSocketClient {
 
 		   public:
-			explicit Aria2cWebSocketClient(const std::string& url,boost::asio::io_context& ioc);
+            explicit Aria2cWebSocketClient(const std::string& url, boost::asio::io_context& ioc);
 			~Aria2cWebSocketClient();
 
 		   public:
@@ -77,11 +77,12 @@ namespace gdl {
 			void onTextMessageReceived(std::string message);
 
 		   private:
-			Result<bool> Send(const std::string_view& method, const nlohmann::json& params);
+            Result<bool> Send(const std::string_view& method, rapidjson::Value& params);
 
 		   private:
 			std::string url_;
 			std::shared_ptr<WebSocketClient> websocket_;
+            rapidjson::Document doc_;
 
 			std::function<void(const State&, std::string)> state_chanage_callback_{nullptr};
 			std::function<void(const std::string&)> text_message_callback_{nullptr};
