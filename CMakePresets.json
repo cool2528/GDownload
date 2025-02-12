@@ -28,7 +28,7 @@
       "description": "OSX Clang",
       "generator": "Ninja",
       "architecture": {
-        "value": "x64",
+        "value": "arm64",
         "strategy": "external"
       },
       "cacheVariables": {
