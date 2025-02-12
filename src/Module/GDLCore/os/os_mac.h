@@ -1,5 +1,8 @@
 #pragma once
 #include "globalTypes.h"
+#include <string>
+#include <optional>
+#include <utility>
 namespace gdl {
 	namespace os {
 		namespace mac {
