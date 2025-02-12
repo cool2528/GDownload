@@ -132,6 +132,11 @@ if(APPLE)
         MACOSX_BUNDLE_ICON_FILE "logo.icns"
         MACOSX_BUNDLE TRUE
         MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME}
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin"
+        BUNDLE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin"
+        BUILD_WITH_INSTALL_RPATH TRUE
+        INSTALL_NAME_DIR "@rpath"
+        INSTALL_RPATH "@executable_path/../Frameworks"
     )
 
     # 复制logo.icns到捆绑包的资源目录中
@@ -147,6 +152,7 @@ if(APPLE)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations
             ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/${PROJECT_NAME}.app/Contents/Resources/translations
+        VERBATIM
     )
 elseif(WIN32)
     if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.rc)
