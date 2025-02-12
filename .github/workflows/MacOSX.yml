@@ -1,0 +1,79 @@
+name: MacOS-CI
+
+on:
+  push:
+    branches:
+      - develop
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest]
+        include:
+          - qt_version: 6.5.2
+            package_name: gdownloader_macos
+
+    steps:
+      - name: Checkout Branch
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ matrix.qt_version }}
+          modules: 'qt5compat qtwebsockets qt3d qtshadertools'
+
+      - name: Install create-dmg
+        run: brew install create-dmg
+
+      - name: Setup vcpkg
+        uses: johnwason/vcpkg-action@v6
+        with:
+          manifest-dir: ${{ github.workspace }}
+          triplet: x64-osx-release
+          token: ${{ github.token }}
+          github-binarycache: true
+
+      - name: Build
+        run: |
+          cmake -B build -S ${{ github.workspace }} \
+            -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/macos_package \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15
+          cmake --build build --config Release --parallel
+          cmake --install build --config Release
+
+      - name: Package Debug Symbols
+        run: |
+          mkdir macos_debug_symbols
+          find build -name "*.dSYM" -exec cp -r {} macos_debug_symbols/ \;
+          zip -r ${{ matrix.package_name }}-${{ matrix.qt_version }}-debug-symbols.zip macos_debug_symbols
+
+      - name: Upload Debug Symbols
+        if: startsWith(github.event.ref, 'refs/tags/')
+        uses: actions/upload-artifact@v4
+        with:
+          name: MacOS-Debug-Symbols
+          path: ${{ matrix.package_name }}-${{ matrix.qt_version }}-debug-symbols.zip
+
+      - name: Upload DMG
+        #if: startsWith(github.event.ref, 'refs/tags/')
+        uses: actions/upload-artifact@v4
+        with:
+          name: MacOS-DMG
+          path: macos_package/*.dmg
+
+      - name: Upload Release
+        #if: startsWith(github.event.ref, 'refs/tags/')
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.RELEASE_TOKEN }}
+          file: |
+            ${{ matrix.package_name }}-${{ matrix.qt_version }}-debug-symbols.zip
+            macos_package/GDownload-*.dmg
+          file_glob: true
+          overwrite: true
+          asset_name: GDownloader_macos_${{ github.ref }}
