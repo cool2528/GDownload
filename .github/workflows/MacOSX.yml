@@ -30,19 +30,18 @@ jobs:
         run: brew install create-dmg
 
       - name: Setup vcpkg
+        id: vcpkg
         uses: johnwason/vcpkg-action@v6
         with:
           manifest-dir: ${{ github.workspace }}
-          triplet: x64-osx-release
+          triplet: arm64-osx-release
           token: ${{ github.token }}
           github-binarycache: true
 
       - name: Build
         run: |
-          cmake -B build -S ${{ github.workspace }} \
-            -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/macos_package \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15
+          echo "vcpkg-cmake-config: ${{ steps.vcpkg.outputs.vcpkg-cmake-config }}"
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S ${{ github.workspace }} -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/macos_package -DCMAKE_BUILD_TYPE=Release
           cmake --build build --config Release --parallel
           cmake --install build --config Release
 
@@ -65,6 +64,10 @@ jobs:
         with:
           name: MacOS-DMG
           path: macos_package/*.dmg
+          
+      - name: echo package name
+        run: |
+          echo "ls macos_package"
 
       - name: Upload Release
         #if: startsWith(github.event.ref, 'refs/tags/')
@@ -73,7 +76,7 @@ jobs:
           repo_token: ${{ secrets.RELEASE_TOKEN }}
           file: |
             ${{ matrix.package_name }}-${{ matrix.qt_version }}-debug-symbols.zip
-            macos_package/GDownload-*.dmg
+            macos_package/*.dmg
           file_glob: true
           overwrite: true
           asset_name: GDownloader_macos_${{ github.ref }}

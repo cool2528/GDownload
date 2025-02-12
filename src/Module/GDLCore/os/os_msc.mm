@@ -2,6 +2,8 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <Foundation/Foundation.h>
 #include <CFNetwork/CFNetwork.h>
+#include <optional>
+#include <utility>
 namespace gdl {
 namespace os {
 namespace mac {
