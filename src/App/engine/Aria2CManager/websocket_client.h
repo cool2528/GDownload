@@ -7,6 +7,7 @@
 #include <mutex>
 #include <queue>
 #include <string>
+#include <thread>
 
 namespace gdl {
 	namespace engine {
@@ -55,6 +56,12 @@ namespace gdl {
 			void setErrorCallback(ErrorCallback cb) { error_callback_ = std::move(cb); }
 			bool isConnected() const { return ws_.is_open(); }
 
+			void setAutoReconnect(bool enabled, int maxRetries = -1, int retryInterval = 5) {
+				auto_reconnect_ = enabled;
+				max_retries_ = maxRetries;
+				retry_interval_ = retryInterval;
+			}
+
 		   private:
 			void onResolve(beast::error_code ec, tcp::resolver::results_type results) {
 				if (ec) {
@@ -80,6 +87,8 @@ namespace gdl {
 					handleError("WebSocket handshake failed: " + ec.message());
 					return;
 				}
+
+				retry_count_ = 0;
 
 				if (connect_callback_) {
 					connect_callback_();
@@ -153,7 +162,27 @@ namespace gdl {
 				if (error_callback_) {
 					error_callback_(error);
 				}
+				
+				if (auto_reconnect_) {
+					if (max_retries_ == -1 || retry_count_ < max_retries_) {
+						retry_count_++;
+						net::post(ws_.get_executor(), 
+							[self = shared_from_this()]() {
+								std::this_thread::sleep_for(std::chrono::seconds(self->retry_interval_));
+								self->reconnect();
+							});
+						return;
+					}
+				}
+				
 				disconnect();
+			}
+
+			void reconnect() {
+				if (!ws_.is_open()) {
+					resolver_.async_resolve(host_, port_,
+						beast::bind_front_handler(&WebSocketClient::onResolve, shared_from_this()));
+				}
 			}
 
 		   private:
@@ -171,6 +200,11 @@ namespace gdl {
 			ConnectCallback connect_callback_;
 			DisconnectCallback disconnect_callback_;
 			ErrorCallback error_callback_;
+
+			bool auto_reconnect_ = false;
+			int max_retries_ = -1;        // -1 表示无限重试
+			int retry_count_ = 0;
+			int retry_interval_ = 5;      // 重试间隔（秒）
 		};
 
 	}  // namespace engine

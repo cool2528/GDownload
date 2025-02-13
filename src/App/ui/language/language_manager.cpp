@@ -5,7 +5,7 @@
 #include <QQmlEngine>
 #include "GDLCore/logger.h"
 #include "Settings/settings_manager.h"
-
+#include "os/os.h"
 namespace gdl {
 	namespace ui {
 		namespace language {
@@ -16,10 +16,11 @@ namespace gdl {
 
 			LanguageManager::LanguageManager(QObject* parent) : QObject(parent) {
 #ifdef __APPLE__
-				const QString path = QDir::currentPath();
+				const QString path = QString::fromStdString(os::GetExecutableDir());
 				QString app_path_dir =
 					QString::fromStdString(std::filesystem::path(path.toStdString()).parent_path().string());
 				translation_path_ = app_path_dir + "/Resources/translations/";
+				LOG_INFO("translation_path_ {}", translation_path_.toStdString())
 #elif WIN32
 				translation_path_ = QDir::currentPath() + "/translations/";
 #endif

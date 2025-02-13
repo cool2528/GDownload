@@ -152,6 +152,10 @@ if(APPLE)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations
             ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/${PROJECT_NAME}.app/Contents/Resources/translations
+        COMMAND $<$<CONFIG:Debug>:install_name_tool>
+            $<$<CONFIG:Debug>:-add_rpath>
+            $<$<CONFIG:Debug>:${QT_ROOT}/lib>
+            $<$<CONFIG:Debug>:${CMAKE_BINARY_DIR}/$<CONFIG>/bin/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME}>
         VERBATIM
     )
 elseif(WIN32)
