@@ -2,8 +2,13 @@ name: MacOS-CI
 
 on:
   push:
+    tags: 
+      - '*'
     branches:
-      - develop
+      - main
+  pull_request:
+    branches:
+      - main
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -46,43 +51,16 @@ jobs:
           cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S ${{ github.workspace }} -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/macos_package -DCMAKE_BUILD_TYPE=Release
           cmake --build build --config Release --parallel
           cmake --install build --config Release
-
-      - name: Package Debug Symbols
-        run: |
-          mkdir macos_debug_symbols
-          find build -name "*.dSYM" -exec cp -r {} macos_debug_symbols/ \;
-          zip -r macos_package/${{ matrix.package_name }}-${{ matrix.qt_version }}-debug-symbols.zip macos_debug_symbols
-
-      - name: Upload Debug Symbols
-        if: startsWith(github.event.ref, 'refs/tags/')
-        uses: actions/upload-artifact@v4
-        with:
-          name: MacOS-Debug-Symbols
-          path: macos_package/${{ matrix.package_name }}-${{ matrix.qt_version }}-debug-symbols.zip
-
-      - name: Upload DMG
-        #if: startsWith(github.event.ref, 'refs/tags/')
-        uses: actions/upload-artifact@v4
-        with:
-          name: MacOS-DMG
-          path: macos_package/*.dmg
-          
       - name: echo package name
         run: |
           echo "ls macos_package"
           ls macos_package
 
-      - name: Get Version
-        id: get_version
-        run: |
-          VERSION=$(git describe --tags --abbrev=0)
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-
       - name: Upload Release
+        if: startsWith(github.event.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.RELEASE_TOKEN }}
           file_glob: true
           file: macos_package/*
           overwrite: true
-          tag: ${{ steps.get_version.outputs.version }}
