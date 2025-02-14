@@ -6,6 +6,7 @@ import gdl.sdk
 import "Navigator"
 import "titlebar"
 import "Browser"
+import "CommonComponents"
 FramelessWindow{
     id: mainWindow
     width: 1024
@@ -88,6 +89,11 @@ FramelessWindow{
 
     }
 
+    ToastContainer {
+        id: toastContainer
+        anchors.fill: parent
+        z: 999999  // 确保显示在最上层
+    }
 
 }
 

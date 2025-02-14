@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+    <!-- 蓝色圆形背景 -->
+    <circle cx="64" cy="64" r="60" fill="#2196F3"/>
+    
+    <!-- 白色下载箭头 - 只保留箭头部分 -->
+    <path d="M64 30 
+             L64 78
+             M64 78
+             L44 58
+             M64 78
+             L84 58" 
+          stroke="white" 
+          stroke-width="12" 
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          fill="none"/>
+</svg>

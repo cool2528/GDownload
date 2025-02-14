@@ -11,6 +11,7 @@
 #include "Parser/file_parser.h"
 #include "logger.h"
 #include "os/os.h"
+#include "toast/toast_manager.h"
 #include "utils/utils.h"
 namespace gdl {
 	namespace ui {
@@ -666,6 +667,11 @@ namespace gdl {
 #endif
 					},
 					Qt::QueuedConnection);
+
+                connect(
+                    this, &BrowserManager::sigErrorMessage, this,
+                    [this](const QString& message) { toast::ToastManager::Instance().ShowError(message); },
+                    Qt::QueuedConnection);
 			}
 			void BrowserManager::InitDownloadHistoryCache() const {
 				const auto records = gdl::cache::DownloadHistoryCache::Instance().GetRecords();
@@ -955,8 +961,8 @@ namespace gdl {
 			}
 
 			void RegisterTypes(QQmlEngine* engine) {
-				qmlRegisterSingletonInstance<BrowserManager>(GEXPORT_MODULE_URL, 1, 0, "BrowserManager",
-															 &BrowserManager::Instance());
+                qmlRegisterSingletonInstance<BrowserManager>(GEXPORT_MODULE_URL, 1, 0, "BrowserManager",
+                                                             &BrowserManager::Instance());
 				const QString app_path = QString::fromStdString(os::GetExecutableDir());
 				QString aria2c_engine_path;
 #ifdef __APPLE__

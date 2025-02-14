@@ -43,7 +43,7 @@ Item{
                 iconSize: 30
                 iconColor: "#ffffff"
                 onClicked: {
-                    Qt.openUrlExternally("https://www.baidu.com/")
+                    Qt.openUrlExternally("https://github.com/cool2528/GDownload")
                 }
             }
             IconButton{

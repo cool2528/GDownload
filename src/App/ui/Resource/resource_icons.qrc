@@ -27,5 +27,9 @@
         <file>images/dialog/dialog_close_hover.svg</file>
         <file>images/dialog/dialog_close_normol.svg</file>
         <file>docs/NOTICE</file>
+        <file>images/toast/error.svg</file>
+        <file>images/toast/info.svg</file>
+        <file>images/toast/success.svg</file>
+        <file>images/toast/warning.svg</file>
     </qresource>
 </RCC>

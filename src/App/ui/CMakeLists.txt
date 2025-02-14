@@ -192,14 +192,14 @@ elseif(WIN32)
         --qmlimport ${QT_ROOT}/qml
         --qmldir ${CMAKE_CURRENT_SOURCE_DIR}/Resource/qml
         COMMAND ${CMAKE_COMMAND} -E make_directory
-        ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/engine
+        ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/$<CONFIG>/engine
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/extra/win32/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,ia32>/engine/
-        ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/engine
+        ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/$<CONFIG>/engine
         # 复制qm文件
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations
-        ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/translations
+        ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/$<CONFIG>/translations
     )
 endif()
 register_target(${PROJECT_NAME})
