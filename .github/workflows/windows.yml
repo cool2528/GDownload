@@ -31,7 +31,7 @@ jobs:
         with:
           version: ${{ matrix.qt_version }}
           arch: ${{ matrix.qt_arch }}
-          modules: 'qt5compat qtwebsockets qt3d qtshadertools'
+          modules: 'qt3d qtimageformats qtwebsockets qt5compat qtshadertools'
           
       - name: vcpkg build
         id: vcpkg

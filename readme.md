@@ -7,7 +7,7 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License"></a>
   <a href="#"><img src="https://img.shields.io/badge/platform-Windows%20|%20macOS%20|%20Linux-lightgrey.svg" alt="Platform"></a>
-  <a href="#"><img src="https://img.shields.io/badge/language-C++17-orange.svg" alt="Language"></a>
+  <a href="#"><img src="https://img.shields.io/badge/language-C++20-orange.svg" alt="Language"></a>
   <a href="#"><img src="https://img.shields.io/badge/Qt-6.5+-green.svg" alt="Qt Version"></a>
 </p>
 
