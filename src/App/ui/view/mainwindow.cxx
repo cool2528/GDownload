@@ -16,6 +16,7 @@
 #include "os/os.h"
 #include "theme/theme.h"
 #include "utils/utils.h"
+#include "toast/toast_manager.h"
 FRAMELESSHELPER_USE_NAMESPACE
 namespace gd {
     namespace ui {
@@ -64,6 +65,7 @@ namespace gd {
                 LOG_ERR("init download history cache fail")
             }
             gdl::ui::browser::RegisterTypes(engine);
+            gdl::ui::toast::RegisterTypes(engine);
         }
         void MainWindow::InitTranslation(QGuiApplication* app) {}
         void MainWindow::InitFont(QQmlEngine* engine) {

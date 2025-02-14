@@ -31,13 +31,13 @@ namespace gdl {
 					if (!child_optional.has_value()) {
                         if (key_path == config::Keys::Dir.get()) {
 							std::error_code ec;
-							if (value.empty() || !std::filesystem::exists(value,ec)) {
+                            if (value.empty() || !std::filesystem::exists(value, ec)) {
 								value = os::GetUserDownloadsDir();
 							}
 						}
                         else if (key_path == config::Keys::ConfPath.get()) {
 							std::error_code ec;
-							if (value.empty() || !std::filesystem::exists(value,ec)) {
+                            if (value.empty() || !std::filesystem::exists(value, ec)) {
 								std::string conf_path;
 #ifdef __APPLE__
 								conf_path = os::GetExecutableDir() + "/../Resources/engine/aria2.conf";
@@ -46,7 +46,6 @@ namespace gdl {
 #endif
 								value = conf_path;
 							}
-
 						}
                         else if (key_path == config::Keys::TrackerSourceUrls.get() && value.empty()) {
 							value = DEFAULT_TRACKER_SOURCE_URLS;
@@ -60,7 +59,42 @@ namespace gdl {
                             }
                         }
 						ptree_root_.put(key_path.data(), value.data());
-					}
+                    }
+                    else {
+                        if (key_path == config::Keys::Dir.get()) {
+                            std::error_code ec;
+                            if (value.empty() || !std::filesystem::exists(value, ec)) {
+                                value = os::GetUserDownloadsDir();
+                                ptree_root_.put(key_path.data(), value.data());
+                            }
+                        }
+                        else if (key_path == config::Keys::ConfPath.get()) {
+                            std::error_code ec;
+                            if (value.empty() || !std::filesystem::exists(value, ec)) {
+                                std::string conf_path;
+#ifdef __APPLE__
+                                conf_path = os::GetExecutableDir() + "/../Resources/engine/aria2.conf";
+#else
+                                conf_path = os::GetExecutableDir() + "/engine/aria2.conf";
+#endif
+                                value = conf_path;
+                                ptree_root_.put(key_path.data(), value.data());
+                            }
+                        }
+                        else if (key_path == config::Keys::TrackerSourceUrls.get() && value.empty()) {
+                            value = DEFAULT_TRACKER_SOURCE_URLS;
+                            ptree_root_.put(key_path.data(), value.data());
+                        }
+                        else if (key_path == config::Keys::SaveSession.get() && value.empty()) {
+                            value = os::GetAppDataDir() + "/gdownload/session/aria2.session";
+                            std::error_code ec;
+                            const auto session_dir = std::filesystem::path(value).parent_path();
+                            if (!std::filesystem::exists(session_dir, ec)) {
+                                std::filesystem::create_directories(session_dir, ec);
+                            }
+                            ptree_root_.put(key_path.data(), value.data());
+                        }
+                    }
 				}
 				lock.unlock();
 				Save();

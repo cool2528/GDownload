@@ -124,8 +124,8 @@ Popup {
                             anchors.top: parent.top
                             font.pixelSize: 12
                             placeholderText: qsTr("One task url per line (supports magnet)")
-                            color: GTheme.dark ? "#9a9a9a" : "#bababa"
-                            placeholderTextColor: color
+                            color: GTheme.dark ? "#ffffff" : "#303133"
+                            placeholderTextColor: GTheme.dark ? "#9a9a9a" : "#bababa"
                             background: Rectangle{
                                 implicitHeight: taskPageLayout.height
                                 implicitWidth: taskPageLayout.width
@@ -363,8 +363,8 @@ Popup {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 100
                             placeholderText: qsTr("Custom request header list (one per line in the format KEY:VALUE)")
-                            color: GTheme.dark ? "#9a9a9a" : "#bababa"
-                            placeholderTextColor: color
+                            color: GTheme.dark ? "#ffffff" : "#303133"
+                            placeholderTextColor: GTheme.dark ? "#9a9a9a" : "#bababa"
                             background: Rectangle{
                                 implicitHeight: taskPageLayout.height
                                 implicitWidth: taskPageLayout.width

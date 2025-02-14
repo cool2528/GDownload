@@ -33,5 +33,7 @@
         <file>qml/CommonComponents/HelpDialog.qml</file>
         <file>qml/CommonComponents/CustomVScrollBar.qml</file>
         <file>qml/CommonComponents/ScrollText.qml</file>
+        <file>qml/CommonComponents/MessageToast.qml</file>
+        <file>qml/CommonComponents/ToastContainer.qml</file>
     </qresource>
 </RCC>
