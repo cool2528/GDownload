@@ -16,6 +16,7 @@ jobs:
         include:
           - qt_version: 6.5.2
             package_name: gdownloader_macos
+            qt_arch: clang_64
 
     steps:
       - name: Checkout Branch
@@ -29,10 +30,13 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ matrix.qt_version }}
-          modules: 'qt5compat qtwebsockets qt3d qtshadertools'
+          arch: ${{ matrix.qt_arch }}
+          modules: 'qt3d qtimageformats qtwebsockets qt5compat qtshadertools'
 
-      - name: Install create-dmg
-        run: brew install create-dmg
+      - name: Install Tools
+        run: |
+          brew install create-dmg
+          brew install ninja
 
       - name: Setup vcpkg
         id: vcpkg
@@ -46,7 +50,7 @@ jobs:
       - name: Build
         run: |
           echo "vcpkg-cmake-config: ${{ steps.vcpkg.outputs.vcpkg-cmake-config }}"
-          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S ${{ github.workspace }} -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/macos_package -DCMAKE_BUILD_TYPE=Release
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S ${{ github.workspace }} -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/macos_package -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -GNinja
           cmake --build build --config Release --parallel
           cmake --install build --config Release
       - name: echo package name
