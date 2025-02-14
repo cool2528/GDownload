@@ -2,7 +2,7 @@
 
 # 安装包元数据
 Name "GDownloader"
-OutFile "GDownloader_windows_msvc2019_x64.exe"
+OutFile "GDownloader_windows_@APP_VERSION@.exe"
 InstallDir "$PROGRAMFILES64\GDownloader"
 RequestExecutionLevel admin
 # 界面配置

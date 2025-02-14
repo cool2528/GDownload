@@ -2,15 +2,16 @@ name: Windows-CI
 
 on:
   push:
-    tags: 
+    tags:
       - '*'
     branches:
-      - main
+      - 'main'
   pull_request:
     branches:
       - main
 jobs:
   build:
+    if: github.ref_type == 'tag' && github.ref_name == 'main'
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -92,10 +93,8 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.RELEASE_TOKEN }}
-          file: |
-            ${{ steps.package.outputs.package_name }}
-            build/release/GDownloader_windows_msvc2019_x64.exe
-          asset_name: GDownloader_windows_${{ github.ref }}_${{ matrix.qt_arch }}.exe
+          file_glob: true
+          file: build/release/GDownloader_windows_*.exe
           overwrite: true
 
 
