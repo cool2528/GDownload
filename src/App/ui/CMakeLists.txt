@@ -168,7 +168,16 @@ elseif(WIN32)
         @ONLY
     )
     endif()
-
+    # 检查生成器类型
+    if(CMAKE_GENERATOR MATCHES "Visual Studio")
+    set(OUTPUT_BIN_PATH "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin/${CMAKE_BUILD_TYPE}")
+    else()
+    # Ninja 或其他生成器
+    set(OUTPUT_BIN_PATH "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin")
+    endif()
+    # 打印生成器信息
+    message(STATUS "CMAKE_GENERATOR: ${CMAKE_GENERATOR}")
+    message(STATUS "OUTPUT_BIN_PATH: ${OUTPUT_BIN_PATH}")
     list(APPEND QT_RESOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.rc)
     endif()
     add_executable(${PROJECT_NAME} ${SOURCES_FILES} ${HEADERS_FILES} ${QT_RESOURCE_FILES} ${QT_QML_FILES})
@@ -192,14 +201,14 @@ elseif(WIN32)
         --qmlimport ${QT_ROOT}/qml
         --qmldir ${CMAKE_CURRENT_SOURCE_DIR}/Resource/qml
         COMMAND ${CMAKE_COMMAND} -E make_directory
-        ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/$<CONFIG>/engine
+        ${OUTPUT_BIN_PATH}/engine
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/extra/win32/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,ia32>/engine/
-        ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/$<CONFIG>/engine
+        ${OUTPUT_BIN_PATH}/engine
         # 复制qm文件
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations
-        ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/$<CONFIG>/translations
+        ${OUTPUT_BIN_PATH}/translations
     )
 endif()
 register_target(${PROJECT_NAME})
