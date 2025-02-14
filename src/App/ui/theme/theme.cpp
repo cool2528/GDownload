@@ -74,7 +74,7 @@ namespace gdl {
 			void RegisterTypes(QQmlEngine* engine) {
 				qmlRegisterUncreatableMetaObject(GThemeType::staticMetaObject, GEXPORT_MODULE_URL, 1, 0, "GThemeType",
 												 "theme type enum");
-				qmlRegisterSingletonInstance<GTheme>(GEXPORT_MODULE_URL, 1, 0, "GTheme", &GTheme::Instance());
+                qmlRegisterSingletonInstance<GTheme>(GEXPORT_MODULE_URL, 1, 0, "GTheme", &GTheme::Instance());
 			}
 
 		}  // namespace theme

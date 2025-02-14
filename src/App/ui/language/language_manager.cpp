@@ -22,7 +22,7 @@ namespace gdl {
 				translation_path_ = app_path_dir + "/Resources/translations/";
 				LOG_INFO("translation_path_ {}", translation_path_.toStdString())
 #elif WIN32
-				translation_path_ = QDir::currentPath() + "/translations/";
+                translation_path_ = QString::fromStdString(os::GetExecutableDir()) + "/translations/";
 #endif
 			}
 
