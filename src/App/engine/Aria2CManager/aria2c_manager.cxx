@@ -88,7 +88,7 @@ namespace gdl {
 			};
 			std::unordered_map<std::string, std::string> aria2c_settings;
 			aria2c_settings["no-conf"]				  = "false";  //no-conf
-			aria2c_settings["conf-path"]			  = config::GetValue(config::Keys::ConfPath).AsString();
+            aria2c_settings["conf-path"]			  = quote_path(config::GetValue(config::Keys::ConfPath).AsString());
 			aria2c_settings["allow-overwrite"]		  = "false";
 			aria2c_settings["auto-file-renaming"]	  = "true";
 			aria2c_settings["bt-exclude-tracker"]	  = "";
