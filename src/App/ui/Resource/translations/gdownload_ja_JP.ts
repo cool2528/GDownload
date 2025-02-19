@@ -393,4 +393,22 @@ Apache License 2.0でライセンスされています
         <translation>暗い</translation>
     </message>
 </context>
+<context>
+    <name>mainWindow</name>
+    <message>
+        <location filename="../qml/mainWindow.qml" line="118"/>
+        <source>Show main interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/mainWindow.qml" line="125"/>
+        <source>Hide main interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/mainWindow.qml" line="132"/>
+        <source>Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>
