@@ -3,6 +3,7 @@ import org.wangwenx190.FramelessHelper
 import QtQuick.Controls.Basic
 import QtQuick.Controls
 import gdl.sdk
+import Qt.labs.platform
 import "Navigator"
 import "titlebar"
 import "Browser"
@@ -93,6 +94,47 @@ FramelessWindow{
         id: toastContainer
         anchors.fill: parent
         z: 999999  // 确保显示在最上层
+    }
+
+    // 系统托盘
+    SystemTrayIcon{
+        id:systemTray
+        icon.mask: true
+        icon.source: "qrc:/images/logo/icon.ico"
+        visible: true
+        tooltip:"GDownload"
+        onActivated: function(reason){
+            if (reason === SystemTrayIcon.DoubleClick) {
+                mainWindow.showNormal()
+            }else if(reason === SystemTrayIcon.MiddleClick){
+                mainWindow.hide()
+            }else if(reason === SystemTrayIcon.Context || reason === SystemTrayIcon.SystemTrayIcon.Trigger){
+                tray_menu.open()
+            }
+        }
+        menu: Menu{
+            id:tray_menu
+            MenuItem{
+                text:qsTr("Show main interface")
+                onTriggered: {
+                    mainWindow.showNormal()
+                }
+            }
+            MenuSeparator{}
+            MenuItem{
+                text:qsTr("Hide main interface")
+                onTriggered: {
+                    mainWindow.hide()
+                }
+            }
+            MenuSeparator{}
+            MenuItem{
+                text:qsTr("Exit")
+                onTriggered: {
+                   Qt.quit()
+                }
+            }
+        }
     }
 
 }

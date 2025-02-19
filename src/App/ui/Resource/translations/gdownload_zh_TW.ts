@@ -394,4 +394,22 @@ GDownload 是一個開源項目，由熱衷於技術的開發者維護。我們�
         <translation>深色</translation>
     </message>
 </context>
+<context>
+    <name>mainWindow</name>
+    <message>
+        <location filename="../qml/mainWindow.qml" line="118"/>
+        <source>Show main interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/mainWindow.qml" line="125"/>
+        <source>Hide main interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/mainWindow.qml" line="132"/>
+        <source>Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>
