@@ -659,6 +659,7 @@ namespace gdl {
 					this, &BrowserManager::sigUpdateActiveProgress, this,
 					[this](double progress) {
 #if defined(_WIN32)
+                        if (qApp->allWindows().isEmpty()) return;
 						auto nativeWindowHandle = reinterpret_cast<void*>(qApp->allWindows().first()->winId());
 						utils::UtilsToolsManager::Instance().SetTaskbarProgress(progress, nativeWindowHandle);
 

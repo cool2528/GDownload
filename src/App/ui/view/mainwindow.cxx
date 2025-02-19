@@ -1,6 +1,6 @@
 #include "mainwindow.h"
+#include <QApplication>
 #include <QFontDatabase>
-#include <QGuiApplication>
 #include <QQmlContext>
 #include <QUrl>
 #include "Browser/browser_manager.h"
@@ -15,8 +15,8 @@
 #include "logger.h"
 #include "os/os.h"
 #include "theme/theme.h"
-#include "utils/utils.h"
 #include "toast/toast_manager.h"
+#include "utils/utils.h"
 FRAMELESSHELPER_USE_NAMESPACE
 namespace gd {
     namespace ui {
@@ -27,20 +27,20 @@ namespace gd {
         int MainWindow::Exec(int argc, char* argv[]) {
 
             FramelessHelper::Quick::initialize();
-            QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
-            QGuiApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
+            QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+            QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-            QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+            QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
-            QCoreApplication::setOrganizationName("gdl");
-            QCoreApplication::setApplicationName("gdownload");
-            QGuiApplication app(argc, argv);
+            QApplication::setOrganizationName("gdl");
+            QApplication::setApplicationName("gdownload");
+            QApplication app(argc, argv);
             InitIcon(&app);
             QQmlApplicationEngine engine;
             InitQmlEngine(&engine);
             InitFont(&engine);
             QObject::connect(
-                &engine, &QQmlApplicationEngine::objectCreationFailed, &app, []() { QCoreApplication::exit(-1); },
+                &engine, &QQmlApplicationEngine::objectCreationFailed, &app, []() { QApplication::exit(-1); },
                 Qt::QueuedConnection);
             const QUrl url(QStringLiteral("qrc:/qml/mainWindow.qml"));
             engine.addImportPath(QStringLiteral("qrc:/qml"));
