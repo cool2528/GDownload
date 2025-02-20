@@ -15,13 +15,56 @@ namespace gdl {
 			}
 
 			bool GTheme::dark() const {
+                bool is_dark = false;
 				if (theme_ == GThemeType::ThemeMode::kDark) {
-					return true;
+                    is_dark = true;
 				}
 				else if (theme_ == GThemeType::ThemeMode::kSystem) {
-					return system_is_dark_theme_;
+                    is_dark = system_is_dark_theme_;
 				}
-				return false;
+                QString menu_style;
+                if (is_dark) {
+                    menu_style =
+                        "QMenu{"
+                        "background-color: #292a2d;"
+                        "}"
+                        "QMenu::item{"
+                        "background-color: #292a2d;"
+                        "color: #ffffff;"
+                        "}"
+                        "QMenu::item:selected{"
+                        "background-color: #3f4042;"
+                        "}"
+                        "QMenu::item:hover{"
+                        "background-color: #3f4042;"
+                        "}"
+                        "QMenu::separator{"
+                        "height: 2px;"
+                        "background:#35383b;"
+                        "}";
+                }
+                else {
+                    menu_style =
+                        "QMenu{"
+                        "background-color: white;"
+                        "}"
+                        "QMenu::item{"
+                        "background-color: transparent;"
+                        "color: #3b3b3b;"
+                        "}"
+                        "QMenu::item:selected{"
+                        "background-color: #e8e8e9;"
+                        "}"
+                        "QMenu::item:hover{"
+                        "background-color: #e8e8e9;"
+                        "}"
+                        "QMenu::separator{"
+                        "height: 2px;"
+                        "background:#dadce0;"
+                        "}";
+                }
+                qApp->setStyleSheet(menu_style);
+                return is_dark;
 			}
 
 			GTheme::GTheme(QObject* parent) : QObject(parent), system_is_dark_theme_(SystemIsDarkTheme()) {
