@@ -17,27 +17,27 @@ namespace gdl {
 
 				switch (role) {
 					case kTaskId:
-						return task.task_id();
+						return QVariant::fromValue(task.task_id());
 					case kTaskState:
-						return static_cast<int>(task.task_state());
+						return QVariant::fromValue(static_cast<int>(task.task_state()));
 					case kTaskFileName:
-						return task.task_file_name();
+						return QVariant::fromValue(task.task_file_name());
 					case kTaskSavePath:
-						return task.task_save_path();
+						return QVariant::fromValue(task.task_save_path());
 					case kTaskTotalSize:
-						return DownloadTaskInfo::FormatFileSize(task.task_total_size());
+						return QVariant::fromValue(DownloadTaskInfo::FormatFileSize(task.task_total_size()));
 					case kTaskCurrentSize:
-						return DownloadTaskInfo::FormatFileSize(task.task_current_size());
+						return QVariant::fromValue(DownloadTaskInfo::FormatFileSize(task.task_current_size()));
 					case kTaskDownloadSpeed:
-						return DownloadTaskInfo::FormatFileSize(task.task_download_speed());
+						return QVariant::fromValue(DownloadTaskInfo::FormatFileSize(task.task_download_speed()));
 					case kTaskProgress:
-						return task.progress();
+						return QVariant::fromValue(task.progress());
 					case kTaskRemainingTime:
-						return task.FormatRemainingTime();
+						return QVariant::fromValue(task.FormatRemainingTime());
 					case kTaskConnections:
-						return task.task_connections();
+						return QVariant::fromValue(task.task_connections());
                     case kTaskDownloadLink:
-                        return task.task_download_link();
+                        return QVariant::fromValue(task.task_download_link());
 					default:
 						return QVariant();
 				}
