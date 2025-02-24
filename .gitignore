@@ -72,7 +72,7 @@ ehthumbs_vista.db
 .directory
 .Trash-*
 .nfs*
-
+*.AppImage
 # Android specific
 *.apk
 *.ap_

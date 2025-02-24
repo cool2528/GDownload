@@ -74,6 +74,12 @@ elseif(WIN32)
 elseif(UNIX AND NOT APPLE)
     set(CMAKE_CXX_VISIBILITY_PRESET "hidden")
     set(CMAKE_VISIBILITY_INLINES_HIDDEN "YES")
+    # 设置 RPATH
+    set(CMAKE_SKIP_BUILD_RPATH FALSE)
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+    set(CMAKE_INSTALL_RPATH "$ORIGIN:$ORIGIN/../lib")
+    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+    set(VCPKG_OVERLAY_TRIPLETS  ${CMAKE_SOURCE_DIR}/custom-triplets)
     set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/linux")
 endif()
 
@@ -239,19 +245,97 @@ elseif(APPLE)
         set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE PATH "Installation prefix" FORCE)
     endif()
 elseif(UNIX AND NOT APPLE)
+    include(GNUInstallDirs)
+    
+    # 获取所有注册的目标
     get_property(PROJECT_TARGETS GLOBAL PROPERTY PROJECT_TARGETS)
-
-    # Linux 安装规则
+    
+    # 设置安装路径
+    set(APP_NAME "gdownload")
+    set(APP_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}")
+    set(APP_BIN_DIR "${APP_INSTALL_DIR}/usr/bin") 
+    set(APP_LIB_DIR "${APP_INSTALL_DIR}/usr/lib")
+    set(APP_SHARE_DIR "${APP_INSTALL_DIR}/usr/share")
+    
+    # 安装所有目标
     install(TARGETS ${PROJECT_TARGETS}
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION ${APP_BIN_DIR}
+        LIBRARY DESTINATION ${APP_LIB_DIR}
+        ARCHIVE DESTINATION ${APP_LIB_DIR}
     )
-    install(FILES README.md LICENSE.txt DESTINATION share/GDownload)
-    install(DIRECTORY ${CMAKE_SOURCE_DIR}/extra/${CMAKE_SYSTEM_NAME}/${CMAKE_SYSTEM_PROCESSOR}/engine DESTINATION engine)
 
-    # 设置默认安装前缀为 /usr/local
-    if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-        set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Installation prefix" FORCE)
+    # 复制 vcpkg 依赖的动态库
+    file(GLOB VCPKG_LIBS 
+        "${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/lib/*.so*"
+    )
+    install(FILES ${VCPKG_LIBS}
+        DESTINATION ${APP_LIB_DIR}
+    )
+
+    # 复制 framelesshelper 动态库
+    file(GLOB FRAMELESS_HELPER_LIBS
+        "${DEPENDENCIES_ROOT_PATH}/FramelessHelper/lib/*.so*"
+    )
+    # 复制 aria2c文件和配置文件
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/extra/linux/$<IF:$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},x86_64>,x64,arm64>/engine/ 
+        DESTINATION ${APP_BIN_DIR}/engine
+    )
+    install(FILES ${FRAMELESS_HELPER_LIBS}
+        DESTINATION ${APP_LIB_DIR}
+    )
+    # 创建和安装desktop文件
+    configure_file(
+        ${CMAKE_SOURCE_DIR}/package/${PROJECT_NAME}.desktop.in
+        ${CMAKE_BINARY_DIR}/gdownload.desktop
+        @ONLY
+    )
+    install(FILES ${CMAKE_BINARY_DIR}/gdownload.desktop
+        DESTINATION ${APP_SHARE_DIR}/applications
+    )
+    
+    # 安装图标文件
+    install(FILES "${CMAKE_SOURCE_DIR}/src/App/ui/Resource/images/logo/logo.svg"
+        DESTINATION ${APP_SHARE_DIR}/icons/hicolor/256x256/apps
+        RENAME "gdownload.svg"
+    )
+    
+    # 查找 linuxdeploy
+    find_program(LINUXDEPLOY_PATH 
+        NAMES 
+            "linuxdeploy-x86_64.AppImage"
+            "linuxdeploy"
+        DOC "Path to linuxdeploy AppImage"
+    )
+
+    if(NOT LINUXDEPLOY_PATH)
+        message(STATUS "LinuxDeploy not found in system")
+    else()
+        message(STATUS "Found LinuxDeploy: ${LINUXDEPLOY_PATH}")
+        
+        install(CODE "
+            # 设置环境变量
+            set(ENV{LD_LIBRARY_PATH} \"\${CMAKE_INSTALL_PREFIX}/usr/lib:${Qt6_DIR}/../../../lib:\$ENV{LD_LIBRARY_PATH}\")
+            set(ENV{QML_SOURCES_PATHS} \"${CMAKE_SOURCE_DIR}/src/App/ui/Resource/qml\")
+            set(ENV{QMAKE} \"${Qt6_DIR}/../../../bin/qmake\")
+            set(ENV{QT_PLUGIN_PATH} \"${Qt6_DIR}/../../../plugins\")
+            set(ENV{QML_IMPORT_PATH} \"${Qt6_DIR}/../../../qml\")
+            set(ENV{DISABLE_PLUGINS} \"sql\")
+            
+            execute_process(
+                COMMAND \"${LINUXDEPLOY_PATH}\"
+                        --appdir=\${CMAKE_INSTALL_PREFIX}
+                        --executable=\${CMAKE_INSTALL_PREFIX}/usr/bin/gdownload
+                        --desktop-file=\${CMAKE_INSTALL_PREFIX}/usr/share/applications/gdownload.desktop
+                        --icon-file=\${CMAKE_INSTALL_PREFIX}/usr/share/icons/hicolor/256x256/apps/gdownload.svg
+                        --plugin qt
+                        --output appimage
+                        --verbosity=3
+                RESULT_VARIABLE DEPLOY_RESULT
+            )
+            
+            if(NOT DEPLOY_RESULT EQUAL 0)
+                message(WARNING \" failed: \${DEPLOY_RESULT}\")
+            endif()
+        ")
     endif()
 endif()

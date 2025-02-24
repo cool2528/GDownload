@@ -1,0 +1,16 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=gdownload
+Comment=A Modern Download Manager
+Comment[zh_CN]=现代化的下载管理器
+Comment[zh_TW]=現代化的下載管理器
+Comment[ja_JP]=モダンなダウンロードマネージャー
+Comment[ko_KR]=현대적인 다운로드 관리자
+Exec=gdownload
+Icon=gdownload
+Terminal=false
+Categories=Network;FileTransfer;P2P;Qt;
+Keywords=download;transfer;bt;magnet;aria2;
+StartupNotify=true
+StartupWMClass=gdownload
