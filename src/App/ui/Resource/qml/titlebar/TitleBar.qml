@@ -69,7 +69,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        visible: Qt.platform.os === "windows"
+        visible: Qt.platform.os !== "osx"
         ImageButton{
             id:win_minsize
             Layout.preferredHeight: 32
