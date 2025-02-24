@@ -2,6 +2,9 @@
 #include <rapidjson/document.h>
 #include <unordered_map>
 #include <variant>
+#include <memory>
+#include <string>
+#include <vector>
 #include "Engine_export.h"
 #include "result/result.h"
 namespace gdl {

@@ -14,7 +14,7 @@ namespace gdl {
 #elif defined(__APPLE__)
 			return mac::GetUserHomeDir();
 #else
-			return linux::GetUserHomeDir();
+			return linux_os::GetUserHomeDir();
 #endif
 		}
 
@@ -24,7 +24,7 @@ namespace gdl {
 #elif defined(__APPLE__)
 			return mac::GetUserDocumentsDir();
 #else
-			return linux::GetUserDocumentsDir();
+			return linux_os::GetUserDocumentsDir();
 #endif
 		}
 
@@ -34,7 +34,7 @@ namespace gdl {
 #elif defined(__APPLE__)
 			return mac::GetUserDownloadsDir();
 #else
-			return linux::GetUserDownloadsDir();
+			return linux_os::GetUserDownloadsDir();
 #endif
 		}
 
@@ -44,7 +44,7 @@ namespace gdl {
 #elif defined(__APPLE__)
 			return mac::GetUserDesktopDir();
 #else
-			return linux::GetUserDesktopDir();
+			return linux_os::GetUserDesktopDir();
 #endif
 		}
 
@@ -54,7 +54,7 @@ namespace gdl {
 #elif defined(__APPLE__)
 			return mac::GetUserVideosDir();
 #else
-			return linux::GetUserVideosDir();
+			return linux_os::GetUserVideosDir();
 #endif
 		}
 
@@ -64,7 +64,7 @@ namespace gdl {
 #elif defined(__APPLE__)
 			return mac::GetUserMusicDir();
 #else
-			return linux::GetUserMusicDir();
+			return linux_os::GetUserMusicDir();
 #endif
 		}
 
@@ -74,7 +74,7 @@ namespace gdl {
 #elif defined(__APPLE__)
 			return mac::GetUserPicturesDir();
 #else
-			return linux::GetUserPicturesDir();
+			return linux_os::GetUserPicturesDir();
 #endif
 		}
 
@@ -84,7 +84,7 @@ namespace gdl {
 #elif defined(__APPLE__)
 			return mac::GetAppDataDir();
 #else
-			return linux::GetAppDataDir();
+			return linux_os::GetAppDataDir();
 #endif
 		}
 
@@ -94,7 +94,7 @@ namespace gdl {
 #elif defined(__APPLE__)
 			return mac::GetTempDir();
 #else
-			return linux::GetTempDir();
+			return linux_os::GetTempDir();
 #endif
 		}
 
@@ -104,7 +104,7 @@ namespace gdl {
 #elif defined(__APPLE__)
 			return mac::GetExecutableDir();
 #else
-			return linux::GetExecutableDir();
+			return linux_os::GetExecutableDir();
 #endif
 		}
 
@@ -114,7 +114,7 @@ namespace gdl {
 #elif defined(__APPLE__)
 			return mac::GetCurrentWorkingDir();
 #else
-			return linux::GetCurrentWorkingDir();
+			return linux_os::GetCurrentWorkingDir();
 #endif
 		}
 
@@ -124,7 +124,7 @@ namespace gdl {
 #elif defined(__APPLE__)
 			return mac::GetSystemHTTPProxy();
 #else
-			return linux::GetSystemHTTPProxy();
+			return linux_os::GetSystemHTTPProxy();
 #endif
 		}
 

@@ -23,7 +23,17 @@ endif()
 add_library(${PROJECT_NAME} SHARED ${SOURCES_FILES} ${HEADERS_FILES})
 register_target(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PRIVATE ${MODULE_INCLUDE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system Boost::property_tree Boost::asio cpr::cpr nlohmann_json::nlohmann_json Boost::url GDLCore)
+target_link_libraries(${PROJECT_NAME} 
+    PRIVATE 
+        GDLCore
+        Boost::system 
+        Boost::property_tree 
+        Boost::asio 
+        cpr::cpr 
+        nlohmann_json::nlohmann_json 
+        Boost::url
+)
+
 if(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE
         ${COREFOUNDATION_FRAMEWORK}
@@ -33,6 +43,11 @@ elseif(WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE 
         UNICODE 
         _UNICODE
+    )
+elseif(UNIX AND NOT APPLE)
+    target_compile_options(${PROJECT_NAME} PRIVATE -fvisibility=hidden -fvisibility-inlines-hidden)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+        PluginManager_EXPORTS
     )
 endif()
 set_target_properties(${PROJECT_NAME} PROPERTIES

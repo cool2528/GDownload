@@ -210,6 +210,19 @@ elseif(WIN32)
         ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations
         ${OUTPUT_BIN_PATH}/translations
     )
+elseif(UNIX AND NOT APPLE)
+    add_executable(${PROJECT_NAME} ${SOURCES_FILES} ${HEADERS_FILES} ${QT_RESOURCE_FILES} ${QT_QML_FILES})
+    message("CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
+    add_custom_command(TARGET ${PROJECT_NAME} 
+    POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/extra/linux/$<IF:$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},x86_64>,x64,arm64>/engine/
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/engine
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${DEPENDENCIES_ROOT_PATH}/FramelessHelper/lib"
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        COMMAND_EXPAND_LISTS
+    )
 endif()
 register_target(${PROJECT_NAME})
 
@@ -230,7 +243,7 @@ if(WIN32)
 elseif(APPLE)
     set(PUGIXML_TARGET pugixml::static pugixml::pugixml)
 else()
-    set(PUGIXML_TARGET pugixml::shared pugixml::pugixml)
+    set(PUGIXML_TARGET pugixml::static pugixml::pugixml)
 endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE LibtorrentRasterbar::torrent-rasterbar ${PUGIXML_TARGET})
 if(WIN32)

@@ -8,6 +8,13 @@
 #include <sys/types.h>
 #include <unistd.h>
 extern char** environ;	// Add this declaration
+#elif defined(__linux__)
+#include <spawn.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <cstring>     // for strerror
+#include <sys/wait.h>  // for waitpid
+#include <errno.h>     // for errno
 #endif
 #include <thread>
 #include "logger.h"
@@ -51,8 +58,8 @@ namespace gdl {
 				return pids;
 			}
 		}  // namespace detail
-		std::int64_t Execute(const String_View& command, const std::vector<String>& arguments,
-							 const String_View& working_directory) {
+		int64_t Execute(const String_View& command, const std::vector<String>& arguments,
+						 const String_View& working_directory) {
 			std::int64_t pid{-1};
 #ifdef _WIN32
 			STARTUPINFO si;
@@ -115,9 +122,9 @@ namespace gdl {
 #endif
 		}
 
-		void Kill(std::int64_t process_id) {
+		void Kill(int64_t pid) {
 #ifdef _WIN32
-			HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, static_cast<DWORD>(process_id));
+			HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, static_cast<DWORD>(pid));
 			if (hProcess == nullptr) {
 				LOG_ERR("OpenProcess failed: {}", GetLastError());
 				return;
@@ -127,9 +134,8 @@ namespace gdl {
 			}
 			CloseHandle(hProcess);
 #else
-			auto pid = static_cast<pid_t>(process_id);
-			if (::kill(pid, SIGKILL) != 0) {
-				LOG_ERR("kill pid {} fail", pid);
+			if (::kill(static_cast<pid_t>(pid), SIGKILL) != 0) {
+				LOG_ERR("Failed to kill process {}: {}", pid, strerror(errno));
 			}
 #endif
 		}
@@ -151,7 +157,7 @@ namespace gdl {
 		bool IsProcessExist(const String_View& process_name) {
 			return !detail::GetPidsByName(process_name).empty();
 		}
-		bool IsProcessExist(std::int64_t pid) {
+		bool IsProcessExistByPid(int64_t pid) {
 #ifdef _WIN32
 			HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, static_cast<DWORD>(pid));
 			if (hProcess == nullptr) {
@@ -160,7 +166,7 @@ namespace gdl {
 			CloseHandle(hProcess);
 			return true;
 #else
-			return kill(static_cast<pid_t>(pid), 0) == 0;
+			return ::kill(static_cast<pid_t>(pid), 0) == 0;
 #endif
 		}
 	}  // namespace process

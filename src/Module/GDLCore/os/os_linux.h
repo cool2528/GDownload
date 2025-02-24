@@ -4,7 +4,7 @@
 #include "globalTypes.h"
 namespace gdl {
 	namespace os {
-		namespace linux {
+		namespace linux_os {
 			String GetUserHomeDir();
 			String GetUserDocumentsDir();
 			String GetUserDownloadsDir();
@@ -18,6 +18,6 @@ namespace gdl {
 			String GetExecutableDir();
 			String GetCurrentWorkingDir();
 			std::optional<std::pair<String, int>> GetSystemHTTPProxy();
-		}  // namespace linux
+		}  // namespace linux_os
 	}  // namespace os
 }  // namespace gdl

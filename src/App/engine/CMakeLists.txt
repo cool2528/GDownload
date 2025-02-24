@@ -51,6 +51,14 @@ elseif(WIN32)
         UNICODE 
         _UNICODE
     )
+elseif(UNIX AND NOT APPLE)
+    message(STATUS "Compiling for UNIX")
+    target_compile_options(${PROJECT_NAME} PRIVATE -fvisibility=hidden 
+    -fvisibility-inlines-hidden
+    )
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+        Engine_EXPORTS
+    )
 endif()
 set_target_properties(${PROJECT_NAME} PROPERTIES
 FOLDER "App"

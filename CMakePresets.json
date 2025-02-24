@@ -35,6 +35,19 @@
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
         "CMAKE_PREFIX_PATH": "$env{QTDIR}"
       }
+    },
+    {
+      "hidden":true,
+      "name":"ubuntu-amd64",
+      "description":"gcc64 linux",
+      "architecture":{
+        "value":"x64",
+        "strategy":"external"
+      },
+      "cacheVariables":{
+         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "CMAKE_PREFIX_PATH": "$env{QTDIR}"
+      }
     }
   ]
 }

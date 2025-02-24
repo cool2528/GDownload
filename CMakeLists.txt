@@ -72,6 +72,8 @@ elseif(WIN32)
     # 设置Windows目标版本
     add_compile_definitions(_WIN32_WINNT=0x0A00) # Windows 10
 elseif(UNIX AND NOT APPLE)
+    set(CMAKE_CXX_VISIBILITY_PRESET "hidden")
+    set(CMAKE_VISIBILITY_INLINES_HIDDEN "YES")
     set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/linux")
 endif()
 
