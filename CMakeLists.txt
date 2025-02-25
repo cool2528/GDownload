@@ -130,7 +130,7 @@ elseif(APPLE)
     )
 
     # 安装第三方依赖的动态库到Frameworks目录
-    file(GLOB FRAMEWORK_DYLIBS "${DEPENDENCIES_ROOT_PATH}/framelesshelper/lib/*.dylib")
+    file(GLOB FRAMEWORK_DYLIBS "${DEPENDENCIES_ROOT_PATH}/Framelesshelper/lib/*.dylib")
     install(FILES ${FRAMEWORK_DYLIBS}
         DESTINATION ${PROJECT_NAME}.app/Contents/Frameworks
     )
@@ -289,7 +289,7 @@ elseif(UNIX AND NOT APPLE)
 
     # 复制 framelesshelper 动态库
     file(GLOB FRAMELESS_HELPER_LIBS
-        "${DEPENDENCIES_ROOT_PATH}/FramelessHelper/lib/*.so*"
+        "${DEPENDENCIES_ROOT_PATH}/Framelesshelper/lib/*.so*"
     )
     # 复制 aria2c文件和配置文件
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/extra/linux/$<IF:$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},x86_64>,x64,arm64>/engine/ 
