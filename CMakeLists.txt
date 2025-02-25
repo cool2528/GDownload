@@ -55,7 +55,8 @@ configure_file(${CMAKE_SOURCE_DIR}/version.h.in ${CMAKE_SOURCE_DIR}/src/version.
 # 设置依赖库的根路径
 if(APPLE)
     set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/osx")
-
+    #使用自定义的 triplets
+    set(VCPKG_OVERLAY_TRIPLETS  ${CMAKE_SOURCE_DIR}/custom-triplets)
     # 查询系统芯片架构
     cmake_host_system_information(RESULT OSX_ARCHITECTURES QUERY OS_PLATFORM)
     message(STATUS "OSX_ARCHITECTURES:${OSX_ARCHITECTURES}")
@@ -134,6 +135,14 @@ elseif(APPLE)
         DESTINATION ${PROJECT_NAME}.app/Contents/Frameworks
     )
 
+    # 这里要复制 vcpkg 的依赖库到Frameworks目录
+    file(GLOB VCPKG_LIBS 
+        "${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/lib/*.dylib"
+    )
+    install(FILES ${VCPKG_LIBS}
+        DESTINATION ${PROJECT_NAME}.app/Contents/Frameworks
+    )
+
     # 运行 macdeployqt
     install(CODE "
         execute_process(
@@ -144,6 +153,12 @@ elseif(APPLE)
                     -qmldir=${CMAKE_SOURCE_DIR}/src/App/ui/Resource/qml
                     -always-overwrite
             RESULT_VARIABLE MACDEPLOYQT_RESULT
+        )
+        #删除所有调试符号文件
+        execute_process(
+            COMMAND find \${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app -name \"*.dSYM\" -type d -exec rm -rf {} +
+            COMMAND strip -S \${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app/Contents/MacOS/*
+            COMMAND find \${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app/Contents/Frameworks -type f -name \"*.dylib\" -exec strip -S {} +
         )
         if(NOT MACDEPLOYQT_RESULT EQUAL 0)
             message(FATAL_ERROR \"macdeployqt failed with error: \${MACDEPLOYQT_RESULT}\")
@@ -279,6 +294,10 @@ elseif(UNIX AND NOT APPLE)
     # 复制 aria2c文件和配置文件
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/extra/linux/$<IF:$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},x86_64>,x64,arm64>/engine/ 
         DESTINATION ${APP_BIN_DIR}/engine
+        FILE_PERMISSIONS 
+        OWNER_READ OWNER_WRITE OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE
     )
     install(FILES ${FRAMELESS_HELPER_LIBS}
         DESTINATION ${APP_LIB_DIR}
