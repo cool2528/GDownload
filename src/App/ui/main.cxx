@@ -2,10 +2,12 @@
 #include <windows.h>
 #endif
 #include <QDir>
+#include <locale>
 #include "GDLCore/logger.h"
 #include "os/os.h"
 #include "view/mainwindow.h"
 int main(int argc, char* argv[]) {
+	std::setlocale(LC_ALL,".UTF-8");
 #if (defined(_WIN32) || defined(_WIN64)) && (defined(DEBUG) || defined(_DEBUG) || !defined(QT_NO_DEBUG))
 	::AllocConsole();
 #endif

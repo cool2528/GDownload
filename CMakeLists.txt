@@ -299,6 +299,10 @@ elseif(UNIX AND NOT APPLE)
         GROUP_READ GROUP_EXECUTE
         WORLD_READ WORLD_EXECUTE
     )
+    # 复制translations 文件夹下的文件
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/src/App/ui/Resource/translations/
+        DESTINATION  ${APP_BIN_DIR}/translations
+    )
     install(FILES ${FRAMELESS_HELPER_LIBS}
         DESTINATION ${APP_LIB_DIR}
     )
