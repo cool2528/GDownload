@@ -21,7 +21,7 @@ namespace gdl {
 					QString::fromStdString(std::filesystem::path(path.toStdString()).parent_path().string());
 				translation_path_ = app_path_dir + "/Resources/translations/";
 				LOG_INFO("translation_path_ {}", translation_path_.toStdString())
-#elif WIN32
+#elif defined(_WIN32) || defined(__linux__)
                 translation_path_ = QString::fromStdString(os::GetExecutableDir()) + "/translations/";
 #endif
 			}

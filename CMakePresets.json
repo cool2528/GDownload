@@ -1,53 +1,53 @@
 {
-  "version": 3,
-  "configurePresets": [
-    {
-      "hidden": true,
-      "name": "windoows-msvc",
-      "description": "Windows MSVC",
-      "generator": "Visual Studio 17 2022",
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
-      },
-      "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-        "CMAKE_PREFIX_PATH": "$env{QTDIR}"
-      },
-      "vendor": {
-        "microsoft.com/VisualStudioSettings/CMake/1.0": {
-          "hostOS": [
-            "Windows"
-          ]
+    "version": 3,
+    "configurePresets": [
+        {
+            "hidden": true,
+            "name": "windoows-msvc",
+            "description": "Windows MSVC",
+            "generator": "Visual Studio 17 2022",
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+                "CMAKE_PREFIX_PATH": "$env{QTDIR}"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "hostOS": [
+                        "Windows"
+                    ]
+                }
+            }
+        },
+        {
+            "hidden": true,
+            "name": "osx-clang",
+            "description": "OSX Clang",
+            "generator": "Ninja",
+            "architecture": {
+                "value": "arm64",
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+                "CMAKE_PREFIX_PATH": "$env{QTDIR}"
+            }
+        },
+        {
+            "hidden": true,
+            "name": "ubuntu-amd64",
+            "description": "gcc64 linux",
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+                "CMAKE_PREFIX_PATH": "$env{QTDIR}"
+            }
         }
-      }
-    },
-    {
-      "hidden": true,
-      "name": "osx-clang",
-      "description": "OSX Clang",
-      "generator": "Ninja",
-      "architecture": {
-        "value": "arm64",
-        "strategy": "external"
-      },
-      "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-        "CMAKE_PREFIX_PATH": "$env{QTDIR}"
-      }
-    },
-    {
-      "hidden":true,
-      "name":"ubuntu-amd64",
-      "description":"gcc64 linux",
-      "architecture":{
-        "value":"x64",
-        "strategy":"external"
-      },
-      "cacheVariables":{
-         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-        "CMAKE_PREFIX_PATH": "$env{QTDIR}"
-      }
-    }
-  ]
+    ]
 }

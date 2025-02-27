@@ -220,6 +220,9 @@ elseif(UNIX AND NOT APPLE)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/extra/linux/$<IF:$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},x86_64>,x64,arm64>/engine/
         $<TARGET_FILE_DIR:${PROJECT_NAME}>/engine
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/translations
         COMMAND_EXPAND_LISTS
     )
 endif()
