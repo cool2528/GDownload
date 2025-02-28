@@ -87,8 +87,6 @@ else()
             -qm ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations/${QM_FILE}.qm
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations
         )
-        
-
     endforeach()
 endif()
 
@@ -225,6 +223,7 @@ elseif(UNIX AND NOT APPLE)
         $<TARGET_FILE_DIR:${PROJECT_NAME}>/translations
         COMMAND_EXPAND_LISTS
     )
+    target_link_libraries(${PROJECT_NAME} PRIVATE libappimageupdate)
 endif()
 register_target(${PROJECT_NAME})
 

@@ -100,6 +100,19 @@ include_directories(${CMAKE_SOURCE_DIR}/src
     ${CMAKE_BINARY_DIR}/src
 )
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+if(UNIX AND NOT APPLE)
+    set(SAVED_CXX_VISIBILITY_PRESET ${CMAKE_CXX_VISIBILITY_PRESET})
+    set(SAVED_VISIBILITY_INLINES_HIDDEN ${CMAKE_VISIBILITY_INLINES_HIDDEN})
+    # 临时移除可见性限制
+    unset(CMAKE_CXX_VISIBILITY_PRESET)
+    unset(CMAKE_VISIBILITY_INLINES_HIDDEN)
+    # 如果是Linux 系统使用 appimageupdate 更新 appimage
+    set(BUILD_LIBAPPIMAGEUPDATE_ONLY ON CACHE BOOL "Only build libappimageupdate" FORCE)
+    add_subdirectory(lib/AppImageUpdate)
+    # 恢复可见性设置
+    set(CMAKE_CXX_VISIBILITY_PRESET ${SAVED_CXX_VISIBILITY_PRESET})
+    set(CMAKE_VISIBILITY_INLINES_HIDDEN ${SAVED_VISIBILITY_INLINES_HIDDEN})
+endif()
 add_subdirectory(src)
 
 # 安装规则
