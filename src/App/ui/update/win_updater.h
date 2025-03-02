@@ -1,45 +1,38 @@
-#ifndef WIN_UPDATER_H_
-#define WIN_UPDATER_H_
+#pragma once
 
-#include "auto_updater.h"
+#include <QFile>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <QFile>
 #include <QProcess>
 #include <memory>
+#include "auto_updater.h"
 
 namespace gdl {
-namespace update {
+    namespace update {
 
-class WinUpdater : public AutoUpdater {
- public:
-  WinUpdater();
-  ~WinUpdater() override;
+        class WinUpdater : public AutoUpdater {
+           public:
+            WinUpdater();
+            ~WinUpdater() override;
 
-  bool Initialize(const UpdateConfig& config) override;
-  void CheckForUpdates(UpdateCheckCallback callback) override;
-  bool StartUpdate(ProgressCallback progress_callback) override;
-  void CancelUpdate() override;
-  bool ApplyUpdate(bool restart_app = true) override;
+            bool Initialize(const UpdateConfig& config) override;
+            void CheckForUpdates(UpdateCheckCallback callback) override;
+            bool StartUpdate(ProgressCallback progress_callback) override;
+            void CancelUpdate() override;
+            bool ApplyUpdate(bool restart_app = true) override;
 
- private:
-  bool ExtractUpdate(const QString& zip_path, const QString& extract_path);
-  bool VerifyUpdatePackage(const QString& package_path, const std::string& signature);
-  void CleanupTempFiles();
-  
-  UpdateConfig config_;
-  UpdateInfo update_info_;
-  ProgressCallback progress_callback_;
-  QNetworkAccessManager network_manager_;
-  QNetworkReply* current_reply_ = nullptr;
-  QFile download_file_;
-  QString update_package_path_;
-  QString extract_path_;
-  bool update_available_ = false;
-  bool update_in_progress_ = false;
-};
+           private:
+            void handleNetworkReply(QNetworkReply* reply, UpdateCheckCallback callback);
 
-}  // namespace update
+            UpdateConfig config_;
+            UpdateInfo update_info_;
+            ProgressCallback progress_callback_;
+            QNetworkAccessManager network_manager_;
+            QFile download_file_;
+            QString update_package_path_;
+            bool update_available_	 = false;
+            bool update_in_progress_ = false;
+        };
+
+    }  // namespace update
 }  // namespace gdl
-
-#endif  // WIN_UPDATER_H_

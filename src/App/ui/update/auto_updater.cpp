@@ -9,19 +9,19 @@
 #endif
 
 namespace gdl {
-namespace update {
+    namespace update {
 
-std::unique_ptr<AutoUpdater> AutoUpdater::Create() {
+        std::unique_ptr<AutoUpdater> AutoUpdater::Create() {
 #ifdef _WIN32
-  return std::make_unique<WinUpdater>();
+            return std::make_unique<WinUpdater>();
 #elif defined(__APPLE__)
-  return std::make_unique<MacUpdater>();
+            return std::make_unique<MacUpdater>();
 #elif defined(__linux__)
-  return std::make_unique<LinuxUpdater>();
+            return std::make_unique<LinuxUpdater>();
 #else
-  return nullptr;  // 不支持的平台
+            return nullptr;	 // 不支持的平台
 #endif
-}
+        }
 
-}  // namespace update
-}  // namespace gdl 
+    }  // namespace update
+}  // namespace gdl

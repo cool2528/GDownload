@@ -3,7 +3,7 @@
     "configurePresets": [
         {
             "hidden": true,
-            "name": "windoows-msvc",
+            "name": "windows-msvc",
             "description": "Windows MSVC",
             "generator": "Visual Studio 17 2022",
             "architecture": {

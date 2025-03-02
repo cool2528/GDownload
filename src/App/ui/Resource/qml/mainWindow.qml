@@ -95,6 +95,9 @@ FramelessWindow{
         anchors.fill: parent
         z: 999999  // 确保显示在最上层
     }
+    UpdateDialog{
+        id: updateDialog
+    }
 
     // 系统托盘
     SystemTrayIcon{
