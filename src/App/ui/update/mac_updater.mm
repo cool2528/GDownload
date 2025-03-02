@@ -2,7 +2,7 @@
 #import <Cocoa/Cocoa.h>
 #import <Sparkle/Sparkle.h>
 
-namespace gdownload {
+namespace gdl {
 namespace update {
 
 // Sparkle代理类
@@ -56,7 +56,7 @@ namespace update {
     UpdateProgress progress;
     progress.stage = UpdateProgress::Stage::kDownloading;
     progress.percentage = 0;
-    progress.message = "开始下载更新";
+    progress.message = "Starting update download";
     _progressCallback(progress);
   }
 }
@@ -66,7 +66,7 @@ namespace update {
     UpdateProgress progress;
     progress.stage = UpdateProgress::Stage::kInstalling;
     progress.percentage = 0;
-    progress.message = "开始安装更新";
+    progress.message = "Starting update installation";
     _progressCallback(progress);
   }
 }
@@ -173,4 +173,4 @@ bool MacUpdater::ApplyUpdate(bool restart_app) {
 }
 
 }  // namespace update
-}  // namespace gdownload
+}  // namespace gdl

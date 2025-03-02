@@ -8,7 +8,7 @@
 #include "linux_updater.h"
 #endif
 
-namespace gdownload {
+namespace gdl {
 namespace update {
 
 std::unique_ptr<AutoUpdater> AutoUpdater::Create() {
@@ -24,4 +24,4 @@ std::unique_ptr<AutoUpdater> AutoUpdater::Create() {
 }
 
 }  // namespace update
-}  // namespace gdownload 
+}  // namespace gdl 

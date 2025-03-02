@@ -7,7 +7,7 @@
 #include <vector>
 #include <map>
 
-namespace gdownload {
+namespace gdl {
 namespace update {
 
 // 更新进度信息
@@ -92,6 +92,6 @@ class AutoUpdater {
 };
 
 }  // namespace update
-}  // namespace gdownload
+}  // namespace gdl
 
 #endif  // AUTO_UPDATER_H_ 

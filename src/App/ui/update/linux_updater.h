@@ -14,7 +14,7 @@ class Updater;
 }
 }
 
-namespace gdownload {
+namespace gdl {
 namespace update {
 
 class LinuxUpdater : public AutoUpdater {
@@ -48,6 +48,6 @@ class LinuxUpdater : public AutoUpdater {
 };
 
 }  // namespace update
-}  // namespace gdownload
+}  // namespace gdl
 
 #endif  // LINUX_UPDATER_H_
