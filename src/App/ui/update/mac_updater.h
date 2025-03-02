@@ -1,31 +1,27 @@
-#ifndef MAC_UPDATER_H_
-#define MAC_UPDATER_H_
-
-#include "auto_updater.h"
+#pragma once
+#if defined(__APPLE__)
 #include <memory>
+#include "auto_updater.h"
 
 namespace gdl {
-namespace update {
+    namespace update {
+        class MacUpdaterImpl;
+        class MacUpdater : public AutoUpdater {
+           public:
+            MacUpdater();
+            ~MacUpdater() override;
 
-// 前向声明，避免暴露Objective-C++细节
-class MacUpdaterImpl;
+            bool Initialize(const UpdateConfig& config) override;
+            void CheckForUpdates(UpdateCheckCallback callback) override;
+            bool StartUpdate(ProgressCallback progress_callback) override;
+            void CancelUpdate() override;
+            bool ApplyUpdate(bool restart_app = true) override;
 
-class MacUpdater : public AutoUpdater {
- public:
-  MacUpdater();
-  ~MacUpdater() override;
+           private:
+            std::unique_ptr<MacUpdaterImpl> impl_;
+        };
 
-  bool Initialize(const UpdateConfig& config) override;
-  void CheckForUpdates(UpdateCheckCallback callback) override;
-  bool StartUpdate(ProgressCallback progress_callback) override;
-  void CancelUpdate() override;
-  bool ApplyUpdate(bool restart_app = true) override;
-
- private:
-  std::unique_ptr<MacUpdaterImpl> impl_;
-};
-
-}  // namespace update
+    }  // namespace update
 }  // namespace gdl
 
-#endif  // MAC_UPDATER_H_
+#endif

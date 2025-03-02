@@ -394,6 +394,29 @@ GDownload는 기술에 대한 열정을 가진 개발자들이 관리하는 오�
     </message>
 </context>
 <context>
+    <name>UpdateDialog</name>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="41"/>
+        <source>New Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="52"/>
+        <source>前往发布页</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="103"/>
+        <source>取消</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="113"/>
+        <source>更新</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>mainWindow</name>
     <message>
         <location filename="../qml/mainWindow.qml" line="118"/>
