@@ -8,7 +8,7 @@
 #include <QProcess>
 #include <memory>
 
-namespace gdownload {
+namespace gdl {
 namespace update {
 
 class WinUpdater : public AutoUpdater {
@@ -40,6 +40,6 @@ class WinUpdater : public AutoUpdater {
 };
 
 }  // namespace update
-}  // namespace gdownload
+}  // namespace gdl
 
 #endif  // WIN_UPDATER_H_

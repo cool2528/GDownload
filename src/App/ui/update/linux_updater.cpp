@@ -10,9 +10,9 @@
 #include <thread>
 
 // 包含AppImageUpdate头文件
-#include <appimage/update/appimage-update.h>
+#include <appimage/update.h>
 
-namespace gdownload {
+namespace gdl {
 namespace update {
 
 LinuxUpdater::LinuxUpdater() = default;
@@ -388,4 +388,4 @@ bool LinuxUpdater::ApplyUpdate(bool restart_app) {
 }
 
 }  // namespace update
-}  // namespace gdownload
+}  // namespace gdl

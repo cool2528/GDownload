@@ -4,7 +4,7 @@
 #include "auto_updater.h"
 #include <memory>
 
-namespace gdownload {
+namespace gdl {
 namespace update {
 
 // 前向声明，避免暴露Objective-C++细节
@@ -26,6 +26,6 @@ class MacUpdater : public AutoUpdater {
 };
 
 }  // namespace update
-}  // namespace gdownload
+}  // namespace gdl
 
 #endif  // MAC_UPDATER_H_
