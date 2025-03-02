@@ -16,7 +16,9 @@
 #include "os/os.h"
 #include "theme/theme.h"
 #include "toast/toast_manager.h"
+#include "update/update_manager.h"
 #include "utils/utils.h"
+#include "version.h"
 FRAMELESSHELPER_USE_NAMESPACE
 namespace gd {
     namespace ui {
@@ -66,6 +68,24 @@ namespace gd {
             }
             gdl::ui::browser::RegisterTypes(engine);
             gdl::ui::toast::RegisterTypes(engine);
+            gdl::update::RegisterTypes(engine);
+            gdl::update::UpdateConfig update_config;
+            update_config.current_version	 = GDownload_VERSION_STRING;
+            update_config.disable_auto_check = gdl::ui::settings::Settings::Instance().GetEnableAutoUpdate();
+#if defined(_WIN32) || defined(_WIN64)
+            update_config.update_url = "https://api.github.com/repos/cool2528/gdownload/releases/latest";
+            std::map<std::string, std::string> headers;
+            headers["Content-Type"] = "application/json";
+            headers["User-Agent"]	= "GDownloader-Update-Client";
+            headers["Authorization"] =
+                "Bearer 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";
+            headers["X-GitHub-Api-Version"] = "2022-11-28";
+            headers["Accept"]				= "application/vnd.github.v3+json";
+            gdl::update::UpdateManager::Instance().SetRequestHeaders(headers);
+#elif defined(__linux__)
+#elif defined(__APPLE__)
+#endif
+            gdl::update::UpdateManager::Instance().Initialize(update_config);
         }
         void MainWindow::InitTranslation(QGuiApplication* app) {}
         void MainWindow::InitFont(QQmlEngine* engine) {

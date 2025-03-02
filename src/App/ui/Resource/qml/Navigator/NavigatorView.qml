@@ -57,6 +57,7 @@ Item{
                 onClicked: {
                     console.debug("select download page")
                     brower_view.index = 0
+                    //updateDialog.open()
                 }
             }
 
