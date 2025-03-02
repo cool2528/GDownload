@@ -8,7 +8,7 @@
 #include <QThread>
 #include <QCryptographicHash>
 
-namespace gdownload {
+namespace gdl {
 namespace update {
 
 WinUpdater::WinUpdater() = default;
@@ -29,7 +29,7 @@ bool WinUpdater::Initialize(const UpdateConfig& config) {
   
   QDir dir(QString::fromStdString(config_.temp_dir));
   if (!dir.exists() && !dir.mkpath(".")) {
-    last_error_ = "无法创建临时目录: " + config_.temp_dir;
+    last_error_ = "Failed to create temp directory: " + config_.temp_dir;
     return false;
   }
   
@@ -96,7 +96,7 @@ void WinUpdater::CheckForUpdates(UpdateCheckCallback callback) {
           callback(has_update, update_info_);
         }
       } else {
-        last_error_ = "无效的服务器响应格式";
+        last_error_ = "Invalid server response format";
         if (callback) {
           callback(false, UpdateInfo{});
         }
@@ -115,7 +115,7 @@ void WinUpdater::CheckForUpdates(UpdateCheckCallback callback) {
 
 bool WinUpdater::StartUpdate(ProgressCallback progress_callback) {
   if (!update_available_ || update_in_progress_) {
-    last_error_ = "没有可用更新或更新已在进行中";
+    last_error_ = "No update available or update already in progress";
     return false;
   }
   
@@ -149,7 +149,7 @@ bool WinUpdater::StartUpdate(ProgressCallback progress_callback) {
   
   download_file_.setFileName(update_package_path_);
   if (!download_file_.open(QIODevice::WriteOnly)) {
-    last_error_ = "无法创建下载文件: " + update_package_path_.toStdString();
+    last_error_ = "Failed to create download file: " + update_package_path_.toStdString();
     update_in_progress_ = false;
     return false;
   }
@@ -160,7 +160,7 @@ bool WinUpdater::StartUpdate(ProgressCallback progress_callback) {
     UpdateProgress progress;
     progress.stage = UpdateProgress::Stage::kDownloading;
     progress.percentage = 0;
-    progress.message = "开始下载更新包";
+    progress.message = "Starting update download";
     progress_callback_(progress);
   }
   
@@ -171,7 +171,7 @@ bool WinUpdater::StartUpdate(ProgressCallback progress_callback) {
       UpdateProgress progress;
       progress.stage = UpdateProgress::Stage::kDownloading;
       progress.percentage = static_cast<int>(received * 100 / total);
-      progress.message = "下载更新包: " + std::to_string(progress.percentage) + "%";
+      progress.message = "Downloading update: " + std::to_string(progress.percentage) + "%";
       progress_callback_(progress);
     }
   });
@@ -187,7 +187,7 @@ bool WinUpdater::StartUpdate(ProgressCallback progress_callback) {
         UpdateProgress progress;
         progress.stage = UpdateProgress::Stage::kVerifying;
         progress.percentage = 0;
-        progress.message = "验证更新包";
+        progress.message = "Verifying update package";
         progress_callback_(progress);
       }
       
@@ -197,7 +197,7 @@ bool WinUpdater::StartUpdate(ProgressCallback progress_callback) {
           UpdateProgress progress;
           progress.stage = UpdateProgress::Stage::kExtracting;
           progress.percentage = 0;
-          progress.message = "解压更新包";
+          progress.message = "Extracting update package";
           progress_callback_(progress);
         }
         
@@ -206,7 +206,7 @@ bool WinUpdater::StartUpdate(ProgressCallback progress_callback) {
             UpdateProgress progress;
             progress.stage = UpdateProgress::Stage::kFinished;
             progress.percentage = 100;
-            progress.message = "更新包准备就绪";
+            progress.message = "Update package ready";
             progress_callback_(progress);
           }
         } else {
@@ -214,7 +214,7 @@ bool WinUpdater::StartUpdate(ProgressCallback progress_callback) {
             UpdateProgress progress;
             progress.stage = UpdateProgress::Stage::kFailed;
             progress.percentage = 0;
-            progress.message = "解压更新包失败: " + last_error_;
+            progress.message = "Failed to extract update package: " + last_error_;
             progress_callback_(progress);
           }
           update_in_progress_ = false;
@@ -224,7 +224,7 @@ bool WinUpdater::StartUpdate(ProgressCallback progress_callback) {
           UpdateProgress progress;
           progress.stage = UpdateProgress::Stage::kFailed;
           progress.percentage = 0;
-          progress.message = "验证更新包失败: " + last_error_;
+          progress.message = "Failed to verify update package: " + last_error_;
           progress_callback_(progress);
         }
         update_in_progress_ = false;
@@ -237,7 +237,7 @@ bool WinUpdater::StartUpdate(ProgressCallback progress_callback) {
         UpdateProgress progress;
         progress.stage = UpdateProgress::Stage::kFailed;
         progress.percentage = 0;
-        progress.message = "下载更新包失败: " + last_error_;
+        progress.message = "Failed to download update package: " + last_error_;
         progress_callback_(progress);
       }
       update_in_progress_ = false;
@@ -266,7 +266,7 @@ void WinUpdater::CancelUpdate() {
 
 bool WinUpdater::ApplyUpdate(bool restart_app) {
   if (!update_in_progress_ || extract_path_.isEmpty()) {
-    last_error_ = "没有准备好的更新包";
+    last_error_ = "No update package ready";
     return false;
   }
   
@@ -274,7 +274,7 @@ bool WinUpdater::ApplyUpdate(bool restart_app) {
     UpdateProgress progress;
     progress.stage = UpdateProgress::Stage::kInstalling;
     progress.percentage = 0;
-    progress.message = "开始安装更新";
+    progress.message = "Starting update installation";
     progress_callback_(progress);
   }
   
@@ -289,7 +289,7 @@ bool WinUpdater::ApplyUpdate(bool restart_app) {
     QFile batch_file(batch_path);
     
     if (!batch_file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-      last_error_ = "无法创建更新脚本";
+      last_error_ = "Failed to create update script";
       return false;
     }
     
@@ -299,7 +299,7 @@ bool WinUpdater::ApplyUpdate(bool restart_app) {
     // 编写批处理脚本
     QTextStream out(&batch_file);
     out << "@echo off\n";
-    out << "echo 等待应用程序退出...\n";
+    out << "echo Waiting for application to exit...\n";
     out << "timeout /t 2 /nobreak > nul\n";
     
     // 等待应用程序退出
@@ -312,16 +312,16 @@ bool WinUpdater::ApplyUpdate(bool restart_app) {
     out << ")\n";
     
     // 复制更新文件
-    out << "echo 正在更新文件...\n";
+    out << "echo Updating files...\n";
     out << "xcopy /Y /E /I \"" << extract_path_ << "\\*\" \"" << app_path << "\\\" > nul\n";
     
     // 如果需要重启应用程序
     if (restart_app) {
-      out << "echo 重新启动应用程序...\n";
+      out << "echo Restarting application...\n";
       out << "start \"\" \"" << app_path << "\\" << QCoreApplication::applicationName() << ".exe\"\n";
     }
     
-    out << "echo 更新完成\n";
+    out << "echo Update completed\n";
     out << "del \"" << batch_path << "\"\n";
     
     batch_file.close();
@@ -340,17 +340,17 @@ bool WinUpdater::ApplyUpdate(bool restart_app) {
         progress.stage = UpdateProgress::Stage::kFinished;
         progress.percentage = 100;
         progress.message = restart_app ? 
-            "应用程序将重启以完成更新" : "更新将在下次启动时应用";
+            "Application will restart to complete update" : "Update will be applied on next start";
         progress_callback_(progress);
       }
     } else {
-      last_error_ = "无法启动更新脚本";
+      last_error_ = "Failed to start update script";
       
       if (progress_callback_) {
         UpdateProgress progress;
         progress.stage = UpdateProgress::Stage::kFailed;
         progress.percentage = 0;
-        progress.message = "安装更新失败: " + last_error_;
+        progress.message = "Failed to install update: " + last_error_;
         progress_callback_(progress);
       }
     }
@@ -382,17 +382,17 @@ bool WinUpdater::ApplyUpdate(bool restart_app) {
         progress.stage = UpdateProgress::Stage::kFinished;
         progress.percentage = 100;
         progress.message = restart_app ? 
-            "应用程序将重启以完成更新" : "更新将在下次启动时应用";
+            "Application will restart to complete update" : "Update will be applied on next start";
         progress_callback_(progress);
       }
     } else {
-      last_error_ = "无法启动更新器进程";
+      last_error_ = "Failed to start updater process";
       
       if (progress_callback_) {
         UpdateProgress progress;
         progress.stage = UpdateProgress::Stage::kFailed;
         progress.percentage = 0;
-        progress.message = "安装更新失败: " + last_error_;
+        progress.message = "Failed to install update: " + last_error_;
         progress_callback_(progress);
       }
     }
@@ -408,7 +408,7 @@ bool WinUpdater::ExtractUpdate(const QString& zip_path, const QString& extract_p
   
   // 检查文件是否存在
   if (!QFile::exists(zip_path)) {
-    last_error_ = "更新包文件不存在";
+    last_error_ = "Update package file does not exist";
     return false;
   }
   
@@ -426,12 +426,12 @@ bool WinUpdater::ExtractUpdate(const QString& zip_path, const QString& extract_p
   process.start("powershell.exe", args);
   
   if (!process.waitForFinished(60000)) {  // 等待最多60秒
-    last_error_ = "解压超时";
+    last_error_ = "Extraction timeout";
     return false;
   }
   
   if (process.exitCode() != 0) {
-    last_error_ = "解压失败: " + 
+    last_error_ = "Extraction failed: " + 
                  QString(process.readAllStandardError()).toStdString();
     return false;
   }
@@ -443,21 +443,21 @@ bool WinUpdater::VerifyUpdatePackage(const QString& package_path,
                                     const std::string& signature) {
   // 实现包验证逻辑，例如检查SHA256或数字签名
   if (!QFile::exists(package_path)) {
-    last_error_ = "更新包文件不存在";
+    last_error_ = "Update package file does not exist";
     return false;
   }
   
   // 简单的SHA256验证示例
   QFile file(package_path);
   if (!file.open(QIODevice::ReadOnly)) {
-    last_error_ = "无法打开更新包进行验证";
+    last_error_ = "Failed to open update package for verification";
     return false;
   }
   
   QCryptographicHash hash(QCryptographicHash::Sha256);
   if (!hash.addData(&file)) {
     file.close();
-    last_error_ = "计算哈希值失败";
+    last_error_ = "Failed to calculate hash";
     return false;
   }
   
@@ -475,7 +475,7 @@ bool WinUpdater::VerifyUpdatePackage(const QString& package_path,
       return true;  // 测试模式下允许不匹配
     }
     
-    last_error_ = "包验证失败: 哈希值不匹配";
+    last_error_ = "Package verification failed: hash mismatch";
     return false;
   }
   
@@ -505,4 +505,4 @@ void WinUpdater::CleanupTempFiles() {
 }
 
 }  // namespace update
-}  // namespace gdownload
+}  // namespace gdl
