@@ -397,40 +397,40 @@ GDownload 是一個開源項目，由熱衷於技術的開發者維護。我們�
 <context>
     <name>UpdateDialog</name>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="41"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="39"/>
         <source>New Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="52"/>
-        <source>前往发布页</source>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="50"/>
+        <source>Go to Download</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="103"/>
-        <source>取消</source>
-        <translation type="unfinished"></translation>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="115"/>
+        <source>Cancel</source>
+        <translation type="unfinished">取消</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="113"/>
-        <source>更新</source>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="125"/>
+        <source>update</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>mainWindow</name>
     <message>
-        <location filename="../qml/mainWindow.qml" line="118"/>
+        <location filename="../qml/mainWindow.qml" line="121"/>
         <source>Show main interface</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/mainWindow.qml" line="125"/>
+        <location filename="../qml/mainWindow.qml" line="128"/>
         <source>Hide main interface</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/mainWindow.qml" line="132"/>
+        <location filename="../qml/mainWindow.qml" line="135"/>
         <source>Exit</source>
         <translation type="unfinished"></translation>
     </message>
