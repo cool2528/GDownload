@@ -97,10 +97,12 @@ namespace gdl {
             update_available_ = has_update;
             if (has_update) {
                 latest_update_info_ = info;
-
+                auto data			= new UpdateDataInfo(
+                      QString::fromStdString(info.version), QString::fromStdString(info.download_url),
+                      QString::fromStdString(info.release_notes), QString::fromStdString(info.release_date), this);
                 // If silent check and not mandatory update, only emit signal
                 if (silent_check_ && !info.is_mandatory && !config_.silent_mode) {
-                    emit updateAvailable(info);
+                    Q_EMIT updateAvailable(data);
                     return;
                 }
                 // If mandatory update or silent mode enabled, start update automatically
@@ -109,25 +111,31 @@ namespace gdl {
                 }
                 else {
                     // Otherwise just emit signal
-                    emit updateAvailable(info);
+                    Q_EMIT updateAvailable(data);
                 }
             }
         }
 
         void UpdateManager::onUpdateProgress(const UpdateProgress& progress) {
             // 转发进度信号
-            emit updateProgress(progress);
+            QString message = QString::fromStdString(progress.message);
+            auto stage		= static_cast<int>(progress.stage);
+            auto percentage = progress.percentage;
+            auto data		= new UpdateProgressData(stage, percentage, message, this);
+            Q_EMIT updateProgress(data);
             // 检查更新是否完成
             if (progress.stage == UpdateProgress::Stage::kFinished) {
-                emit updateFinished(true);
+                Q_EMIT updateFinished(true);
             }
             else if (progress.stage == UpdateProgress::Stage::kFailed) {
                 last_error_ = QString::fromStdString(progress.message);
-                emit updateFinished(false);
+                Q_EMIT updateFinished(false);
             }
         }
 
         void RegisterTypes(QQmlEngine* engine) {
+            qmlRegisterType<UpdateDataInfo>(GEXPORT_MODULE_URL, 1, 0, "UpdateDataInfo");
+            qmlRegisterType<UpdateProgressData>(GEXPORT_MODULE_URL, 1, 0, "UpdateProgressData");
             qmlRegisterSingletonInstance<UpdateManager>(GEXPORT_MODULE_URL, 1, 0, "UpdateManager",
                                                         &UpdateManager::Instance());
         }

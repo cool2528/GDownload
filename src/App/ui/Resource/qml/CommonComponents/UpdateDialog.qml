@@ -144,17 +144,18 @@ Popup {
         function onUpdateAvailable(info) {
             // 更新对话框内容
             versionNumber = "v" + info.version
-            releaseNotes = info.release_notes
+            releaseNotes = info.release_note
             updating = false
             updateDialog.open()
         }
 
         function onUpdateProgress(progress) {
             // 更新进度条
-            updateProgressBar.value = progress.percent
+            updateProgressBar.value = progress.percentage
 
             // 如果更新完成，关闭对话框
-            if (progress.stage === UpdateProgress.Stage.kFinished) {
+            // stage 0 = 检查更新 1 = 下载更新 2 = 解压更新 3 = 验证更新 4 = 安装更新 5 = 更新完成 6 = 更新失败
+            if (progress.stage === 5) {
                 updating = false
                 updateDialog.close()
             }
