@@ -3,146 +3,163 @@
 #import <Cocoa/Cocoa.h>
 #import <Sparkle/Sparkle.h>
 
-namespace gdl {
-	namespace update {
+// 将 interface 声明移到全局作用域
+@interface SparkleDelegate : NSObject <SPUUpdaterDelegate>
+@property(nonatomic, copy) void (^checkCallback)(bool, const gdl::update::UpdateInfo&);
+@property(nonatomic, copy) void (^progressCallback)(const gdl::update::UpdateProgress&);
+@property(nonatomic, strong) NSString* currentVersion;
+@property(nonatomic, assign) BOOL updateInProgress;
+@property(nonatomic, assign) gdl::update::UpdateInfo* updateInfo;
+@end
 
-		// Sparkle代理类
-		@interface SparkleDelegate : NSObject <SPUUpdaterDelegate>
-		@property(nonatomic, copy) AutoUpdater::UpdateCheckCallback checkCallback;
-		@property(nonatomic, copy) AutoUpdater::ProgressCallback progressCallback;
-		@property(nonatomic, strong) NSString* currentVersion;
-		@property(nonatomic, assign) BOOL updateInProgress;
-		@property(nonatomic, strong) UpdateInfo* updateInfo;
-		@end
+// 实现也必须在全局作用域
+@implementation SparkleDelegate
 
-		@implementation SparkleDelegate
+- (instancetype)init {
+	self = [super init];
+	if (self) {
+		_updateInProgress = NO;
+		_updateInfo		  = new gdl::update::UpdateInfo();
+	}
+	return self;
+}
 
-		- (instancetype)init {
-			self = [super init];
-			if (self) {
-				_updateInProgress = NO;
-				_updateInfo		  = new UpdateInfo();
-			}
-			return self;
-		}
-
-		- (void)dealloc {
-			delete _updateInfo;
-			[super dealloc];
-		}
+- (void)dealloc {
+	delete _updateInfo;
+	[super dealloc];
+}
 
 #pragma mark - SPUUpdaterDelegate
 
-		- (void)updater:(SPUUpdater*)updater didFindValidUpdate:(SUAppcastItem*)item {
-			if (_checkCallback) {
-				_updateInfo->version	   = std::string([[item versionString] UTF8String]);
-				_updateInfo->release_notes = std::string([[item itemDescription] UTF8String]);
-				_updateInfo->download_url  = std::string([[[item fileURL] absoluteString] UTF8String]);
-				_updateInfo->release_date  = std::string([[[item date] description] UTF8String]);
-				_updateInfo->is_mandatory  = [item isCriticalUpdate];
-				_updateInfo->package_size  = [[item contentLength] longLongValue];
+- (void)updater:(SPUUpdater*)updater didFindValidUpdate:(SUAppcastItem*)item {
+	if (_checkCallback) {
+		_updateInfo->version	   = std::string([[item versionString] UTF8String]);
+		_updateInfo->release_notes = std::string([[item itemDescription] UTF8String]);
+		_updateInfo->download_url  = std::string([[[item fileURL] absoluteString] UTF8String]);
+		_updateInfo->release_date  = std::string([[[item date] description] UTF8String]);
+		_updateInfo->is_mandatory  = [item isCriticalUpdate];
+		_updateInfo->package_size  = [[item contentLength] longLongValue];
 
-				_checkCallback(true, *_updateInfo);
-			}
-		}
+		_checkCallback(true, *_updateInfo);
+	}
+}
 
-		- (void)updaterDidNotFindUpdate:(SPUUpdater*)updater {
-			if (_checkCallback) {
-				_checkCallback(false, UpdateInfo{});
-			}
-		}
+- (void)updaterDidNotFindUpdate:(SPUUpdater*)updater {
+	if (_checkCallback) {
+		_checkCallback(false, gdl::update::UpdateInfo{});
+	}
+}
 
-		- (void)updater:(SPUUpdater*)updater
-			willDownloadUpdate:(SUAppcastItem*)item
-				   withRequest:(NSMutableURLRequest*)request {
-			if (_progressCallback) {
-				UpdateProgress progress;
-				progress.stage		= UpdateProgress::Stage::kDownloading;
-				progress.percentage = 0;
-				progress.message	= "Starting update download";
-				_progressCallback(progress);
-			}
-		}
+- (void)updater:(SPUUpdater*)updater
+	willDownloadUpdate:(SUAppcastItem*)item
+		   withRequest:(NSMutableURLRequest*)request {
+	if (_progressCallback) {
+		gdl::update::UpdateProgress progress;
+		progress.stage		= gdl::update::UpdateProgress::Stage::kDownloading;
+		progress.percentage = 0;
+		progress.message	= "Starting update download";
+		_progressCallback(progress);
+	}
+}
 
-		- (void)updater:(SPUUpdater*)updater willInstallUpdate:(SUAppcastItem*)item {
-			if (_progressCallback) {
-				UpdateProgress progress;
-				progress.stage		= UpdateProgress::Stage::kInstalling;
-				progress.percentage = 0;
-				progress.message	= "Starting update installation";
-				_progressCallback(progress);
-			}
-		}
+- (void)updater:(SPUUpdater*)updater willInstallUpdate:(SUAppcastItem*)item {
+	if (_progressCallback) {
+		gdl::update::UpdateProgress progress;
+		progress.stage		= gdl::update::UpdateProgress::Stage::kInstalling;
+		progress.percentage = 0;
+		progress.message	= "Starting update installation";
+		_progressCallback(progress);
+	}
+}
 
-		- (void)updater:(SPUUpdater*)updater didAbortWithError:(NSError*)error {
-			if (_progressCallback) {
-				UpdateProgress progress;
-				progress.stage		= UpdateProgress::Stage::kFailed;
-				progress.percentage = 0;
-				progress.message	= std::string([[error localizedDescription] UTF8String]);
-				_progressCallback(progress);
-			}
-			_updateInProgress = NO;
-		}
+- (void)updater:(SPUUpdater*)updater didAbortWithError:(NSError*)error {
+	if (_progressCallback) {
+		gdl::update::UpdateProgress progress;
+		progress.stage		= gdl::update::UpdateProgress::Stage::kFailed;
+		progress.percentage = 0;
+		progress.message	= std::string([[error localizedDescription] UTF8String]);
+		_progressCallback(progress);
+	}
+	_updateInProgress = NO;
+}
 
-		@end
+@end
+
+namespace gdl {
+	namespace update {
 
 		class MacUpdaterImpl {
 		   public:
 			MacUpdaterImpl() {
-				delegate_ = [[SparkleDelegate alloc] init];
-				updater_  = [[SPUUpdater alloc] init];
-				[updater_ setDelegate:delegate_];
+				@autoreleasepool {
+					delegate_ = [[SparkleDelegate alloc] init];
+					updater_  = [[SPUStandardUpdaterController alloc] initWithStartingUpdater:YES
+																   updaterDelegate:delegate_
+																userDriverDelegate:nil];
+				}
 			}
 
 			~MacUpdaterImpl() {
-				[updater_ setDelegate:nil];
-				[updater_ release];
-				[delegate_ release];
+				@autoreleasepool {
+					[updater_ release];
+					[delegate_ release];
+				}
 			}
 
 			bool Initialize(const UpdateConfig& config) {
-				NSString* feedURL = [NSString stringWithUTF8String:config.update_url.c_str()];
-				[updater_ setFeedURL:[NSURL URLWithString:feedURL]];
-				[delegate_ setCurrentVersion:[NSString stringWithUTF8String:config.current_version.c_str()]];
-
-				// 设置自动检查间隔
-				[updater_ setAutomaticallyChecksForUpdates:YES];
-				[updater_ setUpdateCheckInterval:config.check_interval_hours * 3600];
-
-				return true;
+				@autoreleasepool {
+					[delegate_ setCurrentVersion:[NSString stringWithUTF8String:config.current_version.c_str()]];
+					
+					SPUUpdater* updater = [updater_ updater];
+					[updater setAutomaticallyChecksForUpdates:YES];
+					[updater setUpdateCheckInterval:config.check_interval_hours * 3600];
+					
+					return true;
+				}
 			}
 
 			void CheckForUpdates(AutoUpdater::UpdateCheckCallback callback) {
-				[delegate_ setCheckCallback:callback];
-				[updater_ checkForUpdatesInBackground];
+				@autoreleasepool {
+					// 使用 Block 转换 std::function
+					void (^objcCallback)(bool, const gdl::update::UpdateInfo&) = ^(bool found, const gdl::update::UpdateInfo& info) {
+						callback(found, info);
+					};
+					[delegate_ setCheckCallback:objcCallback];
+					[[updater_ updater] checkForUpdatesInBackground];
+				}
 			}
 
 			bool StartUpdate(AutoUpdater::ProgressCallback progress_callback) {
-				if ([delegate_ updateInProgress]) {
-					return false;
+				@autoreleasepool {
+					if ([delegate_ updateInProgress]) {
+						return false;
+					}
+					
+					// 使用 Block 转换 std::function
+					void (^objcProgressCallback)(const gdl::update::UpdateProgress&) = ^(const gdl::update::UpdateProgress& progress) {
+						progress_callback(progress);
+					};
+					[delegate_ setProgressCallback:objcProgressCallback];
+					[delegate_ setUpdateInProgress:YES];
+					[[updater_ updater] checkForUpdates];
+					return true;
 				}
-
-				[delegate_ setProgressCallback:progress_callback];
-				[delegate_ setUpdateInProgress:YES];
-				[updater_ checkForUpdates:nil];
-				return true;
 			}
 
 			void CancelUpdate() {
-				// Sparkle不直接支持取消，但我们可以标记状态
-				[delegate_ setUpdateInProgress:NO];
+				@autoreleasepool {
+					[delegate_ setUpdateInProgress:NO];
+				}
 			}
 
 			bool ApplyUpdate(bool restart_app) {
-				// Sparkle会自动处理应用更新
 				return true;
 			}
 
 			std::string GetLastError() { return last_error_; }
 
 		   private:
-			SPUUpdater* updater_;
+			SPUStandardUpdaterController* updater_;
 			SparkleDelegate* delegate_;
 			std::string last_error_;
 		};

@@ -55,6 +55,7 @@ configure_file(${CMAKE_SOURCE_DIR}/version.h.in ${CMAKE_SOURCE_DIR}/src/version.
 # 设置依赖库的根路径
 if(APPLE)
     set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/osx")
+    set(SPARKLE_ROOT_PATH "${CMAKE_SOURCE_DIR}/Sparkle")
     #使用自定义的 triplets
     set(VCPKG_OVERLAY_TRIPLETS  ${CMAKE_SOURCE_DIR}/custom-triplets)
     # 查询系统芯片架构
@@ -64,7 +65,6 @@ if(APPLE)
 
 elseif(WIN32)
     set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/win")
-
     # 当使用visual studio 以文件夹方式打开cmake 项目通过 QT visual studio tool 生成的cmake 预设时，设置编译选项
     if(CMAKE_GENERATOR STREQUAL "Ninja" OR CMAKE_GENERATOR STREQUAL "Ninja Multi-Config")
         add_compile_options(/EHsc)
