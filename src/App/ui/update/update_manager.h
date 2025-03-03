@@ -2,11 +2,38 @@
 #include <QObject>
 #include <QTimer>
 #include <memory>
+#include "Definitions/autoProperty.h"
 #include "auto_updater.h"
 #include "singleton.hpp"
 class QQmlEngine;
 namespace gdl {
     namespace update {
+        class UpdateDataInfo : public QObject {
+            Q_OBJECT
+            QML_AUTO_PROPERTY(QString, version)
+            QML_AUTO_PROPERTY(QString, url)
+            QML_AUTO_PROPERTY(QString, release_note)
+            QML_AUTO_PROPERTY(QString, release_date)
+           public:
+            explicit UpdateDataInfo(QObject* parent = nullptr) : QObject(parent) {}
+            explicit UpdateDataInfo(const QString& version, const QString& url, const QString& release_note,
+                                    const QString& release_date, QObject* parent = nullptr)
+                : QObject(parent),
+                  version_(version),
+                  url_(url),
+                  release_note_(release_note),
+                  release_date_(release_date) {}
+        };
+        class UpdateProgressData : public QObject {
+            Q_OBJECT
+            QML_AUTO_PROPERTY(int, stage)
+            QML_AUTO_PROPERTY(int, percentage)
+            QML_AUTO_PROPERTY(QString, message)
+           public:
+            explicit UpdateProgressData(QObject* parent = nullptr) : QObject(parent) {}
+            explicit UpdateProgressData(int stage, int percentage, const QString& message, QObject* parent = nullptr)
+                : QObject(parent), stage_(stage), percentage_(percentage), message_(message) {}
+        };
 
         class UpdateManager : public QObject, public Singleton<UpdateManager> {
             Q_OBJECT
@@ -34,10 +61,10 @@ namespace gdl {
 
            Q_SIGNALS:
             // 发现更新信号
-            void updateAvailable(const UpdateInfo& info);
+            void updateAvailable(UpdateDataInfo* info);
 
             // 更新进度信号
-            void updateProgress(const UpdateProgress& progress);
+            void updateProgress(UpdateProgressData* progress);
 
             // 更新完成信号
             void updateFinished(bool success);
