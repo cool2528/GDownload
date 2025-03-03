@@ -10,7 +10,19 @@ if(APPLE)
     if(file MATCHES "\\.mm$")
         set_property(SOURCE ${file} PROPERTY SKIP_AUTOMOC ON)
     endif()
-endforeach()
+    endforeach()
+
+    set(SPARKLE_FRAMEWORK_PATH "${SPARKLE_ROOT_PATH}/Sparkle.framework")
+    if(EXISTS ${SPARKLE_FRAMEWORK_PATH})
+        message("SPARKLE_FRAMEWORK_PATH: ${SPARKLE_FRAMEWORK_PATH}")
+        set(SPARKLE_FRAMEWORK_PATH ${SPARKLE_FRAMEWORK_PATH} CACHE PATH "Sparkle framework path")
+    endif()
+    set(SPARKLE_INCLUDE_PATH "${SPARKLE_FRAMEWORK_PATH}/Headers")
+    if(EXISTS ${SPARKLE_INCLUDE_PATH})
+        message("SPARKLE_INCLUDE_PATH: ${SPARKLE_INCLUDE_PATH}")
+        set(SPARKLE_INCLUDE_PATH ${SPARKLE_INCLUDE_PATH} CACHE PATH "Sparkle include path")
+    endif()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -F${SPARKLE_ROOT_PATH}")
 else()
     project(gdownload LANGUAGES CXX C)
     file(GLOB_RECURSE SOURCES_FILES
@@ -231,22 +243,21 @@ register_target(${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${MODULE_INCLUDE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src/App/engine
+    $<$<CXX_COMPILER_ID:AppleClang>:${SPARKLE_FRAMEWORK_PATH}>
 )
-target_link_libraries(${PROJECT_NAME} PRIVATE ${DEPENDENCIES_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${DEPENDENCIES_LIBRARIES} 
+$<$<CXX_COMPILER_ID:AppleClang>:${SPARKLE_ROOT_PATH}>
+)
 target_compile_definitions(${PROJECT_NAME} PRIVATE
    $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system)
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::property_tree)
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::asio)
-if(WIN32)
-    set(PUGIXML_TARGET pugixml::shared pugixml::pugixml)
-elseif(APPLE)
-    set(PUGIXML_TARGET pugixml::shared pugixml::pugixml)
-else()
-    set(PUGIXML_TARGET pugixml::shared pugixml::pugixml)
+if(APPLE)
+target_link_libraries(${PROJECT_NAME} PRIVATE "-framework Sparkle")
 endif()
-target_link_libraries(${PROJECT_NAME} PRIVATE LibtorrentRasterbar::torrent-rasterbar ${PUGIXML_TARGET})
+target_link_libraries(${PROJECT_NAME} PRIVATE LibtorrentRasterbar::torrent-rasterbar pugixml::shared pugixml::pugixml)
 if(WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE 
         UNICODE 
