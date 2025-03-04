@@ -155,7 +155,10 @@ elseif(APPLE)
     install(FILES ${VCPKG_LIBS}
         DESTINATION ${PROJECT_NAME}.app/Contents/Frameworks
     )
-
+    # 复制 Sparkle.framework 到Frameworks目录
+    install(DIRECTORY ${SPARKLE_ROOT_PATH}/Sparkle.framework
+        DESTINATION ${PROJECT_NAME}.app/Contents/Frameworks
+    )
     # 运行 macdeployqt
     install(CODE "
         execute_process(
