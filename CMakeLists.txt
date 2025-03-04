@@ -155,10 +155,23 @@ elseif(APPLE)
     install(FILES ${VCPKG_LIBS}
         DESTINATION ${PROJECT_NAME}.app/Contents/Frameworks
     )
-    # 复制 Sparkle.framework 到Frameworks目录
+    # 先删除目标目录中可能存在的 Sparkle.framework
+    install(CODE "
+        if(EXISTS \"\${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app/Contents/Frameworks/Sparkle.framework\")
+            execute_process(
+                COMMAND ${CMAKE_COMMAND} -E remove_directory 
+                \"\${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app/Contents/Frameworks/Sparkle.framework\"
+            )
+        endif()
+    ")
+    
+    # 然后复制整个框架
     install(DIRECTORY ${SPARKLE_ROOT_PATH}/Sparkle.framework
         DESTINATION ${PROJECT_NAME}.app/Contents/Frameworks
+        USE_SOURCE_PERMISSIONS
+        PATTERN ".DS_Store" EXCLUDE
     )
+
     # 运行 macdeployqt
     install(CODE "
         execute_process(
