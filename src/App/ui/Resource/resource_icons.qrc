@@ -32,5 +32,7 @@
         <file>images/toast/info.svg</file>
         <file>images/toast/success.svg</file>
         <file>images/toast/warning.svg</file>
+        <file>images/logo/logo.svg</file>
+        <file>images/logo/logo.icns</file>
     </qresource>
 </RCC>
