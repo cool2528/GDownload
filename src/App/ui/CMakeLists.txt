@@ -150,7 +150,15 @@ if(APPLE)
         INSTALL_NAME_DIR "@rpath"
         INSTALL_RPATH "@executable_path/../Frameworks"
     )
-
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E remove_directory
+                ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin/${PROJECT_NAME}.app/Contents/Frameworks/Sparkle.framework
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${SPARKLE_ROOT_PATH}/Sparkle.framework
+                ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin/${PROJECT_NAME}.app/Contents/Frameworks/Sparkle.framework
+        )
+    endif()
     # 复制logo.icns到捆绑包的资源目录中
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -164,10 +172,6 @@ if(APPLE)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations
             ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/${PROJECT_NAME}.app/Contents/Resources/translations
-        # copy sparkle.framework to app/Contents/Frameworks
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${SPARKLE_ROOT_PATH}/Sparkle.framework
-            ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/${PROJECT_NAME}.app/Contents/Frameworks/Sparkle.framework
         COMMAND $<$<CONFIG:Debug>:install_name_tool>
             $<$<CONFIG:Debug>:-add_rpath>
             $<$<CONFIG:Debug>:${QT_ROOT}/lib>
