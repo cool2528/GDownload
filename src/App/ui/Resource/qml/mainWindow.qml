@@ -100,41 +100,75 @@ FramelessWindow{
     }
 
     // 系统托盘
-    SystemTrayIcon{
-        id:systemTray
-        icon.mask: true
-        icon.source: "qrc:/images/logo/icon.ico"
+    SystemTrayIcon {
+        id: systemTray
+        icon.mask: Qt.platform.os === "osx" ? false : true  // 这个属性会自动处理 macOS 下的 template 模式
+        icon.source: Qt.platform.os === "osx" ? "qrc:/images/logo/logo.svg" : "qrc:/images/logo/icon.ico"
         visible: true
-        tooltip:"GDownload"
-        onActivated: function(reason){
-            if (reason === SystemTrayIcon.DoubleClick) {
-                mainWindow.showNormal()
-            }else if(reason === SystemTrayIcon.MiddleClick){
-                mainWindow.hide()
-            }else if(reason === SystemTrayIcon.Context || reason === SystemTrayIcon.SystemTrayIcon.Trigger){
-                tray_menu.open()
-            }
-        }
-        menu: Menu{
-            id:tray_menu
-            MenuItem{
-                text:qsTr("Show main interface")
-                onTriggered: {
+        tooltip: "GDownload"
+
+        onActivated: function(reason) {
+            if (Qt.platform.os === "osx") {
+                // macOS 下点击托盘图标显示菜单
+                if (reason === SystemTrayIcon.Trigger) {
+                    // 不要直接调用 open，而是使用 Qt.callLater 来避免递归
+                    Qt.callLater(function() {
+                        tray_menu.open()
+                    })
+                }
+            } else {
+                // Windows/Linux 保持原有行为
+                if (reason === SystemTrayIcon.DoubleClick) {
                     mainWindow.showNormal()
+                    mainWindow.raise()
+                    mainWindow.requestActivate()
+                } else if (reason === SystemTrayIcon.MiddleClick) {
+                    mainWindow.hide()
+                } else if (reason === SystemTrayIcon.Context || reason === SystemTrayIcon.Trigger) {
+                    Qt.callLater(function() {
+                        tray_menu.open()
+                    })
                 }
             }
-            MenuSeparator{}
-            MenuItem{
-                text:qsTr("Hide main interface")
+        }
+
+        menu: Menu {
+            id: tray_menu
+
+            // macOS 专用标题项
+            MenuItem {
+                text: "GDownload"
+                enabled: false
+                visible: Qt.platform.os === "osx"
+            }
+            MenuSeparator {
+                visible: Qt.platform.os === "osx"
+            }
+
+            MenuItem {
+                text: qsTr("Show main interface")
+                onTriggered: {
+                    if (Qt.platform.os === "osx") {
+                        mainWindow.show()
+                        mainWindow.raise()
+                        mainWindow.requestActivate()
+                    } else {
+                        mainWindow.showNormal()
+                    }
+                }
+            }
+            MenuSeparator {}
+            MenuItem {
+                text: qsTr("Hide main interface")
                 onTriggered: {
                     mainWindow.hide()
                 }
             }
-            MenuSeparator{}
-            MenuItem{
-                text:qsTr("Exit")
+            MenuSeparator {}
+            MenuItem {
+                text: qsTr("Exit")
                 onTriggered: {
-                   Qt.quit()
+                    Qt.quit()
                 }
             }
         }

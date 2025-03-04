@@ -420,17 +420,17 @@ Copyright © 2024 GDownload 团队
 <context>
     <name>mainWindow</name>
     <message>
-        <location filename="../qml/mainWindow.qml" line="121"/>
+        <location filename="../qml/mainWindow.qml" line="144"/>
         <source>Show main interface</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/mainWindow.qml" line="128"/>
+        <location filename="../qml/mainWindow.qml" line="157"/>
         <source>Hide main interface</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/mainWindow.qml" line="135"/>
+        <location filename="../qml/mainWindow.qml" line="164"/>
         <source>Exit</source>
         <translation type="unfinished"></translation>
     </message>
