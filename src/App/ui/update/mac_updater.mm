@@ -32,22 +32,53 @@
 #pragma mark - SPUUpdaterDelegate
 
 - (void)updater:(SPUUpdater*)updater didFindValidUpdate:(SUAppcastItem*)item {
+	NSLog(@"Found update: %@", [item versionString]);
+	NSLog(@"Current version: %@", [self currentVersion]);
+	
 	if (_checkCallback) {
-		_updateInfo->version	   = std::string([[item versionString] UTF8String]);
-		_updateInfo->release_notes = std::string([[item itemDescription] UTF8String]);
-		_updateInfo->download_url  = std::string([[[item fileURL] absoluteString] UTF8String]);
-		_updateInfo->release_date  = std::string([[[item date] description] UTF8String]);
-		_updateInfo->is_mandatory  = [item isCriticalUpdate];
-		_updateInfo->package_size  = [[item contentLength] longLongValue];
-
+		// 版本信息
+		_updateInfo->version = std::string([[item versionString] UTF8String]);
+		
+		// 发布说明 - 可以是 URL 或者内联描述
+		if ([item releaseNotesURL]) {
+			_updateInfo->release_notes = std::string([[[item releaseNotesURL] absoluteString] UTF8String]);
+		} else if ([item itemDescription]) {
+			_updateInfo->release_notes = std::string([[item itemDescription] UTF8String]);
+		}
+		
+		// 下载 URL
+		NSURL* fileURL = [item fileURL];
+		if (fileURL) {
+			_updateInfo->download_url = std::string([[fileURL absoluteString] UTF8String]);
+			NSLog(@"Update file URL: %@", fileURL);
+		} else {
+			NSLog(@"Warning: No file URL found in appcast item");
+		}
+		
+		// 发布日期
+		if ([item date]) {
+			_updateInfo->release_date = std::string([[[item date] description] UTF8String]);
+		}
+		
+		// 是否是强制更新
+		_updateInfo->is_mandatory = false;
+		
+		// 包大小
+		_updateInfo->package_size = [item contentLength];
+		
 		_checkCallback(true, *_updateInfo);
 	}
 }
 
 - (void)updaterDidNotFindUpdate:(SPUUpdater*)updater {
-	if (_checkCallback) {
-		_checkCallback(false, gdl::update::UpdateInfo{});
-	}
+	NSLog(@"=== No Update Found Debug ===");
+	NSLog(@"Current version: %@", [self currentVersion]);
+	NSLog(@"Feed URL: %@", [updater feedURL]);
+	NSLog(@"Last check date: %@", [updater lastUpdateCheckDate]);
+	NSLog(@"===========================");
+	 if (_checkCallback) {
+        _checkCallback(false, gdl::update::UpdateInfo{});
+    }
 }
 
 - (void)updater:(SPUUpdater*)updater
@@ -81,6 +112,28 @@
 		_progressCallback(progress);
 	}
 	_updateInProgress = NO;
+}
+
+- (void)updater:(SPUUpdater*)updater didFinishLoadingAppcast:(SUAppcast*)appcast {
+	NSLog(@"=== Appcast Debug Info ===");
+	NSLog(@"Current App Version: %@", [self currentVersion]);
+	
+	for (SUAppcastItem* item in [appcast items]) {
+		NSLog(@"Comparing versions:");
+		NSLog(@"- Appcast version: %@", [item versionString]);
+		NSLog(@"- Current version: %@", [self currentVersion]);
+		
+		// 检查版本比较结果
+		NSComparisonResult result = [[item versionString] compare:[self currentVersion] options:NSNumericSearch];
+		NSString* compareResult = @"equal to";
+		if (result == NSOrderedAscending) {
+			compareResult = @"older than";
+		} else if (result == NSOrderedDescending) {
+			compareResult = @"newer than";
+		}
+		NSLog(@"Version comparison result: Appcast version is %@ current version", compareResult);
+	}
+	NSLog(@"========================");
 }
 
 @end
