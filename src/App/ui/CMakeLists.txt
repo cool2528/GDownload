@@ -164,6 +164,10 @@ if(APPLE)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations
             ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/${PROJECT_NAME}.app/Contents/Resources/translations
+        # copy sparkle.framework to app/Contents/Frameworks
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${SPARKLE_ROOT_PATH}/Sparkle.framework
+            ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/${PROJECT_NAME}.app/Contents/Frameworks/Sparkle.framework
         COMMAND $<$<CONFIG:Debug>:install_name_tool>
             $<$<CONFIG:Debug>:-add_rpath>
             $<$<CONFIG:Debug>:${QT_ROOT}/lib>
