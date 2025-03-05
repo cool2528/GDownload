@@ -43,6 +43,7 @@ jobs:
         uses: johnwason/vcpkg-action@v6
         with:
           manifest-dir: ${{ github.workspace }}
+          extra-args: --overlay-triplets=${{ github.workspace }}/custom-triplets
           triplet: arm64-osx-release
           token: ${{ github.token }}
           github-binarycache: true

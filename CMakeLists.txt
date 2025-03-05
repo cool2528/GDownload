@@ -108,6 +108,7 @@ if(UNIX AND NOT APPLE)
     unset(CMAKE_VISIBILITY_INLINES_HIDDEN)
     # 如果是Linux 系统使用 appimageupdate 更新 appimage
     set(BUILD_LIBAPPIMAGEUPDATE_ONLY ON CACHE BOOL "Only build libappimageupdate" FORCE)
+    set(USE_SYSTEM_LIBAPPIMAGE ON CACHE BOOL "Use system libappimage" FORCE)
     add_subdirectory(lib/AppImageUpdate)
     # 恢复可见性设置
     set(CMAKE_CXX_VISIBILITY_PRESET ${SAVED_CXX_VISIBILITY_PRESET})
@@ -300,7 +301,6 @@ elseif(UNIX AND NOT APPLE)
     set(APP_BIN_DIR "${APP_INSTALL_DIR}/usr/bin") 
     set(APP_LIB_DIR "${APP_INSTALL_DIR}/usr/lib")
     set(APP_SHARE_DIR "${APP_INSTALL_DIR}/usr/share")
-    
     # 安装所有目标
     install(TARGETS ${PROJECT_TARGETS}
         RUNTIME DESTINATION ${APP_BIN_DIR}
@@ -366,19 +366,19 @@ elseif(UNIX AND NOT APPLE)
         
         install(CODE "
             # 设置环境变量
-            set(ENV{LD_LIBRARY_PATH} \"\${CMAKE_INSTALL_PREFIX}/usr/lib:${Qt6_DIR}/../../../lib:\$ENV{LD_LIBRARY_PATH}\")
+            set(ENV{LD_LIBRARY_PATH} \"${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin:${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/usr/lib:${Qt6_DIR}/../../../lib:\$ENV{LD_LIBRARY_PATH}\")
             set(ENV{QML_SOURCES_PATHS} \"${CMAKE_SOURCE_DIR}/src/App/ui/Resource/qml\")
             set(ENV{QMAKE} \"${Qt6_DIR}/../../../bin/qmake\")
             set(ENV{QT_PLUGIN_PATH} \"${Qt6_DIR}/../../../plugins\")
             set(ENV{QML_IMPORT_PATH} \"${Qt6_DIR}/../../../qml\")
-            set(ENV{DISABLE_PLUGINS} \"sql\")
+            set(ENV{UPDATE_INFORMATION} \"gh-releases-zsync|cool2528|GDownload|latest|gdownload-*.AppImage.zsync\")
             
             execute_process(
                 COMMAND \"${LINUXDEPLOY_PATH}\"
-                        --appdir=\${CMAKE_INSTALL_PREFIX}
-                        --executable=\${CMAKE_INSTALL_PREFIX}/usr/bin/gdownload
-                        --desktop-file=\${CMAKE_INSTALL_PREFIX}/usr/share/applications/gdownload.desktop
-                        --icon-file=\${CMAKE_INSTALL_PREFIX}/usr/share/icons/hicolor/256x256/apps/gdownload.svg
+                        --appdir=${CMAKE_INSTALL_PREFIX}
+                        --executable=${CMAKE_INSTALL_PREFIX}/usr/bin/gdownload
+                        --desktop-file=${CMAKE_INSTALL_PREFIX}/usr/share/applications/gdownload.desktop
+                        --icon-file=${CMAKE_INSTALL_PREFIX}/usr/share/icons/hicolor/256x256/apps/gdownload.svg
                         --plugin qt
                         --output appimage
                         --verbosity=3
@@ -386,7 +386,7 @@ elseif(UNIX AND NOT APPLE)
             )
             
             if(NOT DEPLOY_RESULT EQUAL 0)
-                message(WARNING \" failed: \${DEPLOY_RESULT}\")
+                message(WARNING \" failed: ${DEPLOY_RESULT}\")
             endif()
         ")
     endif()
