@@ -1,0 +1,106 @@
+name: Linux-CI
+
+on:
+  push:
+    tags: 
+      - '*'
+    branches:
+      - 'main'
+      - 'develop'
+  
+
+jobs:
+  build:
+    # if: github.ref_type == 'tag'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        include:
+          - qt_version: 6.5.2
+            package_name: gdownloader_linux
+            qt_arch: gcc_64
+
+    steps:
+      - name: Checkout Branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+          fetch-tags: true
+          submodules: recursive
+
+      - name: Setup Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ matrix.qt_version }}
+          arch: ${{ matrix.qt_arch }}
+          modules: 'qt3d qtimageformats qtwebsockets qt5compat qtshadertools'
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1 libdrm-dev libappimage-dev libxdg-basedir-dev xdg-utils-cxx xdg-utils-cxx-dev mesa-common-dev build-essential libssl-dev autoconf automake libtool wget vim-common desktop-file-utils pkgconf libgpgme-dev  libglib2.0-dev libcairo2-dev librsvg2-dev libfuse-dev git libcurl4-openssl-dev argagg-dev libgcrypt20-dev libboost-dev liblzma-dev libzstd-dev zlib1g-dev libarchive-dev libx11-dev libxpm-dev ninja-build
+
+      - name: Setup vcpkg
+        id: vcpkg
+        uses: johnwason/vcpkg-action@v6
+        with:
+          manifest-dir: ${{ github.workspace }}
+          extra-args: --overlay-triplets=${{ github.workspace }}/custom-triplets
+          triplet: x64-linux-release
+          token: ${{ github.token }}
+          github-binarycache: true
+
+      - name: Download Tools
+        run: |
+          mkdir -p tools
+          cd tools
+          echo "current path: $(pwd)"
+          wget -c "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage"
+          wget -c "https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage"
+          wget -c "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+          chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-qt-x86_64.AppImage appimagetool-x86_64.AppImage
+          # 创建软链接 保持全局可用
+          sudo ln -s $(pwd)/linuxdeploy-x86_64.AppImage /usr/bin/linuxdeploy
+          sudo ln -s $(pwd)/linuxdeploy-plugin-qt-x86_64.AppImage /usr/bin/linuxdeploy-plugin-qt
+          sudo ln -s $(pwd)/appimagetool-x86_64.AppImage /usr/bin/appimagetool
+          cd ${{ github.workspace }}
+          echo "current path: $(pwd)"
+
+      - name: Build
+        run: |
+          echo "vcpkg-cmake-config: ${{ steps.vcpkg.outputs.vcpkg-cmake-config }}"
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S ${{ github.workspace }} -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/linux_package -DCMAKE_BUILD_TYPE=Release -GNinja
+          cmake --build build --config Release --parallel
+          cmake --install build --config Release --strip
+
+      - name: Create AppImage zsync
+        run: |
+          # 先获取当前目录下生成的 appimage 文件名
+          APPIMAGE_NAME=$(ls ${{ github.workspace }}/*.AppImage)
+          echo "APPIMAGE_NAME: $APPIMAGE_NAME"
+
+          # install 已经做了打包 这里只需要生成zsync文件
+          appimagetool ${{ github.workspace }}/linux_package gdownload-*-x86_64.AppImage
+          appimagetool -u "gh-releases-zsync|cool2528|GDownload|latest|gdownload-*.AppImage.zsync" ${{ github.workspace }}/linux_package $APPIMAGE_NAME
+          
+          # 将文件名保存为环境变量供后续步骤使用
+          echo "APPIMAGE_FILENAME=$(basename $APPIMAGE_NAME)" >> $GITHUB_ENV
+          echo "ZSYNC_FILENAME=$(basename $APPIMAGE_NAME).zsync" >> $GITHUB_ENV
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.package_name }}
+          path: |
+            ${{ github.workspace }}/${{ env.APPIMAGE_FILENAME }}
+            ${{ github.workspace }}/${{ env.ZSYNC_FILENAME }}
+
+      - name: Upload Release
+        # if: startsWith(github.event.ref, 'refs/tags/')
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.RELEASE_TOKEN }}
+          file_glob: true
+          file:  ${{ github.workspace }}/gdownload-*.AppImag*
+          overwrite: true 
