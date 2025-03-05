@@ -6,12 +6,10 @@ on:
       - '*'
     branches:
       - 'main'
-      - 'develop'
-  
 
 jobs:
   build:
-    # if: github.ref_type == 'tag'
+    if: github.ref_type == 'tag'
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -79,25 +77,11 @@ jobs:
           # 先获取当前目录下生成的 appimage 文件名
           APPIMAGE_NAME=$(ls ${{ github.workspace }}/*.AppImage)
           echo "APPIMAGE_NAME: $APPIMAGE_NAME"
-
           # install 已经做了打包 这里只需要生成zsync文件
-          appimagetool ${{ github.workspace }}/linux_package gdownload-*-x86_64.AppImage
           appimagetool -u "gh-releases-zsync|cool2528|GDownload|latest|gdownload-*.AppImage.zsync" ${{ github.workspace }}/linux_package $APPIMAGE_NAME
           
-          # 将文件名保存为环境变量供后续步骤使用
-          echo "APPIMAGE_FILENAME=$(basename $APPIMAGE_NAME)" >> $GITHUB_ENV
-          echo "ZSYNC_FILENAME=$(basename $APPIMAGE_NAME).zsync" >> $GITHUB_ENV
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.package_name }}
-          path: |
-            ${{ github.workspace }}/${{ env.APPIMAGE_FILENAME }}
-            ${{ github.workspace }}/${{ env.ZSYNC_FILENAME }}
-
       - name: Upload Release
-        # if: startsWith(github.event.ref, 'refs/tags/')
+        if: startsWith(github.event.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.RELEASE_TOKEN }}
