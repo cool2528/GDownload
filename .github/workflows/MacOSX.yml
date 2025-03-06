@@ -5,10 +5,10 @@ on:
     tags: 
       - '*'
     branches:
-      - main
+      - 'main'
 jobs:
   build:
-    if: github.ref_type == 'tag' && github.ref_name == 'main'
+    if: github.ref_type == 'tag'
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
