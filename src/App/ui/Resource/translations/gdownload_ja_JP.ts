@@ -419,17 +419,17 @@ Apache License 2.0でライセンスされています
 <context>
     <name>mainWindow</name>
     <message>
-        <location filename="../qml/mainWindow.qml" line="144"/>
+        <location filename="../qml/mainWindow.qml" line="149"/>
         <source>Show main interface</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/mainWindow.qml" line="157"/>
+        <location filename="../qml/mainWindow.qml" line="162"/>
         <source>Hide main interface</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/mainWindow.qml" line="164"/>
+        <location filename="../qml/mainWindow.qml" line="169"/>
         <source>Exit</source>
         <translation type="unfinished"></translation>
     </message>
