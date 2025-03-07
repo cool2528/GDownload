@@ -420,17 +420,17 @@ GDownload 是一個開源項目，由熱衷於技術的開發者維護。我們�
 <context>
     <name>mainWindow</name>
     <message>
-        <location filename="../qml/mainWindow.qml" line="144"/>
+        <location filename="../qml/mainWindow.qml" line="149"/>
         <source>Show main interface</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/mainWindow.qml" line="157"/>
+        <location filename="../qml/mainWindow.qml" line="162"/>
         <source>Hide main interface</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/mainWindow.qml" line="164"/>
+        <location filename="../qml/mainWindow.qml" line="169"/>
         <source>Exit</source>
         <translation type="unfinished"></translation>
     </message>
