@@ -261,7 +261,7 @@ namespace gdl {
 
 			bool BrowserManager::RemoveTask(int page_index, const QString& gid) {
 				if (gid.isEmpty()) return false;
-				if (page_index != 0 || page_index != 1) {
+                if (page_index != 0 && page_index != 1) {
 					return false;
 				}
 				if (active_model_) {
@@ -408,13 +408,17 @@ namespace gdl {
 					if (!task) {
 						return false;
 					}
-					QString save_path = task->task_save_path();
-					const auto res	  = stoped_model_->RemoveTaskById(gid);
+                    const QString save_path		  = task->task_save_path();
+                    const QString cache_file_path = save_path + ".aria2";
+                    const auto res				  = stoped_model_->RemoveTaskById(gid);
 					gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
 					if (is_remove_file) {
 						if (QFile::exists(save_path)) {
 							QFile::remove(save_path);
 						}
+                        if (QFile::exists(cache_file_path)) {
+                            QFile::remove(cache_file_path);
+                        }
 					}
 					return res;
 				}
@@ -427,14 +431,18 @@ namespace gdl {
 					if (!task) {
 						return false;
 					}
-					QString gid		  = task->task_id();
-					QString save_path = task->task_save_path();
-					const auto res	  = stoped_model_->RemoveTask(index);
+                    QString gid					  = task->task_id();
+                    const QString save_path		  = task->task_save_path();
+                    const QString cache_file_path = save_path + ".aria2";
+                    const auto res				  = stoped_model_->RemoveTask(index);
 					gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
 					if (is_remove_file) {
 						if (QFile::exists(save_path)) {
 							QFile::remove(save_path);
 						}
+                        if (QFile::exists(cache_file_path)) {
+                            QFile::remove(cache_file_path);
+                        }
 					}
 					return res;
 				}
