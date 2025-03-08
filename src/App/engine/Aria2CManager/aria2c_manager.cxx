@@ -13,7 +13,6 @@
 #endif
 #include "aria2c_http_rpc_client.h"
 #include "config/config.h"
-#include "plugin_manager.h"
 namespace gdl {
 	namespace engine {
 
@@ -371,28 +370,8 @@ namespace gdl {
 
 		Result<bool> Aria2cDownloadManager::AddHttpTask(
 			const String& url, const std::unordered_multimap<std::string, std::string>& options) {
-			auto plugin_vector = plugin::DownloadPluginManager::Instance().GetPluginsForUrl(url);
-			IDownloadPlugin::IDownloadPluginPtr plugin					   = nullptr;
 			std::string real_url										   = url;
 			std::unordered_multimap<std::string, std::string> real_options = options;
-			if (!plugin_vector.empty()) {
-				plugin = plugin_vector.front();
-			}
-			if (plugin) {
-				// 使用下载插件解析真实下载链接
-				auto result = plugin->ParseUrl(url, options);
-				IDownloadPlugin::ParseResult parse_result;
-				if (result.has_value()) {
-					parse_result = result.value();
-					real_url	 = parse_result.real_url;
-					real_options = parse_result.options;
-					real_options.merge(parse_result.headers);
-				}
-				else {
-					return MakeFail(1, "Failed to parse download link");
-				}
-			}
-
 			// 直接添加到下载引擎任务队列中
 			return websocket_client_.AddUri({real_url}, real_options);
 		}

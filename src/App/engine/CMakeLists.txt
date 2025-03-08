@@ -38,7 +38,6 @@ Boost::url
 cpr::cpr 
 Boost::beast 
 GDLCore 
-PluginManager
 rapidjson
 )
 if(APPLE)
