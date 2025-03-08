@@ -25,6 +25,13 @@ namespace gdl {
 			std::error_code ec;
 			if (!std::filesystem::exists(plugin_path, ec)) return false;
             auto guard_plugin = std::make_shared<PluginResourceGuard>(plugin_path);
+            if (!guard_plugin) {
+                return false;
+            }
+
+            if (!guard_plugin->InitPlugin()) {
+                return false;
+            }
             plugins_.push_back(guard_plugin);
 			return true;
 		}
