@@ -13,6 +13,7 @@
 #include "os/os.h"
 #include "toast/toast_manager.h"
 #include "utils/utils.h"
+#include "PluginManager/plugin_manager.h"
 namespace gdl {
 	namespace ui {
 		namespace browser {
@@ -527,6 +528,18 @@ namespace gdl {
 				}
 				return nullptr;
 			}
+
+            void BrowserManager::TestPlugin(const QString &url)
+            {
+				auto plugin_vec = gdl::plugin::DownloadPluginManager::Instance().GetPluginsForUrl(url.toStdString());
+				if (plugin_vec.empty()) {
+					return;
+				}
+				auto plugin = plugin_vec.front();
+				if (!plugin) return;
+				auto file_infos = plugin->ParseUrl(url.toStdString());
+				if (!file_infos.has_value()) return;
+            }
 
 			bool BrowserManager::Init() {
 				// subscribe aria2 responce
