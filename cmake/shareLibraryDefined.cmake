@@ -7,3 +7,4 @@ macro(INIT_SHARE_PROJECT name)
     )
     endif()
 endmacro()
+

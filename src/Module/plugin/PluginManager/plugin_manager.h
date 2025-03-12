@@ -33,7 +33,7 @@ namespace gdl {
 
                public:
                 explicit PluginResourceGuard(const std::string& path);
-                ~PluginResourceGuard();
+				~PluginResourceGuard() = default;
                 INetDiskDownloadPlugin::IDownloadPluginPtr GetPlugin() const { return plugin_; }
                 bool InitPlugin();
 

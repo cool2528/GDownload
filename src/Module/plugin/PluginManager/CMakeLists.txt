@@ -53,3 +53,8 @@ endif()
 set_target_properties(${PROJECT_NAME} PROPERTIES
 FOLDER "Plugin"
 )
+
+add_dependencies(${PROJECT_NAME}
+    GDLCore
+    Baidu_Plugin
+)
