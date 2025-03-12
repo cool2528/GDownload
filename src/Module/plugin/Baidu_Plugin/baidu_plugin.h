@@ -3,6 +3,7 @@
 #include "PluginManager/IDownload_Plugin.h"
 namespace gdl {
     namespace plugin {
+		class BaiduPcsApi;
         class BaiduPlugin : public INetDiskDownloadPlugin {
            public:
             explicit BaiduPlugin();
@@ -17,6 +18,8 @@ namespace gdl {
             PluginMetadata GetPluginMetadata() override;
 
             bool CanHandle(const std::string& url) const override;
+        private:
+			std::unique_ptr<BaiduPcsApi> pcs_api_ {nullptr};
         };
     }  // namespace plugin
 }  // namespace gdl

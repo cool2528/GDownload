@@ -10,6 +10,7 @@
 #include "FramelessHelper/Quick/framelessquickmodule.h"
 #include "GDLCore/logger.h"
 #include "Models/folder_history_model.h"
+#include "PluginManager/plugin_manager.h"
 #include "Settings/settings_manager.h"
 #include "language/language_manager.h"
 #include "logger.h"
@@ -47,6 +48,7 @@ namespace gd {
 			const QUrl url(QStringLiteral("qrc:/qml/mainWindow.qml"));
 			engine.addImportPath(QStringLiteral("qrc:/qml"));
 			engine.load(url);
+			InitNetDiskPlugins();
 			const auto code = app.exec();
 			UnInitEngine();
 			return code;
@@ -110,6 +112,14 @@ namespace gd {
 			gdl::cache::DownloadHistoryCache::Instance().Uninitialize();
 			gdl::ui::settings::Settings::Instance().UnInit();
 		}
+
+        void MainWindow::InitNetDiskPlugins() {
+            auto current_path = QCoreApplication::applicationDirPath().toStdString();
+            auto res		  = gdl::plugin::DownloadPluginManager::Instance().LoadPlugins(current_path);
+            if (!res) {
+                LOG_ERR("load plugins fail")
+            }
+        }
 
 		void MainWindow::InitQtMessageHandler() const {
 			qInstallMessageHandler([](QtMsgType type, const QMessageLogContext& context, const QString& msg) {

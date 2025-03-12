@@ -17,6 +17,7 @@ namespace gd {
 			void InitFont(QQmlEngine* engine);
 			void InitIcon(QGuiApplication* app);
 			void UnInitEngine();
+            void InitNetDiskPlugins();
 			void InitQtMessageHandler() const;
 
 		   private:

@@ -13,6 +13,10 @@ namespace gdl {
 			for (const auto& entry : std::filesystem::directory_iterator(plugins_dir)) {
 				if (entry.path().extension() == ".so" || entry.path().extension() == ".dylib" ||
 					entry.path().extension() == ".dll") {
+                    const auto name = entry.path().filename().string();
+                    if (name.find("Plugin") == std::string::npos) {
+                        continue;
+                    }
 					if (!LoadPlugin(entry.path().string())) {
 						LOG_WARN("loader plugin faild {}", entry.path().string());
 					}
@@ -60,23 +64,20 @@ namespace gdl {
 
 		DownloadPluginManager::DownloadPluginManager() {}
 
-        DownloadPluginManager::PluginResourceGuard::PluginResourceGuard(const std::string& path) {}
-
-        DownloadPluginManager::PluginResourceGuard::~PluginResourceGuard() {
-            loader_.UnLoad();
-        }
+        DownloadPluginManager::PluginResourceGuard::PluginResourceGuard(const std::string& path):path_(path) {}
 
         bool DownloadPluginManager::PluginResourceGuard::InitPlugin() {
             if (!loader_.Load(path_)) return false;
-            create_plugin_	= (CreatePluginFunc)loader_.GetSymbol("CreatePlugin");
-            destroy_plugin_ = (DestroyPluginFunc)loader_.GetSymbol("DestroyPlugin");
+			create_plugin_	= reinterpret_cast<CreatePluginFunc>(loader_.GetSymbol("CreatePlugin"));
+			destroy_plugin_ = reinterpret_cast<DestroyPluginFunc>(loader_.GetSymbol("DestroyPlugin"));
             if (!create_plugin_ || !destroy_plugin_) {
                 loader_.UnLoad();
                 return false;
             }
-            plugin_ = std::make_shared<INetDiskDownloadPlugin>(create_plugin_(), [this](INetDiskDownloadPlugin* p) {
-                if (p && destroy_plugin_) {
-                    destroy_plugin_(p);
+			plugin_ = std::shared_ptr<INetDiskDownloadPlugin>(create_plugin_(), [this](INetDiskDownloadPlugin* p) {
+				if (p && destroy_plugin_) {
+					destroy_plugin_(p);
+					loader_.UnLoad();
                 }
             });
             if (!plugin_) {

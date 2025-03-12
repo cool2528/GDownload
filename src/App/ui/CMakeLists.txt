@@ -127,7 +127,7 @@ list(REMOVE_DUPLICATES QML_IMPORT_PATH)
 set(QML_IMPORT_PATH ${QML_IMPORT_PATH} CACHE STRING "Qt Creator extra QML import paths" FORCE)
 
 # set dependencies library
-set(DEPENDENCIES_LIBRARIES FramelessHelper::Core FramelessHelper::Widgets FramelessHelper::Quick GDLCore Engine)
+set(DEPENDENCIES_LIBRARIES FramelessHelper::Core FramelessHelper::Widgets FramelessHelper::Quick GDLCore Engine PluginManager)
 list(APPEND DEPENDENCIES_LIBRARIES ${QT_PREFIXED_MODULES})
 # 打印操作系统名称
 message("Operating System: ${CMAKE_SYSTEM_NAME}")

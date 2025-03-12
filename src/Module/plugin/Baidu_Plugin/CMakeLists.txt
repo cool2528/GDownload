@@ -17,7 +17,8 @@ if(APPLE)
     find_library(COREFOUNDATION_FRAMEWORK CoreFoundation)
     find_library(SECURITY_FRAMEWORK Security)
 endif()
-add_library(${PROJECT_NAME} SHARED ${SOURCES_FILES} ${HEADERS_FILES})
+add_library(${PROJECT_NAME} MODULE ${SOURCES_FILES} ${HEADERS_FILES})
+
 register_target(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PRIVATE ${MODULE_INCLUDE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} 
