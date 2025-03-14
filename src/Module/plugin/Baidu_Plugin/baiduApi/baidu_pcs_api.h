@@ -13,8 +13,8 @@ namespace gdl {
             std::optional<std::vector<INetDiskDownloadPlugin::FileInfo>> ParseShareUrl(
                 const std::string& url, const std::string& password = "");
             std::optional<std::vector<INetDiskDownloadPlugin::FileInfo>> EnterDirectory(
-                const INetDiskDownloadPlugin::FileInfo& info) const;
-			std::optional<std::vector<INetDiskDownloadPlugin::ParseResult>> GetDownloadInfo(
+                const INetDiskDownloadPlugin::FileInfo& info);
+            std::optional<std::vector<INetDiskDownloadPlugin::ParseResult>> GetDownloadInfo(
                 const INetDiskDownloadPlugin::FileInfo& info);
             void SetVerificationCallback(const INetDiskDownloadPlugin::VerificationCallback& callback);
 
@@ -31,7 +31,7 @@ namespace gdl {
 
             std::optional<cpr::Response> FetchRedirectPage(const std::string& url);
 
-            std::string ExtractSurl(const std::string& url,bool has_password = true);
+            std::string ExtractSurl(const std::string& url, bool has_password = true);
 
             bool VerifySharePassword(const std::string& surl, const std::string& pwd, const std::string& referer_url);
 
@@ -40,16 +40,17 @@ namespace gdl {
 
             bool ReportUserBehavior(const std::string& referer_url);
             std::optional<cpr::Response> FetchDownloadRequestSignature(const std::string& surl,
-                                                                      const std::string& referer_url);
+                                                                       const std::string& referer_url);
 
-            std::optional<std::vector<INetDiskDownloadPlugin::FileInfo>> ParseFileList(
-                const std::string& json_text);
+            std::optional<std::vector<INetDiskDownloadPlugin::FileInfo>> ParseFileList(const std::string& json_text);
 
             std::string ExtractCookies() const;
 
             void ClearCookies();
-			bool ExtractShareInfo(const std::string& html_content);
-			bool ExtractJsToken(const std::string& html_content);
+            bool ExtractShareInfo(const std::string& html_content);
+            bool ExtractJsToken(const std::string& html_content);
+            static std::string GenerateRandomFloat();
+
            private:
             INetDiskDownloadPlugin::VerificationCallback verification_callback_{nullptr};
             CookiesUtils cookies_utils_;
@@ -61,11 +62,11 @@ namespace gdl {
             cpr::Proxies proxy_settings_;
             bool use_debug_settings_ = false;
             std::string surl_;
-			std::string user_uk_;
+            std::string user_uk_;
             std::string user_share_id_;
-			std::string js_token_;
-			std::string bds_token_;
-			std::string is_vip_;
+            std::string js_token_;
+            std::string bds_token_;
+            std::string is_vip_;
         };
     }  // namespace plugin
 }  // namespace gdl
