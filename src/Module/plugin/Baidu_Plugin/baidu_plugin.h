@@ -13,7 +13,7 @@ namespace gdl {
 
             std::optional<std::vector<FileInfo>> EnterDirectory(const FileInfo& info) override;
 
-            std::optional<ParseResult> GetDownloadInfo(const FileInfo& info) override;
+            std::optional<std::vector<ParseResult>> GetDownloadInfo(const FileInfo& info) override;
 
             PluginMetadata GetPluginMetadata() override;
 

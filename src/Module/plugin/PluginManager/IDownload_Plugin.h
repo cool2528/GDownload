@@ -46,15 +46,7 @@ class INetDiskDownloadPlugin {
     enum class FileType : int {
         // 常规文件
         FILE = 0,
-        // 媒体文件
-        MEDIA = 1,
-        // 压缩文件
-        ARCHIVE = 2,
-        // 图片文件
-        IMAGE = 3,
-        // 文档文件
-        DOCUMENT = 4,
-
+        DIR  = 1
     };
     // 文件信息结构
     struct FileInfo {
@@ -63,7 +55,7 @@ class INetDiskDownloadPlugin {
         size_t size;				// 文件大小
         bool is_dir;				// 是否是目录
         FileType type;				// 文件类型
-        std::uint64_t file_id;		// 文件 id
+        std::string file_id;		// 文件 id
         std::uint64_t create_time;	// 创建时间
     };
 
@@ -88,7 +80,7 @@ class INetDiskDownloadPlugin {
      * @return 带真实url下载信息 给aria2 使用的
      */
 
-    virtual std::optional<ParseResult> GetDownloadInfo(const FileInfo& info) = 0;
+    virtual std::optional<std::vector<ParseResult>> GetDownloadInfo(const FileInfo& info) = 0;
 
     /*
      * @breif 获取插件元数据
