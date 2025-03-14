@@ -71,6 +71,7 @@ Item {
         }
 
         contentItem: Canvas {
+            id: canvas
             onPaint: {
                 var ctx = getContext("2d")
                 ctx.reset()
@@ -98,7 +99,7 @@ Item {
             
             Connections {
                 target: historyBtn
-                function onHoveredChanged() { parent.requestPaint() }
+                function onHoveredChanged() { canvas.requestPaint() }
             }
         }
 
@@ -180,6 +181,7 @@ Item {
         }
 
         contentItem: Canvas {
+            id: canvas_icon
             onPaint: {
                 var ctx = getContext("2d")
                 ctx.reset()
@@ -205,7 +207,7 @@ Item {
             
             Connections {
                 target: selectorBtn
-                function onHoveredChanged() { parent.requestPaint() }
+                function onHoveredChanged() { canvas_icon.requestPaint() }
             }
         }
 
