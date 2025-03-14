@@ -33,7 +33,8 @@ namespace gdl {
 			return metadata;
         }
 
-        std::optional<INetDiskDownloadPlugin::ParseResult> BaiduPlugin::GetDownloadInfo(const FileInfo& info) {
+        std::optional<std::vector<INetDiskDownloadPlugin::ParseResult>> BaiduPlugin::GetDownloadInfo(
+			const FileInfo& info) {
 			if (pcs_api_) {
 				return pcs_api_->GetDownloadInfo(info);
 			}
