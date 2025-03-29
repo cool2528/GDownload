@@ -97,6 +97,7 @@ proguard/
 .settings/
 *.sublime-workspace
 .vscode/*
+.cursor/*
 build_osx/*
 build/*
 build_win/*

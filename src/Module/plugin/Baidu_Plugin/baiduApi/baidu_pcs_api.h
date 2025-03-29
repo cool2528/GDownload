@@ -1,17 +1,18 @@
-#pragma once
+﻿#pragma once
 #include <cpr/cpr.h>
 #include <map>
 #include <string>
 #include "IDownload_Plugin.h"
 #include "NetDisk_Utils.h"
+#include "baidu_user.h"
 namespace gdl {
     namespace plugin {
         class BaiduPcsApi {
            public:
-            explicit BaiduPcsApi(const std::string& cookies);
+            explicit BaiduPcsApi();
             ~BaiduPcsApi();
             std::optional<std::vector<INetDiskDownloadPlugin::FileInfo>> ParseShareUrl(
-                const std::string& url, const std::string& password = "");
+                const std::string& url, const std::string& user_token = "");
             std::optional<std::vector<INetDiskDownloadPlugin::FileInfo>> EnterDirectory(
                 const INetDiskDownloadPlugin::FileInfo& info);
             std::optional<std::vector<INetDiskDownloadPlugin::ParseResult>> GetDownloadInfo(
@@ -44,12 +45,18 @@ namespace gdl {
 
             std::optional<std::vector<INetDiskDownloadPlugin::FileInfo>> ParseFileList(const std::string& json_text);
 
+            std::optional<std::vector<INetDiskDownloadPlugin::FileInfo>> GetShareHomeDirectoryFileList();
             std::string ExtractCookies() const;
 
             void ClearCookies();
             bool ExtractShareInfo(const std::string& html_content);
             bool ExtractJsToken(const std::string& html_content);
             static std::string GenerateRandomFloat();
+            void ProcessBaiduCookies(const std::string& cookies);
+			std::vector<std::string> GetRealDownloadAddress(const INetDiskDownloadPlugin::FileInfo& link);
+			std::optional<std::vector<INetDiskDownloadPlugin::FileInfo>> TransferShareFile(
+				const INetDiskDownloadPlugin::FileInfo& info);
+            bool DeleteTransferShareFile(const INetDiskDownloadPlugin::FileInfo& info);
 
            private:
             INetDiskDownloadPlugin::VerificationCallback verification_callback_{nullptr};
@@ -67,6 +74,8 @@ namespace gdl {
             std::string js_token_;
             std::string bds_token_;
             std::string is_vip_;
+            std::string root_path_;
+            BaiduPCS pcs_;
         };
     }  // namespace plugin
 }  // namespace gdl

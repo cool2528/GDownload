@@ -2,6 +2,29 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ja_JP">
 <context>
+    <name>AdvancedSettingPage</name>
+    <message>
+        <location filename="../qml/Browser/AdvancedSettingPage.qml" line="37"/>
+        <source>Baidu Cookie</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/AdvancedSettingPage.qml" line="47"/>
+        <source>Please enter Baidu Cookie</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/AdvancedSettingPage.qml" line="53"/>
+        <source>Save</source>
+        <translation type="unfinished">保存</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/AdvancedSettingPage.qml" line="61"/>
+        <source>Save Baidu Cokies Succeed</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BasicSettingPage</name>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="37"/>
@@ -9,42 +32,42 @@
         <translation>言語</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="67"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="68"/>
         <source>Auto Update</source>
         <translation>自動更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="80"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="81"/>
         <source>Open at Login</source>
         <translation>起動時自動開始</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="94"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="95"/>
         <source>Remember Window Position</source>
         <translation>ウィンドウ位置を記憶</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="107"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="108"/>
         <source>Auto Resume Unfinished Download</source>
         <translation>未完了のダウンロードを自動再開</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="121"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="122"/>
         <source>Download Path</source>
         <translation>ダウンロードパス</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="148"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="149"/>
         <source>Enable Global Proxy</source>
         <translation>グローバルプロキシを有効にする</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="179"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="180"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="193"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="194"/>
         <source>Auto Listen Clipboard Link</source>
         <translation>クリップボードリンクを自動でリッスン</translation>
     </message>
@@ -70,22 +93,22 @@
 <context>
     <name>DownloadPageView</name>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="21"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="22"/>
         <source>Task</source>
         <translation>タスク</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="56"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="57"/>
         <source>Downloading</source>
         <translation>ダウンロード中</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="72"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="73"/>
         <source>Waiting</source>
         <translation>待機中</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="88"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="89"/>
         <source>Stopped</source>
         <translation>停止しました</translation>
     </message>
@@ -242,6 +265,88 @@ Apache License 2.0でライセンスされています
     </message>
 </context>
 <context>
+    <name>NetDiskPageView</name>
+    <message>
+        <source>One task url per line (supports magnet)</source>
+        <translation type="obsolete">1行に1つのタスクURL（マグネットをサポート）</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="29"/>
+        <source>Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="44"/>
+        <source>Parse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="47"/>
+        <source>Invalid Baidu Netdisk URL, please check.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="51"/>
+        <source>Please set Baidu Netdisk cookies first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="77"/>
+        <source>Precautions for parsing Baidu Netdisk share links:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="83"/>
+        <source>1.Please go to Software Settings -&gt; Advanced Settings -&gt; Set Baidu Netdisk cookies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="88"/>
+        <source>2.Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="93"/>
+        <source>3.Please ensure that your account has sufficient storage space before downloading, as the file needs to be saved to your cloud drive first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="102"/>
+        <source>4.Unable to achieve accelerated downloading, only standard downloading is supported. For high-speed downloads, please purchase the official VIP.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="113"/>
+        <source>Click me to go to settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="191"/>
+        <source>File Name</source>
+        <translation type="unfinished">ファイル名</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="198"/>
+        <source>Size</source>
+        <translation type="unfinished">サイズ</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="205"/>
+        <source>Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="305"/>
+        <source>Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="317"/>
+        <source>Return parsing</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <location filename="../../Browser/download_task_model.h" line="108"/>
@@ -287,22 +392,22 @@ Apache License 2.0でライセンスされています
 <context>
     <name>SettingsPageView</name>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="21"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="22"/>
         <source>Preferences</source>
         <translation>プリファレンス</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="57"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="58"/>
         <source>Basic</source>
         <translation>基本設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="73"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="74"/>
         <source>Advanced</source>
         <translation>詳細設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="89"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="90"/>
         <source>Lab</source>
         <translation>ラボ機能</translation>
     </message>
@@ -320,52 +425,57 @@ Apache License 2.0でライセンスされています
         <translation>シード・ミッション</translation>
     </message>
     <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="46"/>
+        <source>Baidu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="126"/>
         <source>One task url per line (supports magnet)</source>
         <translation>1行に1つのタスクURL（マグネットをサポート）</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="245"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="256"/>
         <source>Rename:</source>
         <translation>リネーム</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="253"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="264"/>
         <source>Optional</source>
         <translation>選択可能</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="260"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="271"/>
         <source>Splits:</source>
         <translation>スライス数</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="275"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="286"/>
         <source>Save to:</source>
         <translation>保存先</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="355"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="366"/>
         <source>Custom Request Header List:</source>
         <translation>カスタムリクエストヘッダーリスト：</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="365"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="376"/>
         <source>Custom request header list (one per line in the format KEY:VALUE)</source>
         <translation>カスタムリクエストヘッダーリスト（KEY:VALUE形式で1行につき1つ）</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="408"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="420"/>
         <source>Advanced Options</source>
         <translation>高度なオプション</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="420"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="432"/>
         <source>Cancel</source>
         <translation>キャンセル</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="431"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="443"/>
         <source>Submit</source>
         <translation>投稿する</translation>
     </message>
@@ -413,6 +523,24 @@ Apache License 2.0でライセンスされています
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="125"/>
         <source>update</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>gdl::ui::netdisk::AsyncTaskWorker</name>
+    <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="184"/>
+        <source>Failed to parse the share link.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="190"/>
+        <source>Failed to retrieve download link information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="196"/>
+        <source>Failed to switch directory.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

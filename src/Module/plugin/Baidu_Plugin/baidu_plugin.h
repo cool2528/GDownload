@@ -9,7 +9,7 @@ namespace gdl {
             explicit BaiduPlugin();
             ~BaiduPlugin() override;
             std::optional<std::vector<FileInfo>> ParseUrl(std::string_view url,
-                                                          std::string_view password = "") override;
+                                                          std::string_view user_token = "") override;
 
             std::optional<std::vector<FileInfo>> EnterDirectory(const FileInfo& info) override;
 
@@ -18,8 +18,9 @@ namespace gdl {
             PluginMetadata GetPluginMetadata() override;
 
             bool CanHandle(const std::string& url) const override;
-        private:
-			std::unique_ptr<BaiduPcsApi> pcs_api_ {nullptr};
+
+           private:
+            std::unique_ptr<BaiduPcsApi> pcs_api_{nullptr};
         };
     }  // namespace plugin
 }  // namespace gdl

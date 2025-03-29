@@ -2,6 +2,29 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ko_KR">
 <context>
+    <name>AdvancedSettingPage</name>
+    <message>
+        <location filename="../qml/Browser/AdvancedSettingPage.qml" line="37"/>
+        <source>Baidu Cookie</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/AdvancedSettingPage.qml" line="47"/>
+        <source>Please enter Baidu Cookie</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/AdvancedSettingPage.qml" line="53"/>
+        <source>Save</source>
+        <translation type="unfinished">저장</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/AdvancedSettingPage.qml" line="61"/>
+        <source>Save Baidu Cokies Succeed</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BasicSettingPage</name>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="37"/>
@@ -9,42 +32,42 @@
         <translation>다국어 지원</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="67"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="68"/>
         <source>Auto Update</source>
         <translation>자동 업데이트</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="80"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="81"/>
         <source>Open at Login</source>
         <translation>로그인 시 열기</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="94"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="95"/>
         <source>Remember Window Position</source>
         <translation>창 위치 기억하기</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="107"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="108"/>
         <source>Auto Resume Unfinished Download</source>
         <translation>완료되지 않은 다운로드 자동 재개</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="121"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="122"/>
         <source>Download Path</source>
         <translation>다운로드 경로</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="148"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="149"/>
         <source>Enable Global Proxy</source>
         <translation>글로벌 프록시 사용</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="179"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="180"/>
         <source>Save</source>
         <translation>저장</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="193"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="194"/>
         <source>Auto Listen Clipboard Link</source>
         <translation>자동 듣기 클립보드 링크</translation>
     </message>
@@ -70,22 +93,22 @@
 <context>
     <name>DownloadPageView</name>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="21"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="22"/>
         <source>Task</source>
         <translation>작업</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="56"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="57"/>
         <source>Downloading</source>
         <translation>다운로드</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="72"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="73"/>
         <source>Waiting</source>
         <translation>대기 중</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="88"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="89"/>
         <source>Stopped</source>
         <translation>중지됨</translation>
     </message>
@@ -242,6 +265,88 @@ GDownload는 기술에 대한 열정을 가진 개발자들이 관리하는 오�
     </message>
 </context>
 <context>
+    <name>NetDiskPageView</name>
+    <message>
+        <source>One task url per line (supports magnet)</source>
+        <translation type="obsolete">한 줄당 하나의 작업 URL(자석 지원)</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="29"/>
+        <source>Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="44"/>
+        <source>Parse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="47"/>
+        <source>Invalid Baidu Netdisk URL, please check.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="51"/>
+        <source>Please set Baidu Netdisk cookies first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="77"/>
+        <source>Precautions for parsing Baidu Netdisk share links:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="83"/>
+        <source>1.Please go to Software Settings -&gt; Advanced Settings -&gt; Set Baidu Netdisk cookies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="88"/>
+        <source>2.Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="93"/>
+        <source>3.Please ensure that your account has sufficient storage space before downloading, as the file needs to be saved to your cloud drive first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="102"/>
+        <source>4.Unable to achieve accelerated downloading, only standard downloading is supported. For high-speed downloads, please purchase the official VIP.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="113"/>
+        <source>Click me to go to settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="191"/>
+        <source>File Name</source>
+        <translation type="unfinished">파일 이름</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="198"/>
+        <source>Size</source>
+        <translation type="unfinished">크기</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="205"/>
+        <source>Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="305"/>
+        <source>Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="317"/>
+        <source>Return parsing</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <location filename="../../Browser/download_task_model.h" line="108"/>
@@ -287,22 +392,22 @@ GDownload는 기술에 대한 열정을 가진 개발자들이 관리하는 오�
 <context>
     <name>SettingsPageView</name>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="21"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="22"/>
         <source>Preferences</source>
         <translation>기본 설정</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="57"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="58"/>
         <source>Basic</source>
         <translation>기본 설정</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="73"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="74"/>
         <source>Advanced</source>
         <translation>고급 설정</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="89"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="90"/>
         <source>Lab</source>
         <translation>실험실 기능</translation>
     </message>
@@ -320,52 +425,57 @@ GDownload는 기술에 대한 열정을 가진 개발자들이 관리하는 오�
         <translation>시드 위임</translation>
     </message>
     <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="46"/>
+        <source>Baidu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="126"/>
         <source>One task url per line (supports magnet)</source>
         <translation>한 줄당 하나의 작업 URL(자석 지원)</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="245"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="256"/>
         <source>Rename:</source>
         <translation>이름 바꾸기:</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="253"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="264"/>
         <source>Optional</source>
         <translation>선택 사항</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="260"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="271"/>
         <source>Splits:</source>
         <translation>슬라이스 개수:</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="275"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="286"/>
         <source>Save to:</source>
         <translation>저장 위치:</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="355"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="366"/>
         <source>Custom Request Header List:</source>
         <translation>사용자 지정 요청 헤더 목록:</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="365"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="376"/>
         <source>Custom request header list (one per line in the format KEY:VALUE)</source>
         <translation>사용자 지정 요청 헤더 목록(한 줄에 하나씩, KEY:VALUE 형식)</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="408"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="420"/>
         <source>Advanced Options</source>
         <translation>고급 옵션</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="420"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="432"/>
         <source>Cancel</source>
         <translation>취소</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="431"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="443"/>
         <source>Submit</source>
         <translation>제출하기</translation>
     </message>
@@ -413,6 +523,24 @@ GDownload는 기술에 대한 열정을 가진 개발자들이 관리하는 오�
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="125"/>
         <source>update</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>gdl::ui::netdisk::AsyncTaskWorker</name>
+    <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="184"/>
+        <source>Failed to parse the share link.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="190"/>
+        <source>Failed to retrieve download link information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="196"/>
+        <source>Failed to switch directory.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

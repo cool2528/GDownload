@@ -42,6 +42,7 @@ namespace gdl {
                 SETTING_PROPERTY(bool, EnableAutoShutdown)
                 SETTING_PROPERTY(bool, EnableAutoUpdate)
                 SETTING_PROPERTY(QPoint, WindowPosition)
+                SETTING_PROPERTY(QString, BaiduPanCookies)
 
                public:
                 ~Settings() override;
@@ -50,6 +51,7 @@ namespace gdl {
                 void UnInit();
                 Q_INVOKABLE void SetAria2GlobalProxy(const QString& proxy);
                 Q_INVOKABLE void SetAria2AutoResumeTask(bool enable);
+
                private:
                 explicit Settings(QObject* parent = nullptr);
                 void Save();

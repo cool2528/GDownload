@@ -36,5 +36,6 @@
         <file>qml/CommonComponents/MessageToast.qml</file>
         <file>qml/CommonComponents/ToastContainer.qml</file>
         <file>qml/CommonComponents/UpdateDialog.qml</file>
+        <file>qml/CommonComponents/NetDiskPageView.qml</file>
     </qresource>
 </RCC>

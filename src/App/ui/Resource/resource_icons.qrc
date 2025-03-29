@@ -34,5 +34,7 @@
         <file>images/toast/warning.svg</file>
         <file>images/logo/logo.svg</file>
         <file>images/logo/logo.icns</file>
+        <file>images/browser/FolderType.png</file>
+        <file>images/browser/OtherType.png</file>
     </qresource>
 </RCC>
