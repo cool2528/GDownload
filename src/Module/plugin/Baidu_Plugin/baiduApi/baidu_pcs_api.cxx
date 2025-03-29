@@ -1,4 +1,4 @@
-#include "baidu_pcs_api.h"
+﻿#include "baidu_pcs_api.h"
 #include <cpr/cpr.h>
 #include <algorithm>
 #include <boost/url.hpp>
@@ -31,6 +31,13 @@ namespace gdl {
             const std::string BAIDU_PCS_SHARE_DOWNLOAD	  = "/api/sharedownload";
             const std::string BAIDU_REPORT_USER			  = "/api/report/user";
             const std::string BAIDU_DOWNLOAD_SIGN_REQUEST = "/share/tplconfig";
+            const std::string BAIDU_CLIENT_UA =
+                "netdisk;P2SP;3.0.0.8;netdisk;11.12.3;ANG-AN00;android-android;10.0;JSbridge4.4.0;jointBridge;1.1.0;";
+			const std::string BAIDU_TRANSFER_SHARE_FILE = "/share/transfer";
+            const std::string BAIDU_FILE_MANGER			= "/api/filemanager";
+			const std::string PCS_BAIDU_COM				= "https://pcs.baidu.com";
+			const std::string PCS_APP_ID				= "266719";
+			const std::string PAN_APP_ID				= "250528";
         }  // namespace baidu
         namespace detail {
 
@@ -151,15 +158,14 @@ namespace gdl {
             }
 
         }  // namespace detail
-        BaiduPcsApi::BaiduPcsApi(const std::string& cookies) : cookies_utils_(cookies) {
-
+        BaiduPcsApi::BaiduPcsApi() : cookies_utils_("") {
             InitRequestConfig();
         }
 
         BaiduPcsApi::~BaiduPcsApi() {}
 
         void BaiduPcsApi::InitRequestConfig() {
-            use_debug_settings_ = IS_DEBUG_MODE;
+            use_debug_settings_ = false;
             ssl_opts_			= cpr::Ssl(cpr::ssl::TLSv1_0{});
             cpr::priv::set_ssl_option(ssl_opts_, cpr::ssl::VerifyPeer(false), cpr::ssl::VerifyHost(false));
             if (use_debug_settings_) {
@@ -168,23 +174,20 @@ namespace gdl {
         }
 
         std::optional<std::vector<INetDiskDownloadPlugin::FileInfo>> BaiduPcsApi::ParseShareUrl(
-            const std::string& url, const std::string& password) {
-
+            const std::string& url, const std::string& user_token) {
+			ProcessBaiduCookies(user_token);
             if (!ValidateShareUrl(url)) {
                 return std::nullopt;
             }
 
             boost::url_view share_url(url);
             const auto query_map = share_url.params();
-            std::string pwd		 = password;
-            bool has_password	 = false;
+            std::string pwd;
+            bool has_password = false;
 
             auto pwd_it = query_map.find("pwd");
             if (pwd_it != query_map.end()) {
                 pwd			 = (*pwd_it).value;
-                has_password = true;
-            }
-            else if (!password.empty()) {
                 has_password = true;
             }
 
@@ -218,11 +221,11 @@ namespace gdl {
             if (!file_list.has_value()) {
                 return std::nullopt;
             }
-            auto file_list_res = file_list.value();
-            for (auto& file : file_list_res) {
-                auto r = GetDownloadInfo(file);
+            auto file_list_value = file_list.value();
+            for (auto& file : file_list_value) {
+                file.path = plugin::CookiesUtils::UrlDecode(file.root_path) + "/" + file.name;
             }
-            return file_list;
+            return file_list_value;
         }
 
         bool BaiduPcsApi::ValidateShareUrl(const std::string& url) const {
@@ -257,10 +260,10 @@ namespace gdl {
             auto redirect_params = cpr::Redirect{50, false, false, cpr::PostRedirectFlags::POST_ALL};
 
             if (use_debug_settings_) {
-                reply = cpr::Get(request_params, redirect_params, proxy_settings_, ssl_opts_);
+                reply = cpr::Get(request_params, redirect_params, proxy_settings_, ssl_opts_, baidu_cookies_);
             }
             else {
-                reply = cpr::Get(request_params, redirect_params);
+				reply = cpr::Get(request_params, redirect_params, baidu_cookies_);
             }
 
             std::string baidu_id;
@@ -527,14 +530,43 @@ namespace gdl {
                 if (json.contains("list") && json["list"].is_array()) {
                     for (const auto& item : json["list"]) {
                         INetDiskDownloadPlugin::FileInfo file_info;
-                        file_info.create_time = std::stoull(item["server_mtime"].get<std::string>());
-                        file_info.file_id	  = item["fs_id"].get<std::string>();
-                        file_info.is_dir	  = item["isdir"].get<std::string>() == "1";
-                        file_info.name		  = item["server_filename"].get<std::string>();
-                        file_info.path		  = item["path"].get<std::string>();
-                        file_info.size		  = std::stoull(item["size"].get<std::string>());
-                        file_info.type		  = file_info.is_dir ? INetDiskDownloadPlugin::FileType::DIR
-                                                                 : INetDiskDownloadPlugin::FileType::FILE;
+						if (item.contains("server_mtime")) {
+							if (item["server_mtime"].is_string()) {
+								file_info.create_time = std::stoull(item["server_mtime"].get<std::string>());
+							}
+							else if (item["server_mtime"].is_number()) {
+								file_info.create_time = item["server_mtime"].get<std::uint64_t>();
+							}
+                        }
+						if (item.contains("fs_id")) {
+							if (item["fs_id"].is_string()) {
+								file_info.file_id = item["fs_id"].get<std::string>();
+							}
+							else if (item["fs_id"].is_number()) {
+								file_info.file_id = std::to_string(item["fs_id"].get<std::uint64_t>());
+							}
+						}
+                        if (item.contains("isdir")) {
+							if (item["isdir"].is_string()) {
+								file_info.is_dir = item["isdir"].get<std::string>() == "1";
+                            }
+                            else if (item["isdir"].is_number()) {
+								file_info.is_dir = item["isdir"].get<std::uint64_t>() == 1;
+							}
+                        }
+                        file_info.name = item["server_filename"].get<std::string>();
+                        file_info.path = item["path"].get<std::string>();
+						if (item.contains("size")) {
+							if (item["size"].is_string()) {
+								file_info.size = std::stoull(item["size"].get<std::string>());
+                            }
+                            else if (item["size"].is_number()) {
+								file_info.size = item["size"].get<std::uint64_t>();
+							}
+						}
+                        file_info.type		= file_info.is_dir ? INetDiskDownloadPlugin::FileType::DIR
+                                                               : INetDiskDownloadPlugin::FileType::FILE;
+						file_info.root_path = root_path_;
                         result.emplace_back(file_info);
                     }
                     if (user_uk_.empty() || user_share_id_.empty()) {
@@ -554,6 +586,44 @@ namespace gdl {
             return std::nullopt;
         }
 
+        std::optional<std::vector<INetDiskDownloadPlugin::FileInfo>> BaiduPcsApi::GetShareHomeDirectoryFileList() {
+            std::string real_url				  = "https://pan.baidu.com/s/1" + surl_;
+            std::string share_list				  = baidu::BAIDU_PAN_HOST + baidu::BAIDU_PCS_SHARE_LIST;
+            cpr::Parameters share_list_parameters = {{"web", "1"},
+                                                     {"app_id", "250528"},
+                                                     {"desc", "1"},
+                                                     {"showempty", "0"},
+                                                     {"page", "1"},
+                                                     {"num", "100"},
+                                                     {"order", "time"},
+                                                     {"shorturl", surl_},
+                                                     {"root", "1"},
+                                                     {"view_mode", "1"},
+                                                     {"channel", "chunlei"},
+                                                     {"bdstoken", bds_token_},
+                                                     {"logid", log_id_string_},
+                                                     {"clienttype", "0"},
+                                                     {"dp-logid", detail::DpLogId().GetDpLogId()}};
+
+            auto reply =
+                cpr::Get(cpr::Url(share_list), share_list_parameters,
+                         cpr::Header{{baidu::UA_KEY, baidu::BAIDU_UA_WEB}, {"Referer", real_url}}, baidu_cookies_);
+
+            if (reply.status_code != 200) {
+                return std::nullopt;
+            }
+
+            auto file_list = ParseFileList(reply.text);
+            if (!file_list.has_value()) {
+                return std::nullopt;
+            }
+            auto file_list_value = file_list.value();
+            for (auto& file : file_list_value) {
+                file.path = plugin::CookiesUtils::UrlDecode(file.root_path) + "/" + file.name;
+            }
+            return file_list_value;
+        }
+
         std::string BaiduPcsApi::ExtractCookies() const {
             plugin::CookiesUtils cookies_utils("");
             for (const auto& cookie : baidu_cookies_) {
@@ -564,41 +634,45 @@ namespace gdl {
 
         std::optional<std::vector<INetDiskDownloadPlugin::FileInfo>> BaiduPcsApi::EnterDirectory(
             const INetDiskDownloadPlugin::FileInfo& info) {
-            std::string share_list_url = baidu::BAIDU_PAN_HOST + baidu::BAIDU_PCS_SHARE_LIST;
-
-            cpr::Parameters share_list_parameters = {
-                {"is_from_web", "true"},
-                {"sekey", plugin::CookiesUtils::UrlDecode(rand_sk_string_)},
-                {"uk", user_uk_},
-                {"shareid", user_share_id_},
-                {"order", "other"},
-                {"desc", "1"},
-                {"showempty", "0"},
-                {"view_mode", "1"},
-                {"web", "1"},
-                {"page", "1"},
-                {"num", "100"},
-                {"dir", info.path},
-                {"t", GenerateRandomFloat()},
-                {"channel", "chunlei"},
-                {"app_id", "250528"},
-                {"bdstoken", bds_token_},
-                {"logid", log_id_string_},
-                {"clienttype", "0"},
-                {"dp-logid", detail::DpLogId().GetDpLogId()},
-
-            };
-
-            std::string real_url = baidu::BAIDU_PAN_HOST + "/s/" + (surl_.starts_with("1") ? surl_ : "1" + surl_);
-            cpr::Header header	 = {
-                  {baidu::UA_KEY, baidu::BAIDU_UA_WEB},
-                  {"Referer", real_url},
-              };
-            auto reply = cpr::Get(cpr::Url(share_list_url), share_list_parameters, header, baidu_cookies_);
-            if (reply.status_code != 200) {
-                return std::nullopt;
+            if (info.path == plugin::CookiesUtils::UrlDecode(root_path_)) {
+                return GetShareHomeDirectoryFileList();
             }
-            return ParseFileList(reply.text);
+            else {
+                std::string share_list_url			  = baidu::BAIDU_PAN_HOST + baidu::BAIDU_PCS_SHARE_LIST;
+                cpr::Parameters share_list_parameters = {
+                    {"is_from_web", "true"},
+                    {"sekey", plugin::CookiesUtils::UrlDecode(rand_sk_string_)},
+                    {"uk", user_uk_},
+                    {"shareid", user_share_id_},
+                    {"order", "other"},
+                    {"desc", "1"},
+                    {"showempty", "0"},
+                    {"view_mode", "1"},
+                    {"web", "1"},
+                    {"page", "1"},
+                    {"num", "100"},
+                    {"dir", info.path},
+                    {"t", GenerateRandomFloat()},
+                    {"channel", "chunlei"},
+                    {"app_id", "250528"},
+                    {"bdstoken", bds_token_},
+                    {"logid", log_id_string_},
+                    {"clienttype", "0"},
+                    {"dp-logid", detail::DpLogId().GetDpLogId()},
+
+                };
+
+                std::string real_url = baidu::BAIDU_PAN_HOST + "/s/" + (surl_.starts_with("1") ? surl_ : "1" + surl_);
+                cpr::Header header	 = {
+                      {baidu::UA_KEY, baidu::BAIDU_UA_WEB},
+                      {"Referer", real_url},
+                  };
+                auto reply = cpr::Get(cpr::Url(share_list_url), share_list_parameters, header, baidu_cookies_);
+                if (reply.status_code != 200) {
+                    return std::nullopt;
+                }
+                return ParseFileList(reply.text);
+            }
         }
 
         std::optional<std::vector<INetDiskDownloadPlugin::ParseResult>> BaiduPcsApi::GetDownloadInfo(
@@ -620,6 +694,7 @@ namespace gdl {
                 return results;
             }
             else {
+#if 0
                 std::string url;
                 if (!surl_.starts_with("1")) {
                     url = "1" + surl_;
@@ -654,11 +729,11 @@ namespace gdl {
                 cpr::Parameters download_parameters = {{"sign", sign},
                                                        {"timestamp", timestamp},
                                                        {"channel", "chunlei"},
-                                                       {"web", "1"},
+                                                       {"web", "0"},
                                                        {"app_id", "250528"},
                                                        {"bdstoken", bds_token_},
                                                        {"logid", log_id_string_},
-                                                       {"clienttype", "0"},
+                                                       {"clienttype", "1"},
                                                        {"jsToken", js_token_},
                                                        {"dp-logid", detail::DpLogId().GetDpLogId()}};
 
@@ -671,7 +746,8 @@ namespace gdl {
                                                     {"primaryid", user_share_id_},
                                                     {"fid_list", "[" + info.file_id + "]"},
                                                     {"path_list", ""},
-                                                    {"vip", is_vip_}};
+                                                    {"vip", is_vip_},
+													{"bdstoken", bds_token_}};
                 std::string download_request_url = baidu::BAIDU_PAN_HOST + baidu::BAIDU_PCS_SHARE_DOWNLOAD;
                 if (use_debug_settings_) {
                     reply = cpr::Post(cpr::Url(download_request_url), download_parameters,
@@ -700,7 +776,8 @@ namespace gdl {
                                 INetDiskDownloadPlugin::ParseResult parse_result;
                                 parse_result.file_name = item["server_filename"].get<std::string>();
                                 parse_result.file_size = item["size"].get<std::size_t>();
-                                parse_result.real_url  = item["dlink"].get<std::string>();
+                                auto real_url		   = item["dlink"].get<std::string>();
+                                parse_result.real_url  = real_url;
                                 parse_result.headers.insert(std::make_pair("Cookie", cookies_str));
                                 parse_result.headers.insert(std::make_pair("Referer", referer_url));
                                 parse_result.headers.insert(std::make_pair("User-Agent", baidu::BAIDU_UA_WEB));
@@ -712,6 +789,37 @@ namespace gdl {
                 } catch (std::exception& e) {
                     return std::nullopt;
                 }
+#else
+				auto bduss_cookie = cookies_utils_.GetCookie("BDUSS");
+				if (bduss_cookie.empty()) {
+					bduss_cookie = cookies_utils_.GetCookie("BDUSS_BFESS");
+				}
+				auto transfer_res = TransferShareFile(info);
+				if (!transfer_res.has_value()) return std::nullopt;
+                auto parse_result_list = transfer_res.value();
+				std::vector<INetDiskDownloadPlugin::ParseResult> result;
+                for (const auto& parse_result : parse_result_list) {
+
+					INetDiskDownloadPlugin::ParseResult parse_item;
+					parse_item.file_name = std::filesystem::path(parse_result.path).filename().string();
+                    auto real_urls		 = GetRealDownloadAddress(parse_result);
+					if (real_urls.empty()) continue;
+                    parse_item.real_url = real_urls.front();
+                    if (parse_item.real_url.empty()) continue;
+					parse_item.headers.insert(std::make_pair("header", "Cookie:BDUSS=" + bduss_cookie));
+                    if (is_vip_ == "0") {
+                        parse_item.headers.insert(std::make_pair("force-http-range", "true"));
+                        parse_item.headers.insert(std::make_pair("enable-http-pipelining", "true"));
+                        parse_item.headers.insert(std::make_pair("max-connection-per-server", "2"));
+                        parse_item.headers.insert(std::make_pair("split", "2"));
+                    }
+					parse_item.headers.insert(std::make_pair("user-agent", baidu::BAIDU_CLIENT_UA));
+					parse_item.headers.insert(std::make_pair("out", parse_item.file_name));
+					result.emplace_back(parse_item);
+                    DeleteTransferShareFile(parse_result);
+				}
+                return result;
+#endif
             }
 
             return std::nullopt;
@@ -739,14 +847,22 @@ namespace gdl {
                         this->bds_token_ = json_data["bdstoken"].get<std::string>();
                     }
                     if (json_data.contains("shareid") && json_data["shareid"].is_number()) {
-                        user_share_id_ = json_data["shareid"].get<std::string>();
+						user_share_id_ = std::to_string(json_data["shareid"].get<std::uint64_t>());
                     }
-                    if (json_data.contains("share_uk") && json_data["uk"].is_string()) {
-                        user_uk_ = std::to_string(json_data["share_uk"].get<std::uint64_t>());
+                    if (json_data.contains("share_uk") && json_data["share_uk"].is_string()) {
+                        user_uk_ = json_data["share_uk"].get<std::string>();
                     }
                     if (json_data.contains("is_vip") && json_data["is_vip"].is_number()) {
                         is_vip_ = std::to_string(json_data["is_vip"].get<std::uint64_t>());
                     }
+					if (json_data.contains("file_list") && json_data["file_list"].is_array()) {
+						for (const auto& item : json_data["file_list"]) {
+							if (item.is_object() && item.contains("parent_path") && item["parent_path"].is_string()) {
+								root_path_ = item["parent_path"].get<std::string>();
+                                break;
+							}
+						}
+					}
                 }
                 return ExtractJsToken(html_content) && !bds_token_.empty();
             } catch (const std::exception& e) {
@@ -779,6 +895,176 @@ namespace gdl {
             std::stringstream ss;
             ss << std::fixed << std::setprecision(13) << random_value;
             return ss.str();
+        }
+
+        void BaiduPcsApi::ProcessBaiduCookies(const std::string& cookies) {
+            cookies_utils_	  = CookiesUtils(cookies);
+			auto cookies_list = cookies_utils_.GetAllCookies();
+            for (auto it = cookies_list.begin(); it != cookies_list.end();) {
+                if (it->first != "BDUSS_BFESS" && it->first != "STOKEN" && it->first != "PANPSC" &&
+                    it->first != "BDUSS") {
+                    it = cookies_list.erase(it);
+                }
+                else {
+                    ++it;
+                }
+            }
+			cookies_utils_.Clear();
+            cookies_utils_	  = CookiesUtils(cookies_list);
+            auto bduss_cookie = cookies_utils_.GetCookie("BDUSS");
+			if (bduss_cookie.empty()) {
+				bduss_cookie = cookies_utils_.GetCookie("BDUSS_BFESS");
+            }
+			if (!pcs_.IsValidate()) {
+				pcs_.InitUserInfo(bduss_cookie);
+			}
+        }
+
+        std::vector<std::string> BaiduPcsApi::GetRealDownloadAddress(const INetDiskDownloadPlugin::FileInfo& link) {
+            auto bduss_cookie = cookies_utils_.GetCookie("BDUSS");
+			if (bduss_cookie.empty()) {
+				bduss_cookie = cookies_utils_.GetCookie("BDUSS_BFESS");
+			}
+			if (!pcs_.IsValidate()) {
+				pcs_.InitUserInfo(bduss_cookie);
+			}
+			std::string uid	   = std::to_string(pcs_.GetUserID());
+			std::string devuid = calu_md5(bduss_cookie);
+			std::transform(devuid.begin(), devuid.end(), devuid.begin(), ::toupper);
+			devuid += "|0";
+            std::string enc		  = calu_sha1(bduss_cookie);
+            std::string timestamp = std::to_string(now_timestamp());
+			std::string rand_base = enc + uid + "ebrcUYiuxaZv2XGu7KIYKxUrqfnOfpDF" + timestamp + devuid;
+			std::string rand	  = calu_sha1(rand_base);
+			std::map<std::string, std::string> params;
+			params["apn_id"]	 = "1_0";
+			params["app_id"]	 = baidu::PAN_APP_ID;
+			params["channel"]	 = "0";
+			params["check_blue"] = "1";
+			params["clienttype"] = "17";
+			params["es"]		 = "1";
+			params["esl"]		 = "1";
+			params["freeisp"]	 = "0";
+			params["method"]	 = "locatedownload";
+			params["path"]		 = quote_plus(link.path);
+			params["queryfree"]	 = "0";
+			params["use"]		 = "0";
+			params["ver"]		 = "4.0";
+			params["time"]		 = timestamp;
+			std::string params_str;
+			for (auto it = params.begin(); it != params.end(); ++it) {
+				if (it != params.begin()) params_str += "&";
+				params_str += it->first + "=" + it->second;
+			}
+
+			cpr::Header headers = {{"User-Agent", baidu::BAIDU_CLIENT_UA}, {"Connection", "Keep-Alive"}};
+			std::string url		= baidu::PCS_BAIDU_COM + "/rest/2.0/pcs/file?" + params_str;
+            url += std::format("&rand={}&devuid={}&cuid={}", rand, devuid, devuid);
+			std::vector<std::string> urls;
+			auto response = cpr::Get(cpr::Url{url}, headers, cpr::Cookies{{"BDUSS", bduss_cookie}});
+			if (response.status_code != 200) return urls;
+            try {
+				json info = json::parse(response.text);
+				if (info.contains("urls") && info["urls"].is_array()) {
+                    for (const auto& item : info["urls"]) {
+						if (item.contains("url") && item["url"].is_string()) {
+							const auto url = item["url"].get<std::string>();
+							urls.emplace_back(url);
+						}
+					}
+				}
+				else if (info.contains("urls") && info["urls"].is_object()) {
+					if (info["urls"].contains("url") && info["urls"]["url"].is_string()) {
+						const auto url = info["urls"]["url"].get<std::string>();
+						urls.emplace_back(url);
+					}
+				}
+                return urls;
+
+            } catch (std::exception& e) {
+				return urls;
+            }
+			return urls;
+        }
+
+        std::optional<std::vector<INetDiskDownloadPlugin::FileInfo>> BaiduPcsApi::TransferShareFile(
+            const INetDiskDownloadPlugin::FileInfo& info) {
+			std::string transfer_url = baidu::BAIDU_PAN_HOST + baidu::BAIDU_TRANSFER_SHARE_FILE;
+            cpr::Parameters params	 = {
+                  {"shareid", user_share_id_},
+				  {"from", user_uk_},
+				  {"sekey", plugin::CookiesUtils::UrlDecode(rand_sk_string_)},
+                  {"ondup", "newcopy"},
+                  {"async", "1"},
+                  {"channel", "chunlei"},
+                  {"web", "1"},
+                  {"app_id", "250528"},
+                  {"bdstoken", bds_token_},
+				  {"logid", log_id_string_},
+                  {"clienttype", "0"},
+				  {"dp-logid", detail::DpLogId().GetDpLogId()},
+              };
+            std::string fs_id_list = "[" + info.file_id + "]";
+            cpr::Payload payload   = {{"fsidlist", fs_id_list}, {"path", "/"}};
+			cpr::Header headers	   = {
+				   {"Connection", "keep-alive"},
+				   {"Origin", "https://pan.baidu.com"},
+				   {"Referer", "https://pan.baidu.com/disk/main"},
+				   {"User-Agent", baidu::BAIDU_UA_WEB},
+			   };
+			auto response = cpr::Post(cpr::Url(transfer_url), params, payload, headers, baidu_cookies_);
+			if (response.status_code != 200) return std::nullopt;
+			try {
+
+                nlohmann::json json_data = nlohmann::json::parse(response.text);
+                if (json_data.contains("errno") && json_data["errno"].is_number() &&
+                    json_data["errno"].get<std::uint64_t>() == 0) {
+                    if (json_data.contains("extra") && json_data["extra"].is_object() &&
+                        json_data["extra"].contains("list") && json_data["extra"]["list"].is_array()) {
+						std::vector<INetDiskDownloadPlugin::FileInfo> file_info_list;
+                        for (const auto& item : json_data["extra"]["list"]) {
+                            if (item.is_object() && item.contains("to") && item["to"].is_string() &&
+                                item.contains("to_fs_id") && item["to_fs_id"].is_number()) {
+								INetDiskDownloadPlugin::FileInfo file_info;
+								file_info.file_id = std::to_string(item["from_fs_id"].get<std::uint64_t>());
+                                file_info.path	  = item["to"].get<std::string>();
+								file_info_list.push_back(file_info);
+							}
+						}
+                        return file_info_list;
+					}
+				}
+
+			} catch (std::exception& e) {
+				return std::nullopt;
+			}
+            return std::nullopt;
+        }
+
+        bool BaiduPcsApi::DeleteTransferShareFile(const INetDiskDownloadPlugin::FileInfo& info) {
+
+            std::string file_manger_url = baidu::PCS_BAIDU_COM + "/rest/2.0/pcs/file";
+            auto bduss_cookie			= cookies_utils_.GetCookie("BDUSS");
+            if (bduss_cookie.empty()) {
+                bduss_cookie = cookies_utils_.GetCookie("BDUSS_BFESS");
+            }
+            if (!pcs_.IsValidate()) {
+                pcs_.InitUserInfo(bduss_cookie);
+            }
+            nlohmann::json data_object;
+			nlohmann::json params;
+            nlohmann::json list_object = nlohmann::json::array();
+			params["path"]				  = info.path;
+			list_object.push_back(params);
+            data_object["list"]			  = list_object;
+			std::string data_str = data_object.dump();
+			cpr::Multipart multipart_data = {{"param", cpr::Buffer{data_str.begin(), data_str.end(), {}}}};
+            auto response		 = cpr::Post(cpr::Url(file_manger_url),
+										cpr::Parameters{{"method", "delete"}, {"app_id", baidu::PCS_APP_ID}},
+										cpr::Cookies{{"BDUSS",bduss_cookie},false},
+										multipart_data);
+			if (response.status_code != 200) return false;
+			return true;
         }
 
     }  // namespace plugin

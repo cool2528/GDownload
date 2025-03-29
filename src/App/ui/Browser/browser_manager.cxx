@@ -1,4 +1,4 @@
-#include "browser_manager.h"
+﻿#include "browser_manager.h"
 #include <QApplication>
 #include <QDir>
 #include <QFileInfo>
@@ -9,11 +9,11 @@
 #include "Aria2CManager/engine_def.h"
 #include "Definitions/appDef.h"
 #include "Parser/file_parser.h"
+#include "PluginManager/plugin_manager.h"
 #include "logger.h"
 #include "os/os.h"
 #include "toast/toast_manager.h"
 #include "utils/utils.h"
-#include "PluginManager/plugin_manager.h"
 namespace gdl {
 	namespace ui {
 		namespace browser {
@@ -66,7 +66,7 @@ namespace gdl {
 				for (const auto& url : urls) {
 					if (url.canConvert<QString>()) {
 						auto res =
-							engine::Aria2cDownloadManager::Instance().AddHttpTask(url.toString().toStdString(), opt);
+                            engine::Aria2cDownloadManager::Instance().AddHttpTask({url.toString().toStdString()}, opt);
 						if (res.HasError()) {
 							LOG_ERR("Failed to add HTTP download task Download address {} error {}",
 									url.toString().toStdString(), res.GetError().what());
@@ -528,18 +528,6 @@ namespace gdl {
 				}
 				return nullptr;
 			}
-
-            void BrowserManager::TestPlugin(const QString &url)
-            {
-				auto plugin_vec = gdl::plugin::DownloadPluginManager::Instance().GetPluginsForUrl(url.toStdString());
-				if (plugin_vec.empty()) {
-					return;
-				}
-				auto plugin = plugin_vec.front();
-				if (!plugin) return;
-				auto file_infos = plugin->ParseUrl(url.toStdString());
-				if (!file_infos.has_value()) return;
-            }
 
 			bool BrowserManager::Init() {
 				// subscribe aria2 responce

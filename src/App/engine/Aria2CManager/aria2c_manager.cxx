@@ -369,11 +369,11 @@ namespace gdl {
 		}
 
 		Result<bool> Aria2cDownloadManager::AddHttpTask(
-			const String& url, const std::unordered_multimap<std::string, std::string>& options) {
-			std::string real_url										   = url;
+            const std::vector<String>& url, const std::unordered_multimap<std::string, std::string>& options) {
+
 			std::unordered_multimap<std::string, std::string> real_options = options;
 			// 直接添加到下载引擎任务队列中
-			return websocket_client_.AddUri({real_url}, real_options);
+            return websocket_client_.AddUri(url, real_options);
 		}
 
 		Result<bool> Aria2cDownloadManager::AddTorrentTask(

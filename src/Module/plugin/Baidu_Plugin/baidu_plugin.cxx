@@ -1,24 +1,21 @@
 #include "baidu_plugin.h"
-#include  "baiduApi/baidu_pcs_api.h"
+#include "baiduApi/baidu_pcs_api.h"
 namespace gdl {
     namespace plugin {
 
-        std::optional<std::vector<INetDiskDownloadPlugin::FileInfo>> BaiduPlugin::ParseUrl(std::string_view url,
-                                                                                           std::string_view password) {
+        std::optional<std::vector<INetDiskDownloadPlugin::FileInfo>> BaiduPlugin::ParseUrl(
+            std::string_view url, std::string_view user_token) {
 			if (pcs_api_) {
-				return pcs_api_->ParseShareUrl(url.data(),password.data());
+                return pcs_api_->ParseShareUrl(url.data(), user_token.data());
 			}
             return std::nullopt;
         }
 
         BaiduPlugin::BaiduPlugin() {
-	        pcs_api_ = std::make_unique<BaiduPcsApi>("");
+            pcs_api_ = std::make_unique<BaiduPcsApi>();
         }
 
-        BaiduPlugin::~BaiduPlugin()
-        {
-
-        }
+        BaiduPlugin::~BaiduPlugin() {}
 
         bool BaiduPlugin::CanHandle(const std::string& url) const {
 			return url.find("pan.baidu.com") != std::string::npos;
@@ -26,10 +23,10 @@ namespace gdl {
 
         INetDiskDownloadPlugin::PluginMetadata BaiduPlugin::GetPluginMetadata() {
 			PluginMetadata metadata;
-            metadata.author = "GDL";
+            metadata.author		 = "GDL";
 			metadata.description = "BaiduNetDisk";
-			metadata.name = "BaiduNetDisk";
-			metadata.version = "1.0.0";
+            metadata.name		 = "BaiduNetDisk";
+            metadata.version	 = "1.0.0";
 			return metadata;
         }
 

@@ -10,6 +10,7 @@
     "boost-locale",
     "boost-url",
     "boost-beast",
+    "openssl",
     {
       "name":"cpr",
       "features":["ssl"]

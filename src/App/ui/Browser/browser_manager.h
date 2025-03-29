@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <QtQml/qqml.h>
 #include <QObject>
 #include <QVariantMap>
@@ -71,7 +71,7 @@ namespace gdl {
 
                 Q_INVOKABLE void RefreshTaskList(int page_index);
                 Q_INVOKABLE parser::FilePreviewModel* GetFilePreviewModel(const QString& file_path);
-                Q_INVOKABLE void TestPlugin(const QString& url);
+
 				bool Init();
 				void UnInit();
 
