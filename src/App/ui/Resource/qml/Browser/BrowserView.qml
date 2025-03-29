@@ -12,7 +12,14 @@ Rectangle{
 
         SettingsPageView{
             id:settingPage
-
         }
     }
+
+    function switchDownloadPage(index:int){
+        downloadPage.currentIndex = index
+    }
+    function switchSettingPage(index:int){
+        settingPage.currentIndex = index
+    }
+
 }

@@ -36,6 +36,7 @@ Rectangle{
                     Label{
                         text: qsTr("Language")
                         Layout.preferredWidth: 180
+                        Layout.leftMargin: 5
                         font.pixelSize: 14
                         color: GTheme.dark ?  "#FFFFFF" : "#3b3b3b"
                     }

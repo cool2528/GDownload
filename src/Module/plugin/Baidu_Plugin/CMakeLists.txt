@@ -13,6 +13,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "source" FILES ${SOURCES_FI
 find_package(cpr CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(boost_url CONFIG REQUIRED)
+find_package(OpenSSL REQUIRED)
 if(APPLE)
     find_library(COREFOUNDATION_FRAMEWORK CoreFoundation)
     find_library(SECURITY_FRAMEWORK Security)
@@ -27,6 +28,8 @@ target_link_libraries(${PROJECT_NAME}
         cpr::cpr 
         nlohmann_json::nlohmann_json 
         Boost::url
+        OpenSSL::SSL
+        OpenSSL::Crypto
 )
 
 if(APPLE)

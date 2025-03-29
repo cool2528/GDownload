@@ -43,7 +43,7 @@ Popup {
                     clip:true
                     focus: true
                     interactive: false
-                    model: [qsTr("URL"),qsTr("Torent")]
+                    model: [qsTr("URL"),qsTr("Torent"),qsTr("Baidu")]
                     displaced: Transition { NumberAnimation { properties: "x"; duration: 300; easing: Easing.OutExpo } }
                     delegate: Item {
                         id: delegateItem
@@ -112,7 +112,7 @@ Popup {
                     currentIndex: tabTitle.currentIndex
                     Layout.margins: 10
                     Layout.rightMargin: 20
-                    height: 200
+                    height: 300
                     property int urlType: 0
                     Rectangle{
                         id:linkingPage
@@ -169,6 +169,16 @@ Popup {
                         }
                         color: GTheme.dark ? "#2e2e2e" : "#ffffff"
                     }
+                    Rectangle{
+                        id:netDiskPage
+                        color: GTheme.dark ? "#2e2e2e" : "#ffffff"
+                        NetDiskPageView{
+                            id:netDiskPageView
+                             anchors.fill: parent
+                        }
+
+                    }
+
                     function geturls(){
                         if(currentIndex === 0){
                             taskPageLayout.urlType = 0
@@ -230,6 +240,7 @@ Popup {
                 //General Configuration
                 ColumnLayout{
                     id:generalConfig
+                    visible: taskPageLayout.currentIndex != 2
                     Layout.fillWidth: true
                     Layout.margins: 10
                     Layout.rightMargin: 20
@@ -289,7 +300,7 @@ Popup {
                 //Additional Configuration
                 ColumnLayout {
                     id: additionalConfig
-                    visible: advanced.checked
+                    visible: advanced.checked && taskPageLayout.currentIndex != 2
                     Layout.fillWidth: true
                     Layout.margins: 10
                     Layout.rightMargin: 20
@@ -401,6 +412,7 @@ Popup {
                     Layout.bottomMargin: 20
                     GCheckBox{
                         id:advanced
+                        visible: taskPageLayout.currentIndex != 2
                         Layout.maximumWidth: 150
                         Layout.alignment: Qt.AlignLeft
                         Layout.leftMargin: 10
@@ -430,18 +442,26 @@ Popup {
                         Layout.preferredWidth: 70
                         text: qsTr("Submit")
                         onClicked: {
-                            let url = taskPageLayout.geturls()
-                            let options = taskPageLayout.getOptions()
-                            if(taskPageLayout.urlType === 0)
-                            {
-                                BrowserManager.AddHttpTask(url,options)
-                            }else if(taskPageLayout.urlType === 1){
-                                BrowserManager.AddMetalinkTask(url,options)
-                            }else if(taskPageLayout.urlType === 2){
-                                BrowserManager.AddTorrentTask(url,options)
+                            if(taskPageLayout.currentIndex !== 2){
+                                let url = taskPageLayout.geturls()
+                                let options = taskPageLayout.getOptions()
+                                if(taskPageLayout.urlType === 0)
+                                {
+                                    BrowserManager.AddHttpTask(url,options)
+                                }else if(taskPageLayout.urlType === 1){
+                                    BrowserManager.AddMetalinkTask(url,options)
+                                }else if(taskPageLayout.urlType === 2){
+                                    BrowserManager.AddTorrentTask(url,options)
+                                }
+                            }else{
+                                NetWorkDiskManager.DownloadSelectedFiles()
+                            }
+                            brower_view.index = 0
+                            brower_view.switchDownloadPage(0)
+                            if(taskPageLayout.currentIndex !== 2){
+                                taskPage.close()
                             }
 
-                            taskPage.close()
                         }
                     }
 

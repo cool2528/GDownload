@@ -5,6 +5,7 @@ import "../CommonComponents"
 import gdl.sdk 1.0
 Item {
     id:control
+    property alias currentIndex: bar.currentIndex
     RowLayout{
         id:browserLayout
         anchors.fill: parent

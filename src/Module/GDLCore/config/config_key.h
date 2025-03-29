@@ -62,6 +62,7 @@ namespace gdl {
             CONFIG_PATH(EnableAutoShutdown, "general.enable-auto-shutdown", "false");
             CONFIG_PATH(EnableAutoUpdate, "general.enable-auto-update", "true");
             CONFIG_PATH(WindowPosition, "general.window-position", "");
+            CONFIG_PATH(BaiduPanCookies, "plugin.baidu-pan-cookies", "");
 
 			// static function all keys
 			static constexpr auto GetAllKeys() {
@@ -92,7 +93,8 @@ namespace gdl {
                                              EnableNotification.get(),
                                              EnableAutoShutdown.get(),
                                              EnableAutoUpdate.get(),
-                                             WindowPosition.get()});
+                                             WindowPosition.get(),
+                                             BaiduPanCookies.get()});
 			}
 			// static function all values
 			static constexpr auto GetAllValues() {
@@ -123,7 +125,8 @@ namespace gdl {
 											 EnableNotification.val(),
 											 EnableAutoShutdown.val(),
 											 EnableAutoUpdate.val(),
-											 WindowPosition.val()});
+                                             WindowPosition.val(),
+                                             BaiduPanCookies.val()});
 			}
 		};
 	}  // namespace config

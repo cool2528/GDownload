@@ -54,7 +54,7 @@ namespace gdl {
 			bool InitAria2cEngine(const String_View& aria2c_path);
 			void UninitAria2cEngine();
 			bool EngineIsRuning() const { return engine_is_runing_; }
-			Result<bool> AddHttpTask(const String& url,
+            Result<bool> AddHttpTask(const std::vector<String>& url,
 									 const std::unordered_multimap<std::string, std::string>& options);
 
 			Result<bool> AddTorrentTask(const String& tarrent,
@@ -143,8 +143,6 @@ namespace gdl {
 					using SecondType = std::decay_t<std::tuple_element_t<1, TupleType>>;
 					if constexpr (std::is_same_v<FirstType, std::string> && std::is_same_v<SecondType, Options>) {
 						switch (method) {
-							case Aria2Method::kAddUri:
-								return AddHttpTask(std::forward<Args>(args)...);
 							case Aria2Method::kAddTorrent:
 								return AddTorrentTask(std::forward<Args>(args)...);
 							case Aria2Method::kAddMetalink:
@@ -163,7 +161,16 @@ namespace gdl {
 							default:
 								return MakeFail(1, "Invalid method or arguments");
 						}
-					}
+                    }
+                    else if constexpr (std::is_same_v<FirstType, std::vector<std::string>> &&
+                                       std::is_same_v<SecondType, Options>) {
+                        switch (method) {
+                            case Aria2Method::kAddUri:
+                                return AddHttpTask(std::forward<Args>(args)...);
+                            default:
+                                return MakeFail(1, "Invalid method or arguments");
+                        }
+                    }
 				}
 				else if constexpr (sizeof...(Args) == 3) {
 					using FirstType	 = std::decay_t<std::tuple_element_t<0, TupleType>>;

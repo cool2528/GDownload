@@ -10,6 +10,7 @@
 #include "FramelessHelper/Quick/framelessquickmodule.h"
 #include "GDLCore/logger.h"
 #include "Models/folder_history_model.h"
+#include "NetDisk/NetWork_Disk_magager.h"
 #include "PluginManager/plugin_manager.h"
 #include "Settings/settings_manager.h"
 #include "language/language_manager.h"
@@ -40,6 +41,7 @@ namespace gd {
 			QApplication app(argc, argv);
 			InitIcon(&app);
 			QQmlApplicationEngine engine;
+            InitNetDiskPlugins();
 			InitQmlEngine(&engine);
 			InitFont(&engine);
 			QObject::connect(
@@ -48,7 +50,6 @@ namespace gd {
 			const QUrl url(QStringLiteral("qrc:/qml/mainWindow.qml"));
 			engine.addImportPath(QStringLiteral("qrc:/qml"));
 			engine.load(url);
-			InitNetDiskPlugins();
 			const auto code = app.exec();
 			UnInitEngine();
 			return code;
@@ -88,6 +89,7 @@ namespace gd {
 #elif defined(__APPLE__)
 #endif
 			gdl::update::UpdateManager::Instance().Initialize(update_config);
+            gdl::ui::netdisk::RegisterTypes(engine);
 		}
 		void MainWindow::InitTranslation(QGuiApplication* app) {}
 		void MainWindow::InitFont(QQmlEngine* engine) {

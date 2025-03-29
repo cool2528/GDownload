@@ -1,4 +1,4 @@
-import QtQuick
+﻿import QtQuick
 import QtQuick.Controls
 import "../CommonComponents"
 import gdl.sdk 1.0
@@ -43,8 +43,8 @@ Item{
                 iconSize: 30
                 iconColor: "#ffffff"
                 onClicked: {
-                    //Qt.openUrlExternally("https://github.com/cool2528/GDownload")
-                    BrowserManager.TestPlugin("https://pan.baidu.com/s/1ewelMxsIu7TQ_I35-NCckw?pwd=k54f")
+                    Qt.openUrlExternally("https://github.com/cool2528/GDownload")
+
                 }
             }
             IconButton{
@@ -143,5 +143,7 @@ Item{
         }
         return about
     }
+
+
 
 }

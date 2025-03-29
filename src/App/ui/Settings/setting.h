@@ -601,6 +601,24 @@ namespace gdl {
             }
             SETTING_IMP_END(EnableAutoUpdate)
 
+            // BaiduPanCookies
+            SETTING_IMP_BEGIN(BaiduPanCookies, "plugin.baidu-pan-cookies", QString)
+            void Default() override {
+                value_ = "";
+            }
+            void Put(const QVariant& value) override {
+                if (value.canConvert<QString>()) {
+                    value_ = value.toString();
+                }
+            }
+            VALUE_TYPE Get() const {
+                return value_;
+            }
+            QString ToString() override {
+                return value_;
+            }
+            SETTING_IMP_END(BaiduPanCookies)
+
         }  // namespace settings
     }  // namespace ui
 }  // namespace gdl

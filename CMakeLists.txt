@@ -69,7 +69,9 @@ elseif(WIN32)
     if(CMAKE_GENERATOR STREQUAL "Ninja" OR CMAKE_GENERATOR STREQUAL "Ninja Multi-Config")
         add_compile_options(/EHsc)
     endif()
-
+    if(MSVC)
+        add_compile_options(/utf-8)
+      endif()
     # 设置Windows目标版本
     add_compile_definitions(_WIN32_WINNT=0x0A00) # Windows 10
 elseif(UNIX AND NOT APPLE)
