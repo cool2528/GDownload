@@ -32,6 +32,7 @@ GDownload is a modern cross-platform download manager built with C++ and Qt. It 
 - 🔄 Support for multiple protocols (HTTP, HTTPS, FTP, BitTorrent, Metalink)
 - 📱 Download resume capability
 - 🎨 User-friendly graphical interface
+- 🗂 Support for Baidu Netdisk shared link parsing and downloading (only standard speed download is supported, for high-speed downloads please subscribe to Baidu Netdisk official SVIP)
 
 ## 🛠️ Technology Stack
 
@@ -45,6 +46,19 @@ GDownload is a modern cross-platform download manager built with C++ and Qt. It 
 ## 📦 Installation
 
 [Releases](https://github.com/cool2528/GDownload/releases) Page to download the latest version
+
+### macOS Troubleshooting
+
+If you encounter "App is damaged" or "Cannot open application" warnings on macOS, this is due to security restrictions for applications without developer signatures. You can resolve this by:
+
+1. Open "System Preferences" > "Security & Privacy" > "General", and click "Open Anyway" button (if shown)
+2. If the above method doesn't work, open Terminal and enter the following command:
+   ```
+   sudo xattr -r -d com.apple.quarantine /Applications/GDownload.app
+   ```
+   Note: Please replace the path with your actual installation location
+
+3. Enter your administrator password, then try opening the application again
 
 ## 🚀 Quick Start
 
@@ -81,3 +95,15 @@ Thanks to all developers and users who have contributed to this project!
 
 - [GitHub](https://github.com/cool2528/GDownload)
 - [Issue Tracking](https://github.com/cool2528/GDownload/issues)
+
+## ⚠️ Disclaimer
+
+GDownload is provided solely as a download tool for users to legally download Internet resources. Please comply with local laws and regulations when using this software.
+
+- This software does not collect any user privacy information
+- The copyright of all resources downloaded by users belongs to the original author or their legal holders
+- The developers are not responsible for the content downloaded by users, nor for any losses or damages that may result from using this software
+- The Baidu Netdisk shared link parsing function is only intended for legally accessing your own files and should not be used to infringe on others' intellectual property rights
+- If any function violates relevant laws and regulations, please contact us promptly through Issues, and we will address it immediately
+
+By using this software, you acknowledge that you have read and agreed to all terms of this disclaimer.
