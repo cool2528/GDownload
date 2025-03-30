@@ -6,22 +6,22 @@
     <message>
         <location filename="../qml/Browser/AdvancedSettingPage.qml" line="37"/>
         <source>Baidu Cookie</source>
-        <translation type="unfinished"></translation>
+        <translation>Baidu Cookie</translation>
     </message>
     <message>
         <location filename="../qml/Browser/AdvancedSettingPage.qml" line="47"/>
         <source>Please enter Baidu Cookie</source>
-        <translation type="unfinished"></translation>
+        <translation>바이두 쿠키를 입력하세요.</translation>
     </message>
     <message>
         <location filename="../qml/Browser/AdvancedSettingPage.qml" line="53"/>
         <source>Save</source>
-        <translation type="unfinished">저장</translation>
+        <translation>저장</translation>
     </message>
     <message>
         <location filename="../qml/Browser/AdvancedSettingPage.qml" line="61"/>
         <source>Save Baidu Cokies Succeed</source>
-        <translation type="unfinished"></translation>
+        <translation>바이두 쿠키 저장 성공하기</translation>
     </message>
 </context>
 <context>
@@ -155,27 +155,27 @@
 <context>
     <name>HelpDialog</name>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="78"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="79"/>
         <source>Sponsorship</source>
         <translation>스폰서십</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="78"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="79"/>
         <source>License</source>
         <translation>라이선스</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="78"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="79"/>
         <source>About</source>
         <translation>정보</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="134"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="135"/>
         <source>If you like GDownloader, you can sponsor us on the following platforms:</source>
         <translation>GDownloader가 마음에 드신다면 다음 플랫폼에서 후원할 수 있습니다:</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="165"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="166"/>
         <source># About GDownload
 
 GDownload is a cross-platform download manager built with C++ and Qt. It combines modern technology stack and excellent open-source components to provide users with an efficient and stable downloading experience.
@@ -273,77 +273,77 @@ GDownload는 기술에 대한 열정을 가진 개발자들이 관리하는 오�
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="29"/>
         <source>Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</source>
-        <translation type="unfinished"></translation>
+        <translation>바이두 넷디스크 공유 링크 형식(https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="44"/>
         <source>Parse</source>
-        <translation type="unfinished"></translation>
+        <translation>구문 분석</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="47"/>
         <source>Invalid Baidu Netdisk URL, please check.</source>
-        <translation type="unfinished"></translation>
+        <translation>잘못된 바이두 넷디스크 URL을 확인하세요.</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="51"/>
         <source>Please set Baidu Netdisk cookies first.</source>
-        <translation type="unfinished"></translation>
+        <translation>먼저 바이두 넷디스크 쿠키를 설정하세요.</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="77"/>
         <source>Precautions for parsing Baidu Netdisk share links:</source>
-        <translation type="unfinished"></translation>
+        <translation>바이두 넷디스크 공유 링크 구문 분석 시 주의 사항:</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="83"/>
         <source>1.Please go to Software Settings -&gt; Advanced Settings -&gt; Set Baidu Netdisk cookies</source>
-        <translation type="unfinished"></translation>
+        <translation>1. 소프트웨어 설정-&gt; 고급 설정-&gt; 바이두 넷디스크 쿠키 설정으로 이동합니다.</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="88"/>
         <source>2.Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</source>
-        <translation type="unfinished"></translation>
+        <translation>2.바이두 넷디스크 공유 링크 형식(https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="93"/>
         <source>3.Please ensure that your account has sufficient storage space before downloading, as the file needs to be saved to your cloud drive first.</source>
-        <translation type="unfinished"></translation>
+        <translation>3. 파일을 클라우드 드라이브에 먼저 저장해야 하므로 다운로드하기 전에 계정에 충분한 저장 공간이 있는지 확인하세요.</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="102"/>
         <source>4.Unable to achieve accelerated downloading, only standard downloading is supported. For high-speed downloads, please purchase the official VIP.</source>
-        <translation type="unfinished"></translation>
+        <translation>4. 고속 다운로드가 불가능하며, 일반 다운로드만 지원됩니다. 고속 다운로드를 원하시면 공식 VIP를 구매하세요.</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="113"/>
         <source>Click me to go to settings</source>
-        <translation type="unfinished"></translation>
+        <translation>설정으로 이동하려면 저를 클릭하세요.</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="191"/>
         <source>File Name</source>
-        <translation type="unfinished">파일 이름</translation>
+        <translation>파일 이름</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="198"/>
         <source>Size</source>
-        <translation type="unfinished">크기</translation>
+        <translation>크기</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="205"/>
         <source>Date</source>
-        <translation type="unfinished"></translation>
+        <translation>날짜</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="305"/>
         <source>Back</source>
-        <translation type="unfinished"></translation>
+        <translation>뒤로</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="317"/>
         <source>Return parsing</source>
-        <translation type="unfinished"></translation>
+        <translation>반환 구문 분석</translation>
     </message>
 </context>
 <context>
@@ -427,7 +427,7 @@ GDownload는 기술에 대한 열정을 가진 개발자들이 관리하는 오�
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="46"/>
         <source>Baidu</source>
-        <translation type="unfinished"></translation>
+        <translation>바이두</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="126"/>
@@ -508,22 +508,22 @@ GDownload는 기술에 대한 열정을 가진 개발자들이 관리하는 오�
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="39"/>
         <source>New Version</source>
-        <translation type="unfinished"></translation>
+        <translation>새 버전</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="50"/>
         <source>Go to Download</source>
-        <translation type="unfinished"></translation>
+        <translation>다운로드로 이동</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="115"/>
         <source>Cancel</source>
-        <translation type="unfinished">취소</translation>
+        <translation>취소</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="125"/>
         <source>update</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트</translation>
     </message>
 </context>
 <context>
@@ -531,17 +531,17 @@ GDownload는 기술에 대한 열정을 가진 개발자들이 관리하는 오�
     <message>
         <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="184"/>
         <source>Failed to parse the share link.</source>
-        <translation type="unfinished"></translation>
+        <translation>공유 링크를 구문 분석하지 못했습니다.</translation>
     </message>
     <message>
         <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="190"/>
         <source>Failed to retrieve download link information.</source>
-        <translation type="unfinished"></translation>
+        <translation>다운로드 링크 정보를 검색하지 못했습니다.</translation>
     </message>
     <message>
         <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="196"/>
         <source>Failed to switch directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>디렉터리 전환에 실패했습니다.</translation>
     </message>
 </context>
 <context>
@@ -549,17 +549,17 @@ GDownload는 기술에 대한 열정을 가진 개발자들이 관리하는 오�
     <message>
         <location filename="../qml/mainWindow.qml" line="149"/>
         <source>Show main interface</source>
-        <translation type="unfinished"></translation>
+        <translation>기본 인터페이스 표시</translation>
     </message>
     <message>
         <location filename="../qml/mainWindow.qml" line="162"/>
         <source>Hide main interface</source>
-        <translation type="unfinished"></translation>
+        <translation>기본 인터페이스 숨기기</translation>
     </message>
     <message>
         <location filename="../qml/mainWindow.qml" line="169"/>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>종료</translation>
     </message>
 </context>
 </TS>
