@@ -80,9 +80,6 @@ namespace gd {
 			std::map<std::string, std::string> headers;
 			headers["Content-Type"] = "application/json";
 			headers["User-Agent"]	= "GDownloader-Update-Client";
-			headers["Authorization"] =
-				"Bearer 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";
-			headers["X-GitHub-Api-Version"] = "2022-11-28"; //
 			headers["Accept"]				= "application/vnd.github.v3+json";
 			gdl::update::UpdateManager::Instance().SetRequestHeaders(headers);
 #elif defined(__linux__)
