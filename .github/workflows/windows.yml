@@ -81,7 +81,7 @@ jobs:
         if: startsWith(github.event.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@v2
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          repo_token: ${{ secrets.RELEASE_TOKEN }}
           file_glob: true
           file: build/release/GDownloader_windows_*.exe
           overwrite: true
