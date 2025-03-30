@@ -37,7 +37,8 @@ Popup{
                     verticalCenter: parent.verticalCenter
 
                 }
-
+                Layout.preferredHeight: 16
+                Layout.preferredWidth: 16
                 source: "/images/logo/icon.ico"
             }
             Label{

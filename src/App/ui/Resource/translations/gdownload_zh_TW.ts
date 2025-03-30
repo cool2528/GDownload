@@ -6,22 +6,22 @@
     <message>
         <location filename="../qml/Browser/AdvancedSettingPage.qml" line="37"/>
         <source>Baidu Cookie</source>
-        <translation type="unfinished"></translation>
+        <translation>百度 Cookie</translation>
     </message>
     <message>
         <location filename="../qml/Browser/AdvancedSettingPage.qml" line="47"/>
         <source>Please enter Baidu Cookie</source>
-        <translation type="unfinished"></translation>
+        <translation>請輸入百度 Cookie</translation>
     </message>
     <message>
         <location filename="../qml/Browser/AdvancedSettingPage.qml" line="53"/>
         <source>Save</source>
-        <translation type="unfinished">保存</translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location filename="../qml/Browser/AdvancedSettingPage.qml" line="61"/>
         <source>Save Baidu Cokies Succeed</source>
-        <translation type="unfinished"></translation>
+        <translation>保存 百度 Cokies 成功</translation>
     </message>
 </context>
 <context>
@@ -155,27 +155,27 @@
 <context>
     <name>HelpDialog</name>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="78"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="79"/>
         <source>Sponsorship</source>
         <translation>贊助</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="78"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="79"/>
         <source>License</source>
         <translation>許可證</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="78"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="79"/>
         <source>About</source>
         <translation>關於</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="134"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="135"/>
         <source>If you like GDownloader, you can sponsor us on the following platforms:</source>
         <translation>如果你喜歡 GDownloader，你可以在以下平台贊助我們：</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="165"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="166"/>
         <source># About GDownload
 
 GDownload is a cross-platform download manager built with C++ and Qt. It combines modern technology stack and excellent open-source components to provide users with an efficient and stable downloading experience.
@@ -274,77 +274,77 @@ GDownload 是一個開源項目，由熱衷於技術的開發者維護。我們�
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="29"/>
         <source>Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</source>
-        <translation type="unfinished"></translation>
+        <translation>百度網盤分享連結格式 (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="44"/>
         <source>Parse</source>
-        <translation type="unfinished"></translation>
+        <translation>解析</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="47"/>
         <source>Invalid Baidu Netdisk URL, please check.</source>
-        <translation type="unfinished"></translation>
+        <translation>無效的百度網盤 URL，請檢查</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="51"/>
         <source>Please set Baidu Netdisk cookies first.</source>
-        <translation type="unfinished"></translation>
+        <translation>請先設定百度網盤 cookies</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="77"/>
         <source>Precautions for parsing Baidu Netdisk share links:</source>
-        <translation type="unfinished"></translation>
+        <translation>解析百度網盤分享連結的注意事項：</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="83"/>
         <source>1.Please go to Software Settings -&gt; Advanced Settings -&gt; Set Baidu Netdisk cookies</source>
-        <translation type="unfinished"></translation>
+        <translation>1.請進入軟體設定 -&gt; 進階設定 -&gt; 設定百度網盤 cookies</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="88"/>
         <source>2.Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</source>
-        <translation type="unfinished"></translation>
+        <translation>2.百度網盤分享連結格式 (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="93"/>
         <source>3.Please ensure that your account has sufficient storage space before downloading, as the file needs to be saved to your cloud drive first.</source>
-        <translation type="unfinished"></translation>
+        <translation>3.下載前請確保您的帳戶有足夠的儲存空間，因為檔案需要先儲存到您的雲端磁碟機。</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="102"/>
         <source>4.Unable to achieve accelerated downloading, only standard downloading is supported. For high-speed downloads, please purchase the official VIP.</source>
-        <translation type="unfinished"></translation>
+        <translation>4.無法達到加速下載，僅支援標準下載。如需高速下載，請購買官方 VIP。</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="113"/>
         <source>Click me to go to settings</source>
-        <translation type="unfinished"></translation>
+        <translation>按一下我進入設定</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="191"/>
         <source>File Name</source>
-        <translation type="unfinished">檔案名稱</translation>
+        <translation>檔案名稱</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="198"/>
         <source>Size</source>
-        <translation type="unfinished">大小</translation>
+        <translation>大小</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="205"/>
         <source>Date</source>
-        <translation type="unfinished"></translation>
+        <translation>時間</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="305"/>
         <source>Back</source>
-        <translation type="unfinished"></translation>
+        <translation>回上頁</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="317"/>
         <source>Return parsing</source>
-        <translation type="unfinished"></translation>
+        <translation>回傳解析</translation>
     </message>
 </context>
 <context>
@@ -428,7 +428,7 @@ GDownload 是一個開源項目，由熱衷於技術的開發者維護。我們�
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="46"/>
         <source>Baidu</source>
-        <translation type="unfinished"></translation>
+        <translation>百度網盘</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="126"/>
@@ -509,22 +509,22 @@ GDownload 是一個開源項目，由熱衷於技術的開發者維護。我們�
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="39"/>
         <source>New Version</source>
-        <translation type="unfinished"></translation>
+        <translation>新版本</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="50"/>
         <source>Go to Download</source>
-        <translation type="unfinished"></translation>
+        <translation>前往下載</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="115"/>
         <source>Cancel</source>
-        <translation type="unfinished">取消</translation>
+        <translation>取消</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="125"/>
         <source>update</source>
-        <translation type="unfinished"></translation>
+        <translation>更新</translation>
     </message>
 </context>
 <context>
@@ -532,17 +532,17 @@ GDownload 是一個開源項目，由熱衷於技術的開發者維護。我們�
     <message>
         <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="184"/>
         <source>Failed to parse the share link.</source>
-        <translation type="unfinished"></translation>
+        <translation>解析分享連結失敗</translation>
     </message>
     <message>
         <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="190"/>
         <source>Failed to retrieve download link information.</source>
-        <translation type="unfinished"></translation>
+        <translation>擷取下載連結資訊失敗</translation>
     </message>
     <message>
         <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="196"/>
         <source>Failed to switch directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>切換目錄失敗</translation>
     </message>
 </context>
 <context>
@@ -550,17 +550,17 @@ GDownload 是一個開源項目，由熱衷於技術的開發者維護。我們�
     <message>
         <location filename="../qml/mainWindow.qml" line="149"/>
         <source>Show main interface</source>
-        <translation type="unfinished"></translation>
+        <translation>顯示主介面</translation>
     </message>
     <message>
         <location filename="../qml/mainWindow.qml" line="162"/>
         <source>Hide main interface</source>
-        <translation type="unfinished"></translation>
+        <translation>隱藏主介面</translation>
     </message>
     <message>
         <location filename="../qml/mainWindow.qml" line="169"/>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>離開</translation>
     </message>
 </context>
 </TS>

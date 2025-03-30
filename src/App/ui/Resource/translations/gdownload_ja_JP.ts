@@ -6,22 +6,22 @@
     <message>
         <location filename="../qml/Browser/AdvancedSettingPage.qml" line="37"/>
         <source>Baidu Cookie</source>
-        <translation type="unfinished"></translation>
+        <translation>百度クッキー</translation>
     </message>
     <message>
         <location filename="../qml/Browser/AdvancedSettingPage.qml" line="47"/>
         <source>Please enter Baidu Cookie</source>
-        <translation type="unfinished"></translation>
+        <translation>百度クッキーを入力してください</translation>
     </message>
     <message>
         <location filename="../qml/Browser/AdvancedSettingPage.qml" line="53"/>
         <source>Save</source>
-        <translation type="unfinished">保存</translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location filename="../qml/Browser/AdvancedSettingPage.qml" line="61"/>
         <source>Save Baidu Cokies Succeed</source>
-        <translation type="unfinished"></translation>
+        <translation>Baidu.comクッキーの保存に成功しました</translation>
     </message>
 </context>
 <context>
@@ -155,27 +155,27 @@
 <context>
     <name>HelpDialog</name>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="78"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="79"/>
         <source>Sponsorship</source>
         <translation>スポンサーシップ</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="78"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="79"/>
         <source>License</source>
         <translation>ライセンス</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="78"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="79"/>
         <source>About</source>
         <translation>アバウト</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="134"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="135"/>
         <source>If you like GDownloader, you can sponsor us on the following platforms:</source>
         <translation>GDownloader を気に入っていただけましたら、以下のプラットフォームでスポンサーになることができます:</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="165"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="166"/>
         <source># About GDownload
 
 GDownload is a cross-platform download manager built with C++ and Qt. It combines modern technology stack and excellent open-source components to provide users with an efficient and stable downloading experience.
@@ -273,77 +273,77 @@ Apache License 2.0でライセンスされています
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="29"/>
         <source>Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</source>
-        <translation type="unfinished"></translation>
+        <translation>百度ネットディスク共有リンクフォーマット (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="44"/>
         <source>Parse</source>
-        <translation type="unfinished"></translation>
+        <translation>パース</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="47"/>
         <source>Invalid Baidu Netdisk URL, please check.</source>
-        <translation type="unfinished"></translation>
+        <translation>百度ネットディスクのURLが無効です</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="51"/>
         <source>Please set Baidu Netdisk cookies first.</source>
-        <translation type="unfinished"></translation>
+        <translation>最初にBaidu Netdisk Cookieを設定してください</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="77"/>
         <source>Precautions for parsing Baidu Netdisk share links:</source>
-        <translation type="unfinished"></translation>
+        <translation>Baidu Netdisk共有リンクの解析に関する注意事項</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="83"/>
         <source>1.Please go to Software Settings -&gt; Advanced Settings -&gt; Set Baidu Netdisk cookies</source>
-        <translation type="unfinished"></translation>
+        <translation>1.ソフトウェア設定 -&gt; 詳細設定 -&gt; Baidu Netdisk cookiesを設定します。</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="88"/>
         <source>2.Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</source>
-        <translation type="unfinished"></translation>
+        <translation>2.百度ネットディスク共有リンクフォーマット (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="93"/>
         <source>3.Please ensure that your account has sufficient storage space before downloading, as the file needs to be saved to your cloud drive first.</source>
-        <translation type="unfinished"></translation>
+        <translation>3.ファイルをクラウドドライブに保存する必要があるため、ダウンロードする前にアカウントに十分なストレージ容量があることをご確認ください。</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="102"/>
         <source>4.Unable to achieve accelerated downloading, only standard downloading is supported. For high-speed downloads, please purchase the official VIP.</source>
-        <translation type="unfinished"></translation>
+        <translation>4.高速ダウンロードを実現できず、標準ダウンロードのみ対応。高速ダウンロードをご希望の場合は、公式VIPをご購入ください。</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="113"/>
         <source>Click me to go to settings</source>
-        <translation type="unfinished"></translation>
+        <translation>私をクリックして設定へ</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="191"/>
         <source>File Name</source>
-        <translation type="unfinished">ファイル名</translation>
+        <translation>ファイル名</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="198"/>
         <source>Size</source>
-        <translation type="unfinished">サイズ</translation>
+        <translation>サイズ</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="205"/>
         <source>Date</source>
-        <translation type="unfinished"></translation>
+        <translation>日付</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="305"/>
         <source>Back</source>
-        <translation type="unfinished"></translation>
+        <translation>バック</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="317"/>
         <source>Return parsing</source>
-        <translation type="unfinished"></translation>
+        <translation>リターン・パース</translation>
     </message>
 </context>
 <context>
@@ -427,7 +427,7 @@ Apache License 2.0でライセンスされています
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="46"/>
         <source>Baidu</source>
-        <translation type="unfinished"></translation>
+        <translation>百度ネットディスク</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="126"/>
@@ -508,22 +508,22 @@ Apache License 2.0でライセンスされています
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="39"/>
         <source>New Version</source>
-        <translation type="unfinished"></translation>
+        <translation>新バージョン</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="50"/>
         <source>Go to Download</source>
-        <translation type="unfinished"></translation>
+        <translation>ダウンロード</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="115"/>
         <source>Cancel</source>
-        <translation type="unfinished">キャンセル</translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="125"/>
         <source>update</source>
-        <translation type="unfinished"></translation>
+        <translation>アップデート</translation>
     </message>
 </context>
 <context>
@@ -531,17 +531,17 @@ Apache License 2.0でライセンスされています
     <message>
         <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="184"/>
         <source>Failed to parse the share link.</source>
-        <translation type="unfinished"></translation>
+        <translation>共有リンクの解析に失敗しました</translation>
     </message>
     <message>
         <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="190"/>
         <source>Failed to retrieve download link information.</source>
-        <translation type="unfinished"></translation>
+        <translation>ダウンロードリンク情報の取得に失敗しました</translation>
     </message>
     <message>
         <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="196"/>
         <source>Failed to switch directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>ディレクトリの切り替えに失敗</translation>
     </message>
 </context>
 <context>
@@ -549,17 +549,17 @@ Apache License 2.0でライセンスされています
     <message>
         <location filename="../qml/mainWindow.qml" line="149"/>
         <source>Show main interface</source>
-        <translation type="unfinished"></translation>
+        <translation>メイン・インターフェースを表示</translation>
     </message>
     <message>
         <location filename="../qml/mainWindow.qml" line="162"/>
         <source>Hide main interface</source>
-        <translation type="unfinished"></translation>
+        <translation>メイン・インターフェースを隠す</translation>
     </message>
     <message>
         <location filename="../qml/mainWindow.qml" line="169"/>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>出口</translation>
     </message>
 </context>
 </TS>

@@ -1,18 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
-    <!-- 蓝色圆形背景 -->
-    <circle cx="64" cy="64" r="60" fill="#2196F3"/>
+    <defs>
+        <!-- 主色调渐变 - 更加鲜艳 -->
+        <linearGradient id="vibrantGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#2979FF"/>
+            <stop offset="100%" stop-color="#2962FF"/>
+        </linearGradient>
+        
+        <!-- 简单阴影效果 -->
+        <filter id="simpleShadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.3)"/>
+        </filter>
+    </defs>
     
-    <!-- 白色下载箭头 - 只保留箭头部分 -->
-    <path d="M64 30 
-             L64 78
-             M64 78
-             L44 58
-             M64 78
-             L84 58" 
-          stroke="white" 
-          stroke-width="12" 
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          fill="none"/>
-</svg>
+    <!-- 背景 - 极简圆形 -->
+    <circle cx="64" cy="64" r="56" fill="url(#vibrantGradient)" filter="url(#simpleShadow)"/>
+    
+    <!-- 下载图标 - 清晰粗线条确保小尺寸下可见 -->
+    <g transform="translate(64, 64)">
+        <!-- 主干 -->
+        <line x1="0" y1="-28" x2="0" y2="18" 
+              stroke="white" stroke-width="12" stroke-linecap="round"/>
+        
+        <!-- 箭头尖 -->
+        <path d="M-18,0 L0,18 L18,0" 
+              stroke="white" stroke-width="12" 
+              stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </g>
+    
+    <!-- 简约G标志 - 可选，在小尺寸中可能会隐藏 -->
+    <g transform="translate(98, 85) scale(0.8)">
+        <circle cx="0" cy="0" r="10" fill="white" opacity="0.2"/>
+        <path d="M-4,-6 A8,8 0 1,0 -4,6 L0,6 L0,0 L-2,0" 
+              stroke="white" stroke-width="3" fill="none" 
+              stroke-linejoin="round" stroke-linecap="round"/>
+    </g>
+</svg> 
