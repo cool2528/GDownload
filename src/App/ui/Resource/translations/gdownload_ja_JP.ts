@@ -4,22 +4,41 @@
 <context>
     <name>AdvancedSettingPage</name>
     <message>
-        <location filename="../qml/Browser/AdvancedSettingPage.qml" line="37"/>
+        <source>Baidu Cookie</source>
+        <translation type="vanished">百度クッキー</translation>
+    </message>
+    <message>
+        <source>Please enter Baidu Cookie</source>
+        <translation type="vanished">百度クッキーを入力してください</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="vanished">保存</translation>
+    </message>
+    <message>
+        <source>Save Baidu Cokies Succeed</source>
+        <translation type="vanished">Baidu.comクッキーの保存に成功しました</translation>
+    </message>
+</context>
+<context>
+    <name>BaiduCookieSettingPage</name>
+    <message>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="18"/>
         <source>Baidu Cookie</source>
         <translation>百度クッキー</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/AdvancedSettingPage.qml" line="47"/>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="28"/>
         <source>Please enter Baidu Cookie</source>
         <translation>百度クッキーを入力してください</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/AdvancedSettingPage.qml" line="53"/>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="34"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/AdvancedSettingPage.qml" line="61"/>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="42"/>
         <source>Save Baidu Cokies Succeed</source>
         <translation>Baidu.comクッキーの保存に成功しました</translation>
     </message>
@@ -271,77 +290,77 @@ Apache License 2.0でライセンスされています
         <translation type="obsolete">1行に1つのタスクURL（マグネットをサポート）</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="29"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="30"/>
         <source>Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</source>
         <translation>百度ネットディスク共有リンクフォーマット (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="44"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="45"/>
         <source>Parse</source>
         <translation>パース</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="47"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="48"/>
         <source>Invalid Baidu Netdisk URL, please check.</source>
         <translation>百度ネットディスクのURLが無効です</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="51"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="52"/>
         <source>Please set Baidu Netdisk cookies first.</source>
         <translation>最初にBaidu Netdisk Cookieを設定してください</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="77"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="78"/>
         <source>Precautions for parsing Baidu Netdisk share links:</source>
         <translation>Baidu Netdisk共有リンクの解析に関する注意事項</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="83"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="84"/>
         <source>1.Please go to Software Settings -&gt; Advanced Settings -&gt; Set Baidu Netdisk cookies</source>
         <translation>1.ソフトウェア設定 -&gt; 詳細設定 -&gt; Baidu Netdisk cookiesを設定します。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="88"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="89"/>
         <source>2.Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</source>
         <translation>2.百度ネットディスク共有リンクフォーマット (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="93"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="94"/>
         <source>3.Please ensure that your account has sufficient storage space before downloading, as the file needs to be saved to your cloud drive first.</source>
         <translation>3.ファイルをクラウドドライブに保存する必要があるため、ダウンロードする前にアカウントに十分なストレージ容量があることをご確認ください。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="102"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="103"/>
         <source>4.Unable to achieve accelerated downloading, only standard downloading is supported. For high-speed downloads, please purchase the official VIP.</source>
         <translation>4.高速ダウンロードを実現できず、標準ダウンロードのみ対応。高速ダウンロードをご希望の場合は、公式VIPをご購入ください。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="113"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="114"/>
         <source>Click me to go to settings</source>
         <translation>私をクリックして設定へ</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="191"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="192"/>
         <source>File Name</source>
         <translation>ファイル名</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="198"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="199"/>
         <source>Size</source>
         <translation>サイズ</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="205"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="206"/>
         <source>Date</source>
         <translation>日付</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="305"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="306"/>
         <source>Back</source>
         <translation>バック</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="317"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="318"/>
         <source>Return parsing</source>
         <translation>リターン・パース</translation>
     </message>
@@ -501,6 +520,24 @@ Apache License 2.0でライセンスされています
         <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="59"/>
         <source>Dark</source>
         <translation>暗い</translation>
+    </message>
+</context>
+<context>
+    <name>TrackerServerSettingPage</name>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="18"/>
+        <source>Tracker Servers:</source>
+        <translation>トラッカーサーバー:</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="80"/>
+        <source>Sync</source>
+        <translation>同調</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="96"/>
+        <source>Enable daily auto-update</source>
+        <translation>毎日自動更新を有効にする </translation>
     </message>
 </context>
 <context>

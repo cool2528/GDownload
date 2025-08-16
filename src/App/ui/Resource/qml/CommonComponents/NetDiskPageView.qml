@@ -15,6 +15,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
+        color: GTheme.dark ? "#2e2e2e" : "#ffffff"
         height: visible ? 50 : 0
         visible: true
         RowLayout {

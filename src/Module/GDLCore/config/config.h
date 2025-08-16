@@ -64,5 +64,6 @@ namespace gdl {
 		};
 		GDLCore_API void SetValue(const std::string& key, const ConfigValue& value);
 		GDLCore_API ConfigValue GetValue(const std::string& key, const ConfigValue& defaultValue = std::string(""));
+		GDLCore_API std::string GetTrackersServerUrl(const std::string& key);
 	}  // namespace config
 }  // namespace gdl

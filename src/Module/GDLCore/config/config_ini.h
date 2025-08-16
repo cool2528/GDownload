@@ -1,6 +1,8 @@
 #pragma once
 #include <boost/property_tree/ini_parser.hpp>
 #include <shared_mutex>
+#include <map>
+#include <optional>
 #include "globalTypes.h"
 #include "singleton.hpp"
 namespace gdl {
@@ -19,9 +21,14 @@ namespace gdl {
 			template <typename Type>
 			Type Get(const std::string& key) {
 				std::shared_lock lock(mutex_);
-				return ptree_root_.get<Type>(key);
+				auto optional_val =  ptree_root_.get_optional<Type>(key);
+				if(optional_val.has_value()){
+					return ptree_root_.get<Type>(key);
+				}
+				return Type();
 			}
 
+			std::string GetTrackerServerUrlByName(const std::string& name);
 		   private:
 			explicit ApplicationConfig();
 			bool Load();
@@ -32,6 +39,7 @@ namespace gdl {
 			boost::property_tree::ptree ptree_root_;
 			String config_file_path_;
 			std::shared_mutex mutex_;
+			std::map<std::string,std::string> tracker_source_server_;
 		};
 	}  // namespace config
 }  // namespace gdl

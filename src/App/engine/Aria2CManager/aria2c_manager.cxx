@@ -194,37 +194,43 @@ namespace gdl {
 		}
 
 		void Aria2cDownloadManager::SyncMagnetServerList() {
-			// BitTorrent tracker server blacklist
+			// BitTorrent 跟踪器服务器黑名单
 			const std::string trackers_black_url(
 				"https://bitbucket.org/xiu2/trackerslistcollection/raw/master/blacklist.txt");
 			auto bt_exclude_tracker = GetBitTorrentUrl(trackers_black_url);
 			if (!bt_exclude_tracker.empty()) {
-				// Set if the obtained blacklist is not empty
+				// 如果获取的黑名单不为空，则设置
 				websocket_client_.ChangeGlobalOption({std::make_pair("bt-exclude-tracker", bt_exclude_tracker)});
 			}
 			else {
 				LOG_WARN("If the list of blacklists is empty, then");
 			}
-			// Get BitTorrent tracker server list from configuration file
+			// 从配置文件中获取 BitTorrent 跟踪器服务器列表
 			try {
-                auto json_data					   = config::GetValue(config::Keys::TrackerSourceUrls).AsString();
-				nlohmann::json tracker_source_urls = nlohmann::json::parse(json_data.c_str());
-				if (!tracker_source_urls.is_array()) {
-					LOG_ERR("Invalid tracker_source_urls {}", json_data);
+				auto json_data					   = config::GetValue(config::Keys::TrackerSourceNames).AsString();
+				nlohmann::json tracker_source_names = nlohmann::json::parse(json_data.c_str());
+
+				if (!tracker_source_names.is_array()) {
+					LOG_ERR("Invalid tracker_source_names {}", json_data);
 					return;
 				}
 				std::string bt_tracker;
-				for (const auto& url : tracker_source_urls) {
-					if (url.is_string()) {
-						std::string source_url = url.get<std::string>();
+				for (const auto& key : tracker_source_names) {
+					if (key.is_string()) {
+						std::string name = key.get<std::string>();
+						auto source_url		 = config::GetTrackersServerUrl(name);
                         auto bt_tracker_urls   = GetBitTorrentUrl(source_url);
-						bt_tracker += "," + bt_tracker_urls;
+						if (!bt_exclude_tracker.empty()) {
+							bt_tracker += "," + bt_tracker_urls;
+						}
 					}
 					if (!engine_is_runing_) break;
 				}
 				if (!bt_tracker.empty()) {
-					// Set if the obtained BitTorrent URL list is not empty
+					// 如果获取的 BitTorrent URL 列表不为空，则设置
 					websocket_client_.ChangeGlobalOption({std::make_pair("bt-tracker", bt_tracker)});
+					std::replace(bt_tracker.begin(), bt_tracker.end(), ',', '\n');
+					pub_sub_system_.Publish(kAria2SyncMagnetServerList, bt_tracker);
 				}
 
 			} catch (std::exception& e) {
@@ -342,8 +348,10 @@ namespace gdl {
 				return false;
 			}
 			// 启动 更新当前aria2c 的所有 暂停 正在下载 停止的任务状态列表 定时器
-			update_aria2c_tasks_timer_.Start(std::bind(&Aria2cDownloadManager::UpdateAria2cTasks, this),
-											 std::chrono::milliseconds(300), true);
+			if (config::GetValue(config::Keys::EnableTrackerSourceAutoUpdate).AsBool()) {
+				update_aria2c_tasks_timer_.Start(std::bind(&Aria2cDownloadManager::UpdateAria2cTasks, this),
+												 std::chrono::milliseconds(300), true);
+			}
 			// 链接 aria2c websocket
 			websocket_client_.Open();
 			engine_is_runing_ = true;
@@ -393,6 +401,11 @@ namespace gdl {
 				return sub;
 			}
 			return MakeFail(1, "Subscribe failed");
+		}
+
+		void Aria2cDownloadManager::UpdateMagnetServerList() {
+			boost::asio::post(io_context_, [this]() { SyncMagnetServerList(); });
+
 		}
 
 		void Aria2cDownloadManager::UnSubscribeAria2Message(Subscription subscription) {
