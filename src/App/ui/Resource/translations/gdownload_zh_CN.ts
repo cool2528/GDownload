@@ -4,22 +4,41 @@
 <context>
     <name>AdvancedSettingPage</name>
     <message>
-        <location filename="../qml/Browser/AdvancedSettingPage.qml" line="37"/>
+        <source>Baidu Cookie</source>
+        <translation type="vanished">百度网盘Cookie</translation>
+    </message>
+    <message>
+        <source>Please enter Baidu Cookie</source>
+        <translation type="vanished">请输入百度 Cookie</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="vanished">保存</translation>
+    </message>
+    <message>
+        <source>Save Baidu Cokies Succeed</source>
+        <translation type="vanished">保存百度Cokies成功</translation>
+    </message>
+</context>
+<context>
+    <name>BaiduCookieSettingPage</name>
+    <message>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="18"/>
         <source>Baidu Cookie</source>
         <translation>百度网盘Cookie</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/AdvancedSettingPage.qml" line="47"/>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="28"/>
         <source>Please enter Baidu Cookie</source>
         <translation>请输入百度 Cookie</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/AdvancedSettingPage.qml" line="53"/>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="34"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/AdvancedSettingPage.qml" line="61"/>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="42"/>
         <source>Save Baidu Cokies Succeed</source>
         <translation>保存百度Cokies成功</translation>
     </message>
@@ -272,77 +291,77 @@ Copyright © 2024 GDownload 团队
         <translation type="obsolete">每行一个任务 url（支持磁铁）</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="29"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="30"/>
         <source>Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</source>
         <translation>百度网盘分享链接格式（https://pan.baidu.com/s/1xxxxxxxxxxxx/?pwd=xxxx）</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="44"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="45"/>
         <source>Parse</source>
         <translation>解析</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="47"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="48"/>
         <source>Invalid Baidu Netdisk URL, please check.</source>
         <translation>百度网盘 URL 无效，请检查。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="51"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="52"/>
         <source>Please set Baidu Netdisk cookies first.</source>
         <translation>请先设置百度网盘 cookie</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="77"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="78"/>
         <source>Precautions for parsing Baidu Netdisk share links:</source>
         <translation>解析百度网盘共享链接的注意事项：</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="83"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="84"/>
         <source>1.Please go to Software Settings -&gt; Advanced Settings -&gt; Set Baidu Netdisk cookies</source>
         <translation>1.请进入软件设置 -&gt; 高级设置 -&gt; 设置百度网盘 cookie</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="88"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="89"/>
         <source>2.Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</source>
         <translation>2.百度网盘分享链接格式 (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="93"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="94"/>
         <source>3.Please ensure that your account has sufficient storage space before downloading, as the file needs to be saved to your cloud drive first.</source>
         <translation>3.下载前请确保您的账户有足够的存储空间，因为文件需要先保存到您的云盘中。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="102"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="103"/>
         <source>4.Unable to achieve accelerated downloading, only standard downloading is supported. For high-speed downloads, please purchase the official VIP.</source>
         <translation>4.无法实现加速下载，仅支持标准下载。如需高速下载，请购买官方 VIP</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="113"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="114"/>
         <source>Click me to go to settings</source>
         <translation>点击我去设置</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="191"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="192"/>
         <source>File Name</source>
         <translation>文件名</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="198"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="199"/>
         <source>Size</source>
         <translation>大小</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="205"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="206"/>
         <source>Date</source>
         <translation>日期</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="305"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="306"/>
         <source>Back</source>
         <translation>返回上级</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="317"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="318"/>
         <source>Return parsing</source>
         <translation>返回解析</translation>
     </message>
@@ -502,6 +521,24 @@ Copyright © 2024 GDownload 团队
         <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="59"/>
         <source>Dark</source>
         <translation>暗色</translation>
+    </message>
+</context>
+<context>
+    <name>TrackerServerSettingPage</name>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="18"/>
+        <source>Tracker Servers:</source>
+        <translation>Tracker 服务器:</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="80"/>
+        <source>Sync</source>
+        <translation>同步</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="96"/>
+        <source>Enable daily auto-update</source>
+        <translation>启用每日自动更新</translation>
     </message>
 </context>
 <context>

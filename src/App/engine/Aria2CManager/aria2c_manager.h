@@ -65,6 +65,7 @@ namespace gdl {
 
 			Result<Subscription> SubscriptionAria2Message(const std::string& topic,
 														  std::function<void(const std::string&)> handler);
+			void UpdateMagnetServerList();
             template <typename... Args>
 			Result<bool> CallAria2cMethod(const Aria2Method& method, Args&&... args) {
 				using TupleType = std::tuple<Args...>;

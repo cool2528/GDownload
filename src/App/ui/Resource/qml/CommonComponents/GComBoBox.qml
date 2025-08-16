@@ -4,6 +4,7 @@ import gdl.sdk
 
 ComboBox {
     id: control
+    property int maxPopHeight: 0
     delegate: ItemDelegate {
         width: control.width
         contentItem: Text {
@@ -78,7 +79,7 @@ ComboBox {
     popup: Popup {
         y: control.height - 1
         width: control.width
-        implicitHeight: contentItem.implicitHeight
+        implicitHeight: maxPopHeight < contentItem.implicitHeight ? maxPopHeight : contentItem.implicitHeight
         padding: 1
 
         contentItem: ListView {
