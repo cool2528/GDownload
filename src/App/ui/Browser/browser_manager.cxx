@@ -35,6 +35,10 @@ namespace gdl {
 
 			BrowserManager::~BrowserManager() {}
 
+			Q_INVOKABLE void BrowserManager::SyncTrackersServerlist(){
+				engine::Aria2cDownloadManager::Instance().UpdateMagnetServerList();
+			}
+
 			DownloadTaskModel* BrowserManager::GetActiveDownloadModel() {
 				return active_model_.get();
 			}
@@ -540,6 +544,11 @@ namespace gdl {
 					kAria2ActiveProgress, [this](const std::string& msg) { OnHandleAria2ActiveProgress(msg); });
 				if (res.HasError()) return false;
 				aria2_active_progress_subcription_ = res.Value();
+				// subscribe sync server list
+				res = engine::Aria2cDownloadManager::Instance().SubscriptionAria2Message(
+					kAria2SyncMagnetServerList, [this](const std::string& msg) { 
+						Q_EMIT sigUpdateSyncServerList(QString::fromStdString(msg));
+					});
 				return true;
 			}
 
@@ -682,6 +691,12 @@ namespace gdl {
                     this, &BrowserManager::sigErrorMessage, this,
                     [this](const QString& message) { toast::ToastManager::Instance().ShowError(message); },
                     Qt::QueuedConnection);
+				connect(
+					this, &BrowserManager::sigUpdateSyncServerList, this,
+					[this](const QString& list) { 
+						utils::UtilsToolsManager::Instance().SetserverList(list);
+					},Qt::QueuedConnection);
+				
 			}
 			void BrowserManager::InitDownloadHistoryCache() const {
 				const auto records = gdl::cache::DownloadHistoryCache::Instance().GetRecords();

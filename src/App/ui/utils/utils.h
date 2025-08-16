@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QWindow>
 #include "GDLCore/singleton.hpp"
+#include "Definitions/autoProperty.h"
 class QQuickWindow;
 class QQmlEngine;
 namespace gdl {
@@ -18,6 +19,7 @@ namespace gdl {
 			class UtilsToolsManager : public QObject, public Singleton<UtilsToolsManager> {
 				Q_OBJECT
 				SINGLETON_DECLARE(UtilsToolsManager)
+				QML_AUTO_PROPERTY_V(QString, serverList, "")
 			   public:
 				~UtilsToolsManager() override;
 #if defined(__APPLE__)

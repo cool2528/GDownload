@@ -37,5 +37,7 @@
         <file>qml/CommonComponents/ToastContainer.qml</file>
         <file>qml/CommonComponents/UpdateDialog.qml</file>
         <file>qml/CommonComponents/NetDiskPageView.qml</file>
+        <file>qml/Browser/BaiduCookieSettingPage.qml</file>
+        <file>qml/Browser/TrackerServerSettingPage.qml</file>
     </qresource>
 </RCC>

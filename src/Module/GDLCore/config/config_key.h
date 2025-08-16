@@ -1,10 +1,6 @@
 #pragma once
 #include <array>
 #include <string>
-#define DEFAULT_TRACKER_SOURCE_URLS                                                                                 \
-	"[\"https://ngosang.github.io/trackerslist/trackers_best.txt\",\"https://ngosang.github.io/trackerslist/"       \
-	"trackers_all.txt\",\"https://ngosang/trackerslist/master/trackers_all_http.txt\",\"https://ngosang.github.io/" \
-	"trackerslist/trackers_all_https.txt\"]"
 namespace gdl {
 	namespace config {
 		template <std::size_t N>
@@ -48,7 +44,7 @@ namespace gdl {
 			CONFIG_PATH(DhtListenPort, "aria2c.dht-listen-port", "26701");
 			CONFIG_PATH(MaxConcurrentDownloads, "aria2c.max-concurrent-downloads", "64");
 			CONFIG_PATH(ConfPath, "aria2c.conf-path", "");
-			CONFIG_PATH(TrackerSourceUrls, "aria2c.tracker_source_urls", DEFAULT_TRACKER_SOURCE_URLS);
+			CONFIG_PATH(TrackerSourceUrls, "aria2c.tracker_source_urls", "");
             CONFIG_PATH(SaveSession, "aria2c.save-session", "");
             CONFIG_PATH(IsSaveSession, "aria2c.is-save-session", "true");
             CONFIG_PATH(EnableGlobalProxy, "aria2c.enable-global-proxy", "false");
@@ -63,6 +59,9 @@ namespace gdl {
             CONFIG_PATH(EnableAutoUpdate, "general.enable-auto-update", "true");
             CONFIG_PATH(WindowPosition, "general.window-position", "");
             CONFIG_PATH(BaiduPanCookies, "plugin.baidu-pan-cookies", "");
+			CONFIG_PATH(TrackerSourceNames,"aria2c.tracker_source_name","");
+			CONFIG_PATH(EnableTrackerSourceAutoUpdate,"aria2c.enable_tracker_source_auto_update","true");
+		
 
 			// static function all keys
 			static constexpr auto GetAllKeys() {
@@ -94,7 +93,9 @@ namespace gdl {
                                              EnableAutoShutdown.get(),
                                              EnableAutoUpdate.get(),
                                              WindowPosition.get(),
-                                             BaiduPanCookies.get()});
+                                             BaiduPanCookies.get(),
+									         TrackerSourceNames.get(),
+											 EnableTrackerSourceAutoUpdate.get()});
 			}
 			// static function all values
 			static constexpr auto GetAllValues() {
@@ -126,7 +127,9 @@ namespace gdl {
 											 EnableAutoShutdown.val(),
 											 EnableAutoUpdate.val(),
                                              WindowPosition.val(),
-                                             BaiduPanCookies.val()});
+                                             BaiduPanCookies.val(),
+											 TrackerSourceNames.val(),
+											 EnableTrackerSourceAutoUpdate.val()});
 			}
 		};
 	}  // namespace config

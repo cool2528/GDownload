@@ -23,6 +23,9 @@ namespace gdl {
 
 			   public:
 				~BrowserManager() override;
+
+				Q_INVOKABLE void SyncTrackersServerlist();
+
 				Q_INVOKABLE DownloadTaskModel* GetActiveDownloadModel();
 
 				Q_INVOKABLE DownloadTaskModel* GetStopedDownloadModel();
@@ -80,6 +83,7 @@ namespace gdl {
 				void sigErrorMessage(const QString& error);
 				void sigUpdateTasksMessage(const DownloadTaskInfo& info);
                 void sigUpdateActiveProgress(const double& progress);
+				void sigUpdateSyncServerList(const QString& list);
 
 			   private:
 				explicit BrowserManager(QObject* parent = nullptr);
@@ -96,6 +100,7 @@ namespace gdl {
 				std::unique_ptr<DownloadTaskModel> waiting_model_{nullptr};
                 engine::Subscription aria2_responce_subcription_{nullptr};
                 engine::Subscription aria2_active_progress_subcription_{nullptr};
+				engine::Subscription aria2_sync_server_list_subcription_{nullptr};
 			};
 			void RegisterTypes(QQmlEngine* engine);
 		}  // namespace browser

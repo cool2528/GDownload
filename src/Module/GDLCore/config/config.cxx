@@ -16,5 +16,9 @@ namespace gdl {
 			return value;
 		}
 
+		 std::string GetTrackersServerUrl(const std::string& key) {
+			return ApplicationConfig::Instance().GetTrackerServerUrlByName(key);
+		}
+
 	}  // namespace config
 }  // namespace gdl
