@@ -100,22 +100,30 @@ namespace gdl {
 			update_available_ = has_update;
 			if (has_update) {
 				latest_update_info_ = info;
-				auto data			= new UpdateDataInfo(
-					  QString::fromStdString(info.version), QString::fromStdString(info.download_url),
-					  QString::fromStdString(info.release_notes), QString::fromStdString(info.release_date), this);
-				// If silent check and not mandatory update, only emit signal
-				if (silent_check_ && !info.is_mandatory && !config_.silent_mode) {
-					Q_EMIT updateAvailable(data);
-					return;
-				}
-				// If mandatory update or silent mode enabled, start update automatically
-				if (info.is_mandatory || config_.silent_mode) {
-					StartUpdate();
-				}
-				else {
-					// Otherwise just emit signal
-					Q_EMIT updateAvailable(data);
-				}
+				// 使用 QMetaObject::invokeMethod 确保在主线程中创建对象
+				QMetaObject::invokeMethod(
+					this,
+					[this, info]() {
+						auto data = new UpdateDataInfo(QString::fromStdString(info.version),
+													   QString::fromStdString(info.download_url),
+													   QString::fromStdString(info.release_notes),
+													   QString::fromStdString(info.release_date), this);
+
+						// If silent check and not mandatory update, only emit signal
+						if (silent_check_ && !info.is_mandatory && !config_.silent_mode) {
+							Q_EMIT updateAvailable(data);
+							return;
+						}
+						// If mandatory update or silent mode enabled, start update automatically
+						if (info.is_mandatory || config_.silent_mode) {
+							StartUpdate();
+						}
+						else {
+							// Otherwise just emit signal
+							Q_EMIT updateAvailable(data);
+						}
+					},
+					Qt::QueuedConnection);
 			}
 		}
 
@@ -124,15 +132,28 @@ namespace gdl {
 			QString message = QString::fromStdString(progress.message);
 			auto stage		= static_cast<int>(progress.stage);
 			auto percentage = progress.percentage;
-			auto data		= new UpdateProgressData(stage, percentage, message, this);
-			Q_EMIT updateProgress(data);
+			// 使用 QMetaObject::invokeMethod 确保在主线程中创建对象
+			QMetaObject::invokeMethod(this, [this, stage, percentage, message]() {
+				auto data = new UpdateProgressData(stage, percentage, message, this);
+				Q_EMIT updateProgress(data);
+			}, Qt::QueuedConnection);
+			
 			// 检查更新是否完成
 			if (progress.stage == UpdateProgress::Stage::kFinished) {
-				Q_EMIT updateFinished(true);
+				QMetaObject::invokeMethod(this, [this]() {
+					Q_EMIT updateFinished(true);
+				}, Qt::QueuedConnection);
 			}
 			else if (progress.stage == UpdateProgress::Stage::kFailed) {
-				last_error_ = QString::fromStdString(progress.message);
-				Q_EMIT updateFinished(false);
+				QMetaObject::invokeMethod(this, [this, message]() {
+					last_error_ = message;
+					Q_EMIT updateFinished(false);
+				}, Qt::QueuedConnection);
+			}
+			else if (progress.stage == UpdateProgress::Stage::kInstalling) {
+				QMetaObject::invokeMethod(this, [this]() {
+					updater_->ApplyUpdate();
+				}, Qt::QueuedConnection);
 			}
 		}
 

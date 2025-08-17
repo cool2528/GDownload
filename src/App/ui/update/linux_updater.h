@@ -28,7 +28,7 @@ namespace gdl {
            private:
             void UpdateProgressThread();
             void LogMessages();
-
+            void handleNetworkReply(QNetworkReply* reply, UpdateCheckCallback callback);
             UpdateConfig config_;
             UpdateInfo update_info_;
             ProgressCallback progress_callback_;
@@ -36,7 +36,7 @@ namespace gdl {
             QNetworkAccessManager network_manager_;
             QNetworkReply* current_reply_ = nullptr;
 
-            // libappimageupdate实例
+            // libappimageupdate instance
             std::unique_ptr<appimage::update::Updater> updater_;
             std::thread update_thread_;
             bool update_available_	 = false;

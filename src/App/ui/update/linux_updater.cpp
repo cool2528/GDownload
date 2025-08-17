@@ -2,322 +2,387 @@
 #if defined(__linux__)
 #include <appimage/update.h>
 #include <QCoreApplication>
+#include <QDebug>
 #include <QDir>
+#include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QProcess>
 #include <QStandardPaths>
+#include <QTextStream>
 #include <chrono>
+#include <nlohmann/json.hpp>
 #include <thread>
 
 namespace gdl {
-    namespace update {
+	namespace update {
 
-        LinuxUpdater::LinuxUpdater() = default;
+		LinuxUpdater::LinuxUpdater() = default;
 
-        LinuxUpdater::~LinuxUpdater() {
-            CancelUpdate();
-        }
+		LinuxUpdater::~LinuxUpdater() {
+			CancelUpdate();
+		}
 
-        bool LinuxUpdater::Initialize(const UpdateConfig& config) {
-            config_ = config;
+		bool LinuxUpdater::Initialize(const UpdateConfig& config) {
+			config_ = config;
 
-            // 确保临时目录存在
-            if (config_.temp_dir.empty()) {
-                config_.temp_dir =
-                    QStandardPaths::writableLocation(QStandardPaths::TempLocation).toStdString() + "/GDownloadUpdater";
-            }
+			// Ensure temporary directory exists
+			if (config_.temp_dir.empty()) {
+				config_.temp_dir =
+					QStandardPaths::writableLocation(QStandardPaths::TempLocation).toStdString() + "/GDownloadUpdater";
+			}
 
-            QDir dir(QString::fromStdString(config_.temp_dir));
-            if (!dir.exists() && !dir.mkpath(".")) {
-                last_error_ = "无法创建临时目录: " + config_.temp_dir;
-                return false;
-            }
+			QDir dir(QString::fromStdString(config_.temp_dir));
+			if (!dir.exists() && !dir.mkpath(".")) {
+				last_error_ = "Failed to create temporary directory: " + config_.temp_dir;
+				qCritical() << "Failed to create temporary directory:" << QString::fromStdString(config_.temp_dir);
+				return false;
+			}
+			QString appimage_path = QCoreApplication::applicationFilePath();
 
-            return true;
-        }
+			// Check if we're running in an AppImage
+			if (qEnvironmentVariableIsSet("APPIMAGE")) {
+				appimage_path = qEnvironmentVariable("APPIMAGE");
+			}
 
-        void LinuxUpdater::CheckForUpdates(UpdateCheckCallback callback) {
-            if (update_in_progress_) {
-                if (callback) {
-                    callback(false, UpdateInfo{});
-                }
-                return;
-            }
+			if (!updater_) {
+				updater_ = std::make_unique<appimage::update::Updater>(appimage_path.toStdString());
+			}
 
-            // 获取当前AppImage路径
-            QString appimage_path = QCoreApplication::applicationFilePath();
+			return true;
+		}
 
-            // 如果是AppImage，使用libappimageupdate检查更新
-            try {
-                // 创建updater实例
-                if (!updater_){
-                    updater_ = std::make_unique<appimage::update::Updater>(appimage_path.toStdString());
-                }
+		void LinuxUpdater::handleNetworkReply(QNetworkReply* reply, UpdateCheckCallback callback) {
+			if (!reply) {
+				last_error_ = "Network reply is nullptr";
+				if (callback) {
+					callback(false, UpdateInfo{});
+				}
+			}
+			auto error = reply->error();
+			if (error != QNetworkReply::NoError) {
+				last_error_ = reply->errorString().toStdString();
+				if (callback) {
+					callback(false, UpdateInfo{});
+				}
+				return;
+			}
 
-                // 检查更新
-                bool update_available = false;
-                if (!updater_->checkForChanges(update_available)) {
-                    // 记录错误信息
-                    std::string message;
-                    while (updater_->nextStatusMessage(message)) {
-                        last_error_ += message + "\n";
-                    }
+			QString appimage_path = QCoreApplication::applicationFilePath();
 
-                    if (callback) {
-                        callback(false, UpdateInfo{});
-                    }
-                    return;
-                }
+			// Check if we're running in an AppImage
+			if (qEnvironmentVariableIsSet("APPIMAGE")) {
+				appimage_path = qEnvironmentVariable("APPIMAGE");
+			}
 
-                update_available_ = update_available;
+			QByteArray data = reply->readAll();
+			try {
 
-                if (update_available) {
-                    // 填充更新信息
-                    update_info_.version	   = "新版本";	// AppImageUpdate不提供版本信息
-                    update_info_.download_url  = "";		// 由AppImageUpdate内部处理
-                    update_info_.release_notes = "";		// AppImageUpdate不提供发布说明
-                    update_info_.is_mandatory  = false;
+				nlohmann::json doc = nlohmann::json::parse(data.toStdString());
+				UpdateInfo info;
+				if (!doc.contains("tag_name")) {
+					last_error_ = "Invalid update info";
+					if (callback) {
+						callback(false, UpdateInfo{});
+					}
+					return;
+				}
+				QString tag_name	 = QString::fromStdString(doc["tag_name"].get<std::string>());
+				tag_name			 = tag_name.replace("v", "");
+				info.version		 = tag_name.toStdString();
+				QString published_at = QString::fromStdString(doc["published_at"].get<std::string>());
+				info.release_date =
+					QDateTime::fromString(published_at, Qt::ISODate).toString("yyyy-MM-dd hh:mm:ss").toStdString();
+				info.release_notes = doc["body"].get<std::string>();
+				if (doc.contains("assets") && doc["assets"].is_array()) {
+					for (auto asset : doc["assets"]) {
+						if (asset.contains("browser_download_url") && asset.contains("name")) {
+							const auto name = asset["name"].get<std::string>();
+							if (name.find(".AppImage") == std::string::npos) {
+								continue;
+							}
+							info.download_url = asset["browser_download_url"].get<std::string>();
+							info.package_size = asset["size"].get<int64_t>();
+							break;
+						}
+					}
+					update_info_ = info;
+				}
+				bool update_available = false;
+				if (!updater_->checkForChanges(update_available)) {
+					// Log error messages
+					std::string message;
+					while (updater_->nextStatusMessage(message)) {
+						last_error_ += message + "\n";
+						qWarning() << "Update check error:" << QString::fromStdString(message);
+					}
 
-                    // 获取更多信息
-                    std::string message;
-                    while (updater_->nextStatusMessage(message)) {
-                        update_info_.release_notes += message + "\n";
-                    }
-                }
+					if (callback) {
+						callback(false, UpdateInfo{});
+					}
+					return;
+				}
+				update_available_ = update_available;
+				if (update_available) {
+					std::string message;
+					while (updater_->nextStatusMessage(message)) {
+						qInfo() << "Update info:" << QString::fromStdString(message);
+					}
+				}
+				if (callback) {
+					callback(update_available, update_info_);
+				}
 
-                if (callback) {
-                    callback(update_available, update_info_);
-                }
-            } catch (const std::exception& e) {
-                last_error_ = std::string("检查更新失败: ") + e.what();
-                if (callback) {
-                    callback(false, UpdateInfo{});
-                }
-            }
-        }
+			} catch (std::exception& e) {
+				last_error_ = e.what();
+				if (callback) {
+					callback(false, UpdateInfo{});
+				}
+				return;
+			}
+		}
+		void LinuxUpdater::CheckForUpdates(UpdateCheckCallback callback) {
+			QNetworkRequest request(QUrl(QString::fromStdString(config_.update_url)));
+			request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+			for (const auto& header : request_headers_) {
+				request.setRawHeader(header.first.c_str(), header.second.c_str());
+			}
+			auto reply = network_manager_.get(request);
+			if (!reply) {
+				last_error_ = "Failed to create network request";
+				return;
+			}
+			QObject::connect(reply, &QNetworkReply::finished, [this, reply, callback]() {
+				this->handleNetworkReply(reply, callback);
+				reply->deleteLater();
+			});
+		}
 
-        bool LinuxUpdater::StartUpdate(ProgressCallback progress_callback) {
-            if (!update_available_ || update_in_progress_) {
-                last_error_ = "没有可用更新或更新已在进行中";
-                return false;
-            }
+		bool LinuxUpdater::StartUpdate(ProgressCallback progress_callback) {
+			if (!update_available_ || update_in_progress_) {
+				last_error_ = "No available update or update already in progress";
+				qWarning() << "StartUpdate failed:" << QString::fromStdString(last_error_);
+				return false;
+			}
 
-            progress_callback_	= progress_callback;
-            update_in_progress_ = true;
-            should_stop_thread_ = false;
+			progress_callback_	= progress_callback;
+			update_in_progress_ = true;
+			should_stop_thread_ = false;
 
-            // 获取当前AppImage路径
-            QString appimage_path = QCoreApplication::applicationFilePath();
+			// Get current AppImage path
+			QString appimage_path = QCoreApplication::applicationFilePath();
 
-            // 检查是否是AppImage
-            if (!appimage_path.contains(".AppImage")) {
-                last_error_			= "当前应用不是AppImage格式，无法使用AppImageUpdate更新";
-                update_in_progress_ = false;
-                return false;
-            }
+			// Check if we're running in an AppImage
+			if (qEnvironmentVariableIsSet("APPIMAGE")) {
+				appimage_path = qEnvironmentVariable("APPIMAGE");
+			}
 
-            try {
-                // 如果updater_为空，创建一个新实例
-                if (!updater_) {
-                    updater_ = std::make_unique<appimage::update::Updater>(appimage_path.toStdString());
-                }
+			// Check if it's an AppImage
+			if (!appimage_path.contains(".AppImage")) {
+				last_error_			= "Current application is not in AppImage format, cannot use AppImageUpdate";
+				update_in_progress_ = false;
+				qCritical() << "StartUpdate failed:" << QString::fromStdString(last_error_);
+				return false;
+			}
 
-                // 启动更新线程
-                update_thread_ = std::thread([this]() {
-                    // 启动更新
-                    updater_->start();
+			try {
+				// If updater_ is null, create a new instance
+				if (!updater_) {
+					updater_ = std::make_unique<appimage::update::Updater>(appimage_path.toStdString());
+				}
 
-                    // 监控更新进度
-                    UpdateProgressThread();
-                });
+				// Start update thread
+				update_thread_ = std::thread([this]() {
+					try {
+						// Start update
+						updater_->start();
 
-                return true;
-            } catch (const std::exception& e) {
-                last_error_			= std::string("启动更新失败: ") + e.what();
-                update_in_progress_ = false;
-                return false;
-            }
-        }
+						// Monitor update progress
+						UpdateProgressThread();
+					} catch (const std::exception& e) {
+						qCritical() << "Exception in update thread:" << e.what();
+						last_error_			= std::string("Update thread error: ") + e.what();
+						update_in_progress_ = false;
 
-        void LinuxUpdater::UpdateProgressThread() {
-            // 监控更新进度，直到完成或被取消
-            while (!updater_->isDone() && !should_stop_thread_) {
-                // 避免CPU占用过高
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+						if (progress_callback_) {
+							UpdateProgress progress;
+							progress.stage		= UpdateProgress::Stage::kFailed;
+							progress.percentage = 0;
+							progress.message	= "Update failed: " + std::string(e.what());
+							progress_callback_(progress);
+						}
+					}
+				});
 
-                // 获取进度
-                double progress = 0.0;
-                if (updater_->progress(progress)) {
-                    if (progress_callback_) {
-                        UpdateProgress update_progress;
+				return true;
+			} catch (const std::exception& e) {
+				last_error_			= std::string("Failed to start update: ") + e.what();
+				update_in_progress_ = false;
+				qCritical() << "StartUpdate failed:" << e.what();
+				return false;
+			}
+		}
 
-                        // 根据进度确定阶段
-                        if (progress < 0.5) {
-                            update_progress.stage = UpdateProgress::Stage::kDownloading;
-                        }
-                        else if (progress < 0.75) {
-                            update_progress.stage = UpdateProgress::Stage::kExtracting;
-                        }
-                        else if (progress < 0.9) {
-                            update_progress.stage = UpdateProgress::Stage::kVerifying;
-                        }
-                        else {
-                            update_progress.stage = UpdateProgress::Stage::kInstalling;
-                        }
+		void LinuxUpdater::UpdateProgressThread() {
+			// Monitor update progress until completion or cancellation
+			while (!updater_->isDone() && !should_stop_thread_) {
+				// Avoid high CPU usage
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				// Get progress
+				double progress = 0.0;
+				if (updater_->progress(progress)) {
+					if (progress_callback_) {
+						UpdateProgress update_progress;
+						update_progress.percentage = static_cast<int>(progress * 100);
+						// Get status message
+						std::string message;
+						if (updater_->nextStatusMessage(message)) {
+							update_progress.message = message;
+							qInfo() << "Update progress:" << QString::fromStdString(message);
+						}
+						else {
+							update_progress.stage = UpdateProgress::Stage::kDownloading;
+							update_progress.message =
+								"Downloading update package: " + std::to_string(update_progress.percentage);
+						}
+						progress_callback_(update_progress);
+					}
+				}
 
-                        update_progress.percentage = static_cast<int>(progress * 100);
+				// Log all messages
+				LogMessages();
+			}
 
-                        // 获取状态消息
-                        std::string message;
-                        if (updater_->nextStatusMessage(message)) {
-                            update_progress.message = message;
-                        }
-                        else {
-                            // 如果没有新消息，使用默认消息
-                            switch (update_progress.stage) {
-                                case UpdateProgress::Stage::kDownloading:
-                                    update_progress.message = "正在下载更新...";
-                                    break;
-                                case UpdateProgress::Stage::kExtracting:
-                                    update_progress.message = "正在解压更新...";
-                                    break;
-                                case UpdateProgress::Stage::kVerifying:
-                                    update_progress.message = "正在验证更新...";
-                                    break;
-                                case UpdateProgress::Stage::kInstalling:
-                                    update_progress.message = "正在安装更新...";
-                                    break;
-                                default:
-                                    update_progress.message = "正在更新...";
-                                    break;
-                            }
-                        }
+			// Update completed, check for errors
+			if (!should_stop_thread_) {
+				if (updater_->hasError()) {
+					qCritical() << "Update failed with error";
+					if (progress_callback_) {
+						UpdateProgress progress;
+						progress.stage		= UpdateProgress::Stage::kFailed;
+						progress.percentage = 0;
 
-                        progress_callback_(update_progress);
-                    }
-                }
+						// Get error message
+						std::string message;
+						if (updater_->nextStatusMessage(message)) {
+							progress.message = "Update failed: " + message;
+							qCritical() << "Update error:" << QString::fromStdString(message);
+						}
+						else {
+							progress.message = "Update failed";
+							qCritical() << "Update failed with no specific error message";
+						}
 
-                // 记录所有消息
-                LogMessages();
-            }
+						progress_callback_(progress);
+					}
+				}
+				else {
+					qInfo() << "Update completed successfully";
+					if (progress_callback_) {
+						UpdateProgress progress;
+						progress.stage		= UpdateProgress::Stage::kInstalling;
+						progress.percentage = 100;
+						progress.message	= "Update completed, preparing to apply update";
+						progress_callback_(progress);
+					}
+				}
+			}
 
-            // 更新完成，检查是否有错误
-            if (!should_stop_thread_) {
-                if (updater_->hasError()) {
-                    if (progress_callback_) {
-                        UpdateProgress progress;
-                        progress.stage		= UpdateProgress::Stage::kFailed;
-                        progress.percentage = 0;
+			update_in_progress_ = false;
+		}
 
-                        // 获取错误消息
-                        std::string message;
-                        if (updater_->nextStatusMessage(message)) {
-                            progress.message = "更新失败: " + message;
-                        }
-                        else {
-                            progress.message = "更新失败";
-                        }
+		void LinuxUpdater::LogMessages() {
+			// Log all messages
+			std::string message;
+			while (updater_->nextStatusMessage(message)) {
+				if (!message.empty()) {
+					last_error_ += message + "\n";
+					qInfo() << "Update message:" << QString::fromStdString(message);
+				}
+			}
+		}
 
-                        progress_callback_(progress);
-                    }
-                }
-                else {
-                    if (progress_callback_) {
-                        UpdateProgress progress;
-                        progress.stage		= UpdateProgress::Stage::kFinished;
-                        progress.percentage = 100;
-                        progress.message	= "更新完成，准备应用更新";
-                        progress_callback_(progress);
-                    }
-                }
-            }
+		void LinuxUpdater::CancelUpdate() {
+			if (current_reply_) {
+				current_reply_->abort();
+				current_reply_->deleteLater();
+				current_reply_ = nullptr;
+			}
 
-            update_in_progress_ = false;
-        }
+			// Mark that the thread should stop
+			should_stop_thread_ = true;
 
-        void LinuxUpdater::LogMessages() {
-            // 记录所有消息
-            std::string message;
-            while (updater_->nextStatusMessage(message)) {
-                // 在实际应用中，可能需要将这些消息记录到日志文件
-                // 这里简单地将它们添加到last_error_
-                if (!message.empty()) {
-                    last_error_ += message + "\n";
-                }
-            }
-        }
+			// Wait for thread to finish
+			if (update_thread_.joinable()) {
+				update_thread_.join();
+			}
 
-        void LinuxUpdater::CancelUpdate() {
-            if (current_reply_) {
-                current_reply_->abort();
-                current_reply_->deleteLater();
-                current_reply_ = nullptr;
-            }
+			update_in_progress_ = false;
+			qInfo() << "Update cancelled";
+		}
 
-            // 标记线程应该停止
-            should_stop_thread_ = true;
+		bool LinuxUpdater::ApplyUpdate(bool restart_app) {
+			if (!updater_ || updater_->hasError()) {
+				last_error_ = "No prepared update package or error occurred during update process";
+				qCritical() << "ApplyUpdate failed:" << QString::fromStdString(last_error_);
+				return false;
+			}
 
-            // 等待线程结束
-            if (update_thread_.joinable()) {
-                update_thread_.join();
-            }
+			// Get new file path
+			std::string new_file_path;
+			if (!updater_->pathToNewFile(new_file_path) || new_file_path.empty()) {
+				last_error_ = "Failed to get updated AppImage path";
+				qCritical() << "ApplyUpdate failed:" << QString::fromStdString(last_error_);
+				return false;
+			}
 
-            update_in_progress_ = false;
-        }
+			if (progress_callback_) {
+				UpdateProgress progress;
+				progress.stage		= UpdateProgress::Stage::kInstalling;
+				progress.percentage = 100;
+				progress.message	= "Preparing to apply update...";
+				progress_callback_(progress);
+			}
 
-        bool LinuxUpdater::ApplyUpdate(bool restart_app) {
-            if (!updater_ || updater_->hasError()) {
-                last_error_ = "没有准备好的更新包或更新过程中出现错误";
-                return false;
-            }
+			// Ensure new file exists
+			if (!QFile::exists(QString::fromStdString(new_file_path))) {
+				last_error_ = "Updated AppImage file does not exist";
+				qCritical() << "ApplyUpdate failed:" << QString::fromStdString(last_error_);
+				return false;
+			}
 
-            // 获取新文件路径
-            std::string new_file_path;
-            if (!updater_->pathToNewFile(new_file_path) || new_file_path.empty()) {
-                last_error_ = "无法获取更新后的AppImage路径";
-                return false;
-            }
+			// Set executable permissions
+			QFile file(QString::fromStdString(new_file_path));
+			if (!file.setPermissions(file.permissions() | QFile::ExeOwner | QFile::ExeUser | QFile::ExeGroup |
+									 QFile::ExeOther)) {
+				last_error_ = "Failed to set executable permissions on updated AppImage";
+				qCritical() << "ApplyUpdate failed:" << QString::fromStdString(last_error_);
+				return false;
+			}
 
-            if (progress_callback_) {
-                UpdateProgress progress;
-                progress.stage		= UpdateProgress::Stage::kInstalling;
-                progress.percentage = 95;
-                progress.message	= "准备应用更新...";
-                progress_callback_(progress);
-            }
+			qInfo() << "Update applied successfully, new file path:" << QString::fromStdString(new_file_path);
 
-            // 确保新文件存在
-            if (!QFile::exists(QString::fromStdString(new_file_path))) {
-                last_error_ = "更新后的AppImage文件不存在";
-                return false;
-            }
+			if (restart_app) {
+				// Start new version
+				qInfo() << "Starting new version and quitting current application";
+				QProcess::startDetached(QString::fromStdString(new_file_path), QStringList());
 
-            // 设置可执行权限
-            QFile file(QString::fromStdString(new_file_path));
-            file.setPermissions(file.permissions() | QFile::ExeOwner | QFile::ExeUser | QFile::ExeGroup |
-                                QFile::ExeOther);
+				// Quit current application
+				QCoreApplication::quit();
+			}
 
-            if (restart_app) {
-                // 启动新版本
-                QProcess::startDetached(QString::fromStdString(new_file_path), QStringList());
+			if (progress_callback_) {
+				UpdateProgress progress;
+				progress.stage		= UpdateProgress::Stage::kFinished;
+				progress.percentage = 100;
+				progress.message	= "Update completed";
+				progress_callback_(progress);
+			}
 
-                // 退出当前应用
-                QCoreApplication::quit();
-            }
+			return true;
+		}
 
-            if (progress_callback_) {
-                UpdateProgress progress;
-                progress.stage		= UpdateProgress::Stage::kFinished;
-                progress.percentage = 100;
-                progress.message	= "更新完成";
-                progress_callback_(progress);
-            }
-
-            return true;
-        }
-
-    }  // namespace update
+	}  // namespace update
 }  // namespace gdl
 #endif

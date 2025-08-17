@@ -15,7 +15,6 @@ Popup {
     property string versionNumber: ""
     property string releaseNotes: ""
     property bool updating: false
-    
     // 背景设置
     background: Rectangle {
         color: GTheme.dark ? "#2e2e2e" : "#ffffff"
@@ -134,6 +133,11 @@ Popup {
                     }
                 }
             }
+            Text {
+                id: updateTip
+                font.pixelSize: 14
+                color: GTheme.dark ? "#ffffff" : "#3b3b3b"
+            }
         }
     }
 
@@ -154,18 +158,22 @@ Popup {
             updateProgressBar.value = progress.percentage
 
             // 如果更新完成，关闭对话框
-            // stage 0 = 检查更新 1 = 下载更新 2 = 解压更新 3 = 验证更新 4 = 安装更新 5 = 更新完成 6 = 更新失败
+            // stage 0 = 检查更新 1 = 下载更新 2 = 解压更新 3 = 验证更新 4 = 安装更新 5 = 下载完成 6 = 更新失败
             if (progress.stage === 5) {
                 updating = false
                 updateDialog.close()
+            }else if(progress.stage ===  6){
+                ToastManager.ShowError(progress.message)
+            }else if(progress.stage ===  4){
+                ToastManager.ShowInfo(progress.message)
             }
+
+            updateTip.text = progress.message
         }
 
         function onUpdateFinished(success) {
             updating = false
-            if (!success) {
-
-            }
+            console.log("update stage ",success)
         }
     }
 

@@ -77,8 +77,14 @@ jobs:
           # 先获取当前目录下生成的 appimage 文件名
           APPIMAGE_NAME=$(ls ${{ github.workspace }}/*.AppImage)
           echo "APPIMAGE_NAME: $APPIMAGE_NAME"
-          # install 已经做了打包 这里只需要生成zsync文件
-          appimagetool -u "gh-releases-zsync|cool2528|GDownload|latest|gdownload-*.AppImage.zsync" ${{ github.workspace }}/linux_package $APPIMAGE_NAME
+          # 检查文件如果存在则不执行下面的命令
+          if [ -f "${{ github.workspace }}/linux_package/gdownload.desktop" ]; then
+            echo "gdownload.desktop already exists, skip"
+          else
+            # install 已经做了打包 这里只需要生成zsync文件
+            appimagetool -u "gh-releases-zsync|cool2528|GDownload|latest|gdownload-*.AppImage.zsync" ${{ github.workspace }}/linux_package $APPIMAGE_NAME
+          fi
+          
           
       - name: Upload Release
         if: startsWith(github.event.ref, 'refs/tags/')
@@ -88,3 +94,5 @@ jobs:
           file_glob: true
           file:  ${{ github.workspace }}/gdownload-*.AppImag*
           overwrite: true 
+          body: |
+            ${{ github.event.head_commit.message }}

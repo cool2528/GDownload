@@ -45,16 +45,16 @@ namespace gdl {
             bool Initialize(const UpdateConfig& config);
 
             // 手动检查更新
-            void CheckForUpdates(bool silent = false);
+		  Q_INVOKABLE void CheckForUpdates(bool silent = false);
 
             // 开始安装更新
-            bool StartUpdate();
+           Q_INVOKABLE bool StartUpdate();
 
             // 取消更新
-            void CancelUpdate();
+		   Q_INVOKABLE void CancelUpdate();
 
             // 获取最后一次错误
-            QString GetLastError() const;
+		   Q_INVOKABLE QString GetLastError() const;
 
             // 设置自定义HTTP请求头
             void SetRequestHeaders(const std::map<std::string, std::string>& headers);

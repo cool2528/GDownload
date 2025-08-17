@@ -85,6 +85,8 @@ jobs:
           file_glob: true
           file: build/release/GDownloader_windows_*.exe
           overwrite: true
+          body: |
+            ${{ github.event.head_commit.message }}
 
 
 

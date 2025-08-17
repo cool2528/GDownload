@@ -67,3 +67,5 @@ jobs:
           file_glob: true
           file: macos_package/*
           overwrite: true
+          body: |
+            ${{ github.event.head_commit.message }}

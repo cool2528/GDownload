@@ -4,7 +4,7 @@ import gdl.sdk
 
 ComboBox {
     id: control
-    property int maxPopHeight: 0
+    property int maxPopHeight: 200
     delegate: ItemDelegate {
         width: control.width
         contentItem: Text {
