@@ -543,22 +543,22 @@ GDownload는 기술에 대한 열정을 가진 개발자들이 관리하는 오�
 <context>
     <name>UpdateDialog</name>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="39"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="38"/>
         <source>New Version</source>
         <translation>새 버전</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="50"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="49"/>
         <source>Go to Download</source>
         <translation>다운로드로 이동</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="115"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="114"/>
         <source>Cancel</source>
         <translation>취소</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="125"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="124"/>
         <source>update</source>
         <translation>업데이트</translation>
     </message>

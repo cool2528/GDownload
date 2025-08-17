@@ -161,7 +161,7 @@ namespace gdl {
                 // File exists and size matches, skip download
                 if (progress_callback_) {
                     UpdateProgress progress;
-                    progress.stage		= UpdateProgress::Stage::kFinished;
+                    progress.stage		= UpdateProgress::Stage::kInstalling;
                     progress.percentage = 100;
                     progress.message	= "Using already downloaded update package";
                     progress_callback_(progress);
@@ -213,7 +213,7 @@ namespace gdl {
             }
 
             // Connect signals
-            QObject::connect(reply, &QNetworkReply::readyRead, [&]() {
+			QObject::connect(reply, &QNetworkReply::readyRead, [this, reply]() {
                 if (download_file_.isOpen() && reply) {
                     download_file_.write(reply->readAll());
                 }
@@ -221,7 +221,7 @@ namespace gdl {
 
             QObject::connect(
                 reply, &QNetworkReply::downloadProgress,
-                [this, downloaded_bytes](qint64 bytesReceived, qint64 bytesTotal) {
+				[this, downloaded_bytes, reply](qint64 bytesReceived, qint64 bytesTotal) {
                     if (!progress_callback_) return;
 
                     // Calculate actual progress (considering resume)
@@ -238,7 +238,7 @@ namespace gdl {
                     progress_callback_(progress);
                 });
 
-            QObject::connect(reply, &QNetworkReply::finished, [&]() {
+            QObject::connect(reply, &QNetworkReply::finished, [this, reply]() {
                 if (download_file_.isOpen()) {
                     download_file_.close();
                 }
@@ -256,7 +256,6 @@ namespace gdl {
                     }
 
                     reply->deleteLater();
-                    reply = nullptr;
                     return;
                 }
 
@@ -275,21 +274,19 @@ namespace gdl {
                     }
 
                     reply->deleteLater();
-                    reply = nullptr;
                     return;
                 }
 
                 // Download complete
                 if (progress_callback_) {
                     UpdateProgress progress;
-                    progress.stage		= UpdateProgress::Stage::kFinished;
+					progress.stage		= UpdateProgress::Stage::kInstalling;
                     progress.percentage = 100;
-                    progress.message	= "Update package download complete";
+					progress.message = "Download complete, ready to start updating";
                     progress_callback_(progress);
                 }
 
                 reply->deleteLater();
-                reply = nullptr;
             });
 
             // Report download start
@@ -334,19 +331,51 @@ namespace gdl {
                 progress_callback_(progress);
             }
 
-            // Build installer command line arguments
-            QStringList arguments;
-            arguments << "/SILENT";	 // Silent install, only show progress bar
-
-            if (restart_app) {
-                arguments << "/RESTARTAPPLICATIONS";  // Restart application after install
-            }
-            else {
-                arguments << "/NORESTART";	// Don't restart application
-            }
-
-            // Launch installer
-
+            // Launch the installer
+			QProcess installer;
+			installer.setProgram(update_package_path_);
+			installer.setArguments(QStringList() << "/S");	// Silent install
+			installer.setProcessChannelMode(QProcess::MergedChannels);
+			installer.start();
+			UpdateProgress progress;
+			if (!installer.waitForStarted()) {
+				last_error_ = "Failed to start installer: " + update_package_path_.toStdString();
+				progress.stage = UpdateProgress::Stage::kFailed;
+				progress.message = last_error_;
+				progress.message = last_error_;
+				if (progress_callback_) {
+					progress.percentage = 100;
+					progress_callback_(progress);
+				}
+				return false;
+			}
+			if (!installer.waitForFinished()) {
+				last_error_ = "Installer did not finish: " + update_package_path_.toStdString();
+				progress.stage = UpdateProgress::Stage::kFailed;
+				progress.message = last_error_;
+				progress.message = last_error_;
+				if (progress_callback_) {
+					progress.percentage = 100;
+					progress_callback_(progress);
+				}
+				return false;
+			}
+			if (installer.exitCode() != 0) {
+				last_error_ = "Installer failed with exit code: " + std::to_string(installer.exitCode());
+				progress.stage = UpdateProgress::Stage::kFailed;
+				progress.message = last_error_;
+				if (progress_callback_) {
+					progress.percentage = 100;
+					progress_callback_(progress);
+				}
+				return false;
+			}
+			if (progress_callback_) {
+				progress.percentage = 100;
+				progress.stage		= UpdateProgress::Stage::kFinished;
+				progress.message	= "Update installed successfully";
+				progress_callback_(progress);
+			}
             return true;
         }
 

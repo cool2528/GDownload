@@ -544,22 +544,22 @@ Copyright © 2024 GDownload 团队
 <context>
     <name>UpdateDialog</name>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="39"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="38"/>
         <source>New Version</source>
         <translation>新版本</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="50"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="49"/>
         <source>Go to Download</source>
         <translation>前往下载</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="115"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="114"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="125"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="124"/>
         <source>update</source>
         <translation>更新</translation>
     </message>
