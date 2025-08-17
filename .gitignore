@@ -141,3 +141,9 @@ CMakeUserPresets.json
 !extra/win32/x64/engine/aria2c.exe
 src/version.h
 .vs/*
+
+#version file
+src/version.h
+
+#translations files
+src/App/ui/Resource/translations/*.qm

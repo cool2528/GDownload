@@ -75,16 +75,12 @@ namespace gd {
 			gdl::update::UpdateConfig update_config;
 			update_config.current_version	 = GDownload_VERSION_STRING;
 			update_config.disable_auto_check = gdl::ui::settings::Settings::Instance().GetEnableAutoUpdate();
-#if defined(_WIN32) || defined(_WIN64)
 			update_config.update_url = "https://api.github.com/repos/cool2528/gdownload/releases/latest";
 			std::map<std::string, std::string> headers;
 			headers["Content-Type"] = "application/json";
 			headers["User-Agent"]	= "GDownloader-Update-Client";
 			headers["Accept"]				= "application/vnd.github.v3+json";
 			gdl::update::UpdateManager::Instance().SetRequestHeaders(headers);
-#elif defined(__linux__)
-#elif defined(__APPLE__)
-#endif
 			gdl::update::UpdateManager::Instance().Initialize(update_config);
             gdl::ui::netdisk::RegisterTypes(engine);
 		}

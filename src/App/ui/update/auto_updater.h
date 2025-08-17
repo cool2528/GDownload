@@ -8,16 +8,16 @@
 namespace gdl {
     namespace update {
 
-        // 更新进度信息
+        // Update progress information
         struct UpdateProgress {
             enum class Stage {
-                kChecking,	   // 检查更新
-                kDownloading,  // 下载更新
-                kExtracting,   // 解压更新
-                kVerifying,	   // 验证更新
-                kInstalling,   // 安装更新
-                kFinished,	   // 更新完成
-                kFailed		   // 更新失败
+                kChecking,	   // Checking for updates
+                kDownloading,  // Downloading update
+                kExtracting,   // Extracting update
+                kVerifying,	   // Verifying update
+                kInstalling,   // Installing update
+                kFinished,	   // Update completed
+                kFailed		   // Update failed
             };
 
             Stage stage	   = Stage::kChecking;
@@ -25,30 +25,30 @@ namespace gdl {
             std::string message;
         };
 
-        // 更新配置
+        // Update configuration
         struct UpdateConfig {
-            std::string update_url;			   // 更新服务器URL
-            std::string current_version;	   // 当前版本号
-            std::string temp_dir;			   // 临时文件目录
-            bool allow_beta			 = false;  // 是否接受beta版本
-            int check_interval_hours = 24;	   // 自动检查间隔(小时)
-            bool silent_mode		 = false;  // 静默更新模式
-            bool disable_auto_check	 = false;  // 禁用自动检查
+            std::string update_url;			   // Update server URL
+            std::string current_version;	   // Current version number
+            std::string temp_dir;			   // Temporary file directory
+            bool allow_beta			 = false;  // Whether to accept beta versions
+            int check_interval_hours = 24;	   // Auto check interval (hours)
+            bool silent_mode		 = false;  // Silent update mode
+            bool disable_auto_check	 = false;  // Disable automatic check
         };
 
-        // 更新信息
+        // Update information
         struct UpdateInfo {
-            std::string version;					 // 新版本号
-            std::string download_url;				 // 下载地址
-            std::string release_notes;				 // 发布说明
-            std::string release_date;				 // 发布日期
-            bool is_mandatory	 = false;			 // 是否强制更新
-            int64_t package_size = 0;				 // 包大小(字节)
-            std::string signature;					 // 包签名(用于验证)
-            std::vector<std::string> changed_files;	 // 变更文件列表
+            std::string version;					 // New version number
+            std::string download_url;				 // Download URL
+            std::string release_notes;				 // Release notes
+            std::string release_date;				 // Release date
+            bool is_mandatory	 = false;			 // Whether the update is mandatory
+            int64_t package_size = 0;				 // Package size (bytes)
+            std::string signature;					 // Package signature (for verification)
+            std::vector<std::string> changed_files;	 // List of changed files
         };
 
-        // 自动更新基类
+        // Auto updater base class
         class AutoUpdater {
            public:
             using ProgressCallback	  = std::function<void(const UpdateProgress&)>;
@@ -56,30 +56,30 @@ namespace gdl {
 
             virtual ~AutoUpdater() = default;
 
-            // 初始化更新器
+            // Initialize the updater
             virtual bool Initialize(const UpdateConfig& config) = 0;
 
-            // 检查更新
+            // Check for updates
             virtual void CheckForUpdates(UpdateCheckCallback callback) = 0;
 
-            // 开始下载并安装更新
+            // Start downloading and installing updates
             virtual bool StartUpdate(ProgressCallback progress_callback) = 0;
 
-            // 取消正在进行的更新
+            // Cancel ongoing update
             virtual void CancelUpdate() = 0;
 
-            // 应用已下载的更新(可能需要重启)
+            // Apply downloaded update (may require restart)
             virtual bool ApplyUpdate(bool restart_app = true) = 0;
 
-            // 设置自定义HTTP请求头
+            // Set custom HTTP request headers
             virtual void SetRequestHeaders(const std::map<std::string, std::string>& headers) {
                 request_headers_ = headers;
             }
 
-            // 获取最后一次错误
+            // Get the last error
             virtual std::string GetLastError() const { return last_error_; }
 
-            // 创建平台特定的更新器实例
+            // Create platform-specific updater instance
             static std::unique_ptr<AutoUpdater> Create();
 
            protected:

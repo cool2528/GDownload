@@ -543,22 +543,22 @@ Apache License 2.0でライセンスされています
 <context>
     <name>UpdateDialog</name>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="39"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="38"/>
         <source>New Version</source>
         <translation>新バージョン</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="50"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="49"/>
         <source>Go to Download</source>
         <translation>ダウンロード</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="115"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="114"/>
         <source>Cancel</source>
         <translation>キャンセル</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="125"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="124"/>
         <source>update</source>
         <translation>アップデート</translation>
     </message>
