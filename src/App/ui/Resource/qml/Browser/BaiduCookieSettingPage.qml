@@ -3,20 +3,19 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import "../CommonComponents"
 import gdl.sdk
-Rectangle{
+GCard{
     id:baiduCookieManager
     Layout.margins: 10
     Layout.fillWidth: true
     Layout.preferredHeight: 80
-    color: "transparent"
-    border.color: "#409EFF"
-    border.width: 1
+    outlined: true
+    padding: 10
     RowLayout{
         spacing: 10
         anchors.fill: parent
         Label{
             text: qsTr("Baidu Cookie")
-            color: GTheme.dark ?  "#FFFFFF" : "#3b3b3b"
+            color: GTheme.textPrimary
             font.pixelSize: 14
             Layout.preferredWidth: 100
             Layout.leftMargin: 10

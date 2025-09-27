@@ -23,22 +23,22 @@
 <context>
     <name>BaiduCookieSettingPage</name>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="18"/>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="17"/>
         <source>Baidu Cookie</source>
         <translation>百度クッキー</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="28"/>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="27"/>
         <source>Please enter Baidu Cookie</source>
         <translation>百度クッキーを入力してください</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="34"/>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="33"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="42"/>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="41"/>
         <source>Save Baidu Cokies Succeed</source>
         <translation>Baidu.comクッキーの保存に成功しました</translation>
     </message>
@@ -46,47 +46,47 @@
 <context>
     <name>BasicSettingPage</name>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="37"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="42"/>
         <source>Language</source>
         <translation>言語</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="68"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="84"/>
         <source>Auto Update</source>
         <translation>自動更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="81"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="97"/>
         <source>Open at Login</source>
         <translation>起動時自動開始</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="95"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="111"/>
         <source>Remember Window Position</source>
         <translation>ウィンドウ位置を記憶</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="108"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="124"/>
         <source>Auto Resume Unfinished Download</source>
         <translation>未完了のダウンロードを自動再開</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="122"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="145"/>
         <source>Download Path</source>
         <translation>ダウンロードパス</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="149"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="179"/>
         <source>Enable Global Proxy</source>
         <translation>グローバルプロキシを有効にする</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="180"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="213"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="194"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="232"/>
         <source>Auto Listen Clipboard Link</source>
         <translation>クリップボードリンクを自動でリッスン</translation>
     </message>
@@ -112,22 +112,22 @@
 <context>
     <name>DownloadPageView</name>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="22"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="30"/>
         <source>Task</source>
         <translation>タスク</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="57"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="65"/>
         <source>Downloading</source>
         <translation>ダウンロード中</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="73"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="81"/>
         <source>Waiting</source>
         <translation>待機中</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="89"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="97"/>
         <source>Stopped</source>
         <translation>停止しました</translation>
     </message>
@@ -158,7 +158,7 @@
 <context>
     <name>GDownloadViewPage</name>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="256"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="253"/>
         <source>Remaining </source>
         <translation>残り</translation>
     </message>
@@ -174,27 +174,27 @@
 <context>
     <name>HelpDialog</name>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="79"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="75"/>
         <source>Sponsorship</source>
         <translation>スポンサーシップ</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="79"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="75"/>
         <source>License</source>
         <translation>ライセンス</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="79"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="75"/>
         <source>About</source>
         <translation>アバウト</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="135"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="127"/>
         <source>If you like GDownloader, you can sponsor us on the following platforms:</source>
         <translation>GDownloader を気に入っていただけましたら、以下のプラットフォームでスポンサーになることができます:</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="166"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="158"/>
         <source># About GDownload
 
 GDownload is a cross-platform download manager built with C++ and Qt. It combines modern technology stack and excellent open-source components to provide users with an efficient and stable downloading experience.
@@ -411,22 +411,22 @@ Apache License 2.0でライセンスされています
 <context>
     <name>SettingsPageView</name>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="22"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="30"/>
         <source>Preferences</source>
         <translation>プリファレンス</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="58"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="66"/>
         <source>Basic</source>
         <translation>基本設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="74"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="82"/>
         <source>Advanced</source>
         <translation>詳細設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="90"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="98"/>
         <source>Lab</source>
         <translation>ラボ機能</translation>
     </message>
@@ -502,7 +502,7 @@ Apache License 2.0でライセンスされています
 <context>
     <name>ThemeSwitch</name>
     <message>
-        <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="12"/>
+        <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="13"/>
         <source>Theme Mode:</source>
         <translation>テーマモード：</translation>
     </message>
@@ -525,17 +525,17 @@ Apache License 2.0でライセンスされています
 <context>
     <name>TrackerServerSettingPage</name>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="18"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="17"/>
         <source>Tracker Servers:</source>
         <translation>トラッカーサーバー:</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="80"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="79"/>
         <source>Sync</source>
         <translation>同調</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="96"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="95"/>
         <source>Enable daily auto-update</source>
         <translation>毎日自動更新を有効にする </translation>
     </message>

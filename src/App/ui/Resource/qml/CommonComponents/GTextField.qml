@@ -4,34 +4,39 @@ import gdl.sdk
 
 TextField {
     id: control
+    // 规格化：尺寸 large/default/small
+    property string size: "default"
+    readonly property int implicitH: (size === "large" ? 40 : (size === "small" ? 24 : 32))
+    readonly property int radiusPx: 4
+    readonly property int fontPx: (size === "large" ? 16 : (size === "small" ? 12 : 14))
     
-    // 内部属性用于颜色管理
+    // 内部属性用于颜色管理（基于 GTheme/ElementPlusColors 收敛）
     readonly property var colors: {
         const darkTheme = {
-            background: "#303030",
-            border: "#484848",
-            borderFocus: "#5151f9",
-            text: "#ffffff",
-            placeholder: "#9a9a9a",
-            selection: "#505050",
-            selectedText: "#ffffff"
+            background: GTheme.fillBase,
+            border: GTheme.borderBase,
+            borderFocus: GTheme.primaryColor,
+            text: GTheme.textPrimary,
+            placeholder: GTheme.textPlaceholder,
+            selection: GTheme.fillLight,
+            selectedText: GTheme.textPrimary
         }
-        
+
         const lightTheme = {
-            background: "#ffffff", 
-            border: "#d7dae2",
-            borderFocus: "#5151f9",
-            text: "#303133",
-            placeholder: "#bababa",
-            selection: "#e8f0fe",
-            selectedText: "#303133"
+            background: GTheme.bgWhite,
+            border: GTheme.borderBase,
+            borderFocus: GTheme.primaryColor,
+            text: GTheme.textPrimary,
+            placeholder: GTheme.textPlaceholder,
+            selection: GTheme.primaryLight(5),
+            selectedText: GTheme.textPrimary
         }
-        
+
         return GTheme.dark ? darkTheme : lightTheme
     }
 
     // 基础属性设置
-    font.pixelSize: 14
+    font.pixelSize: fontPx
     selectByMouse: true
     selectedTextColor: colors.selectedText
     selectionColor: colors.selection
@@ -40,12 +45,12 @@ TextField {
 
     // 背景设置
     background: Rectangle {
-        implicitHeight: 30
+        implicitHeight: control.implicitH
         implicitWidth: 200
         color: colors.background
         border.color: control.activeFocus ? colors.borderFocus : colors.border
         border.width: control.activeFocus ? 2 : 1
-        radius: 2
+        radius: control.radiusPx
 
         // 添加边框颜色过渡动画
         Behavior on border.color {

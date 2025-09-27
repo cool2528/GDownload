@@ -12,11 +12,19 @@ Item {
         spacing: 0
         Rectangle{
             id:leftMenuBar
-            color: GTheme.dark ? "#282828" :"#f2f3f6"
+            color: GTheme.bgPage
             Layout.fillHeight: true
             Layout.minimumWidth: 200
             Layout.preferredWidth: 200
             Layout.maximumWidth: 200
+            // 右侧分隔线
+            Rectangle {
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                width: 1
+                color: GTheme.borderLight
+            }
             Text {
                 id: title
                 text: qsTr("Preferences")
@@ -25,7 +33,7 @@ Item {
                 anchors.top: parent.top
                 anchors.topMargin: 30
                 font.pixelSize: 14
-                color: GTheme.dark ? "#ffffff" :  "#3b3b3b"
+                color: GTheme.textPrimary
 
             }
             ColumnLayout{
@@ -98,7 +106,7 @@ Item {
 
         Rectangle{
             id:browser
-            color: GTheme.dark ? "#2e2e2e" : "#ffffff"
+            color: GTheme.bgWhite
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.minimumWidth: 380

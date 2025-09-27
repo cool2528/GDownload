@@ -20,6 +20,10 @@
         <file>images/titlebar/windows-restore.svg</file>
         <file>images/titlebar/windows-restore-hover.svg</file>
         <file>images/logo/icon.ico</file>
+        <file>images/titlebar/windows-minimize-dark.svg</file>
+        <file>images/titlebar/windows-maximize-dark.svg</file>
+        <file>images/titlebar/windows-restore-dark.svg</file>
+        <file>images/titlebar/windows-close-dark.svg</file>
         <file>images/theme/theme-auto@2x.png</file>
         <file>images/theme/theme-dark@2x.png</file>
         <file>images/theme/theme-light@2x.png</file>

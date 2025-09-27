@@ -17,7 +17,7 @@ Popup {
     property bool updating: false
     // 背景设置
     background: Rectangle {
-        color: GTheme.dark ? "#2e2e2e" : "#ffffff"
+        color: GTheme.bgWhite
         radius: 5
     }
     
@@ -38,7 +38,7 @@ Popup {
                     text: qsTr("New Version") + " " + versionNumber
                     font.pixelSize: 18
                     font.bold: true
-                    color: GTheme.dark ? "#ffffff" : "#3b3b3b"
+                    color: GTheme.textPrimary
                 }
                 
                 Item { Layout.fillWidth: true }
@@ -64,15 +64,15 @@ Popup {
             Rectangle {
                 Layout.fillWidth: true
                 height: 1
-                color: GTheme.dark ? "#3c3c3c" : "#e5e5e5"
+                color: GTheme.borderLight
             }
 
             Rectangle{
                 id: releaseNotesRect
                 Layout.preferredWidth: updateDialog.width - 20
                 Layout.preferredHeight: 300
-                color: GTheme.dark ? "#2e2e2e" : "#ffffff"
-                border.color: GTheme.dark ? "#3c3c3c" : "#e5e5e5"
+                color: GTheme.bgWhite
+                border.color: GTheme.borderLight
                 border.width: 1
                 radius: 5
                 ScrollText {
@@ -136,7 +136,7 @@ Popup {
             Text {
                 id: updateTip
                 font.pixelSize: 14
-                color: GTheme.dark ? "#ffffff" : "#3b3b3b"
+                color: GTheme.textPrimary
             }
         }
     }

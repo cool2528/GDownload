@@ -147,3 +147,9 @@ src/version.h
 
 #translations files
 src/App/ui/Resource/translations/*.qm
+/docs/
+#AI files
+/.claude/
+CLAUDE.md
+AGENTS.md
+GEMINI.md

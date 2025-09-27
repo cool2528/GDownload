@@ -7,33 +7,37 @@ SpinBox {
     value: 50
     editable: true
     LayoutMirroring.enabled: false
+    // 规格化：尺寸 large/default/small
+    property string size: "default"
+    readonly property int implicitH: (size === "large" ? 40 : (size === "small" ? 24 : 32))
+    readonly property int radiusPx: 4
 
-    // 内部属性用于颜色管理
+    // 内部属性用于颜色管理（基于 GTheme/ElementPlusColors 收敛）
     readonly property var colors: {
         const darkTheme = {
-            background: "#303030",
-            border: "#404040",
-            borderFocus: "#5151f9", 
-            button: "#404040",
-            buttonHover: "#505050",
-            buttonPressed: "#606060",
-            arrow: "#909090",
-            arrowHover: "#ffffff",
-            text: "#ffffff"
+            background: GTheme.fillBase,
+            border: GTheme.borderBase,
+            borderFocus: GTheme.primaryColor,
+            button: GTheme.fillLight,
+            buttonHover: GTheme.fillBase,
+            buttonPressed: GTheme.borderLight,
+            arrow: GTheme.textSecondary,
+            arrowHover: GTheme.textPrimary,
+            text: GTheme.textPrimary
         }
-        
+
         const lightTheme = {
-            background: "#ffffff",
-            border: "#d7dae2", 
-            borderFocus: "#5151f9",
-            button: "#f6f6f6",
-            buttonHover: "#f0f0f0", 
-            buttonPressed: "#e4e4e4",
-            arrow: "#94969a",
-            arrowHover: "#5151f9",
-            text: "#7b7d80"
+            background: GTheme.bgWhite,
+            border: GTheme.borderBase,
+            borderFocus: GTheme.primaryColor,
+            button: GTheme.fillLight,
+            buttonHover: GTheme.fillBase,
+            buttonPressed: GTheme.borderLight,
+            arrow: GTheme.textRegular,
+            arrowHover: GTheme.primaryColor,
+            text: GTheme.textRegular
         }
-        
+
         return GTheme.dark ? darkTheme : lightTheme
     }
 
@@ -41,8 +45,8 @@ SpinBox {
         z: 2
         text: control.textFromValue(control.value, control.locale)
         font: control.font
-        color: colors.text
-        selectionColor: GTheme.dark ? "#505050" : "#acd2fe"
+        color: control.enabled ? colors.text : GTheme.textDisabled
+        selectionColor: GTheme.dark ? GTheme.fillLight : GTheme.primaryLight(5)
         selectedTextColor: colors.text
         horizontalAlignment: Qt.AlignHCenter
         verticalAlignment: Qt.AlignVCenter
@@ -56,9 +60,8 @@ SpinBox {
         y: 2
         height: parent.height/2 - 2
         width: height
-        color: control.up.pressed ? colors.buttonPressed : 
-               control.up.hovered ? colors.buttonHover : colors.button
-        border.color: colors.border
+        color: control.enabled ? (control.up.pressed ? colors.buttonPressed : control.up.hovered ? colors.buttonHover : colors.button) : GTheme.fillLighter
+        border.color: control.enabled ? colors.border : GTheme.borderBase
 
         // 添加颜色过渡动画
         Behavior on color {
@@ -94,9 +97,8 @@ SpinBox {
         y: parent.height - height - 2
         height: parent.height/2 - 2
         width: height
-        color: control.down.pressed ? colors.buttonPressed :
-               control.down.hovered ? colors.buttonHover : colors.button
-        border.color: colors.border
+        color: control.enabled ? (control.down.pressed ? colors.buttonPressed : control.down.hovered ? colors.buttonHover : colors.button) : GTheme.fillLighter
+        border.color: control.enabled ? colors.border : GTheme.borderBase
 
         Behavior on color {
             ColorAnimation { duration: 150 }
@@ -127,9 +129,10 @@ SpinBox {
 
     background: Rectangle {
         implicitWidth: 100
-        implicitHeight: 30
-        color: colors.background
+        implicitHeight: control.implicitH
+        color: control.enabled ? colors.background : GTheme.fillLighter
         border.color: control.focus ? colors.borderFocus : colors.border
+        radius: control.radiusPx
         
         // 添加边框颜色过渡动画
         Behavior on border.color {

@@ -3,19 +3,24 @@ import QtQuick.Controls
 import gdl.sdk
 Switch {
     id: control
-    property color checkedBkColor: "#1887EE"
-    property color normalBkColor: "#bbbbbb"
-    property color checkedFkColor: "#FFFFFF"
-    property color normalFkColor: "#ffffff"
-    property color textColor: GTheme.dark ?  "#FFFFFF" : "#3b3b3b"
-    implicitHeight: 28
+    // 规格化尺寸：large/default/small
+    property string size: "default"
+    readonly property int trackH: (size === "large" ? 28 : (size === "small" ? 18 : 22))
+    readonly property int trackW: Math.round(trackH * 1.8)
+    readonly property int knob: trackH - 2
+    property color checkedBkColor: GTheme.primaryColor
+    property color normalBkColor: GTheme.borderBase
+    property color checkedFkColor: GTheme.bgWhite
+    property color normalFkColor: GTheme.bgWhite
+    property color textColor: GTheme.textPrimary
+    implicitHeight: trackH
     font.pixelSize: 14
     indicator: Rectangle {
-        implicitWidth: 40
-        implicitHeight: 22
+        implicitWidth: control.trackW
+        implicitHeight: control.trackH
         x: control.width - width - control.rightPadding
         y: parent.height / 2 - height / 2
-        radius: 11
+        radius: height / 2
         color: control.checked ? checkedBkColor : normalBkColor
         border.color: control.checked ? checkedBkColor : normalBkColor
 
@@ -31,9 +36,9 @@ Switch {
             id: toggleButton
             x: control.checked ? parent.width - width - 1 : 1
             y: parent.height / 2 - height / 2
-            width: 20
-            height: 20
-            radius: 10
+            width: control.knob
+            height: control.knob
+            radius: height / 2
             color: control.checked ? checkedFkColor : normalFkColor
             border.color: control.checked ? checkedFkColor : normalFkColor
 
@@ -59,6 +64,10 @@ Switch {
         font: control.font
         color: textColor
         verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignLeft
         rightPadding: control.indicator.width + control.spacing
+        wrapMode: Text.WordWrap
+        elide: Text.ElideRight
+        maximumLineCount: 2
     }
 }

@@ -9,7 +9,7 @@ Control{
     width: parent.width
     height: parent.height
     background: Rectangle{
-        color: GTheme.dark ? "#2e2e2e" :"#ffffff"
+        color: GTheme.bgWhite
         Item {
             anchors.fill: parent
             opacity: listViewdownload.count > 0 ? 0 : 1
@@ -41,25 +41,20 @@ Control{
             interactive: false
             orientation:ListView.Vertical
             model:downloadView.model
-            delegate:Rectangle{
+            delegate: GCard {
                 height: 105
-                color: GTheme.dark ? "#282828" : "#ffffff"
-                radius: 5
-                anchors{
+                padding: 8
+                outlined: true
+                hoverEnabled: true
+                selected: ListView.isCurrentItem || (downloadView.pageType === 0 && model.taskState === 1)
+                anchors {
                     left: parent.left
                     leftMargin: 20
                     right: parent.right
                     rightMargin: 20
-
-                }
-                border.color: itemMouse.hovered ? "#5151f9" : GTheme.dark ? "#4b4b4b" : "#c5c5c5"
-                HoverHandler{
-                    id:itemMouse
-                    acceptedDevices: PointerDevice.Mouse
-                    cursorShape: Qt.ArrowCursor
                 }
 
-                Column{
+                Column {
                     anchors.fill: parent
                     spacing: 10
                     RowLayout{
@@ -74,7 +69,7 @@ Control{
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                             Layout.margins: 10
-                            color: GTheme.dark ? "#ffffff" : "#303133"
+                            color: GTheme.textPrimary
                             font.pixelSize: 14
                         }
                         Rectangle{
@@ -85,8 +80,10 @@ Control{
                             implicitWidth: 150
                             radius: 5
                             Layout.preferredHeight: 25
-                            color: GTheme.dark ? mouse.hovered ? "#5151f9" : "#414141" : mouse.hovered ? "#5151f9" : "#ffffff"
-                            border.color: GTheme.dark ? "#545454" : "#f5f5f5"
+                            // 暗色主题下 hover 不使用极浅的主色浅层，避免过曝；统一用填充浅色
+                            color: mouse.hovered ? (GTheme.dark ? GTheme.fillLight : GTheme.fillLight)
+                                               : (GTheme.dark ? GTheme.fillBase : GTheme.bgWhite)
+                            border.color: GTheme.borderLight
                             HoverHandler{
                                 id:mouse
                                 acceptedDevices: PointerDevice.Mouse
@@ -108,7 +105,7 @@ Control{
                                     Layout.maximumHeight: 20
                                     iconSource: SegoeFluentIcons.Play
 
-                                    iconColor:GTheme.dark ? mouse.hovered ? "#ffffff" : "#7c7c7c": mouse.hovered ? "#ffffff" : "#acacac"
+                                    iconColor: mouse.hovered ? GTheme.textPrimary : GTheme.textSecondary
                                     onClicked: {
                                         if(downloadView.pageType == 0)
                                         {
@@ -132,7 +129,7 @@ Control{
                                     Layout.maximumHeight: 20
                                     iconSource: SegoeFluentIcons.Pause
 
-                                    iconColor:GTheme.dark ? mouse.hovered ? "#ffffff" : "#7c7c7c": mouse.hovered ? "#ffffff" : "#acacac"
+                                    iconColor: mouse.hovered ? GTheme.textPrimary : GTheme.textSecondary
                                     onClicked: {
                                         if(downloadView.pageType == 0)
                                         {
@@ -152,7 +149,7 @@ Control{
                                     Layout.minimumHeight: 20
                                     Layout.maximumHeight: 20
                                     iconSource: SegoeFluentIcons.Delete
-                                    iconColor:GTheme.dark ? mouse.hovered ? "#ffffff" : "#7c7c7c": mouse.hovered ? "#ffffff" : "#acacac"
+                                    iconColor: mouse.hovered ? GTheme.textPrimary : GTheme.textSecondary
                                     onClicked: {
                                         if(downloadView.pageType == 0){
                                             BrowserManager.RemoveTask(0,model.taskId)
@@ -172,7 +169,7 @@ Control{
                                     Layout.minimumHeight: 20
                                     Layout.maximumHeight: 20
                                     iconSource: SegoeFluentIcons.Folder
-                                    iconColor:GTheme.dark ? mouse.hovered ? "#ffffff" : "#7c7c7c": mouse.hovered ? "#ffffff" : "#acacac"
+                                    iconColor: mouse.hovered ? GTheme.textPrimary : GTheme.textSecondary
                                     onClicked: {
                                         BrowserManager.OpenFileLocation(model.savePath)
                                     }
@@ -186,7 +183,7 @@ Control{
                                     Layout.minimumHeight: 20
                                     Layout.maximumHeight: 20
                                     iconSource: SegoeFluentIcons.Link
-                                    iconColor:GTheme.dark ? mouse.hovered ? "#ffffff" : "#7c7c7c": mouse.hovered ? "#ffffff" : "#acacac"
+                                    iconColor: mouse.hovered ? GTheme.textPrimary : GTheme.textSecondary
                                     onClicked: {
                                         console.debug("copy download link ",model.downloadLink)
                                         UtilsToolsManager.SetClipboardText(model.downloadLink)
@@ -211,7 +208,7 @@ Control{
                             from: 0
                             to:100
                             value: model.progress
-                            bkColor: GTheme.dark ? "#ffffff" : "#e8ebf3"
+                            bkColor: GTheme.fillLight
                         }
                     }
 
@@ -226,7 +223,7 @@ Control{
                             Layout.alignment:  Qt.AlignLeft
                             Layout.fillWidth: true
                             text: model.currentSize + "/" + model.totalSize //qsTr("7.38MB/5.43GB")
-                            color: GTheme.dark ? "#878787" : "#a0a0a0"
+                            color: GTheme.textSecondary
                             font.pixelSize: 14
                         }
 
@@ -243,7 +240,7 @@ Control{
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 text: model.downloadSpeed //qsTr("↓973.4 KB/s")
-                                color: GTheme.dark ? "#878787" : "#a0a0a0"
+                                color: GTheme.textSecondary
                                 font.pixelSize: 14
                             }
 
@@ -254,7 +251,7 @@ Control{
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 text: qsTr("Remaining ") + model.remainingTime //qsTr("Remaining 1h 37m 21s")
-                                color: GTheme.dark ? "#878787" : "#a0a0a0"
+                                color: GTheme.textSecondary
                                 font.pixelSize: 14
                             }
 
@@ -266,7 +263,7 @@ Control{
                                 Layout.fillHeight: true
                                 iconSource: SegoeFluentIcons.Connected
                                 iconSize: 14
-                                color: GTheme.dark ? "#878787" : "#a0a0a0"
+                                color: GTheme.textSecondary
                             }
 
                             Text {
@@ -277,7 +274,7 @@ Control{
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 text: String("%1").arg(model.connections) //qsTr("64")
-                                color: GTheme.dark ? "#878787" : "#a0a0a0"
+                                color: GTheme.textSecondary
                                 font.pixelSize: 14
                             }
                         }
@@ -285,7 +282,6 @@ Control{
                     // end
 
                 }
-
             }
 
         }
