@@ -32,11 +32,7 @@ Popup{
             spacing: 10
             Image {
                 id: logo
-                anchors{
-                    left: parent.left
-                    verticalCenter: parent.verticalCenter
-
-                }
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
                 Layout.preferredHeight: 16
                 Layout.preferredWidth: 16
                 source: "/images/logo/icon.ico"
@@ -44,7 +40,7 @@ Popup{
             Label{
                 text: String("GDownloader Version: %1").arg(UtilsToolsManager.Version())
                 font.pixelSize: 15
-                color: GTheme.dark ?  "#ffffff" : "#3b3b3b"
+                color: GTheme.textPrimary
                 verticalAlignment: Text.AlignVCenter
             }
             ImageButton{
@@ -81,7 +77,7 @@ Popup{
                 height: parent.height
                 width: text.contentWidth + 20
                 radius: 5
-                color: tabArea.currentIndex === index || parent.hovered ? (GTheme.dark ? "#5151f9" : "#f2f2f2") : "transparent"
+                color: (tabArea.currentIndex === index || parent.hovered) ? GTheme.fillLight : "transparent"
                 Button {
                     anchors.verticalCenter: parent.verticalCenter
                     contentItem: Text {
@@ -89,7 +85,7 @@ Popup{
                         anchors.fill: parent
                         text: modelData
                         font.pixelSize: 14
-                        color: tabArea.currentIndex === index  || parent.hovered ? (GTheme.dark ? "#ffffff" : "#5151f9") : (GTheme.dark ? "#a0a0a0" : "#494c55" )
+                        color: (tabArea.currentIndex === index  || parent.hovered) ? GTheme.primaryColor : GTheme.textRegular
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
@@ -103,21 +99,17 @@ Popup{
                 }
             }
         }
-        Rectangle{
-            id:splitLine
+        Divider {
             anchors.bottom: tabArea.bottom
             anchors.bottomMargin: -5
             anchors.left: parent.left
             anchors.leftMargin: 5
             anchors.right: parent.right
             anchors.rightMargin: 5
-            width: parent.width
-            height: 3
-            color: GTheme.dark ? "#434343" : "#e5e5e5"
         }
         StackLayout{
             id:layout
-            anchors.top: splitLine.bottom
+            anchors.top: tabArea.bottom
             anchors.left: tabArea.left
             width: parent.width - 20
             height: 325
@@ -134,7 +126,7 @@ Popup{
                     Label{
                         text: qsTr("If you like GDownloader, you can sponsor us on the following platforms:")
                         font.pixelSize: 14
-                        color: GTheme.dark ?  "#ffffff" : "#3b3b3b"
+                color: GTheme.textPrimary
                         Layout.margins: 10
                     }
                     Image {
@@ -211,7 +203,7 @@ Licensed under the Apache License 2.0
 
     }
     background: Rectangle{
-        color: GTheme.dark ?  "#2e2e2e" : "#ffffff"
+        color: GTheme.bgWhite
         radius: 5
     }
 

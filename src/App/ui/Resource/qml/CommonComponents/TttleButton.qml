@@ -4,26 +4,35 @@ import gdl.sdk 1.0
 Button {
     id: control
     property int iconSource
-    property int iconSize:control.font.pixelSize
+    property int iconSize: control.font.pixelSize
 
     contentItem: Item {
+        Rectangle {
+            id: selectedBar
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            width: 2
+            visible: control.checked
+            color: GTheme.primaryColor
+        }
         FontIcon{
             id:icon
             iconSize: control.iconSize
             iconSource: control.iconSource
             anchors.left: parent.left
-            anchors.leftMargin: 5
+            anchors.leftMargin: 8
             anchors.top: parent.top
             anchors.topMargin: 7
-            color: GTheme.dark ? (control.hovered || control.checked) ? "#ffffff" : "#a0a0a0" : (control.hovered || control.checked) ? "#5151f9" : "#494c55"
+            color: (control.hovered || control.checked) ? GTheme.primaryColor : (GTheme.dark ? GTheme.textSecondary : GTheme.textRegular)
         }
         Text {
             id: text
             text: control.text
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: icon.right
-            anchors.leftMargin: 20
-            color: GTheme.dark ? (control.hovered || control.checked) ? "#ffffff" : "#a0a0a0" : (control.hovered || control.checked) ? "#5151f9" : "#494c55"
+            anchors.leftMargin: 18
+            color: (control.hovered || control.checked) ? GTheme.primaryColor : (GTheme.dark ? GTheme.textSecondary : GTheme.textRegular)
         }
         HoverHandler{
             id:mouse
@@ -33,7 +42,7 @@ Button {
     }
 
     background: Rectangle {
-        color: GTheme.dark ? (control.hovered || control.checked) ? "#3c3c3c" : "transparent" : (control.hovered || control.checked) ? "#e7e9ee" : "transparent"
+        color: (control.hovered || control.checked) ? GTheme.fillLight : "transparent"
         radius: 2
     }
 }

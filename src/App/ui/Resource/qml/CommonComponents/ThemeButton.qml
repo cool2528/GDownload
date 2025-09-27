@@ -20,7 +20,7 @@ Button {
             implicitWidth: 70
             radius: 10
             border.width: button.checked ? 1 : 0
-            border.color: "#5b5bfa"
+            border.color: GTheme.primaryColor
             color: "transparent"
             clip: true
             anchors{
@@ -53,12 +53,7 @@ Button {
                 bottom: parent.bottom
                 topMargin: 5
             }
-            color: {
-                if(GTheme.dark){
-                    return button.checked ? "#5b5bfa" : "#ffffff"
-                }
-                return button.checked ? "#5b5bfa" : "#3b3b3b"
-            }
+            color: button.checked ? GTheme.primaryColor : GTheme.textPrimary
 
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter

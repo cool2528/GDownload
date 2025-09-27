@@ -5,33 +5,37 @@ import gdl.sdk
 CheckBox {
     id: control
     checked: false
+    // 规格化尺寸：large/default/small
+    property string size: "default"
+    readonly property int indicatorPx: (size === "large" ? 18 : (size === "small" ? 14 : 16))
+    readonly property int fontPx: (size === "large" ? 16 : (size === "small" ? 12 : 14))
     
     // 内部属性用于颜色管理
     readonly property var colors: {
         const darkTheme = {
-            background: "#525354",
-            backgroundChecked: "#5f5ff9",
-            border: "transparent",
-            borderHover: "#5f5ff9",
-            checkmark: "#ffffff",
-            text: "#ffffff"
+            background: GTheme.fillBase,
+            backgroundChecked: GTheme.primaryColor,
+            border: GTheme.borderBase,
+            borderHover: GTheme.primaryColor,
+            checkmark: GTheme.bgWhite,
+            text: GTheme.textPrimary
         }
         
         const lightTheme = {
-            background: "#ffffff",
-            backgroundChecked: "#5f5ff9", 
-            border: "#dadde4",
-            borderHover: "#5f5ff9",
-            checkmark: "#ffffff",
-            text: "#55575b"
+            background: GTheme.bgWhite,
+            backgroundChecked: GTheme.primaryColor,
+            border: GTheme.borderBase,
+            borderHover: GTheme.primaryColor,
+            checkmark: GTheme.bgWhite,
+            text: GTheme.textRegular
         }
         
         return GTheme.dark ? darkTheme : lightTheme
     }
 
     indicator: Rectangle {
-        implicitWidth: 16
-        implicitHeight: 16
+        implicitWidth: control.indicatorPx
+        implicitHeight: control.indicatorPx
         x: control.leftPadding
         y: parent.height / 2 - height / 2
         radius: 3
@@ -100,7 +104,7 @@ CheckBox {
 
     contentItem: Text {
         text: control.text
-        font: control.font
+        font.pixelSize: control.fontPx
         opacity: enabled ? 1.0 : 0.3
         color: colors.text
         verticalAlignment: Text.AlignVCenter

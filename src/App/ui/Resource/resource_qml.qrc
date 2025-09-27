@@ -5,6 +5,7 @@
         <file>qml/CommonComponents/IconButton.qml</file>
         <file>qml/CommonComponents/FontIcon.qml</file>
         <file>qml/CommonComponents/ImageButton.qml</file>
+        <file>qml/CommonComponents/TitleIconButton.qml</file>
         <file>qml/Navigator/NavigatorView.qml</file>
         <file>qml/Browser/BrowserView.qml</file>
         <file>qml/Browser/DownloadPageView.qml</file>
@@ -21,6 +22,8 @@
         <file>qml/CommonComponents/GDropArea.qml</file>
         <file>qml/CommonComponents/GDownloadViewPage.qml</file>
         <file>qml/CommonComponents/GProgressBar.qml</file>
+        <file>qml/CommonComponents/GCard.qml</file>
+        <file>qml/CommonComponents/Divider.qml</file>
         <file>qml/Browser/SettingPageTitle.qml</file>
         <file>qml/Browser/BasicSettingPage.qml</file>
         <file>qml/Browser/AdvancedSettingPage.qml</file>
@@ -39,5 +42,6 @@
         <file>qml/CommonComponents/NetDiskPageView.qml</file>
         <file>qml/Browser/BaiduCookieSettingPage.qml</file>
         <file>qml/Browser/TrackerServerSettingPage.qml</file>
+        <file>qml/CommonComponents/DesignTokens.qml</file>
     </qresource>
 </RCC>
