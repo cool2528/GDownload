@@ -4,6 +4,7 @@ import QtQuick.Controls
 import gdl.sdk
 Item {
     id:control
+    implicitHeight: Math.max(label.implicitHeight + 20, row.implicitHeight + 20)
     ButtonGroup{
         id:themeButtonGroup
     }
@@ -15,20 +16,19 @@ Item {
         anchors.leftMargin: 10
         anchors.verticalCenter: parent.verticalCenter
         font.pixelSize: 14
-        color: GTheme.dark ? "#ffffff" : "#3b3b3b"
+        color: GTheme.textPrimary
     }
     RowLayout{
         id:row
-        anchors{
-            left: label.right
-            leftMargin: 10
-            top: parent.top
-        }
-        spacing: 10
+        anchors.left: label.right
+        anchors.right: parent.right
+        anchors.leftMargin: 15
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: 15
         ThemeButton{
             id:systemThemeButton
-            Layout.preferredWidth: 70
-            Layout.preferredHeight: 70
+            Layout.preferredWidth: 60
+            Layout.preferredHeight: 60
             tipText: qsTr("System")
             checkable: true
             imageSource: "/images/theme/theme-auto@2x.png"
@@ -41,8 +41,8 @@ Item {
         ThemeButton{
             id:lightThemeButton
             checkable: true
-            Layout.preferredWidth: 70
-            Layout.preferredHeight: 70
+            Layout.preferredWidth: 60
+            Layout.preferredHeight: 60
             imageSource: "/images/theme/theme-light@2x.png"
             tipText: qsTr("Light")
             ButtonGroup.group: themeButtonGroup
@@ -54,8 +54,8 @@ Item {
         ThemeButton{
             id:darkThemeButton
             checkable: true
-            Layout.preferredWidth: 70
-            Layout.preferredHeight: 70
+            Layout.preferredWidth: 60
+            Layout.preferredHeight: 60
             tipText: qsTr("Dark")
             imageSource: "/images/theme/theme-dark@2x.png"
             ButtonGroup.group: themeButtonGroup

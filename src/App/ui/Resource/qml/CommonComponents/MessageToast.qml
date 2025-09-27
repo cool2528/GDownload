@@ -47,15 +47,15 @@ Popup {
     function getBackgroundColor() {
         switch(messageType) {
             case MessageToast.Success:
-                return "#E6F4EA"
+                return GTheme.successLight(8)
             case MessageToast.Warning:
-                return "#FFF3E0"
+                return GTheme.warningLight(8)
             case MessageToast.Info:
-                return "#E8EAF6"
+                return GTheme.infoLight(8)
             case MessageToast.Error:
-                return "#FDECEA"
+                return GTheme.dangerLight(8)
             default:
-                return "#FFFFFF"
+                return GTheme.bgWhite()
         }
     }
     
@@ -116,7 +116,7 @@ Popup {
         Label {
             id: messageLabel
             text: message
-            color: "#333333"
+            color: GTheme.textPrimary
             font.pixelSize: 14
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignVCenter

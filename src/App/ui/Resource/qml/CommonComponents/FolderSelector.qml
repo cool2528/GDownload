@@ -19,31 +19,31 @@ Item {
     // 内部属性用于颜色管理
     readonly property var colors: {
         const darkTheme = {
-            background: "#2E2E2E",
-            backgroundFocus: Qt.lighter("#2E2E2E"),
-            border: "#545454",
-            borderFocus: "#5151f9",
-            text: "#ffffff",
-            buttonBg: "#2d2d2d",
-            buttonIcon: "#c4c4c4",
-            buttonIconHover: "#5151f9",
-            popupBg: "#323232",
-            historyItemHover: "#3c3c3c",
-            historyIcon: "#808080"
+            background: GTheme.fillBase,
+            backgroundFocus: GTheme.fillLight,
+            border: GTheme.borderBase,
+            borderFocus: GTheme.primaryColor,
+            text: GTheme.textPrimary,
+            buttonBg: GTheme.fillLight,
+            buttonIcon: GTheme.textSecondary,
+            buttonIconHover: GTheme.primaryColor,
+            popupBg: GTheme.bgWhite,
+            historyItemHover: GTheme.fillLight,
+            historyIcon: GTheme.textSecondary
         }
         
         const lightTheme = {
-            background: "#ffffff", 
-            backgroundFocus: Qt.lighter("#ffffff"),
-            border: "#a9a9a9",
-            borderFocus: "#5151f9",
-            text: "#303030",
-            buttonBg: "#f3f6f9",
-            buttonIcon: "#8d9096",
-            buttonIconHover: "#5151f9",
-            popupBg: "#ffffff",
-            historyItemHover: "#f5f5f5",
-            historyIcon: "#a0a0a0"
+            background: GTheme.bgWhite,
+            backgroundFocus: GTheme.fillLight,
+            border: GTheme.borderBase,
+            borderFocus: GTheme.primaryColor,
+            text: GTheme.textPrimary,
+            buttonBg: GTheme.fillLight,
+            buttonIcon: GTheme.textSecondary,
+            buttonIconHover: GTheme.primaryColor,
+            popupBg: GTheme.bgWhite,
+            historyItemHover: GTheme.fillLight,
+            historyIcon: GTheme.textSecondary
         }
         
         return GTheme.dark ? darkTheme : lightTheme
@@ -127,7 +127,7 @@ Item {
         color: colors.text
         text: path
         selectByMouse: true
-        selectionColor: "#3078BB"
+        selectionColor: GTheme.primaryLight(5)
         font.pixelSize: 14
         
         background: Rectangle {

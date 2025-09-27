@@ -5,7 +5,7 @@ import gdl.sdk
 import "../Utils/utils.js" as Utils
 Rectangle {
     id: netDiskPage
-    color: GTheme.dark ? "#2e2e2e" : "#ffffff"
+    color: GTheme.bgWhite
     property string parentPath:""
     property string homePath:""
     property bool isBusy: false
@@ -15,7 +15,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        color: GTheme.dark ? "#2e2e2e" : "#ffffff"
+        color: GTheme.bgWhite
         height: visible ? 50 : 0
         visible: true
         RowLayout {
@@ -28,13 +28,13 @@ Rectangle {
                 Layout.fillHeight: true
                 font.pixelSize: 12
                 placeholderText: qsTr("Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)")
-                color: GTheme.dark ? "#ffffff" : "#303133"
-                placeholderTextColor: GTheme.dark ? "#9a9a9a" : "#bababa"
+                color: GTheme.textPrimary
+                placeholderTextColor: GTheme.textPlaceholder
                 background: Rectangle{
                     implicitHeight: parent.height
                     implicitWidth: parent.width
-                    color: GTheme.dark  ? "#303030" : "#ffffff"
-                    border.color: GTheme.dark ? urlInput.enabled ? "#5151f9" : "#545454" : urlInput.enabled ? "#5151f9" : "#b8bcc5"
+                    color: GTheme.bgWhite
+                    border.color: urlInput.enabled ? GTheme.primaryColor : GTheme.borderBase
                 }
             }
 
@@ -76,23 +76,23 @@ Rectangle {
             Label{
                 id:tipLabel
                 text: qsTr("Precautions for parsing Baidu Netdisk share links:")
-                color: "#F56C6C"
+                color: GTheme.dangerColor
                 font.pixelSize: 18
                 font.bold: true
             }
             Label{
                 text: qsTr("1.Please go to Software Settings -> Advanced Settings -> Set Baidu Netdisk cookies")
-                color: "#F56C6C"
+                color: GTheme.dangerColor
                 font.pixelSize: 15
             }
             Label{
                 text: qsTr("2.Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)")
-                color: "#F56C6C"
+                color: GTheme.dangerColor
                 font.pixelSize: 15
             }
             Label{
                 text: qsTr("3.Please ensure that your account has sufficient storage space before downloading, as the file needs to be saved to your cloud drive first.")
-                color: "#F56C6C"
+                color: GTheme.dangerColor
                 Layout.fillWidth: true
                 Layout.preferredWidth: parent.width - 50
                 font.pixelSize: 15
@@ -101,7 +101,7 @@ Rectangle {
             }
             Label{
                 text: qsTr("4.Unable to achieve accelerated downloading, only standard downloading is supported. For high-speed downloads, please purchase the official VIP.")
-                color: "#F56C6C"
+                color: GTheme.dangerColor
                 Layout.fillWidth: true
                 Layout.preferredWidth: parent.width - 50
                 font.pixelSize: 15
@@ -192,21 +192,21 @@ Rectangle {
                 text: qsTr("File Name")
                 Layout.fillWidth: true
                 Layout.minimumWidth: 200
-                color: GTheme.dark ? "#d9d9d9" : "#68696d"
+                color: GTheme.textRegular
                 font.pixelSize: 14
             }
             Label {
                 text: qsTr("Size")
                 Layout.fillWidth: true
                 Layout.minimumWidth: 100
-                color: GTheme.dark ? "#d9d9d9" : "#68696d"
+                color: GTheme.textRegular
                 font.pixelSize: 14
             }
             Label {
                 text: qsTr("Date")
                 Layout.fillWidth: true
                 Layout.minimumWidth: 100
-                color: GTheme.dark ? "#d9d9d9" : "#68696d"
+                color: GTheme.textRegular
                 font.pixelSize: 14
             }
         }
@@ -248,7 +248,7 @@ Rectangle {
                     text: model.fileName
                     Layout.fillWidth: true
                     Layout.minimumWidth: 200
-                    color: GTheme.dark ? "#ffffff" : "#303133"
+                    color: GTheme.textPrimary
                     font.pixelSize: 14
                 }
 
@@ -256,7 +256,7 @@ Rectangle {
                     text: model.fileSize
                     Layout.fillWidth: true
                     Layout.minimumWidth: 100
-                    color: GTheme.dark ? "#ffffff" : "#303133"
+                    color: GTheme.textPrimary
                     font.pixelSize: 14
                 }
 
@@ -264,7 +264,7 @@ Rectangle {
                     text: model.createTime
                     Layout.fillWidth: true
                     Layout.minimumWidth: 100
-                    color: GTheme.dark ? "#ffffff" : "#303133"
+                    color: GTheme.textPrimary
                     font.pixelSize: 14
                 }
 

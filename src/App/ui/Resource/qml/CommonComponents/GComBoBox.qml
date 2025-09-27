@@ -1,9 +1,14 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Effects
 import gdl.sdk
 
 ComboBox {
     id: control
+    // 规格化：尺寸 large/default/small
+    property string size: "default"
+    readonly property int implicitH: (size === "large" ? 40 : (size === "small" ? 24 : 32))
+    readonly property int radiusPx: 4
     property int maxPopHeight: 200
     delegate: ItemDelegate {
         width: control.width
@@ -11,7 +16,9 @@ ComboBox {
             text: control.textRole
                 ? (Array.isArray(control.model) ? modelData[control.textRole] : model[control.textRole])
                 : modelData
-            color: GTheme.dark ? "#ffffff" : "#55575b"
+            color: (control.currentIndex === index)
+                   ? GTheme.primaryColor
+                   : (GTheme.dark ? GTheme.textPrimary : GTheme.textRegular)
             font: control.font
             elide: Text.ElideRight
             verticalAlignment: Text.AlignVCenter
@@ -19,7 +26,9 @@ ComboBox {
         highlighted: control.highlightedIndex === index
         
         background: Rectangle {
-            color: parent.highlighted ? (GTheme.dark ? "#404040" : "#f5f5ff") : "transparent"
+            color: parent.highlighted
+                   ? (GTheme.dark ? GTheme.fillLight : GTheme.primaryLight(9))
+                   : (control.currentIndex === index ? (GTheme.dark ? GTheme.fillBase : GTheme.fillLight) : "transparent")
         }
     }
 
@@ -47,9 +56,9 @@ ComboBox {
             context.lineTo(width, 0);
             context.lineTo(width / 2, height);
             context.closePath();
-            context.fillStyle = GTheme.dark ? 
-                (control.pressed ? "#808080" : "#ffffff") :
-                (control.pressed ? "#666666" : "#55575b")
+            context.fillStyle = GTheme.dark ?
+                (control.pressed ? GTheme.textSecondary : GTheme.textPrimary) :
+                (control.pressed ? GTheme.textSecondary : GTheme.textRegular)
             context.fill();
         }
     }
@@ -60,20 +69,18 @@ ComboBox {
 
         text: control.displayText
         font: control.font
-        color: GTheme.dark ? "#ffffff" : "#55575b"
+        color: control.enabled ? (GTheme.dark ? GTheme.textPrimary : GTheme.textRegular) : GTheme.textDisabled
         verticalAlignment: Text.AlignVCenter
         elide: Text.ElideRight
     }
 
     background: Rectangle {
         implicitWidth: 120
-        implicitHeight: 40
-        color: GTheme.dark ? "#303030" : "#ffffff"
-        border.color: control.pressed || control.hovered ? 
-            (GTheme.dark ? "#5151f9" : "#5151f9") : 
-            (GTheme.dark ? "#404040" : "#d9dbe3")
+        implicitHeight: control.implicitH
+        color: control.enabled ? (GTheme.dark ? GTheme.fillBase : GTheme.bgWhite) : GTheme.fillLighter
+        border.color: (control.pressed || control.hovered || control.visualFocus) ? GTheme.primaryColor : GTheme.borderBase
         border.width: control.visualFocus ? 2 : 1
-        radius: 2
+        radius: control.radiusPx
     }
 
     popup: Popup {
@@ -91,9 +98,17 @@ ComboBox {
         }
 
         background: Rectangle {
-            color: GTheme.dark ? "#303030" : "#ffffff"
-            border.color: GTheme.dark ? "#404040" : "#d9dbe3"
-            radius: 2
+            color: GTheme.dark ? GTheme.fillBase : GTheme.bgWhite
+            border.color: GTheme.borderBase
+            radius: control.radiusPx
+            layer.enabled: true
+            layer.effect: MultiEffect {
+                shadowEnabled: true
+                shadowColor: Qt.rgba(0,0,0,0.12)
+                shadowBlur: 8
+                shadowVerticalOffset: 4
+                // 与圆角匹配（MultiEffect 不直接识别 radius，借助源半透明背景过渡）
+            }
         }
     }
 }

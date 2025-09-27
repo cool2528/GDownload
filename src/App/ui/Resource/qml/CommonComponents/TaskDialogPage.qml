@@ -14,7 +14,7 @@ Popup {
     closePolicy:Popup.CloseOnEscape //| Popup.CloseOnPressOutside | Popup.CloseOnReleaseOutside
     focus: true
     background: Rectangle{
-        color: GTheme.dark ? "#2e2e2e" : "#ffffff"
+        color: GTheme.bgWhite
     }
     contentItem: ScrollView {
         id:scrollView
@@ -56,7 +56,7 @@ Popup {
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: modelData
-                                color: index === tabTitle.currentIndex || parent.hovered ? "#5151f9" : GTheme.dark ? "#ffffff" :"#2a2b2d"
+                                color: (index === tabTitle.currentIndex || parent.hovered) ? GTheme.primaryColor : GTheme.textRegular
                                 verticalAlignment: Text.AlignVCenter
                                 horizontalAlignment: Text.AlignHCenter
                             }
@@ -76,11 +76,11 @@ Popup {
                     }
                     highlight: Rectangle{
                         height: 2
-                        y:tabTitle.currentItem.y + tabTitle.currentItem.height - 2
-                        x:tabTitle.currentItem.x
+                        y: tabTitle.currentItem ? tabTitle.currentItem.y + tabTitle.currentItem.height - 2 : 0
+                        x: tabTitle.currentItem ? tabTitle.currentItem.x : 0
                         z:999
-                        width: tabTitle.currentItem.width
-                        color:"#5151f9"
+                        width: tabTitle.currentItem ? tabTitle.currentItem.width : 0
+                        color: GTheme.primaryColor
                         Behavior on x {
                             NumberAnimation {
                                 easing.type: Easing.OutExpo
@@ -104,7 +104,7 @@ Popup {
                     Layout.rightMargin: 10
                     height: 2
                     z:tabTitle.z - 1
-                    color:  GTheme.dark ? "#555555" : "#e0e3ea"
+                    color:  GTheme.borderLight
                 }
                 // tab Page
                 StackLayout{
@@ -116,7 +116,7 @@ Popup {
                     property int urlType: 0
                     Rectangle{
                         id:linkingPage
-                        color: GTheme.dark ? "#2e2e2e" : "#ffffff"
+                        color: GTheme.bgWhite
                         TextArea{
                             id:input
                             anchors.left: parent.left
@@ -124,13 +124,13 @@ Popup {
                             anchors.top: parent.top
                             font.pixelSize: 12
                             placeholderText: qsTr("One task url per line (supports magnet)")
-                            color: GTheme.dark ? "#ffffff" : "#303133"
-                            placeholderTextColor: GTheme.dark ? "#9a9a9a" : "#bababa"
+                            color: GTheme.textPrimary
+                            placeholderTextColor: GTheme.textPlaceholder
                             background: Rectangle{
                                 implicitHeight: taskPageLayout.height
                                 implicitWidth: taskPageLayout.width
-                                color: GTheme.dark  ? "#303030" : "#ffffff"
-                                border.color: GTheme.dark ? input.enabled ? "#5151f9" : "#545454" : input.enabled ? "#5151f9" : "#b8bcc5"
+                                color: GTheme.bgWhite
+                                border.color: input.enabled ? GTheme.primaryColor : GTheme.borderBase
                             }
                         }
                         Component.onCompleted: {
@@ -167,11 +167,11 @@ Popup {
                                 dropTorent.visible = true
                             }
                         }
-                        color: GTheme.dark ? "#2e2e2e" : "#ffffff"
+                        color: GTheme.bgWhite
                     }
                     Rectangle{
                         id:netDiskPage
-                        color: GTheme.dark ? "#2e2e2e" : "#ffffff"
+                        color: GTheme.bgWhite
                         NetDiskPageView{
                             id:netDiskPageView
                              anchors.fill: parent
@@ -255,7 +255,7 @@ Popup {
                             Layout.leftMargin: 10
                             text: qsTr("Rename:")
                             font.pixelSize: 14
-                            color:GTheme.dark ? "#d9d9d9" : "#68696d"
+                            color: GTheme.textRegular
                         }
                         RowLayout{
                             id:renameLayout
@@ -270,7 +270,7 @@ Popup {
                                 id:splits
                                 text: qsTr("Splits:")
                                 font.pixelSize: 14
-                                color:GTheme.dark ? "#d9d9d9" : "#68696d"
+                                color: GTheme.textRegular
                             }
                             GSpinBox{
                                 id:spinbox
@@ -285,7 +285,7 @@ Popup {
                             Layout.leftMargin: 10
                             text: qsTr("Save to:")
                             font.pixelSize: 14
-                            color:GTheme.dark ? "#d9d9d9" : "#68696d"
+                            color: GTheme.textRegular
                         }
                         FolderSelector{
                             id:savePath
@@ -313,7 +313,7 @@ Popup {
                         Label {
                             text: "User-Agent:"
                             font.pixelSize: 14
-                            color: GTheme.dark ? "#d9d9d9" : "#68696d"
+                            color: GTheme.textRegular
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                         }
                         GTextField {
@@ -326,7 +326,7 @@ Popup {
                         Label {
                             text: "Authorization:"
                             font.pixelSize: 14
-                            color: GTheme.dark ? "#d9d9d9" : "#68696d"
+                            color: GTheme.textRegular
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                         }
                         GTextField {
@@ -339,7 +339,7 @@ Popup {
                         Label {
                             text: "Referer:"
                             font.pixelSize: 14
-                            color: GTheme.dark ? "#d9d9d9" : "#68696d"
+                            color: GTheme.textRegular
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                         }
                         GTextField {
@@ -352,7 +352,7 @@ Popup {
                         Label {
                             text: "Cookie:"
                             font.pixelSize: 14
-                            color: GTheme.dark ? "#d9d9d9" : "#68696d"
+                            color: GTheme.textRegular
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                         }
                         GTextField {
@@ -365,7 +365,7 @@ Popup {
                         Label{
                             text: qsTr("Custom Request Header List:")
                             font.pixelSize: 14
-                            color: GTheme.dark ? "#d9d9d9" : "#68696d"
+                            color: GTheme.textRegular
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                         }
                         TextArea{
@@ -374,13 +374,13 @@ Popup {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 100
                             placeholderText: qsTr("Custom request header list (one per line in the format KEY:VALUE)")
-                            color: GTheme.dark ? "#ffffff" : "#303133"
-                            placeholderTextColor: GTheme.dark ? "#9a9a9a" : "#bababa"
+                            color: GTheme.textPrimary
+                            placeholderTextColor: GTheme.textPlaceholder
                             background: Rectangle{
                                 implicitHeight: taskPageLayout.height
                                 implicitWidth: taskPageLayout.width
-                                color: GTheme.dark  ? "#303030" : "#ffffff"
-                                border.color: GTheme.dark ? input.enabled ? "#5151f9" : "#545454" : input.enabled ? "#5151f9" : "#b8bcc5"
+                                color: GTheme.bgWhite
+                                border.color: input.enabled ? GTheme.primaryColor : GTheme.borderBase
                             }
 
                             function getRequestHeaderList() {

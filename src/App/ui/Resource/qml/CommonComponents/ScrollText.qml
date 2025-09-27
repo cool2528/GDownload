@@ -4,8 +4,6 @@ import gdl.sdk
 ScrollView {
     id: scrollView
     clip: true
-    anchors.top: parent.top
-    anchors.topMargin: 0
     implicitWidth: 560
     implicitHeight: 300
     property var text
@@ -19,7 +17,7 @@ ScrollView {
         viewContentHeight: view.contentHeight
     }
     background: Rectangle {
-        color: GTheme.dark ? "#242424" : "#ffffff"
+        color: GTheme.bgWhite
         radius: promptPage ? 6 : 0
     }
     contentItem: Flickable {
@@ -42,8 +40,8 @@ ScrollView {
             text: scrollView.text
             textFormat: promptPage ? TextEdit.MarkdownText : TextEdit.PlainText
 
-            selectionColor: GTheme.dark ? "#3078BB" : "#3078BB"
-            color: GTheme.dark ? "#E9E9E9" : "#303030"
+            selectionColor: GTheme.primaryLight(5)
+            color: GTheme.textPrimary
             leftPadding: promptPage ? 15 : 7
             topPadding: promptPage ? 20 : 5
             rightPadding: promptPage ? 31 : 14

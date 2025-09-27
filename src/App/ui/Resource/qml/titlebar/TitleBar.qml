@@ -5,7 +5,7 @@ import gdl.sdk
 Rectangle {
     id: titleBar
     width: parent.width
-    color: GTheme.dark ? "#242424" : "#ffffff"
+    color: GTheme.bgWhite
     height: 32
     visible: Qt.platform.os === "osx" ? (mainWindow.fullScreen ? false : true) : true
     Component.onCompleted: {
@@ -74,10 +74,11 @@ Rectangle {
             id:win_minsize
             Layout.preferredHeight: 32
             Layout.preferredWidth: 40
-            imageSize:Qt.size(16,16)
-            backgroundColor: hovered ? "#c0c0c0" : "transparent"
-            normalImage: "/images/titlebar/windows-minimize.svg"
-            hoverImage: "/images/titlebar/windows-minimize-hover.svg"
+            imageSize: Qt.size(16,16)
+            backgroundColor: hovered ? GTheme.fillLight : "transparent"
+            normalImage: GTheme.dark ? "/images/titlebar/windows-minimize-dark.svg" : "/images/titlebar/windows-minimize.svg"
+            hoverImage: GTheme.dark ? "/images/titlebar/windows-minimize-dark.svg" : "/images/titlebar/windows-minimize-hover.svg"
+            tintColor: "transparent"
             onClicked: {
                 mainWindow.showMinimized2()
             }
@@ -87,10 +88,11 @@ Rectangle {
             visible: !mainWindow.maximized
             Layout.preferredHeight: 32
             Layout.preferredWidth: 40
-            imageSize:Qt.size(16,16)
-            backgroundColor: hovered ? "#c0c0c0" : "transparent"
-            normalImage: "/images/titlebar/windows-maximize.svg"
-            hoverImage: "/images/titlebar/windows-maximize-hover.svg"
+            imageSize: Qt.size(16,16)
+            backgroundColor: hovered ? GTheme.fillLight : "transparent"
+            normalImage: GTheme.dark ? "/images/titlebar/windows-maximize-dark.svg" : "/images/titlebar/windows-maximize.svg"
+            hoverImage: GTheme.dark ? "/images/titlebar/windows-maximize-dark.svg" : "/images/titlebar/windows-maximize-hover.svg"
+            tintColor: "transparent"
             onClicked: {
                 mainWindow.toggleMaximized()
             }
@@ -102,10 +104,11 @@ Rectangle {
              visible: mainWindow.maximized
             Layout.preferredHeight: 32
             Layout.preferredWidth: 40
-            imageSize:Qt.size(16,16)
-            backgroundColor: hovered ? "#c0c0c0" : "transparent"
-            normalImage: "/images/titlebar/windows-restore.svg"
-            hoverImage: "/images/titlebar/windows-restore-hover.svg"
+            imageSize: Qt.size(16,16)
+            backgroundColor: hovered ? GTheme.fillLight : "transparent"
+            normalImage: GTheme.dark ? "/images/titlebar/windows-restore-dark.svg" : "/images/titlebar/windows-restore.svg"
+            hoverImage: GTheme.dark ? "/images/titlebar/windows-restore-dark.svg" : "/images/titlebar/windows-restore-hover.svg"
+            tintColor: "transparent"
             onClicked: {
                 mainWindow.toggleMaximized()
             }
@@ -114,10 +117,11 @@ Rectangle {
             id:win_close
             Layout.preferredHeight: 32
             Layout.preferredWidth: 40
-            imageSize:Qt.size(16,16)
-            backgroundColor: hovered ? "#e81123" :"transparent"
-            normalImage: "/images/titlebar/windows-close.svg"
-            hoverImage: "/images/titlebar/windows-close-hover.svg"
+            imageSize: Qt.size(16,16)
+            backgroundColor: hovered ? GTheme.dangerLight(3) : "transparent"
+            normalImage: GTheme.dark ? "/images/titlebar/windows-close-dark.svg" : "/images/titlebar/windows-close.svg"
+            hoverImage: GTheme.dark ? "/images/titlebar/windows-close-dark.svg" : "/images/titlebar/windows-close-hover.svg"
+            tintColor: "transparent"
             onClicked: {
                 Qt.quit()
             }

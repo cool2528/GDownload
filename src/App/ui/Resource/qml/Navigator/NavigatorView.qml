@@ -10,18 +10,19 @@ Item{
         id:systemNavigator
         anchors.fill: parent
         gradient: Gradient{
-            GradientStop{
-                position: 0.0
-                color: "#414141"
-            }
-            GradientStop{
-                position: 0.33
-                color: "#444444"
-            }
-            GradientStop{
-                position: 1.0
-                color: "#484848"
-            }
+            // 使用 ElementPlusColors 提供的 QML 方法（深色中性色）
+            GradientStop{ position: 0.0;  color: ElementPlusColors.fillBase(true) }
+            GradientStop{ position: 0.5;  color: ElementPlusColors.fillLight(true) }
+            GradientStop{ position: 1.0;  color: ElementPlusColors.fillLighter(true) }
+        }
+
+        // 右侧分隔线，增强分区感
+        Rectangle {
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            width: 1
+            color: GTheme.borderLight
         }
 
         implicitWidth: 74
@@ -41,7 +42,7 @@ Item{
                 Layout.fillWidth: true
                 iconSource: SegoeFluentIcons.HomeSolid
                 iconSize: 30
-                iconColor: "#ffffff"
+                iconColor: hovered ? GTheme.primaryColor : ElementPlusColors.bgWhite(false)
                 onClicked: {
                     Qt.openUrlExternally("https://github.com/cool2528/GDownload")
 
@@ -54,7 +55,7 @@ Item{
                 Layout.fillWidth: true
                 iconSource: SegoeFluentIcons.SubscriptionAdd
                 iconSize: 30
-                iconColor: "#ffffff"
+                iconColor: hovered ? GTheme.primaryColor : ElementPlusColors.bgWhite(false)
                 onClicked: {
                     console.debug("select download page")
                     brower_view.index = 0
@@ -92,7 +93,7 @@ Item{
                 id:setting
                 iconSource: SegoeFluentIcons.SettingsSolid
                 iconSize: 30
-                iconColor: "#ffffff"
+                iconColor: hovered ? GTheme.primaryColor : ElementPlusColors.bgWhite(false)
                 onClicked: {
                     console.debug("open settings dialog")
                     brower_view.index = 1
@@ -103,7 +104,7 @@ Item{
                 Layout.topMargin: 40
                 iconSource: SegoeFluentIcons.Info
                 iconSize: 30
-                iconColor: "#ffffff"
+                iconColor: hovered ? GTheme.primaryColor : ElementPlusColors.bgWhite(false)
                 onClicked: {
                     console.debug("open help dialog")
                     let about = showAboutDialog()

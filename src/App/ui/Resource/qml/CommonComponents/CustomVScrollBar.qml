@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import gdl.sdk
 
 ScrollBar {
     id: scrollBar
@@ -76,7 +77,7 @@ ScrollBar {
     contentItem: Rectangle {
         id: contentItem
 
-        color: "#4F4F4F"
+        color: GTheme.dark ? GTheme.borderLight : GTheme.borderBase
         radius: 5
 
         implicitWidth: fixWidth > 0 ? fixWidth : 15

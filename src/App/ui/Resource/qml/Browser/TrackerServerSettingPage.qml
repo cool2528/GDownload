@@ -3,20 +3,19 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import "../CommonComponents"
 import gdl.sdk
-Rectangle {
+GCard {
     id:trackServerPage
     Layout.margins: 10
     Layout.fillWidth: true
     Layout.preferredHeight: 550
-    color: "transparent"
-    border.color: "#409EFF"
-    border.width: 1
+    outlined: true
+    padding: 10
     RowLayout{
         id:comboxLayout
         spacing: 30
         Label{
             text: qsTr("Tracker Servers:")
-            color: GTheme.dark ?  "#FFFFFF" : "#3b3b3b"
+            color: GTheme.textPrimary
             font.pixelSize: 14
             Layout.preferredWidth: 100
             Layout.leftMargin: 10
@@ -111,13 +110,13 @@ Rectangle {
         TextArea{
             id:serverResult
             text: UtilsToolsManager.serverList
-            color: GTheme.dark ? "#ffffff" : "#303133"
-            placeholderTextColor: GTheme.dark ? "#9a9a9a" : "#bababa"
+            color: GTheme.textPrimary
+            placeholderTextColor: GTheme.textPlaceholder
             background: Rectangle{
-                implicitHeight: serverResult.implicitHeight 
+                // 避免与 TextArea 的 implicitHeight 相互依赖造成 binding loop
                 implicitWidth: serverResultScrollView.availableWidth 
-                color: GTheme.dark  ? "#303030" : "#ffffff"
-                border.color: GTheme.dark ? serverResult.enabled ? "#5151f9" : "#545454" : serverResult.enabled ? "#5151f9" : "#b8bcc5"
+                color: GTheme.bgWhite
+                border.color: serverResult.enabled ? GTheme.primaryColor : GTheme.borderBase
             }
         }
     }

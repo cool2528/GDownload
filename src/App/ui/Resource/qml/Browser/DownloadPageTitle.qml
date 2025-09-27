@@ -22,7 +22,7 @@ Item {
             }
         }
         font.pixelSize: 14
-        color: GTheme.dark ? "#ffffff" :  "#3b3b3b"
+        color: GTheme.textPrimary
     }
 
     RowLayout{
@@ -36,7 +36,7 @@ Item {
             Layout.minimumHeight: 40
             Layout.maximumHeight: 40
             iconSource: SegoeFluentIcons.Delete
-            iconColor: GTheme.dark ? hovered ? "#5151f9" : "#ffffff": hovered ? "#5151f9" : "#8a8c91"
+            iconColor: hovered ? GTheme.primaryColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
             onClicked: {
                 if(type ===0){
                     BrowserManager.RemoveAllTask(0,true)
@@ -53,7 +53,7 @@ Item {
             Layout.minimumHeight: 40
             Layout.maximumHeight: 40
             iconSource: SegoeFluentIcons.Refresh
-            iconColor: GTheme.dark ? hovered ? "#5151f9" : "#ffffff": hovered ? "#5151f9" : "#8a8c91"
+            iconColor: hovered ? GTheme.primaryColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
             onClicked: {
                 if(type ===0){
                     BrowserManager.RefreshTaskList(0)
@@ -71,7 +71,7 @@ Item {
             Layout.maximumHeight: 40
             visible: type !== 2
             iconSource: SegoeFluentIcons.PlayBadge12
-            iconColor: GTheme.dark ? hovered ? "#5151f9" : "#ffffff": hovered ? "#5151f9" : "#8a8c91"
+            iconColor: hovered ? GTheme.primaryColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
             onClicked: {
                 if(type ===0){
                     BrowserManager.UnpauseAllTask(0)
@@ -89,7 +89,7 @@ Item {
             Layout.maximumHeight: 40
             visible: type !== 2
             iconSource: SegoeFluentIcons.PauseBadge12
-            iconColor:GTheme.dark ? hovered ? "#5151f9" : "#ffffff": hovered ? "#5151f9" : "#8a8c91"
+            iconColor: hovered ? GTheme.primaryColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
             onClicked: {
                 if(type ===0){
                     BrowserManager.PauseAllTask(0)
@@ -101,12 +101,5 @@ Item {
             }
         }
     }
-    Rectangle{
-        id:splitLine
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 5
-        width: parent.width
-        height: 3
-        color: GTheme.dark ? "#434343" : "#e5e5e5"
-    }
+    Divider { anchors.bottom: parent.bottom; anchors.bottomMargin: 5 }
 }

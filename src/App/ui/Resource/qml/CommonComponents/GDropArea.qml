@@ -12,7 +12,7 @@ Item {
         id: dropArea
         property bool hoverd: false
         anchors.fill: parent
-        color: GTheme.dark ? "#282828" : "#ffffff"
+        color: GTheme.bgWhite
 
         Canvas {
             id:canvas
@@ -21,7 +21,7 @@ Item {
                 var ctx = getContext("2d")
                 ctx.clearRect(1, 1, width-2, height-2, 4, 4)
                 ctx.setLineDash([5, 5])
-                ctx.strokeStyle =  (dropZone.containsDrag || dropArea.hoverd) ? "#5151f9" : (GTheme.dark ? "#555555" : "#d4d4d4")
+                ctx.strokeStyle =  (dropZone.containsDrag || dropArea.hoverd) ? GTheme.primaryColor : GTheme.borderBase
                 ctx.lineWidth = 1
                 ctx.beginPath()
                 ctx.roundedRect(1, 1, width-2, height-2, 4, 4)
@@ -51,7 +51,7 @@ Item {
             anchors.topMargin: 10
             anchors.horizontalCenter: parent.horizontalCenter
             text: qsTr("Drag a torrent or metalink file here, or click to select.")
-            color: GTheme.dark ? "#939495" : "#666666"
+            color: GTheme.textSecondary
         }
 
 

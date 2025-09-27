@@ -22,14 +22,7 @@ Item {
             }
         }
         font.pixelSize: 14
-        color: GTheme.dark ? "#ffffff" : "#3b3b3b"
+        color: GTheme.textPrimary
     }
-    Rectangle{
-        id:splitLine
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 5
-        width: parent.width
-        height: 3
-        color: GTheme.dark ? "#434343" : "#e5e5e5"
-    }
+    Divider { anchors.bottom: parent.bottom; anchors.bottomMargin: 5 }
 }
