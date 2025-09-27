@@ -1,38 +1,33 @@
 import QtQuick
 import QtQuick.Controls
-Button{
-    id:control
+import gdl.sdk
+
+Button {
+    id: control
     property int iconSource
-    property int iconSize
-    property color backgroundColor:"transparent"
+    property int iconSize: 16
+    property color backgroundColor: "transparent"
     property alias iconColor: icon.color
-    implicitHeight: {
-        return textMetrics.height
-    }
-    implicitWidth: {
-        return textMetrics.width
+
+    implicitHeight: 32
+    implicitWidth: 32
+
+    background: Rectangle {
+        color: control.backgroundColor
+        radius: 4
     }
 
-    background: Rectangle{
-        color: control.backgroundColor
-    }
-    FontIcon{
-        id:icon
-        anchors.fill: parent
+    contentItem: FontIcon {
+        id: icon
+        anchors.centerIn: parent
         iconSize: control.iconSize
         iconSource: control.iconSource
-        color:icon.color
+        color: GTheme.textSecondary
     }
-    HoverHandler{
-        id:mouse
+
+    HoverHandler {
+        id: mouse
         acceptedDevices: PointerDevice.Mouse
         cursorShape: Qt.PointingHandCursor
     }
-    TextMetrics{
-        id:textMetrics
-        font.family: FluentIcons
-        font.pixelSize: iconSize
-        text: String.fromCharCode(iconSource).toString(16)
-    }
-
 }

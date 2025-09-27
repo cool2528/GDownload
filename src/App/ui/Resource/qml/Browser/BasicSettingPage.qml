@@ -3,248 +3,302 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import "../CommonComponents"
 import gdl.sdk
-Rectangle{
-    id:basicSetting
-    color: GTheme.dark ? "#1E1E1E" : GTheme.bgWhite
+
+// Element Plus 风格基础设置页面
+Rectangle {
+    id: basicSetting
+    color: GTheme.bgPage  // 使用 Element Plus 页面背景色
     clip: true
-    ScrollView{
-        id:scroView
+
+    // Element Plus 设计标准
+    readonly property int standardSpacing: 16
+    readonly property int cardSpacing: 12
+    readonly property int contentMargin: 24
+
+    ScrollView {
+        id: scrollView
         anchors.fill: parent
-        anchors.margins: 0
         ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
         clip: true
         contentWidth: availableWidth
-        contentHeight: columnLayout.implicitHeight
+        contentHeight: columnLayout.implicitHeight + 60  // 增加底部间距
 
-        ColumnLayout{
-            id:columnLayout
-            width: scroView.availableWidth
-            spacing: 4
+        ColumnLayout {
+            id: columnLayout
+            width: scrollView.availableWidth
+            spacing: basicSetting.cardSpacing
             anchors.margins: 0
-                GCard {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 140
-                    Layout.leftMargin: 10
-                    Layout.rightMargin: 10
-                    Layout.topMargin: 3
-                    Layout.bottomMargin: 3
-                    outlined: true
-                    padding: 12
-                    ColumnLayout {
-                        anchors.fill: parent
-                        anchors.margins: 8
-                        spacing: 8
-                        ThemeSwitch{
-                            id:themeSwitch
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 70
-                        }
-                        RowLayout{
-                            id:language
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignVCenter
-                            spacing: 10
-                            Label{
-                                text: qsTr("Language")
-                                Layout.preferredWidth: 100
-                                font.pixelSize: 14
-                                color: GTheme.textPrimary
-                                verticalAlignment: Text.AlignVCenter
-                            }
-                            GComBoBox{
-                                id:languageComBoBox
-                                Layout.preferredWidth: 150
-                                Layout.preferredHeight: 36
-                                property var values: LanguageManager.GetSupportedLanguages()
-                                model: ["English","简体中文","繁體中文","日本語","한국어"]
-                                onActivated: function(selectIndex){
-                                    let index = selectIndex
-                                    let value = languageComBoBox.values[index]
-                                    LanguageManager.SwitchLanguage(value)
-                                }
-                                Component.onCompleted: {
-                                    let index = languageComBoBox.values.indexOf(LanguageManager.GetCurrentLanguage())
-                                    languageComBoBox.currentIndex = index
-                                }
-                            }
-                        }
-                    }
-                }
+            anchors.topMargin: basicSetting.standardSpacing  // 顶部间距
 
-                // 基础开关分组
-                GCard {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 280
-                    Layout.leftMargin: 10
-                    Layout.rightMargin: 10
-                    Layout.topMargin: 3
-                    Layout.bottomMargin: 3
-                    outlined: true
-                    padding: 12
-                    ColumnLayout {
-                        anchors.fill: parent
-                        anchors.margins: 8
-                        spacing: 5
-                        // 开启自动更新
-                        GButtonSwitch{
-                            id:autoUpdate
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 38
-                            Layout.margins: 10
-                            text: qsTr("Auto Update")
-                            checked: SettingsManager.qEnableAutoUpdate
-                            onClicked: {
-                                SettingsManager.SetEnableAutoUpdate(checked)
-                            }
-                        }
-                        Divider{
-                            Layout.fillWidth: true
-                            Layout.leftMargin: 5
-                            Layout.rightMargin: 5
-                        }
-                        // 开机自启动
-                        GButtonSwitch{
-                            id:autoStart
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 38
-                            Layout.margins: 10
-                            text: qsTr("Open at Login")
-                            checked: SettingsManager.qAutoStart
-                            onClicked: {
-                                SettingsManager.SetAutoStart(checked)
-                                UtilsToolsManager.SetAutoStart(checked)
-                            }
-                        }
-                        Divider{
-                            Layout.fillWidth: true
-                            Layout.leftMargin: 5
-                            Layout.rightMargin: 5
-                        }
-                        // 下次启动记住窗口位置
-                        GButtonSwitch{
-                            id:rememberWindowPosition
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 38
-                            Layout.margins: 10
-                            text: qsTr("Remember Window Position")
-                            checked: SettingsManager.qRememberWindowPosition
-                            onClicked: {
-                                SettingsManager.SetRememberWindowPosition(checked)
-                            }
-                        }
-                        Divider{
-                            Layout.fillWidth: true
-                            Layout.leftMargin: 5
-                            Layout.rightMargin: 5
-                        }
-                        // 下次启动自动恢复未完成的下载任务
-                        GButtonSwitch{
-                            id:autoResume
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 38
-                            Layout.margins: 10
-                            text: qsTr("Auto Resume Unfinished Download")
-                            checked: SettingsManager.qAutoResumeTask
-                            onClicked: {
-                                SettingsManager.SetAria2AutoResumeTask(checked)
-                            }
-                        }
-                    }
-                }
+            // 主题和语言设置卡片
+            GCard {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 140
+                Layout.leftMargin: basicSetting.contentMargin
+                Layout.rightMargin: basicSetting.contentMargin
+                outlined: true
+                padding: basicSetting.standardSpacing
 
-                // 设置全局下载保存路径
-                GCard {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 50
-                    Layout.leftMargin: 10
-                    Layout.rightMargin: 10
-                    Layout.topMargin: 3
-                    Layout.bottomMargin: 3
-                    outlined: true
-                    padding: 12
-                    RowLayout{
-                        id:downloadPath
-                        anchors.fill: parent
-                        anchors.margins: 8
-                        spacing: 10
-                        Label{
-                            text: qsTr("Download Path")
-                            Layout.preferredWidth: 150
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: basicSetting.standardSpacing
+                    spacing: basicSetting.standardSpacing
+
+                    // 卡片标题
+                    Text {
+                        text: qsTr("Appearance & Language")
+                        font.pixelSize: 16
+                        font.weight: Font.Medium
+                        color: GTheme.textPrimary
+                        Layout.fillWidth: true
+                    }
+
+                    ThemeSwitch {
+                        id: themeSwitch
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 70
+                    }
+
+                    RowLayout {
+                        id: language
+                        Layout.fillWidth: true
+                        Layout.alignment: Qt.AlignVCenter
+                        spacing: basicSetting.standardSpacing
+
+                        Label {
+                            text: qsTr("Language")
+                            Layout.preferredWidth: 100
                             font.pixelSize: 14
                             color: GTheme.textPrimary
+                            verticalAlignment: Text.AlignVCenter
                         }
-                        FolderSelector{
-                            id:folderSelector
-                            Layout.fillWidth: true
-                            Layout.rightMargin: 30
-                            Layout.preferredHeight: 38
-                            path: SettingsManager.qDir
-                            onActived: function(){
-                                SettingsManager.SetDir(folderSelector.path)
-                                folderSelector.path = Qt.binding(function(){return SettingsManager.qDir})
+
+                        GComBoBox {
+                            id: languageComBoBox
+                            Layout.preferredWidth: 150
+                            Layout.preferredHeight: 36
+                            property var values: LanguageManager.GetSupportedLanguages()
+                            model: ["English","简体中文","繁體中文","日本語","한국어"]
+                            onActivated: function(selectIndex){
+                                let index = selectIndex
+                                let value = languageComBoBox.values[index]
+                                LanguageManager.SwitchLanguage(value)
+                            }
+                            Component.onCompleted: {
+                                let index = languageComBoBox.values.indexOf(LanguageManager.GetCurrentLanguage())
+                                languageComBoBox.currentIndex = index
                             }
                         }
                     }
                 }
+            }
 
-                // 是否启用全局代理
-                GCard {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 130
-                    Layout.leftMargin: 10
-                    Layout.rightMargin: 10
-                    Layout.topMargin: 3
-                    Layout.bottomMargin: 3
-                    outlined: true
-                    padding: 12
-                    ColumnLayout{
-                        id:proxy
-                        anchors.fill: parent
-                        anchors.margins: 8
-                        spacing: 5
-                        GButtonSwitch{
-                            id:enableProxy
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 38
-                            Layout.margins: 10
-                            text: qsTr("Enable Global Proxy")
-                            checked: SettingsManager.qEnableGlobalProxy
-                            onClicked: {
-                                SettingsManager.SetEnableGlobalProxy(checked)
-                                if(!checked){
-                                    SettingsManager.SetAria2GlobalProxy("")
-                                }
+            // 应用行为设置卡片
+            GCard {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 300
+                Layout.leftMargin: basicSetting.contentMargin
+                Layout.rightMargin: basicSetting.contentMargin
+                outlined: true
+                padding: basicSetting.standardSpacing
+
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: basicSetting.standardSpacing
+                    spacing: 8
+
+                    // 卡片标题
+                    Text {
+                        text: qsTr("Application Behavior")
+                        font.pixelSize: 16
+                        font.weight: Font.Medium
+                        color: GTheme.textPrimary
+                        Layout.fillWidth: true
+                        Layout.bottomMargin: 8
+                    }
+
+                    // 开启自动更新
+                    GButtonSwitch {
+                        id: autoUpdate
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 38
+                        text: qsTr("Auto Update")
+                        checked: SettingsManager.qEnableAutoUpdate
+                        onClicked: {
+                            SettingsManager.SetEnableAutoUpdate(checked)
+                        }
+                    }
+
+                    Divider {
+                        Layout.fillWidth: true
+                        Layout.leftMargin: 8
+                        Layout.rightMargin: 8
+                    }
+
+                    // 开机自启动
+                    GButtonSwitch {
+                        id: autoStart
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 38
+                        text: qsTr("Open at Login")
+                        checked: SettingsManager.qAutoStart
+                        onClicked: {
+                            SettingsManager.SetAutoStart(checked)
+                            UtilsToolsManager.SetAutoStart(checked)
+                        }
+                    }
+
+                    Divider {
+                        Layout.fillWidth: true
+                        Layout.leftMargin: 8
+                        Layout.rightMargin: 8
+                    }
+
+                    // 下次启动记住窗口位置
+                    GButtonSwitch {
+                        id: rememberWindowPosition
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 38
+                        text: qsTr("Remember Window Position")
+                        checked: SettingsManager.qRememberWindowPosition
+                        onClicked: {
+                            SettingsManager.SetRememberWindowPosition(checked)
+                        }
+                    }
+
+                    Divider {
+                        Layout.fillWidth: true
+                        Layout.leftMargin: 8
+                        Layout.rightMargin: 8
+                    }
+
+                    // 下次启动自动恢复未完成的下载任务
+                    GButtonSwitch {
+                        id: autoResume
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 38
+                        text: qsTr("Auto Resume Unfinished Download")
+                        checked: SettingsManager.qAutoResumeTask
+                        onClicked: {
+                            SettingsManager.SetAria2AutoResumeTask(checked)
+                        }
+                    }
+                }
+            }
+
+            // 下载路径设置卡片
+            GCard {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 80
+                Layout.leftMargin: basicSetting.contentMargin
+                Layout.rightMargin: basicSetting.contentMargin
+                outlined: true
+                padding: basicSetting.standardSpacing
+
+                RowLayout {
+                    id: downloadPath
+                    anchors.fill: parent
+                    anchors.margins: basicSetting.standardSpacing
+                    spacing: basicSetting.standardSpacing
+
+                    // 标签区域
+                    ColumnLayout {
+                        Layout.preferredWidth: 140
+                        spacing: 4
+
+                        Text {
+                            text: qsTr("Download Path")
+                            font.pixelSize: 14
+                            font.weight: Font.Medium
+                            color: GTheme.textPrimary
+                        }
+
+                        Text {
+                            text: qsTr("Global download folder")
+                            font.pixelSize: 12
+                            color: GTheme.textSecondary
+                        }
+                    }
+
+                    FolderSelector {
+                        id: folderSelector
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 38
+                        path: SettingsManager.qDir
+                        onActived: function(){
+                            SettingsManager.SetDir(folderSelector.path)
+                            folderSelector.path = Qt.binding(function(){return SettingsManager.qDir})
+                        }
+                    }
+                }
+            }
+
+            // 网络代理设置卡片
+            GCard {
+                Layout.fillWidth: true
+                Layout.preferredHeight: enableProxy.checked ? 150 : 100
+                Layout.leftMargin: basicSetting.contentMargin
+                Layout.rightMargin: basicSetting.contentMargin
+                outlined: true
+                padding: basicSetting.standardSpacing
+
+                ColumnLayout {
+                    id: proxy
+                    anchors.fill: parent
+                    anchors.margins: basicSetting.standardSpacing
+                    spacing: 12
+
+                    // 卡片标题
+                    Text {
+                        text: qsTr("Network Proxy")
+                        font.pixelSize: 16
+                        font.weight: Font.Medium
+                        color: GTheme.textPrimary
+                        Layout.fillWidth: true
+                    }
+
+                    GButtonSwitch {
+                        id: enableProxy
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 38
+                        text: qsTr("Enable Global Proxy")
+                        checked: SettingsManager.qEnableGlobalProxy
+                        onClicked: {
+                            SettingsManager.SetEnableGlobalProxy(checked)
+                            if(!checked){
+                                SettingsManager.SetAria2GlobalProxy("")
                             }
                         }
-                        Divider{
+                    }
+
+                    // 代理设置输入区域
+                    ColumnLayout {
+                        visible: enableProxy.checked
+                        Layout.fillWidth: true
+                        spacing: 8
+
+                        Divider {
                             Layout.fillWidth: true
-                            Layout.leftMargin: 5
-                            Layout.rightMargin: 5
+                            Layout.leftMargin: 8
+                            Layout.rightMargin: 8
                         }
-                        // 代理设置
+
                         RowLayout {
-                            spacing: 10
+                            spacing: basicSetting.standardSpacing
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 45
-                            Layout.alignment: Qt.AlignVCenter
-                            Layout.margins: 5
 
                             GTextField {
                                 id: proxySetting
-                                visible: enableProxy.checked
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 32
+                                Layout.preferredHeight: 36
                                 placeholderText: "[http://][USER:PASSWORD@]HOST[:PORT]"
                                 text: SettingsManager.qGlobalProxy
                             }
 
-                            // 保存按钮
                             GButton {
                                 id: saveProxy
-                                visible: enableProxy.checked
                                 Layout.preferredWidth: 80
-                                Layout.preferredHeight: 32
-                                Layout.alignment: Qt.AlignVCenter
+                                Layout.preferredHeight: 36
                                 type: 1
                                 text: qsTr("Save")
                                 onClicked: {
@@ -254,38 +308,53 @@ Rectangle{
                         }
                     }
                 }
-                // 自动监听剪切板链接
-                GCard {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 50
-                    Layout.leftMargin: 10
-                    Layout.rightMargin: 10
-                    Layout.topMargin: 3
-                    Layout.bottomMargin: 3
-                    outlined: true
-                    padding: 12
-                    ColumnLayout {
-                        anchors.fill: parent
-                        anchors.margins: 8
+            }
+            // 剪贴板监听设置卡片
+            GCard {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 120  // 增加高度以适应内容
+                Layout.leftMargin: basicSetting.contentMargin
+                Layout.rightMargin: basicSetting.contentMargin
+                Layout.bottomMargin: basicSetting.standardSpacing  // 添加底部间距
+                outlined: true
+                padding: basicSetting.standardSpacing
 
-                        GButtonSwitch{
-                            id:listenClipboard
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 38
-                            text: qsTr("Auto Listen Clipboard Link")
-                            checked: SettingsManager.qListenClipboard
-                            onClicked: {
-                                SettingsManager.SetListenClipboard(checked)
-                            }
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: basicSetting.standardSpacing
+                    spacing: 8
+
+                    // 卡片标题和描述
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 4
+
+                        Text {
+                            text: qsTr("Clipboard Monitor")
+                            font.pixelSize: 16
+                            font.weight: Font.Medium
+                            color: GTheme.textPrimary
+                        }
+
+                        Text {
+                            text: qsTr("Automatically detect download links from clipboard")
+                            font.pixelSize: 12
+                            color: GTheme.textSecondary
                         }
                     }
-                }
 
-                // 底部间距
-                Item {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 20
+                    GButtonSwitch {
+                        id: listenClipboard
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 38
+                        text: qsTr("Auto Listen Clipboard Link")
+                        checked: SettingsManager.qListenClipboard
+                        onClicked: {
+                            SettingsManager.SetListenClipboard(checked)
+                        }
+                    }
                 }
             }
         }
     }
+}

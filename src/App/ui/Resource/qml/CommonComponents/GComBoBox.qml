@@ -5,31 +5,91 @@ import gdl.sdk
 
 ComboBox {
     id: control
-    // 规格化：尺寸 large/default/small
+    // Element Plus 规格化 API
+    // size: large | default | small
     property string size: "default"
+    // status: normal | success | warning | danger（扩展状态支持）
+    property string status: "normal"
+    // clearable: 支持一键清空（Element Plus 特性）
+    property bool clearable: false
+    // placeholder: 占位文本
+    property string placeholder: "Please select"
+
     readonly property int implicitH: (size === "large" ? 40 : (size === "small" ? 24 : 32))
     readonly property int radiusPx: 4
+    readonly property int fontPx: (size === "large" ? 16 : (size === "small" ? 12 : 14))
     property int maxPopHeight: 200
+    // Element Plus 风格颜色管理
+    readonly property var colors: {
+        const statusColors = {
+            normal: {
+                border: GTheme.borderBase,
+                borderHover: GTheme.primaryColor,
+                borderFocus: GTheme.primaryColor
+            },
+            success: {
+                border: GTheme.borderBase,
+                borderHover: GTheme.successColor,
+                borderFocus: GTheme.successColor
+            },
+            warning: {
+                border: GTheme.borderBase,
+                borderHover: GTheme.warningColor,
+                borderFocus: GTheme.warningColor
+            },
+            danger: {
+                border: GTheme.borderBase,
+                borderHover: GTheme.dangerColor,
+                borderFocus: GTheme.dangerColor
+            }
+        }
+        return statusColors[status] || statusColors.normal
+    }
+
     delegate: ItemDelegate {
         width: control.width
+        height: 32  // Element Plus 标准选项高度
+
         contentItem: Text {
             text: control.textRole
                 ? (Array.isArray(control.model) ? modelData[control.textRole] : model[control.textRole])
                 : modelData
-            color: (control.currentIndex === index)
-                   ? GTheme.primaryColor
-                   : (GTheme.dark ? GTheme.textPrimary : GTheme.textRegular)
-            font: control.font
+            color: {
+                if (control.currentIndex === index) {
+                    return colors.borderFocus
+                }
+                return GTheme.dark ? GTheme.textPrimary : GTheme.textRegular
+            }
+            font.pixelSize: control.fontPx
             elide: Text.ElideRight
             verticalAlignment: Text.AlignVCenter
+            leftPadding: 12
+            rightPadding: 12
         }
         highlighted: control.highlightedIndex === index
-        
+
         background: Rectangle {
-            color: parent.highlighted
-                   ? (GTheme.dark ? GTheme.fillLight : GTheme.primaryLight(9))
-                   : (control.currentIndex === index ? (GTheme.dark ? GTheme.fillBase : GTheme.fillLight) : "transparent")
+            color: {
+                if (parent.highlighted) {
+                    return GTheme.dark ? GTheme.fillLight : GTheme.primaryLight(9)
+                }
+                if (control.currentIndex === index) {
+                    return GTheme.dark ? GTheme.fillBase : GTheme.fillLight
+                }
+                return "transparent"
+            }
+
+            // 优化的 hover 效果，避免闪烁
+            Behavior on color {
+                ColorAnimation {
+                    duration: 200
+                    easing.type: Easing.OutCubic
+                }
+            }
         }
+
+        // 移除可能的 HoverHandler 冲突
+        hoverEnabled: true
     }
 
     indicator: Canvas {
@@ -64,23 +124,91 @@ ComboBox {
     }
 
     contentItem: Text {
-        leftPadding: 10
-        rightPadding: control.indicator.width + control.spacing
+        leftPadding: 12  // Element Plus 标准内边距
+        rightPadding: control.indicator.width + control.spacing + 8
 
-        text: control.displayText
-        font: control.font
-        color: control.enabled ? (GTheme.dark ? GTheme.textPrimary : GTheme.textRegular) : GTheme.textDisabled
+        text: control.displayText || control.placeholder
+        font.pixelSize: control.fontPx
+        color: {
+            if (!control.enabled) {
+                return GTheme.textDisabled
+            }
+            if (!control.displayText) {
+                // placeholder 样式
+                return GTheme.textPlaceholder
+            }
+            return GTheme.dark ? GTheme.textPrimary : GTheme.textRegular
+        }
         verticalAlignment: Text.AlignVCenter
         elide: Text.ElideRight
+
+        // 文本颜色过渡
+        Behavior on color {
+            ColorAnimation { duration: 150 }
+        }
     }
 
     background: Rectangle {
         implicitWidth: 120
         implicitHeight: control.implicitH
-        color: control.enabled ? (GTheme.dark ? GTheme.fillBase : GTheme.bgWhite) : GTheme.fillLighter
-        border.color: (control.pressed || control.hovered || control.visualFocus) ? GTheme.primaryColor : GTheme.borderBase
+        color: {
+            if (!control.enabled) {
+                return GTheme.fillLighter
+            }
+            return GTheme.dark ? GTheme.fillBase : GTheme.bgWhite
+        }
+        border.color: {
+            if (!control.enabled) {
+                return GTheme.borderLighter
+            }
+            if (control.visualFocus) {
+                return colors.borderFocus
+            }
+            if (control.hovered || control.pressed) {
+                return colors.borderHover
+            }
+            return colors.border
+        }
         border.width: control.visualFocus ? 2 : 1
         radius: control.radiusPx
+
+        // Element Plus focus 阴影效果
+        layer.enabled: control.visualFocus
+        layer.effect: MultiEffect {
+            shadowEnabled: true
+            shadowColor: {
+                const focusColor = colors.borderFocus
+                return Qt.rgba(
+                    Qt.colorEqual(focusColor, focusColor) ? focusColor.r : 0.25,
+                    Qt.colorEqual(focusColor, focusColor) ? focusColor.g : 0.59,
+                    Qt.colorEqual(focusColor, focusColor) ? focusColor.b : 1.0,
+                    0.2
+                )
+            }
+            shadowBlur: 6
+            shadowVerticalOffset: 0
+            shadowHorizontalOffset: 0
+        }
+
+        // 优化的颜色过渡动画，避免闪烁
+        Behavior on color {
+            ColorAnimation {
+                duration: 200
+                easing.type: Easing.OutCubic
+            }
+        }
+        Behavior on border.color {
+            ColorAnimation {
+                duration: 200
+                easing.type: Easing.OutCubic
+            }
+        }
+        Behavior on border.width {
+            NumberAnimation {
+                duration: 200
+                easing.type: Easing.OutCubic
+            }
+        }
     }
 
     popup: Popup {
@@ -101,13 +229,32 @@ ComboBox {
             color: GTheme.dark ? GTheme.fillBase : GTheme.bgWhite
             border.color: GTheme.borderBase
             radius: control.radiusPx
+
+            // Element Plus 下拉面板阴影
             layer.enabled: true
             layer.effect: MultiEffect {
                 shadowEnabled: true
-                shadowColor: Qt.rgba(0,0,0,0.12)
-                shadowBlur: 8
+                shadowColor: Qt.rgba(0, 0, 0, 0.12)
+                shadowBlur: 12
                 shadowVerticalOffset: 4
-                // 与圆角匹配（MultiEffect 不直接识别 radius，借助源半透明背景过渡）
+                shadowHorizontalOffset: 0
+            }
+
+            // 面板展开动画
+            scale: control.popup.visible ? 1.0 : 0.95
+            opacity: control.popup.visible ? 1.0 : 0.0
+
+            Behavior on scale {
+                NumberAnimation {
+                    duration: 200
+                    easing.type: Easing.OutCubic
+                }
+            }
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: 150
+                    easing.type: Easing.OutCubic
+                }
             }
         }
     }

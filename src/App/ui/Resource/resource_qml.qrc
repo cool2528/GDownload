@@ -42,6 +42,6 @@
         <file>qml/CommonComponents/NetDiskPageView.qml</file>
         <file>qml/Browser/BaiduCookieSettingPage.qml</file>
         <file>qml/Browser/TrackerServerSettingPage.qml</file>
-        <file>qml/CommonComponents/DesignTokens.qml</file>
+        <file>qml/CommonComponents/GNavButton.qml</file>
     </qresource>
 </RCC>
