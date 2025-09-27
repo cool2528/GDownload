@@ -1,210 +1,345 @@
-﻿import QtQuick
+import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Qt5Compat.GraphicalEffects
 import gdl.sdk
-Popup{
+
+// Element Plus 风格帮助对话框
+Popup {
     id: helpDialog
-    width: 580
-    height: 450
+    width: 640
+    height: 520
     x: (parent.width - width) / 2
     y: (parent.height - height) / 2
-    padding: 0
     modal: true
     visible: false
-    closePolicy: Popup.NoAutoClose
-    contentItem: Rectangle{
-        anchors.fill: parent
-        // 头部
-        color: "transparent"
-        clip: true
-        RowLayout{
-            id:headerLogo
-            anchors{
-                top: parent.top
-                topMargin: 20
-                left: parent.left
-                leftMargin: 30
-                right: parent.right
-                rightMargin: 20
-            }
-            width: parent.width
-            height: 30
-            spacing: 10
-            Image {
-                id: logo
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
-                Layout.preferredHeight: 16
-                Layout.preferredWidth: 16
-                source: "/images/logo/icon.ico"
-            }
-            Label{
-                text: String("GDownloader Version: %1").arg(UtilsToolsManager.Version())
-                font.pixelSize: 15
-                color: GTheme.textPrimary
-                verticalAlignment: Text.AlignVCenter
-            }
-            ImageButton{
-                id:closeBtn
-                Layout.alignment: Qt.AlignRight
-                Layout.preferredHeight: 15
-                Layout.preferredWidth: 15
-                backgroundColor:"transparent"
-                normalImage: "/images/dialog/dialog_close_normol.svg"
-                hoverImage: "/images/dialog/dialog_close_hover.svg"
-                onClicked: {
-                    helpDialog.close()
-                }
-            }
+    closePolicy: Popup.CloseOnEscape
+
+    // Element Plus 设计标准
+    readonly property int standardPadding: 24
+    readonly property int standardSpacing: 16
+    readonly property int headerHeight: 64
+
+    // Element Plus 风格背景
+    background: Rectangle {
+        color: GTheme.bgWhite
+        radius: 8
+        border.width: 1
+        border.color: GTheme.borderLight
+
+        // Element Plus 风格阴影
+        layer.enabled: true
+        layer.effect: DropShadow {
+            radius: 16
+            samples: 33
+            color: Qt.rgba(0, 0, 0, 0.1)
+            horizontalOffset: 0
+            verticalOffset: 4
         }
-        // 内容
-        ListView{
-            id:tabArea
-            anchors{
-                top: headerLogo.bottom
-                topMargin: 20
-                left: parent.left
-                leftMargin: 20
-            }
-            width: contentWidth
-            height: 30
-            layoutDirection: Qt.LeftToRight
-            orientation: ListView.Horizontal
-            boundsBehavior: Flickable.StopAtBounds
-            spacing: 10
-            clip: true
-            model: [qsTr("Sponsorship"),qsTr("License"),qsTr("About")]
-            delegate:Rectangle{
-                height: parent.height
-                width: text.contentWidth + 20
-                radius: 5
-                color: (tabArea.currentIndex === index || parent.hovered) ? GTheme.fillLight : "transparent"
-                Button {
-                    anchors.verticalCenter: parent.verticalCenter
-                    contentItem: Text {
-                        id: text
-                        anchors.fill: parent
-                        text: modelData
-                        font.pixelSize: 14
-                        color: (tabArea.currentIndex === index  || parent.hovered) ? GTheme.primaryColor : GTheme.textRegular
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-                    background: MouseArea {
-                        cursorShape: Qt.PointingHandCursor;
-                        acceptedButtons: Qt.NoButton
-                    }
-                    onClicked: {
-                        tabArea.currentIndex = index;
-                    }
-                }
-            }
-        }
-        Divider {
-            anchors.bottom: tabArea.bottom
-            anchors.bottomMargin: -5
-            anchors.left: parent.left
-            anchors.leftMargin: 5
-            anchors.right: parent.right
-            anchors.rightMargin: 5
-        }
-        StackLayout{
-            id:layout
-            anchors.top: tabArea.bottom
-            anchors.left: tabArea.left
-            width: parent.width - 20
-            height: 325
-            focus: true
-            currentIndex: tabArea.currentIndex
-            // Sponsor page
-            Item{
-                id: sponsor
-                Layout.fillWidth: true
-                Layout.rightMargin: 10
-                ColumnLayout{
-                    anchors.fill: parent
-                    spacing: 10
-                    Label{
-                        text: qsTr("If you like GDownloader, you can sponsor us on the following platforms:")
-                        font.pixelSize: 14
-                color: GTheme.textPrimary
-                        Layout.margins: 10
-                    }
+    }
+
+    contentItem: ColumnLayout {
+        spacing: 0
+
+        // 头部区域
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: helpDialog.headerHeight
+            color: "transparent"
+
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: helpDialog.standardPadding
+                anchors.rightMargin: helpDialog.standardPadding
+                spacing: helpDialog.standardSpacing
+
+                // 图标区域
+                Rectangle {
+                    Layout.preferredWidth: 40
+                    Layout.preferredHeight: 40
+                    Layout.alignment: Qt.AlignVCenter
+                    color: GTheme.infoLight(9)
+                    radius: 8
+
                     Image {
-                        fillMode: Image.PreserveAspectFit
-                        source: "/payee/sponsor.jpg"
+                        anchors.centerIn: parent
+                        source: "/images/logo/icon.ico"
+                        sourceSize: Qt.size(24, 24)
+                    }
+                }
+
+                // 标题和版本信息
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 4
+
+                    Text {
+                        text: qsTr("About GDownload")
+                        font.pixelSize: 18
+                        font.weight: Font.DemiBold
+                        color: GTheme.textPrimary
+                    }
+
+                    Text {
+                        text: String("Version %1").arg(UtilsToolsManager.Version())
+                        font.pixelSize: 14
+                        color: GTheme.textSecondary
+                    }
+                }
+
+                // 关闭按钮
+                IconButton {
+                    iconSource: SegoeFluentIcons.ChromeClose
+                    iconSize: 14
+                    Layout.preferredWidth: 28
+                    Layout.preferredHeight: 28
+                    iconColor: hovered ? GTheme.textPrimary : GTheme.textSecondary
+                    backgroundColor: hovered ? GTheme.fillLight : "transparent"
+                    onClicked: helpDialog.close()
+                }
+            }
+        }
+
+        // 分隔线
+        Divider {
+            Layout.fillWidth: true
+        }
+
+        // 标签页导航
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 48
+            Layout.topMargin: helpDialog.standardSpacing
+            Layout.leftMargin: helpDialog.standardPadding
+            Layout.rightMargin: helpDialog.standardPadding
+            color: "transparent"
+
+            RowLayout {
+                anchors.fill: parent
+                spacing: 0
+
+                Repeater {
+                    model: [
+                        { name: qsTr("Sponsorship"), icon: SegoeFluentIcons.Heart },
+                        { name: qsTr("License"), icon: SegoeFluentIcons.FileText },
+                        { name: qsTr("About"), icon: SegoeFluentIcons.Info }
+                    ]
+
+                    GNavButton {
+                        required property int index
+                        required property var modelData
+
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 44
+                        checkable: true
+                        checked: index === tabNavigation.currentIndex
+                        iconSource: modelData.icon
+                        text: modelData.name
+                        ButtonGroup.group: tabGroup
+                        onClicked: {
+                            tabNavigation.currentIndex = index
+                        }
+                    }
+                }
+            }
+
+            ButtonGroup {
+                id: tabGroup
+            }
+
+            QtObject {
+                id: tabNavigation
+                property int currentIndex: 0
+            }
+        }
+
+        // 内容区域
+        StackLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.leftMargin: helpDialog.standardPadding
+            Layout.rightMargin: helpDialog.standardPadding
+            Layout.bottomMargin: helpDialog.standardSpacing
+            currentIndex: tabNavigation.currentIndex
+
+            // 赞助页面
+            GCard {
+                outlined: true
+                padding: helpDialog.standardSpacing
+
+                ColumnLayout {
+                    anchors.fill: parent
+                    spacing: helpDialog.standardSpacing
+
+                    Text {
+                        text: qsTr("Support GDownload Development")
+                        font.pixelSize: 16
+                        font.weight: Font.Medium
+                        color: GTheme.textPrimary
+                        Layout.fillWidth: true
+                    }
+
+                    Text {
+                        text: qsTr("If you like GDownload, you can support us through the following platforms:")
+                        font.pixelSize: 14
+                        color: GTheme.textSecondary
+                        Layout.fillWidth: true
+                        wrapMode: Text.WordWrap
+                    }
+
+                    ScrollView {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        Layout.margins: 10
+                        clip: true
+
+                        Image {
+                            fillMode: Image.PreserveAspectFit
+                            source: "/payee/sponsor.jpg"
+                            sourceSize.width: 400
+                        }
+                    }
+
+                    Text {
+                        text: qsTr("Thank you for your support! ❤️")
+                        font.pixelSize: 12
+                        color: GTheme.textPlaceholder
+                        Layout.alignment: Qt.AlignHCenter
                     }
                 }
             }
 
-            // Open Source License page
-            ScrollText{
-                id: license
-                Layout.rightMargin: 10
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                text: UtilsToolsManager.GetNoticeContent()
+            // 许可证页面
+            GCard {
+                outlined: true
+                padding: helpDialog.standardSpacing
+
+                ColumnLayout {
+                    anchors.fill: parent
+                    spacing: 8
+
+                    Text {
+                        text: qsTr("Open Source Licenses")
+                        font.pixelSize: 16
+                        font.weight: Font.Medium
+                        color: GTheme.textPrimary
+                    }
+
+                    ScrollText {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        text: UtilsToolsManager.GetNoticeContent()
+                        font.pixelSize: 12
+                    }
+                }
             }
 
-            // About page
-            ScrollText{
-                id: about
-                Layout.rightMargin: 10
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                textFormat: Text.MarkdownText
-                text:qsTr('# About GDownload
+            // 关于页面
+            GCard {
+                outlined: true
+                padding: helpDialog.standardSpacing
 
-GDownload is a cross-platform download manager built with C++ and Qt. It combines modern technology stack and excellent open-source components to provide users with an efficient and stable downloading experience.
+                ColumnLayout {
+                    anchors.fill: parent
+                    spacing: 8
+
+                    Text {
+                        text: qsTr("About GDownload")
+                        font.pixelSize: 16
+                        font.weight: Font.Medium
+                        color: GTheme.textPrimary
+                    }
+
+                    ScrollText {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        textFormat: Text.MarkdownText
+                        font.pixelSize: 13
+                        text: qsTr(`# GDownload
+
+**A modern cross-platform download manager**
 
 ## Core Features
 
-- Cross-platform support (Windows, macOS, Linux)
-- Efficient download engine powered by aria2c
-- Multi-threaded concurrent downloads
-- Support for multiple protocols (HTTP, HTTPS, FTP, BitTorrent, Metalink)
-- Download resume capability
-- User-friendly graphical interface
+✅ **Multi-Platform Support** - Windows, macOS, Linux
+✅ **High-Performance Engine** - Powered by aria2c
+✅ **Multi-Protocol Support** - HTTP/HTTPS/FTP/BitTorrent/Metalink
+✅ **Smart Download Management** - Multi-threaded, resume capability
+✅ **Modern UI** - Built with Qt Quick and Element Plus design
 
 ## Technology Stack
 
-- UI Framework: Qt Quick (QML) + Qt C++
-- Core Engine: aria2c
-- Network Library: Boost.Asio
-- BT Download: LibtorrentRasterbar
-- XML Parser: PugiXML
-- Frameless Window: FramelessHelper
+- **Frontend**: Qt Quick (QML) + Element Plus Design
+- **Backend**: Qt C++ + Modern C++20
+- **Download Engine**: aria2c
+- **Network**: Boost.Asio with SSL
+- **BitTorrent**: LibtorrentRasterbar
+- **Build System**: CMake + vcpkg
 
 ## Development Team
 
-GDownload is an open-source project maintained by developers who are passionate about technology. We welcome community contributions, including but not limited to:
+GDownload is maintained by passionate developers who believe in:
+- Open source software
+- Modern UI/UX design
+- High-quality code
+- Community collaboration
 
-- Code contributions
-- Bug reports
-- Feature suggestions
-- Documentation improvements
+## Get Involved
 
-## Contact Us
+🔗 **GitHub**: [https://github.com/cool2528/GDownload](https://github.com/cool2528/GDownload)
+🐛 **Issues**: [Report bugs or request features](https://github.com/cool2528/GDownload/issues)
+📝 **Contribute**: Pull requests are welcome!
 
-- [GitHub:](https://github.com/cool2528/GDownload)
-- [Issue Tracking:](https://github.com/cool2528/GDownload/issues)
-- [Home Page: ](https://github.com/cool2528/GDownload)
-
-## Copyright Notice
+## License
 
 Copyright © 2024 GDownload Team
 Licensed under the Apache License 2.0
 
-*Thanks to all developers and users who have contributed to this project!*')
+---
+
+*Thank you to all contributors and users who make GDownload better!* 🚀`)
+                    }
+                }
             }
         }
-
-    }
-    background: Rectangle{
-        color: GTheme.bgWhite
-        radius: 5
     }
 
+    // 打开动画
+    enter: Transition {
+        ParallelAnimation {
+            NumberAnimation {
+                property: "scale"
+                from: 0.9
+                to: 1.0
+                duration: 200
+                easing.type: Easing.OutCubic
+            }
+            NumberAnimation {
+                property: "opacity"
+                from: 0.0
+                to: 1.0
+                duration: 200
+                easing.type: Easing.OutCubic
+            }
+        }
+    }
+
+    // 关闭动画
+    exit: Transition {
+        ParallelAnimation {
+            NumberAnimation {
+                property: "scale"
+                from: 1.0
+                to: 0.9
+                duration: 150
+                easing.type: Easing.InCubic
+            }
+            NumberAnimation {
+                property: "opacity"
+                from: 1.0
+                to: 0.0
+                duration: 150
+                easing.type: Easing.InCubic
+            }
+        }
+    }
 }

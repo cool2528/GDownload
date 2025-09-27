@@ -3,20 +3,31 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import "../CommonComponents"
 import gdl.sdk 1.0
+
+// Element Plus 风格下载页面视图
 Item {
-    id:control
-    property alias currentIndex: bar.currentIndex
-    RowLayout{
-        id:browserLayout
+    id: control
+    property alias currentIndex: navigationBar.currentIndex
+
+    // Element Plus 设计标准
+    readonly property int standardSpacing: 16
+    readonly property int standardRadius: 4
+    readonly property int sidebarWidth: 240
+
+    RowLayout {
+        id: browserLayout
         anchors.fill: parent
         spacing: 0
-        Rectangle{
-            id:leftMenuBar
+
+        // 左侧导航栏
+        Rectangle {
+            id: leftSidebar
             color: GTheme.bgPage
             Layout.fillHeight: true
-            Layout.minimumWidth: 200
-            Layout.preferredWidth: 200
-            Layout.maximumWidth: 200
+            Layout.minimumWidth: control.sidebarWidth
+            Layout.preferredWidth: control.sidebarWidth
+            Layout.maximumWidth: control.sidebarWidth
+
             // 右侧分隔线
             Rectangle {
                 anchors.right: parent.right
@@ -25,124 +36,139 @@ Item {
                 width: 1
                 color: GTheme.borderLight
             }
-            Text {
-                id: title
-                text: qsTr("Task")
-                anchors.left: parent.left
-                anchors.leftMargin: 15
-                anchors.top: parent.top
-                anchors.topMargin: 30
-                font.pixelSize: 14
-                color: GTheme.textPrimary
 
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: control.standardSpacing
+                spacing: control.standardSpacing
+
+                // 页面标题
+                Text {
+                    text: qsTr("Download Tasks")
+                    font.pixelSize: 18
+                    font.weight: Font.DemiBold
+                    color: GTheme.textPrimary
+                    Layout.fillWidth: true
+                    Layout.bottomMargin: 8
+                }
+
+                // 导航按钮组
+                ColumnLayout {
+                    id: navigationBar
+                    Layout.fillWidth: true
+                    spacing: 4
+                    property int currentIndex: 0
+                    property var buttonsArr: [downloadingBtn, waitingBtn, stoppedBtn]
+
+                    ButtonGroup {
+                        id: navigationGroup
+                        onCheckedButtonChanged: {
+                            let index = navigationBar.buttonsArr.indexOf(navigationGroup.checkedButton)
+                            navigationBar.currentIndex = index
+                            console.debug("Navigation index:", index)
+                        }
+                    }
+
+                    // 下载中按钮
+                    GNavButton {
+                        id: downloadingBtn
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 44
+                        checkable: true
+                        checked: true
+                        ButtonGroup.group: navigationGroup
+                        iconSource: SegoeFluentIcons.PlaySolid
+                        text: qsTr("Downloading")
+                        onClicked: {
+                            checked = true
+                        }
+                    }
+
+                    // 等待中按钮
+                    GNavButton {
+                        id: waitingBtn
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 44
+                        checkable: true
+                        ButtonGroup.group: navigationGroup
+                        iconSource: SegoeFluentIcons.PauseBold
+                        text: qsTr("Waiting")
+                        onClicked: {
+                            checked = true
+                        }
+                    }
+
+                    // 已停止按钮
+                    GNavButton {
+                        id: stoppedBtn
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 44
+                        checkable: true
+                        ButtonGroup.group: navigationGroup
+                        iconSource: SegoeFluentIcons.Stop
+                        text: qsTr("Stopped")
+                        onClicked: {
+                            checked = true
+                        }
+                    }
+
+                    // 填充空间
+                    Item {
+                        Layout.fillHeight: true
+                    }
+                }
             }
-            ColumnLayout{
-                id:bar
-                anchors.top: title.bottom
-                anchors.topMargin: 5
-                width: parent.width
-                property int currentIndex: 0
-                property var buttonsArr: [download,waiting,stopped]
-                ButtonGroup{
-                    id:titleGroup
-                    onCheckedButtonChanged: {
-                        let index  = bar.buttonsArr.indexOf(titleGroup.checkedButton)
-                        bar.currentIndex = index
-                        console.debug("index ",index)
-                    }
-                }
-                TttleButton{
-                    id:download
-                    checkable: true
-                    checked: true
-                    ButtonGroup.group:titleGroup
-                    iconSource:SegoeFluentIcons.PlaySolid
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: 40
-                    Layout.maximumHeight: 40
-                    Layout.leftMargin: 10
-                    Layout.rightMargin: 10
-                    text: qsTr("Downloading")
-                    onClicked: {
-                        checked = true
-                    }
-                }
-                //Waiting
-                TttleButton{
-                    id:waiting
-                    checkable: true
-                    ButtonGroup.group:titleGroup
-                    iconSource:SegoeFluentIcons.PauseBold
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: 40
-                    Layout.maximumHeight: 40
-                    Layout.leftMargin: 10
-                    Layout.rightMargin: 10
-                    text: qsTr("Waiting")
-                    onClicked: {
-                        checked = true
-                    }
-                }
-                //Stopped
-                TttleButton{
-                    id:stopped
-                    checkable: true
-                    ButtonGroup.group:titleGroup
-                    iconSource:SegoeFluentIcons.Stop
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: 40
-                    Layout.maximumHeight: 40
-                    Layout.leftMargin: 10
-                    Layout.rightMargin: 10
-                    text: qsTr("Stopped")
-                    onClicked: {
-                        checked = true
-                    }
-
-                }
-            }
-
         }
 
-        Rectangle{
-            id:browser
+        // 主内容区域
+        Rectangle {
+            id: mainContent
             color: GTheme.bgWhite
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.minimumWidth: 380
-            Layout.preferredWidth: 380
-            DownloadPageTitle{
-                id:downloadTitle
-                type: bar.currentIndex
+            Layout.minimumWidth: 400
 
-            }
-            StackLayout{
-                id:downloadStack
-                anchors.top: downloadTitle.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                currentIndex: bar.currentIndex
+            ColumnLayout {
+                anchors.fill: parent
+                spacing: 0
 
-                GDownloadViewPage {
-                    id: downloadPage
-                    pageType: 0
-                    objectName: "downloadPage"
-                    model: BrowserManager.GetActiveDownloadModel()
+                // 页面标题栏
+                DownloadPageTitle {
+                    id: downloadTitle
+                    Layout.fillWidth: true
+                    type: navigationBar.currentIndex
                 }
-                
-                GDownloadViewPage {
-                    id: waitingPage
-                    pageType: 1
-                    objectName: "waitingPage"
-                    model: BrowserManager.GetWaitingDownloadModel()
-                }
-                
-                GDownloadViewPage {
-                    id: completedPage
-                    pageType: 2
-                    objectName: "completedPage"
-                    model: BrowserManager.GetStopedDownloadModel()
+
+                // 下载列表堆栈视图
+                StackLayout {
+                    id: downloadStack
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    currentIndex: navigationBar.currentIndex
+
+                    // 下载中页面
+                    GDownloadViewPage {
+                        id: downloadPage
+                        pageType: 0
+                        objectName: "downloadPage"
+                        model: BrowserManager.GetActiveDownloadModel()
+                    }
+
+                    // 等待中页面
+                    GDownloadViewPage {
+                        id: waitingPage
+                        pageType: 1
+                        objectName: "waitingPage"
+                        model: BrowserManager.GetWaitingDownloadModel()
+                    }
+
+                    // 已停止页面
+                    GDownloadViewPage {
+                        id: completedPage
+                        pageType: 2
+                        objectName: "completedPage"
+                        model: BrowserManager.GetStopedDownloadModel()
+                    }
                 }
             }
         }

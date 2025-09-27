@@ -5,32 +5,76 @@ import gdl.sdk
 CheckBox {
     id: control
     checked: false
-    // 规格化尺寸：large/default/small
+    // Element Plus 规格化 API
+    // size: large | default | small
     property string size: "default"
+    // border: 添加边框样式（Element Plus 特性）
+    property bool border: false
+    // status: normal | success | warning | danger（扩展状态支持）
+    property string status: "normal"
+
     readonly property int indicatorPx: (size === "large" ? 18 : (size === "small" ? 14 : 16))
     readonly property int fontPx: (size === "large" ? 16 : (size === "small" ? 12 : 14))
+    readonly property int borderRadius: 3
     
-    // 内部属性用于颜色管理
+    // Element Plus 风格颜色管理
     readonly property var colors: {
-        const darkTheme = {
-            background: GTheme.fillBase,
-            backgroundChecked: GTheme.primaryColor,
-            border: GTheme.borderBase,
-            borderHover: GTheme.primaryColor,
-            checkmark: GTheme.bgWhite,
-            text: GTheme.textPrimary
+        const baseColors = {
+            primary: {
+                background: GTheme.bgWhite,
+                backgroundChecked: GTheme.primaryColor,
+                border: GTheme.borderBase,
+                borderHover: GTheme.primaryColor,
+                borderChecked: GTheme.primaryColor,
+                checkmark: GTheme.bgWhite,
+                text: GTheme.textRegular
+            },
+            success: {
+                background: GTheme.bgWhite,
+                backgroundChecked: GTheme.successColor,
+                border: GTheme.borderBase,
+                borderHover: GTheme.successColor,
+                borderChecked: GTheme.successColor,
+                checkmark: GTheme.bgWhite,
+                text: GTheme.textRegular
+            },
+            warning: {
+                background: GTheme.bgWhite,
+                backgroundChecked: GTheme.warningColor,
+                border: GTheme.borderBase,
+                borderHover: GTheme.warningColor,
+                borderChecked: GTheme.warningColor,
+                checkmark: GTheme.bgWhite,
+                text: GTheme.textRegular
+            },
+            danger: {
+                background: GTheme.bgWhite,
+                backgroundChecked: GTheme.dangerColor,
+                border: GTheme.borderBase,
+                borderHover: GTheme.dangerColor,
+                borderChecked: GTheme.dangerColor,
+                checkmark: GTheme.bgWhite,
+                text: GTheme.textRegular
+            }
         }
-        
-        const lightTheme = {
-            background: GTheme.bgWhite,
-            backgroundChecked: GTheme.primaryColor,
-            border: GTheme.borderBase,
-            borderHover: GTheme.primaryColor,
-            checkmark: GTheme.bgWhite,
-            text: GTheme.textRegular
+
+        // 暗色主题适配
+        if (GTheme.dark) {
+            const darkColors = JSON.parse(JSON.stringify(baseColors))
+            Object.keys(darkColors).forEach(key => {
+                darkColors[key].background = GTheme.fillBase
+                darkColors[key].text = GTheme.textPrimary
+            })
+            return darkColors
         }
-        
-        return GTheme.dark ? darkTheme : lightTheme
+
+        return baseColors
+    }
+
+    // 当前状态颜色
+    readonly property var currentColors: {
+        const statusKey = (status === "success" || status === "warning" || status === "danger") ? status : "primary"
+        return colors[statusKey] || colors.primary
     }
 
     indicator: Rectangle {
@@ -38,10 +82,18 @@ CheckBox {
         implicitHeight: control.indicatorPx
         x: control.leftPadding
         y: parent.height / 2 - height / 2
-        radius: 3
-        color: control.checked ? colors.backgroundChecked : colors.background
-        border.color: control.hovered ? colors.borderHover : colors.border
-        border.width: control.hovered ? 1.5 : 1
+        radius: control.borderRadius
+        color: control.checked ? currentColors.backgroundChecked : currentColors.background
+        border.color: {
+            if (!control.enabled) {
+                return GTheme.dark ? GTheme.borderBase : GTheme.borderLight
+            }
+            if (control.checked) {
+                return currentColors.borderChecked
+            }
+            return control.hovered ? currentColors.borderHover : currentColors.border
+        }
+        border.width: (control.hovered || control.checked) ? 1.5 : 1
         
         // 添加颜色过渡动画
         Behavior on color {
@@ -70,23 +122,22 @@ CheckBox {
                 onPaint: {
                     var ctx = getContext("2d")
                     ctx.reset()
-                    
-                    // 设置绘制样式
-                    ctx.strokeStyle = colors.checkmark
+
+                    // Element Plus 风格勾选标记
+                    ctx.strokeStyle = currentColors.checkmark
                     ctx.lineWidth = 2
                     ctx.lineCap = "round"
                     ctx.lineJoin = "round"
-                    
-                    // 计算绘制区域
+
+                    // 优化的 Element Plus 勾选路径
                     var w = width
                     var h = height
-                    var padding = w * 0.2
-                    
-                    // 绘制对勾
+                    var padding = w * 0.15  // 更贴近 Element Plus 的边距
+
                     ctx.beginPath()
-                    ctx.moveTo(padding, h * 0.5)
-                    ctx.lineTo(w * 0.4, h * 0.7)
-                    ctx.lineTo(w - padding, h * 0.3)
+                    ctx.moveTo(padding + 1, h * 0.5)
+                    ctx.lineTo(w * 0.42, h * 0.72)
+                    ctx.lineTo(w - padding - 1, h * 0.28)
                     ctx.stroke()
                 }
                 
@@ -106,17 +157,31 @@ CheckBox {
         text: control.text
         font.pixelSize: control.fontPx
         opacity: enabled ? 1.0 : 0.3
-        color: colors.text
+        color: currentColors.text
         verticalAlignment: Text.AlignVCenter
         leftPadding: control.indicator.width + control.spacing
-        
-        // 添加文字颜色过渡
+
+        // Element Plus 边框样式支持
+        Rectangle {
+            anchors.fill: parent
+            anchors.margins: -6
+            color: "transparent"
+            border.color: control.border ? currentColors.border : "transparent"
+            border.width: control.border ? 1 : 0
+            radius: control.borderRadius
+            visible: control.border
+
+            Behavior on border.color {
+                ColorAnimation { duration: 150 }
+            }
+        }
+
         Behavior on color {
             ColorAnimation { duration: 150 }
         }
     }
     
-    // 添加鼠标悬停效果
+    // 使用 HoverHandler 设置鼠标形状
     HoverHandler {
         acceptedDevices: PointerDevice.Mouse
         cursorShape: Qt.PointingHandCursor

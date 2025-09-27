@@ -14,6 +14,12 @@ Button {
     contentItem: Item {
         id: content
         anchors.fill: parent
+
+        // 添加鼠标手状态
+        HoverHandler {
+            acceptedDevices: PointerDevice.Mouse
+            cursorShape: Qt.PointingHandCursor
+        }
         Rectangle{
             id:imageRect
             implicitHeight: 40
@@ -29,7 +35,7 @@ Button {
                 top: parent.top
             }
             Image {
-                id:image
+                id: image
                 anchors.fill: parent
                 anchors.margins: 1
                 layer.enabled: true

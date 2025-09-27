@@ -23,70 +23,127 @@
 <context>
     <name>BaiduCookieSettingPage</name>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="17"/>
         <source>Baidu Cookie</source>
-        <translation>Baidu Cookie</translation>
+        <translation type="vanished">Baidu Cookie</translation>
+    </message>
+    <message>
+        <source>Please enter Baidu Cookie</source>
+        <translation type="vanished">바이두 쿠키를 입력하세요.</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="27"/>
-        <source>Please enter Baidu Cookie</source>
-        <translation>바이두 쿠키를 입력하세요.</translation>
+        <source>Baidu Netdisk Integration</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="33"/>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="34"/>
+        <source>Configure Baidu Netdisk cookie for link parsing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="51"/>
+        <source>Cookie</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="58"/>
+        <source>BDUSS value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="69"/>
+        <source>Paste your Baidu Netdisk cookie here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="75"/>
         <source>Save</source>
         <translation>저장</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="41"/>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="82"/>
+        <source>Baidu cookie saved successfully</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save Baidu Cokies Succeed</source>
-        <translation>바이두 쿠키 저장 성공하기</translation>
+        <translation type="vanished">바이두 쿠키 저장 성공하기</translation>
     </message>
 </context>
 <context>
     <name>BasicSettingPage</name>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="42"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="49"/>
+        <source>Appearance &amp; Language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="69"/>
         <source>Language</source>
         <translation>다국어 지원</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="84"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="112"/>
+        <source>Application Behavior</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="125"/>
         <source>Auto Update</source>
         <translation>자동 업데이트</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="97"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="143"/>
         <source>Open at Login</source>
         <translation>로그인 시 열기</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="111"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="162"/>
         <source>Remember Window Position</source>
         <translation>창 위치 기억하기</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="124"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="180"/>
         <source>Auto Resume Unfinished Download</source>
         <translation>완료되지 않은 다운로드 자동 재개</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="145"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="210"/>
         <source>Download Path</source>
         <translation>다운로드 경로</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="179"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="217"/>
+        <source>Global download folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="253"/>
+        <source>Network Proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="264"/>
         <source>Enable Global Proxy</source>
         <translation>글로벌 프록시 사용</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="213"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="303"/>
         <source>Save</source>
         <translation>저장</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="232"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="333"/>
+        <source>Clipboard Monitor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="340"/>
+        <source>Automatically detect download links from clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="350"/>
         <source>Auto Listen Clipboard Link</source>
         <translation>자동 듣기 클립보드 링크</translation>
     </message>
@@ -94,40 +151,69 @@
 <context>
     <name>DownloadPageTitle</name>
     <message>
-        <location filename="../qml/Browser/DownloadPageTitle.qml" line="17"/>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="41"/>
         <source>Downloading</source>
         <translation>다운로드</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageTitle.qml" line="19"/>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="42"/>
         <source>Waiting</source>
         <translation>대기 중</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageTitle.qml" line="21"/>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="43"/>
         <source>Stopped</source>
         <translation>중지됨</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="44"/>
+        <source>Downloads</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="55"/>
+        <source>Active download tasks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="56"/>
+        <source>Queued download tasks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="57"/>
+        <source>Completed or stopped tasks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="58"/>
+        <source>Manage your downloads</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>DownloadPageView</name>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="30"/>
         <source>Task</source>
-        <translation>작업</translation>
+        <translation type="vanished">작업</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="65"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="47"/>
+        <source>Download Tasks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="81"/>
         <source>Downloading</source>
         <translation>다운로드</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="81"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="95"/>
         <source>Waiting</source>
         <translation>대기 중</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="97"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="109"/>
         <source>Stopped</source>
         <translation>중지됨</translation>
     </message>
@@ -158,7 +244,42 @@
 <context>
     <name>GDownloadViewPage</name>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="253"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="49"/>
+        <source>No active downloads</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="50"/>
+        <source>No waiting downloads</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="51"/>
+        <source>No completed downloads</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="52"/>
+        <source>No downloads</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="62"/>
+        <source>Add some download links to get started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="122"/>
+        <source>Size: %1 • Progress: %2%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="203"/>
+        <source>Link copied to clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="264"/>
         <source>Remaining </source>
         <translation>남아있음 </translation>
     </message>
@@ -174,27 +295,51 @@
 <context>
     <name>HelpDialog</name>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="75"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="77"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="246"/>
+        <source>About GDownload</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="123"/>
         <source>Sponsorship</source>
         <translation>스폰서십</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="75"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="124"/>
         <source>License</source>
         <translation>라이선스</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="75"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="125"/>
         <source>About</source>
         <translation>정보</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="127"/>
-        <source>If you like GDownloader, you can sponsor us on the following platforms:</source>
-        <translation>GDownloader가 마음에 드신다면 다음 플랫폼에서 후원할 수 있습니다:</translation>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="175"/>
+        <source>Support GDownload Development</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="158"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="183"/>
+        <source>If you like GDownload, you can support us through the following platforms:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="203"/>
+        <source>Thank you for your support! ❤️</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="221"/>
+        <source>Open Source Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you like GDownloader, you can sponsor us on the following platforms:</source>
+        <translation type="vanished">GDownloader가 마음에 드신다면 다음 플랫폼에서 후원할 수 있습니다:</translation>
+    </message>
+    <message>
         <source># About GDownload
 
 GDownload is a cross-platform download manager built with C++ and Qt. It combines modern technology stack and excellent open-source components to provide users with an efficient and stable downloading experience.
@@ -238,7 +383,7 @@ Copyright © 2024 GDownload Team
 Licensed under the Apache License 2.0
 
 *Thanks to all developers and users who have contributed to this project!*</source>
-        <translation># GDownload 소개
+        <translation type="vanished"># GDownload 소개
 
 GDownload는 C++와 Qt로 구축된 크로스 플랫폼 다운로드 관리자입니다. 최신 기술 스택과 우수한 오픈 소스 구성 요소를 결합하여 사용자에게 효율적이고 안정적인 다운로드 경험을 제공합니다.
 
@@ -281,6 +426,129 @@ GDownload는 기술에 대한 열정을 가진 개발자들이 관리하는 오�
 아파치 라이선스 2.0에 따라 라이선스 제공
 
 *이 프로젝트에 기여해주신 모든 개발자와 사용자에게 감사드립니다!</translation>
+    </message>
+</context>
+<context>
+    <name>LabSettingPage</name>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="69"/>
+        <source>Experimental Features</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="76"/>
+        <source>These features are experimental and may be unstable. Use with caution and report any issues you encounter.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="84"/>
+        <source>⚠️ Enable at your own risk</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="109"/>
+        <source>Download Performance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="121"/>
+        <source>Enhanced Multi-threading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="130"/>
+        <source>Improves download speed by using advanced threading algorithms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="148"/>
+        <source>Smart Bandwidth Allocation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="157"/>
+        <source>Automatically adjusts bandwidth usage based on network conditions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="182"/>
+        <source>User Interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="194"/>
+        <source>Enhanced Animations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="203"/>
+        <source>Enables smooth transitions and micro-interactions throughout the interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="221"/>
+        <source>Adaptive Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="230"/>
+        <source>Automatically adjusts layout based on window size and DPI settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="255"/>
+        <source>Network &amp; Protocols</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="267"/>
+        <source>HTTP/3 Protocol Support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="276"/>
+        <source>Enables next-generation HTTP/3 protocol for faster downloads</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="294"/>
+        <source>Intelligent Retry Mechanism</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="303"/>
+        <source>Advanced retry strategies with exponential backoff and error analysis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="321"/>
+        <source>P2P Download Acceleration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="330"/>
+        <source>Uses peer-to-peer technology to accelerate popular file downloads</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="359"/>
+        <source>Reset Experimental Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="366"/>
+        <source>Disable all experimental features and restore defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="374"/>
+        <source>Reset All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="388"/>
+        <source>All experimental features have been reset</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -393,40 +661,67 @@ GDownload는 기술에 대한 열정을 가진 개발자들이 관리하는 오�
 <context>
     <name>SettingPageTitle</name>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="17"/>
         <source>Basic</source>
-        <translation>기본 설정</translation>
+        <translation type="vanished">기본 설정</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <translation type="vanished">고급 설정</translation>
+    </message>
+    <message>
+        <source>Lab</source>
+        <translation type="vanished">실험실 기능</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="17"/>
+        <source>Basic Settings</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="19"/>
-        <source>Advanced</source>
-        <translation>고급 설정</translation>
+        <source>Advanced Settings</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="21"/>
-        <source>Lab</source>
-        <translation>실험실 기능</translation>
+        <source>Lab Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="37"/>
+        <source>Configure basic download preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="39"/>
+        <source>Advanced configuration options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="41"/>
+        <source>Experimental features and settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SettingsPageView</name>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="30"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="42"/>
         <source>Preferences</source>
         <translation>기본 설정</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="66"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="80"/>
         <source>Basic</source>
         <translation>기본 설정</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="82"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="91"/>
         <source>Advanced</source>
         <translation>고급 설정</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="98"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="102"/>
         <source>Lab</source>
         <translation>실험실 기능</translation>
     </message>
@@ -434,69 +729,56 @@ GDownload는 기술에 대한 열정을 가진 개발자들이 관리하는 오�
 <context>
     <name>TaskDialogPage</name>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="46"/>
         <source>URL</source>
-        <translation>작업 연결</translation>
+        <translation type="vanished">작업 연결</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="46"/>
         <source>Torent</source>
-        <translation>시드 위임</translation>
+        <translation type="vanished">시드 위임</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="46"/>
         <source>Baidu</source>
-        <translation>바이두</translation>
+        <translation type="vanished">바이두</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="126"/>
         <source>One task url per line (supports magnet)</source>
-        <translation>한 줄당 하나의 작업 URL(자석 지원)</translation>
+        <translation type="vanished">한 줄당 하나의 작업 URL(자석 지원)</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="256"/>
         <source>Rename:</source>
-        <translation>이름 바꾸기:</translation>
+        <translation type="vanished">이름 바꾸기:</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="264"/>
         <source>Optional</source>
-        <translation>선택 사항</translation>
+        <translation type="vanished">선택 사항</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="271"/>
         <source>Splits:</source>
-        <translation>슬라이스 개수:</translation>
+        <translation type="vanished">슬라이스 개수:</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="286"/>
         <source>Save to:</source>
-        <translation>저장 위치:</translation>
+        <translation type="vanished">저장 위치:</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="366"/>
         <source>Custom Request Header List:</source>
-        <translation>사용자 지정 요청 헤더 목록:</translation>
+        <translation type="vanished">사용자 지정 요청 헤더 목록:</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="376"/>
         <source>Custom request header list (one per line in the format KEY:VALUE)</source>
-        <translation>사용자 지정 요청 헤더 목록(한 줄에 하나씩, KEY:VALUE 형식)</translation>
+        <translation type="vanished">사용자 지정 요청 헤더 목록(한 줄에 하나씩, KEY:VALUE 형식)</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="420"/>
         <source>Advanced Options</source>
-        <translation>고급 옵션</translation>
+        <translation type="vanished">고급 옵션</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="432"/>
         <source>Cancel</source>
-        <translation>취소</translation>
+        <translation type="vanished">취소</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="443"/>
         <source>Submit</source>
-        <translation>제출하기</translation>
+        <translation type="vanished">제출하기</translation>
     </message>
 </context>
 <context>
@@ -525,42 +807,87 @@ GDownload는 기술에 대한 열정을 가진 개발자들이 관리하는 오�
 <context>
     <name>TrackerServerSettingPage</name>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="17"/>
         <source>Tracker Servers:</source>
-        <translation>트래커 서버:</translation>
+        <translation type="vanished">트래커 서버:</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="79"/>
         <source>Sync</source>
-        <translation>동기화</translation>
+        <translation type="vanished">동기화</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="95"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="26"/>
+        <source>BitTorrent Tracker Servers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="33"/>
+        <source>Configure tracker servers for BitTorrent downloads</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="46"/>
+        <source>Tracker Sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="117"/>
+        <source>Sync Trackers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="133"/>
         <source>Enable daily auto-update</source>
         <translation>일일 자동 업데이트를 활성화합니다.</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="149"/>
+        <source>Current Tracker List</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>UpdateDialog</name>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="38"/>
         <source>New Version</source>
-        <translation>새 버전</translation>
+        <translation type="vanished">새 버전</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="49"/>
         <source>Go to Download</source>
-        <translation>다운로드로 이동</translation>
+        <translation type="vanished">다운로드로 이동</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="114"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="86"/>
+        <source>New Version Available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="135"/>
+        <source>Release Notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="174"/>
+        <source>Updating...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="226"/>
+        <source>Go to Download Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="240"/>
         <source>Cancel</source>
         <translation>취소</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="124"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="250"/>
+        <source>Update Now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>update</source>
-        <translation>업데이트</translation>
+        <translation type="vanished">업데이트</translation>
     </message>
 </context>
 <context>

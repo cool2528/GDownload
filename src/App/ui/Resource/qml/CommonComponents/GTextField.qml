@@ -62,8 +62,9 @@ TextField {
         }
     }
 
-    // 添加鼠标悬停效果
+    // 使用 HoverHandler 设置鼠标形状
     HoverHandler {
+        acceptedDevices: PointerDevice.Mouse
         cursorShape: Qt.IBeamCursor
     }
     
