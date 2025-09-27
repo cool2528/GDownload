@@ -111,6 +111,7 @@ namespace gdl {
 			   private:
 				explicit GTheme(QObject* parent = nullptr);
 				bool SystemIsDarkTheme() const;
+				void applyMenuStyleSheet();
 
 			   protected:
 				bool eventFilter(QObject* obj, QEvent* event) override;

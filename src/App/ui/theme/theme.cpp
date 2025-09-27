@@ -16,15 +16,19 @@ namespace gdl {
 			}
 
 			bool GTheme::dark() const {
-                bool is_dark = false;
+                // 简化 dark() 方法，仅返回主题状态，不处理样式表
 				if (theme_ == GThemeType::ThemeMode::kDark) {
-                    is_dark = true;
+                    return true;
 				}
 				else if (theme_ == GThemeType::ThemeMode::kSystem) {
-                    is_dark = system_is_dark_theme_;
+                    return system_is_dark_theme_;
 				}
+                return false;
+			}
 
-                // 使用Element Plus风格的菜单样式
+            // 新增方法：应用样式表（仅在主题切换时调用）
+            void GTheme::applyMenuStyleSheet() {
+                bool is_dark = dark();
                 QString menu_style;
                 if (is_dark) {
                     menu_style =
@@ -81,7 +85,6 @@ namespace gdl {
                         "}";
                 }
                 qApp->setStyleSheet(menu_style);
-                return is_dark;
 			}
 
 			GTheme::GTheme(QObject* parent) : QObject(parent), system_is_dark_theme_(SystemIsDarkTheme()) {
@@ -96,6 +99,10 @@ namespace gdl {
                     Settheme(GThemeType::ThemeMode::kDark);
                 }
 				qApp->installEventFilter(this);
+
+                // 初始化时应用样式表
+                applyMenuStyleSheet();
+
                 connect(this, &GTheme::themeChanged, this, [this]() {
                     QString theme_string;
                     switch (theme_) {
@@ -110,6 +117,8 @@ namespace gdl {
                             break;
                     }
                     settings::Settings::Instance().SetTheme(theme_string);
+                    // 主题切换时重新应用样式表
+                    applyMenuStyleSheet();
                     Q_EMIT darkChanged();
                 });
 			}
@@ -124,6 +133,8 @@ namespace gdl {
 			bool GTheme::eventFilter(QObject* obj, QEvent* event) {
 				if (event->type() == QEvent::ApplicationPaletteChange) {
 					system_is_dark_theme_ = SystemIsDarkTheme();
+					// 系统主题变化时重新应用样式表
+					applyMenuStyleSheet();
 					Q_EMIT darkChanged();
 					event->accept();
 					return true;

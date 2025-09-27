@@ -2,293 +2,291 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import gdl.sdk
-Control{
-    id:downloadView
-    property alias model: listViewdownload.model
+
+// Element Plus 风格下载列表页面
+Control {
+    id: downloadView
+    property alias model: downloadListView.model
     property int pageType: -1 // 0 downloadPage 1 waitingPage  2 completedPage
-    width: parent.width
-    height: parent.height
-    background: Rectangle{
-        color: GTheme.bgWhite
+
+    // Element Plus 设计标准
+    readonly property int standardSpacing: 16
+    readonly property int cardSpacing: 12
+    readonly property int contentMargin: 24
+
+    background: Rectangle {
+        color: GTheme.bgPage
+
+        // 空状态显示
         Item {
             anchors.fill: parent
-            opacity: listViewdownload.count > 0 ? 0 : 1
-            onOpacityChanged: {
-                console.log("page_background opacity ",opacity)
+            opacity: downloadListView.count > 0 ? 0 : 1
+            visible: opacity > 0
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: 200
+                    easing.type: Easing.OutCubic
+                }
             }
-            Image {
-                id: backgroundImage
+
+            ColumnLayout {
                 anchors.centerIn: parent
-                source: "/images/browser/no-task.svg"
+                spacing: downloadView.standardSpacing
+
+                Image {
+                    id: emptyStateImage
+                    source: "/images/browser/no-task.svg"
+                    Layout.alignment: Qt.AlignHCenter
+                    sourceSize.width: 120
+                    sourceSize.height: 120
+                    opacity: 0.6
+                }
+
+                Text {
+                    text: {
+                        switch(downloadView.pageType) {
+                            case 0: return qsTr("No active downloads")
+                            case 1: return qsTr("No waiting downloads")
+                            case 2: return qsTr("No completed downloads")
+                            default: return qsTr("No downloads")
+                        }
+                    }
+                    font.pixelSize: 16
+                    font.weight: Font.Medium
+                    color: GTheme.textSecondary
+                    Layout.alignment: Qt.AlignHCenter
+                }
+
+                Text {
+                    text: qsTr("Add some download links to get started")
+                    font.pixelSize: 14
+                    color: GTheme.textPlaceholder
+                    Layout.alignment: Qt.AlignHCenter
+                }
             }
         }
-
     }
 
-    ScrollView{
-        id:scroView
+    ScrollView {
+        id: scrollView
+        anchors.fill: parent
         ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
         clip: true
-        width: parent.width
-        height: parent.height
-        ListView{
-            id:listViewdownload
-            Layout.fillWidth: true
-            height: downloadView.height
-            spacing: 10
-            clip:true
-            focus: true
-            interactive: false
-            orientation:ListView.Vertical
-            model:downloadView.model
+
+        ListView {
+            id: downloadListView
+            spacing: downloadView.cardSpacing
+            topMargin: downloadView.standardSpacing
+            bottomMargin: downloadView.standardSpacing
+            leftMargin: downloadView.contentMargin
+            rightMargin: downloadView.contentMargin
+            clip: true
+            interactive: true
+            orientation: ListView.Vertical
+            model: downloadView.model
+
             delegate: GCard {
-                height: 105
-                padding: 8
+                width: downloadListView.width - downloadListView.leftMargin - downloadListView.rightMargin
+                height: 120
+                padding: downloadView.standardSpacing
                 outlined: true
                 hoverEnabled: true
                 selected: ListView.isCurrentItem || (downloadView.pageType === 0 && model.taskState === 1)
-                anchors {
-                    left: parent.left
-                    leftMargin: 20
-                    right: parent.right
-                    rightMargin: 20
-                }
 
-                Column {
+                ColumnLayout {
                     anchors.fill: parent
-                    spacing: 10
-                    RowLayout{
-                        id:rowlayout
-                        width: parent.width
-                        height: 30
-                        spacing: 10
-                        Text {
-                            id: titleName
-                            text: model.fileName
-                            Layout.leftMargin: 20
+                    spacing: 8
+
+                    // 文件名和操作按钮行
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: downloadView.standardSpacing
+
+                        // 文件名区域
+                        ColumnLayout {
                             Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                            Layout.margins: 10
-                            color: GTheme.textPrimary
-                            font.pixelSize: 14
-                        }
-                        Rectangle{
-                            id:controlRect
-                            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                            Layout.rightMargin: 10
-                            //Layout.fillWidth: true
-                            implicitWidth: 150
-                            radius: 5
-                            Layout.preferredHeight: 25
-                            // 暗色主题下 hover 不使用极浅的主色浅层，避免过曝；统一用填充浅色
-                            color: mouse.hovered ? (GTheme.dark ? GTheme.fillLight : GTheme.fillLight)
-                                               : (GTheme.dark ? GTheme.fillBase : GTheme.bgWhite)
-                            border.color: GTheme.borderLight
-                            HoverHandler{
-                                id:mouse
-                                acceptedDevices: PointerDevice.Mouse
-                                cursorShape: Qt.ArrowCursor
-                            }
-                            // download page
-                            RowLayout{
-                                spacing: 5
-                                Layout.alignment: Qt.AlignVCenter
-                                width: parent.width
-                                height: parent.height
-                                IconButton{
-                                    id:revocerButton
-                                    visible: model.taskState !== 1
-                                    Layout.leftMargin: 10
-                                    Layout.margins: 5
-                                    //Layout.fillWidth: true
-                                    Layout.minimumHeight: 20
-                                    Layout.maximumHeight: 20
-                                    iconSource: SegoeFluentIcons.Play
+                            spacing: 4
 
-                                    iconColor: mouse.hovered ? GTheme.textPrimary : GTheme.textSecondary
-                                    onClicked: {
-                                        if(downloadView.pageType == 0)
-                                        {
-                                            BrowserManager.UnpauseTask(0,model.taskId)
-                                        }else if(downloadView.pageType == 1){
-                                            //
-                                            BrowserManager.UnpauseTask(1,model.taskId)
-                                        }else if(downloadView.pageType == 2){
-                                            //
-                                            Qt.openUrlExternally(model.savePath)
-                                        }
-                                    }
-                                }
-                                IconButton{
-                                    id:pauseButton
-                                    visible: model.taskState === 1
-                                    Layout.leftMargin: 10
-                                    Layout.margins: 5
-                                    //Layout.fillWidth: true
-                                    Layout.minimumHeight: 20
-                                    Layout.maximumHeight: 20
-                                    iconSource: SegoeFluentIcons.Pause
-
-                                    iconColor: mouse.hovered ? GTheme.textPrimary : GTheme.textSecondary
-                                    onClicked: {
-                                        if(downloadView.pageType == 0)
-                                        {
-                                            BrowserManager.PauseTask(0,model.taskId)
-                                        }else if(downloadView.pageType == 1){
-                                            //
-                                            BrowserManager.PauseTask(1,model.taskId)
-                                        }else if(downloadView.pageType == 2){
-                                            //
-                                        }
-                                    }
-                                }
-                                IconButton{
-                                    id:delButton
-                                    Layout.margins: 5
-                                    //Layout.fillWidth: true
-                                    Layout.minimumHeight: 20
-                                    Layout.maximumHeight: 20
-                                    iconSource: SegoeFluentIcons.Delete
-                                    iconColor: mouse.hovered ? GTheme.textPrimary : GTheme.textSecondary
-                                    onClicked: {
-                                        if(downloadView.pageType == 0){
-                                            BrowserManager.RemoveTask(0,model.taskId)
-                                        }else if(downloadView.pageType == 1){
-                                            BrowserManager.RemoveTask(1,model.taskId)
-                                        }else if(downloadView.pageType == 2){
-                                            //
-                                            BrowserManager.RemoveStopTask(model.taskId)
-                                        }
-                                    }
-                                }
-
-                                IconButton{
-                                    id:openFolderButton
-                                    Layout.margins: 5
-                                    //Layout.fillWidth: true
-                                    Layout.minimumHeight: 20
-                                    Layout.maximumHeight: 20
-                                    iconSource: SegoeFluentIcons.Folder
-                                    iconColor: mouse.hovered ? GTheme.textPrimary : GTheme.textSecondary
-                                    onClicked: {
-                                        BrowserManager.OpenFileLocation(model.savePath)
-                                    }
-                                }
-
-                                IconButton{
-                                    id:copyUrlButton
-                                    Layout.topMargin: 8
-                                    Layout.margins: 5
-                                    //Layout.fillWidth: true
-                                    Layout.minimumHeight: 20
-                                    Layout.maximumHeight: 20
-                                    iconSource: SegoeFluentIcons.Link
-                                    iconColor: mouse.hovered ? GTheme.textPrimary : GTheme.textSecondary
-                                    onClicked: {
-                                        console.debug("copy download link ",model.downloadLink)
-                                        UtilsToolsManager.SetClipboardText(model.downloadLink)
-                                    }
-                                }
-                            }
-
-                        }
-                    }
-
-                    // ProgressBar
-
-                    RowLayout{
-                        id:progressLayout
-                        width: parent.width
-                        height: 10
-                        GProgressBar{
-                            id:progressBar
-                            Layout.margins: 10
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 6
-                            from: 0
-                            to:100
-                            value: model.progress
-                            bkColor: GTheme.fillLight
-                        }
-                    }
-
-                    // tip text
-                    RowLayout{
-                        id:tipText
-                        width: parent.width
-                        height: 30
-                        Text {
-                            id: downloadProgress
-                            Layout.margins: 10
-                            Layout.alignment:  Qt.AlignLeft
-                            Layout.fillWidth: true
-                            text: model.currentSize + "/" + model.totalSize //qsTr("7.38MB/5.43GB")
-                            color: GTheme.textSecondary
-                            font.pixelSize: 14
-                        }
-
-                        RowLayout{
-                            spacing: 0
-                            Layout.alignment: Qt.AlignRight
-                            Layout.fillWidth: true
-                            Layout.maximumWidth: 300
-                            Layout.preferredWidth: 200
                             Text {
-                                id: downloadSpeed
-                                Layout.topMargin: 10
-                                Layout.rightMargin: 10
+                                text: model.fileName
+                                font.pixelSize: 15
+                                font.weight: Font.Medium
+                                color: GTheme.textPrimary
+                                elide: Text.ElideRight
                                 Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                text: model.downloadSpeed //qsTr("↓973.4 KB/s")
-                                color: GTheme.textSecondary
-                                font.pixelSize: 14
+                                maximumLineCount: 1
                             }
 
                             Text {
-                                id: downloadRemaining
-                                Layout.topMargin: 10
-                                Layout.rightMargin: 10
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                text: qsTr("Remaining ") + model.remainingTime //qsTr("Remaining 1h 37m 21s")
+                                text: qsTr("Size: %1 • Progress: %2%").arg(model.totalSize).arg(model.progress)
+                                font.pixelSize: 12
                                 color: GTheme.textSecondary
-                                font.pixelSize: 14
-                            }
-
-                            FontIcon{
-                                id:connectedIcon
-                                Layout.topMargin: 13
-                                Layout.rightMargin: 10
                                 Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                iconSource: SegoeFluentIcons.Connected
+                            }
+                        }
+
+                        // 操作按钮区域
+                        RowLayout {
+                            spacing: 4
+
+                            // 开始/恢复按钮
+                            IconButton {
+                                visible: model.taskState !== 1
+                                iconSource: downloadView.pageType === 2 ?
+                                           SegoeFluentIcons.OpenFile : SegoeFluentIcons.Play
                                 iconSize: 14
+                                Layout.preferredWidth: 28
+                                Layout.preferredHeight: 28
+                                iconColor: hovered ? GTheme.primaryColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
+                                backgroundColor: hovered ? GTheme.fillLight : "transparent"
+                                onClicked: {
+                                    if (downloadView.pageType === 2) {
+                                        Qt.openUrlExternally(model.savePath)
+                                    } else if (downloadView.pageType === 0) {
+                                        BrowserManager.UnpauseTask(0, model.taskId)
+                                    } else if (downloadView.pageType === 1) {
+                                        BrowserManager.UnpauseTask(1, model.taskId)
+                                    }
+                                }
+                            }
+
+                            // 暂停按钮
+                            IconButton {
+                                visible: model.taskState === 1
+                                iconSource: SegoeFluentIcons.Pause
+                                iconSize: 14
+                                Layout.preferredWidth: 28
+                                Layout.preferredHeight: 28
+                                iconColor: hovered ? GTheme.primaryColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
+                                backgroundColor: hovered ? GTheme.fillLight : "transparent"
+                                onClicked: {
+                                    if (downloadView.pageType === 0) {
+                                        BrowserManager.PauseTask(0, model.taskId)
+                                    } else if (downloadView.pageType === 1) {
+                                        BrowserManager.PauseTask(1, model.taskId)
+                                    }
+                                }
+                            }
+
+                            // 分隔线
+                            Rectangle {
+                                Layout.preferredWidth: 1
+                                Layout.preferredHeight: 16
+                                color: GTheme.borderLight
+                                Layout.alignment: Qt.AlignVCenter
+                            }
+
+                            // 打开文件夹按钮
+                            IconButton {
+                                iconSource: SegoeFluentIcons.Folder
+                                iconSize: 14
+                                Layout.preferredWidth: 28
+                                Layout.preferredHeight: 28
+                                iconColor: hovered ? GTheme.primaryColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
+                                backgroundColor: hovered ? GTheme.fillLight : "transparent"
+                                onClicked: {
+                                    BrowserManager.OpenFileLocation(model.savePath)
+                                }
+                            }
+
+                            // 复制链接按钮
+                            IconButton {
+                                iconSource: SegoeFluentIcons.Link
+                                iconSize: 14
+                                Layout.preferredWidth: 28
+                                Layout.preferredHeight: 28
+                                iconColor: hovered ? GTheme.primaryColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
+                                backgroundColor: hovered ? GTheme.fillLight : "transparent"
+                                onClicked: {
+                                    UtilsToolsManager.SetClipboardText(model.downloadLink)
+                                    ToastManager.ShowSuccess(qsTr("Link copied to clipboard"))
+                                }
+                            }
+
+                            // 删除按钮
+                            IconButton {
+                                iconSource: SegoeFluentIcons.Delete
+                                iconSize: 14
+                                Layout.preferredWidth: 28
+                                Layout.preferredHeight: 28
+                                iconColor: hovered ? GTheme.dangerColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
+                                backgroundColor: hovered ? GTheme.fillLight : "transparent"
+                                onClicked: {
+                                    if (downloadView.pageType === 0) {
+                                        BrowserManager.RemoveTask(0, model.taskId)
+                                    } else if (downloadView.pageType === 1) {
+                                        BrowserManager.RemoveTask(1, model.taskId)
+                                    } else if (downloadView.pageType === 2) {
+                                        BrowserManager.RemoveStopTask(model.taskId)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // 进度条
+                    GProgressBar {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 6
+                        from: 0
+                        to: 100
+                        value: model.progress
+                        visible: downloadView.pageType !== 2  // 已完成任务不显示进度条
+                    }
+
+                    // 下载状态信息行
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: downloadView.standardSpacing
+
+                        Text {
+                            text: model.currentSize + "/" + model.totalSize
+                            font.pixelSize: 12
+                            color: GTheme.textSecondary
+                            Layout.alignment: Qt.AlignLeft
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
+                        }
+
+                        // 下载速度
+                        Text {
+                            text: model.downloadSpeed
+                            font.pixelSize: 12
+                            color: GTheme.textSecondary
+                            visible: downloadView.pageType === 0 && model.taskState === 1
+                        }
+
+                        // 剩余时间
+                        Text {
+                            text: qsTr("Remaining ") + model.remainingTime
+                            font.pixelSize: 12
+                            color: GTheme.textSecondary
+                            visible: downloadView.pageType === 0 && model.taskState === 1
+                        }
+
+                        // 连接数
+                        RowLayout {
+                            spacing: 4
+                            visible: downloadView.pageType === 0
+
+                            FontIcon {
+                                iconSource: SegoeFluentIcons.Connected
+                                iconSize: 12
                                 color: GTheme.textSecondary
                             }
 
                             Text {
-                                id: connectNumber
-                                Layout.leftMargin: 10
-                                Layout.topMargin: 10
-                                Layout.rightMargin: 10
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                text: String("%1").arg(model.connections) //qsTr("64")
+                                text: String("%1").arg(model.connections)
+                                font.pixelSize: 12
                                 color: GTheme.textSecondary
-                                font.pixelSize: 14
                             }
                         }
                     }
-                    // end
-
                 }
             }
-
         }
-
-
-    }
-    Component.onCompleted: {
-        console.debug("model ",listViewdownload.count)
     }
 }
