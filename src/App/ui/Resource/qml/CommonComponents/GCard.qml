@@ -14,13 +14,13 @@ Control {
 
     // 外观属性
     property int radius: 4
-    padding: 10
+    padding: 2
     clip: true
 
     implicitWidth: Math.max(background ? background.implicitWidth : 0,
-                             contentItem ? contentItem.implicitWidth + padding * 2 : 0)
+                             contentItem ? contentItem.implicitWidth + padding : 0)
     implicitHeight: Math.max(background ? background.implicitHeight : 0,
-                              contentItem ? contentItem.implicitHeight + padding * 2 : 0)
+                              contentItem ? contentItem.implicitHeight + padding : 0)
 
     background: Rectangle {
         id: bg

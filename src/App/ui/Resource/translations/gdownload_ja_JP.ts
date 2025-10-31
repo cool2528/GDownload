@@ -2,58 +2,31 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ja_JP">
 <context>
-    <name>AdvancedSettingPage</name>
-    <message>
-        <source>Baidu Cookie</source>
-        <translation type="vanished">百度クッキー</translation>
-    </message>
-    <message>
-        <source>Please enter Baidu Cookie</source>
-        <translation type="vanished">百度クッキーを入力してください</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation type="vanished">保存</translation>
-    </message>
-    <message>
-        <source>Save Baidu Cokies Succeed</source>
-        <translation type="vanished">Baidu.comクッキーの保存に成功しました</translation>
-    </message>
-</context>
-<context>
     <name>BaiduCookieSettingPage</name>
-    <message>
-        <source>Baidu Cookie</source>
-        <translation type="vanished">百度クッキー</translation>
-    </message>
-    <message>
-        <source>Please enter Baidu Cookie</source>
-        <translation type="vanished">百度クッキーを入力してください</translation>
-    </message>
     <message>
         <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="27"/>
         <source>Baidu Netdisk Integration</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">百度ネットディスクの統合</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="34"/>
         <source>Configure Baidu Netdisk cookie for link parsing</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">リンク解析用にBaidu Netdisk cookieを設定する</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="51"/>
         <source>Cookie</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">クッキー</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="58"/>
         <source>BDUSS value</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">BDUSS値</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="69"/>
         <source>Paste your Baidu Netdisk cookie here</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Baidu Netdisk cookieをここに貼り付けます。</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="75"/>
@@ -63,11 +36,7 @@
     <message>
         <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="82"/>
         <source>Baidu cookie saved successfully</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save Baidu Cokies Succeed</source>
-        <translation type="vanished">Baidu.comクッキーの保存に成功しました</translation>
+        <translation type="unfinished">百度のクッキーが正常に保存されました</translation>
     </message>
 </context>
 <context>
@@ -75,7 +44,7 @@
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="49"/>
         <source>Appearance &amp; Language</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">外見と言葉</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="69"/>
@@ -85,7 +54,7 @@
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="112"/>
         <source>Application Behavior</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">アプリケーションの動作</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="125"/>
@@ -115,12 +84,12 @@
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="217"/>
         <source>Global download folder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">グローバルダウンロードフォルダ</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="253"/>
         <source>Network Proxy</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ネットワーク・プロキシ</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="264"/>
@@ -135,12 +104,12 @@
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="333"/>
         <source>Clipboard Monitor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">クリップボードモニター</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="340"/>
         <source>Automatically detect download links from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">クリップボードからダウンロードリンクを自動検出</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="350"/>
@@ -168,39 +137,35 @@
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="44"/>
         <source>Downloads</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ダウンロード</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="55"/>
         <source>Active download tasks</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">アクティブなダウンロードタスク</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="56"/>
         <source>Queued download tasks</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">キューに入ったダウンロード・タスク</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="57"/>
         <source>Completed or stopped tasks</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">完了または停止したタスク</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="58"/>
         <source>Manage your downloads</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ダウンロードの管理</translation>
     </message>
 </context>
 <context>
     <name>DownloadPageView</name>
     <message>
-        <source>Task</source>
-        <translation type="vanished">タスク</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/DownloadPageView.qml" line="47"/>
         <source>Download Tasks</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">タスクのダウンロード</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageView.qml" line="81"/>
@@ -246,37 +211,37 @@
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="49"/>
         <source>No active downloads</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">アクティブダウンロードなし</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="50"/>
         <source>No waiting downloads</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ダウンロード待ちなし</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="51"/>
         <source>No completed downloads</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ダウンロードが完了していない</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="52"/>
         <source>No downloads</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ダウンロードなし</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="62"/>
         <source>Add some download links to get started</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ダウンロードリンクの追加</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="122"/>
         <source>Size: %1 • Progress: %2%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">サイズ: %1 - プログレス：%2%</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="203"/>
         <source>Link copied to clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">クリップボードにコピーされたリンク</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="264"/>
@@ -298,7 +263,7 @@
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="77"/>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="246"/>
         <source>About GDownload</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">GDownloadについて</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="123"/>
@@ -318,114 +283,22 @@
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="175"/>
         <source>Support GDownload Development</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gダウンロード開発支援</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="183"/>
         <source>If you like GDownload, you can support us through the following platforms:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">GDownloadを気に入っていただけたなら、以下のプラットフォームからご支援いただけます：</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="203"/>
         <source>Thank you for your support! ❤️</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ご支援ありがとうございました！❤️</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="221"/>
         <source>Open Source Licenses</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If you like GDownloader, you can sponsor us on the following platforms:</source>
-        <translation type="vanished">GDownloader を気に入っていただけましたら、以下のプラットフォームでスポンサーになることができます:</translation>
-    </message>
-    <message>
-        <source># About GDownload
-
-GDownload is a cross-platform download manager built with C++ and Qt. It combines modern technology stack and excellent open-source components to provide users with an efficient and stable downloading experience.
-
-## Core Features
-
-- Cross-platform support (Windows, macOS, Linux)
-- Efficient download engine powered by aria2c
-- Multi-threaded concurrent downloads
-- Support for multiple protocols (HTTP, HTTPS, FTP, BitTorrent, Metalink)
-- Download resume capability
-- User-friendly graphical interface
-
-## Technology Stack
-
-- UI Framework: Qt Quick (QML) + Qt C++
-- Core Engine: aria2c
-- Network Library: Boost.Asio
-- BT Download: LibtorrentRasterbar
-- XML Parser: PugiXML
-- Frameless Window: FramelessHelper
-
-## Development Team
-
-GDownload is an open-source project maintained by developers who are passionate about technology. We welcome community contributions, including but not limited to:
-
-- Code contributions
-- Bug reports
-- Feature suggestions
-- Documentation improvements
-
-## Contact Us
-
-- [GitHub:](https://github.com/cool2528/GDownload)
-- [Issue Tracking:](https://github.com/cool2528/GDownload/issues)
-- [Home Page: ](https://github.com/cool2528/GDownload)
-
-## Copyright Notice
-
-Copyright © 2024 GDownload Team
-Licensed under the Apache License 2.0
-
-*Thanks to all developers and users who have contributed to this project!*</source>
-        <translation type="vanished"># GDownloadについて
-
-GDownloadは、C++とQtで構築されたクロスプラットフォームのダウンロードマネージャーです。最新の技術スタックと優れたオープンソースコンポーネントを組み合わせ、ユーザーに効率的で安定したダウンロード体験を提供します。
-
-## コア機能
-
-- クロスプラットフォーム対応（Windows、macOS、Linux）
-- aria2cを搭載した効率的なダウンロードエンジン
-- マルチスレッド同時ダウンロード
-- 複数のプロトコル対応（HTTP、HTTPS、FTP、BitTorrent、Metalink）
-- ダウンロードの再開機能
-- ユーザーフレンドリーなグラフィカルインターフェース
-
-## 技術スタック
-
-- UIフレームワーク: Qt Quick（QML）+ Qt C++
-- コアエンジン: aria2c
-- ネットワークライブラリ: Boost.Asio
-- BTダウンロード: LibtorrentRasterbar
-- XMLパーサー: PugiXML
-- フレームレスウィンドウ: FramelessHelper
-
-## 開発チーム
-
-GDownloadは、技術に情熱を持つ開発者によってメンテナンスされているオープンソースプロジェクトです。コミュニティの貢献を歓迎します。以下に限定されません：
-
-- コードの貢献
-- バグ報告
-- 機能の提案
-- ドキュメントの改善
-
-## お問い合わせ
-
-- [GitHub:](https://github.com/cool2528/GDownload)
-- [Issue Tracking:](https://github.com/cool2528/GDownload/issues)
-- [ホームページ: ](https://github.com/cool2528/GDownload)
-
-## 著作権表示
-
-Copyright © 2024 GDownload Team
-Apache License 2.0でライセンスされています
-
-*このプロジェクトに貢献してくれたすべての開発者とユーザーに感謝します！*</translation>
+        <translation type="unfinished">オープンソースライセンス</translation>
     </message>
 </context>
 <context>
@@ -433,130 +306,126 @@ Apache License 2.0でライセンスされています
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="69"/>
         <source>Experimental Features</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">実験的特徴</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="76"/>
         <source>These features are experimental and may be unstable. Use with caution and report any issues you encounter.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">これらの機能は実験的なものであり、不安定な場合があります。注意して使用し、問題があれば報告してください。</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="84"/>
         <source>⚠️ Enable at your own risk</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">⚠️ 自己責任で有効化すること</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="109"/>
         <source>Download Performance</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ダウンロード・パフォーマンス</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="121"/>
         <source>Enhanced Multi-threading</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">強化されたマルチスレッド</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="130"/>
         <source>Improves download speed by using advanced threading algorithms</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">高度なスレッディング・アルゴリズムによりダウンロード速度を向上</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="148"/>
         <source>Smart Bandwidth Allocation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">スマートな帯域割当</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="157"/>
         <source>Automatically adjusts bandwidth usage based on network conditions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ネットワーク状況に応じて帯域幅の使用量を自動的に調整</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="182"/>
         <source>User Interface</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ユーザーインターフェース</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="194"/>
         <source>Enhanced Animations</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">強化されたアニメーション</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="203"/>
         <source>Enables smooth transitions and micro-interactions throughout the interface</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">インターフェイス全体でスムーズなトランジションとマイクロインタラクションを可能にする</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="221"/>
         <source>Adaptive Layout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">適応レイアウト</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="230"/>
         <source>Automatically adjusts layout based on window size and DPI settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ウィンドウサイズとDPI設定に基づいてレイアウトを自動調整</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="255"/>
         <source>Network &amp; Protocols</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ネットワークとプロトコル</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="267"/>
         <source>HTTP/3 Protocol Support</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">HTTP/3プロトコルのサポート</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="276"/>
         <source>Enables next-generation HTTP/3 protocol for faster downloads</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">次世代HTTP/3プロトコルによる高速ダウンロードを実現</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="294"/>
         <source>Intelligent Retry Mechanism</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">インテリジェント・リトライ・メカニズム</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="303"/>
         <source>Advanced retry strategies with exponential backoff and error analysis</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">指数バックオフとエラー解析による高度なリトライ戦略</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="321"/>
         <source>P2P Download Acceleration</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">P2Pダウンロード・アクセラレーション</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="330"/>
         <source>Uses peer-to-peer technology to accelerate popular file downloads</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ピアツーピア技術を使用して、人気のあるファイルのダウンロードを高速化します。</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="359"/>
         <source>Reset Experimental Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">実験設定のリセット</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="366"/>
         <source>Disable all experimental features and restore defaults</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">すべての実験的機能を無効にし、デフォルトに戻す</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="374"/>
         <source>Reset All</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">すべてリセット</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="388"/>
         <source>All experimental features have been reset</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">すべての実験的機能はリセットされた</translation>
     </message>
 </context>
 <context>
     <name>NetDiskPageView</name>
-    <message>
-        <source>One task url per line (supports magnet)</source>
-        <translation type="obsolete">1行に1つのタスクURL（マグネットをサポート）</translation>
-    </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="30"/>
         <source>Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</source>
@@ -661,46 +530,34 @@ Apache License 2.0でライセンスされています
 <context>
     <name>SettingPageTitle</name>
     <message>
-        <source>Basic</source>
-        <translation type="vanished">基本設定</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <translation type="vanished">詳細設定</translation>
-    </message>
-    <message>
-        <source>Lab</source>
-        <translation type="vanished">ラボ機能</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="17"/>
         <source>Basic Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">基本設定</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="19"/>
         <source>Advanced Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">詳細設定</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="21"/>
         <source>Lab Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ラボの設定</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="37"/>
         <source>Configure basic download preferences</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ダウンロードの基本設定</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="39"/>
         <source>Advanced configuration options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">高度な設定オプション</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="41"/>
         <source>Experimental features and settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">実験の特徴と設定</translation>
     </message>
 </context>
 <context>
@@ -727,58 +584,105 @@ Apache License 2.0でライセンスされています
     </message>
 </context>
 <context>
+    <name>TaskAdvancedOptionsCard</name>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="32"/>
+        <source>Advanced Options</source>
+        <translation type="unfinished">高度なオプション</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="101"/>
+        <source>Custom Headers:</source>
+        <translation type="unfinished">カスタムヘッダー</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="113"/>
+        <source>Custom request headers (one per line: KEY:VALUE)</source>
+        <translation type="unfinished">カスタムリクエストヘッダ（1行に1つ：KEY:VALUE）</translation>
+    </message>
+</context>
+<context>
+    <name>TaskDialogHeader</name>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogHeader.qml" line="11"/>
+        <source>Add New Download Task</source>
+        <translation type="unfinished">新しいダウンロードタスクの追加</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogHeader.qml" line="12"/>
+        <source>Add downloads from URLs, torrents, or cloud storage</source>
+        <translation type="unfinished">URL、トレント、クラウドストレージからのダウンロードを追加する</translation>
+    </message>
+</context>
+<context>
     <name>TaskDialogPage</name>
     <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="96"/>
         <source>URL</source>
-        <translation type="vanished">タスクのリンク</translation>
+        <translation>タスクのリンク</translation>
     </message>
     <message>
-        <source>Torent</source>
-        <translation type="vanished">シード・ミッション</translation>
-    </message>
-    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="98"/>
         <source>Baidu</source>
-        <translation type="vanished">百度ネットディスク</translation>
+        <translation>百度ネットディスク</translation>
     </message>
     <message>
-        <source>One task url per line (supports magnet)</source>
-        <translation type="vanished">1行に1つのタスクURL（マグネットをサポート）</translation>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="97"/>
+        <source>Torrent</source>
+        <translation type="unfinished">激流</translation>
     </message>
     <message>
-        <source>Rename:</source>
-        <translation type="vanished">リネーム</translation>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="142"/>
+        <source>Download URLs</source>
+        <translation type="unfinished">ダウンロードURL</translation>
     </message>
     <message>
-        <source>Optional</source>
-        <translation type="vanished">選択可能</translation>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="160"/>
+        <source>Enter download URLs (one per line, supports magnet links)</source>
+        <translation type="unfinished">ダウンロードURLを入力（1行に1つ、マグネットリンクに対応）</translation>
     </message>
     <message>
-        <source>Splits:</source>
-        <translation type="vanished">スライス数</translation>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="352"/>
+        <source>Add Task</source>
+        <translation type="unfinished">タスクの追加</translation>
     </message>
     <message>
-        <source>Save to:</source>
-        <translation type="vanished">保存先</translation>
-    </message>
-    <message>
-        <source>Custom Request Header List:</source>
-        <translation type="vanished">カスタムリクエストヘッダーリスト：</translation>
-    </message>
-    <message>
-        <source>Custom request header list (one per line in the format KEY:VALUE)</source>
-        <translation type="vanished">カスタムリクエストヘッダーリスト（KEY:VALUE形式で1行につき1つ）</translation>
-    </message>
-    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="331"/>
         <source>Advanced Options</source>
-        <translation type="vanished">高度なオプション</translation>
+        <translation>高度なオプション</translation>
     </message>
     <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="343"/>
         <source>Cancel</source>
-        <translation type="vanished">キャンセル</translation>
+        <translation>キャンセル</translation>
+    </message>
+</context>
+<context>
+    <name>TaskGeneralOptionsCard</name>
+    <message>
+        <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="23"/>
+        <source>Download Settings</source>
+        <translation type="unfinished">設定のダウンロード</translation>
     </message>
     <message>
-        <source>Submit</source>
-        <translation type="vanished">投稿する</translation>
+        <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="39"/>
+        <source>Rename:</source>
+        <translation type="unfinished">リネーム</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="49"/>
+        <source>Optional filename</source>
+        <translation type="unfinished">オプションのファイル名</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="53"/>
+        <source>Splits:</source>
+        <translation type="unfinished">スライス数</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="69"/>
+        <source>Save to:</source>
+        <translation type="unfinished">保存先</translation>
     </message>
 </context>
 <context>
@@ -807,32 +711,24 @@ Apache License 2.0でライセンスされています
 <context>
     <name>TrackerServerSettingPage</name>
     <message>
-        <source>Tracker Servers:</source>
-        <translation type="vanished">トラッカーサーバー:</translation>
-    </message>
-    <message>
-        <source>Sync</source>
-        <translation type="vanished">同調</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="26"/>
         <source>BitTorrent Tracker Servers</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">BitTorrent トラッカーサーバー</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="33"/>
         <source>Configure tracker servers for BitTorrent downloads</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">BitTorrentダウンロード用のトラッカーサーバーを設定する</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="46"/>
         <source>Tracker Sources</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">トラッカー・ソース</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="117"/>
         <source>Sync Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">シンクトラッカー</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="133"/>
@@ -842,38 +738,30 @@ Apache License 2.0でライセンスされています
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="149"/>
         <source>Current Tracker List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">現在のトラッカーリスト</translation>
     </message>
 </context>
 <context>
     <name>UpdateDialog</name>
     <message>
-        <source>New Version</source>
-        <translation type="vanished">新バージョン</translation>
-    </message>
-    <message>
-        <source>Go to Download</source>
-        <translation type="vanished">ダウンロード</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="86"/>
         <source>New Version Available</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">新バージョン</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="135"/>
         <source>Release Notes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">リリースノート</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="174"/>
         <source>Updating...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">更新中...</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="226"/>
         <source>Go to Download Page</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ダウンロードページへ</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="240"/>
@@ -883,11 +771,7 @@ Apache License 2.0でライセンスされています
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="250"/>
         <source>Update Now</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>update</source>
-        <translation type="vanished">アップデート</translation>
+        <translation type="unfinished">今すぐ更新</translation>
     </message>
 </context>
 <context>
