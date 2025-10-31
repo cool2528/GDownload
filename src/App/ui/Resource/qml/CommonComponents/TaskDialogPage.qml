@@ -9,7 +9,8 @@ import "../Utils/utils.js" as Utils
 Popup {
     id: taskPage
     width: 720
-    height: Math.min(1000, contentLayout.implicitHeight + standardPadding * 2)
+    implicitHeight: contentLayout.implicitHeight + standardPadding * 2
+    height: Math.min(parent ? parent.height - standardPadding * 2 : 1000, implicitHeight)
     x: (parent.width - width) / 2
     y: (parent.height - height) / 2
     modal: true
@@ -18,9 +19,10 @@ Popup {
 
     // Element Plus 设计标准
     readonly property int standardPadding: 24
-    readonly property int standardSpacing: 16
+    readonly property int standardSpacing: 5
     readonly property int headerHeight: 64
     readonly property int buttonHeight: 32
+    readonly property int contentMinHeight: 460
 
     // Element Plus 风格背景
     background: Rectangle {
@@ -45,63 +47,11 @@ Popup {
         spacing: 0
 
         // 头部区域
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.preferredHeight: taskPage.headerHeight
-            color: "transparent"
-
-            RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin: taskPage.standardPadding
-                anchors.rightMargin: taskPage.standardPadding
-                spacing: taskPage.standardSpacing
-
-                // 图标区域
-                Rectangle {
-                    Layout.preferredWidth: 40
-                    Layout.preferredHeight: 40
-                    Layout.alignment: Qt.AlignVCenter
-                    color: GTheme.primaryLight(9)
-                    radius: 8
-
-                    FontIcon {
-                        anchors.centerIn: parent
-                        iconSource: SegoeFluentIcons.Add
-                        iconSize: 20
-                        color: GTheme.primaryColor
-                    }
-                }
-
-                // 标题信息
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 4
-
-                    Text {
-                        text: qsTr("Add New Download Task")
-                        font.pixelSize: 18
-                        font.weight: Font.DemiBold
-                        color: GTheme.textPrimary
-                    }
-
-                    Text {
-                        text: qsTr("Add downloads from URLs, torrents, or cloud storage")
-                        font.pixelSize: 14
-                        color: GTheme.textSecondary
-                    }
-                }
-
-                // 关闭按钮
-                IconButton {
-                    iconSource: SegoeFluentIcons.ChromeClose
-                    iconSize: 14
-                    Layout.preferredWidth: 28
-                    Layout.preferredHeight: 28
-                    iconColor: hovered ? GTheme.textPrimary : GTheme.textSecondary
-                    backgroundColor: hovered ? GTheme.fillLight : "transparent"
-                    onClicked: taskPage.close()
-                }
-            }
+        TaskDialogHeader {
+            headerHeight: taskPage.headerHeight
+            standardPadding: taskPage.standardPadding
+            standardSpacing: taskPage.standardSpacing
+            onCloseRequested: taskPage.close()
         }
 
         // 分隔线
@@ -110,15 +60,24 @@ Popup {
         }
 
         // 主要内容区域
-        Item {
+        ScrollView {
+            id: scrollArea
             Layout.fillWidth: true
-            implicitHeight: Math.max(460, contentArea.implicitHeight)
-            Layout.preferredHeight: implicitHeight
+            Layout.fillHeight: true
+            Layout.minimumHeight: taskPage.contentMinHeight
+            Layout.preferredHeight: taskPage.contentMinHeight
+            implicitHeight: taskPage.contentMinHeight
+            clip: true
+            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+            ScrollBar.vertical.policy: ScrollBar.AsNeeded
+            contentHeight: contentArea.height
 
+            // 使用默认 Flickable 作为 contentItem，直接提供内容列
             ColumnLayout {
                 id: contentArea
-                anchors.fill: parent
-                anchors.margins: taskPage.standardPadding
+                width: scrollArea.availableWidth - taskPage.standardPadding * 2
+                x: taskPage.standardPadding
+                y: taskPage.standardPadding
                 spacing: taskPage.standardSpacing
 
                 // 标签页导航
@@ -156,22 +115,18 @@ Popup {
                             }
                         }
                     }
-
-                    ButtonGroup {
-                        id: tabGroup
-                    }
-
-                    QtObject {
-                        id: tabNavigation
-                        property int currentIndex: 0
-                    }
                 }
+
+                ButtonGroup { id: tabGroup }
+                QtObject { id: tabNavigation; property int currentIndex: 0 }
 
                 // 标签页内容区域
                 StackLayout {
                     id: taskPageLayout
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 200
+                    // 自适应当前页内容高度，避免固定 200 导致可视区过小
+                    //Layout.preferredHeight: 300
+                    Layout.fillHeight: true
                     currentIndex: tabNavigation.currentIndex
                     property int urlType: 0
 
@@ -179,48 +134,41 @@ Popup {
                     GCard {
                         outlined: true
                         padding: taskPage.standardSpacing
-
+                        Layout.preferredHeight: 150
                         ColumnLayout {
                             anchors.fill: parent
-                            spacing: 8
+                            spacing: 0
+                            ScrollView{
+                                id:view_input
+                                anchors.fill: parent
+                                TextArea {
+                                    id: input
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    font.pixelSize: 13
+                                    placeholderText: qsTr("Enter download URLs (one per line, supports magnet links)")
+                                    color: GTheme.textPrimary
+                                    placeholderTextColor: GTheme.textPlaceholder
+                                    selectByMouse: true
+                                    wrapMode: TextArea.Wrap
 
-                            Text {
-                                text: qsTr("Download URLs")
-                                font.pixelSize: 14
-                                font.weight: Font.Medium
-                                color: GTheme.textPrimary
-                            }
+                                    background: Rectangle {
+                                        color: GTheme.fillLighter
+                                        border.width: 1
+                                        border.color: input.activeFocus ? GTheme.primaryColor : GTheme.borderLight
+                                        radius: 6
 
-                            TextArea {
-                                id: input
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                Layout.minimumHeight: 120
-                                font.pixelSize: 13
-                                placeholderText: qsTr("Enter download URLs (one per line, supports magnet links)")
-                                color: GTheme.textPrimary
-                                placeholderTextColor: GTheme.textPlaceholder
-                                selectByMouse: true
-                                wrapMode: TextArea.Wrap
-
-                                background: Rectangle {
-                                    color: GTheme.fillLighter
-                                    border.width: 1
-                                    border.color: input.activeFocus ? GTheme.primaryColor : GTheme.borderLight
-                                    radius: 6
-
-                                    Behavior on border.color {
-                                        ColorAnimation { duration: 150 }
+                                        Behavior on border.color { ColorAnimation { duration: 150 } }
                                     }
-                                }
 
-                                Component.onCompleted: {
-                                    ClipboardWatcher.clipboardChanged.connect(function(text) {
-                                        if (text.length > 3) {
-                                            input.text = text
-                                        }
-                                    })
-                                    input.text = ClipboardWatcher.GetClipboardText()
+                                    Component.onCompleted: {
+                                        ClipboardWatcher.clipboardChanged.connect(function(text) {
+                                            if (text.length > 3) {
+                                                input.text = text
+                                            }
+                                        })
+                                        input.text = ClipboardWatcher.GetClipboardText()
+                                    }
                                 }
                             }
                         }
@@ -230,12 +178,11 @@ Popup {
                     GCard {
                         outlined: true
                         padding: taskPage.standardSpacing
-
+                        Layout.preferredHeight: 150
                         GDropArea {
                             id: dropTorrent
                             anchors.fill: parent
                             visible: true
-
                             onAccepted: {
                                 let model = BrowserManager.GetFilePreviewModel(dropTorrent.path)
                                 if (model) {
@@ -261,10 +208,12 @@ Popup {
                     GCard {
                         outlined: true
                         padding: taskPage.standardSpacing
-
+                        Layout.fillHeight: true
+                        Layout.preferredHeight: 300
                         NetDiskPageView {
                             id: netDiskPageView
                             anchors.fill: parent
+                            // NetDiskPageView 根为 Rectangle，默认无隐式高度，提供一个合理的缺省高度
                         }
                     }
 
@@ -288,33 +237,33 @@ Popup {
                     function getOptions() {
                         let options = {}
                         let headers = []
-                        if (renameEdit.text.length > 0) {
-                            options["out"] = renameEdit.text
+                        if (generalConfig.renameText.length > 0) {
+                            options["out"] = generalConfig.renameText
                         }
-                        if (spinbox.value > 0) {
-                            options["max-concurrent-downloads"] = String("%1").arg(spinbox.value)
+                        if (generalConfig.splitsValue > 0) {
+                            options["max-concurrent-downloads"] = String("%1").arg(generalConfig.splitsValue)
                         }
-                        if (savePath.path.length > 0) {
-                            options["dir"] = savePath.path
+                        if (generalConfig.saveDirectory.length > 0) {
+                            options["dir"] = generalConfig.saveDirectory
                         }
-                        if (userAgent.text.length > 0) {
-                            options["user-agent"] = userAgent.text
+                        if (additionalConfig.userAgentText.length > 0) {
+                            options["user-agent"] = additionalConfig.userAgentText
                         }
-                        if (authorization.text.length > 0) {
+                        if (additionalConfig.authorizationText.length > 0) {
                             options["http-auth-challenge"] = "true"
-                            headers.push(String("Authorization: %1").arg(authorization.text))
+                            headers.push(String("Authorization: %1").arg(additionalConfig.authorizationText))
                         }
-                        if (cookie.text.length > 0) {
-                            headers.push(String("Cookie: %1").arg(cookie.text))
+                        if (additionalConfig.cookieText.length > 0) {
+                            headers.push(String("Cookie: %1").arg(additionalConfig.cookieText))
                         }
-                        if (referrer.text.length > 0) {
-                            options["referer"] = referrer.text
+                        if (additionalConfig.referrerText.length > 0) {
+                            options["referer"] = additionalConfig.referrerText
                         }
                         if (currentIndex === 1) {
                             let select_files = filePreview.previewModel.getSelectedFiles()
                             options["select-file"] = select_files.join()
                         }
-                        let customHeaders = customRequestHeaderList.getRequestHeaderList()
+                        let customHeaders = additionalConfig.collectRequestHeaders()
                         if (customHeaders.length > 0) {
                             headers = headers.concat(customHeaders)
                         }
@@ -326,221 +275,24 @@ Popup {
                 }
 
                 // 基础配置区域
-                GCard {
+                TaskGeneralOptionsCard {
                     id: generalConfig
                     Layout.fillWidth: true
                     Layout.preferredHeight: 150
+                    standardSpacing: taskPage.standardSpacing
                     visible: tabNavigation.currentIndex !== 2
-                    outlined: true
-                    padding: taskPage.standardSpacing
-
-                    ColumnLayout {
-                        anchors.fill: parent
-                        spacing: taskPage.standardSpacing
-
-                        Text {
-                            text: qsTr("Download Settings")
-                            font.pixelSize: 14
-                            font.weight: Font.Medium
-                            color: GTheme.textPrimary
-                        }
-
-                        GridLayout {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            columns: 4
-                            columnSpacing: taskPage.standardSpacing
-                            rowSpacing: 12
-
-                            // 重命名
-                            Text {
-                                text: qsTr("Rename:")
-                                font.pixelSize: 13
-                                color: GTheme.textSecondary
-                                Layout.alignment: Qt.AlignVCenter
-                            }
-
-                            GTextField {
-                                id: renameEdit
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 32
-                                placeholderText: qsTr("Optional filename")
-                            }
-
-                            // 分片数
-                            Text {
-                                text: qsTr("Splits:")
-                                font.pixelSize: 13
-                                color: GTheme.textSecondary
-                                Layout.alignment: Qt.AlignVCenter
-                            }
-
-                            GSpinBox {
-                                id: spinbox
-                                Layout.preferredWidth: 100
-                                Layout.preferredHeight: 32
-                                from: 1
-                                to: 64
-                                value: 16
-                            }
-
-                            // 保存路径
-                            Text {
-                                text: qsTr("Save to:")
-                                font.pixelSize: 13
-                                color: GTheme.textSecondary
-                                Layout.alignment: Qt.AlignVCenter
-                            }
-
-                            FolderSelector {
-                                id: savePath
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 32
-                                Layout.columnSpan: 3
-                                path: SettingsManager.qDir
-                            }
-                        }
-                    }
                 }
 
                 // 高级配置区域
-                GCard {
+                TaskAdvancedOptionsCard {
                     id: additionalConfig
+                    standardSpacing: taskPage.standardSpacing
                     Layout.fillWidth: true
-                    Layout.topMargin: advanced.checked && tabNavigation.currentIndex !== 2 ? 16 : 0
+                    Layout.fillHeight: true
+                    Layout.topMargin: advanced.checked && tabNavigation.currentIndex !== 2 ? 8 : 0
                     visible: advanced.checked && tabNavigation.currentIndex !== 2
-                    outlined: true
-                    padding: taskPage.standardSpacing
-                    Layout.preferredHeight: visible ? advancedContent.implicitHeight + padding * 2 : 0
+                    Layout.preferredHeight: visible ? additionalConfig.view.implicitHeight + 50 + taskPage.standardSpacing : 0
                     Layout.minimumHeight: Layout.preferredHeight
-
-                    ColumnLayout {
-                        id: advancedContent
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.top: parent.top
-                        spacing: taskPage.standardSpacing
-
-                        Text {
-                            text: qsTr("Advanced Options")
-                            font.pixelSize: 14
-                            font.weight: Font.Medium
-                            color: GTheme.textPrimary
-                        }
-
-                        GridLayout {
-                            Layout.fillWidth: true
-                            columns: 2
-                            columnSpacing: taskPage.standardSpacing
-                            rowSpacing: 12
-
-                            Text {
-                                text: "User-Agent:"
-                                font.pixelSize: 13
-                                color: GTheme.textSecondary
-                                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
-                                Layout.preferredWidth: 100
-                            }
-                            GTextField {
-                                id: userAgent
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 32
-                                placeholderText: "User-Agent"
-                            }
-
-                            Text {
-                                text: "Authorization:"
-                                font.pixelSize: 13
-                                color: GTheme.textSecondary
-                                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
-                                Layout.preferredWidth: 100
-                            }
-                            GTextField {
-                                id: authorization
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 32
-                                placeholderText: "Authorization"
-                            }
-
-                            Text {
-                                text: "Referer:"
-                                font.pixelSize: 13
-                                color: GTheme.textSecondary
-                                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
-                                Layout.preferredWidth: 100
-                            }
-                            GTextField {
-                                id: referrer
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 32
-                                placeholderText: "Referer"
-                            }
-
-                            Text {
-                                text: "Cookie:"
-                                font.pixelSize: 13
-                                color: GTheme.textSecondary
-                                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
-                                Layout.preferredWidth: 100
-                            }
-                            GTextField {
-                                id: cookie
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 32
-                                placeholderText: "Cookie"
-                            }
-
-                            Text {
-                                text: qsTr("Custom Headers:")
-                                font.pixelSize: 13
-                                color: GTheme.textSecondary
-                                Layout.alignment: Qt.AlignTop | Qt.AlignRight
-                                Layout.preferredWidth: 100
-                            }
-
-                            TextArea {
-                                id: customRequestHeaderList
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 80
-                                font.pixelSize: 12
-                                placeholderText: qsTr("Custom request headers (one per line: KEY:VALUE)")
-                                color: GTheme.textPrimary
-                                placeholderTextColor: GTheme.textPlaceholder
-                                selectByMouse: true
-                                wrapMode: TextArea.Wrap
-
-                                background: Rectangle {
-                                    color: GTheme.fillLighter
-                                    border.width: 1
-                                    border.color: customRequestHeaderList.activeFocus ? GTheme.primaryColor : GTheme.borderLight
-                                    radius: 6
-
-                                    Behavior on border.color {
-                                        ColorAnimation { duration: 150 }
-                                    }
-                                }
-
-                                function getRequestHeaderList() {
-                                    let headers = []
-                                    if (customRequestHeaderList.text.trim().length === 0) {
-                                        return headers
-                                    }
-                                    let lines = customRequestHeaderList.text.split('\n')
-                                    for (let line of lines) {
-                                        line = line.trim()
-                                        if (line.length === 0) continue
-                                        let colonIndex = line.indexOf(':')
-                                        if (colonIndex === -1) continue
-                                        let key = line.substring(0, colonIndex).trim()
-                                        let value = line.substring(colonIndex + 1).trim()
-                                        if (key.length === 0 || value.length === 0) continue
-                                        headers.push(key + ": " + value)
-                                    }
-                                    return headers
-                                }
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -568,6 +320,7 @@ Popup {
                     text: qsTr("Advanced Options")
                     visible: tabNavigation.currentIndex !== 2
                     Layout.alignment: Qt.AlignVCenter
+
                 }
 
                 Item {
@@ -612,7 +365,7 @@ Popup {
             }
         }
 
-    }
+        }
     // 打开动画
     enter: Transition {
         ParallelAnimation {

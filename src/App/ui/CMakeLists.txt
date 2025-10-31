@@ -68,6 +68,7 @@ if(WIN32)
             COMMAND ${QT_ROOT}/bin/lupdate.exe 
             ${CMAKE_CURRENT_SOURCE_DIR}
             -ts ${TS_FILE}
+            -no-obsolete
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         )
         # 获取不带后缀的文件名
@@ -88,6 +89,7 @@ else()
             COMMAND ${QT_ROOT}/bin/lupdate
             ${CMAKE_CURRENT_SOURCE_DIR}
             -ts ${TS_FILE}
+            -no-obsolete
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         )
         # 获取不带后缀的文件名
