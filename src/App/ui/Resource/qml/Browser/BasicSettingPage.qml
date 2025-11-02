@@ -13,7 +13,7 @@ Rectangle {
     // Element Plus 设计标准
     readonly property int standardSpacing: 16
     readonly property int cardSpacing: 12
-    readonly property int contentMargin: 24
+    readonly property int contentMargin: 2
 
     ScrollView {
         id: scrollView
@@ -33,7 +33,7 @@ Rectangle {
             // 主题和语言设置卡片
             GCard {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 140
+                Layout.preferredHeight: 200
                 Layout.leftMargin: basicSetting.contentMargin
                 Layout.rightMargin: basicSetting.contentMargin
                 outlined: true
@@ -64,7 +64,7 @@ Rectangle {
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignVCenter
                         spacing: basicSetting.standardSpacing
-
+                        Layout.preferredHeight: 100
                         Label {
                             text: qsTr("Language")
                             Layout.preferredWidth: 100

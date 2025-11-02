@@ -22,6 +22,7 @@ namespace gdl {
                 SETTING_PROPERTY(QString, Dir)
                 SETTING_PROPERTY(int, ListenPort)
                 SETTING_PROPERTY(int, RpcListenPort)
+                SETTING_PROPERTY(QString, RpcSecret)
                 SETTING_PROPERTY(int, Split)
                 SETTING_PROPERTY(QString, UserAgent)
                 SETTING_PROPERTY(QString, AllProxy)

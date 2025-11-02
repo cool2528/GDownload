@@ -10,6 +10,7 @@
 #include "Definitions/appDef.h"
 #include "Parser/file_parser.h"
 #include "PluginManager/plugin_manager.h"
+#include "Settings/settings_manager.h"
 #include "logger.h"
 #include "os/os.h"
 #include "toast/toast_manager.h"
@@ -899,7 +900,9 @@ namespace gdl {
 
 			DownloadTaskInfo BrowserManager::Aria2QueryByGidTaskInfo(const std::string& gid) {
 				DownloadTaskInfo task_info;
-				const std::string host = std::string("http://127.0.0.1:") + kEngineRpcPort;
+				auto rpc_port = std::to_string(settings::Settings::Instance().GetRpcListenPort());
+				if (rpc_port.empty()) rpc_port = kEngineRpcPort;
+				const std::string host = std::string("http://127.0.0.1:") + rpc_port;
 				engine::Aria2cHttpClient client(host);
 				auto http_result = client.TellStatus(gid, keys);
 				if (http_result.HasError()) {

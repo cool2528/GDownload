@@ -84,6 +84,15 @@ QColor ElementPlusColorProvider::bgBase(bool isDark) const {
     return isDark ? QColor(DarkNeutral::kBgBase) : QColor(LightNeutral::kBgBase);
 }
 
+QColor ElementPlusColorProvider::bgOverlay(bool isDark) const {
+    return isDark ? QColor(DarkNeutral::kBgOverlay) : QColor(LightNeutral::kBgOverlay);
+}
+
+QColor ElementPlusColorProvider::bgElevated(bool isDark) const {
+    // 浅色模式使用 bgOverlay，暗色模式使用新增的 bgElevated
+    return isDark ? QColor(DarkNeutral::kBgElevated) : QColor(LightNeutral::kBgOverlay);
+}
+
 void RegisterElementPlusColors(QQmlEngine* engine) {
     qmlRegisterSingletonType<ElementPlusColorProvider>(
         GEXPORT_MODULE_URL, 1, 0, "ElementPlusColors",

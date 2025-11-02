@@ -9,11 +9,11 @@ namespace gdl {
 		}
 
 		ConfigValue GetValue(const std::string& key, const ConfigValue& defaultValue) {
-			auto value = ApplicationConfig::Instance().Get<std::string>(key);
-			if (value.empty()) {
+			auto opt = ApplicationConfig::Instance().TryGet<std::string>(key);
+			if (!opt.has_value()) {
 				return defaultValue;
 			}
-			return value;
+			return *opt;
 		}
 
 		 std::string GetTrackersServerUrl(const std::string& key) {

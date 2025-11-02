@@ -188,6 +188,22 @@ namespace gdl {
 			}
 			SETTING_IMP_END(RpcListenPort)
 
+			// RpcSecret
+			SETTING_IMP_BEGIN(RpcSecret, "aria2c.rpc-secret", QString)
+			void Default() override {
+				value_ = "GDownload_secret";
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toString();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return value_;
+			}
+			SETTING_IMP_END(RpcSecret)
+
 			// Split
 			SETTING_IMP_BEGIN(Split, "aria2c.split", int)
 			void Default() override {

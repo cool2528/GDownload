@@ -37,6 +37,9 @@ namespace gdl {
                 // 获取当前自启动状态
                 Q_INVOKABLE bool IsAutoStartEnabled() const;
 
+                // 退出后自动重启自身（延迟毫秒），仅安排重启，不负责退出
+                Q_INVOKABLE bool RelaunchAfterExit(int delayMs = 500);
+
 			   private:
 				explicit UtilsToolsManager(QObject* parent = nullptr);
 				

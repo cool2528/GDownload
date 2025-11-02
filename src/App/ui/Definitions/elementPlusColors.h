@@ -6,19 +6,19 @@
 namespace ElementPlusColors {
 Q_NAMESPACE
 
-// Element Plus 主色系
+// Element Plus 主色系 - 优化为现代科技蓝
 namespace Primary {
-    constexpr const char* kPrimary = "#409EFF";
-    constexpr const char* kPrimaryLight1 = "#53A8FF";
-    constexpr const char* kPrimaryLight2 = "#66B1FF";
-    constexpr const char* kPrimaryLight3 = "#79BBFF";
-    constexpr const char* kPrimaryLight4 = "#8CC5FF";
-    constexpr const char* kPrimaryLight5 = "#A0CFFF";
-    constexpr const char* kPrimaryLight6 = "#B3D8FF";
-    constexpr const char* kPrimaryLight7 = "#C6E2FF";
-    constexpr const char* kPrimaryLight8 = "#D9ECFF";
-    constexpr const char* kPrimaryLight9 = "#ECF5FF";
-    constexpr const char* kPrimaryDark2 = "#337ECC";
+    constexpr const char* kPrimary = "#3B82F6";        // 科技蓝主色
+    constexpr const char* kPrimaryLight1 = "#4F92F7";
+    constexpr const char* kPrimaryLight2 = "#62A1F8";
+    constexpr const char* kPrimaryLight3 = "#76B1F9";
+    constexpr const char* kPrimaryLight4 = "#89C0FA";
+    constexpr const char* kPrimaryLight5 = "#9DD0FB";
+    constexpr const char* kPrimaryLight6 = "#B0DFFC";
+    constexpr const char* kPrimaryLight7 = "#C4EFFD";
+    constexpr const char* kPrimaryLight8 = "#D7EFFE";
+    constexpr const char* kPrimaryLight9 = "#EBF7FF";
+    constexpr const char* kPrimaryDark2 = "#2563EB";   // 深色变体
 }
 
 // Element Plus 状态色
@@ -93,36 +93,37 @@ namespace LightNeutral {
     constexpr const char* kBgOverlay = "#FFFFFF";
 }
 
-// Element Plus 中性色 - 暗色模式
+// Element Plus 中性色 - 暗色模式（优化对比度）
 namespace DarkNeutral {
-    // 文字色
-    constexpr const char* kTextPrimary = "#E5EAF3";
-    constexpr const char* kTextRegular = "#CFD3DC";
-    constexpr const char* kTextSecondary = "#A3A6AD";
-    constexpr const char* kTextPlaceholder = "#8D9095";
-    constexpr const char* kTextDisabled = "#6C6E72";
+    // 文字色 - 提升亮度以增强对比度
+    constexpr const char* kTextPrimary = "#F1F5F9";      // 更亮，提升可读性
+    constexpr const char* kTextRegular = "#E2E8F0";      // 更清晰
+    constexpr const char* kTextSecondary = "#94A3B8";    // 优化中间色调
+    constexpr const char* kTextPlaceholder = "#64748B";  // 增强区分度
+    constexpr const char* kTextDisabled = "#475569";     // 更明确的禁用状态
 
-    // 边框色
-    constexpr const char* kBorderDarker = "#636466";
-    constexpr const char* kBorderDark = "#58585B";
-    constexpr const char* kBorderBase = "#4C4D4F";
-    constexpr const char* kBorderLight = "#414243";
-    constexpr const char* kBorderLighter = "#363637";
-    constexpr const char* kBorderExtraLight = "#2B2B2C";
+    // 边框色 - 优化层次感
+    constexpr const char* kBorderDarker = "#475569";
+    constexpr const char* kBorderDark = "#334155";
+    constexpr const char* kBorderBase = "#1E293B";
+    constexpr const char* kBorderLight = "#0F172A";
+    constexpr const char* kBorderLighter = "#020617";
+    constexpr const char* kBorderExtraLight = "#000000";
 
-    // 填充色
-    constexpr const char* kFillDarker = "#424243";
-    constexpr const char* kFillDark = "#39393A";
-    constexpr const char* kFillBase = "#303030";
-    constexpr const char* kFillLight = "#262627";
-    constexpr const char* kFillLighter = "#1D1D1D";
-    constexpr const char* kFillBlank = "#141414";
+    // 填充色 - 增加深度感
+    constexpr const char* kFillDarker = "#475569";
+    constexpr const char* kFillDark = "#334155";
+    constexpr const char* kFillBase = "#1E293B";
+    constexpr const char* kFillLight = "#0F172A";
+    constexpr const char* kFillLighter = "#020617";
+    constexpr const char* kFillBlank = "#000000";
 
-    // 背景色
-    constexpr const char* kBgWhite = "#141414";
-    constexpr const char* kBgPage = "#0A0A0A";
-    constexpr const char* kBgBase = "#1D1E1F";
-    constexpr const char* kBgOverlay = "#1D1D1D";
+    // 背景色 - 使用深蓝灰提升质感
+    constexpr const char* kBgWhite = "#020617";          // 深蓝黑
+    constexpr const char* kBgPage = "#0F172A";           // 页面背景
+    constexpr const char* kBgBase = "#1E293B";           // 基础背景
+    constexpr const char* kBgOverlay = "#334155";        // 浮层背景
+    constexpr const char* kBgElevated = "#475569";       // 高层背景（新增）
 }
 
 // Element Plus 尺寸规范
@@ -186,6 +187,8 @@ public:
     Q_INVOKABLE QColor bgWhite(bool isDark = false) const;
     Q_INVOKABLE QColor bgPage(bool isDark = false) const;
     Q_INVOKABLE QColor bgBase(bool isDark = false) const;
+    Q_INVOKABLE QColor bgOverlay(bool isDark = false) const;
+    Q_INVOKABLE QColor bgElevated(bool isDark = false) const;  // 新增：高层背景色
 
     // 尺寸
     Q_INVOKABLE int sizeLarge() const { return Sizes::kLarge; }
