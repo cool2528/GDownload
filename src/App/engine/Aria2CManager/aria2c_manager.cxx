@@ -23,7 +23,11 @@ namespace gdl {
 			  update_aria2c_tasks_timer_(io_context_),
 			  pub_sub_system_(io_context_),
 			  flush_timer_(io_context_),
-			  websocket_client_(std::string("ws://127.0.0.1:") + kEngineRpcPort + "/jsonrpc", io_context_) {
+			  websocket_client_([]() {
+				  auto rpc_port = config::GetValue(config::Keys::RpcListenPort).AsString();
+				  if (rpc_port.empty()) rpc_port = kEngineRpcPort;
+				  return std::string("ws://127.0.0.1:") + rpc_port + "/jsonrpc";
+			  }(), io_context_) {
 
 			websocket_client_.SetMessageCallback([this](const std::string& msg) {
 				// 直接收到的所有消息 通过发布订阅回客户端
@@ -113,8 +117,12 @@ namespace gdl {
 			aria2c_settings["no-proxy"]					  = "";
 			aria2c_settings["pause-metadata"]			  = "false";
 			aria2c_settings["pause"]					  = "false";
-			aria2c_settings["rpc-listen-port"]			  = kEngineRpcPort;
-			aria2c_settings["rpc-secret"]				  = kDefaultRpcSecret;
+			// 使用配置的 RPC 监听端口，如果配置为空则使用默认端口
+			auto rpc_port = config::GetValue(config::Keys::RpcListenPort).AsString();
+			aria2c_settings["rpc-listen-port"] = rpc_port.empty() ? kEngineRpcPort : rpc_port;
+			// 使用配置的 RPC Secret，如果配置为空则使用默认值
+			auto rpc_secret = config::GetValue(config::Keys::RpcSecret).AsString();
+			aria2c_settings["rpc-secret"]				  = rpc_secret.empty() ? kDefaultRpcSecret : rpc_secret;
 			aria2c_settings["seed-ratio"]				  = "2";
 			aria2c_settings["seed-time"]				  = "2880";
 			aria2c_settings["split"]					  = "64";
@@ -239,7 +247,10 @@ namespace gdl {
 		}
 
 		void Aria2cDownloadManager::SyncGlobalStatInfo() {
-			const std::string host = std::string("http://127.0.0.1:") + kEngineRpcPort;
+			// Engine 层使用 config 系统
+			auto rpc_port = config::GetValue(config::Keys::RpcListenPort).AsString();
+			if (rpc_port.empty()) rpc_port = kEngineRpcPort;
+			const std::string host = std::string("http://127.0.0.1:") + rpc_port;
 			Aria2cHttpClient client(host);
 			auto http_result = client.GetGlobalStat();
 			if (auto res = std::get_if<ErrorResult>(&http_result.Value().result)) {
@@ -263,7 +274,10 @@ namespace gdl {
         std::string Aria2cDownloadManager::SyncActiveTaskInfo() {
             std::string result_string				   = "{}";
             static const std::vector<std::string> keys = {"status", "totalLength", "completedLength"};
-            const std::string host					   = std::string("http://127.0.0.1:") + kEngineRpcPort;
+            // Engine 层使用 config 系统
+            auto rpc_port = config::GetValue(config::Keys::RpcListenPort).AsString();
+            if (rpc_port.empty()) rpc_port = kEngineRpcPort;
+            const std::string host					   = std::string("http://127.0.0.1:") + rpc_port;
             Aria2cHttpClient client(host);
             auto http_result = client.TellActive(keys);
             if (auto res = std::get_if<ErrorResult>(&http_result.Value().result)) {

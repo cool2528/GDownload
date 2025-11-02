@@ -15,6 +15,7 @@
 #include <QString>
 #include <QCoreApplication>
 #include <QDir>
+#include <QProcess>
 
 #ifdef Q_OS_WIN
 #include <QSettings>
@@ -104,6 +105,70 @@ namespace gdl {
 
             bool UtilsToolsManager::IsAutoStartEnabled() const {
                 return IsAutoStartEnabledImpl();
+            }
+
+            bool UtilsToolsManager::RelaunchAfterExit(int delayMs) {
+                if (delayMs < 0) {
+                    delayMs = 0;
+                }
+
+                const QString exePath = QDir::toNativeSeparators(QCoreApplication::applicationFilePath());
+                const QString workDir = QDir::toNativeSeparators(QCoreApplication::applicationDirPath());
+                const qint64 pid = QCoreApplication::applicationPid();
+
+#ifdef Q_OS_WIN
+                QString exeEscaped = exePath;
+                exeEscaped.replace("'", "''");
+                QString workDirEscaped = workDir;
+                workDirEscaped.replace("'", "''");
+
+                const QString command = QStringLiteral(
+                    "$pid=%1; "
+                    "while (Get-Process -Id $pid -ErrorAction SilentlyContinue) { Start-Sleep -Milliseconds 100 }; "
+                    "Start-Sleep -Milliseconds %2; "
+                    "Start-Process -FilePath '%3' -WorkingDirectory '%4'"
+                ).arg(pid).arg(delayMs).arg(exeEscaped).arg(workDirEscaped);
+
+                const QStringList args = {
+                    QStringLiteral("-NoProfile"),
+                    QStringLiteral("-WindowStyle"), QStringLiteral("Hidden"),
+                    QStringLiteral("-Command"), command
+                };
+
+                if (!QProcess::startDetached(QStringLiteral("powershell.exe"), args, workDir)) {
+                    LOG_ERR("RelaunchAfterExit: failed to invoke powershell.exe");
+                    return false;
+                }
+                return true;
+
+#elif defined(Q_OS_MACOS) || defined(Q_OS_LINUX)
+                QString exeEscaped = exePath;
+                exeEscaped.replace("'", "'\\''");
+                QString workDirEscaped = workDir;
+                workDirEscaped.replace("'", "'\\''");
+
+                const QString script = QStringLiteral(
+                    "pid=%1; "
+                    "while kill -0 $pid 2>/dev/null; do sleep 0.1; done; "
+                    "sleep %2; "
+                    "cd '%4'; "
+                    "exec '%3' &"
+                ).arg(pid)
+                 .arg(QString::number(delayMs / 1000.0, 'f', 3))
+                 .arg(exeEscaped)
+                 .arg(workDirEscaped);
+
+                if (!QProcess::startDetached(QStringLiteral("/bin/sh"), { QStringLiteral("-c"), script }, workDir)) {
+                    LOG_ERR("RelaunchAfterExit: failed to invoke /bin/sh relay script");
+                    return false;
+                }
+                return true;
+#else
+                Q_UNUSED(delayMs);
+                Q_UNUSED(exePath);
+                Q_UNUSED(workDir);
+                return false;
+#endif
             }
 
             bool UtilsToolsManager::SetAutoStartImpl(bool enable) {

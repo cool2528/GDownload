@@ -2,6 +2,124 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ko_KR">
 <context>
+    <name>Aria2RpcSettingPage</name>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="27"/>
+        <source>Aria2 RPC Settings</source>
+        <translation>Aria2 RPC 설정</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="34"/>
+        <source>Configure Aria2 remote RPC listening port</source>
+        <translation>Aria2 원격 RPC 수신 포트 구성</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="48"/>
+        <source>RPC Listen Port</source>
+        <translation>RPC 수신 포트</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="60"/>
+        <source>Port:</source>
+        <translation>포트:</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="81"/>
+        <source>(1024-65535)</source>
+        <translation>(1024-65535)</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="178"/>
+        <source>Reset to Default</source>
+        <translation>기본값으로 재설정</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="190"/>
+        <source>RPC settings reset to default. Please restart the application!</source>
+        <translation>RPC 설정이 기본값으로 재설정되었습니다. 애플리케이션을 재시작하십시오!</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="194"/>
+        <source>✓ Settings reset to default (Restart required)</source>
+        <translation>✓ 설정이 기본값으로 재설정되었습니다 (재시작 필요)</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="200"/>
+        <source>Save Settings</source>
+        <translation>설정 저장</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="208"/>
+        <source>✗ Invalid port. Please enter a value between 1024 and 65535.</source>
+        <translation>✗ 잘못된 포트입니다. 1024에서 65535 사이의 값을 입력하십시오.</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="210"/>
+        <source>Invalid port number!</source>
+        <translation>잘못된 포트 번호!</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="216"/>
+        <source>✗ Secret cannot be empty!</source>
+        <translation>✗ 시크릿은 비어 있을 수 없습니다!</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="218"/>
+        <source>Secret cannot be empty!</source>
+        <translation>시크릿은 비어 있을 수 없습니다!</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="230"/>
+        <source>✓ RPC settings saved successfully! Please restart the application to apply changes.</source>
+        <translation>✓ RPC 설정이 성공적으로 저장되었습니다! 변경 사항을 적용하려면 애플리케이션을 재시작하십시오.</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="233"/>
+        <source>✓ Settings saved: Port=%1, Secret updated (Restart required)</source>
+        <translation>✓ 설정이 저장되었습니다: 포트=%1, 시크릿이 업데이트되었습니다 (재시작 필요)</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="241"/>
+        <source>No changes detected.</source>
+        <translation>변경 사항이 감지되지 않았습니다.</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="242"/>
+        <source>Settings unchanged.</source>
+        <translation>설정이 변경되지 않았습니다.</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="104"/>
+        <source>RPC Secret</source>
+        <translation>RPC 시크릿</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="116"/>
+        <source>Secret:</source>
+        <translation>시크릿:</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="142"/>
+        <source>Show</source>
+        <translation>표시</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="150"/>
+        <source>Generate Random</source>
+        <translation>무작위 생성</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="285"/>
+        <source>Important Information</source>
+        <translation>중요한 정보</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="300"/>
+        <source>• The RPC port is used for communication between the application and Aria2 engine&lt;br&gt;• Default port is &lt;b&gt;16888&lt;/b&gt;&lt;br&gt;• The RPC secret is used for authentication between the application and Aria2 engine&lt;br&gt;• Default secret is &lt;b&gt;GDownload_secret&lt;/b&gt;&lt;br&gt;• It&apos;s recommended to use a strong random secret for security&lt;br&gt;• Make sure the port is not used by other applications&lt;br&gt;• &lt;b style=&apos;color: %1&apos;&gt;⚠️ You MUST restart the application after changing the port or secret!&lt;/b&gt;&lt;br&gt;• Choose a port number between 1024 and 65535&lt;br&gt;• Changes are saved immediately but only take effect after restart</source>
+        <translation>• RPC 포트는 애플리케이션과 Aria2 엔진 간의 통신에 사용됩니다&lt;br&gt;• 기본 포트는 &lt;b&gt;16888&lt;/b&gt;입니다&lt;br&gt;• RPC 시크릿은 애플리케이션과 Aria2 엔진 간의 인증에 사용됩니다&lt;br&gt;• 기본 시크릿은 &lt;b&gt;GDownload_secret&lt;/b&gt;입니다&lt;br&gt;• 보안을 위해 강력한 무작위 시크릿을 사용하는 것이 좋습니다&lt;br&gt;• 포트가 다른 애플리케이션에서 사용되지 않는지 확인하십시오&lt;br&gt;• &lt;b style=&apos;color: %1&apos;&gt;⚠️ 포트 또는 시크릿을 변경한 후 애플리케이션을 재시작해야 합니다!&lt;/b&gt;&lt;br&gt;• 1024에서 65535 사이의 포트 번호를 선택하십시오&lt;br&gt;• 변경 사항은 즉시 저장되지만 재시작 후에만 적용됩니다</translation>
+    </message>
+</context>
+<context>
     <name>BaiduCookieSettingPage</name>
     <message>
         <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="27"/>
@@ -302,129 +420,6 @@
     </message>
 </context>
 <context>
-    <name>LabSettingPage</name>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="69"/>
-        <source>Experimental Features</source>
-        <translation type="unfinished">실험적 기능</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="76"/>
-        <source>These features are experimental and may be unstable. Use with caution and report any issues you encounter.</source>
-        <translation type="unfinished">이러한 기능은 실험 중이며 불안정할 수 있습니다. 주의해서 사용하고 문제가 발생하면 보고해 주세요.</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="84"/>
-        <source>⚠️ Enable at your own risk</source>
-        <translation type="unfinished">⚠️ 본인 책임 하에 사용</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="109"/>
-        <source>Download Performance</source>
-        <translation type="unfinished">성능 다운로드</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="121"/>
-        <source>Enhanced Multi-threading</source>
-        <translation type="unfinished">향상된 멀티 스레딩</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="130"/>
-        <source>Improves download speed by using advanced threading algorithms</source>
-        <translation type="unfinished">고급 스레딩 알고리즘을 사용하여 다운로드 속도 향상</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="148"/>
-        <source>Smart Bandwidth Allocation</source>
-        <translation type="unfinished">스마트 대역폭 할당</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="157"/>
-        <source>Automatically adjusts bandwidth usage based on network conditions</source>
-        <translation type="unfinished">네트워크 상태에 따라 대역폭 사용량을 자동으로 조정합니다.</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="182"/>
-        <source>User Interface</source>
-        <translation type="unfinished">사용자 인터페이스</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="194"/>
-        <source>Enhanced Animations</source>
-        <translation type="unfinished">향상된 애니메이션</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="203"/>
-        <source>Enables smooth transitions and micro-interactions throughout the interface</source>
-        <translation type="unfinished">인터페이스 전반에서 원활한 전환과 마이크로 인터랙션 지원</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="221"/>
-        <source>Adaptive Layout</source>
-        <translation type="unfinished">적응형 레이아웃</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="230"/>
-        <source>Automatically adjusts layout based on window size and DPI settings</source>
-        <translation type="unfinished">창 크기 및 DPI 설정에 따라 레이아웃을 자동으로 조정합니다.</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="255"/>
-        <source>Network &amp; Protocols</source>
-        <translation type="unfinished">네트워크 및 프로토콜</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="267"/>
-        <source>HTTP/3 Protocol Support</source>
-        <translation type="unfinished">HTTP/3 프로토콜 지원</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="276"/>
-        <source>Enables next-generation HTTP/3 protocol for faster downloads</source>
-        <translation type="unfinished">더 빠른 다운로드를 위한 차세대 HTTP/3 프로토콜 지원</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="294"/>
-        <source>Intelligent Retry Mechanism</source>
-        <translation type="unfinished">지능형 재시도 메커니즘</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="303"/>
-        <source>Advanced retry strategies with exponential backoff and error analysis</source>
-        <translation type="unfinished">지수 백오프 및 오류 분석을 통한 고급 재시도 전략</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="321"/>
-        <source>P2P Download Acceleration</source>
-        <translation type="unfinished">P2P 다운로드 가속화</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="330"/>
-        <source>Uses peer-to-peer technology to accelerate popular file downloads</source>
-        <translation type="unfinished">P2P 기술을 사용하여 인기 있는 파일 다운로드 가속화</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="359"/>
-        <source>Reset Experimental Settings</source>
-        <translation type="unfinished">실험 설정 초기화</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="366"/>
-        <source>Disable all experimental features and restore defaults</source>
-        <translation type="unfinished">모든 실험적 기능을 비활성화하고 기본값으로 복원하기</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="374"/>
-        <source>Reset All</source>
-        <translation type="unfinished">모두 초기화</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="388"/>
-        <source>All experimental features have been reset</source>
-        <translation type="unfinished">모든 실험적 기능이 초기화되었습니다.</translation>
-    </message>
-</context>
-<context>
     <name>NetDiskPageView</name>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="30"/>
@@ -632,27 +627,22 @@
         <translation type="unfinished">토렌트</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="142"/>
-        <source>Download URLs</source>
-        <translation type="unfinished">다운로드 URL</translation>
-    </message>
-    <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="160"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="149"/>
         <source>Enter download URLs (one per line, supports magnet links)</source>
         <translation type="unfinished">다운로드 URL 입력(한 줄에 하나씩, 자석 링크 지원)</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="352"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="341"/>
         <source>Add Task</source>
         <translation type="unfinished">작업 추가</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="331"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="320"/>
         <source>Advanced Options</source>
         <translation>고급 옵션</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="343"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="332"/>
         <source>Cancel</source>
         <translation>취소</translation>
     </message>

@@ -28,6 +28,17 @@ namespace gdl {
 				return Type();
 			}
 
+			// 尝试获取配置值：存在则返回值，不存在返回 std::nullopt
+			template <typename Type>
+			std::optional<Type> TryGet(const std::string& key) {
+				std::shared_lock lock(mutex_);
+				auto optional_val = ptree_root_.get_optional<Type>(key);
+				if (optional_val.has_value()) {
+					return optional_val.value();
+				}
+				return std::nullopt;
+			}
+
 			std::string GetTrackerServerUrlByName(const std::string& name);
 		   private:
 			explicit ApplicationConfig();

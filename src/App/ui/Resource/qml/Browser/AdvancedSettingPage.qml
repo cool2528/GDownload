@@ -14,7 +14,7 @@ Rectangle {
     // Element Plus 设计标准
     readonly property int standardSpacing: 16
     readonly property int cardSpacing: 12
-    readonly property int contentMargin: 24
+    readonly property int contentMargin: 2
 
     ScrollView {
         id: scrollView
@@ -30,6 +30,13 @@ Rectangle {
             spacing: advancedSetting.cardSpacing
             anchors.margins: 0
             anchors.topMargin: advancedSetting.standardSpacing  // 顶部间距
+
+            // Aria2 RPC 设置卡片
+            Aria2RpcSettingPage {
+                Layout.fillWidth: true
+                Layout.leftMargin: advancedSetting.contentMargin
+                Layout.rightMargin: advancedSetting.contentMargin
+            }
 
             // 百度网盘设置卡片
             BaiduCookieSettingPage {

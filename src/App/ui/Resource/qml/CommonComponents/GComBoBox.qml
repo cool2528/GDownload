@@ -55,7 +55,11 @@ ComboBox {
                 ? (Array.isArray(control.model) ? modelData[control.textRole] : model[control.textRole])
                 : modelData
             color: {
-                if (control.currentIndex === index) {
+                // 使用统一的状态判断，避免频繁切换
+                const isHighlighted = control.highlightedIndex === index
+                const isSelected = control.currentIndex === index
+
+                if (isHighlighted || isSelected) {
                     return colors.borderFocus
                 }
                 return GTheme.dark ? GTheme.textPrimary : GTheme.textRegular
@@ -66,30 +70,43 @@ ComboBox {
             leftPadding: 12
             rightPadding: 12
         }
+
+        // 简化高亮逻辑，避免状态冲突
         highlighted: control.highlightedIndex === index
+        hoverEnabled: true  // 启用悬停事件
 
         background: Rectangle {
+            id: itemBackground
+            // 简化颜色逻辑，优先级：高亮 > 悬停 > 选中 > 普通
+            readonly property bool isHighlighted: control.highlightedIndex === index
+            readonly property bool isSelected: control.currentIndex === index
+            readonly property bool isHovered: parent.hovered
+            readonly property bool isDark: GTheme.dark
+
             color: {
-                if (parent.highlighted) {
-                    return GTheme.dark ? GTheme.fillLight : GTheme.primaryLight(9)
+                if (isHighlighted) {
+                    return isDark ? GTheme.fillLight : GTheme.primaryLight(9)
                 }
-                if (control.currentIndex === index) {
-                    return GTheme.dark ? GTheme.fillBase : GTheme.fillLight
+                if (isHovered) {
+                    // hover 高亮色
+                    return isDark ? GTheme.fillBase : GTheme.fillLighter
                 }
-                return "transparent"
+                if (isSelected) {
+                    return isDark ? GTheme.fillBase : GTheme.fillLight
+                }
+                // 普通状态使用背景色，不透明
+                return isDark ? GTheme.bgElevated : GTheme.bgWhite
             }
 
-            // 优化的 hover 效果，避免闪烁
+            // 使用更稳定的颜色过渡
             Behavior on color {
+                enabled: !itemBackground.isHighlighted  // 使用完整路径引用
                 ColorAnimation {
-                    duration: 200
+                    duration: 150
                     easing.type: Easing.OutCubic
                 }
             }
         }
-
-        // 移除可能的 HoverHandler 冲突
-        hoverEnabled: true
     }
 
     indicator: Canvas {
@@ -222,6 +239,15 @@ ComboBox {
             implicitHeight: contentHeight
             model: control.popup.visible ? control.delegateModel : null
             currentIndex: control.highlightedIndex
+            
+            // 优化高亮索引更新，减少闪烁
+            onCurrentIndexChanged: {
+                if (currentIndex >= 0 && currentIndex < count) {
+                    // 确保项目可见
+                    positionViewAtIndex(currentIndex, ListView.Contain)
+                }
+            }
+            
             ScrollIndicator.vertical: ScrollIndicator { }
         }
 
