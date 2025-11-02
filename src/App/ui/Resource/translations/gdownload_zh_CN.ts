@@ -2,6 +2,124 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN">
 <context>
+    <name>Aria2RpcSettingPage</name>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="27"/>
+        <source>Aria2 RPC Settings</source>
+        <translation>Aria2 RPC 设置</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="34"/>
+        <source>Configure Aria2 remote RPC listening port</source>
+        <translation>配置 Aria2 远程 RPC 监听端口</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="48"/>
+        <source>RPC Listen Port</source>
+        <translation>RPC 监听端口</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="60"/>
+        <source>Port:</source>
+        <translation>端口：</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="81"/>
+        <source>(1024-65535)</source>
+        <translation>（1024-65535）</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="178"/>
+        <source>Reset to Default</source>
+        <translation>恢复默认</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="190"/>
+        <source>RPC settings reset to default. Please restart the application!</source>
+        <translation>RPC 设置已重置为默认值。请重启应用程序！</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="194"/>
+        <source>✓ Settings reset to default (Restart required)</source>
+        <translation>✓ 设置已重置为默认值（需要重启）</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="200"/>
+        <source>Save Settings</source>
+        <translation>保存设置</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="208"/>
+        <source>✗ Invalid port. Please enter a value between 1024 and 65535.</source>
+        <translation>✗ 无效端口。请输入 1024 到 65535 之间的值。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="210"/>
+        <source>Invalid port number!</source>
+        <translation>无效的端口号！</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="216"/>
+        <source>✗ Secret cannot be empty!</source>
+        <translation>✗ 密钥不能为空！</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="218"/>
+        <source>Secret cannot be empty!</source>
+        <translation>密钥不能为空！</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="230"/>
+        <source>✓ RPC settings saved successfully! Please restart the application to apply changes.</source>
+        <translation>✓ RPC 设置保存成功！请重启应用程序以使更改生效。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="233"/>
+        <source>✓ Settings saved: Port=%1, Secret updated (Restart required)</source>
+        <translation>✓ 设置已保存：端口=%1，密钥已更新（需要重启）</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="241"/>
+        <source>No changes detected.</source>
+        <translation>未检测到更改。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="242"/>
+        <source>Settings unchanged.</source>
+        <translation>设置未更改。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="104"/>
+        <source>RPC Secret</source>
+        <translation>RPC 密钥</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="116"/>
+        <source>Secret:</source>
+        <translation>密钥：</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="142"/>
+        <source>Show</source>
+        <translation>显示</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="150"/>
+        <source>Generate Random</source>
+        <translation>生成随机密钥</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="285"/>
+        <source>Important Information</source>
+        <translation>重要信息</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="300"/>
+        <source>• The RPC port is used for communication between the application and Aria2 engine&lt;br&gt;• Default port is &lt;b&gt;16888&lt;/b&gt;&lt;br&gt;• The RPC secret is used for authentication between the application and Aria2 engine&lt;br&gt;• Default secret is &lt;b&gt;GDownload_secret&lt;/b&gt;&lt;br&gt;• It&apos;s recommended to use a strong random secret for security&lt;br&gt;• Make sure the port is not used by other applications&lt;br&gt;• &lt;b style=&apos;color: %1&apos;&gt;⚠️ You MUST restart the application after changing the port or secret!&lt;/b&gt;&lt;br&gt;• Choose a port number between 1024 and 65535&lt;br&gt;• Changes are saved immediately but only take effect after restart</source>
+        <translation>• RPC 端口用于应用程序和 Aria2 引擎之间的通信&lt;br&gt;• 默认端口为 &lt;b&gt;16888&lt;/b&gt;&lt;br&gt;• RPC 密钥用于应用程序和 Aria2 引擎之间的身份验证&lt;br&gt;• 默认密钥为 &lt;b&gt;GDownload_secret&lt;/b&gt;&lt;br&gt;• 为了安全起见，建议使用强随机密钥&lt;br&gt;• 确保该端口未被其他应用程序使用&lt;br&gt;• &lt;b style=&apos;color: %1&apos;&gt;⚠️ 更改端口或密钥后必须重启应用程序！&lt;/b&gt;&lt;br&gt;• 选择 1024 到 65535 之间的端口号&lt;br&gt;• 更改会立即保存，但只有在重启后才会生效</translation>
+    </message>
+</context>
+<context>
     <name>BaiduCookieSettingPage</name>
     <message>
         <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="27"/>
@@ -302,129 +420,6 @@
     </message>
 </context>
 <context>
-    <name>LabSettingPage</name>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="69"/>
-        <source>Experimental Features</source>
-        <translation type="unfinished">实验特点</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="76"/>
-        <source>These features are experimental and may be unstable. Use with caution and report any issues you encounter.</source>
-        <translation type="unfinished">这些功能是试验性的，可能不稳定。请谨慎使用，并报告遇到的任何问题。</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="84"/>
-        <source>⚠️ Enable at your own risk</source>
-        <translation type="unfinished">⚠️ 启用风险自负</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="109"/>
-        <source>Download Performance</source>
-        <translation type="unfinished">下载性能</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="121"/>
-        <source>Enhanced Multi-threading</source>
-        <translation type="unfinished">增强型多线程</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="130"/>
-        <source>Improves download speed by using advanced threading algorithms</source>
-        <translation type="unfinished">利用先进的线程算法提高下载速度</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="148"/>
-        <source>Smart Bandwidth Allocation</source>
-        <translation type="unfinished">智能带宽分配</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="157"/>
-        <source>Automatically adjusts bandwidth usage based on network conditions</source>
-        <translation type="unfinished">根据网络状况自动调整带宽使用量</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="182"/>
-        <source>User Interface</source>
-        <translation type="unfinished">用户界面</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="194"/>
-        <source>Enhanced Animations</source>
-        <translation type="unfinished">增强型动画</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="203"/>
-        <source>Enables smooth transitions and micro-interactions throughout the interface</source>
-        <translation type="unfinished">实现整个界面的平滑过渡和微交互</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="221"/>
-        <source>Adaptive Layout</source>
-        <translation type="unfinished">自适应布局</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="230"/>
-        <source>Automatically adjusts layout based on window size and DPI settings</source>
-        <translation type="unfinished">根据窗口大小和 DPI 设置自动调整布局</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="255"/>
-        <source>Network &amp; Protocols</source>
-        <translation type="unfinished">网络与协议</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="267"/>
-        <source>HTTP/3 Protocol Support</source>
-        <translation type="unfinished">支持 HTTP/3 协议</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="276"/>
-        <source>Enables next-generation HTTP/3 protocol for faster downloads</source>
-        <translation type="unfinished">启用下一代 HTTP/3 协议，加快下载速度</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="294"/>
-        <source>Intelligent Retry Mechanism</source>
-        <translation type="unfinished">智能重试机制</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="303"/>
-        <source>Advanced retry strategies with exponential backoff and error analysis</source>
-        <translation type="unfinished">采用指数后退和误差分析的高级重试策略</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="321"/>
-        <source>P2P Download Acceleration</source>
-        <translation type="unfinished">P2P 下载加速</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="330"/>
-        <source>Uses peer-to-peer technology to accelerate popular file downloads</source>
-        <translation type="unfinished">利用点对点技术加速流行文件的下载</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="359"/>
-        <source>Reset Experimental Settings</source>
-        <translation type="unfinished">重置实验设置</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="366"/>
-        <source>Disable all experimental features and restore defaults</source>
-        <translation type="unfinished">禁用所有实验功能并恢复默认值</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="374"/>
-        <source>Reset All</source>
-        <translation type="unfinished">全部重置</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="388"/>
-        <source>All experimental features have been reset</source>
-        <translation type="unfinished">所有实验功能均已重置</translation>
-    </message>
-</context>
-<context>
     <name>NetDiskPageView</name>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="30"/>
@@ -632,27 +627,22 @@
         <translation type="unfinished">下载</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="142"/>
-        <source>Download URLs</source>
-        <translation type="unfinished">下载 URL</translation>
-    </message>
-    <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="160"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="149"/>
         <source>Enter download URLs (one per line, supports magnet links)</source>
         <translation type="unfinished">输入下载 URL（每行一个，支持磁铁链接）</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="352"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="341"/>
         <source>Add Task</source>
         <translation type="unfinished">添加任务</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="331"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="320"/>
         <source>Advanced Options</source>
         <translation>高级选项</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="343"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="332"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>

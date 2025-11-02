@@ -1,0 +1,208 @@
+name: CLI-All-Platforms
+
+on:
+  push:
+    tags:
+      - '*'
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [linux, macos, windows]
+        include:
+          - target: linux
+            os: ubuntu-latest
+            qt_version: 6.5.2
+            qt_arch: gcc_64
+            vcpkg_triplet: x64-linux-release
+            install_prefix: linux_package
+            release_glob: gdownload-*.AppImag*
+            cmake_extra: ""
+            pdb_archive: ""
+          - target: macos
+            os: macos-latest
+            qt_version: 6.5.2
+            qt_arch: clang_64
+            vcpkg_triplet: arm64-osx-release
+            install_prefix: macos_package
+            release_glob: macos_package/*
+            cmake_extra: "-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang"
+            pdb_archive: ""
+          - target: windows
+            os: windows-latest
+            qt_version: 6.5.2
+            qt_arch: win64_msvc2019_64
+            vcpkg_triplet: x64-windows-release
+            install_prefix: windows_package
+            release_glob: build/release/GDownloader_windows_*.exe
+            msvc_arch: x64
+            pdb_archive: windows_pdb.zip
+            cmake_extra: ""
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          submodules: recursive
+
+      - name: Setup Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ matrix.qt_version }}
+          arch: ${{ matrix.qt_arch }}
+          modules: qt3d qtimageformats qtwebsockets qt5compat qtshadertools
+
+      - name: Install Linux Dependencies
+        if: matrix.target == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1 libdrm-dev libappimage-dev libxdg-basedir-dev xdg-utils-cxx xdg-utils-cxx-dev mesa-common-dev build-essential libssl-dev autoconf automake libtool wget vim-common desktop-file-utils pkgconf libgpgme-dev libglib2.0-dev libcairo2-dev librsvg2-dev libfuse-dev git libcurl4-openssl-dev argagg-dev libgcrypt20-dev libboost-dev liblzma-dev libzstd-dev zlib1g-dev libarchive-dev libx11-dev libxpm-dev ninja-build
+
+      - name: Install macOS Tools
+        if: matrix.target == 'macos'
+        run: |
+          brew install create-dmg ninja
+
+      - name: Cache AppImage Tools
+        if: matrix.target == 'linux'
+        uses: actions/cache@v4
+        with:
+          path: tools
+          key: appimage-tools-${{ runner.os }}-${{ hashFiles('.github/workflows/cli-matrix.yml') }}
+
+      - name: Setup vcpkg
+        id: vcpkg
+        uses: johnwason/vcpkg-action@v6
+        with:
+          manifest-dir: ${{ github.workspace }}
+          triplet: ${{ matrix.vcpkg_triplet }}
+          extra-args: --overlay-triplets=${{ github.workspace }}/custom-triplets
+          token: ${{ github.token }}
+          github-binarycache: true
+
+      - name: Download AppImage Tools
+        if: matrix.target == 'linux'
+        run: |
+          mkdir -p tools
+          cd tools
+          if [ ! -f linuxdeploy-x86_64.AppImage ]; then
+            wget -c "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage"
+          fi
+          if [ ! -f linuxdeploy-plugin-qt-x86_64.AppImage ]; then
+            wget -c "https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage"
+          fi
+          if [ ! -f appimagetool-x86_64.AppImage ]; then
+            wget -c "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+          fi
+          chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-qt-x86_64.AppImage appimagetool-x86_64.AppImage
+          sudo ln -sf $(pwd)/linuxdeploy-x86_64.AppImage /usr/bin/linuxdeploy
+          sudo ln -sf $(pwd)/linuxdeploy-plugin-qt-x86_64.AppImage /usr/bin/linuxdeploy-plugin-qt
+          sudo ln -sf $(pwd)/appimagetool-x86_64.AppImage /usr/bin/appimagetool
+
+      - name: Configure & Build (Unix)
+        if: matrix.target != 'windows'
+        run: |
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} \
+            -B build \
+            -S ${{ github.workspace }} \
+            -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/${{ matrix.install_prefix }} \
+            -DCMAKE_BUILD_TYPE=Release \
+            -GNinja \
+            ${{ matrix.cmake_extra }}
+          cmake --build build --config Release --parallel
+          if [ "${{ matrix.target }}" = "linux" ]; then
+            cmake --install build --config Release --strip
+          else
+            cmake --install build --config Release
+          fi
+
+      - name: Configure & Build (Windows)
+        if: matrix.target == 'windows'
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.msvc_arch }}
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\${{ matrix.install_prefix }} -DCMAKE_BUILD_TYPE=Release -GNinja -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00"
+          cmake --build build --config Release --parallel
+          mkdir windows_pdb
+          copy /Y build\Release\bin\*.pdb windows_pdb
+          del /S /Q build\Release\bin\*.pdb
+          del /S /Q build\Release\bin\*.lib
+          del /S /Q build\Release\bin\*.exp
+          cmake --install build --config Release
+
+      - name: Package PDB
+        if: matrix.target == 'windows'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path windows_pdb -DestinationPath ${{ matrix.pdb_archive }} -Force
+
+      - name: Install NSIS
+        if: matrix.target == 'windows'
+        uses: repolevedavaj/install-nsis@v1.0.2
+        with:
+          nsis-version: '3.10'
+
+      - name: Build Windows Installer
+        if: matrix.target == 'windows'
+        shell: cmd
+        run: |
+          makensis -V4 "%GITHUB_WORKSPACE%\build\release\windows_installer.nsi"
+
+      - name: Create AppImage zsync
+        if: matrix.target == 'linux'
+        run: |
+          APPIMAGE_NAME=$(find ${{ github.workspace }} -maxdepth 1 -name "*.AppImage" | head -n 1)
+          if [ -z "$APPIMAGE_NAME" ]; then
+            echo "AppImage not found, skipping zsync generation"
+          elif [ ! -f "${{ github.workspace }}/${{ matrix.install_prefix }}/gdownload.desktop" ]; then
+            appimagetool -u "gh-releases-zsync|cool2528|GDownload|latest|gdownload-*.AppImage.zsync" ${{ github.workspace }}/${{ matrix.install_prefix }} "$APPIMAGE_NAME"
+          fi
+
+      - name: Upload Build Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}-build-${{ github.run_id }}
+          path: |
+            ${{ github.workspace }}/${{ matrix.install_prefix }}
+          if-no-files-found: warn
+
+      - name: Prepare Release Notes
+        id: release_body
+        run: |
+          git fetch --tags --force
+          LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
+          # 处理换行与百分号，适配 GitHub 输出格式
+          LAST_COMMIT_MSG="${LAST_COMMIT_MSG//'%'/'%25'}"
+          LAST_COMMIT_MSG="${LAST_COMMIT_MSG//$'\n'/'%0A'}"
+          echo "body=${LAST_COMMIT_MSG}" >> "$GITHUB_OUTPUT"
+        shell: bash
+        if: startsWith(github.ref, 'refs/tags/')
+
+      - name: Upload Release Artifact
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file_glob: true
+          file: ${{ matrix.release_glob }}
+          overwrite: false
+          body: ${{ steps.release_body.outputs.body }}
+
+      - name: Upload Windows PDB
+        if: matrix.target == 'windows' && startsWith(github.ref, 'refs/tags/')
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ matrix.pdb_archive }}
+          overwrite: false
+          body: ${{ steps.release_body.outputs.body }}

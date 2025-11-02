@@ -37,7 +37,8 @@ namespace gdl {
 			CONFIG_PATH(BtTracker, "aria2c.bt-tracker", "");
 			CONFIG_PATH(Dir, "aria2c.dir", "");
 			CONFIG_PATH(ListenPort, "aria2c.listen-port", "21301");
-			CONFIG_PATH(RpcListenPort, "aria2c.rpc-listen-port", "");
+			CONFIG_PATH(RpcListenPort, "aria2c.rpc-listen-port", "16888");
+			CONFIG_PATH(RpcSecret, "aria2c.rpc-secret", "GDownload_secret");
 			CONFIG_PATH(Split, "aria2c.split", "");
 			CONFIG_PATH(UserAgent, "aria2c.user-agent", "");
 			CONFIG_PATH(AllProxy, "aria2c.all-proxy", "");
@@ -73,6 +74,7 @@ namespace gdl {
                                              Dir.get(),
                                              ListenPort.get(),
                                              RpcListenPort.get(),
+                                             RpcSecret.get(),
                                              Split.get(),
                                              UserAgent.get(),
                                              AllProxy.get(),
@@ -107,6 +109,7 @@ namespace gdl {
 											 Dir.val(),
 											 ListenPort.val(),
 											 RpcListenPort.val(),
+											 RpcSecret.val(),
 											 Split.val(),
 											 UserAgent.val(),
 											 AllProxy.val(),

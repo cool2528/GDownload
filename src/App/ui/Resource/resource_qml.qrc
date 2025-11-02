@@ -46,5 +46,6 @@
         <file>qml/Browser/BaiduCookieSettingPage.qml</file>
         <file>qml/Browser/TrackerServerSettingPage.qml</file>
         <file>qml/CommonComponents/GNavButton.qml</file>
+        <file>qml/Browser/Aria2RpcSettingPage.qml</file>
     </qresource>
 </RCC>

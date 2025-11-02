@@ -2,6 +2,124 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ja_JP">
 <context>
+    <name>Aria2RpcSettingPage</name>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="27"/>
+        <source>Aria2 RPC Settings</source>
+        <translation>Aria2 RPC 設定</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="34"/>
+        <source>Configure Aria2 remote RPC listening port</source>
+        <translation>Aria2 リモート RPC リスニングポートを構成</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="48"/>
+        <source>RPC Listen Port</source>
+        <translation>RPC リスニングポート</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="60"/>
+        <source>Port:</source>
+        <translation>ポート：</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="81"/>
+        <source>(1024-65535)</source>
+        <translation>（1024-65535）</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="178"/>
+        <source>Reset to Default</source>
+        <translation>デフォルトに戻す</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="190"/>
+        <source>RPC settings reset to default. Please restart the application!</source>
+        <translation>RPC 設定がデフォルトにリセットされました。アプリケーションを再起動してください！</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="194"/>
+        <source>✓ Settings reset to default (Restart required)</source>
+        <translation>✓ 設定がデフォルトにリセットされました（再起動が必要）</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="200"/>
+        <source>Save Settings</source>
+        <translation>設定を保存</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="208"/>
+        <source>✗ Invalid port. Please enter a value between 1024 and 65535.</source>
+        <translation>✗ 無効なポート。1024 から 65535 の間の値を入力してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="210"/>
+        <source>Invalid port number!</source>
+        <translation>無効なポート番号！</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="216"/>
+        <source>✗ Secret cannot be empty!</source>
+        <translation>✗ シークレットは空にできません！</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="218"/>
+        <source>Secret cannot be empty!</source>
+        <translation>シークレットは空にできません！</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="230"/>
+        <source>✓ RPC settings saved successfully! Please restart the application to apply changes.</source>
+        <translation>✓ RPC 設定が正常に保存されました！変更を適用するにはアプリケーションを再起動してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="233"/>
+        <source>✓ Settings saved: Port=%1, Secret updated (Restart required)</source>
+        <translation>✓ 設定が保存されました：ポート=%1、シークレットが更新されました（再起動が必要）</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="241"/>
+        <source>No changes detected.</source>
+        <translation>変更が検出されませんでした。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="242"/>
+        <source>Settings unchanged.</source>
+        <translation>設定は変更されていません。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="104"/>
+        <source>RPC Secret</source>
+        <translation>RPC シークレット</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="116"/>
+        <source>Secret:</source>
+        <translation>シークレット：</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="142"/>
+        <source>Show</source>
+        <translation>表示</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="150"/>
+        <source>Generate Random</source>
+        <translation>ランダム生成</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="285"/>
+        <source>Important Information</source>
+        <translation>重要な情報</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="300"/>
+        <source>• The RPC port is used for communication between the application and Aria2 engine&lt;br&gt;• Default port is &lt;b&gt;16888&lt;/b&gt;&lt;br&gt;• The RPC secret is used for authentication between the application and Aria2 engine&lt;br&gt;• Default secret is &lt;b&gt;GDownload_secret&lt;/b&gt;&lt;br&gt;• It&apos;s recommended to use a strong random secret for security&lt;br&gt;• Make sure the port is not used by other applications&lt;br&gt;• &lt;b style=&apos;color: %1&apos;&gt;⚠️ You MUST restart the application after changing the port or secret!&lt;/b&gt;&lt;br&gt;• Choose a port number between 1024 and 65535&lt;br&gt;• Changes are saved immediately but only take effect after restart</source>
+        <translation>• RPC ポートは、アプリケーションと Aria2 エンジン間の通信に使用されます&lt;br&gt;• デフォルトポートは &lt;b&gt;16888&lt;/b&gt; です&lt;br&gt;• RPC シークレットは、アプリケーションと Aria2 エンジン間の認証に使用されます&lt;br&gt;• デフォルトシークレットは &lt;b&gt;GDownload_secret&lt;/b&gt; です&lt;br&gt;• セキュリティのため、強力なランダムシークレットの使用をお勧めします&lt;br&gt;• ポートが他のアプリケーションで使用されていないことを確認してください&lt;br&gt;• &lt;b style=&apos;color: %1&apos;&gt;⚠️ ポートまたはシークレットを変更した後、アプリケーションを再起動する必要があります！&lt;/b&gt;&lt;br&gt;• 1024 から 65535 の間のポート番号を選択してください&lt;br&gt;• 変更はすぐに保存されますが、再起動後にのみ有効になります</translation>
+    </message>
+</context>
+<context>
     <name>BaiduCookieSettingPage</name>
     <message>
         <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="27"/>
@@ -302,129 +420,6 @@
     </message>
 </context>
 <context>
-    <name>LabSettingPage</name>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="69"/>
-        <source>Experimental Features</source>
-        <translation type="unfinished">実験的特徴</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="76"/>
-        <source>These features are experimental and may be unstable. Use with caution and report any issues you encounter.</source>
-        <translation type="unfinished">これらの機能は実験的なものであり、不安定な場合があります。注意して使用し、問題があれば報告してください。</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="84"/>
-        <source>⚠️ Enable at your own risk</source>
-        <translation type="unfinished">⚠️ 自己責任で有効化すること</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="109"/>
-        <source>Download Performance</source>
-        <translation type="unfinished">ダウンロード・パフォーマンス</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="121"/>
-        <source>Enhanced Multi-threading</source>
-        <translation type="unfinished">強化されたマルチスレッド</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="130"/>
-        <source>Improves download speed by using advanced threading algorithms</source>
-        <translation type="unfinished">高度なスレッディング・アルゴリズムによりダウンロード速度を向上</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="148"/>
-        <source>Smart Bandwidth Allocation</source>
-        <translation type="unfinished">スマートな帯域割当</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="157"/>
-        <source>Automatically adjusts bandwidth usage based on network conditions</source>
-        <translation type="unfinished">ネットワーク状況に応じて帯域幅の使用量を自動的に調整</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="182"/>
-        <source>User Interface</source>
-        <translation type="unfinished">ユーザーインターフェース</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="194"/>
-        <source>Enhanced Animations</source>
-        <translation type="unfinished">強化されたアニメーション</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="203"/>
-        <source>Enables smooth transitions and micro-interactions throughout the interface</source>
-        <translation type="unfinished">インターフェイス全体でスムーズなトランジションとマイクロインタラクションを可能にする</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="221"/>
-        <source>Adaptive Layout</source>
-        <translation type="unfinished">適応レイアウト</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="230"/>
-        <source>Automatically adjusts layout based on window size and DPI settings</source>
-        <translation type="unfinished">ウィンドウサイズとDPI設定に基づいてレイアウトを自動調整</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="255"/>
-        <source>Network &amp; Protocols</source>
-        <translation type="unfinished">ネットワークとプロトコル</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="267"/>
-        <source>HTTP/3 Protocol Support</source>
-        <translation type="unfinished">HTTP/3プロトコルのサポート</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="276"/>
-        <source>Enables next-generation HTTP/3 protocol for faster downloads</source>
-        <translation type="unfinished">次世代HTTP/3プロトコルによる高速ダウンロードを実現</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="294"/>
-        <source>Intelligent Retry Mechanism</source>
-        <translation type="unfinished">インテリジェント・リトライ・メカニズム</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="303"/>
-        <source>Advanced retry strategies with exponential backoff and error analysis</source>
-        <translation type="unfinished">指数バックオフとエラー解析による高度なリトライ戦略</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="321"/>
-        <source>P2P Download Acceleration</source>
-        <translation type="unfinished">P2Pダウンロード・アクセラレーション</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="330"/>
-        <source>Uses peer-to-peer technology to accelerate popular file downloads</source>
-        <translation type="unfinished">ピアツーピア技術を使用して、人気のあるファイルのダウンロードを高速化します。</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="359"/>
-        <source>Reset Experimental Settings</source>
-        <translation type="unfinished">実験設定のリセット</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="366"/>
-        <source>Disable all experimental features and restore defaults</source>
-        <translation type="unfinished">すべての実験的機能を無効にし、デフォルトに戻す</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="374"/>
-        <source>Reset All</source>
-        <translation type="unfinished">すべてリセット</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="388"/>
-        <source>All experimental features have been reset</source>
-        <translation type="unfinished">すべての実験的機能はリセットされた</translation>
-    </message>
-</context>
-<context>
     <name>NetDiskPageView</name>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="30"/>
@@ -632,27 +627,22 @@
         <translation type="unfinished">激流</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="142"/>
-        <source>Download URLs</source>
-        <translation type="unfinished">ダウンロードURL</translation>
-    </message>
-    <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="160"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="149"/>
         <source>Enter download URLs (one per line, supports magnet links)</source>
         <translation type="unfinished">ダウンロードURLを入力（1行に1つ、マグネットリンクに対応）</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="352"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="341"/>
         <source>Add Task</source>
         <translation type="unfinished">タスクの追加</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="331"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="320"/>
         <source>Advanced Options</source>
         <translation>高度なオプション</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="343"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="332"/>
         <source>Cancel</source>
         <translation>キャンセル</translation>
     </message>
