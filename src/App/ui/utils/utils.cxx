@@ -2,11 +2,16 @@
 #include <qdir.h>
 #include <QClipboard>
 #include <QGuiApplication>
+#if !defined(GDL_UTILS_DISABLE_QML_INTEGRATION)
 #include <QQmlContext>
 #include <QQmlEngine>
 #include <QQuickWindow>
+#endif
+#include <utility>
 #include "GDLCore/logger.h"
+#ifndef GDL_UTILS_DISABLE_QML_INTEGRATION
 #include "clipboard_watcher.h"
+#endif
 #if defined(_WIN32) || defined(_WIN64)
 #include <shobjidl.h>
 #include <windows.h>
@@ -16,6 +21,17 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QProcess>
+
+namespace {
+    gdl::ui::utils::UtilsToolsManager::ProcessLauncher g_processLauncher;
+
+    bool InvokeProcessLauncher(const QString& program, const QStringList& arguments, const QString& workingDir) {
+        if (g_processLauncher) {
+            return g_processLauncher(program, arguments, workingDir);
+        }
+        return QProcess::startDetached(program, arguments, workingDir);
+    }
+}  // namespace
 
 #ifdef Q_OS_WIN
 #include <QSettings>
@@ -32,6 +48,14 @@ namespace gdl {
 	namespace ui {
 		namespace utils {
 			UtilsToolsManager::~UtilsToolsManager() {}
+
+            void UtilsToolsManager::SetProcessLauncherForTesting(ProcessLauncher launcher) {
+                g_processLauncher = std::move(launcher);
+            }
+
+            void UtilsToolsManager::ResetProcessLauncherForTesting() {
+                g_processLauncher = {};
+            }
 
             bool UtilsToolsManager::SetClipboardText(const QString& text) {
                 QClipboard* clipboard = QGuiApplication::clipboard();
@@ -80,7 +104,7 @@ namespace gdl {
                 return content;
             }
 
-#ifdef __APPLE__
+#if defined(__APPLE__) && !defined(GDL_UTILS_DISABLE_QML_INTEGRATION)
 			void UtilsToolsManager::HideMacOsxWindowStandardButtons(QQuickWindow* window) {
 				if (window) {
 					hideWindowStandardButtons(window->winId());
@@ -91,12 +115,16 @@ namespace gdl {
 			UtilsToolsManager::UtilsToolsManager(QObject* parent) {}
 
 			void RegisterTypes(QQmlEngine* engine) {
+#ifndef GDL_UTILS_DISABLE_QML_INTEGRATION
 				if (!engine) {
 					LOG_ERR("invalid QQmlEngine");
 					return;
 				}
 				engine->rootContext()->setContextProperty("UtilsToolsManager", &UtilsToolsManager::Instance());
                 engine->rootContext()->setContextProperty("ClipboardWatcher", &ClipboardWatcher::Instance());
+#else
+                Q_UNUSED(engine);
+#endif
 			}
 
             bool UtilsToolsManager::SetAutoStart(bool enable) {
@@ -117,29 +145,76 @@ namespace gdl {
                 const qint64 pid = QCoreApplication::applicationPid();
 
 #ifdef Q_OS_WIN
+                // 更完善的路径转义
                 QString exeEscaped = exePath;
                 exeEscaped.replace("'", "''");
+                exeEscaped.replace("\"", "\"\"");
                 QString workDirEscaped = workDir;
                 workDirEscaped.replace("'", "''");
+                workDirEscaped.replace("\"", "\"\"");
 
                 const QString command = QStringLiteral(
-                    "$pid=%1; "
-                    "while (Get-Process -Id $pid -ErrorAction SilentlyContinue) { Start-Sleep -Milliseconds 100 }; "
+                    "$ErrorActionPreference = 'Stop'; "
+                    "$targetPid=%1; "
+                    "Write-Host 'RelaunchAfterExit: Waiting for PID $targetPid to exit...'; "
+                    "while (Get-Process -Id $targetPid -ErrorAction SilentlyContinue) { Start-Sleep -Milliseconds 200 }; "
+                    "Write-Host 'RelaunchAfterExit: Process exited, waiting %2ms...'; "
                     "Start-Sleep -Milliseconds %2; "
-                    "Start-Process -FilePath '%3' -WorkingDirectory '%4'"
+                    "Write-Host 'RelaunchAfterExit: Starting new process...'; "
+                    "try { "
+                    "  Start-Process -FilePath '%3' -WorkingDirectory '%4' -PassThru | Out-Null; "
+                    "  Write-Host 'RelaunchAfterExit: Successfully started'; "
+                    "} catch { "
+                    "  Write-Host 'RelaunchAfterExit: Failed to start process: $_'; "
+                    "  exit 1; "
+                    "}"
                 ).arg(pid).arg(delayMs).arg(exeEscaped).arg(workDirEscaped);
 
-                const QStringList args = {
+                // 尝试多种启动方式
+                QStringList powerShellArgs = {
+                    QStringLiteral("-NoLogo"),
                     QStringLiteral("-NoProfile"),
-                    QStringLiteral("-WindowStyle"), QStringLiteral("Hidden"),
+                    QStringLiteral("-ExecutionPolicy"), QStringLiteral("Bypass"),  // 绕过执行策略限制
                     QStringLiteral("-Command"), command
                 };
 
-                if (!QProcess::startDetached(QStringLiteral("powershell.exe"), args, workDir)) {
-                    LOG_ERR("RelaunchAfterExit: failed to invoke powershell.exe");
-                    return false;
+                LOG_INFO("RelaunchAfterExit: invoking powershell.exe with args: {} workDir: {}",
+                         powerShellArgs.join(" ").toStdString(),
+                         workDir.toStdString());
+                // 首先尝试正常窗口启动（便于调试）
+                if (!InvokeProcessLauncher(QStringLiteral("powershell.exe"), powerShellArgs, workDir)) {
+                    LOG_ERR("RelaunchAfterExit: failed to invoke powershell.exe with normal window");
+
+                    // 尝试隐藏窗口方式
+                    powerShellArgs.insert(1, QStringLiteral("-WindowStyle"));
+                    powerShellArgs.insert(2, QStringLiteral("Hidden"));
+
+                    if (!InvokeProcessLauncher(QStringLiteral("powershell.exe"), powerShellArgs, workDir)) {
+                        LOG_ERR("RelaunchAfterExit: failed to invoke powershell.exe with hidden window");
+
+                        // 最后尝试使用 cmd.exe 作为备选方案
+                        QString cmdPath = exePath;
+                        cmdPath.replace("/", "\\");
+                        QString cmdCommand = QStringLiteral(
+                            "ping 127.0.0.1 -n %1 > nul && \"%2\""
+                        ).arg(QString::number((delayMs + 999) / 1000)).arg(cmdPath);
+
+                        QStringList cmdArgs = { QStringLiteral("/c"), cmdCommand };
+                        if (InvokeProcessLauncher(QStringLiteral("cmd.exe"), cmdArgs, workDir)) {
+                            LOG_INFO("RelaunchAfterExit: successfully invoked cmd.exe fallback");
+                            return true;
+                        } else {
+                            LOG_ERR("RelaunchAfterExit: all relaunch methods failed");
+                            return false;
+                        }
+                    } else {
+                        LOG_INFO("RelaunchAfterExit: successfully invoked hidden powershell.exe");
+                        return true;
+                    }
+                } else {
+                    LOG_INFO("RelaunchAfterExit: successfully invoked normal powershell.exe");
+                    return true;
                 }
-                return true;
 
 #elif defined(Q_OS_MACOS) || defined(Q_OS_LINUX)
                 QString exeEscaped = exePath;
@@ -158,7 +233,7 @@ namespace gdl {
                  .arg(exeEscaped)
                  .arg(workDirEscaped);
 
-                if (!QProcess::startDetached(QStringLiteral("/bin/sh"), { QStringLiteral("-c"), script }, workDir)) {
+                if (!InvokeProcessLauncher(QStringLiteral("/bin/sh"), { QStringLiteral("-c"), script }, workDir)) {
                     LOG_ERR("RelaunchAfterExit: failed to invoke /bin/sh relay script");
                     return false;
                 }

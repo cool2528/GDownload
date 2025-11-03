@@ -4,8 +4,10 @@
 	 */
 #include <QObject>
 #include <QWindow>
+#include <functional>
+#include <QStringList>
 #include "GDLCore/singleton.hpp"
-#include "Definitions/autoProperty.h"
+#include "App/ui/Definitions/autoProperty.h"
 class QQuickWindow;
 class QQmlEngine;
 namespace gdl {
@@ -39,6 +41,11 @@ namespace gdl {
 
                 // 退出后自动重启自身（延迟毫秒），仅安排重启，不负责退出
                 Q_INVOKABLE bool RelaunchAfterExit(int delayMs = 500);
+
+                using ProcessLauncher =
+                    std::function<bool(const QString& program, const QStringList& arguments, const QString& workingDir)>;
+                static void SetProcessLauncherForTesting(ProcessLauncher launcher);
+                static void ResetProcessLauncherForTesting();
 
 			   private:
 				explicit UtilsToolsManager(QObject* parent = nullptr);
