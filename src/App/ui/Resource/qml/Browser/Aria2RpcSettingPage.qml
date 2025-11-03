@@ -235,7 +235,7 @@ GCard {
                         // 保存设置
                         SettingsManager.SetRpcListenPort(portValue)
                         SettingsManager.SetRpcSecret(secretInput.text.trim())
-                        UtilsToolsManager.RelaunchAfterExit()
+                        UtilsToolsManager.RelaunchAfterExit(3000)
                         Qt.quit()
                     } else {
                         ToastManager.ShowInfo(qsTr("No changes detected."), 2000)
