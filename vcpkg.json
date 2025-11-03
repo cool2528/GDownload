@@ -19,6 +19,7 @@
     "sqlite3",
     "libtorrent",
     "pugixml",
-    "rapidjson"
+    "rapidjson",
+    "gtest"
   ]
 }

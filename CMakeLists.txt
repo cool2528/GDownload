@@ -118,6 +118,13 @@ if(UNIX AND NOT APPLE)
 endif()
 add_subdirectory(src)
 
+# 可选的测试支持
+option(BUILD_TESTS "Build tests" OFF)
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
+
 # 安装规则
 if(WIN32)
     get_property(PROJECT_TARGETS GLOBAL PROPERTY PROJECT_TARGETS)
