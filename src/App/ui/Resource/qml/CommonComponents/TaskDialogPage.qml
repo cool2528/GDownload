@@ -95,7 +95,7 @@ Popup {
                             model: [
                                 { name: qsTr("URL"), icon: SegoeFluentIcons.Link },
                                 { name: qsTr("Torrent"), icon: SegoeFluentIcons.CloudDownload },
-                                { name: qsTr("Baidu"), icon: SegoeFluentIcons.CloudFolder }
+                                { name: qsTr("Baidu"), icon: SegoeFluentIcons.Cloud }
                             ]
 
                             GNavButton {

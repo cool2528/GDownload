@@ -120,7 +120,7 @@ Popup {
 
                 Repeater {
                     model: [
-                        { name: qsTr("License"), icon: SegoeFluentIcons.FileText },
+                        { name: qsTr("License"), icon: SegoeFluentIcons.Code },
                         { name: qsTr("About"), icon: SegoeFluentIcons.Info }
                     ]
 
