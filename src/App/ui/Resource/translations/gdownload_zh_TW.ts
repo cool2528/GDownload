@@ -124,27 +124,27 @@
     <message>
         <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="27"/>
         <source>Baidu Netdisk Integration</source>
-        <translation type="unfinished">百度网盘集成</translation>
+        <translation>百度网盘集成</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="34"/>
         <source>Configure Baidu Netdisk cookie for link parsing</source>
-        <translation type="unfinished">为链接解析配置百度网盘 cookie</translation>
+        <translation>为链接解析配置百度网盘 cookie</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="51"/>
         <source>Cookie</source>
-        <translation type="unfinished">饼干</translation>
+        <translation>饼干</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="58"/>
         <source>BDUSS value</source>
-        <translation type="unfinished">BDUSS 值</translation>
+        <translation>BDUSS 值</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="69"/>
         <source>Paste your Baidu Netdisk cookie here</source>
-        <translation type="unfinished">在此处粘贴您的百度网盘 cookie</translation>
+        <translation>在此处粘贴您的百度网盘 cookie</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="75"/>
@@ -154,7 +154,7 @@
     <message>
         <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="82"/>
         <source>Baidu cookie saved successfully</source>
-        <translation type="unfinished">成功保存百度 cookie</translation>
+        <translation>成功保存百度 cookie</translation>
     </message>
 </context>
 <context>
@@ -162,7 +162,7 @@
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="49"/>
         <source>Appearance &amp; Language</source>
-        <translation type="unfinished">外观与语言</translation>
+        <translation>外观与语言</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="69"/>
@@ -172,7 +172,7 @@
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="112"/>
         <source>Application Behavior</source>
-        <translation type="unfinished">应用行为</translation>
+        <translation>应用行为</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="125"/>
@@ -202,12 +202,12 @@
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="217"/>
         <source>Global download folder</source>
-        <translation type="unfinished">全局下载文件夹</translation>
+        <translation>全局下载文件夹</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="253"/>
         <source>Network Proxy</source>
-        <translation type="unfinished">网络代理</translation>
+        <translation>网络代理</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="264"/>
@@ -222,12 +222,12 @@
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="333"/>
         <source>Clipboard Monitor</source>
-        <translation type="unfinished">剪贴板监控器</translation>
+        <translation>剪贴板监控器</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="340"/>
         <source>Automatically detect download links from clipboard</source>
-        <translation type="unfinished">自动检测剪贴板中的下载链接</translation>
+        <translation>自动检测剪贴板中的下载链接</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="350"/>
@@ -255,27 +255,27 @@
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="44"/>
         <source>Downloads</source>
-        <translation type="unfinished">下载</translation>
+        <translation>下载</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="55"/>
         <source>Active download tasks</source>
-        <translation type="unfinished">当前下载任务</translation>
+        <translation>当前下载任务</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="56"/>
         <source>Queued download tasks</source>
-        <translation type="unfinished">排队下载任务</translation>
+        <translation>排队下载任务</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="57"/>
         <source>Completed or stopped tasks</source>
-        <translation type="unfinished">已完成或停止的任务</translation>
+        <translation>已完成或停止的任务</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="58"/>
         <source>Manage your downloads</source>
-        <translation type="unfinished">管理下载</translation>
+        <translation>管理下载</translation>
     </message>
 </context>
 <context>
@@ -283,7 +283,7 @@
     <message>
         <location filename="../qml/Browser/DownloadPageView.qml" line="47"/>
         <source>Download Tasks</source>
-        <translation type="unfinished">下载任务</translation>
+        <translation>下载任务</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageView.qml" line="81"/>
@@ -327,44 +327,69 @@
 <context>
     <name>GDownloadViewPage</name>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="49"/>
-        <source>No active downloads</source>
-        <translation type="unfinished">无活动下载</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="50"/>
-        <source>No waiting downloads</source>
-        <translation type="unfinished">下载无需等待</translation>
+        <source>No active downloads</source>
+        <translation>无活动下载</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="51"/>
-        <source>No completed downloads</source>
-        <translation type="unfinished">未完成下载</translation>
+        <source>No waiting downloads</source>
+        <translation>下载无需等待</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="52"/>
+        <source>No completed downloads</source>
+        <translation>未完成下载</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="53"/>
         <source>No downloads</source>
-        <translation type="unfinished">无下载</translation>
+        <translation>无下载</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="62"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="63"/>
         <source>Add some download links to get started</source>
-        <translation type="unfinished">添加一些下载链接以开始使用</translation>
+        <translation>添加一些下载链接以开始使用</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="122"/>
-        <source>Size: %1 • Progress: %2%</source>
-        <translation type="unfinished">大小： %1 - 进度：%2%</translation>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="159"/>
+        <source>Progress: %1%</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="203"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="183"/>
+        <source>Open file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="183"/>
+        <source>Resume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="205"/>
+        <source>Pause</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="234"/>
+        <source>Open folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="249"/>
+        <source>Copy link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="265"/>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="252"/>
         <source>Link copied to clipboard</source>
-        <translation type="unfinished">链接复制到剪贴板</translation>
-    </message>
-    <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="264"/>
-        <source>Remaining </source>
-        <translation>剩餘</translation>
+        <translation>链接复制到剪贴板</translation>
     </message>
 </context>
 <context>
@@ -381,7 +406,7 @@
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="77"/>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="246"/>
         <source>About GDownload</source>
-        <translation type="unfinished">关于 GDownload</translation>
+        <translation>关于 GDownload</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="123"/>
@@ -401,22 +426,22 @@
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="175"/>
         <source>Support GDownload Development</source>
-        <translation type="unfinished">支持 GDownload 开发</translation>
+        <translation>支持 GDownload 开发</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="183"/>
         <source>If you like GDownload, you can support us through the following platforms:</source>
-        <translation type="unfinished">如果您喜欢 GDownload，可以通过以下平台支持我们：</translation>
+        <translation>如果您喜欢 GDownload，可以通过以下平台支持我们：</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="203"/>
         <source>Thank you for your support! ❤️</source>
-        <translation type="unfinished">感谢您的支持！❤️</translation>
+        <translation>感谢您的支持！❤️</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="221"/>
         <source>Open Source Licenses</source>
-        <translation type="unfinished">开源许可证</translation>
+        <translation>开源许可证</translation>
     </message>
 </context>
 <context>
@@ -527,32 +552,32 @@
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="17"/>
         <source>Basic Settings</source>
-        <translation type="unfinished">基本设置</translation>
+        <translation>基本设置</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="19"/>
         <source>Advanced Settings</source>
-        <translation type="unfinished">高级设置</translation>
+        <translation>高级设置</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="21"/>
         <source>Lab Settings</source>
-        <translation type="unfinished">实验室设置</translation>
+        <translation>实验室设置</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="37"/>
         <source>Configure basic download preferences</source>
-        <translation type="unfinished">配置基本下载首选项</translation>
+        <translation>配置基本下载首选项</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="39"/>
         <source>Advanced configuration options</source>
-        <translation type="unfinished">高级配置选项</translation>
+        <translation>高级配置选项</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="41"/>
         <source>Experimental features and settings</source>
-        <translation type="unfinished">实验特点和设置</translation>
+        <translation>实验特点和设置</translation>
     </message>
 </context>
 <context>
@@ -583,17 +608,17 @@
     <message>
         <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="32"/>
         <source>Advanced Options</source>
-        <translation type="unfinished">進階選項</translation>
+        <translation>高级选项</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="101"/>
         <source>Custom Headers:</source>
-        <translation type="unfinished">定制接头：</translation>
+        <translation>定制接头：</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="113"/>
         <source>Custom request headers (one per line: KEY:VALUE)</source>
-        <translation type="unfinished">自定义请求标头（每行一个：KEY:VALUE）</translation>
+        <translation>自定义请求标头（每行一个：KEY:VALUE）</translation>
     </message>
 </context>
 <context>
@@ -601,12 +626,12 @@
     <message>
         <location filename="../qml/CommonComponents/TaskDialogHeader.qml" line="11"/>
         <source>Add New Download Task</source>
-        <translation type="unfinished">添加新的下载任务</translation>
+        <translation>添加新的下载任务</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogHeader.qml" line="12"/>
         <source>Add downloads from URLs, torrents, or cloud storage</source>
-        <translation type="unfinished">添加从 URL、torrents 或云存储下载的内容</translation>
+        <translation>添加从 URL、torrents 或云存储下载的内容</translation>
     </message>
 </context>
 <context>
@@ -624,17 +649,17 @@
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="97"/>
         <source>Torrent</source>
-        <translation type="unfinished">下载</translation>
+        <translation>下载</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="149"/>
         <source>Enter download URLs (one per line, supports magnet links)</source>
-        <translation type="unfinished">输入下载 URL（每行一个，支持磁铁链接）</translation>
+        <translation>输入下载 URL（每行一个，支持磁铁链接）</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="341"/>
         <source>Add Task</source>
-        <translation type="unfinished">添加任务</translation>
+        <translation>添加任务</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="320"/>
@@ -652,27 +677,27 @@
     <message>
         <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="23"/>
         <source>Download Settings</source>
-        <translation type="unfinished">下载设置</translation>
+        <translation>下载设置</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="39"/>
         <source>Rename:</source>
-        <translation type="unfinished">重新命名:</translation>
+        <translation>重新命名：</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="49"/>
         <source>Optional filename</source>
-        <translation type="unfinished">可选文件名</translation>
+        <translation>可选文件名</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="53"/>
         <source>Splits:</source>
-        <translation type="unfinished">分片數</translation>
+        <translation>分裂：</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="69"/>
         <source>Save to:</source>
-        <translation type="unfinished">儲存至:</translation>
+        <translation>保存到</translation>
     </message>
 </context>
 <context>
@@ -703,22 +728,22 @@
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="26"/>
         <source>BitTorrent Tracker Servers</source>
-        <translation type="unfinished">BitTorrent 跟踪服务器</translation>
+        <translation>BitTorrent 跟踪服务器</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="33"/>
         <source>Configure tracker servers for BitTorrent downloads</source>
-        <translation type="unfinished">为 BitTorrent 下载配置跟踪服务器</translation>
+        <translation>为 BitTorrent 下载配置跟踪服务器</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="46"/>
         <source>Tracker Sources</source>
-        <translation type="unfinished">跟踪源</translation>
+        <translation>跟踪源</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="117"/>
         <source>Sync Trackers</source>
-        <translation type="unfinished">同步跟踪器</translation>
+        <translation>同步跟踪器</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="133"/>
@@ -728,7 +753,7 @@
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="149"/>
         <source>Current Tracker List</source>
-        <translation type="unfinished">当前跟踪器列表</translation>
+        <translation>当前跟踪器列表</translation>
     </message>
 </context>
 <context>
@@ -736,22 +761,22 @@
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="86"/>
         <source>New Version Available</source>
-        <translation type="unfinished">新版本发布</translation>
+        <translation>新版本发布</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="135"/>
         <source>Release Notes</source>
-        <translation type="unfinished">发布说明</translation>
+        <translation>发布说明</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="174"/>
         <source>Updating...</source>
-        <translation type="unfinished">更新...</translation>
+        <translation>更新...</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="226"/>
         <source>Go to Download Page</source>
-        <translation type="unfinished">转至下载页面</translation>
+        <translation>转至下载页面</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="240"/>
@@ -761,7 +786,7 @@
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="250"/>
         <source>Update Now</source>
-        <translation type="unfinished">立即更新</translation>
+        <translation>立即更新</translation>
     </message>
 </context>
 <context>
