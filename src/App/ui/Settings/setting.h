@@ -5,6 +5,7 @@
 #include <QRect>
 #include <QSize>
 #include <nlohmann/json.hpp>
+#include "config/config_key.h"
 namespace gdl {
 	namespace ui {
 		namespace settings {
@@ -21,6 +22,8 @@ namespace gdl {
 			   public:
 				inline static QHash<QString, Setting*> settings_;
 			};
+
+#define CONFIG_KEY_PATH(NAME) config::Keys::NAME.get().data()
 
 #define SETTING_IMP_BEGIN(CLASS_NAME, KEY, TYPE)      \
 	class CLASS_NAME : public Setting {               \
@@ -53,7 +56,7 @@ namespace gdl {
 	Q_SIGNAL void NAME##Changed();
 
 			// WindowSize
-			SETTING_IMP_BEGIN(WindowSize, "general.window_size", QSize)
+			SETTING_IMP_BEGIN(WindowSize, CONFIG_KEY_PATH(WindowSize), QSize)
 			void Default() override {
 				value_ = QSize(1024, 768);
 			}
@@ -77,7 +80,7 @@ namespace gdl {
 			SETTING_IMP_END(WindowSize)
 
 			// Theme
-			SETTING_IMP_BEGIN(Theme, "general.theme", QString)
+			SETTING_IMP_BEGIN(Theme, CONFIG_KEY_PATH(Theme), QString)
 			void Default() override {
 				value_ = "Light";
 			}
@@ -93,7 +96,7 @@ namespace gdl {
 			SETTING_IMP_END(Theme)
 
 			// Language
-			SETTING_IMP_BEGIN(Language, "general.language", QString)
+			SETTING_IMP_BEGIN(Language, CONFIG_KEY_PATH(Language), QString)
 			void Default() override {
 				value_ = "zh-cn";
 			}
@@ -109,7 +112,7 @@ namespace gdl {
 			SETTING_IMP_END(Language)
 
 			// BtExludeTracker
-			SETTING_IMP_BEGIN(BtExludeTracker, "aria2c.bt-exclude-tracker", QString)
+			SETTING_IMP_BEGIN(BtExludeTracker, CONFIG_KEY_PATH(BtExludeTracker), QString)
 			void Default() override {
 				value_ = "";
 			}
@@ -125,7 +128,7 @@ namespace gdl {
 			SETTING_IMP_END(BtExludeTracker)
 
 			// BtTracker
-			SETTING_IMP_BEGIN(BtTracker, "aria2c.bt-tracker", QString)
+			SETTING_IMP_BEGIN(BtTracker, CONFIG_KEY_PATH(BtTracker), QString)
 			void Default() override {
 				value_ = "";
 			}
@@ -141,7 +144,7 @@ namespace gdl {
 			SETTING_IMP_END(BtTracker)
 
 			// Dir
-			SETTING_IMP_BEGIN(Dir, "aria2c.dir", QString)
+			SETTING_IMP_BEGIN(Dir, CONFIG_KEY_PATH(Dir), QString)
 			void Default() override {
 				value_ = "";
 			}
@@ -157,7 +160,7 @@ namespace gdl {
 			SETTING_IMP_END(Dir)
 
 			// ListenPort
-			SETTING_IMP_BEGIN(ListenPort, "aria2c.listen-port", int)
+			SETTING_IMP_BEGIN(ListenPort, CONFIG_KEY_PATH(ListenPort), int)
 			void Default() override {
 				value_ = 21301;
 			}
@@ -173,7 +176,7 @@ namespace gdl {
 			SETTING_IMP_END(ListenPort)
 
 			// RpcListenPort
-			SETTING_IMP_BEGIN(RpcListenPort, "aria2c.rpc-listen-port", int)
+			SETTING_IMP_BEGIN(RpcListenPort, CONFIG_KEY_PATH(RpcListenPort), int)
 			void Default() override {
 				value_ = 16888;
 			}
@@ -189,7 +192,7 @@ namespace gdl {
 			SETTING_IMP_END(RpcListenPort)
 
 			// RpcSecret
-			SETTING_IMP_BEGIN(RpcSecret, "aria2c.rpc-secret", QString)
+			SETTING_IMP_BEGIN(RpcSecret, CONFIG_KEY_PATH(RpcSecret), QString)
 			void Default() override {
 				value_ = "GDownload_secret";
 			}
@@ -205,7 +208,7 @@ namespace gdl {
 			SETTING_IMP_END(RpcSecret)
 
 			// Split
-			SETTING_IMP_BEGIN(Split, "aria2c.split", int)
+			SETTING_IMP_BEGIN(Split, CONFIG_KEY_PATH(Split), int)
 			void Default() override {
 				value_ = 16;
 			}
@@ -221,7 +224,7 @@ namespace gdl {
 			SETTING_IMP_END(Split)
 
 			// UserAgent
-			SETTING_IMP_BEGIN(UserAgent, "aria2c.user-agent", QString)
+			SETTING_IMP_BEGIN(UserAgent, CONFIG_KEY_PATH(UserAgent), QString)
 			void Default() override {
 				value_ = "";
 			}
@@ -237,7 +240,7 @@ namespace gdl {
 			SETTING_IMP_END(UserAgent)
 
 			// AllProxy
-			SETTING_IMP_BEGIN(AllProxy, "aria2c.all-proxy", QString)
+			SETTING_IMP_BEGIN(AllProxy, CONFIG_KEY_PATH(AllProxy), QString)
 			void Default() override {
 				value_ = "";
 			}
@@ -253,7 +256,7 @@ namespace gdl {
 			SETTING_IMP_END(AllProxy)
 
 			// DhtListenPort
-			SETTING_IMP_BEGIN(DhtListenPort, "aria2c.dht-listen-port", int)
+			SETTING_IMP_BEGIN(DhtListenPort, CONFIG_KEY_PATH(DhtListenPort), int)
 			void Default() override {
 				value_ = 6881;
 			}
@@ -269,7 +272,7 @@ namespace gdl {
 			SETTING_IMP_END(DhtListenPort)
 
 			// MaxConcurrentDownloads
-			SETTING_IMP_BEGIN(MaxConcurrentDownloads, "aria2c.max-concurrent-downloads", int)
+			SETTING_IMP_BEGIN(MaxConcurrentDownloads, CONFIG_KEY_PATH(MaxConcurrentDownloads), int)
 
 			void Default() override {
 				value_ = 5;
@@ -286,7 +289,7 @@ namespace gdl {
 			SETTING_IMP_END(MaxConcurrentDownloads)
 
 			//ConfPath
-			SETTING_IMP_BEGIN(ConfPath, "aria2c.conf-path", QString)
+			SETTING_IMP_BEGIN(ConfPath, CONFIG_KEY_PATH(ConfPath), QString)
 			void Default() override {
 				value_ = "";
 			}
@@ -302,7 +305,7 @@ namespace gdl {
 			SETTING_IMP_END(ConfPath)
 
 			// TrackerSourceUrls
-			SETTING_IMP_BEGIN(TrackerSourceUrls, "aria2c.tracker_source_urls", QString)
+			SETTING_IMP_BEGIN(TrackerSourceUrls, CONFIG_KEY_PATH(TrackerSourceUrls), QString)
 			void Default() override {
 				value_ = QString();
 			}
@@ -318,7 +321,7 @@ namespace gdl {
 			SETTING_IMP_END(TrackerSourceUrls)
 
 			//SaveSession
-			SETTING_IMP_BEGIN(SaveSession, "aria2c.save-session", QString)
+			SETTING_IMP_BEGIN(SaveSession, CONFIG_KEY_PATH(SaveSession), QString)
 			void Default() override {
 				value_ = "";
 			}
@@ -334,7 +337,7 @@ namespace gdl {
 			SETTING_IMP_END(SaveSession)
 
 			// IsSaveSession
-			SETTING_IMP_BEGIN(IsSaveSession, "aria2c.is-save-session", bool)
+			SETTING_IMP_BEGIN(IsSaveSession, CONFIG_KEY_PATH(IsSaveSession), bool)
 			void Default() override {
 				value_ = false;
 			}
@@ -358,7 +361,7 @@ namespace gdl {
 			SETTING_IMP_END(IsSaveSession)
 
 			//EnableGlobalProxy
-			SETTING_IMP_BEGIN(EnableGlobalProxy, "aria2c.enable-global-proxy", bool)
+			SETTING_IMP_BEGIN(EnableGlobalProxy, CONFIG_KEY_PATH(EnableGlobalProxy), bool)
 			void Default() override {
 				value_ = false;
 			}
@@ -382,7 +385,7 @@ namespace gdl {
 			SETTING_IMP_END(EnableGlobalProxy)
 
 			//GlobalProxy
-			SETTING_IMP_BEGIN(GlobalProxy, "aria2c.global-proxy", QString)
+			SETTING_IMP_BEGIN(GlobalProxy, CONFIG_KEY_PATH(GlobalProxy), QString)
 			void Default() override {
 				value_ = "";
 			}
@@ -398,7 +401,7 @@ namespace gdl {
 			SETTING_IMP_END(GlobalProxy)
 
 			// ListenClipboard
-			SETTING_IMP_BEGIN(ListenClipboard, "general.listen-clipboard", bool)
+			SETTING_IMP_BEGIN(ListenClipboard, CONFIG_KEY_PATH(ListenClipboard), bool)
 			void Default() override {
 				value_ = true;
 			}
@@ -422,7 +425,7 @@ namespace gdl {
 			SETTING_IMP_END(ListenClipboard)
 
 			// AutoResumeTask
-			SETTING_IMP_BEGIN(AutoResumeTask, "aria2c.auto-resume-task", bool)
+			SETTING_IMP_BEGIN(AutoResumeTask, CONFIG_KEY_PATH(AutoResumeTask), bool)
 			void Default() override {
 				value_ = false;
 			}
@@ -446,7 +449,7 @@ namespace gdl {
 			SETTING_IMP_END(AutoResumeTask)
 
 			//AutoStart
-			SETTING_IMP_BEGIN(AutoStart, "general.auto-start", bool)
+			SETTING_IMP_BEGIN(AutoStart, CONFIG_KEY_PATH(AutoStart), bool)
 			void Default() override {
 				value_ = false;
 			}
@@ -471,7 +474,7 @@ namespace gdl {
 			SETTING_IMP_END(AutoStart)
 
 			//RememberWindowPosition
-			SETTING_IMP_BEGIN(RememberWindowPosition, "general.remember-window-position", bool)
+			SETTING_IMP_BEGIN(RememberWindowPosition, CONFIG_KEY_PATH(RememberWindowPosition), bool)
 			void Default() override {
 				value_ = true;
 			}
@@ -496,7 +499,7 @@ namespace gdl {
 			SETTING_IMP_END(RememberWindowPosition)
 
 			// WindowPosition
-			SETTING_IMP_BEGIN(WindowPosition, "general.window-position", QPoint)
+			SETTING_IMP_BEGIN(WindowPosition, CONFIG_KEY_PATH(WindowPosition), QPoint)
 			void Default() override {
 				value_ = QPoint(0, 0);
 			}
@@ -521,7 +524,7 @@ namespace gdl {
 			SETTING_IMP_END(WindowPosition)
 
 			// EnableTrayIcon
-			SETTING_IMP_BEGIN(EnableTrayIcon, "general.enable-tray-icon", bool)
+			SETTING_IMP_BEGIN(EnableTrayIcon, CONFIG_KEY_PATH(EnableTrayIcon), bool)
 			void Default() override {
 				value_ = true;
 			}
@@ -545,7 +548,7 @@ namespace gdl {
 			SETTING_IMP_END(EnableTrayIcon)
 
 			// EnableNotification
-			SETTING_IMP_BEGIN(EnableNotification, "general.enable-notification", bool)
+			SETTING_IMP_BEGIN(EnableNotification, CONFIG_KEY_PATH(EnableNotification), bool)
 			void Default() override {
 				value_ = true;
 			}
@@ -569,7 +572,7 @@ namespace gdl {
 			SETTING_IMP_END(EnableNotification)
 
 			// EnableAutoShutdown
-			SETTING_IMP_BEGIN(EnableAutoShutdown, "general.enable-auto-shutdown", bool)
+			SETTING_IMP_BEGIN(EnableAutoShutdown, CONFIG_KEY_PATH(EnableAutoShutdown), bool)
 			void Default() override {
 				value_ = false;
 			}
@@ -594,7 +597,7 @@ namespace gdl {
 			SETTING_IMP_END(EnableAutoShutdown)
 
 			// EnableAutoUpdate
-			SETTING_IMP_BEGIN(EnableAutoUpdate, "general.enable-auto-update", bool)
+			SETTING_IMP_BEGIN(EnableAutoUpdate, CONFIG_KEY_PATH(EnableAutoUpdate), bool)
 			void Default() override {
 				value_ = true;
 			}
@@ -618,7 +621,7 @@ namespace gdl {
 			SETTING_IMP_END(EnableAutoUpdate)
 
 			// BaiduPanCookies
-			SETTING_IMP_BEGIN(BaiduPanCookies, "plugin.baidu-pan-cookies", QString)
+			SETTING_IMP_BEGIN(BaiduPanCookies, CONFIG_KEY_PATH(BaiduPanCookies), QString)
 			void Default() override {
 				value_ = "";
 			}
@@ -636,7 +639,7 @@ namespace gdl {
 			SETTING_IMP_END(BaiduPanCookies)
 
 			// TrackerSourceNames
-			SETTING_IMP_BEGIN(TrackerSourceNames, "aria2c.tracker_source_name", QString)
+			SETTING_IMP_BEGIN(TrackerSourceNames, CONFIG_KEY_PATH(TrackerSourceNames), QString)
 			void Default() override {
 				value_ = "";
 			}
@@ -654,7 +657,7 @@ namespace gdl {
 			SETTING_IMP_END(TrackerSourceNames)
 
 			//EnableTrackerSourceAutoUpdate
-			SETTING_IMP_BEGIN(EnableTrackerSourceAutoUpdate, "aria2c.enable_tracker_source_auto_update", bool)
+			SETTING_IMP_BEGIN(EnableTrackerSourceAutoUpdate, CONFIG_KEY_PATH(EnableTrackerSourceAutoUpdate), bool)
 			void Default() override {
 				value_ = true;
 			}
@@ -680,3 +683,4 @@ namespace gdl {
 		}  // namespace settings
 	}  // namespace ui
 }  // namespace gdl
+

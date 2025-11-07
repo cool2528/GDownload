@@ -19,6 +19,17 @@ find_package(boost_property_tree CONFIG REQUIRED)
 find_package(boost_beast CONFIG REQUIRED)
 find_package(boost_locale CONFIG REQUIRED)
 find_package(unofficial-sqlite3 CONFIG REQUIRED)
+find_path(TOMLPLUSPLUS_INCLUDE_DIR
+    NAMES "toml++/toml.h"
+    HINTS ${CMAKE_PREFIX_PATH}
+    PATH_SUFFIXES include
+)
+if(NOT TOMLPLUSPLUS_INCLUDE_DIR)
+    message(FATAL_ERROR "Failed to locate toml++ headers. Ensure tomlplusplus is installed (e.g. via vcpkg).")
+endif()
+add_library(tomlplusplus INTERFACE)
+target_include_directories(tomlplusplus INTERFACE ${TOMLPLUSPLUS_INCLUDE_DIR})
+add_library(tomlplusplus::tomlplusplus ALIAS tomlplusplus)
 if(APPLE)
     file(GLOB_RECURSE SOURCE_OBJ_FILES
         *.mm
@@ -36,7 +47,7 @@ endif()
 
 register_target(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog Boost::property_tree Boost::beast Boost::locale unofficial::sqlite3::sqlite3)
+target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog Boost::property_tree Boost::beast Boost::locale unofficial::sqlite3::sqlite3 tomlplusplus::tomlplusplus)
 
 if(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE
