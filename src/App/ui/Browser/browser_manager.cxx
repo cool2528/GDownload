@@ -550,6 +550,13 @@ namespace gdl {
 					kAria2SyncMagnetServerList, [this](const std::string& msg) { 
 						Q_EMIT sigUpdateSyncServerList(QString::fromStdString(msg));
 					});
+				if (res.HasError()) return false;
+				aria2_sync_server_list_subcription_ = res.Value();
+				// subscribe tracker update status
+				res = engine::Aria2cDownloadManager::Instance().SubscriptionAria2Message(
+					kAria2TrackerUpdateStatus, [this](const std::string& msg) { OnHandleTrackerUpdateStatus(msg); });
+				if (res.HasError()) return false;
+				aria2_tracker_update_status_subscription_ = res.Value();
 				return true;
 			}
 
@@ -560,6 +567,14 @@ namespace gdl {
 				if (aria2_active_progress_subcription_) {
 					engine::Aria2cDownloadManager::Instance().UnSubscribeAria2Message(
 						aria2_active_progress_subcription_);
+				}
+				if (aria2_sync_server_list_subcription_) {
+					engine::Aria2cDownloadManager::Instance().UnSubscribeAria2Message(
+						aria2_sync_server_list_subcription_);
+				}
+				if (aria2_tracker_update_status_subscription_) {
+					engine::Aria2cDownloadManager::Instance().UnSubscribeAria2Message(
+						aria2_tracker_update_status_subscription_);
 				}
 			}
 
@@ -896,6 +911,10 @@ namespace gdl {
 				} catch (...) {
 					LOG_ERR("OnHandleAria2ActiveProgress exception");
 				}
+			}
+
+			void BrowserManager::OnHandleTrackerUpdateStatus(const std::string& msg) {
+				Q_EMIT sigTrackerUpdateStatus(QString::fromStdString(msg));
 			}
 
 			DownloadTaskInfo BrowserManager::Aria2QueryByGidTaskInfo(const std::string& gid) {

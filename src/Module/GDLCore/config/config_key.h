@@ -62,7 +62,7 @@ namespace gdl {
             CONFIG_PATH(BaiduPanCookies, "plugin.baidu-pan-cookies", "");
 			CONFIG_PATH(TrackerSourceNames,"aria2c.tracker_source_name","");
 			CONFIG_PATH(EnableTrackerSourceAutoUpdate,"aria2c.enable_tracker_source_auto_update","true");
-		
+
 
 			// static function all keys
 			static constexpr auto GetAllKeys() {
