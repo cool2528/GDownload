@@ -49,7 +49,9 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "source" FILES ${SOURCES_FI
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "resource" FILES ${QT_RESOURCE_FILES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "qml" FILES ${QT_QML_FILES})
 
-find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
+if(GDL_UI_GENERATE_TRANSLATIONS)
+    find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
+endif()
 # 生成翻译ts文件
 set(QT_TS_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations/gdownload_ja_JP.ts"
@@ -60,48 +62,52 @@ set(QT_TS_FILES
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "ts" FILES ${QT_TS_FILES})
 set(QT_ROOT "${Qt6_DIR}/../../..")
 # 使用foreach遍历所有ts文件
-if(WIN32)
-    message("update ts file for windows QT_ROOT: ${QT_ROOT}")
-    foreach(TS_FILE ${QT_TS_FILES})
-        message("update ts file: ${TS_FILE}")
-        execute_process(
-            COMMAND ${QT_ROOT}/bin/lupdate.exe 
-            ${CMAKE_CURRENT_SOURCE_DIR}
-            -ts ${TS_FILE}
-            -no-obsolete
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        )
-        # 获取不带后缀的文件名
-        get_filename_component(QM_FILE ${TS_FILE} NAME_WE)
-        # 根据ts文件生成qm文件
-        execute_process(
-            COMMAND ${QT_ROOT}/bin/lrelease
-            ${TS_FILE}
-            -qm ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations/${QM_FILE}.qm
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations
-        )
-    endforeach()
+if(GDL_UI_GENERATE_TRANSLATIONS)
+    if(WIN32)
+        message("update ts file for windows QT_ROOT: ${QT_ROOT}")
+        foreach(TS_FILE ${QT_TS_FILES})
+            message("update ts file: ${TS_FILE}")
+            execute_process(
+                COMMAND ${QT_ROOT}/bin/lupdate.exe 
+                ${CMAKE_CURRENT_SOURCE_DIR}
+                -ts ${TS_FILE}
+                -no-obsolete
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            )
+            # 获取不带后缀的文件名
+            get_filename_component(QM_FILE ${TS_FILE} NAME_WE)
+            # 根据ts文件生成qm文件
+            execute_process(
+                COMMAND ${QT_ROOT}/bin/lrelease
+                ${TS_FILE}
+                -qm ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations/${QM_FILE}.qm
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations
+            )
+        endforeach()
+    else()
+        message("update ts file for linux QT_ROOT: ${QT_ROOT}")
+        foreach(TS_FILE ${QT_TS_FILES})
+            message("update ts file: ${TS_FILE}")
+            execute_process(
+                COMMAND ${QT_ROOT}/bin/lupdate
+                ${CMAKE_CURRENT_SOURCE_DIR}
+                -ts ${TS_FILE}
+                -no-obsolete
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            )
+            # 获取不带后缀的文件名
+            get_filename_component(QM_FILE ${TS_FILE} NAME_WE)
+            # 根据ts文件生成qm文件
+            execute_process(
+                COMMAND ${QT_ROOT}/bin/lrelease
+                ${TS_FILE}
+                -qm ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations/${QM_FILE}.qm
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations
+            )
+        endforeach()
+    endif()
 else()
-    message("update ts file for linux QT_ROOT: ${QT_ROOT}")
-    foreach(TS_FILE ${QT_TS_FILES})
-        message("update ts file: ${TS_FILE}")
-        execute_process(
-            COMMAND ${QT_ROOT}/bin/lupdate
-            ${CMAKE_CURRENT_SOURCE_DIR}
-            -ts ${TS_FILE}
-            -no-obsolete
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        )
-        # 获取不带后缀的文件名
-        get_filename_component(QM_FILE ${TS_FILE} NAME_WE)
-        # 根据ts文件生成qm文件
-        execute_process(
-            COMMAND ${QT_ROOT}/bin/lrelease
-            ${TS_FILE}
-            -qm ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations/${QM_FILE}.qm
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations
-        )
-    endforeach()
+    message(STATUS "Skipping translation update (GDL_UI_GENERATE_TRANSLATIONS=OFF)")
 endif()
 
 # 如果 resource/docs 不存在notice 文件则复制到这个目录下
