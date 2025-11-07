@@ -38,6 +38,10 @@
         <file>qml/CommonComponents/ScrollText.qml</file>
         <file>qml/CommonComponents/MessageToast.qml</file>
         <file>qml/CommonComponents/ToastContainer.qml</file>
+        <file>qml/CommonComponents/GMessage.qml</file>
+        <file>qml/CommonComponents/GMessageContainer.qml</file>
+        <file>qml/CommonComponents/GMessageTest.qml</file>
+        <file>qml/CommonComponents/CloseConfirmDialog.qml</file>
         <file>qml/CommonComponents/TaskDialogHeader.qml</file>
         <file>qml/CommonComponents/TaskGeneralOptionsCard.qml</file>
         <file>qml/CommonComponents/TaskAdvancedOptionsCard.qml</file>

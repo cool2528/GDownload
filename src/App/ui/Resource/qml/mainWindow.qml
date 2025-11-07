@@ -95,6 +95,27 @@ FramelessWindow{
         anchors.fill: parent
         z: 999999  // 确保显示在最上层
     }
+
+    // GMessage 消息容器（增强版）
+    GMessageContainer {
+        id: messageContainer
+        anchors.fill: parent
+        z: 1000000  // 比 ToastContainer 更高，确保显示在最上层
+
+        Component.onCompleted: {
+            // 连接 MessageManager 信号
+            MessageManager.messageRequested.connect(function(options) {
+                if (options.action === "close") {
+                    messageContainer.closeMessageById(options.id)
+                } else if (options.action === "closeAll") {
+                    messageContainer.closeAllMessages()
+                } else {
+                    messageContainer.showMessage(options)
+                }
+            })
+        }
+    }
+
     UpdateDialog{
         id: updateDialog
     }

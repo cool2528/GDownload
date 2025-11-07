@@ -2,12 +2,56 @@ import QtQuick
 import QtQuick.Layouts
 import "../CommonComponents"
 import gdl.sdk
+
 Rectangle {
     id: titleBar
     width: parent.width
     color: GTheme.bgWhite
     height: 32
     visible: Qt.platform.os === "osx" ? (mainWindow.fullScreen ? false : true) : true
+
+    // 关闭确认对话框
+    CloseConfirmDialog {
+        id: closeConfirmDialog
+
+        onActionSelected: function(action, dontAskAgain) {
+            // 如果选择了"不再询问"，保存设置
+            if (dontAskAgain) {
+                SettingsManager.qShowCloseConfirm = false
+                if (action === CloseConfirmDialog.MinimizeToTray) {
+                    SettingsManager.qCloseToTray = true
+                } else if (action === CloseConfirmDialog.Quit) {
+                    SettingsManager.qCloseToTray = false
+                }
+            }
+
+            // 执行对应的操作
+            if (action === CloseConfirmDialog.Quit) {
+                Qt.quit()
+            } else if (action === CloseConfirmDialog.MinimizeToTray) {
+                mainWindow.hide()
+            }
+            // Cancel 不做任何操作
+        }
+    }
+
+    // 关闭窗口的处理函数
+    function handleClose() {
+        // 如果设置了不再询问
+        if (!SettingsManager.qShowCloseConfirm) {
+            if (SettingsManager.qCloseToTray) {
+                // 最小化到托盘
+                mainWindow.hide()
+            } else {
+                // 直接退出
+                Qt.quit()
+            }
+        } else {
+            // 显示确认对话框
+            closeConfirmDialog.open()
+        }
+    }
+
     Component.onCompleted: {
        if(Qt.platform.os !== "osx"){
            helper.setHitTestVisible(win_close)
@@ -33,7 +77,7 @@ Rectangle {
             normalImage: "/images/titlebar/macos-close.svg"
             hoverImage: "/images/titlebar/macos-clos-hover.svg"
             onClicked: {
-                Qt.quit()
+                titleBar.handleClose()
             }
         }
 
@@ -123,7 +167,7 @@ Rectangle {
             hoverImage: GTheme.dark ? "/images/titlebar/windows-close-dark.svg" : "/images/titlebar/windows-close-hover.svg"
             tintColor: "transparent"
             onClicked: {
-                Qt.quit()
+                titleBar.handleClose()
             }
         }
 
