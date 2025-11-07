@@ -1,25 +1,30 @@
 {
   "dependencies": [
-    "spdlog",
-    "boost-property-tree",
     {
-      "name":"boost-asio",
-      "features":["ssl"]
+      "name": "boost-asio",
+      "features": [
+        "ssl"
+      ]
     },
-    "boost-system",
-    "boost-locale",
-    "boost-url",
     "boost-beast",
-    "openssl",
+    "boost-locale",
+    "boost-property-tree",
+    "boost-system",
+    "boost-url",
     {
-      "name":"cpr",
-      "features":["ssl"]
+      "name": "cpr",
+      "features": [
+        "ssl"
+      ]
     },
-    "nlohmann-json",
-    "sqlite3",
+    "gtest",
     "libtorrent",
+    "nlohmann-json",
+    "openssl",
     "pugixml",
     "rapidjson",
-    "gtest"
+    "spdlog",
+    "sqlite3",
+    "tomlplusplus"
   ]
 }
