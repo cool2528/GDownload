@@ -46,6 +46,8 @@ namespace gdl {
                 SETTING_PROPERTY(QString, BaiduPanCookies)
                 SETTING_PROPERTY(QString, TrackerSourceNames)
                 SETTING_PROPERTY(bool, EnableTrackerSourceAutoUpdate)
+                SETTING_PROPERTY(bool, ShowCloseConfirm)
+                SETTING_PROPERTY(bool, CloseToTray)
 
                public:
                 ~Settings() override;
