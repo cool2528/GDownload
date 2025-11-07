@@ -87,6 +87,7 @@ elseif(UNIX AND NOT APPLE)
 endif()
 
 project(GDownload LANGUAGES CXX C)
+option(GDL_UI_GENERATE_TRANSLATIONS "Generate TS/QM translation files during configure" OFF)
 message(STATUS "CMAKE_PREFIX_PATH:${CMAKE_PREFIX_PATH}")
 message(STATUS "CMAKE_TOOLCHAIN_FILE:${CMAKE_TOOLCHAIN_FILE}")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
