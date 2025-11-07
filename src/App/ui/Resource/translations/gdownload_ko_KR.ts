@@ -327,67 +327,42 @@
 <context>
     <name>GDownloadViewPage</name>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="50"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="49"/>
         <source>No active downloads</source>
         <translation>활성 다운로드 없음</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="51"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="50"/>
         <source>No waiting downloads</source>
         <translation>대기 다운로드 없음</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="52"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="51"/>
         <source>No completed downloads</source>
         <translation>완료된 다운로드 없음</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="53"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="52"/>
         <source>No downloads</source>
         <translation>다운로드 없음</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="63"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="62"/>
         <source>Add some download links to get started</source>
         <translation>시작하려면 다운로드 링크를 추가하세요.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="159"/>
-        <source>Progress: %1%</source>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="124"/>
+        <source>Size: %1 • Progress: %2%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="183"/>
-        <source>Open file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="183"/>
-        <source>Resume</source>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="271"/>
+        <source>Remaining </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="205"/>
-        <source>Pause</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="234"/>
-        <source>Open folder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="249"/>
-        <source>Copy link</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="265"/>
-        <source>Delete</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="252"/>
         <source>Link copied to clipboard</source>
         <translation>링크가 클립보드에 복사됨</translation>
     </message>
