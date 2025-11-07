@@ -40,5 +40,36 @@ namespace gdl {
 			std::unique_ptr<Impl> impl_;
 		};
 
+		// Tracker ETag 缓存结构
+		struct TrackerETagEntry {
+			std::string url;		// Tracker 源 URL
+			std::string etag;		// HTTP ETag
+			std::string content;	// 缓存内容
+			std::int64_t timestamp;	// 更新时间戳
+		};
+
+		class GDLCore_API TrackerETagCache : public Singleton<TrackerETagCache> {
+			SINGLETON_DECLARE(TrackerETagCache)
+		   public:
+			bool Initialize(const String& db_path);
+			void Uninitialize();
+			~TrackerETagCache();
+
+			// CRUD 操作
+			bool SetEntry(const TrackerETagEntry& entry);
+			std::optional<TrackerETagEntry> GetEntry(const std::string& url);
+			bool DeleteEntry(const std::string& url);
+			bool ClearAllEntries();
+
+			// 批量操作
+			std::vector<TrackerETagEntry> GetAllEntries();
+			size_t GetTotalCount();
+
+		   private:
+			TrackerETagCache();
+			class Impl;
+			std::unique_ptr<Impl> impl_;
+		};
+
 	}  // namespace cache
 }  // namespace gdl

@@ -84,11 +84,13 @@ namespace gdl {
 				void sigUpdateTasksMessage(const DownloadTaskInfo& info);
                 void sigUpdateActiveProgress(const double& progress);
 				void sigUpdateSyncServerList(const QString& list);
+				void sigTrackerUpdateStatus(const QString& status);
 
 			   private:
 				explicit BrowserManager(QObject* parent = nullptr);
 				void OnHandleAria2Message(const std::string& msg);
                 void OnHandleAria2ActiveProgress(const std::string& msg);
+				void OnHandleTrackerUpdateStatus(const std::string& msg);
 				void InitDownloadHistoryCache() const;
 				static gdl::cache::DownloadRecord DownloadTaskInfoToRecord(const DownloadTaskInfo& info);
 				static DownloadTaskInfo DownloadRecordToTaskInfo(const gdl::cache::DownloadRecord& record);
@@ -101,6 +103,7 @@ namespace gdl {
                 engine::Subscription aria2_responce_subcription_{nullptr};
                 engine::Subscription aria2_active_progress_subcription_{nullptr};
 				engine::Subscription aria2_sync_server_list_subcription_{nullptr};
+				engine::Subscription aria2_tracker_update_status_subscription_{nullptr};
 			};
 			void RegisterTypes(QQmlEngine* engine);
 		}  // namespace browser

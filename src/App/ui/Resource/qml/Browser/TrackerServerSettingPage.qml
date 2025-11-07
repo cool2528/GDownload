@@ -140,6 +140,50 @@ GCard {
             }
         }
 
+        // Tracker 更新状态显示区域
+        RowLayout {
+            id: statusArea
+            Layout.fillWidth: true
+            spacing: 12
+            visible: statusText.text !== ""
+
+            Rectangle {
+                width: 4
+                height: parent.height
+                radius: 2
+                color: {
+                    if (statusText.status === "started") return GTheme.warningColor
+                    if (statusText.status === "success") return GTheme.successColor
+                    if (statusText.status === "error") return GTheme.dangerColor
+                    return GTheme.infoColor
+                }
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 4
+
+                Text {
+                    id: statusText
+                    property string status: ""
+                    font.pixelSize: 13
+                    color: {
+                        if (status === "started") return GTheme.warningColor
+                        if (status === "success") return GTheme.successColor
+                        if (status === "error") return GTheme.dangerColor
+                        return GTheme.textPrimary
+                    }
+                }
+
+                Text {
+                    id: statusDetails
+                    font.pixelSize: 12
+                    color: GTheme.textSecondary
+                    visible: text !== ""
+                }
+            }
+        }
+
         // Tracker 列表预览区域
         ColumnLayout {
             Layout.fillWidth: true
@@ -174,6 +218,58 @@ GCard {
                     }
                 }
             }
+        }
+    }
+
+    // 监听 Tracker 更新状态
+    Connections {
+        target: BrowserManager
+
+        function onSigTrackerUpdateStatus(status) {
+            try {
+                var data = JSON.parse(status)
+                statusText.status = data.status
+
+                if (data.status === "started") {
+                    statusText.text = data.message || qsTr("Updating tracker list...")
+                    statusDetails.text = ""
+                    syncBtn.enabled = false
+                } else if (data.status === "success") {
+                    statusText.text = data.message || qsTr("Tracker list updated successfully")
+                    statusDetails.text = qsTr("%1 trackers, %2/%3 sources succeeded, took %4ms")
+                        .arg(data.tracker_count || 0)
+                        .arg(data.successful_sources || 0)
+                        .arg((data.successful_sources || 0) + (data.failed_sources || 0))
+                        .arg(data.elapsed_ms || 0)
+                    syncBtn.enabled = true
+
+                    // 13秒后自动隐藏成功消息
+                    hideTimer.restart()
+                } else if (data.status === "error") {
+                    statusText.text = data.message || qsTr("Failed to update tracker list")
+                    statusDetails.text = data.error || ""
+                    syncBtn.enabled = true
+
+                    // 15秒后自动隐藏错误消息
+                    hideTimer.interval = 15000
+                    hideTimer.restart()
+                }
+            } catch (e) {
+                console.error("Failed to parse tracker update status:", e)
+            }
+        }
+    }
+
+    // 自动隐藏成功/错误消息的计时器
+    Timer {
+        id: hideTimer
+        interval: 13000
+        repeat: false
+        onTriggered: {
+            statusText.text = ""
+            statusDetails.text = ""
+            statusText.status = ""
+            interval = 13000  // 重置为默认值
         }
     }
 }
