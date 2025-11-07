@@ -214,6 +214,26 @@ namespace gdl {
 			std::string ParseTextUrls(const std::string& input);
 			std::string GetBitTorrentUrl(const std::string& url);
 
+			// Tracker 优化相关方法
+			/// 带降级策略的 URL 获取
+			std::string GetBitTorrentUrlWithFallback(const std::string& url);
+			/// GitHub Raw 转 jsDelivr CDN
+			std::string ConvertToJsDelivrCDN(const std::string& url);
+			/// GitHub Raw 转 GitHub 代理
+			std::string ConvertToGitHubProxy(const std::string& url);
+			/// 统计 Tracker 数量
+			int CountTrackers(const std::string& tracker_list);
+
+			// ETag 缓存相关方法（使用数据库存储）
+			/// 初始化 ETag 缓存数据库
+			void InitializeETagCache();
+			/// 获取缓存的内容（如果有效）
+			std::optional<std::string> GetCachedContent(const std::string& url, const std::string& etag);
+			/// 更新缓存条目
+			void UpdateCacheEntry(const std::string& url, const std::string& etag, const std::string& content);
+
+
+
 		   private:
 			String aria2c_path_;
 			boost::asio::io_context io_context_;
