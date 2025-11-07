@@ -680,6 +680,54 @@ namespace gdl {
 			}
             SETTING_IMP_END(EnableTrackerSourceAutoUpdate)
 
+			// ShowCloseConfirm
+			SETTING_IMP_BEGIN(ShowCloseConfirm, CONFIG_KEY_PATH(ShowCloseConfirm), bool)
+			void Default() override {
+				value_ = true;
+			}
+			void Put(const QVariant& value) override {
+				if (value.canConvert<bool>()) {
+					value_ = value.toBool();
+				}
+				else if (value.canConvert<QString>()) {
+					value_ = value.toString() == "true" || value.toString() == "1";
+				}
+				else if (value.canConvert<int>()) {
+					value_ = value.toInt() == 1;
+				}
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return value_ ? "true" : "false";
+			}
+			SETTING_IMP_END(ShowCloseConfirm)
+
+			// CloseToTray
+			SETTING_IMP_BEGIN(CloseToTray, CONFIG_KEY_PATH(CloseToTray), bool)
+			void Default() override {
+				value_ = false;
+			}
+			void Put(const QVariant& value) override {
+				if (value.canConvert<bool>()) {
+					value_ = value.toBool();
+				}
+				else if (value.canConvert<QString>()) {
+					value_ = value.toString() == "true" || value.toString() == "1";
+				}
+				else if (value.canConvert<int>()) {
+					value_ = value.toInt() == 1;
+				}
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return value_ ? "true" : "false";
+			}
+			SETTING_IMP_END(CloseToTray)
+
 		}  // namespace settings
 	}  // namespace ui
 }  // namespace gdl

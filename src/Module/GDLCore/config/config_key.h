@@ -62,6 +62,8 @@ namespace gdl {
             CONFIG_PATH(BaiduPanCookies, "plugin.baidu-pan-cookies", "");
 			CONFIG_PATH(TrackerSourceNames,"aria2c.tracker_source_name","");
 			CONFIG_PATH(EnableTrackerSourceAutoUpdate,"aria2c.enable_tracker_source_auto_update","true");
+			CONFIG_PATH(ShowCloseConfirm, "general.show-close-confirm", "true");
+			CONFIG_PATH(CloseToTray, "general.close-to-tray", "false");
 
 
 			// static function all keys
@@ -97,7 +99,9 @@ namespace gdl {
                                              WindowPosition.get(),
                                              BaiduPanCookies.get(),
 									         TrackerSourceNames.get(),
-											 EnableTrackerSourceAutoUpdate.get()});
+											 EnableTrackerSourceAutoUpdate.get(),
+											 ShowCloseConfirm.get(),
+											 CloseToTray.get()});
 			}
 			// static function all values
 			static constexpr auto GetAllValues() {
@@ -132,7 +136,9 @@ namespace gdl {
                                              WindowPosition.val(),
                                              BaiduPanCookies.val(),
 											 TrackerSourceNames.val(),
-											 EnableTrackerSourceAutoUpdate.val()});
+											 EnableTrackerSourceAutoUpdate.val(),
+											 ShowCloseConfirm.val(),
+											 CloseToTray.val()});
 			}
 		};
 	}  // namespace config
