@@ -92,15 +92,16 @@ Control {
                 padding: downloadView.standardSpacing
                 outlined: true
                 hoverEnabled: true
-                selected: ListView.isCurrentItem || (downloadView.pageType === 0 && model.taskState === 1)
+                selected: hovered
 
                 ColumnLayout {
                     anchors.fill: parent
                     spacing: 8
-
                     // 文件名和操作按钮行
                     RowLayout {
                         Layout.fillWidth: true
+                        Layout.leftMargin: 8
+                        Layout.rightMargin: 8
                         spacing: downloadView.standardSpacing
 
                         // 文件名区域
@@ -119,6 +120,7 @@ Control {
                             }
 
                             Text {
+                                visible: pageType !== 2
                                 text: qsTr("Size: %1 • Progress: %2%").arg(model.totalSize).arg(model.progress)
                                 font.pixelSize: 12
                                 color: GTheme.textSecondary
@@ -229,6 +231,8 @@ Control {
                     GProgressBar {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 6
+                        Layout.leftMargin: 8
+                        Layout.rightMargin: 8
                         from: 0
                         to: 100
                         value: model.progress
@@ -238,6 +242,9 @@ Control {
                     // 下载状态信息行
                     RowLayout {
                         Layout.fillWidth: true
+                        Layout.leftMargin: 8
+                        Layout.rightMargin: 8
+                        Layout.bottomMargin: 8
                         spacing: downloadView.standardSpacing
 
                         Text {
@@ -271,7 +278,6 @@ Control {
                         RowLayout {
                             spacing: 4
                             visible: downloadView.pageType === 0
-
                             FontIcon {
                                 iconSource: SegoeFluentIcons.Connected
                                 iconSize: 12
