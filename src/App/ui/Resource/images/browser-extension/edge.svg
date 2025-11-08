@@ -1,0 +1,57 @@
+<!-- Microsoft Edge Browser Icon - Redesigned -->
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 主蓝色渐变 -->
+    <linearGradient id="edgeBlue1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0078D4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1490DF;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- 绿色渐变 -->
+    <linearGradient id="edgeGreen" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00B294;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0FCEA5;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- 深蓝色渐变 -->
+    <linearGradient id="edgeBlue2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#003D92;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0078D4;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- 浅蓝色渐变 -->
+    <radialGradient id="edgeBlue3" cx="30%" cy="30%">
+      <stop offset="0%" style="stop-color:#50E6FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1490DF;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  
+  <!-- 背景白色圆 -->
+  <circle cx="32" cy="32" r="31" fill="white"/>
+  
+  <!-- 主波浪形状（蓝色部分） - 左侧大波浪 -->
+  <path d="M 6 32 Q 6 18, 16 10 Q 26 2, 40 4 Q 48 5, 54 10 Q 50 8, 44 8 Q 32 8, 24 16 Q 16 24, 16 34 Q 16 42, 22 48 Q 28 54, 36 54 Q 42 54, 46 50 Q 48 48, 48 45 Q 48 42, 45 40 Q 42 38, 38 38 Q 34 38, 32 40 Q 30 42, 30 44 Q 30 46, 32 48 Q 26 48, 22 44 Q 18 40, 18 34 Q 18 26, 24 20 Q 30 14, 38 14 Q 46 14, 52 18 Q 58 22, 60 28 Q 62 34, 60 40 Q 58 48, 52 54 Q 44 62, 32 62 Q 18 62, 10 52 Q 6 46, 6 38 L 6 32 Z" 
+        fill="url(#edgeBlue1)"/>
+  
+  <!-- 绿色波浪（右下部分） -->
+  <path d="M 48 45 Q 50 48, 54 50 Q 58 52, 60 50 Q 62 48, 60 44 Q 58 40, 54 38 Q 50 36, 46 38 Q 44 40, 44 42 Q 44 44, 46 45 Q 47 45, 48 45 Z M 36 54 Q 44 54, 50 50 Q 54 48, 56 44 Q 58 40, 56 36 Q 54 32, 50 30 Q 52 34, 52 38 Q 52 44, 48 48 Q 44 52, 38 52 Q 32 52, 28 48 L 32 52 Q 34 54, 36 54 Z" 
+        fill="url(#edgeGreen)"/>
+  
+  <!-- 深蓝色阴影部分 -->
+  <path d="M 16 34 Q 16 28, 20 22 Q 24 16, 30 14 Q 34 12, 38 14 Q 34 12, 30 12 Q 24 12, 20 16 Q 14 22, 14 30 Q 14 36, 18 42 Q 17 38, 16 34 Z" 
+        fill="url(#edgeBlue2)" opacity="0.5"/>
+  
+  <!-- 右上角浅蓝色高光 -->
+  <path d="M 40 4 Q 48 5, 54 10 Q 58 14, 60 20 Q 60 16, 58 12 Q 54 6, 48 4 Q 44 3, 40 4 Z" 
+        fill="url(#edgeBlue3)"/>
+  
+  <!-- 中心白色高光 -->
+  <ellipse cx="28" cy="26" rx="6" ry="5" fill="white" opacity="0.3"/>
+  
+  <!-- 内圈小波浪（增加立体感） -->
+  <path d="M 38 38 Q 42 38, 45 40 Q 46 41, 46 42 Q 46 44, 44 45 Q 42 46, 40 46 Q 36 46, 34 44 Q 32 42, 32 40 Q 32 38, 34 38 Q 36 38, 38 38 Z" 
+        fill="url(#edgeBlue3)" opacity="0.6"/>
+  
+  <!-- 外边框（增强边缘） -->
+  <circle cx="32" cy="32" r="30.5" fill="none" stroke="#E8E8E8" stroke-width="0.5"/>
+</svg>
