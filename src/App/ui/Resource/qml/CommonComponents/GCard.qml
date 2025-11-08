@@ -25,11 +25,24 @@ Control {
     background: Rectangle {
         id: bg
         radius: card.radius
-        color: card.disabled ? GTheme.fillLighter
-                              : (hoverHandler.hovered && card.hoverEnabled ? GTheme.fillLight
-                                                                          : (GTheme.dark ? "#2D2D2D" : GTheme.bgWhite))
+        // Ant Design + VS Code 配色方案
+        color: {
+            if (card.disabled) {
+                return GTheme.fillLighter
+            }
+
+            if (hoverHandler.hovered && card.hoverEnabled) {
+                // Ant Design (浅色): #FFFFFF 纯白高亮
+                // VS Code (暗色): #2D2D30 活动项背景
+                return GTheme.bgElevated
+            }
+
+            // Ant Design (浅色): #FAFAFA 浅灰卡片
+            // VS Code (暗色): #252526 侧边栏色
+            return GTheme.bgBase
+        }
         border.width: card.selected ? 2 : (card.outlined ? 1 : 0)
-        border.color: card.selected ? GTheme.primaryColor : (card.outlined ? (GTheme.dark ? GTheme.borderBase : GTheme.borderLight) : "transparent")
+        border.color: card.selected ? GTheme.primaryColor : (card.outlined ? GTheme.borderBase : "transparent")
     }
 
     contentItem: Item {

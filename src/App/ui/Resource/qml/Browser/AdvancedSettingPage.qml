@@ -38,6 +38,13 @@ Rectangle {
                 Layout.rightMargin: advancedSetting.contentMargin
             }
 
+            // 连接和性能参数设置卡片
+            ConnectionPerformanceSettingPage {
+                Layout.fillWidth: true
+                Layout.leftMargin: advancedSetting.contentMargin
+                Layout.rightMargin: advancedSetting.contentMargin
+            }
+
             // Aria2 RPC 设置卡片
             Aria2RpcSettingPage {
                 Layout.fillWidth: true

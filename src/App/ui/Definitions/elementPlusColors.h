@@ -6,124 +6,124 @@
 namespace ElementPlusColors {
 Q_NAMESPACE
 
-// Element Plus 主色系 - 优化为现代科技蓝
+// Ant Design 主色系 - 科技蓝（两种主题通用）
 namespace Primary {
-    constexpr const char* kPrimary = "#3B82F6";        // 科技蓝主色
-    constexpr const char* kPrimaryLight1 = "#4F92F7";
-    constexpr const char* kPrimaryLight2 = "#62A1F8";
-    constexpr const char* kPrimaryLight3 = "#76B1F9";
-    constexpr const char* kPrimaryLight4 = "#89C0FA";
-    constexpr const char* kPrimaryLight5 = "#9DD0FB";
-    constexpr const char* kPrimaryLight6 = "#B0DFFC";
-    constexpr const char* kPrimaryLight7 = "#C4EFFD";
-    constexpr const char* kPrimaryLight8 = "#D7EFFE";
-    constexpr const char* kPrimaryLight9 = "#EBF7FF";
-    constexpr const char* kPrimaryDark2 = "#2563EB";   // 深色变体
+    constexpr const char* kPrimary = "#1890FF";        // Ant Design 主色 level-6
+    constexpr const char* kPrimaryLight1 = "#E6F7FF";  // level-1
+    constexpr const char* kPrimaryLight2 = "#BAE7FF";  // level-2
+    constexpr const char* kPrimaryLight3 = "#91D5FF";  // level-3
+    constexpr const char* kPrimaryLight4 = "#69C0FF";  // level-4
+    constexpr const char* kPrimaryLight5 = "#40A9FF";  // level-5 (hover)
+    constexpr const char* kPrimaryLight6 = "#1890FF";  // level-6 (主色)
+    constexpr const char* kPrimaryLight7 = "#096DD9";  // level-7 (active)
+    constexpr const char* kPrimaryLight8 = "#0050B3";  // level-8
+    constexpr const char* kPrimaryLight9 = "#003A8C";  // level-9
+    constexpr const char* kPrimaryDark2 = "#096DD9";   // active 状态
 }
 
-// Element Plus 状态色
+// Ant Design 状态色
 namespace Status {
-    // 成功色
-    constexpr const char* kSuccess = "#67C23A";
-    constexpr const char* kSuccessLight3 = "#85CE61";
-    constexpr const char* kSuccessLight5 = "#B3E19D";
-    constexpr const char* kSuccessLight7 = "#D1EDC4";
-    constexpr const char* kSuccessLight8 = "#E1F3D8";
-    constexpr const char* kSuccessLight9 = "#F0F9FF";
-    constexpr const char* kSuccessDark2 = "#529B2E";
+    // 成功色 - Ant Design Green
+    constexpr const char* kSuccess = "#52C41A";
+    constexpr const char* kSuccessLight3 = "#73D13D";
+    constexpr const char* kSuccessLight5 = "#95DE64";
+    constexpr const char* kSuccessLight7 = "#B7EB8F";
+    constexpr const char* kSuccessLight8 = "#D9F7BE";
+    constexpr const char* kSuccessLight9 = "#F6FFED";
+    constexpr const char* kSuccessDark2 = "#389E0D";
 
-    // 警告色
-    constexpr const char* kWarning = "#E6A23C";
-    constexpr const char* kWarningLight3 = "#EBB563";
-    constexpr const char* kWarningLight5 = "#F3D19E";
-    constexpr const char* kWarningLight7 = "#F8E3C5";
-    constexpr const char* kWarningLight8 = "#FAECD8";
-    constexpr const char* kWarningLight9 = "#FDF6EC";
-    constexpr const char* kWarningDark2 = "#B88230";
+    // 警告色 - Ant Design Gold
+    constexpr const char* kWarning = "#FAAD14";
+    constexpr const char* kWarningLight3 = "#FFC53D";
+    constexpr const char* kWarningLight5 = "#FFD666";
+    constexpr const char* kWarningLight7 = "#FFE58F";
+    constexpr const char* kWarningLight8 = "#FFF1B8";
+    constexpr const char* kWarningLight9 = "#FFFBE6";
+    constexpr const char* kWarningDark2 = "#D48806";
 
-    // 危险色
-    constexpr const char* kDanger = "#F56C6C";
-    constexpr const char* kError = "#F56C6C";
-    constexpr const char* kDangerLight3 = "#F78989";
-    constexpr const char* kDangerLight5 = "#FAB6B6";
-    constexpr const char* kDangerLight7 = "#FCD3D3";
-    constexpr const char* kDangerLight8 = "#FDE2E2";
-    constexpr const char* kDangerLight9 = "#FEF0F0";
-    constexpr const char* kDangerDark2 = "#C45656";
+    // 危险色 - Ant Design Red
+    constexpr const char* kDanger = "#F5222D";
+    constexpr const char* kError = "#F5222D";
+    constexpr const char* kDangerLight3 = "#FF4D4F";
+    constexpr const char* kDangerLight5 = "#FF7875";
+    constexpr const char* kDangerLight7 = "#FFA39E";
+    constexpr const char* kDangerLight8 = "#FFCCC7";
+    constexpr const char* kDangerLight9 = "#FFF1F0";
+    constexpr const char* kDangerDark2 = "#CF1322";
 
-    // 信息色
-    constexpr const char* kInfo = "#909399";
-    constexpr const char* kInfoLight3 = "#A6A9AD";
-    constexpr const char* kInfoLight5 = "#C8C9CC";
-    constexpr const char* kInfoLight7 = "#DEDFE0";
-    constexpr const char* kInfoLight8 = "#E9E9EB";
-    constexpr const char* kInfoLight9 = "#F4F4F5";
-    constexpr const char* kInfoDark2 = "#73767A";
+    // 信息色 - 使用主色
+    constexpr const char* kInfo = "#1890FF";
+    constexpr const char* kInfoLight3 = "#40A9FF";
+    constexpr const char* kInfoLight5 = "#69C0FF";
+    constexpr const char* kInfoLight7 = "#91D5FF";
+    constexpr const char* kInfoLight8 = "#BAE7FF";
+    constexpr const char* kInfoLight9 = "#E6F7FF";
+    constexpr const char* kInfoDark2 = "#096DD9";
 }
 
-// Element Plus 中性色 - 浅色模式
-namespace LightNeutral {
-    // 文字色
-    constexpr const char* kTextPrimary = "#303133";
-    constexpr const char* kTextRegular = "#606266";
-    constexpr const char* kTextSecondary = "#909399";
-    constexpr const char* kTextPlaceholder = "#A8ABB2";
-    constexpr const char* kTextDisabled = "#C0C4CC";
+// Ant Design 中性色 - 浅色模式
+namespace AntDesignLight {
+    // 文字色 - 模拟黑色透明度效果（Qt 不支持 #RRGGBBAA 格式）
+    constexpr const char* kTextPrimary = "#262626";        // 模拟 rgba(0,0,0,0.85)
+    constexpr const char* kTextRegular = "#595959";        // 模拟 rgba(0,0,0,0.65)
+    constexpr const char* kTextSecondary = "#8C8C8C";      // 模拟 rgba(0,0,0,0.45)
+    constexpr const char* kTextPlaceholder = "#BFBFBF";    // 模拟 rgba(0,0,0,0.25)
+    constexpr const char* kTextDisabled = "#D9D9D9";       // 禁用文本更浅
 
     // 边框色
-    constexpr const char* kBorderDarker = "#CDD0D6";
-    constexpr const char* kBorderDark = "#D4D7DE";
-    constexpr const char* kBorderBase = "#DCDFE6";
-    constexpr const char* kBorderLight = "#E4E7ED";
-    constexpr const char* kBorderLighter = "#EBEEF5";
-    constexpr const char* kBorderExtraLight = "#F2F6FC";
+    constexpr const char* kBorderDarker = "#BFBFBF";
+    constexpr const char* kBorderDark = "#D9D9D9";
+    constexpr const char* kBorderBase = "#D9D9D9";         // Ant Design 标准边框
+    constexpr const char* kBorderLight = "#E8E8E8";        // 调整为更明显的浅灰（原 #F0F0F0 太浅）
+    constexpr const char* kBorderLighter = "#F0F0F0";
+    constexpr const char* kBorderExtraLight = "#FAFAFA";
 
     // 填充色
-    constexpr const char* kFillDarker = "#E6E8EB";
-    constexpr const char* kFillDark = "#EBEDF0";
-    constexpr const char* kFillBase = "#F0F2F5";
-    constexpr const char* kFillLight = "#F5F7FA";
+    constexpr const char* kFillDarker = "#E6E6E6";
+    constexpr const char* kFillDark = "#F0F0F0";
+    constexpr const char* kFillBase = "#FAFAFA";
+    constexpr const char* kFillLight = "#F5F5F5";
     constexpr const char* kFillLighter = "#FAFAFA";
     constexpr const char* kFillBlank = "#FFFFFF";
 
     // 背景色
-    constexpr const char* kBgWhite = "#FFFFFF";
-    constexpr const char* kBgPage = "#F2F3F5";
-    constexpr const char* kBgBase = "#F5F7FA";
-    constexpr const char* kBgOverlay = "#FFFFFF";
+    constexpr const char* kBgWhite = "#FFFFFF";            // 纯白高亮
+    constexpr const char* kBgPage = "#F0F2F5";             // Ant Design 页面背景
+    constexpr const char* kBgBase = "#FAFAFA";             // 卡片默认背景
+    constexpr const char* kBgOverlay = "#FFFFFF";          // 浮层背景
 }
 
-// Element Plus 中性色 - 暗色模式（优化对比度）
-namespace DarkNeutral {
-    // 文字色 - 提升亮度以增强对比度
-    constexpr const char* kTextPrimary = "#F1F5F9";      // 更亮，提升可读性
-    constexpr const char* kTextRegular = "#E2E8F0";      // 更清晰
-    constexpr const char* kTextSecondary = "#94A3B8";    // 优化中间色调
-    constexpr const char* kTextPlaceholder = "#64748B";  // 增强区分度
-    constexpr const char* kTextDisabled = "#475569";     // 更明确的禁用状态
+// VS Code 中性色 - 暗色模式
+namespace VSCodeDark {
+    // 文字色 - VS Code 标准文本色
+    constexpr const char* kTextPrimary = "#CCCCCC";        // VS Code 主要文本
+    constexpr const char* kTextRegular = "#BBBBBB";        // 常规文本
+    constexpr const char* kTextSecondary = "#969696";      // VS Code 次要文本
+    constexpr const char* kTextPlaceholder = "#6A6A6A";    // placeholder
+    constexpr const char* kTextDisabled = "#656565";       // VS Code 禁用文本
 
-    // 边框色 - 优化层次感
-    constexpr const char* kBorderDarker = "#475569";
-    constexpr const char* kBorderDark = "#334155";
-    constexpr const char* kBorderBase = "#1E293B";
-    constexpr const char* kBorderLight = "#0F172A";
-    constexpr const char* kBorderLighter = "#020617";
-    constexpr const char* kBorderExtraLight = "#000000";
+    // 边框色 - VS Code 层次色
+    constexpr const char* kBorderDarker = "#474747";
+    constexpr const char* kBorderDark = "#3E3E42";
+    constexpr const char* kBorderBase = "#3E3E42";         // VS Code 标准边框
+    constexpr const char* kBorderLight = "#2D2D30";
+    constexpr const char* kBorderLighter = "#252526";
+    constexpr const char* kBorderExtraLight = "#1E1E1E";
 
-    // 填充色 - 增加深度感
-    constexpr const char* kFillDarker = "#475569";
-    constexpr const char* kFillDark = "#334155";
-    constexpr const char* kFillBase = "#1E293B";
-    constexpr const char* kFillLight = "#0F172A";
-    constexpr const char* kFillLighter = "#020617";
-    constexpr const char* kFillBlank = "#000000";
+    // 填充色 - VS Code 背景层次
+    constexpr const char* kFillDarker = "#474747";
+    constexpr const char* kFillDark = "#3E3E42";
+    constexpr const char* kFillBase = "#252526";
+    constexpr const char* kFillLight = "#2D2D30";
+    constexpr const char* kFillLighter = "#333333";
+    constexpr const char* kFillBlank = "#1E1E1E";
 
-    // 背景色 - 使用深蓝灰提升质感
-    constexpr const char* kBgWhite = "#020617";          // 深蓝黑
-    constexpr const char* kBgPage = "#0F172A";           // 页面背景
-    constexpr const char* kBgBase = "#1E293B";           // 基础背景
-    constexpr const char* kBgOverlay = "#334155";        // 浮层背景
-    constexpr const char* kBgElevated = "#475569";       // 高层背景（新增）
+    // 背景色 - VS Code 标准背景色
+    constexpr const char* kBgWhite = "#1E1E1E";            // 编辑器背景（最深）
+    constexpr const char* kBgPage = "#1E1E1E";             // 编辑器背景
+    constexpr const char* kBgBase = "#252526";             // 侧边栏背景
+    constexpr const char* kBgElevated = "#2D2D30";         // 活动项背景
+    constexpr const char* kBgOverlay = "#333333";          // 活动栏背景
 }
 
 // Element Plus 尺寸规范

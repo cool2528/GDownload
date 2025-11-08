@@ -808,6 +808,38 @@ namespace gdl {
 			}
 			SETTING_IMP_END(LowestSpeedLimit)
 
+			// MaxConnectionPerServer (单服务器最大连接数)
+			SETTING_IMP_BEGIN(MaxConnectionPerServer, CONFIG_KEY_PATH(MaxConnectionPerServer), int)
+			void Default() override {
+				value_ = 16;
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toInt();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return QString::number(value_);
+			}
+			SETTING_IMP_END(MaxConnectionPerServer)
+
+			// MinSplitSize (最小分割大小，单位: MB)
+			SETTING_IMP_BEGIN(MinSplitSize, CONFIG_KEY_PATH(MinSplitSize), int)
+			void Default() override {
+				value_ = 20;  // 20MB
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toInt();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return QString::number(value_);
+			}
+			SETTING_IMP_END(MinSplitSize)
+
 		}  // namespace settings
 	}  // namespace ui
 }  // namespace gdl
