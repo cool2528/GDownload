@@ -22,26 +22,126 @@
 
 [English](README_EN.md) | 简体中文
 
-GDownload 是一款现代化的跨平台下载管理器,使用 C++ 和 Qt 开发。它结合了现代技术栈和优秀的开源组件,为用户提供高效、稳定的下载体验。
+GDownload 是一款现代化的跨平台下载管理器，使用 C++ 和 Qt 开发。它结合了现代技术栈和优秀的开源组件，为用户提供高效、稳定的下载体验。
 
-## ✨ 特性
+## 📸 界面展示
 
-- 🖥️ 跨平台支持 (Windows, macOS, Linux)
-- ⚡ 基于 aria2c 的高效下载引擎
-- 🚀 多线程并发下载
-- 🔄 支持多种协议 (HTTP, HTTPS, FTP, BitTorrent, Metalink)
-- 📱 支持下载续传
-- 🎨 美观的用户界面
-- 🗂 支持百度网盘分享链接解析下载(只支持标准速度下载不支持加速下载，想高速下载请开通百度网盘官方SVIP)
+<p align="center">
+  <img src="screenshot/screenshot-1.png" alt="Light Theme" width="45%"/>
+  <img src="screenshot/screenshot-2.png" alt="Dark Theme" width="45%"/>
+</p>
+<p align="center"><i>浅色主题与深色主题</i></p>
+
+## ✨ 核心特性
+
+### 🚀 强大的下载引擎
+- ⚡ 基于 aria2c 的高性能下载引擎
+- 🔄 支持多种协议 (HTTP/HTTPS/FTP/BitTorrent/Metalink)
+- 🚄 多线程并发下载，最大化带宽利用
+- 📱 断点续传，随时暂停和恢复
+- 🔗 磁力链接和种子文件支持
+
+### 🎨 现代化界面
+- 🖥️ 跨平台支持 (Windows、macOS、Linux)
+- 🌓 浅色/深色主题自动切换
+- 🎯 Element Plus 设计系统
+- 🌍 多语言支持 (简体中文、繁体中文、English、日本語、한국어)
+- 💫 流畅的动画和交互体验
+
+### ⚙️ 高级功能
+
+#### 速度控制
+- 📊 全局下载速度限制
+- 📈 全局上传速度限制（BT/种子）
+- 🎚️ 实时速度调整
+
+#### 连接与性能优化
+- 🔌 单服务器最大连接数配置
+- 🔢 最小分段大小设置
+- 🧩 文件分段数量控制
+- 📦 磁盘缓存大小优化
+- 🔄 最大同时下载任务数
+
+#### BitTorrent 增强
+- 🌐 BT Tracker 服务器自动同步
+- 📡 自定义 Tracker 源
+- ⏱️ DHT 超时配置
+- 🔁 超时自动重试
+
+#### 下载完成后操作
+- 🔔 系统通知提醒
+- 🎵 自定义提示音
+- 🔊 语音播报
+- 📂 自动打开下载文件夹
+- 💻 运行自定义命令
+- 🔌 电脑自动关机/休眠/睡眠
+
+### 🗂️ 网盘集成
+- 📦 百度网盘分享链接解析下载
+  - ⚠️ 仅支持标准速度下载（非加速下载）
+  - 💡 高速下载请开通百度网盘官方 SVIP
+- 🔌 插件化架构，易于扩展其他网盘
+
+### 🧩 浏览器插件 (实验功能)
+
+> 💡 **提升下载效率**: 直接从浏览器捕获下载链接，无需复制粘贴
+
+#### 支持的浏览器
+- 🌐 **Chrome** / **Edge** / **Firefox**
+
+#### 核心功能
+- 🔗 **一键捕获**: 自动检测网页中的下载链接
+- 📋 **批量下载**: 选择多个链接一次性发送到 GDownload
+- 🎨 **统一设计**: 完美匹配 GDownload 的 Element Plus 界面风格
+- 🔒 **安全连接**: 通过 WebSocket 直连 aria2c，无需额外服务
+- 🎯 **智能过滤**: 按文件大小、类型、自定义规则筛选链接
+- ⚡ **开箱即用**: 默认配置已优化，无需额外设置
+
+#### 快速安装
+
+**步骤 1: 下载插件**
+- 访问插件仓库: [gd-browser-extension](https://github.com/cool2528/gd-browser-extension/releases)
+- 或通过 GDownload 应用内引导: `设置` → `Lab` → `浏览器插件`
+
+**步骤 2: 安装到浏览器**
+
+<details>
+<summary>Chrome / Edge 安装方法</summary>
+
+1. 打开扩展管理页面:
+   - Chrome: `chrome://extensions/`
+   - Edge: `edge://extensions/`
+2. 开启右上角的 **"开发者模式"**
+3. 点击 **"加载已解压的扩展程序"**
+4. 选择解压后的 `dist` 文件夹
+</details>
+
+<details>
+<summary>Firefox 安装方法</summary>
+
+1. 打开 `about:debugging#/runtime/this-firefox`
+2. 点击 **"加载临时附加组件"**
+3. 选择 `dist` 文件夹中的 `manifest.json`
+</details>
+
+**步骤 3: 开始使用**
+- ✅ 插件会自动连接到 GDownload
+- ✅ 浏览网页时，点击插件图标即可捕获下载链接
+- ✅ 选择链接后一键发送到 GDownload 开始下载
+
+> 📖 **详细文档**: 应用内前往 `设置` → `Lab` 查看完整安装指南和配置说明
 
 ## 🛠️ 技术栈
 
-- 🎯 UI 框架: Qt Quick (QML) + Qt C++
-- ⚙️ 核心引擎: aria2c
-- 🌐 网络库: Boost.Asio
-- 🔗 BT下载: LibtorrentRasterbar
-- 📄 XML解析: PugiXML
-- 🪟 无边框窗口: FramelessHelper
+- 🎯 **UI 框架**: Qt Quick (QML) + Qt C++
+- ⚙️ **核心引擎**: aria2c
+- 🌐 **网络库**: Boost.Asio + Beast (WebSocket)
+- 🔗 **BT 下载**: LibtorrentRasterbar
+- 💾 **数据存储**: SQLite3
+- 📝 **日志系统**: spdlog
+- 📄 **数据解析**: nlohmann-json, PugiXML
+- 🪟 **无边框窗口**: FramelessHelper
+- 🏗️ **构建系统**: CMake + vcpkg
 
 ## 📦 安装
 
@@ -62,10 +162,26 @@ GDownload 是一款现代化的跨平台下载管理器,使用 C++ 和 Qt 开发
 
 ## 🚀 快速开始
 
-1. 启动 GDownload
-2. 输入要下载的文件URL
-3. 选择保存位置
+1. 从 [Releases](https://github.com/cool2528/GDownload/releases) 下载适合你系统的安装包
+2. 启动 GDownload
+3. 添加下载任务：
+   - 点击 ➕ 按钮或使用快捷键 `Ctrl+N`
+   - 输入下载链接（支持 HTTP/HTTPS/FTP/磁力链接/种子文件）
+   - 选择保存位置
+   - 配置下载选项（可选）
 4. 点击"开始下载"
+5. 在设置中自定义你的下载体验
+
+### 💡 使用技巧
+
+- **批量下载**: 在新建任务对话框中，每行输入一个链接
+- **剪贴板监听**: 启用后自动捕获复制的下载链接
+- **🔥 浏览器插件**: 前往 `设置` → `Lab`，安装浏览器插件享受更便捷的下载体验
+  - 无需复制链接，直接从网页捕获
+  - 支持批量选择和智能过滤
+  - 一键发送到 GDownload
+- **自定义 User-Agent**: 高级设置中可配置 HTTP 请求头，绕过某些网站的下载限制
+- **BT 加速**: 设置中可添加和更新 Tracker 服务器列表，提升 BT 下载速度
 
 ## 🤝 贡献
 

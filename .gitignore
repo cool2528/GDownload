@@ -153,3 +153,5 @@ src/App/ui/Resource/translations/*.qm
 CLAUDE.md
 AGENTS.md
 GEMINI.md
+#browser-extension
+/browser-extension/
