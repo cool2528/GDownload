@@ -31,6 +31,13 @@ Rectangle {
             anchors.margins: 0
             anchors.topMargin: advancedSetting.standardSpacing  // 顶部间距
 
+            // 速度控制设置卡片
+            SpeedControlSettingPage {
+                Layout.fillWidth: true
+                Layout.leftMargin: advancedSetting.contentMargin
+                Layout.rightMargin: advancedSetting.contentMargin
+            }
+
             // Aria2 RPC 设置卡片
             Aria2RpcSettingPage {
                 Layout.fillWidth: true

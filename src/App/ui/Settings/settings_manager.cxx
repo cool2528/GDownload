@@ -49,6 +49,46 @@ namespace gdl {
                 engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
             }
 
+            void Settings::SetAria2MaxDownloadLimit(int value)
+            {
+                SetMaxDownloadLimit(value);
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"max-download-limit", std::to_string(value * 1024)});  // KB -> Bytes
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
+            }
+
+            void Settings::SetAria2MaxOverallDownloadLimit(int value)
+            {
+                SetMaxOverallDownloadLimit(value);
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"max-overall-download-limit", std::to_string(value * 1024)});  // KB -> Bytes
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
+            }
+
+            void Settings::SetAria2MaxUploadLimit(int value)
+            {
+                SetMaxUploadLimit(value);
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"max-upload-limit", std::to_string(value * 1024)});  // KB -> Bytes
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
+            }
+
+            void Settings::SetAria2MaxOverallUploadLimit(int value)
+            {
+                SetMaxOverallUploadLimit(value);
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"max-overall-upload-limit", std::to_string(value * 1024)});  // KB -> Bytes
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
+            }
+
+            void Settings::SetAria2LowestSpeedLimit(int value)
+            {
+                SetLowestSpeedLimit(value);
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"lowest-speed-limit", std::to_string(value * 1024)});  // KB -> Bytes
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
+            }
+
             void Settings::Save() {
                 QHashIterator<QString, Setting*> i(Setting::settings_);
                 while (i.hasNext()) {
