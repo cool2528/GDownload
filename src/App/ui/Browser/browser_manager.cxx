@@ -839,6 +839,12 @@ namespace gdl {
 								return;
 							}
 							Q_EMIT sigUpdateTasksMessage(task);
+
+							// 执行用户配置的开始后操作
+							auto action = settings::Settings::Instance().GetOnStartAction();
+							if (action == 1) {  // 播放声音
+								PlayNotificationSound();
+							}
 						}
 						else if (method == kAria2OnDownloadPause) {
 							//aria2.onDownloadPause
@@ -870,6 +876,11 @@ namespace gdl {
 							}
 							task.set_task_state(TaskState::kComplete);
 							Q_EMIT sigUpdateTasksMessage(task);
+
+							// 执行用户配置的完成后操作
+							auto action = settings::Settings::Instance().GetOnCompleteAction();
+							auto customCmd = settings::Settings::Instance().GetCustomCompleteCommand();
+							ExecutePostDownloadAction(task, action, customCmd);
 						}
 						else if (method == kAria2OnDownloadError) {
 							// aria2.onDownloadError
@@ -880,6 +891,20 @@ namespace gdl {
 							}
 							task.set_task_state(TaskState::kError);
 							Q_EMIT sigUpdateTasksMessage(task);
+
+							// 执行用户配置的错误后操作
+							auto action = settings::Settings::Instance().GetOnErrorAction();
+							auto customCmd = settings::Settings::Instance().GetCustomErrorCommand();
+							// 错误操作只支持播放声音和自定义命令
+							if (action == 1) {  // 播放声音
+								PlayNotificationSound();
+							} else if (action == 2 && !customCmd.isEmpty()) {  // 自定义命令
+								QString filePath = task.task_save_path();
+								QString gid = task.task_id();
+								QFileInfo fileInfo(filePath);
+								QString dir = fileInfo.absolutePath();
+								ExecuteCustomCommand(customCmd, filePath, dir, gid);
+							}
 						}
 						else {
 							LOG_WARN("Unknown method type: {}", method);
@@ -1005,6 +1030,119 @@ namespace gdl {
 					}
 				}
 				return task_info;
+			}
+
+			// 执行下载完成后的操作
+			void BrowserManager::ExecutePostDownloadAction(
+				const DownloadTaskInfo& task,
+				int actionType,
+				const QString& customCommand) {
+
+				QString filePath = task.task_save_path();
+				QString gid = task.task_id();
+				QFileInfo fileInfo(filePath);
+				QString dir = fileInfo.absolutePath();
+
+				switch (actionType) {
+					case 0:  // 无操作
+						break;
+
+					case 1:  // 打开文件
+						#ifdef _WIN32
+							QProcess::startDetached("explorer", {"/select,", QDir::toNativeSeparators(filePath)});
+						#elif __APPLE__
+							QProcess::startDetached("open", {filePath});
+						#else
+							QProcess::startDetached("xdg-open", {filePath});
+						#endif
+						break;
+
+					case 2:  // 打开目录
+						#ifdef _WIN32
+							QProcess::startDetached("explorer", {QDir::toNativeSeparators(dir)});
+						#elif __APPLE__
+							QProcess::startDetached("open", {dir});
+						#else
+							QProcess::startDetached("xdg-open", {dir});
+						#endif
+						break;
+
+					case 3:  // 播放声音
+						PlayNotificationSound();
+						break;
+
+					case 4:  // 自定义命令
+						if (!customCommand.isEmpty()) {
+							ExecuteCustomCommand(customCommand, filePath, dir, gid);
+						}
+						break;
+
+					case 5:  // 关机
+						#ifdef _WIN32
+							QProcess::startDetached("shutdown", {"/s", "/t", "60"});  // 60秒后关机
+						#elif __APPLE__
+							QProcess::startDetached("osascript", {"-e", "tell app \"System Events\" to shut down"});
+						#else
+							QProcess::startDetached("shutdown", {"-h", "+1"});
+						#endif
+						break;
+
+					case 6:  // 睡眠
+						#ifdef _WIN32
+							QProcess::startDetached("rundll32.exe", {"powrprof.dll,SetSuspendState", "0,1,0"});
+						#elif __APPLE__
+							QProcess::startDetached("pmset", {"sleepnow"});
+						#else
+							QProcess::startDetached("systemctl", {"suspend"});
+						#endif
+						break;
+
+					case 7:  // 重启
+						#ifdef _WIN32
+							QProcess::startDetached("shutdown", {"/r", "/t", "60"});
+						#elif __APPLE__
+							QProcess::startDetached("osascript", {"-e", "tell app \"System Events\" to restart"});
+						#else
+							QProcess::startDetached("shutdown", {"-r", "+1"});
+						#endif
+						break;
+
+					default:
+						LOG_WARN("Unknown post-download action type: {}", actionType);
+						break;
+				}
+			}
+
+			// 执行自定义命令（替换变量）
+			void BrowserManager::ExecuteCustomCommand(
+				const QString& command,
+				const QString& filePath,
+				const QString& dir,
+				const QString& gid) {
+
+				// 替换变量
+				QString cmd = command;
+				cmd.replace("{file}", filePath);
+				cmd.replace("{dir}", dir);
+				cmd.replace("{gid}", gid);
+
+				// 异步执行命令
+				LOG_INFO("Executing custom command: {}", cmd.toStdString());
+				QProcess::startDetached(cmd);
+			}
+
+			// 播放通知声音
+			void BrowserManager::PlayNotificationSound() {
+				#ifdef _WIN32
+					// Windows 使用系统通知声音
+					QProcess::startDetached("powershell", {"-Command", "(New-Object Media.SoundPlayer 'C:\\Windows\\Media\\Windows Notify.wav').PlaySync();"});
+				#elif __APPLE__
+					// macOS 使用系统声音
+					QProcess::startDetached("afplay", {"/System/Library/Sounds/Glass.aiff"});
+				#else
+					// Linux 使用 PulseAudio
+					QProcess::startDetached("paplay", {"/usr/share/sounds/freedesktop/stereo/complete.oga"});
+				#endif
 			}
 
 			void RegisterTypes(QQmlEngine* engine) {
