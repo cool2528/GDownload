@@ -48,6 +48,11 @@ namespace gdl {
                 SETTING_PROPERTY(bool, EnableTrackerSourceAutoUpdate)
                 SETTING_PROPERTY(bool, ShowCloseConfirm)
                 SETTING_PROPERTY(bool, CloseToTray)
+                SETTING_PROPERTY(int, MaxDownloadLimit)
+                SETTING_PROPERTY(int, MaxOverallDownloadLimit)
+                SETTING_PROPERTY(int, MaxUploadLimit)
+                SETTING_PROPERTY(int, MaxOverallUploadLimit)
+                SETTING_PROPERTY(int, LowestSpeedLimit)
 
                public:
                 ~Settings() override;
@@ -56,6 +61,11 @@ namespace gdl {
                 void UnInit();
                 Q_INVOKABLE void SetAria2GlobalProxy(const QString& proxy);
                 Q_INVOKABLE void SetAria2AutoResumeTask(bool enable);
+                Q_INVOKABLE void SetAria2MaxDownloadLimit(int value);
+                Q_INVOKABLE void SetAria2MaxOverallDownloadLimit(int value);
+                Q_INVOKABLE void SetAria2MaxUploadLimit(int value);
+                Q_INVOKABLE void SetAria2MaxOverallUploadLimit(int value);
+                Q_INVOKABLE void SetAria2LowestSpeedLimit(int value);
 
                private:
                 explicit Settings(QObject* parent = nullptr);

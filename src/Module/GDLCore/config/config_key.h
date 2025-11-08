@@ -64,6 +64,12 @@ namespace gdl {
 			CONFIG_PATH(EnableTrackerSourceAutoUpdate,"aria2c.enable_tracker_source_auto_update","true");
 			CONFIG_PATH(ShowCloseConfirm, "general.show-close-confirm", "true");
 			CONFIG_PATH(CloseToTray, "general.close-to-tray", "false");
+			// 速度控制配置
+			CONFIG_PATH(MaxDownloadLimit, "aria2c.max-download-limit", "0");
+			CONFIG_PATH(MaxOverallDownloadLimit, "aria2c.max-overall-download-limit", "0");
+			CONFIG_PATH(MaxUploadLimit, "aria2c.max-upload-limit", "0");
+			CONFIG_PATH(MaxOverallUploadLimit, "aria2c.max-overall-upload-limit", "0");
+			CONFIG_PATH(LowestSpeedLimit, "aria2c.lowest-speed-limit", "0");
 
 
 			// static function all keys
@@ -101,7 +107,12 @@ namespace gdl {
 									         TrackerSourceNames.get(),
 											 EnableTrackerSourceAutoUpdate.get(),
 											 ShowCloseConfirm.get(),
-											 CloseToTray.get()});
+											 CloseToTray.get(),
+											 MaxDownloadLimit.get(),
+											 MaxOverallDownloadLimit.get(),
+											 MaxUploadLimit.get(),
+											 MaxOverallUploadLimit.get(),
+											 LowestSpeedLimit.get()});
 			}
 			// static function all values
 			static constexpr auto GetAllValues() {
@@ -138,7 +149,12 @@ namespace gdl {
 											 TrackerSourceNames.val(),
 											 EnableTrackerSourceAutoUpdate.val(),
 											 ShowCloseConfirm.val(),
-											 CloseToTray.val()});
+											 CloseToTray.val(),
+											 MaxDownloadLimit.val(),
+											 MaxOverallDownloadLimit.val(),
+											 MaxUploadLimit.val(),
+											 MaxOverallUploadLimit.val(),
+											 LowestSpeedLimit.val()});
 			}
 		};
 	}  // namespace config
