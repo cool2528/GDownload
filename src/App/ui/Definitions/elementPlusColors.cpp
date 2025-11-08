@@ -29,68 +29,69 @@ QColor ElementPlusColorProvider::primaryLight(int level) const {
 }
 
 QColor ElementPlusColorProvider::textPrimary(bool isDark) const {
-    return isDark ? QColor(DarkNeutral::kTextPrimary) : QColor(LightNeutral::kTextPrimary);
+    return isDark ? QColor(VSCodeDark::kTextPrimary) : QColor(AntDesignLight::kTextPrimary);
 }
 
 QColor ElementPlusColorProvider::textRegular(bool isDark) const {
-    return isDark ? QColor(DarkNeutral::kTextRegular) : QColor(LightNeutral::kTextRegular);
+    return isDark ? QColor(VSCodeDark::kTextRegular) : QColor(AntDesignLight::kTextRegular);
 }
 
 QColor ElementPlusColorProvider::textSecondary(bool isDark) const {
-    return isDark ? QColor(DarkNeutral::kTextSecondary) : QColor(LightNeutral::kTextSecondary);
+    return isDark ? QColor(VSCodeDark::kTextSecondary) : QColor(AntDesignLight::kTextSecondary);
 }
 
 QColor ElementPlusColorProvider::textPlaceholder(bool isDark) const {
-    return isDark ? QColor(DarkNeutral::kTextPlaceholder) : QColor(LightNeutral::kTextPlaceholder);
+    return isDark ? QColor(VSCodeDark::kTextPlaceholder) : QColor(AntDesignLight::kTextPlaceholder);
 }
 
 QColor ElementPlusColorProvider::textDisabled(bool isDark) const {
-    return isDark ? QColor(DarkNeutral::kTextDisabled) : QColor(LightNeutral::kTextDisabled);
+    return isDark ? QColor(VSCodeDark::kTextDisabled) : QColor(AntDesignLight::kTextDisabled);
 }
 
 QColor ElementPlusColorProvider::borderBase(bool isDark) const {
-    return isDark ? QColor(DarkNeutral::kBorderBase) : QColor(LightNeutral::kBorderBase);
+    return isDark ? QColor(VSCodeDark::kBorderBase) : QColor(AntDesignLight::kBorderBase);
 }
 
 QColor ElementPlusColorProvider::borderLight(bool isDark) const {
-    return isDark ? QColor(DarkNeutral::kBorderLight) : QColor(LightNeutral::kBorderLight);
+    return isDark ? QColor(VSCodeDark::kBorderLight) : QColor(AntDesignLight::kBorderLight);
 }
 
 QColor ElementPlusColorProvider::borderLighter(bool isDark) const {
-    return isDark ? QColor(DarkNeutral::kBorderLighter) : QColor(LightNeutral::kBorderLighter);
+    return isDark ? QColor(VSCodeDark::kBorderLighter) : QColor(AntDesignLight::kBorderLighter);
 }
 
 QColor ElementPlusColorProvider::fillBase(bool isDark) const {
-    return isDark ? QColor(DarkNeutral::kFillBase) : QColor(LightNeutral::kFillBase);
+    return isDark ? QColor(VSCodeDark::kFillBase) : QColor(AntDesignLight::kFillBase);
 }
 
 QColor ElementPlusColorProvider::fillLight(bool isDark) const {
-    return isDark ? QColor(DarkNeutral::kFillLight) : QColor(LightNeutral::kFillLight);
+    return isDark ? QColor(VSCodeDark::kFillLight) : QColor(AntDesignLight::kFillLight);
 }
 
 QColor ElementPlusColorProvider::fillLighter(bool isDark) const {
-    return isDark ? QColor(DarkNeutral::kFillLighter) : QColor(LightNeutral::kFillLighter);
+    return isDark ? QColor(VSCodeDark::kFillLighter) : QColor(AntDesignLight::kFillLighter);
 }
 
 QColor ElementPlusColorProvider::bgWhite(bool isDark) const {
-    return isDark ? QColor(DarkNeutral::kBgWhite) : QColor(LightNeutral::kBgWhite);
+    return isDark ? QColor(VSCodeDark::kBgWhite) : QColor(AntDesignLight::kBgWhite);
 }
 
 QColor ElementPlusColorProvider::bgPage(bool isDark) const {
-    return isDark ? QColor(DarkNeutral::kBgPage) : QColor(LightNeutral::kBgPage);
+    return isDark ? QColor(VSCodeDark::kBgPage) : QColor(AntDesignLight::kBgPage);
 }
 
 QColor ElementPlusColorProvider::bgBase(bool isDark) const {
-    return isDark ? QColor(DarkNeutral::kBgBase) : QColor(LightNeutral::kBgBase);
+    return isDark ? QColor(VSCodeDark::kBgBase) : QColor(AntDesignLight::kBgBase);
 }
 
 QColor ElementPlusColorProvider::bgOverlay(bool isDark) const {
-    return isDark ? QColor(DarkNeutral::kBgOverlay) : QColor(LightNeutral::kBgOverlay);
+    return isDark ? QColor(VSCodeDark::kBgOverlay) : QColor(AntDesignLight::kBgOverlay);
 }
 
 QColor ElementPlusColorProvider::bgElevated(bool isDark) const {
-    // 浅色模式使用 bgOverlay，暗色模式使用新增的 bgElevated
-    return isDark ? QColor(DarkNeutral::kBgElevated) : QColor(LightNeutral::kBgOverlay);
+    // Ant Design 浅色：#FFFFFF 纯白高亮
+    // VS Code 暗色：#2D2D30 活动项背景
+    return isDark ? QColor(VSCodeDark::kBgElevated) : QColor(AntDesignLight::kBgWhite);
 }
 
 void RegisterElementPlusColors(QQmlEngine* engine) {

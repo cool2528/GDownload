@@ -89,6 +89,39 @@ namespace gdl {
                 engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
             }
 
+            void Settings::SetAria2MaxConcurrentDownloads(int value)
+            {
+                SetMaxConcurrentDownloads(value);
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"max-concurrent-downloads", std::to_string(value)});
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
+            }
+
+            void Settings::SetAria2Split(int value)
+            {
+                SetSplit(value);
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"split", std::to_string(value)});
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
+            }
+
+            void Settings::SetAria2MaxConnectionPerServer(int value)
+            {
+                SetMaxConnectionPerServer(value);
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"max-connection-per-server", std::to_string(value)});
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
+            }
+
+            void Settings::SetAria2MinSplitSize(int sizeMB)
+            {
+                SetMinSplitSize(sizeMB);
+                // 转换为字节（MB -> Bytes）并添加 "M" 后缀
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"min-split-size", std::to_string(sizeMB) + "M"});
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
+            }
+
             void Settings::Save() {
                 QHashIterator<QString, Setting*> i(Setting::settings_);
                 while (i.hasNext()) {

@@ -30,7 +30,7 @@ Item {
                 Layout.preferredWidth: 40
                 Layout.preferredHeight: 40
                 Layout.alignment: Qt.AlignVCenter
-                color: GTheme.primaryLight(9)
+                color: GTheme.primaryLight(1)
                 radius: 8
 
                 FontIcon {

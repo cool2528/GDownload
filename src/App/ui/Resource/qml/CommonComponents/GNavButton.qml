@@ -67,8 +67,11 @@ Button {
     }
 
     background: Rectangle {
+        // Ant Design 规范：
+        // 浅色主题 - 选中/悬停使用 Primary level-1 (#E6F7FF) 极浅蓝色背景
+        // 暗色主题 - 选中/悬停使用 fillLight (#2D2D30) VS Code 活动项背景
         color: (control.hovered || control.checked) ?
-                  (GTheme.dark ? GTheme.fillLight : GTheme.primaryLight(9)) :
+                  (GTheme.dark ? GTheme.fillLight : GTheme.primaryLight(1)) :
                   "transparent"
         radius: 6  // Element Plus 导航项圆角
     }

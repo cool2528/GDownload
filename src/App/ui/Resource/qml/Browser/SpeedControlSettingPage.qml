@@ -83,7 +83,7 @@ GCard {
         }
 
         // 分隔线
-        Rectangle {
+        Divider {
             Layout.fillWidth: true
             Layout.preferredHeight: 1
             color: GTheme.borderLight
@@ -135,7 +135,7 @@ GCard {
         }
 
         // 分隔线
-        Rectangle {
+        Divider {
             Layout.fillWidth: true
             Layout.preferredHeight: 1
             color: GTheme.borderLight

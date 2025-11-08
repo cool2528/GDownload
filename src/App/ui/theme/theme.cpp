@@ -33,54 +33,54 @@ namespace gdl {
                 if (is_dark) {
                     menu_style =
                         "QMenu{"
-                        "background-color: " + QString(ElementPlusColors::DarkNeutral::kBgOverlay) + ";"
-                        "border: 1px solid " + QString(ElementPlusColors::DarkNeutral::kBorderBase) + ";"
+                        "background-color: " + QString(ElementPlusColors::VSCodeDark::kBgOverlay) + ";"
+                        "border: 1px solid " + QString(ElementPlusColors::VSCodeDark::kBorderBase) + ";"
                         "border-radius: 4px;"
                         "padding: 4px 0;"
                         "}"
                         "QMenu::item{"
                         "background-color: transparent;"
-                        "color: " + QString(ElementPlusColors::DarkNeutral::kTextPrimary) + ";"
+                        "color: " + QString(ElementPlusColors::VSCodeDark::kTextPrimary) + ";"
                         "padding: 8px 16px;"
                         "margin: 0 4px;"
                         "border-radius: 4px;"
                         "}"
                         "QMenu::item:selected{"
-                        "background-color: " + QString(ElementPlusColors::DarkNeutral::kFillLight) + ";"
+                        "background-color: " + QString(ElementPlusColors::VSCodeDark::kFillLight) + ";"
                         "}"
                         "QMenu::item:hover{"
-                        "background-color: " + QString(ElementPlusColors::DarkNeutral::kFillLight) + ";"
+                        "background-color: " + QString(ElementPlusColors::VSCodeDark::kFillLight) + ";"
                         "}"
                         "QMenu::separator{"
                         "height: 1px;"
-                        "background: " + QString(ElementPlusColors::DarkNeutral::kBorderLight) + ";"
+                        "background: " + QString(ElementPlusColors::VSCodeDark::kBorderLight) + ";"
                         "margin: 4px 12px;"
                         "}";
                 }
                 else {
                     menu_style =
                         "QMenu{"
-                        "background-color: " + QString(ElementPlusColors::LightNeutral::kBgWhite) + ";"
-                        "border: 1px solid " + QString(ElementPlusColors::LightNeutral::kBorderLight) + ";"
+                        "background-color: " + QString(ElementPlusColors::AntDesignLight::kBgWhite) + ";"
+                        "border: 1px solid " + QString(ElementPlusColors::AntDesignLight::kBorderLight) + ";"
                         "border-radius: 4px;"
                         "padding: 4px 0;"
                         "}"
                         "QMenu::item{"
                         "background-color: transparent;"
-                        "color: " + QString(ElementPlusColors::LightNeutral::kTextPrimary) + ";"
+                        "color: " + QString(ElementPlusColors::AntDesignLight::kTextPrimary) + ";"
                         "padding: 8px 16px;"
                         "margin: 0 4px;"
                         "border-radius: 4px;"
                         "}"
                         "QMenu::item:selected{"
-                        "background-color: " + QString(ElementPlusColors::LightNeutral::kFillLight) + ";"
+                        "background-color: " + QString(ElementPlusColors::AntDesignLight::kFillLight) + ";"
                         "}"
                         "QMenu::item:hover{"
-                        "background-color: " + QString(ElementPlusColors::LightNeutral::kFillLight) + ";"
+                        "background-color: " + QString(ElementPlusColors::AntDesignLight::kFillLight) + ";"
                         "}"
                         "QMenu::separator{"
                         "height: 1px;"
-                        "background: " + QString(ElementPlusColors::LightNeutral::kBorderLighter) + ";"
+                        "background: " + QString(ElementPlusColors::AntDesignLight::kBorderLighter) + ";"
                         "margin: 4px 12px;"
                         "}";
                 }
@@ -164,73 +164,78 @@ namespace gdl {
 			}
 
 			QColor GTheme::textPrimary() const {
-				return dark() ? QColor(ElementPlusColors::DarkNeutral::kTextPrimary)
-							  : QColor(ElementPlusColors::LightNeutral::kTextPrimary);
+				return dark() ? QColor(ElementPlusColors::VSCodeDark::kTextPrimary)
+							  : QColor(ElementPlusColors::AntDesignLight::kTextPrimary);
 			}
 
 			QColor GTheme::textRegular() const {
-				return dark() ? QColor(ElementPlusColors::DarkNeutral::kTextRegular)
-							  : QColor(ElementPlusColors::LightNeutral::kTextRegular);
+				return dark() ? QColor(ElementPlusColors::VSCodeDark::kTextRegular)
+							  : QColor(ElementPlusColors::AntDesignLight::kTextRegular);
 			}
 
 			QColor GTheme::textSecondary() const {
-				return dark() ? QColor(ElementPlusColors::DarkNeutral::kTextSecondary)
-							  : QColor(ElementPlusColors::LightNeutral::kTextSecondary);
+				return dark() ? QColor(ElementPlusColors::VSCodeDark::kTextSecondary)
+							  : QColor(ElementPlusColors::AntDesignLight::kTextSecondary);
 			}
 
 			QColor GTheme::textPlaceholder() const {
-				return dark() ? QColor(ElementPlusColors::DarkNeutral::kTextPlaceholder)
-							  : QColor(ElementPlusColors::LightNeutral::kTextPlaceholder);
+				return dark() ? QColor(ElementPlusColors::VSCodeDark::kTextPlaceholder)
+							  : QColor(ElementPlusColors::AntDesignLight::kTextPlaceholder);
 			}
 
 			QColor GTheme::textDisabled() const {
-				return dark() ? QColor(ElementPlusColors::DarkNeutral::kTextDisabled)
-							  : QColor(ElementPlusColors::LightNeutral::kTextDisabled);
+				return dark() ? QColor(ElementPlusColors::VSCodeDark::kTextDisabled)
+							  : QColor(ElementPlusColors::AntDesignLight::kTextDisabled);
 			}
 
 			QColor GTheme::borderBase() const {
-				return dark() ? QColor(ElementPlusColors::DarkNeutral::kBorderBase)
-							  : QColor(ElementPlusColors::LightNeutral::kBorderBase);
+				return dark() ? QColor(ElementPlusColors::VSCodeDark::kBorderBase)
+							  : QColor(ElementPlusColors::AntDesignLight::kBorderBase);
 			}
 
 			QColor GTheme::borderLight() const {
-				return dark() ? QColor(ElementPlusColors::DarkNeutral::kBorderLight)
-							  : QColor(ElementPlusColors::LightNeutral::kBorderLight);
+				return dark() ? QColor(ElementPlusColors::VSCodeDark::kBorderLight)
+							  : QColor(ElementPlusColors::AntDesignLight::kBorderLight);
 			}
 
 			QColor GTheme::borderLighter() const {
-				return dark() ? QColor(ElementPlusColors::DarkNeutral::kBorderLighter)
-							  : QColor(ElementPlusColors::LightNeutral::kBorderLighter);
+				return dark() ? QColor(ElementPlusColors::VSCodeDark::kBorderLighter)
+							  : QColor(ElementPlusColors::AntDesignLight::kBorderLighter);
 			}
 
 			QColor GTheme::fillBase() const {
-				return dark() ? QColor(ElementPlusColors::DarkNeutral::kFillBase)
-							  : QColor(ElementPlusColors::LightNeutral::kFillBase);
+				return dark() ? QColor(ElementPlusColors::VSCodeDark::kFillBase)
+							  : QColor(ElementPlusColors::AntDesignLight::kFillBase);
 			}
 
 			QColor GTheme::fillLight() const {
-				return dark() ? QColor(ElementPlusColors::DarkNeutral::kFillLight)
-							  : QColor(ElementPlusColors::LightNeutral::kFillLight);
+				return dark() ? QColor(ElementPlusColors::VSCodeDark::kFillLight)
+							  : QColor(ElementPlusColors::AntDesignLight::kFillLight);
 			}
 
 			QColor GTheme::fillLighter() const {
-				return dark() ? QColor(ElementPlusColors::DarkNeutral::kFillLighter)
-							  : QColor(ElementPlusColors::LightNeutral::kFillLighter);
+				return dark() ? QColor(ElementPlusColors::VSCodeDark::kFillLighter)
+							  : QColor(ElementPlusColors::AntDesignLight::kFillLighter);
 			}
 
 			QColor GTheme::bgWhite() const {
-				return dark() ? QColor(ElementPlusColors::DarkNeutral::kBgWhite)
-							  : QColor(ElementPlusColors::LightNeutral::kBgWhite);
+				return dark() ? QColor(ElementPlusColors::VSCodeDark::kBgWhite)
+							  : QColor(ElementPlusColors::AntDesignLight::kBgWhite);
 			}
 
 			QColor GTheme::bgPage() const {
-				return dark() ? QColor(ElementPlusColors::DarkNeutral::kBgPage)
-							  : QColor(ElementPlusColors::LightNeutral::kBgPage);
+				return dark() ? QColor(ElementPlusColors::VSCodeDark::kBgPage)
+							  : QColor(ElementPlusColors::AntDesignLight::kBgPage);
 			}
 
 			QColor GTheme::bgBase() const {
-				return dark() ? QColor(ElementPlusColors::DarkNeutral::kBgBase)
-							  : QColor(ElementPlusColors::LightNeutral::kBgBase);
+				return dark() ? QColor(ElementPlusColors::VSCodeDark::kBgBase)
+							  : QColor(ElementPlusColors::AntDesignLight::kBgBase);
+			}
+
+			QColor GTheme::bgElevated() const {
+				return dark() ? QColor(ElementPlusColors::VSCodeDark::kBgElevated)
+							  : QColor(ElementPlusColors::AntDesignLight::kBgWhite);
 			}
 
 			// 工具方法：获取颜色的不同层级

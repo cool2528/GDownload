@@ -70,6 +70,9 @@ namespace gdl {
 			CONFIG_PATH(MaxUploadLimit, "aria2c.max-upload-limit", "0");
 			CONFIG_PATH(MaxOverallUploadLimit, "aria2c.max-overall-upload-limit", "0");
 			CONFIG_PATH(LowestSpeedLimit, "aria2c.lowest-speed-limit", "0");
+			// 连接和性能参数配置
+			CONFIG_PATH(MaxConnectionPerServer, "aria2c.max-connection-per-server", "16");
+			CONFIG_PATH(MinSplitSize, "aria2c.min-split-size", "20");  // 单位：MB
 
 
 			// static function all keys
@@ -112,7 +115,9 @@ namespace gdl {
 											 MaxOverallDownloadLimit.get(),
 											 MaxUploadLimit.get(),
 											 MaxOverallUploadLimit.get(),
-											 LowestSpeedLimit.get()});
+											 LowestSpeedLimit.get(),
+											 MaxConnectionPerServer.get(),
+											 MinSplitSize.get()});
 			}
 			// static function all values
 			static constexpr auto GetAllValues() {
@@ -154,7 +159,9 @@ namespace gdl {
 											 MaxOverallDownloadLimit.val(),
 											 MaxUploadLimit.val(),
 											 MaxOverallUploadLimit.val(),
-											 LowestSpeedLimit.val()});
+											 LowestSpeedLimit.val(),
+											 MaxConnectionPerServer.val(),
+											 MinSplitSize.val()});
 			}
 		};
 	}  // namespace config

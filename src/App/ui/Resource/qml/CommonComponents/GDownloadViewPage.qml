@@ -12,7 +12,7 @@ Control {
     // Element Plus 设计标准
     readonly property int standardSpacing: 16
     readonly property int cardSpacing: 12
-    readonly property int contentMargin: 24
+    readonly property int contentMargin: 16
 
     background: Rectangle {
         color: GTheme.bgPage
@@ -76,11 +76,11 @@ Control {
 
         ListView {
             id: downloadListView
-            spacing: downloadView.cardSpacing
+            spacing: 8
             topMargin: downloadView.standardSpacing
             bottomMargin: downloadView.standardSpacing
-            leftMargin: downloadView.contentMargin
-            rightMargin: downloadView.contentMargin
+            leftMargin: 8
+            rightMargin: 8
             clip: true
             interactive: true
             orientation: ListView.Vertical
