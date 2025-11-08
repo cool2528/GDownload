@@ -54,5 +54,8 @@
         <file>qml/Browser/SpeedControlSettingPage.qml</file>
         <file>qml/Browser/ConnectionPerformanceSettingPage.qml</file>
         <file>qml/Browser/PostDownloadActionsSettingPage.qml</file>
+        <file>qml/Browser/TimeoutRetrySettingPage.qml</file>
+        <file>qml/Browser/BitTorrentAdvancedSettingPage.qml</file>
+        <file>qml/Browser/UserAgentSettingPage.qml</file>
     </qresource>
 </RCC>

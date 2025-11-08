@@ -60,6 +60,13 @@ namespace gdl {
                 SETTING_PROPERTY(int, OnErrorAction)
                 SETTING_PROPERTY(QString, CustomErrorCommand)
                 SETTING_PROPERTY(int, OnStartAction)
+                SETTING_PROPERTY(int, Timeout)
+                SETTING_PROPERTY(int, ConnectTimeout)
+                SETTING_PROPERTY(int, MaxTries)
+                SETTING_PROPERTY(int, RetryWait)
+                SETTING_PROPERTY(bool, EnableDht)
+                SETTING_PROPERTY(int, BtMaxPeers)
+                SETTING_PROPERTY(bool, BtRequireCrypto)
 
                public:
                 ~Settings() override;
@@ -77,6 +84,14 @@ namespace gdl {
                 Q_INVOKABLE void SetAria2Split(int value);
                 Q_INVOKABLE void SetAria2MaxConnectionPerServer(int value);
                 Q_INVOKABLE void SetAria2MinSplitSize(int sizeMB);
+                Q_INVOKABLE void SetAria2Timeout(int value);
+                Q_INVOKABLE void SetAria2ConnectTimeout(int value);
+                Q_INVOKABLE void SetAria2MaxTries(int value);
+                Q_INVOKABLE void SetAria2RetryWait(int value);
+                Q_INVOKABLE void SetAria2EnableDht(bool enable);
+                Q_INVOKABLE void SetAria2BtMaxPeers(int value);
+                Q_INVOKABLE void SetAria2BtRequireCrypto(bool enable);
+                Q_INVOKABLE void SetAria2UserAgent(const QString& userAgent);
 
                private:
                 explicit Settings(QObject* parent = nullptr);
