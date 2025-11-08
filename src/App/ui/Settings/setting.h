@@ -920,6 +920,118 @@ namespace gdl {
 			}
 			SETTING_IMP_END(OnStartAction)
 
+			// Timeout (连接超时，单位：秒)
+			SETTING_IMP_BEGIN(Timeout, CONFIG_KEY_PATH(Timeout), int)
+			void Default() override {
+				value_ = 60;  // 60秒
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toInt();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return QString::number(value_);
+			}
+			SETTING_IMP_END(Timeout)
+
+			// ConnectTimeout (建立连接超时，单位：秒)
+			SETTING_IMP_BEGIN(ConnectTimeout, CONFIG_KEY_PATH(ConnectTimeout), int)
+			void Default() override {
+				value_ = 60;  // 60秒
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toInt();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return QString::number(value_);
+			}
+			SETTING_IMP_END(ConnectTimeout)
+
+			// MaxTries (最大重试次数，0=无限)
+			SETTING_IMP_BEGIN(MaxTries, CONFIG_KEY_PATH(MaxTries), int)
+			void Default() override {
+				value_ = 5;
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toInt();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return QString::number(value_);
+			}
+			SETTING_IMP_END(MaxTries)
+
+			// RetryWait (重试等待时间，单位：秒，0=禁用)
+			SETTING_IMP_BEGIN(RetryWait, CONFIG_KEY_PATH(RetryWait), int)
+			void Default() override {
+				value_ = 0;  // 默认禁用
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toInt();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return QString::number(value_);
+			}
+			SETTING_IMP_END(RetryWait)
+
+			// EnableDht (启用 DHT)
+			SETTING_IMP_BEGIN(EnableDht, CONFIG_KEY_PATH(EnableDht), bool)
+			void Default() override {
+				value_ = true;
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toBool();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return value_ ? "true" : "false";
+			}
+			SETTING_IMP_END(EnableDht)
+
+			// BtMaxPeers (BT 最大对等节点数)
+			SETTING_IMP_BEGIN(BtMaxPeers, CONFIG_KEY_PATH(BtMaxPeers), int)
+			void Default() override {
+				value_ = 55;
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toInt();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return QString::number(value_);
+			}
+			SETTING_IMP_END(BtMaxPeers)
+
+			// BtRequireCrypto (BT 要求加密)
+			SETTING_IMP_BEGIN(BtRequireCrypto, CONFIG_KEY_PATH(BtRequireCrypto), bool)
+			void Default() override {
+				value_ = false;
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toBool();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return value_ ? "true" : "false";
+			}
+			SETTING_IMP_END(BtRequireCrypto)
+
 		}  // namespace settings
 	}  // namespace ui
 }  // namespace gdl

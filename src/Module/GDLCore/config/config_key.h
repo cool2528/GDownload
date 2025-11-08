@@ -79,6 +79,15 @@ namespace gdl {
 			CONFIG_PATH(OnErrorAction, "aria2c.on-error-action", "0");  // 0=无操作, 1=播放声音, 2=自定义命令
 			CONFIG_PATH(CustomErrorCommand, "aria2c.custom-error-command", "");
 			CONFIG_PATH(OnStartAction, "aria2c.on-start-action", "0");  // 0=无操作, 1=播放声音
+			// 超时和重试配置
+			CONFIG_PATH(Timeout, "aria2c.timeout", "60");
+			CONFIG_PATH(ConnectTimeout, "aria2c.connect-timeout", "60");
+			CONFIG_PATH(MaxTries, "aria2c.max-tries", "5");
+			CONFIG_PATH(RetryWait, "aria2c.retry-wait", "0");
+			// BitTorrent 高级配置
+			CONFIG_PATH(EnableDht, "aria2c.enable-dht", "true");
+			CONFIG_PATH(BtMaxPeers, "aria2c.bt-max-peers", "55");
+			CONFIG_PATH(BtRequireCrypto, "aria2c.bt-require-crypto", "false");
 
 
 			// static function all keys
@@ -128,7 +137,14 @@ namespace gdl {
 											 CustomCompleteCommand.get(),
 											 OnErrorAction.get(),
 											 CustomErrorCommand.get(),
-											 OnStartAction.get()});
+											 OnStartAction.get(),
+											 Timeout.get(),
+											 ConnectTimeout.get(),
+											 MaxTries.get(),
+											 RetryWait.get(),
+											 EnableDht.get(),
+											 BtMaxPeers.get(),
+											 BtRequireCrypto.get()});
 			}
 			// static function all values
 			static constexpr auto GetAllValues() {
@@ -177,7 +193,14 @@ namespace gdl {
 											 CustomCompleteCommand.val(),
 											 OnErrorAction.val(),
 											 CustomErrorCommand.val(),
-											 OnStartAction.val()});
+											 OnStartAction.val(),
+											 Timeout.val(),
+											 ConnectTimeout.val(),
+											 MaxTries.val(),
+											 RetryWait.val(),
+											 EnableDht.val(),
+											 BtMaxPeers.val(),
+											 BtRequireCrypto.val()});
 			}
 		};
 	}  // namespace config
