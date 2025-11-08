@@ -840,6 +840,86 @@ namespace gdl {
 			}
 			SETTING_IMP_END(MinSplitSize)
 
+			// OnCompleteAction (下载完成后操作：0=无操作, 1=打开文件, 2=打开目录, 3=播放声音, 4=自定义命令, 5=关机, 6=睡眠, 7=重启)
+			SETTING_IMP_BEGIN(OnCompleteAction, CONFIG_KEY_PATH(OnCompleteAction), int)
+			void Default() override {
+				value_ = 0;  // 默认：无操作
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toInt();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return QString::number(value_);
+			}
+			SETTING_IMP_END(OnCompleteAction)
+
+			// CustomCompleteCommand (自定义完成命令)
+			SETTING_IMP_BEGIN(CustomCompleteCommand, CONFIG_KEY_PATH(CustomCompleteCommand), QString)
+			void Default() override {
+				value_ = "";
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toString();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return value_;
+			}
+			SETTING_IMP_END(CustomCompleteCommand)
+
+			// OnErrorAction (下载错误后操作：0=无操作, 1=播放声音, 2=自定义命令)
+			SETTING_IMP_BEGIN(OnErrorAction, CONFIG_KEY_PATH(OnErrorAction), int)
+			void Default() override {
+				value_ = 0;  // 默认：无操作
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toInt();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return QString::number(value_);
+			}
+			SETTING_IMP_END(OnErrorAction)
+
+			// CustomErrorCommand (自定义错误命令)
+			SETTING_IMP_BEGIN(CustomErrorCommand, CONFIG_KEY_PATH(CustomErrorCommand), QString)
+			void Default() override {
+				value_ = "";
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toString();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return value_;
+			}
+			SETTING_IMP_END(CustomErrorCommand)
+
+			// OnStartAction (下载开始后操作：0=无操作, 1=播放声音)
+			SETTING_IMP_BEGIN(OnStartAction, CONFIG_KEY_PATH(OnStartAction), int)
+			void Default() override {
+				value_ = 0;  // 默认：无操作
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toInt();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return QString::number(value_);
+			}
+			SETTING_IMP_END(OnStartAction)
+
 		}  // namespace settings
 	}  // namespace ui
 }  // namespace gdl

@@ -95,6 +95,10 @@ namespace gdl {
 				static gdl::cache::DownloadRecord DownloadTaskInfoToRecord(const DownloadTaskInfo& info);
 				static DownloadTaskInfo DownloadRecordToTaskInfo(const gdl::cache::DownloadRecord& record);
 				static DownloadTaskInfo Aria2QueryByGidTaskInfo(const std::string& gid);
+				// 下载完成后操作相关方法
+				void ExecutePostDownloadAction(const DownloadTaskInfo& task, int actionType, const QString& customCommand);
+				void PlayNotificationSound();
+				void ExecuteCustomCommand(const QString& command, const QString& filePath, const QString& dir, const QString& gid);
 
 			   private:
 				std::unique_ptr<DownloadTaskModel> active_model_{nullptr};

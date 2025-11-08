@@ -85,7 +85,7 @@ ComboBox {
 
             color: {
                 if (isHighlighted) {
-                    return isDark ? GTheme.fillLight : GTheme.primaryLight(9)
+                    return isDark ? GTheme.fillLight : GTheme.primaryLight(1)
                 }
                 if (isHovered) {
                     // hover 高亮色

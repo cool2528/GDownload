@@ -55,6 +55,11 @@ namespace gdl {
                 SETTING_PROPERTY(int, LowestSpeedLimit)
                 SETTING_PROPERTY(int, MaxConnectionPerServer)
                 SETTING_PROPERTY(int, MinSplitSize)
+                SETTING_PROPERTY(int, OnCompleteAction)
+                SETTING_PROPERTY(QString, CustomCompleteCommand)
+                SETTING_PROPERTY(int, OnErrorAction)
+                SETTING_PROPERTY(QString, CustomErrorCommand)
+                SETTING_PROPERTY(int, OnStartAction)
 
                public:
                 ~Settings() override;
