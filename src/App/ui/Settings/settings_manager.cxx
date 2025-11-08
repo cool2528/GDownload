@@ -122,6 +122,86 @@ namespace gdl {
                 engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
             }
 
+            void Settings::SetAria2Timeout(int value)
+            {
+                SetTimeout(value);
+
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"timeout", std::to_string(value)});
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(
+                    engine::Aria2Method::kChangeGlobalOption, opt);
+            }
+
+            void Settings::SetAria2ConnectTimeout(int value)
+            {
+                SetConnectTimeout(value);
+
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"connect-timeout", std::to_string(value)});
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(
+                    engine::Aria2Method::kChangeGlobalOption, opt);
+            }
+
+            void Settings::SetAria2MaxTries(int value)
+            {
+                SetMaxTries(value);
+
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"max-tries", std::to_string(value)});
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(
+                    engine::Aria2Method::kChangeGlobalOption, opt);
+            }
+
+            void Settings::SetAria2RetryWait(int value)
+            {
+                SetRetryWait(value);
+
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"retry-wait", std::to_string(value)});
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(
+                    engine::Aria2Method::kChangeGlobalOption, opt);
+            }
+
+            void Settings::SetAria2EnableDht(bool enable)
+            {
+                SetEnableDht(enable);
+
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"enable-dht", enable ? "true" : "false"});
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(
+                    engine::Aria2Method::kChangeGlobalOption, opt);
+            }
+
+            void Settings::SetAria2BtMaxPeers(int value)
+            {
+                SetBtMaxPeers(value);
+
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"bt-max-peers", std::to_string(value)});
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(
+                    engine::Aria2Method::kChangeGlobalOption, opt);
+            }
+
+            void Settings::SetAria2BtRequireCrypto(bool enable)
+            {
+                SetBtRequireCrypto(enable);
+
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"bt-require-crypto", enable ? "true" : "false"});
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(
+                    engine::Aria2Method::kChangeGlobalOption, opt);
+            }
+
+            void Settings::SetAria2UserAgent(const QString& userAgent)
+            {
+                SetUserAgent(userAgent);
+
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"user-agent", userAgent.toStdString()});
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(
+                    engine::Aria2Method::kChangeGlobalOption, opt);
+            }
+
             void Settings::Save() {
                 QHashIterator<QString, Setting*> i(Setting::settings_);
                 while (i.hasNext()) {

@@ -52,6 +52,27 @@ Rectangle {
                 Layout.rightMargin: advancedSetting.contentMargin
             }
 
+            // 超时和重试设置卡片
+            TimeoutRetrySettingPage {
+                Layout.fillWidth: true
+                Layout.leftMargin: advancedSetting.contentMargin
+                Layout.rightMargin: advancedSetting.contentMargin
+            }
+
+            // BitTorrent 高级设置卡片
+            BitTorrentAdvancedSettingPage {
+                Layout.fillWidth: true
+                Layout.leftMargin: advancedSetting.contentMargin
+                Layout.rightMargin: advancedSetting.contentMargin
+            }
+
+            // User-Agent 设置卡片
+            UserAgentSettingPage {
+                Layout.fillWidth: true
+                Layout.leftMargin: advancedSetting.contentMargin
+                Layout.rightMargin: advancedSetting.contentMargin
+            }
+
             // Aria2 RPC 设置卡片
             Aria2RpcSettingPage {
                 Layout.fillWidth: true
