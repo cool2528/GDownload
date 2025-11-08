@@ -42,6 +42,7 @@ namespace gdl {
 				Q_PROPERTY(QColor bgWhite READ bgWhite NOTIFY darkChanged)
 				Q_PROPERTY(QColor bgPage READ bgPage NOTIFY darkChanged)
 				Q_PROPERTY(QColor bgBase READ bgBase NOTIFY darkChanged)
+				Q_PROPERTY(QColor bgElevated READ bgElevated NOTIFY darkChanged)
 
 				// Element Plus 尺寸属性
 				Q_PROPERTY(int sizeLarge READ sizeLarge CONSTANT)
@@ -90,6 +91,7 @@ namespace gdl {
 				QColor bgWhite() const;
 				QColor bgPage() const;
 				QColor bgBase() const;
+				QColor bgElevated() const;
 
 				// Element Plus 尺寸方法
 				int sizeLarge() const { return ElementPlusColors::Sizes::kLarge; }

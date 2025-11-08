@@ -8,7 +8,7 @@ Rectangle {
     id: control
     property int type: 0
     implicitHeight: 64
-    color: GTheme.bgWhite
+    color: GTheme.bgPage  // 改为与下方内容区域一致的背景色
 
     // Element Plus 设计标准
     readonly property int standardSpacing: 16

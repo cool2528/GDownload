@@ -53,6 +53,8 @@ namespace gdl {
                 SETTING_PROPERTY(int, MaxUploadLimit)
                 SETTING_PROPERTY(int, MaxOverallUploadLimit)
                 SETTING_PROPERTY(int, LowestSpeedLimit)
+                SETTING_PROPERTY(int, MaxConnectionPerServer)
+                SETTING_PROPERTY(int, MinSplitSize)
 
                public:
                 ~Settings() override;
@@ -66,6 +68,10 @@ namespace gdl {
                 Q_INVOKABLE void SetAria2MaxUploadLimit(int value);
                 Q_INVOKABLE void SetAria2MaxOverallUploadLimit(int value);
                 Q_INVOKABLE void SetAria2LowestSpeedLimit(int value);
+                Q_INVOKABLE void SetAria2MaxConcurrentDownloads(int value);
+                Q_INVOKABLE void SetAria2Split(int value);
+                Q_INVOKABLE void SetAria2MaxConnectionPerServer(int value);
+                Q_INVOKABLE void SetAria2MinSplitSize(int sizeMB);
 
                private:
                 explicit Settings(QObject* parent = nullptr);
