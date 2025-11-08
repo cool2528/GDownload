@@ -728,6 +728,86 @@ namespace gdl {
 			}
 			SETTING_IMP_END(CloseToTray)
 
+			// MaxDownloadLimit (单位: KB/s)
+			SETTING_IMP_BEGIN(MaxDownloadLimit, CONFIG_KEY_PATH(MaxDownloadLimit), int)
+			void Default() override {
+				value_ = 0;  // 0 = unlimited
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toInt();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return QString::number(value_);
+			}
+			SETTING_IMP_END(MaxDownloadLimit)
+
+			// MaxOverallDownloadLimit (单位: KB/s)
+			SETTING_IMP_BEGIN(MaxOverallDownloadLimit, CONFIG_KEY_PATH(MaxOverallDownloadLimit), int)
+			void Default() override {
+				value_ = 0;  // 0 = unlimited
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toInt();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return QString::number(value_);
+			}
+			SETTING_IMP_END(MaxOverallDownloadLimit)
+
+			// MaxUploadLimit (单位: KB/s)
+			SETTING_IMP_BEGIN(MaxUploadLimit, CONFIG_KEY_PATH(MaxUploadLimit), int)
+			void Default() override {
+				value_ = 0;  // 0 = unlimited
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toInt();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return QString::number(value_);
+			}
+			SETTING_IMP_END(MaxUploadLimit)
+
+			// MaxOverallUploadLimit (单位: KB/s)
+			SETTING_IMP_BEGIN(MaxOverallUploadLimit, CONFIG_KEY_PATH(MaxOverallUploadLimit), int)
+			void Default() override {
+				value_ = 0;  // 0 = unlimited
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toInt();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return QString::number(value_);
+			}
+			SETTING_IMP_END(MaxOverallUploadLimit)
+
+			// LowestSpeedLimit (单位: KB/s)
+			SETTING_IMP_BEGIN(LowestSpeedLimit, CONFIG_KEY_PATH(LowestSpeedLimit), int)
+			void Default() override {
+				value_ = 0;  // 0 = disabled
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toInt();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return QString::number(value_);
+			}
+			SETTING_IMP_END(LowestSpeedLimit)
+
 		}  // namespace settings
 	}  // namespace ui
 }  // namespace gdl

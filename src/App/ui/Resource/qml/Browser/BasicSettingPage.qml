@@ -96,7 +96,7 @@ Rectangle {
             // 应用行为设置卡片
             GCard {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 300
+                Layout.preferredHeight: 350
                 Layout.leftMargin: basicSetting.contentMargin
                 Layout.rightMargin: basicSetting.contentMargin
                 outlined: true
@@ -181,6 +181,24 @@ Rectangle {
                         checked: SettingsManager.qAutoResumeTask
                         onClicked: {
                             SettingsManager.SetAria2AutoResumeTask(checked)
+                        }
+                    }
+
+                    Divider {
+                        Layout.fillWidth: true
+                        Layout.leftMargin: 8
+                        Layout.rightMargin: 8
+                    }
+
+                    // 关闭时显示确认对话框
+                    GButtonSwitch {
+                        id: showCloseConfirm
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 38
+                        text: qsTr("Show Close Confirmation")
+                        checked: SettingsManager.qShowCloseConfirm
+                        onClicked: {
+                            SettingsManager.SetShowCloseConfirm(checked)
                         }
                     }
                 }

@@ -51,5 +51,6 @@
         <file>qml/Browser/TrackerServerSettingPage.qml</file>
         <file>qml/CommonComponents/GNavButton.qml</file>
         <file>qml/Browser/Aria2RpcSettingPage.qml</file>
+        <file>qml/Browser/SpeedControlSettingPage.qml</file>
     </qresource>
 </RCC>
