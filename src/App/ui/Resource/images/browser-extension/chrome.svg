@@ -1,0 +1,20 @@
+<!-- Chrome Browser Icon -->
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer Circle -->
+  <circle cx="32" cy="32" r="30" fill="#4285F4"/>
+  
+  <!-- Red Section -->
+  <path d="M32 2C18.298 2 6.687 10.533 2.866 22.5H32L46.25 46.433C54.72 41.618 60.5 32.742 60.5 22.5C60.5 10.897 50.103 2 32 2Z" fill="#EA4335"/>
+  
+  <!-- Yellow Section -->
+  <path d="M2.866 22.5C2.312 24.778 2 27.152 2 29.6C2 45.464 14.536 58 30.4 58C36.064 58 41.328 56.272 45.75 43.433L32 22.5H2.866Z" fill="#FBBC04"/>
+  
+  <!-- Green Section -->
+  <path d="M46.25 46.433L32 22.5L17.75 46.433C22.172 53.272 29.064 58 37 58C41.328 56.272 45.25 53.433 46.25 46.433Z" fill="#34A853"/>
+  
+  <!-- Center White Circle -->
+  <circle cx="32" cy="32" r="12" fill="white"/>
+  
+  <!-- Center Blue Circle -->
+  <circle cx="32" cy="32" r="10" fill="#4285F4"/>
+</svg>

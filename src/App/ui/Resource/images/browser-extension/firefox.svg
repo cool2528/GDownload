@@ -1,0 +1,69 @@
+<!-- Firefox Browser Icon - Redesigned -->
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 火焰渐变（橙红色） -->
+    <radialGradient id="ffFlame1" cx="40%" cy="40%">
+      <stop offset="0%" style="stop-color:#FFE81F;stop-opacity:1" />
+      <stop offset="40%" style="stop-color:#FFB238;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF6611;stop-opacity:1" />
+    </radialGradient>
+    
+    <!-- 狐狸身体渐变 -->
+    <radialGradient id="ffBody" cx="50%" cy="50%">
+      <stop offset="0%" style="stop-color:#FF9640;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D74011;stop-opacity:1" />
+    </radialGradient>
+    
+    <!-- 地球蓝色渐变 -->
+    <linearGradient id="ffGlobe" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00D7FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0090ED;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- 紫色阴影 -->
+    <radialGradient id="ffShadow" cx="50%" cy="70%">
+      <stop offset="0%" style="stop-color:#A42E00;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#5A0F00;stop-opacity:0.4" />
+    </radialGradient>
+  </defs>
+  
+  <!-- 背景圆 -->
+  <circle cx="32" cy="32" r="30" fill="#20123A"/>
+  
+  <!-- 地球（蓝色） -->
+  <ellipse cx="32" cy="35" rx="20" ry="18" fill="url(#ffGlobe)"/>
+  
+  <!-- 地球高光 -->
+  <ellipse cx="28" cy="32" rx="8" ry="7" fill="#B8E1FF" opacity="0.4"/>
+  
+  <!-- 狐狸尾巴（从左下到右上的火焰） -->
+  <path d="M 8 48 Q 12 38, 18 32 Q 22 26, 28 22 Q 32 18, 38 16 Q 42 14, 45 15 Q 40 20, 36 24 Q 30 30, 26 36 Q 20 44, 16 50 Q 12 54, 8 48 Z" 
+        fill="url(#ffFlame1)"/>
+  
+  <!-- 狐狸身体主体（右侧环绕） -->
+  <path d="M 45 15 Q 52 14, 56 18 Q 58 22, 58 28 Q 58 34, 56 40 Q 54 46, 50 50 Q 46 54, 40 55 Q 36 56, 32 54 Q 38 52, 42 48 Q 46 44, 48 38 Q 50 32, 50 26 Q 50 20, 48 17 Q 47 15, 45 15 Z" 
+        fill="url(#ffBody)"/>
+  
+  <!-- 狐狸头部 -->
+  <ellipse cx="50" cy="22" rx="8" ry="10" fill="url(#ffBody)"/>
+  
+  <!-- 狐狸耳朵（左） -->
+  <path d="M 46 14 Q 44 10, 46 8 Q 48 10, 48 12 Q 48 14, 46 14 Z" fill="#FF6611"/>
+  
+  <!-- 狐狸耳朵（右） -->
+  <path d="M 54 14 Q 56 10, 58 8 Q 58 10, 57 12 Q 56 14, 54 14 Z" fill="#FF6611"/>
+  
+  <!-- 狐狸面部高光 -->
+  <ellipse cx="48" cy="20" rx="3" ry="4" fill="#FFD4A3" opacity="0.6"/>
+  
+  <!-- 白色腹部 -->
+  <path d="M 40 35 Q 42 32, 44 30 Q 46 34, 46 38 Q 46 42, 44 46 Q 42 44, 40 42 Q 38 38, 40 35 Z" 
+        fill="#FFF4E6" opacity="0.8"/>
+  
+  <!-- 尾巴火焰（黄色高光） -->
+  <path d="M 10 46 Q 14 40, 20 34 Q 24 30, 28 26 Q 26 30, 22 36 Q 18 42, 14 48 Q 12 50, 10 46 Z" 
+        fill="#FFDF1B" opacity="0.7"/>
+  
+  <!-- 底部阴影 -->
+  <ellipse cx="32" cy="58" rx="22" ry="4" fill="url(#ffShadow)"/>
+</svg>

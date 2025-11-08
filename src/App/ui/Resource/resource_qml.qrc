@@ -57,5 +57,9 @@
         <file>qml/Browser/TimeoutRetrySettingPage.qml</file>
         <file>qml/Browser/BitTorrentAdvancedSettingPage.qml</file>
         <file>qml/Browser/UserAgentSettingPage.qml</file>
+        <file>qml/Browser/BrowserExtension/FeatureHighlightCard.qml</file>
+        <file>qml/Browser/BrowserExtension/InstallationGuideCard.qml</file>
+        <file>qml/Browser/BrowserExtension/ConfigHelperCard.qml</file>
+        <file>qml/Browser/BrowserExtension/FAQCard.qml</file>
     </qresource>
 </RCC>
