@@ -45,6 +45,13 @@ Rectangle {
                 Layout.rightMargin: advancedSetting.contentMargin
             }
 
+            // 下载完成后操作设置卡片
+            PostDownloadActionsSettingPage {
+                Layout.fillWidth: true
+                Layout.leftMargin: advancedSetting.contentMargin
+                Layout.rightMargin: advancedSetting.contentMargin
+            }
+
             // Aria2 RPC 设置卡片
             Aria2RpcSettingPage {
                 Layout.fillWidth: true

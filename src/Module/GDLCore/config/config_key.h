@@ -73,6 +73,12 @@ namespace gdl {
 			// 连接和性能参数配置
 			CONFIG_PATH(MaxConnectionPerServer, "aria2c.max-connection-per-server", "16");
 			CONFIG_PATH(MinSplitSize, "aria2c.min-split-size", "20");  // 单位：MB
+			// 下载完成后操作配置
+			CONFIG_PATH(OnCompleteAction, "aria2c.on-complete-action", "0");  // 0=无操作, 1=打开文件, 2=打开目录, 3=播放声音, 4=自定义命令, 5=关机, 6=睡眠, 7=重启
+			CONFIG_PATH(CustomCompleteCommand, "aria2c.custom-complete-command", "");
+			CONFIG_PATH(OnErrorAction, "aria2c.on-error-action", "0");  // 0=无操作, 1=播放声音, 2=自定义命令
+			CONFIG_PATH(CustomErrorCommand, "aria2c.custom-error-command", "");
+			CONFIG_PATH(OnStartAction, "aria2c.on-start-action", "0");  // 0=无操作, 1=播放声音
 
 
 			// static function all keys
@@ -117,7 +123,12 @@ namespace gdl {
 											 MaxOverallUploadLimit.get(),
 											 LowestSpeedLimit.get(),
 											 MaxConnectionPerServer.get(),
-											 MinSplitSize.get()});
+											 MinSplitSize.get(),
+											 OnCompleteAction.get(),
+											 CustomCompleteCommand.get(),
+											 OnErrorAction.get(),
+											 CustomErrorCommand.get(),
+											 OnStartAction.get()});
 			}
 			// static function all values
 			static constexpr auto GetAllValues() {
@@ -161,7 +172,12 @@ namespace gdl {
 											 MaxOverallUploadLimit.val(),
 											 LowestSpeedLimit.val(),
 											 MaxConnectionPerServer.val(),
-											 MinSplitSize.val()});
+											 MinSplitSize.val(),
+											 OnCompleteAction.val(),
+											 CustomCompleteCommand.val(),
+											 OnErrorAction.val(),
+											 CustomErrorCommand.val(),
+											 OnStartAction.val()});
 			}
 		};
 	}  // namespace config
