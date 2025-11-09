@@ -148,15 +148,17 @@ jobs:
 
       - name: Install NSIS
         if: matrix.target == 'windows'
-        uses: repolevedavaj/install-nsis@v1.0.2
-        with:
-          nsis-version: '3.10'
+        shell: pwsh
+        run: |
+          choco install nsis -y
+          # 刷新环境变量
+          $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 
       - name: Build Windows Installer
         if: matrix.target == 'windows'
-        shell: cmd
+        shell: pwsh
         run: |
-          makensis -V4 "%GITHUB_WORKSPACE%\build\release\windows_installer.nsi"
+          makensis -V4 "$env:GITHUB_WORKSPACE\build\release\windows_installer.nsi"
 
       - name: Create AppImage zsync
         if: matrix.target == 'linux'
