@@ -115,6 +115,8 @@ namespace gdl {
 								return websocket_client_.GetPeers(std::forward<Args>(args)...);
 							case Aria2Method::kGetServers:
 								return websocket_client_.GetServers(std::forward<Args>(args)...);
+							case Aria2Method::kRemoveDownloadResult:
+								return websocket_client_.RemoveDownloadResult(std::forward<Args>(args)...);
 							default:
 								return MakeFail(1, "Invalid method or arguments");
 						}

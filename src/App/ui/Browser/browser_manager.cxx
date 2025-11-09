@@ -265,17 +265,38 @@ namespace gdl {
 				return false;
 			}
 
-			bool BrowserManager::RemoveTask(int page_index, const QString& gid) {
+			bool BrowserManager::RemoveTask(int page_index, const QString& gid, bool is_remove_file) {
 				if (gid.isEmpty()) return false;
                 if (page_index != 0 && page_index != 1) {
 					return false;
 				}
+
+				// 获取任务信息以获取文件路径（在删除任务之前）
+				QString save_path;
+				QString cache_file_path;
+				if (page_index == 0 && active_model_) {
+					auto task_info = active_model_->GetTaskById(gid);
+					if (task_info) {
+						save_path = task_info->task_save_path();
+						cache_file_path = save_path + ".aria2";
+					}
+				} else if (page_index == 1 && waiting_model_) {
+					auto task_info = waiting_model_->GetTaskById(gid);
+					if (task_info) {
+						save_path = task_info->task_save_path();
+						cache_file_path = save_path + ".aria2";
+					}
+				}
+
+				// 从模型中移除任务
 				if (active_model_) {
 					active_model_->RemoveTaskById(gid);
 				}
 				if (waiting_model_) {
 					waiting_model_->RemoveTaskById(gid);
 				}
+
+				// 调用 aria2 删除任务
 				const auto res = engine::Aria2cDownloadManager::Instance()
 									 .CallAria2cMethod(engine::Aria2Method::kRemove, gid.toStdString())
 									 .IsOk();
@@ -286,6 +307,17 @@ namespace gdl {
 						active_model_->RemoveTaskById(gid);
 					}
 				}
+
+				// 如果需要删除文件
+				if (is_remove_file && !save_path.isEmpty()) {
+					if (QFile::exists(save_path)) {
+						QFile::remove(save_path);
+					}
+					if (QFile::exists(cache_file_path)) {
+						QFile::remove(cache_file_path);
+					}
+				}
+
 				return true;
 			}
 
@@ -293,15 +325,7 @@ namespace gdl {
 				if (page_index == 0) {
 					if (active_model_) {
 						for (const auto& task : active_model_->GetTaskIds()) {
-							auto task_info = active_model_->GetTaskById(task);
-							if (!task_info) {
-								continue;
-							}
-							QString save_path = task_info->task_save_path();
-							RemoveTask(page_index, task);
-							if (is_remove_file && QFile::exists(save_path)) {
-								QFile::remove(save_path);
-							}
+							RemoveTask(page_index, task, is_remove_file);
 						}
 						return true;
 					}
@@ -309,15 +333,7 @@ namespace gdl {
 				else if (page_index == 1) {
 					if (waiting_model_) {
 						for (const auto& task : waiting_model_->GetTaskIds()) {
-							auto task_info = waiting_model_->GetTaskById(task);
-							if (!task_info) {
-								continue;
-							}
-							QString save_path = task_info->task_save_path();
-							RemoveTask(page_index, task);
-							if (is_remove_file && QFile::exists(save_path)) {
-								QFile::remove(save_path);
-							}
+							RemoveTask(page_index, task, is_remove_file);
 						}
 						return true;
 					}

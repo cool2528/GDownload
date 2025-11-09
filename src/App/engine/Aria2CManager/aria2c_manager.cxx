@@ -6,6 +6,8 @@
 #include <sstream>
 #include <chrono>
 #include <thread>
+#include <set>
+#include <random>
 #include "engine_def.h"
 #include "logger.h"
 #include "os/os.h"
@@ -488,11 +490,13 @@ namespace gdl {
 		std::string Aria2cDownloadManager::ConvertToGitHubProxy(const std::string& url) {
 			// https://raw.githubusercontent.com/...
 			// -> https://gh-proxy.com/https://raw.githubusercontent.com/...
-			std::set<std::string> domains = {"https://ghfast.top/", "https://gh-proxy.com/"};
+			std::vector<std::string> domains = {"https://ghfast.top/", "https://gh-proxy.com/"};
 			// 随机返回一个域名
-			auto it = domains.begin();
-			std::advance(it, std::rand() % domains.size());
-			return *it + url;
+			std::random_device rd;
+			std::mt19937 gen(rd());
+			std::uniform_int_distribution<int> dis(0, domains.size() - 1);
+			std::string domain = domains[dis(gen)];
+			return domain + url;
 		}
 
 		std::string Aria2cDownloadManager::GetBitTorrentUrlWithFallback(const std::string& url) {
@@ -619,6 +623,7 @@ namespace gdl {
 			engine_is_runing_ = false;
 			update_aria2c_tasks_timer_.Stop();
 			daily_task_timer_.Stop();
+			websocket_client_.PurgeDownloadResult();
 			websocket_client_.Shutdown();
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			websocket_client_.Disconnect();
