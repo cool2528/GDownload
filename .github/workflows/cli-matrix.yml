@@ -148,16 +148,15 @@ jobs:
 
       - name: Install NSIS
         if: matrix.target == 'windows'
+        run: choco install nsis -y --no-progress
         shell: pwsh
-        run: |
-          choco install nsis -y
-          # 刷新环境变量
-          $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 
       - name: Build Windows Installer
         if: matrix.target == 'windows'
         shell: pwsh
         run: |
+          # 刷新 PATH 确保能找到 makensis
+          refreshenv
           makensis -V4 "$env:GITHUB_WORKSPACE\build\release\windows_installer.nsi"
 
       - name: Create AppImage zsync
