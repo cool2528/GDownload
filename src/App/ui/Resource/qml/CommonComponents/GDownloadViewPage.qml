@@ -215,13 +215,11 @@ Control {
                                 iconColor: hovered ? GTheme.dangerColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
                                 backgroundColor: hovered ? GTheme.fillLight : "transparent"
                                 onClicked: {
-                                    if (downloadView.pageType === 0) {
-                                        BrowserManager.RemoveTask(0, model.taskId)
-                                    } else if (downloadView.pageType === 1) {
-                                        BrowserManager.RemoveTask(1, model.taskId)
-                                    } else if (downloadView.pageType === 2) {
-                                        BrowserManager.RemoveStopTask(model.taskId)
-                                    }
+                                    // 打开删除确认对话框
+                                    deleteConfirmDialog.pageType = downloadView.pageType
+                                    deleteConfirmDialog.taskFileName = model.fileName
+                                    deleteConfirmDialog.currentTaskId = model.taskId
+                                    deleteConfirmDialog.open()
                                 }
                             }
                         }
@@ -292,6 +290,38 @@ Control {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    // 删除确认对话框
+    DeleteConfirmDialog {
+        id: deleteConfirmDialog
+        parent: Overlay.overlay
+
+        // 存储当前要删除的任务ID
+        property string currentTaskId: ""
+
+        // 处理删除操作
+        onActionSelected: function(action) {
+            if (action === DeleteConfirmDialog.Cancel) {
+                // 用户取消，不执行任何操作
+                return
+            }
+
+            // 确定是否删除文件
+            const shouldDeleteFile = (action === DeleteConfirmDialog.DeleteBoth)
+
+            // 根据页面类型调用相应的删除方法
+            if (downloadView.pageType === 0) {
+                // 正在下载页面
+                BrowserManager.RemoveTask(0, currentTaskId, shouldDeleteFile)
+            } else if (downloadView.pageType === 1) {
+                // 等待中页面（通常没有文件，但保持一致性）
+                BrowserManager.RemoveTask(1, currentTaskId, shouldDeleteFile)
+            } else if (downloadView.pageType === 2) {
+                // 已完成页面
+                BrowserManager.RemoveStopTask(currentTaskId, shouldDeleteFile)
             }
         }
     }

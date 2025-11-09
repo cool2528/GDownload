@@ -2,5 +2,5 @@
 #define GDownload_VERSION_MAJOR 1
 #define GDownload_VERSION_MINOR 0
 #define GDownload_VERSION_BUILD 3
-#define GDownload_VERSION_COMMIT c02c65b
-#define GDownload_VERSION_STRING "1.0.3.c02c65b"
+#define GDownload_VERSION_COMMIT b66b464
+#define GDownload_VERSION_STRING "1.0.3.b66b464"
