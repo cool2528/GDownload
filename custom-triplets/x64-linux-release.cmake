@@ -5,7 +5,7 @@ set(VCPKG_LIBRARY_LINKAGE dynamic)
 set(VCPKG_CMAKE_SYSTEM_NAME Linux)
 
 set(VCPKG_FIXUP_ELF_RPATH ON)
-set(CMAKE_BUILD_TYPE Release)
+set(VCPKG_BUILD_TYPE release)
 
 
 

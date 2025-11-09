@@ -79,15 +79,31 @@ jobs:
           path: tools
           key: appimage-tools-${{ runner.os }}-${{ hashFiles('.github/workflows/cli-matrix.yml') }}
 
+      - name: Cache vcpkg binary cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ github.workspace }}/vcpkg_installed
+            ~/.cache/vcpkg/archives
+            C:\Users\runneradmin\AppData\Local\vcpkg\archives
+            ~/Library/Caches/vcpkg/archives
+          key: vcpkg-${{ matrix.vcpkg_triplet }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'custom-triplets/**') }}
+          restore-keys: |
+            vcpkg-${{ matrix.vcpkg_triplet }}-
+            vcpkg-
+
       - name: Setup vcpkg
         id: vcpkg
         uses: johnwason/vcpkg-action@v6
+        env:
+          VCPKG_MAX_CONCURRENCY: 4
         with:
           manifest-dir: ${{ github.workspace }}
           triplet: ${{ matrix.vcpkg_triplet }}
           extra-args: --overlay-triplets=${{ github.workspace }}/custom-triplets
           token: ${{ github.token }}
           github-binarycache: true
+          cache-key: vcpkg-${{ matrix.vcpkg_triplet }}
 
       - name: Download AppImage Tools
         if: matrix.target == 'linux'
@@ -148,16 +164,28 @@ jobs:
 
       - name: Install NSIS
         if: matrix.target == 'windows'
-        run: choco install nsis -y --no-progress
+        run: |
+          choco install nsis -y --no-progress
+          # 验证安装
+          if (Test-Path "C:\Program Files (x86)\NSIS\makensis.exe") {
+            Write-Host "NSIS installed at: C:\Program Files (x86)\NSIS\makensis.exe"
+          } else {
+            Write-Host "NSIS not found in default location"
+            Get-ChildItem "C:\Program Files*" -Recurse -Filter "makensis.exe" -ErrorAction SilentlyContinue
+          }
         shell: pwsh
 
       - name: Build Windows Installer
         if: matrix.target == 'windows'
         shell: pwsh
         run: |
-          # 刷新 PATH 确保能找到 makensis
-          refreshenv
-          makensis -V4 "$env:GITHUB_WORKSPACE\build\release\windows_installer.nsi"
+          # 直接使用绝对路径调用 makensis
+          $makensis = "C:\Program Files (x86)\NSIS\makensis.exe"
+          if (-not (Test-Path $makensis)) {
+            Write-Error "makensis not found at $makensis"
+            exit 1
+          }
+          & $makensis -V4 "$env:GITHUB_WORKSPACE\build\release\windows_installer.nsi"
 
       - name: Create AppImage zsync
         if: matrix.target == 'linux'
