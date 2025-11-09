@@ -207,8 +207,6 @@ private:
     explicit ElementPlusColorProvider(QObject* parent = nullptr);
 };
 
-QML_DECLARE_TYPE(ElementPlusColorProvider)
-
 void RegisterElementPlusColors(QQmlEngine* engine);
 
 } // namespace ElementPlusColors
