@@ -488,7 +488,11 @@ namespace gdl {
 		std::string Aria2cDownloadManager::ConvertToGitHubProxy(const std::string& url) {
 			// https://raw.githubusercontent.com/...
 			// -> https://gh-proxy.com/https://raw.githubusercontent.com/...
-			return "https://gh-proxy.com/" + url;
+			std::set<std::string> domains = {"https://ghfast.top/", "https://gh-proxy.com/"};
+			// 随机返回一个域名
+			auto it = domains.begin();
+			std::advance(it, std::rand() % domains.size());
+			return *it + url;
 		}
 
 		std::string Aria2cDownloadManager::GetBitTorrentUrlWithFallback(const std::string& url) {
