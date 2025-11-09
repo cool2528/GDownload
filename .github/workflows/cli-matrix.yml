@@ -181,11 +181,21 @@ jobs:
         id: release_body
         run: |
           git fetch --tags --force
-          LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
-          # 处理换行与百分号，适配 GitHub 输出格式
-          LAST_COMMIT_MSG="${LAST_COMMIT_MSG//'%'/'%25'}"
-          LAST_COMMIT_MSG="${LAST_COMMIT_MSG//$'\n'/'%0A'}"
-          echo "body=${LAST_COMMIT_MSG}" >> "$GITHUB_OUTPUT"
+          # 读取 CHANGELOG.md 文件内容
+          if [ -f "CHANGELOG.md" ]; then
+            CHANGELOG_CONTENT=$(cat CHANGELOG.md)
+            # 处理换行与百分号，适配 GitHub 输出格式
+            CHANGELOG_CONTENT="${CHANGELOG_CONTENT//'%'/'%25'}"
+            CHANGELOG_CONTENT="${CHANGELOG_CONTENT//$'\n'/'%0A'}"
+            CHANGELOG_CONTENT="${CHANGELOG_CONTENT//$'\r'/'%0D'}"
+            echo "body=${CHANGELOG_CONTENT}" >> "$GITHUB_OUTPUT"
+          else
+            # 如果 CHANGELOG.md 不存在，回退到使用最后一个 commit 消息
+            LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
+            LAST_COMMIT_MSG="${LAST_COMMIT_MSG//'%'/'%25'}"
+            LAST_COMMIT_MSG="${LAST_COMMIT_MSG//$'\n'/'%0A'}"
+            echo "body=${LAST_COMMIT_MSG}" >> "$GITHUB_OUTPUT"
+          fi
         shell: bash
         if: startsWith(github.ref, 'refs/tags/')
 
