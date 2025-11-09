@@ -810,8 +810,8 @@ namespace gdl {
                     if (is_vip_ == "0") {
                         parse_item.headers.insert(std::make_pair("force-http-range", "true"));
                         parse_item.headers.insert(std::make_pair("enable-http-pipelining", "true"));
-                        parse_item.headers.insert(std::make_pair("max-connection-per-server", "2"));
-                        parse_item.headers.insert(std::make_pair("split", "2"));
+                        parse_item.headers.insert(std::make_pair("max-connection-per-server", "8"));
+                        parse_item.headers.insert(std::make_pair("split", "16"));
                     }
 					parse_item.headers.insert(std::make_pair("user-agent", baidu::BAIDU_CLIENT_UA));
 					parse_item.headers.insert(std::make_pair("out", parse_item.file_name));

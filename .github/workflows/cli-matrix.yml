@@ -116,6 +116,7 @@ jobs:
             -S ${{ github.workspace }} \
             -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/${{ matrix.install_prefix }} \
             -DCMAKE_BUILD_TYPE=Release \
+            -DGDL_UI_GENERATE_TRANSLATIONS=on \
             -GNinja \
             ${{ matrix.cmake_extra }}
           cmake --build build --config Release --parallel
@@ -130,7 +131,7 @@ jobs:
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.msvc_arch }}
-          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\${{ matrix.install_prefix }} -DCMAKE_BUILD_TYPE=Release -GNinja -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00"
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\${{ matrix.install_prefix }} -DCMAKE_BUILD_TYPE=Release -DGDL_UI_GENERATE_TRANSLATIONS=on -GNinja -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00"
           cmake --build build --config Release --parallel
           mkdir windows_pdb
           copy /Y build\Release\bin\*.pdb windows_pdb
