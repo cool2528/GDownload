@@ -9,8 +9,53 @@ on:
   workflow_dispatch:
 
 jobs:
+  # 创建 Release（只运行一次，避免重复创建）
+  create-release:
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Prepare Release Notes
+        id: release_body
+        run: |
+          git fetch --tags --force
+          # 读取 CHANGELOG.md 文件内容
+          if [ -f "CHANGELOG.md" ]; then
+            CHANGELOG_CONTENT=$(cat CHANGELOG.md)
+            # 处理换行与百分号，适配 GitHub 输出格式
+            CHANGELOG_CONTENT="${CHANGELOG_CONTENT//'%'/'%25'}"
+            CHANGELOG_CONTENT="${CHANGELOG_CONTENT//$'\n'/'%0A'}"
+            CHANGELOG_CONTENT="${CHANGELOG_CONTENT//$'\r'/'%0D'}"
+            echo "body=${CHANGELOG_CONTENT}" >> "$GITHUB_OUTPUT"
+          else
+            # 如果 CHANGELOG.md 不存在，回退到使用最后一个 commit 消息
+            LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
+            LAST_COMMIT_MSG="${LAST_COMMIT_MSG//'%'/'%25'}"
+            LAST_COMMIT_MSG="${LAST_COMMIT_MSG//$'\n'/'%0A'}"
+            echo "body=${LAST_COMMIT_MSG}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          body: ${{ steps.release_body.outputs.body }}
+          draft: false
+          prerelease: false
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build:
-    if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'
+    needs: [create-release]
+    if: |
+      !cancelled() &&
+      (needs.create-release.result == 'success' || needs.create-release.result == 'skipped')
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -206,43 +251,21 @@ jobs:
             ${{ github.workspace }}/${{ matrix.install_prefix }}
           if-no-files-found: warn
 
-      - name: Prepare Release Notes
-        id: release_body
-        run: |
-          git fetch --tags --force
-          # 读取 CHANGELOG.md 文件内容
-          if [ -f "CHANGELOG.md" ]; then
-            CHANGELOG_CONTENT=$(cat CHANGELOG.md)
-            # 处理换行与百分号，适配 GitHub 输出格式
-            CHANGELOG_CONTENT="${CHANGELOG_CONTENT//'%'/'%25'}"
-            CHANGELOG_CONTENT="${CHANGELOG_CONTENT//$'\n'/'%0A'}"
-            CHANGELOG_CONTENT="${CHANGELOG_CONTENT//$'\r'/'%0D'}"
-            echo "body=${CHANGELOG_CONTENT}" >> "$GITHUB_OUTPUT"
-          else
-            # 如果 CHANGELOG.md 不存在，回退到使用最后一个 commit 消息
-            LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
-            LAST_COMMIT_MSG="${LAST_COMMIT_MSG//'%'/'%25'}"
-            LAST_COMMIT_MSG="${LAST_COMMIT_MSG//$'\n'/'%0A'}"
-            echo "body=${LAST_COMMIT_MSG}" >> "$GITHUB_OUTPUT"
-          fi
-        shell: bash
-        if: startsWith(github.ref, 'refs/tags/')
-
       - name: Upload Release Artifact
         if: startsWith(github.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
           file_glob: true
           file: ${{ matrix.release_glob }}
           overwrite: false
-          body: ${{ steps.release_body.outputs.body }}
 
       - name: Upload Windows PDB
         if: matrix.target == 'windows' && startsWith(github.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
           file: ${{ matrix.pdb_archive }}
           overwrite: false
-          body: ${{ steps.release_body.outputs.body }}
