@@ -1,0 +1,26 @@
+--- a/src/core/CMakeLists.txt
++++ b/src/core/CMakeLists.txt
+@@ -264,6 +264,23 @@
+     )
+ endif()
+
++# Remove AGL framework link on macOS as it's deprecated and removed in modern macOS
++if(APPLE AND TARGET WrapOpenGL::WrapOpenGL)
++    get_target_property(_wrap_opengl_link_libs WrapOpenGL::WrapOpenGL INTERFACE_LINK_LIBRARIES)
++    if(_wrap_opengl_link_libs)
++        set(_filtered_libs "")
++        foreach(_lib ${_wrap_opengl_link_libs})
++            string(FIND "${_lib}" "AGL" _agl_pos)
++            if(_agl_pos EQUAL -1)
++                list(APPEND _filtered_libs "${_lib}")
++            endif()
++        endforeach()
++        set_target_properties(WrapOpenGL::WrapOpenGL PROPERTIES
++            INTERFACE_LINK_LIBRARIES "${_filtered_libs}"
++        )
++    endif()
++endif()
++
+ include(GNUInstallDirs)
+ target_include_directories(${SUB_MODULE_TARGET} PUBLIC
+     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${INCLUDE_PREFIX}/../..>"

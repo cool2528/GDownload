@@ -6,6 +6,8 @@ vcpkg_from_github(
     REF 2.5.0
     SHA512 0612e1a4c886af7329eee43c3bda6d55f9db65d734e7432627562675cc8a0011a78bae85183fcb343d1514a8ba672df22f6cc1b0ce4ba1ef1c698356bf4ab55a
     HEAD_REF main
+    PATCHES
+        remove-agl-framework.patch
 )
 
 # 下载 cmake-utils 子模块
@@ -20,6 +22,15 @@ vcpkg_from_github(
 # 将 cmake-utils 内容复制到 SOURCE_PATH/cmake
 file(REMOVE_RECURSE "${SOURCE_PATH}/cmake")
 file(COPY "${CMAKE_UTILS_PATH}/" DESTINATION "${SOURCE_PATH}/cmake")
+
+# 修复 cmake/utils.cmake 中已弃用的链接选项
+file(READ "${SOURCE_PATH}/cmake/utils.cmake" UTILS_CMAKE_CONTENT)
+string(REPLACE
+    "-Wl,-fatal_warnings -Wl,-undefined,error"
+    "-Wl,-undefined,dynamic_lookup"
+    UTILS_CMAKE_CONTENT
+    "${UTILS_CMAKE_CONTENT}")
+file(WRITE "${SOURCE_PATH}/cmake/utils.cmake" "${UTILS_CMAKE_CONTENT}")
 
 # Qt 路径通过自定义 triplet 的 VCPKG_CMAKE_CONFIGURE_OPTIONS 传递
 # 请确保设置了 QTDIR 环境变量，或在 triplet 中正确配置 CMAKE_PREFIX_PATH
