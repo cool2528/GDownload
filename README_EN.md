@@ -160,6 +160,20 @@ If you encounter "App is damaged" or "Cannot open application" warnings on macOS
 
 3. Enter your administrator password, then try opening the application again
 
+## 🔨 Building from Source
+
+If you want to compile GDownload from source, we provide detailed build guides for developers.
+
+👉 **[View Full Build Documentation](build-guides/BUILD_EN.md)**
+
+The documentation includes:
+- 📋 System requirements and dependency installation
+- 🚀 Quick build using CMake Presets
+- 🔧 Platform-specific detailed instructions (Windows, macOS, Linux)
+- ⚙️ Build options configuration
+- 🐛 Troubleshooting solutions
+- 💡 Recommended developer workflow
+
 ## 🚀 Quick Start
 
 1. Download the installer for your system from [Releases](https://github.com/cool2528/GDownload/releases)
