@@ -118,21 +118,12 @@ endif()
 # 输出CMAKE_BINARY_DIR 的路径
 message("CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")
 
-# set FramelessHelper_DIR
-message("DEPENDENCIES_ROOT_PATH: ${DEPENDENCIES_ROOT_PATH} CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
-set(FramelessHelper_DIR ${DEPENDENCIES_ROOT_PATH}/Framelesshelper/lib/cmake)
-list(APPEND CMAKE_PREFIX_PATH ${DEPENDENCIES_ROOT_PATH}/Framelesshelper)
-message("CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
-set(FRAMELESSHELPER_IMPORT_DIR ${DEPENDENCIES_ROOT_PATH}/Framelesshelper/qml)
 find_package(FramelessHelper REQUIRED COMPONENTS Core Widgets Quick)
 find_package(boost_system CONFIG REQUIRED)
 find_package(boost_property_tree CONFIG REQUIRED)
 find_package(boost_asio CONFIG REQUIRED)
 find_package(LibtorrentRasterbar CONFIG REQUIRED)
 find_package(pugixml CONFIG REQUIRED)
-list(APPEND QML_IMPORT_PATH "${FRAMELESSHELPER_IMPORT_DIR}")
-list(REMOVE_DUPLICATES QML_IMPORT_PATH)
-set(QML_IMPORT_PATH ${QML_IMPORT_PATH} CACHE STRING "Qt Creator extra QML import paths" FORCE)
 
 # set dependencies library
 set(DEPENDENCIES_LIBRARIES FramelessHelper::Core FramelessHelper::Widgets FramelessHelper::Quick GDLCore Engine PluginManager)
@@ -216,13 +207,9 @@ elseif(WIN32)
         TARGET ${PROJECT_NAME}
         PRE_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}> $<TARGET_FILE_DIR:${PROJECT_NAME}>
-        # 复制 FramelessHelper DLL
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${DEPENDENCIES_ROOT_PATH}/FramelessHelper/bin"
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>
         COMMAND_EXPAND_LISTS
     )
-    #增加调用qt的 windeployqt
+    # 增加调用qt的 windeployqt
     add_custom_command(TARGET ${PROJECT_NAME} 
         POST_BUILD
         COMMAND ${QT_ROOT}/bin/windeployqt.exe $<TARGET_FILE:${PROJECT_NAME}>

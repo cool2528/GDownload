@@ -1,7 +1,3 @@
-[submodule "dependencies"]
-	path = dependencies
-	url = https://github.com/cool2528/vendor.git
-	branch = main
 [submodule "lib/AppImageUpdate"]
 	path = lib/AppImageUpdate
 	url = https://github.com/cool2528/AppImageUpdate.git
