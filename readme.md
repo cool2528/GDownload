@@ -160,6 +160,20 @@ GDownload 是一款现代化的跨平台下载管理器，使用 C++ 和 Qt 开�
 
 3. 输入管理员密码后，再次尝试打开应用程序
 
+## 🔨 从源代码构建
+
+如果您想从源代码编译 GDownload，我们为开发者提供了详细的构建指南。
+
+👉 **[查看完整构建文档](build-guides/BUILD_CN.md)**
+
+该文档包含：
+- 📋 系统要求和依赖安装
+- 🚀 使用 CMake Presets 快速构建
+- 🔧 平台特定的详细步骤（Windows、macOS、Linux）
+- ⚙️ 构建选项配置
+- 🐛 常见问题解决方案
+- 💡 开发者工作流推荐
+
 ## 🚀 快速开始
 
 1. 从 [Releases](https://github.com/cool2528/GDownload/releases) 下载适合你系统的安装包

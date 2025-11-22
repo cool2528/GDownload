@@ -29,6 +29,7 @@ ui_*.h
 *.jsc
 Makefile*
 *build-*
+!build-guides/
 *.qm
 *.prl
 
@@ -83,7 +84,7 @@ bin/
 gen/
 out/
 .gradle/
-build/
+/build/
 local.properties
 proguard/
 *.log
@@ -99,7 +100,6 @@ proguard/
 .vscode/*
 .cursor/*
 build_osx/*
-build/*
 build_win/*
 build_unix/*
 # System Files
