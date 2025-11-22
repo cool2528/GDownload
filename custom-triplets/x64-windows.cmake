@@ -1,10 +1,8 @@
-set(VCPKG_TARGET_ARCHITECTURE arm64)
+# 自定义的 Windows x64 triplet，配置 Qt 路径以支持 FramelessHelper 构建
+
+set(VCPKG_TARGET_ARCHITECTURE x64)
 set(VCPKG_CRT_LINKAGE dynamic)
 set(VCPKG_LIBRARY_LINKAGE dynamic)
-
-set(VCPKG_CMAKE_SYSTEM_NAME Darwin)
-set(VCPKG_OSX_ARCHITECTURES arm64)
-set(VCPKG_BUILD_TYPE release)
 
 # 允许 QTDIR 环境变量传递到 vcpkg 构建环境
 set(VCPKG_ENV_PASSTHROUGH QTDIR)

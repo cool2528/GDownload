@@ -61,6 +61,10 @@ jobs:
       fail-fast: false
       matrix:
         target: [linux, macos, windows]
+        # macOS 构建说明：
+        # - 使用 universal-osx-release triplet 构建 Universal Binary (ARM64 + x86_64)
+        # - 一个二进制文件同时支持 Apple Silicon (M1/M2/M3) 和 Intel Mac
+        # - 覆盖 100% 的 macOS 用户（无需 Rosetta 2）
         include:
           - target: linux
             os: ubuntu-latest
@@ -75,10 +79,10 @@ jobs:
             os: macos-latest
             qt_version: 6.5.2
             qt_arch: clang_64
-            vcpkg_triplet: arm64-osx-release
+            vcpkg_triplet: universal-osx-release
             install_prefix: macos_package
             release_glob: macos_package/*
-            cmake_extra: "-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang"
+            cmake_extra: "-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_OSX_ARCHITECTURES='arm64;x86_64'"
             pdb_archive: ""
           - target: windows
             os: windows-latest
@@ -172,11 +176,13 @@ jobs:
       - name: Configure & Build (Unix)
         if: matrix.target != 'windows'
         run: |
+          export QTDIR="${Qt6_DIR}/../.."
           cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} \
             -B build \
             -S ${{ github.workspace }} \
             -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/${{ matrix.install_prefix }} \
             -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_PREFIX_PATH="${QTDIR}" \
             -DGDL_UI_GENERATE_TRANSLATIONS=on \
             -GNinja \
             ${{ matrix.cmake_extra }}
@@ -192,7 +198,8 @@ jobs:
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.msvc_arch }}
-          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\${{ matrix.install_prefix }} -DCMAKE_BUILD_TYPE=Release -DGDL_UI_GENERATE_TRANSLATIONS=on -GNinja -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00"
+          set QTDIR=%Qt6_DIR%\..\..
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\${{ matrix.install_prefix }} -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=%QTDIR% -DGDL_UI_GENERATE_TRANSLATIONS=on -GNinja -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00"
           cmake --build build --config Release --parallel
           mkdir windows_pdb
           copy /Y build\Release\bin\*.pdb windows_pdb
