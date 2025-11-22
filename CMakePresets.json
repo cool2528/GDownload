@@ -24,17 +24,56 @@
         },
         {
             "hidden": true,
-            "name": "osx-clang",
-            "description": "OSX Clang",
+            "name": "osx-base",
+            "description": "macOS Base Configuration",
             "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+                "CMAKE_PREFIX_PATH": "$env{QTDIR}"
+            }
+        },
+        {
+            "hidden": true,
+            "name": "osx-arm64",
+            "description": "macOS ARM64 (Apple Silicon)",
+            "inherits": "osx-base",
             "architecture": {
                 "value": "arm64",
                 "strategy": "external"
             },
             "cacheVariables": {
-                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-                "CMAKE_PREFIX_PATH": "$env{QTDIR}"
+                "CMAKE_OSX_ARCHITECTURES": "arm64",
+                "VCPKG_TARGET_TRIPLET": "arm64-osx"
             }
+        },
+        {
+            "hidden": true,
+            "name": "osx-x64",
+            "description": "macOS x86_64 (Intel)",
+            "inherits": "osx-base",
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "CMAKE_OSX_ARCHITECTURES": "x86_64",
+                "VCPKG_TARGET_TRIPLET": "x64-osx"
+            }
+        },
+        {
+            "hidden": true,
+            "name": "osx-universal",
+            "description": "macOS Universal Binary (ARM64 + x86_64)",
+            "inherits": "osx-base",
+            "cacheVariables": {
+                "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64"
+            }
+        },
+        {
+            "hidden": true,
+            "name": "osx-clang",
+            "description": "macOS Clang (Legacy - ARM64 only)",
+            "inherits": "osx-arm64"
         },
         {
             "hidden": true,

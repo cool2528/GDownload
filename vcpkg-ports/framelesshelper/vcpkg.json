@@ -1,0 +1,19 @@
+{
+  "name": "framelesshelper",
+  "version": "2.5.0",
+  "description": "Cross-platform frameless window framework for Qt. Supports Windows, Linux and macOS. NOTE: Requires Qt to be provided externally via CMAKE_PREFIX_PATH.",
+  "homepage": "https://github.com/wangwenx190/framelesshelper",
+  "license": "MIT",
+  "supports": "!uwp",
+  "dependencies": [
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    }
+  ]
+}
+

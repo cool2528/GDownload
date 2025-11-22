@@ -48,23 +48,34 @@ set(APP_VERSION "${CURRENT_VERSION_MAJOR}.${CURRENT_VERSION_MINOR}.${CURRENT_VER
 
 # 设置vcpkg的manifest模式
 set(VCPKG_MANIFEST_MODE ON)
+# 设置vcpkg的overlay ports路径
+set(VCPKG_OVERLAY_PORTS "${CMAKE_SOURCE_DIR}/vcpkg-ports")
 
 # 生成版本头文件
 configure_file(${CMAKE_SOURCE_DIR}/version.h.in ${CMAKE_SOURCE_DIR}/src/version.h)
 
-# 设置依赖库的根路径
+# 设置依赖库的根路径（仅保留 Sparkle 自动更新框架）
 if(APPLE)
-    set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/osx")
     set(SPARKLE_ROOT_PATH "${CMAKE_SOURCE_DIR}/Sparkle")
-    #使用自定义的 triplets
+    # 使用自定义的 triplets
     set(VCPKG_OVERLAY_TRIPLETS  ${CMAKE_SOURCE_DIR}/custom-triplets)
-    # 查询系统芯片架构
-    cmake_host_system_information(RESULT OSX_ARCHITECTURES QUERY OS_PLATFORM)
-    message(STATUS "OSX_ARCHITECTURES:${OSX_ARCHITECTURES}")
-    set(CMAKE_OSX_ARCHITECTURES ${OSX_ARCHITECTURES})
+
+    # macOS 架构配置
+    # 支持三种模式：
+    # 1. 手动指定单架构：-DCMAKE_OSX_ARCHITECTURES=arm64 或 x86_64
+    # 2. 手动指定多架构（Universal Binary）：-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+    # 3. 自动检测当前主机架构（默认）
+    if(DEFINED CMAKE_OSX_ARCHITECTURES)
+        message(STATUS "Using specified macOS architectures: ${CMAKE_OSX_ARCHITECTURES}")
+    else()
+        cmake_host_system_information(RESULT OSX_ARCHITECTURES QUERY OS_PLATFORM)
+        message(STATUS "Auto-detected macOS architecture: ${OSX_ARCHITECTURES}")
+        set(CMAKE_OSX_ARCHITECTURES ${OSX_ARCHITECTURES})
+    endif()
 
 elseif(WIN32)
-    set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/win")
+    # 使用自定义的 triplets（用于传递 Qt 路径给 vcpkg 构建的包）
+    set(VCPKG_OVERLAY_TRIPLETS ${CMAKE_SOURCE_DIR}/custom-triplets)
     # 当使用visual studio 以文件夹方式打开cmake 项目通过 QT visual studio tool 生成的cmake 预设时，设置编译选项
     if(CMAKE_GENERATOR STREQUAL "Ninja" OR CMAKE_GENERATOR STREQUAL "Ninja Multi-Config")
         add_compile_options(/EHsc)
@@ -83,7 +94,6 @@ elseif(UNIX AND NOT APPLE)
     set(CMAKE_INSTALL_RPATH "$ORIGIN:$ORIGIN/../lib")
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
     set(VCPKG_OVERLAY_TRIPLETS  ${CMAKE_SOURCE_DIR}/custom-triplets)
-    set(DEPENDENCIES_ROOT_PATH "${CMAKE_SOURCE_DIR}/dependencies/linux")
 endif()
 
 project(GDownload LANGUAGES CXX C)
@@ -151,12 +161,6 @@ elseif(APPLE)
         BUNDLE DESTINATION .
         LIBRARY DESTINATION ${PROJECT_NAME}.app/Contents/Frameworks
         RUNTIME DESTINATION ${PROJECT_NAME}.app/Contents/MacOS
-    )
-
-    # 安装第三方依赖的动态库到Frameworks目录
-    file(GLOB FRAMEWORK_DYLIBS "${DEPENDENCIES_ROOT_PATH}/Framelesshelper/lib/*.dylib")
-    install(FILES ${FRAMEWORK_DYLIBS}
-        DESTINATION ${PROJECT_NAME}.app/Contents/Frameworks
     )
 
     # 这里要复制 vcpkg 的依赖库到Frameworks目录
@@ -326,10 +330,6 @@ elseif(UNIX AND NOT APPLE)
         DESTINATION ${APP_LIB_DIR}
     )
 
-    # 复制 framelesshelper 动态库
-    file(GLOB FRAMELESS_HELPER_LIBS
-        "${DEPENDENCIES_ROOT_PATH}/Framelesshelper/lib/*.so*"
-    )
     # 复制 aria2c文件和配置文件
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/extra/linux/$<IF:$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},x86_64>,x64,arm64>/engine/ 
         DESTINATION ${APP_BIN_DIR}/engine
@@ -341,9 +341,6 @@ elseif(UNIX AND NOT APPLE)
     # 复制translations 文件夹下的文件
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/src/App/ui/Resource/translations/
         DESTINATION  ${APP_BIN_DIR}/translations
-    )
-    install(FILES ${FRAMELESS_HELPER_LIBS}
-        DESTINATION ${APP_LIB_DIR}
     )
     # 创建和安装desktop文件
     configure_file(

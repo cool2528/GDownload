@@ -17,6 +17,7 @@
         "ssl"
       ]
     },
+    "framelesshelper",
     "gtest",
     "libtorrent",
     "nlohmann-json",
@@ -26,5 +27,12 @@
     "spdlog",
     "sqlite3",
     "tomlplusplus"
+  ],
+  "builtin-baseline": "c8696863d371ab7f46545af949dfc541a6a5c4f0",
+  "overrides": [
+    {
+      "name": "framelesshelper",
+      "version": "2.5.0"
+    }
   ]
 }
