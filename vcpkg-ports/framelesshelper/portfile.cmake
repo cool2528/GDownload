@@ -9,6 +9,7 @@ vcpkg_from_github(
     PATCHES
         remove-agl-framework.patch
         add-qt-private-components.patch
+        fix-quickcontrols2-private.patch
 )
 
 # 下载 cmake-utils 子模块
