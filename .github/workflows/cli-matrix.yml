@@ -60,11 +60,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [linux, macos, windows]
+        target: [linux, macos-arm64, macos-x64, windows]
         # macOS 构建说明：
-        # - 使用 universal-osx-release triplet 构建 Universal Binary (ARM64 + x86_64)
-        # - 一个二进制文件同时支持 Apple Silicon (M1/M2/M3) 和 Intel Mac
-        # - 覆盖 100% 的 macOS 用户（无需 Rosetta 2）
+        # - 分别构建 ARM64 和 x86_64 架构
+        # - 通过 merge-macos-universal 任务合并为 Universal Binary
+        # - 避免 vcpkg 在多架构模式下的构建失败问题
         include:
           - target: linux
             os: ubuntu-latest
@@ -75,14 +75,27 @@ jobs:
             release_glob: gdownload-*.AppImag*
             cmake_extra: ""
             pdb_archive: ""
-          - target: macos
+          - target: macos-arm64
             os: macos-latest
             qt_version: 6.5.2
             qt_arch: clang_64
-            vcpkg_triplet: universal-osx-release
-            install_prefix: macos_package
-            release_glob: macos_package/*
-            cmake_extra: "-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_OSX_ARCHITECTURES='arm64;x86_64'"
+            vcpkg_triplet: arm64-osx-release
+            install_prefix: macos_arm64_package
+            cmake_arch: arm64
+            artifact_name: macos-arm64-app
+            release_glob: ""
+            cmake_extra: "-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang"
+            pdb_archive: ""
+          - target: macos-x64
+            os: macos-latest
+            qt_version: 6.5.2
+            qt_arch: clang_64
+            vcpkg_triplet: x64-osx-release
+            install_prefix: macos_x64_package
+            cmake_arch: x86_64
+            artifact_name: macos-x64-app
+            release_glob: ""
+            cmake_extra: "-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang"
             pdb_archive: ""
           - target: windows
             os: windows-latest
@@ -177,6 +190,10 @@ jobs:
         if: matrix.target != 'windows'
         run: |
           export QTDIR="${Qt6_DIR}/../.."
+          EXTRA_CMAKE_ARGS=""
+          if [[ "${{ matrix.target }}" == macos-* ]]; then
+            EXTRA_CMAKE_ARGS="-DCMAKE_OSX_ARCHITECTURES=${{ matrix.cmake_arch }}"
+          fi
           cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} \
             -B build \
             -S ${{ github.workspace }} \
@@ -185,7 +202,8 @@ jobs:
             -DCMAKE_PREFIX_PATH="${QTDIR}" \
             -DGDL_UI_GENERATE_TRANSLATIONS=on \
             -GNinja \
-            ${{ matrix.cmake_extra }}
+            ${{ matrix.cmake_extra }} \
+            ${EXTRA_CMAKE_ARGS}
           cmake --build build --config Release --parallel
           if [ "${{ matrix.target }}" = "linux" ]; then
             cmake --install build --config Release --strip
@@ -258,6 +276,14 @@ jobs:
             ${{ github.workspace }}/${{ matrix.install_prefix }}
           if-no-files-found: warn
 
+      - name: Upload Architecture Artifact (macOS only)
+        if: startsWith(matrix.target, 'macos-')
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ github.workspace }}/${{ matrix.install_prefix }}/GDownload.app
+          retention-days: 1
+
       - name: Upload Release Artifact
         if: startsWith(github.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@v2
@@ -275,4 +301,70 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
           file: ${{ matrix.pdb_archive }}
+          overwrite: false
+
+  merge-macos-universal:
+    needs: build
+    if: |
+      !cancelled() &&
+      (needs.build.result == 'success')
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download ARM64 Build
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-arm64-app
+          path: build-arm64
+
+      - name: Download x64 Build
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-x64-app
+          path: build-x64
+
+      - name: Merge Universal Binary
+        run: |
+          chmod +x scripts/merge_macos_bundle.sh
+          ./scripts/merge_macos_bundle.sh \
+            build-arm64/GDownload.app \
+            build-x64/GDownload.app \
+            GDownload.app
+
+      - name: Verify Universal Binary
+        run: |
+          echo "验证主可执行文件:"
+          file GDownload.app/Contents/MacOS/GDownload
+          lipo -info GDownload.app/Contents/MacOS/GDownload
+
+          echo "验证所有 .dylib 文件:"
+          find GDownload.app -name "*.dylib" -exec sh -c 'echo "{}"; lipo -info "{}"' \;
+
+      - name: Create DMG
+        run: |
+          brew install create-dmg
+          create-dmg \
+            --volname "GDownload" \
+            --window-pos 200 120 \
+            --window-size 600 400 \
+            --icon-size 100 \
+            --app-drop-link 450 185 \
+            "GDownload-Universal.dmg" \
+            "GDownload.app"
+
+      - name: Upload Universal Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-universal-dmg
+          path: GDownload-Universal.dmg
+
+      - name: Upload to Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+          file: GDownload-Universal.dmg
           overwrite: false
