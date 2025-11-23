@@ -199,45 +199,55 @@ makensis build\release\windows_installer.nsi
 
 #### Build Steps
 
-**Option A: Universal Binary (Recommended - supports both Intel and Apple Silicon)**
+**Option A: Universal Binary Build Separately and Merge (Recommended - Most Reliable)**
 
-Edit `CMakeUserPresets.json`:
-```json
-{
-  "name": "osx-universal-user",
-  "environment": {
-    "VCPKG_ROOT": "/Users/yourname/vcpkg",
-    "QTDIR": "/Users/yourname/Qt/6.5.2/macos"
-  }
-}
+This is the recommended approach for production, building ARM64 and x86_64 separately then merging:
+
+```bash
+# 1. Build ARM64 version
+cmake --preset osx-arm64-user
+cmake --build build-arm64 --config Release
+cmake --install build-arm64
+
+# 2. Build x86_64 version
+cmake --preset osx-x64-user
+cmake --build build-x64 --config Release
+cmake --install build-x64
+
+# 3. Merge into Universal Binary
+./scripts/merge_macos_bundle.sh \
+  install-arm64/GDownload.app \
+  install-x64/GDownload.app \
+  install-universal/GDownload.app
+
+# 4. Verify
+lipo -info install-universal/GDownload.app/Contents/MacOS/GDownload
+# Should output: Architectures in the fat file: ... are: x86_64 arm64
 ```
 
-Build:
+**Option B: Universal Binary One-Time Build (Not Recommended - May Fail)**
+
+Use `osx-universal-user` preset to build in one go:
+
 ```bash
 cmake --preset osx-universal-user
-cmake --build --preset osx-universal-debug-user
+cmake --build build-universal --config Release
 ```
 
-Verify Universal Binary:
-```bash
-lipo -archs build/Debug/bin/gdownload.app/Contents/MacOS/gdownload
-# Should output: arm64 x86_64
-```
+> ⚠️ **Warning**: This method depends on vcpkg's Universal Binary support. Some dependencies may fail to build. If you encounter issues, use Option A instead.
 
-**Option B: Single Architecture**
+**Option C: Single Architecture Build**
+
+If you only need a specific architecture:
 
 ```bash
 # ARM64 only (Apple Silicon)
-cmake --preset osx-clang-user
-cmake --build --preset osx-debug-user
+cmake --preset osx-arm64-user
+cmake --build build-arm64 --config Release
 
-# Or manually specify architecture
-cmake -B build -S . \
-  -G Ninja \
-  -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
-  -DCMAKE_PREFIX_PATH="$QTDIR" \
-  -DCMAKE_BUILD_TYPE=Debug \
-  -DCMAKE_OSX_ARCHITECTURES="arm64"  # or "x86_64"
+# x86_64 only (Intel)
+cmake --preset osx-x64-user
+cmake --build build-x64 --config Release
 ```
 
 #### Creating DMG Package
@@ -343,8 +353,9 @@ The project provides pre-configured CMake Presets to simplify the build process.
 - `windows-msvc-user` - Windows Debug build configuration
 
 #### macOS
-- `osx-clang-user` - macOS ARM64 Debug build
-- `osx-universal-user` - **macOS Universal Binary** (ARM64 + x86_64)
+- `osx-arm64-user` - macOS ARM64 (Apple Silicon)
+- `osx-x64-user` - macOS x86_64 (Intel)
+- `osx-universal-user` - **macOS Universal Binary** (for local testing, CI recommends building separately)
 
 #### Linux
 - `ubuntu-amd64-user` - Linux x64 Debug build
@@ -457,17 +468,35 @@ echo $QTDIR
 ### Q: macOS Universal Binary build fails
 
 **Possible causes:**
-1. Qt version doesn't support Universal Binary (requires Qt 6.2+)
-2. vcpkg dependencies not properly built as Universal Binary
-3. `CMAKE_OSX_ARCHITECTURES` not specified
+1. vcpkg dependencies don't support simultaneous Universal Binary build
+2. Qt version doesn't support Universal Binary (requires Qt 6.2+)
+3. `CMAKE_OSX_ARCHITECTURES` not correctly specified
 
 **Solution:**
-```bash
-# Explicitly specify architectures
-cmake --preset osx-universal-user \
-  -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
 
-# Verify Qt supports Universal Binary
+**Recommended approach: Build separately then merge**
+```bash
+# 1. Build ARM64 and x86_64 separately
+cmake --preset osx-arm64-user
+cmake --build build-arm64 --config Release
+cmake --install build-arm64
+
+cmake --preset osx-x64-user
+cmake --build build-x64 --config Release
+cmake --install build-x64
+
+# 2. Merge using script
+./scripts/merge_macos_bundle.sh \
+  install-arm64/GDownload.app \
+  install-x64/GDownload.app \
+  install-universal/GDownload.app
+
+# 3. Verify result
+lipo -info install-universal/GDownload.app/Contents/MacOS/GDownload
+```
+
+**Verify Qt supports Universal Binary:**
+```bash
 lipo -archs $QTDIR/lib/QtCore.framework/QtCore
 # Should output: arm64 x86_64
 ```
