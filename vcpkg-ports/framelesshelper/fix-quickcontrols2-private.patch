@@ -1,0 +1,40 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index aaaaaaa..bbbbbbb 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -75,7 +75,7 @@ endif()
+ find_package(QT NAMES Qt6 Qt5 QUIET COMPONENTS Widgets Quick)
+ find_package(Qt${QT_VERSION_MAJOR} QUIET COMPONENTS Widgets Quick)
+ if(QT_VERSION_MAJOR EQUAL 6 AND Qt${QT_VERSION_MAJOR}Quick_FOUND)
+-    find_package(Qt6 QUIET COMPONENTS QuickPrivate WidgetsPrivate QuickTemplates2Private)
++    find_package(Qt6 QUIET COMPONENTS QuickPrivate WidgetsPrivate QuickTemplates2Private QuickControls2Private)
+ endif()
+
+ if(FRAMELESSHELPER_NATIVE_IMPL AND NOT WIN32)
+diff --git a/src/quick/CMakeLists.txt b/src/quick/CMakeLists.txt
+index aaaaaaa..bbbbbbb 100644
+--- a/src/quick/CMakeLists.txt
++++ b/src/quick/CMakeLists.txt
+@@ -235,11 +235,17 @@ if(FRAMELESSHELPER_NO_PRIVATE)
+         Qt${QT_VERSION_MAJOR}::Quick
+     )
+ else()
+-    target_link_libraries(${SUB_MODULE_TARGET} PRIVATE
+-        Qt${QT_VERSION_MAJOR}::QuickPrivate
+-        Qt${QT_VERSION_MAJOR}::QuickTemplates2Private
+-        Qt${QT_VERSION_MAJOR}::QuickControls2Private
+-    )
++    set(__private_libs Qt${QT_VERSION_MAJOR}::QuickPrivate Qt${QT_VERSION_MAJOR}::QuickTemplates2Private)
++    # QuickControls2Private is optional in Qt 6.10+
++    if(TARGET Qt${QT_VERSION_MAJOR}::QuickControls2Private)
++        list(APPEND __private_libs Qt${QT_VERSION_MAJOR}::QuickControls2Private)
++    else()
++        message(STATUS "Qt${QT_VERSION_MAJOR}::QuickControls2Private not found, skipping...")
++    endif()
++
++    target_link_libraries(${SUB_MODULE_TARGET} PRIVATE ${__private_libs})
++
++    unset(__private_libs)
+ endif()
+
+ target_link_libraries(${SUB_MODULE_TARGET} PRIVATE

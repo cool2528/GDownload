@@ -1,0 +1,21 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index aaaaaaa..bbbbbbb 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -67,8 +67,16 @@ project(${PROJECT_NAME}
+ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui)
+ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui)
+
++# Find Qt Private components for Qt6
++if(QT_VERSION_MAJOR EQUAL 6)
++    find_package(Qt6 REQUIRED COMPONENTS CorePrivate GuiPrivate)
++endif()
++
+ find_package(QT NAMES Qt6 Qt5 QUIET COMPONENTS Widgets Quick)
+ find_package(Qt${QT_VERSION_MAJOR} QUIET COMPONENTS Widgets Quick)
++if(QT_VERSION_MAJOR EQUAL 6 AND Qt${QT_VERSION_MAJOR}Quick_FOUND)
++    find_package(Qt6 QUIET COMPONENTS QuickPrivate WidgetsPrivate QuickTemplates2Private)
++endif()
+
+ if(FRAMELESSHELPER_NATIVE_IMPL AND NOT WIN32)
+     message(WARNING "FRAMELESSHELPER_NATIVE_IMPL currently only supports the Windows platform!")

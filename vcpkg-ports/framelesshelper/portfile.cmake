@@ -8,6 +8,7 @@ vcpkg_from_github(
     HEAD_REF main
     PATCHES
         remove-agl-framework.patch
+        add-qt-private-components.patch
 )
 
 # 下载 cmake-utils 子模块

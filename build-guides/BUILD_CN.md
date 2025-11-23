@@ -199,45 +199,55 @@ makensis build\release\windows_installer.nsi
 
 #### 构建步骤
 
-**选项 A：Universal Binary（推荐，同时支持 Intel 和 Apple Silicon）**
+**选项 A：Universal Binary 分别构建（推荐，稳定可靠）**
 
-编辑 `CMakeUserPresets.json`：
-```json
-{
-  "name": "osx-universal-user",
-  "environment": {
-    "VCPKG_ROOT": "/Users/yourname/vcpkg",
-    "QTDIR": "/Users/yourname/Qt/6.5.2/macos"
-  }
-}
+这是生产环境推荐的方法，分别构建 ARM64 和 x86_64 版本后合并：
+
+```bash
+# 1. 构建 ARM64 版本
+cmake --preset osx-arm64-user
+cmake --build build-arm64 --config Release
+cmake --install build-arm64
+
+# 2. 构建 x86_64 版本
+cmake --preset osx-x64-user
+cmake --build build-x64 --config Release
+cmake --install build-x64
+
+# 3. 合并为 Universal Binary
+./scripts/merge_macos_bundle.sh \
+  install-arm64/GDownload.app \
+  install-x64/GDownload.app \
+  install-universal/GDownload.app
+
+# 4. 验证
+lipo -info install-universal/GDownload.app/Contents/MacOS/GDownload
+# 应输出: Architectures in the fat file: ... are: x86_64 arm64
 ```
 
-构建：
+**选项 B：Universal Binary 一次性构建（不推荐，可能失败）**
+
+使用 `osx-universal-user` preset 一次性构建：
+
 ```bash
 cmake --preset osx-universal-user
-cmake --build --preset osx-universal-debug-user
+cmake --build build-universal --config Release
 ```
 
-验证 Universal Binary：
-```bash
-lipo -archs build/Debug/bin/gdownload.app/Contents/MacOS/gdownload
-# 应输出: arm64 x86_64
-```
+> ⚠️ **注意**: 此方法依赖 vcpkg 的 Universal Binary 支持，某些依赖包可能构建失败。如遇到问题，请使用选项 A。
 
-**选项 B：单一架构**
+**选项 C：单一架构构建**
+
+如果只需要特定架构：
 
 ```bash
 # 仅 ARM64 (Apple Silicon)
-cmake --preset osx-clang-user
-cmake --build --preset osx-debug-user
+cmake --preset osx-arm64-user
+cmake --build build-arm64 --config Release
 
-# 或手动指定架构
-cmake -B build -S . \
-  -G Ninja \
-  -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
-  -DCMAKE_PREFIX_PATH="$QTDIR" \
-  -DCMAKE_BUILD_TYPE=Debug \
-  -DCMAKE_OSX_ARCHITECTURES="arm64"  # 或 "x86_64"
+# 仅 x86_64 (Intel)
+cmake --preset osx-x64-user
+cmake --build build-x64 --config Release
 ```
 
 #### 生成 DMG 安装包
@@ -343,8 +353,9 @@ export QMAKE=$QTDIR/bin/qmake
 - `windows-msvc-user` - Windows Debug 构建配置
 
 #### macOS
-- `osx-clang-user` - macOS ARM64 Debug 构建
-- `osx-universal-user` - **macOS Universal Binary** (ARM64 + x86_64)
+- `osx-arm64-user` - macOS ARM64 (Apple Silicon)
+- `osx-x64-user` - macOS x86_64 (Intel)
+- `osx-universal-user` - **macOS Universal Binary** (用于本地测试，CI 推荐分别构建)
 
 #### Linux
 - `ubuntu-amd64-user` - Linux x64 Debug 构建
@@ -457,17 +468,35 @@ echo $QTDIR
 ### Q: macOS Universal Binary 构建失败
 
 **可能原因：**
-1. Qt 版本不支持 Universal Binary（需要 Qt 6.2+）
-2. vcpkg 依赖未正确构建为 Universal Binary
-3. 未指定 `CMAKE_OSX_ARCHITECTURES`
+1. vcpkg 某些依赖不支持 Universal Binary 同时构建
+2. Qt 版本不支持 Universal Binary（需要 Qt 6.2+）
+3. 未正确指定 `CMAKE_OSX_ARCHITECTURES`
 
 **解决方案：**
-```bash
-# 显式指定架构
-cmake --preset osx-universal-user \
-  -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
 
-# 验证 Qt 是否支持
+**推荐方法：分别构建后合并**
+```bash
+# 1. 分别构建 ARM64 和 x86_64
+cmake --preset osx-arm64-user
+cmake --build build-arm64 --config Release
+cmake --install build-arm64
+
+cmake --preset osx-x64-user
+cmake --build build-x64 --config Release
+cmake --install build-x64
+
+# 2. 使用脚本合并
+./scripts/merge_macos_bundle.sh \
+  install-arm64/GDownload.app \
+  install-x64/GDownload.app \
+  install-universal/GDownload.app
+
+# 3. 验证结果
+lipo -info install-universal/GDownload.app/Contents/MacOS/GDownload
+```
+
+**验证 Qt 是否支持 Universal Binary：**
+```bash
 lipo -archs $QTDIR/lib/QtCore.framework/QtCore
 # 应输出: arm64 x86_64
 ```
