@@ -1,0 +1,38 @@
+diff --git a/src/core/utils_win.cpp b/src/core/utils_win.cpp
+index f5e46b6..c29a5aa 100644
+--- a/src/core/utils_win.cpp
++++ b/src/core/utils_win.cpp
+@@ -53,6 +53,9 @@
+ #    include <QtGui/qpa/qplatformnativeinterface.h>
+ #  else // (QT_VERSION >= QT_VERSION_CHECK(6, 2, 0))
+ #    include <QtGui/qpa/qplatformwindow_p.h>
++#    if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
++#      include <QtGui/qstylehints.h>
++#    endif
+ #  endif // (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+ #endif
+ #include <d2d1.h>
+@@ -2305,7 +2308,13 @@ bool Utils::shouldAppsUseDarkMode_windows()
+         return false;
+     }
+ #if FRAMELESSHELPER_CONFIG(private_qt)
+-#  if (QT_VERSION >= QT_VERSION_CHECK(6, 2, 0))
++#  if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
++    if (const auto hints = QGuiApplication::styleHints()) {
++        return (hints->colorScheme() == Qt::ColorScheme::Dark);
++    } else {
++        WARNING << "QStyleHints is not available.";
++    }
++#  elif (QT_VERSION >= QT_VERSION_CHECK(6, 2, 0))
+     if (const auto app = qApp->nativeInterface<QNativeInterface::Private::QWindowsApplication>()) {
+         return app->isDarkMode();
+     } else {
+@@ -2320,7 +2329,7 @@ bool Utils::shouldAppsUseDarkMode_windows()
+ #  else // (QT_VERSION < QT_VERSION_CHECK(5, 15, 0))
+     // Qt gained the ability to detect the system dark mode setting only since 5.15.
+     // We should detect it ourself on versions below that.
+-#  endif // (QT_VERSION >= QT_VERSION_CHECK(6, 2, 0))
++#  endif // (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+ #endif // FRAMELESSHELPER_CONFIG(private_qt)
+     // Starting from Windows 10 1903, "ShouldAppsUseDarkMode()" (exported by UXTHEME.DLL,
+     // ordinal number 132) always return "TRUE" (actually, a random non-zero number at

@@ -1,0 +1,45 @@
+diff --git a/include/FramelessHelper/Core/private/framelesshelpercore_global_p.h b/include/FramelessHelper/Core/private/framelesshelpercore_global_p.h
+index aaaaaaa..bbbbbbb 100644
+--- a/include/FramelessHelper/Core/private/framelesshelpercore_global_p.h
++++ b/include/FramelessHelper/Core/private/framelesshelpercore_global_p.h
+@@ -164,18 +164,18 @@ FRAMELESSHELPER_END_NAMESPACE
+   [[maybe_unused]] [[nodiscard]] inline constexpr bool operator>(const Type1 &lhs, const Type2 &rhs) noexcept \
+   { \
+       return ((lhs.width() * lhs.height()) > (rhs.width() * rhs.height())); \
+   } \
+   [[maybe_unused]] [[nodiscard]] inline constexpr bool operator>=(const Type1 &lhs, const Type2 &rhs) noexcept \
+   { \
+-      return (operator>(lhs, rhs) || operator==(lhs, rhs)); \
++      return ((lhs.width() * lhs.height()) >= (rhs.width() * rhs.height())); \
+   } \
+   [[maybe_unused]] [[nodiscard]] inline constexpr bool operator<(const Type1 &lhs, const Type2 &rhs) noexcept \
+   { \
+-      return (operator!=(lhs, rhs) && !operator>(lhs, rhs)); \
++      return ((lhs.width() * lhs.height()) < (rhs.width() * rhs.height())); \
+   } \
+   [[maybe_unused]] [[nodiscard]] inline constexpr bool operator<=(const Type1 &lhs, const Type2 &rhs) noexcept \
+   { \
+-      return (operator<(lhs, rhs) || operator==(lhs, rhs)); \
++      return ((lhs.width() * lhs.height()) <= (rhs.width() * rhs.height())); \
+   }
+ 
+ DECLARE_SIZE_COMPARE_OPERATORS(QSize, QSize)
+diff --git a/src/core/utils_win.cpp b/src/core/utils_win.cpp
+index aaaaaaa..bbbbbbb 100644
+--- a/src/core/utils_win.cpp
++++ b/src/core/utils_win.cpp
+@@ -2305,7 +2305,14 @@ bool Utils::shouldAppsUseDarkMode_windows()
+         return false;
+     }
+ #if FRAMELESSHELPER_CONFIG(private_qt)
+-#  if (QT_VERSION >= QT_VERSION_CHECK(6, 2, 0))
++#  if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
++    if (const auto hints = QGuiApplication::styleHints()) {
++        return (hints->colorScheme() == Qt::ColorScheme::Dark);
++    } else {
++        WARNING << "QStyleHints is not available.";
++    }
++#  elif (QT_VERSION >= QT_VERSION_CHECK(6, 2, 0))
+     if (const auto app = qApp->nativeInterface<QNativeInterface::Private::QWindowsApplication>()) {
+         return app->isDarkMode();
+     } else {
