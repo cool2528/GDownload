@@ -1,9 +1,11 @@
+diff --git a/src/core/CMakeLists.txt b/src/core/CMakeLists.txt
+index aaaaaaa..bbbbbbb 100644
 --- a/src/core/CMakeLists.txt
 +++ b/src/core/CMakeLists.txt
 @@ -264,6 +264,23 @@
      )
  endif()
-
+ 
 +# Remove AGL framework link on macOS as it's deprecated and removed in modern macOS
 +if(APPLE AND TARGET WrapOpenGL::WrapOpenGL)
 +    get_target_property(_wrap_opengl_link_libs WrapOpenGL::WrapOpenGL INTERFACE_LINK_LIBRARIES)
