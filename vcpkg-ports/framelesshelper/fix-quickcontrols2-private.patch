@@ -9,7 +9,7 @@ index aaaaaaa..bbbbbbb 100644
 -    find_package(Qt6 QUIET COMPONENTS QuickPrivate WidgetsPrivate QuickTemplates2Private)
 +    find_package(Qt6 QUIET COMPONENTS QuickPrivate WidgetsPrivate QuickTemplates2Private QuickControls2Private)
  endif()
-
+ 
  if(FRAMELESSHELPER_NATIVE_IMPL AND NOT WIN32)
 diff --git a/src/quick/CMakeLists.txt b/src/quick/CMakeLists.txt
 index aaaaaaa..bbbbbbb 100644
@@ -36,5 +36,5 @@ index aaaaaaa..bbbbbbb 100644
 +
 +    unset(__private_libs)
  endif()
-
+ 
  target_link_libraries(${SUB_MODULE_TARGET} PRIVATE

@@ -1,0 +1,17 @@
+diff --git a/src/core/utils.cpp b/src/core/utils.cpp
+index 25c31e1..68d04be 100644
+--- a/src/core/utils.cpp
++++ b/src/core/utils.cpp
+@@ -612,7 +612,12 @@ bool Utils::isWindowAccelerated(const QWindow *window)
+     switch (window->surfaceType()) {
+     case QSurface::RasterGLSurface:
+ #if FRAMELESSHELPER_CONFIG(private_qt)
++#  if (QT_VERSION >= QT_VERSION_CHECK(6, 10, 0))
++        Q_UNUSED(window);
++        return true;
++#  else
+         return qt_window_private(const_cast<QWindow *>(window))->compositing;
++#  endif
+ #else
+         return true;
+ #endif
