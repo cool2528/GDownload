@@ -1,0 +1,88 @@
+diff --git a/src/core/platformsupport_linux.cpp b/src/core/platformsupport_linux.cpp
+--- a/src/core/platformsupport_linux.cpp
++++ b/src/core/platformsupport_linux.cpp
+@@ -26,6 +26,7 @@
+ 
+ #include "framelesshelper_linux.h"
+ #include "sysapiloader_p.h"
++#include <type_traits>
+ 
+ //////////////////////////////////////////////
+ // Xlib
+@@ -297,6 +298,8 @@
+ 
+ #ifndef FRAMELESSHELPER_HAS_GTK
+ 
++#if 0
++
+ #define GTKSETTINGS_IMPL(Type, ...) \
+     Type gtkSettings(const gchar *property) \
+     { \
+@@ -317,6 +320,11 @@
+         return result; \
+     }
+ 
++GTKSETTINGS_IMPL(bool, const bool result = g_value_get_boolean(&value);)
++GTKSETTINGS_IMPL(QString, const QString result = QUtf8String(g_value_get_string(&value));)
++
++#endif // 0
++
+ FRAMELESSHELPER_STRING_CONSTANT2(libgtk, "libgtk-3")
+ 
+ FRAMELESSHELPER_STRING_CONSTANT(gtk_init)
+@@ -473,9 +481,6 @@
+     API_CALL_FUNCTION(libgtk, g_clear_object, object_ptr);
+ }
+ 
+-GTKSETTINGS_IMPL(bool, const bool result = g_value_get_boolean(&value);)
+-GTKSETTINGS_IMPL(QString, const QString result = QUtf8String(g_value_get_string(&value));)
+-
+ #endif // FRAMELESSHELPER_HAS_GTK
+ 
+ FRAMELESSHELPER_BEGIN_NAMESPACE
+@@ -491,9 +496,18 @@
+     if (!settings) {
+         return T{};
+     }
++#ifdef FRAMELESSHELPER_HAS_GTK
+     T result = {};
+     g_object_get(settings, property, &result, nullptr);
+     return result;
++#else
++    static_assert(std::is_same_v<T, bool>, "gtkSettings only supports bool when GTK headers are unavailable");
++    GValue value = G_VALUE_INIT;
++    g_object_get_property(reinterpret_cast<GObject *>(settings), property, &value);
++    const bool result = g_value_get_boolean(&value);
++    g_value_unset(&value);
++    return result;
++#endif
+ }
+ 
+ template bool gtkSettings<bool>(const gchar *);
+@@ -505,10 +519,24 @@
+     if (!property || (*property == '\0')) {
+         return {};
+     }
+-    const auto raw = gtkSettings<gchararray>(property);
++    static GtkSettings * const settings = gtk_settings_get_default();
++    if (!settings) {
++        return {};
++    }
++#ifdef FRAMELESSHELPER_HAS_GTK
++    gchararray raw = nullptr;
++    g_object_get(settings, property, &raw, nullptr);
+     const QString result = QUtf8String(raw);
+     g_free(raw);
+     return result;
++#else
++    GValue value = G_VALUE_INIT;
++    g_object_get_property(reinterpret_cast<GObject *>(settings), property, &value);
++    const gchar *raw = g_value_get_string(&value);
++    const QString result = QUtf8String(raw);
++    g_value_unset(&value);
++    return result;
++#endif
+ }
+ FRAMELESSHELPER_END_NAMESPACE
+ 
+*** End Patch

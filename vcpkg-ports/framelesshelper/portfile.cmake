@@ -13,6 +13,7 @@ vcpkg_from_github(
         fix-qt-6.10-constexpr.patch
         fix-qt-6.10-darkmode.patch
         fix-qt-6.10-compositing.patch
+        fix-gtk-settings.patch
 )
 
 # 下载 cmake-utils 子模块
