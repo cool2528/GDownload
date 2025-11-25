@@ -127,7 +127,7 @@ jobs:
         if: matrix.target == 'linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgl1 libdrm-dev libappimage-dev libxdg-basedir-dev xdg-utils-cxx xdg-utils-cxx-dev mesa-common-dev build-essential libssl-dev autoconf automake libtool wget vim-common desktop-file-utils pkgconf libgpgme-dev libglib2.0-dev libcairo2-dev librsvg2-dev libfuse-dev git libcurl4-openssl-dev argagg-dev libgcrypt20-dev libboost-dev liblzma-dev libzstd-dev zlib1g-dev libarchive-dev libx11-dev libxpm-dev ninja-build
+          sudo apt-get install -y libgl1 libdrm-dev libappimage-dev libxdg-basedir-dev xdg-utils-cxx xdg-utils-cxx-dev mesa-common-dev build-essential libssl-dev autoconf automake libtool wget vim-common desktop-file-utils pkgconf libgpgme-dev libglib2.0-dev libcairo2-dev librsvg2-dev libfuse-dev git libcurl4-openssl-dev argagg-dev libgcrypt20-dev libboost-dev liblzma-dev libzstd-dev zlib1g-dev libarchive-dev libx11-dev libxpm-dev ninja-build libxkbcommon-dev libxkbcommon-x11-0 libxkbcommon-x11-dev xkb-data
 
       - name: Install macOS Tools
         if: matrix.target == 'macos'
