@@ -42,6 +42,7 @@ namespace gdl {
                 SETTING_PROPERTY(bool, EnableNotification)
                 SETTING_PROPERTY(bool, EnableAutoShutdown)
                 SETTING_PROPERTY(bool, EnableAutoUpdate)
+                SETTING_PROPERTY(bool, EnableGithubAccelerate)
                 SETTING_PROPERTY(QPoint, WindowPosition)
                 SETTING_PROPERTY(QString, BaiduPanCookies)
                 SETTING_PROPERTY(QString, TrackerSourceNames)

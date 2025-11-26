@@ -85,6 +85,7 @@ namespace gdl {
             bool update_available_ = false;
             bool silent_check_	   = false;
             QString last_error_;
+            bool apply_requested_ = false;
         };
 
         void RegisterTypes(QQmlEngine* engine);

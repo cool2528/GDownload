@@ -163,6 +163,29 @@ Popup {
                     }
                 }
 
+                // GitHub 加速开关
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 4
+
+                    GButtonSwitch {
+                        id: githubAccelerateSwitch
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 32
+                        text: qsTr("Enable GitHub Accelerated Download")
+                        checked: SettingsManager.qEnableGithubAccelerate
+                        onClicked: SettingsManager.SetEnableGithubAccelerate(checked)
+                    }
+
+                    Text {
+                        text: qsTr("Use a GitHub mirror (ghproxy) when fetching update packages.")
+                        font.pixelSize: 12
+                        color: GTheme.textSecondary
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
+                }
+
                 // 更新进度区域
                 ColumnLayout {
                     Layout.fillWidth: true
