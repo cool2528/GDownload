@@ -182,8 +182,8 @@ elseif(WIN32)
     if(CMAKE_BUILD_TYPE STREQUAL "Release")
     set(EXECUTABLE ${PROJECT_NAME}.exe)
     configure_file(
-        ${CMAKE_SOURCE_DIR}/package/windows_installer.nsi.in
-        ${CMAKE_BINARY_DIR}/release/windows_installer.nsi
+        ${CMAKE_SOURCE_DIR}/package/windows_installer.iss.in
+        ${CMAKE_BINARY_DIR}/release/windows_installer.iss
         @ONLY
     )
     endif()

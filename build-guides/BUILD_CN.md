@@ -165,8 +165,9 @@ cmake --build --preset windows-debug-user   # Windows
 cmake --preset windows-msvc-user
 cmake --build build --config Release
 
-# 使用 NSIS 生成安装程序
-makensis build\release\windows_installer.nsi
+# 使用 Inno Setup 生成安装程序
+# 确保已安装 Inno Setup: choco install innosetup
+"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" build\release\windows_installer.iss
 ```
 
 ---
