@@ -139,22 +139,28 @@ namespace gdl {
 			}, Qt::QueuedConnection);
 			
 			// 检查更新是否完成
-			if (progress.stage == UpdateProgress::Stage::kFinished) {
-				QMetaObject::invokeMethod(this, [this]() {
-					Q_EMIT updateFinished(true);
-				}, Qt::QueuedConnection);
-			}
-			else if (progress.stage == UpdateProgress::Stage::kFailed) {
-				QMetaObject::invokeMethod(this, [this, message]() {
-					last_error_ = message;
-					Q_EMIT updateFinished(false);
-				}, Qt::QueuedConnection);
-			}
-			else if (progress.stage == UpdateProgress::Stage::kInstalling) {
-				QMetaObject::invokeMethod(this, [this]() {
-					updater_->ApplyUpdate();
-				}, Qt::QueuedConnection);
-			}
+        if (progress.stage == UpdateProgress::Stage::kFinished) {
+            apply_requested_ = false;
+            QMetaObject::invokeMethod(this, [this]() {
+                Q_EMIT updateFinished(true);
+            }, Qt::QueuedConnection);
+        }
+        else if (progress.stage == UpdateProgress::Stage::kFailed) {
+            apply_requested_ = false;
+            QMetaObject::invokeMethod(this, [this, message]() {
+                last_error_ = message;
+                Q_EMIT updateFinished(false);
+            }, Qt::QueuedConnection);
+        }
+        else if (progress.stage == UpdateProgress::Stage::kInstalling) {
+            if (apply_requested_ || progress.percentage < 100) {
+                return;
+            }
+            apply_requested_ = true;
+            QMetaObject::invokeMethod(this, [this]() {
+                updater_->ApplyUpdate();
+            }, Qt::QueuedConnection);
+        }
 		}
 
 		void RegisterTypes(QQmlEngine* engine) {

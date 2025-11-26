@@ -620,6 +620,31 @@ namespace gdl {
 			}
 			SETTING_IMP_END(EnableAutoUpdate)
 
+			// EnableGithubAccelerate
+			SETTING_IMP_BEGIN(EnableGithubAccelerate, CONFIG_KEY_PATH(EnableGithubAccelerate), bool)
+			void Default() override {
+				value_ = false;
+			}
+			void Put(const QVariant& value) override {
+				if (value.canConvert<bool>()) {
+					value_ = value.toBool();
+				}
+				else if (value.canConvert<QString>()) {
+					auto str = value.toString();
+					value_   = str == "true" || str == "1";
+				}
+				else if (value.canConvert<int>()) {
+					value_ = value.toInt() == 1;
+				}
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return value_ ? "true" : "false";
+			}
+			SETTING_IMP_END(EnableGithubAccelerate)
+
 			// BaiduPanCookies
 			SETTING_IMP_BEGIN(BaiduPanCookies, CONFIG_KEY_PATH(BaiduPanCookies), QString)
 			void Default() override {
