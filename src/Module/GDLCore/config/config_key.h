@@ -58,6 +58,7 @@ namespace gdl {
             CONFIG_PATH(EnableNotification, "general.enable-notification", "true");
             CONFIG_PATH(EnableAutoShutdown, "general.enable-auto-shutdown", "false");
             CONFIG_PATH(EnableAutoUpdate, "general.enable-auto-update", "true");
+            CONFIG_PATH(EnableGithubAccelerate, "general.enable-github-accelerate", "false");
             CONFIG_PATH(WindowPosition, "general.window-position", "");
             CONFIG_PATH(BaiduPanCookies, "plugin.baidu-pan-cookies", "");
 			CONFIG_PATH(TrackerSourceNames,"aria2c.tracker_source_name","");
@@ -120,6 +121,7 @@ namespace gdl {
                                              EnableNotification.get(),
                                              EnableAutoShutdown.get(),
                                              EnableAutoUpdate.get(),
+                                             EnableGithubAccelerate.get(),
                                              WindowPosition.get(),
                                              BaiduPanCookies.get(),
 									         TrackerSourceNames.get(),
@@ -174,8 +176,9 @@ namespace gdl {
 											 RememberWindowPosition.val(),
 											 EnableTrayIcon.val(),
 											 EnableNotification.val(),
-											 EnableAutoShutdown.val(),
-											 EnableAutoUpdate.val(),
+                                             EnableAutoShutdown.val(),
+                                             EnableAutoUpdate.val(),
+                                             EnableGithubAccelerate.val(),
                                              WindowPosition.val(),
                                              BaiduPanCookies.val(),
 											 TrackerSourceNames.val(),

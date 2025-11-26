@@ -6,8 +6,38 @@
 #include <QStandardPaths>
 #include <QThread>
 #include <nlohmann/json.hpp>
+#include "config/config.h"
 namespace gdl {
     namespace update {
+
+        namespace {
+            constexpr const char* kGithubMirrorPrefix = "https://gh-proxy.com/";
+
+            std::string ApplyGithubMirrorIfNeeded(const std::string& original_url) {
+                if (original_url.empty()) {
+                    return original_url;
+                }
+
+                const bool enable_mirror =
+                    gdl::config::GetValue(std::string(config::Keys::EnableGithubAccelerate.get())).AsBool();
+                if (!enable_mirror) {
+                    return original_url;
+                }
+
+                if (original_url.rfind(kGithubMirrorPrefix, 0) == 0) {
+                    return original_url;
+                }
+
+                const bool is_github_resource =
+                    original_url.find("github.com") != std::string::npos ||
+                    original_url.find("githubusercontent.com") != std::string::npos;
+                if (!is_github_resource) {
+                    return original_url;
+                }
+
+                return std::string(kGithubMirrorPrefix) + original_url;
+            }
+        }  // namespace
 
         namespace VersionTools {
             class Version {
@@ -170,7 +200,8 @@ namespace gdl {
             }
 
             // Start download
-            QNetworkRequest request(QUrl(QString::fromStdString(update_info_.download_url)));
+            const auto actual_download_url = ApplyGithubMirrorIfNeeded(update_info_.download_url);
+            QNetworkRequest request(QUrl(QString::fromStdString(actual_download_url)));
 
             // Support resume download
             if (file_info.exists() && file_info.size() > 0 && file_info.size() < update_info_.package_size) {
@@ -237,7 +268,21 @@ namespace gdl {
                                        "KB / " + std::to_string(actual_total / 1024) + "KB";
                     progress_callback_(progress);
                 });
+			QObject::connect(reply, &QNetworkReply::errorOccurred, [this, reply](QNetworkReply::NetworkError error) {
+                last_error_			= reply->errorString().toStdString();
+                update_in_progress_ = false;
+                download_file_.close();
+				if (progress_callback_) {
+					UpdateProgress progress;
+					progress.stage		= UpdateProgress::Stage::kFailed;
+					progress.percentage = 0;
+					progress.message	= "Download failed: " + last_error_;
+					progress_callback_(progress);
+				}
 
+				reply->deleteLater();
+				return;
+            });
             QObject::connect(reply, &QNetworkReply::finished, [this, reply]() {
                 if (download_file_.isOpen()) {
                     download_file_.close();
@@ -311,15 +356,12 @@ namespace gdl {
         }
 
         bool WinUpdater::ApplyUpdate(bool restart_app) {
-            if (!update_in_progress_) {
-                last_error_ = "No update package ready";
-                return false;
-            }
 
             // Check if update package exists
             QFileInfo file_info(update_package_path_);
             if (!file_info.exists() || !file_info.isFile()) {
                 last_error_ = "Update package file does not exist: " + update_package_path_.toStdString();
+                update_in_progress_ = false;
                 return false;
             }
 
@@ -334,7 +376,7 @@ namespace gdl {
             // Launch the installer
 			QProcess installer;
 			installer.setProgram(update_package_path_);
-			installer.setArguments(QStringList() << "/S");	// Silent install
+			//installer.setArguments(QStringList() << "/S");	// Silent install
 			installer.setProcessChannelMode(QProcess::MergedChannels);
 			installer.start();
 			UpdateProgress progress;
@@ -342,22 +384,22 @@ namespace gdl {
 				last_error_ = "Failed to start installer: " + update_package_path_.toStdString();
 				progress.stage = UpdateProgress::Stage::kFailed;
 				progress.message = last_error_;
-				progress.message = last_error_;
 				if (progress_callback_) {
 					progress.percentage = 100;
 					progress_callback_(progress);
 				}
+				update_in_progress_ = false;
 				return false;
 			}
 			if (!installer.waitForFinished()) {
 				last_error_ = "Installer did not finish: " + update_package_path_.toStdString();
 				progress.stage = UpdateProgress::Stage::kFailed;
 				progress.message = last_error_;
-				progress.message = last_error_;
 				if (progress_callback_) {
 					progress.percentage = 100;
 					progress_callback_(progress);
 				}
+				update_in_progress_ = false;
 				return false;
 			}
 			if (installer.exitCode() != 0) {
@@ -368,6 +410,7 @@ namespace gdl {
 					progress.percentage = 100;
 					progress_callback_(progress);
 				}
+				update_in_progress_ = false;
 				return false;
 			}
 			if (progress_callback_) {
@@ -376,6 +419,7 @@ namespace gdl {
 				progress.message	= "Update installed successfully";
 				progress_callback_(progress);
 			}
+            update_in_progress_ = false;
             return true;
         }
 
