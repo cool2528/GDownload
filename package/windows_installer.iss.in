@@ -1,0 +1,198 @@
+; GDownload Inno Setup Script
+; 参考 VSCode 的安装体验设计
+
+#define MyAppName "GDownload"
+#define MyAppVersion "@APP_VERSION@"
+#define MyAppPublisher "GDownload Team"
+#define MyAppURL "https://github.com/cool2528/GDownload"
+#define MyAppExeName "@EXECUTABLE@"
+
+[Setup]
+; 应用程序基本信息
+AppId={{A8B9C1D2-E3F4-5678-9ABC-DEF012345678}
+AppName={#MyAppName}
+AppVersion={#MyAppVersion}
+AppPublisher={#MyAppPublisher}
+AppPublisherURL={#MyAppURL}
+AppSupportURL={#MyAppURL}/issues
+AppUpdatesURL={#MyAppURL}/releases
+DefaultDirName={autopf}\{#MyAppName}
+DefaultGroupName={#MyAppName}
+
+; 支持系统级和用户级安装（类似 VSCode）
+PrivilegesRequired=lowest
+PrivilegesRequiredOverridesAllowed=dialog
+
+; 输出配置
+OutputDir=@CMAKE_BINARY_DIR@\release
+OutputBaseFilename=GDownloader_windows_{#MyAppVersion}
+SetupIconFile=@CMAKE_SOURCE_DIR@\src\App\ui\Resource\images\logo\icon.ico
+UninstallDisplayIcon={app}\{#MyAppExeName}
+
+; 压缩配置
+Compression=lzma2/max
+SolidCompression=yes
+LZMAUseSeparateProcess=yes
+LZMANumBlockThreads=4
+
+; 界面配置
+WizardStyle=modern
+DisableWelcomePage=no
+DisableDirPage=no
+DisableProgramGroupPage=yes
+
+; 版本信息
+VersionInfoVersion={#MyAppVersion}
+VersionInfoCompany={#MyAppPublisher}
+VersionInfoDescription={#MyAppName} Setup
+VersionInfoCopyright=Copyright (C) 2024 {#MyAppPublisher}
+
+; 架构支持
+ArchitecturesAllowed=x64compatible
+ArchitecturesInstallIn64BitMode=x64compatible
+
+; 许可协议（如果存在）
+LicenseFile=@CMAKE_SOURCE_DIR@\LICENSE.txt
+
+[Languages]
+Name: "english"; MessagesFile: "compiler:Default.isl"
+
+[Tasks]
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
+Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+Name: "addtopath"; Description: "Add to PATH (allows running from command line)"; GroupDescription: "Advanced:"; Flags: unchecked
+Name: "associatefiles"; Description: "Associate .torrent files with {#MyAppName}"; GroupDescription: "File Associations:"; Flags: unchecked
+
+[Files]
+; 主程序文件
+Source: "@CMAKE_BINARY_DIR@\release\bin\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; 排除 PDB 调试文件
+Source: "@CMAKE_BINARY_DIR@\release\bin\*"; DestDir: "{app}"; Excludes: "*.pdb,*.lib,*.exp"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+[Icons]
+; 开始菜单快捷方式
+Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
+; 桌面快捷方式（可选）
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+; 快速启动栏快捷方式（可选）
+Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: quicklaunchicon
+
+[Run]
+; 安装完成后的操作选项
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+
+[Registry]
+; 添加卸载信息到注册表
+Root: HKA; Subkey: "Software\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppName}"; ValueType: string; ValueName: "DisplayName"; ValueData: "{#MyAppName}"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppName}"; ValueType: string; ValueName: "DisplayVersion"; ValueData: "{#MyAppVersion}"
+Root: HKA; Subkey: "Software\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppName}"; ValueType: string; ValueName: "Publisher"; ValueData: "{#MyAppPublisher}"
+Root: HKA; Subkey: "Software\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppName}"; ValueType: string; ValueName: "DisplayIcon"; ValueData: "{app}\{#MyAppExeName},0"
+Root: HKA; Subkey: "Software\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppName}"; ValueType: string; ValueName: "URLInfoAbout"; ValueData: "{#MyAppURL}"
+
+; 关联 .torrent 文件（可选任务）
+Root: HKA; Subkey: "Software\Classes\.torrent"; ValueType: string; ValueName: ""; ValueData: "{#MyAppName}File"; Flags: uninsdeletevalue uninsdeletekeyifempty; Tasks: associatefiles
+Root: HKA; Subkey: "Software\Classes\{#MyAppName}File"; ValueType: string; ValueName: ""; ValueData: "{#MyAppName} Torrent File"; Flags: uninsdeletekey; Tasks: associatefiles
+Root: HKA; Subkey: "Software\Classes\{#MyAppName}File\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"; Tasks: associatefiles
+Root: HKA; Subkey: "Software\Classes\{#MyAppName}File\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Tasks: associatefiles
+
+[Code]
+// 添加到 PATH 环境变量的代码
+procedure CurStepChanged(CurStep: TSetupStep);
+var
+  Path: string;
+  AppPath: string;
+begin
+  if (CurStep = ssPostInstall) and WizardIsTaskSelected('addtopath') then
+  begin
+    AppPath := ExpandConstant('{app}');
+
+    // 根据安装权限选择注册表位置
+    if IsAdminInstallMode then
+    begin
+      RegQueryStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager\Environment', 'Path', Path);
+      if Pos(AppPath, Path) = 0 then
+      begin
+        Path := Path + ';' + AppPath;
+        RegWriteStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager\Environment', 'Path', Path);
+      end;
+    end
+    else
+    begin
+      RegQueryStringValue(HKEY_CURRENT_USER, 'Environment', 'Path', Path);
+      if Pos(AppPath, Path) = 0 then
+      begin
+        Path := Path + ';' + AppPath;
+        RegWriteStringValue(HKEY_CURRENT_USER, 'Environment', 'Path', Path);
+      end;
+    end;
+  end;
+end;
+
+// 卸载时从 PATH 移除
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+var
+  Path: string;
+  AppPath: string;
+  P: Integer;
+begin
+  if CurUninstallStep = usPostUninstall then
+  begin
+    AppPath := ExpandConstant('{app}');
+
+    // 从系统 PATH 移除
+    if RegQueryStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager\Environment', 'Path', Path) then
+    begin
+      P := Pos(';' + AppPath, Path);
+      if P = 0 then
+        P := Pos(AppPath + ';', Path);
+      if P > 0 then
+      begin
+        Delete(Path, P, Length(AppPath) + 1);
+        RegWriteStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager\Environment', 'Path', Path);
+      end;
+    end;
+
+    // 从用户 PATH 移除
+    if RegQueryStringValue(HKEY_CURRENT_USER, 'Environment', 'Path', Path) then
+    begin
+      P := Pos(';' + AppPath, Path);
+      if P = 0 then
+        P := Pos(AppPath + ';', Path);
+      if P > 0 then
+      begin
+        Delete(Path, P, Length(AppPath) + 1);
+        RegWriteStringValue(HKEY_CURRENT_USER, 'Environment', 'Path', Path);
+      end;
+    end;
+  end;
+end;
+
+// 检测旧版本
+function InitializeSetup(): Boolean;
+var
+  OldVersion: string;
+  UninstallPath: string;
+  ResultCode: Integer;
+begin
+  Result := True;
+
+  // 检查是否已安装
+  if RegQueryStringValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppName}', 'UninstallString', UninstallPath) or
+     RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppName}', 'UninstallString', UninstallPath) then
+  begin
+    if RegQueryStringValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppName}', 'DisplayVersion', OldVersion) or
+       RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppName}', 'DisplayVersion', OldVersion) then
+    begin
+      if MsgBox('Version ' + OldVersion + ' of {#MyAppName} is already installed. Do you want to uninstall it first?', mbConfirmation, MB_YESNO) = IDYES then
+      begin
+        // 静默卸载旧版本
+        Exec(RemoveQuotes(UninstallPath), '/SILENT', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+      end
+      else
+      begin
+        Result := False;
+      end;
+    end;
+  end;
+end;

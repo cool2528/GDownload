@@ -232,16 +232,16 @@ jobs:
         run: |
           Compress-Archive -Path windows_pdb -DestinationPath ${{ matrix.pdb_archive }} -Force
 
-      - name: Install NSIS
+      - name: Install Inno Setup
         if: matrix.target == 'windows'
         run: |
-          choco install nsis -y --no-progress
+          choco install innosetup -y --no-progress
           # 验证安装
-          if (Test-Path "C:\Program Files (x86)\NSIS\makensis.exe") {
-            Write-Host "NSIS installed at: C:\Program Files (x86)\NSIS\makensis.exe"
+          if (Test-Path "C:\Program Files (x86)\Inno Setup 6\ISCC.exe") {
+            Write-Host "Inno Setup installed at: C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
           } else {
-            Write-Host "NSIS not found in default location"
-            Get-ChildItem "C:\Program Files*" -Recurse -Filter "makensis.exe" -ErrorAction SilentlyContinue
+            Write-Host "Inno Setup not found in default location"
+            Get-ChildItem "C:\Program Files*" -Recurse -Filter "ISCC.exe" -ErrorAction SilentlyContinue
           }
         shell: pwsh
 
@@ -249,13 +249,13 @@ jobs:
         if: matrix.target == 'windows'
         shell: pwsh
         run: |
-          # 直接使用绝对路径调用 makensis
-          $makensis = "C:\Program Files (x86)\NSIS\makensis.exe"
-          if (-not (Test-Path $makensis)) {
-            Write-Error "makensis not found at $makensis"
+          # 直接使用绝对路径调用 ISCC (Inno Setup Compiler)
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            Write-Error "ISCC not found at $iscc"
             exit 1
           }
-          & $makensis -V4 "$env:GITHUB_WORKSPACE\build\release\windows_installer.nsi"
+          & $iscc /V5 "$env:GITHUB_WORKSPACE\build\release\windows_installer.iss"
 
       - name: Create AppImage zsync
         if: matrix.target == 'linux'
