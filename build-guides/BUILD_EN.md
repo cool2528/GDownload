@@ -23,13 +23,13 @@ This guide provides detailed instructions for building GDownload from source on 
 - **CMake** 3.18 or later
 - **Git** (for cloning repository and version information)
 - **vcpkg** package manager
-- **Qt 6.5.2** or later
+- **Qt 6.10.1** or later
 
 ### Windows
 
 - **Visual Studio 2022** (Community edition or higher recommended)
 - **MSVC Compiler** (C++20 support required)
-- Qt 6.5.2+ (MSVC 2019 64-bit)
+- Qt 6.10.1+ (MSVC 2019 64-bit)
 
 ### macOS
 
@@ -39,13 +39,13 @@ This guide provides detailed instructions for building GDownload from source on 
   ```bash
   brew install ninja
   ```
-- Qt 6.5.2+ (macOS universal)
+- Qt 6.10.1+ (macOS universal)
 
 ### Linux
 
 - **GCC 11+** or **Clang 14+**
 - **Ninja** build system (recommended)
-- Qt 6.5.2+ (gcc_64)
+- Qt 6.10.1+ (gcc_64)
 - System dependencies:
   ```bash
   # Ubuntu/Debian
@@ -74,7 +74,7 @@ git submodule update --init --recursive
 
 ```powershell
 $env:VCPKG_ROOT = "D:\tools\vcpkg"
-$env:QTDIR = "C:\Qt\6.5.2\msvc2019_64"
+$env:QTDIR = "C:\Qt\6.10.1\msvc2019_64"
 ```
 </details>
 
@@ -83,8 +83,8 @@ $env:QTDIR = "C:\Qt\6.5.2\msvc2019_64"
 
 ```bash
 export VCPKG_ROOT="/path/to/vcpkg"
-export QTDIR="/path/to/Qt/6.5.2/macos"  # macOS
-# export QTDIR="/path/to/Qt/6.5.2/gcc_64"  # Linux
+export QTDIR="/path/to/Qt/6.10.1/macos"  # macOS
+# export QTDIR="/path/to/Qt/6.10.1/gcc_64"  # Linux
 ```
 </details>
 
@@ -116,7 +116,7 @@ cmake --build --preset windows-debug-user   # Windows
 
 2. **Install Qt**
    - Download [Qt Online Installer](https://www.qt.io/download-qt-installer)
-   - Install Qt 6.5.2, select "MSVC 2019 64-bit" component
+   - Install Qt 6.10.1, select "MSVC 2019 64-bit" component
 
 3. **Install vcpkg**
    ```powershell
@@ -135,7 +135,7 @@ cmake --build --preset windows-debug-user   # Windows
      "name": "windows-msvc-user",
      "environment": {
        "VCPKG_ROOT": "D:\\tools\\vcpkg",
-       "QTDIR": "C:\\Qt\\6.5.2\\msvc2019_64"
+       "QTDIR": "C:\\Qt\\6.10.1\\msvc2019_64"
      }
    }
    ```
@@ -189,7 +189,7 @@ cmake --build build --config Release
 
 3. **Install Qt**
    - Download [Qt Online Installer](https://www.qt.io/download-qt-installer)
-   - Install Qt 6.5.2, select "macOS" component
+   - Install Qt 6.10.1, select "macOS" component
 
 4. **Install vcpkg**
    ```bash
@@ -300,7 +300,7 @@ create-dmg \
 
 2. **Install Qt**
    - Download [Qt Online Installer](https://www.qt.io/download-qt-installer)
-   - Install Qt 6.5.2, select "Desktop gcc 64-bit" component
+   - Install Qt 6.10.1, select "Desktop gcc 64-bit" component
 
 3. **Install vcpkg**
    ```bash
@@ -317,7 +317,7 @@ Edit `CMakeUserPresets.json`:
   "name": "ubuntu-amd64-user",
   "environment": {
     "VCPKG_ROOT": "/home/yourname/vcpkg",
-    "QTDIR": "/home/yourname/Qt/6.5.2/gcc_64"
+    "QTDIR": "/home/yourname/Qt/6.10.1/gcc_64"
   }
 }
 ```
@@ -459,11 +459,11 @@ CMake Error: Could not find Qt6Config.cmake
 ```bash
 # Windows
 echo $env:QTDIR
-# Should output something like: C:\Qt\6.5.2\msvc2019_64
+# Should output something like: C:\Qt\6.10.1\msvc2019_64
 
 # macOS/Linux
 echo $QTDIR
-# Should output something like: /Users/yourname/Qt/6.5.2/macos
+# Should output something like: /Users/yourname/Qt/6.10.1/macos
 ```
 
 ### Q: macOS Universal Binary build fails

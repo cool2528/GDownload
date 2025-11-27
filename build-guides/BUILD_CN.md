@@ -23,13 +23,13 @@
 - **CMake** 3.18 或更高版本
 - **Git** (用于克隆仓库和版本信息)
 - **vcpkg** 包管理器
-- **Qt 6.5.2** 或更高版本
+- **Qt 6.10.1** 或更高版本
 
 ### Windows
 
 - **Visual Studio 2022** (建议使用 Community 版或更高)
 - **MSVC 编译器** (C++20 支持)
-- Qt 6.5.2+ (MSVC 2019 64-bit)
+- Qt 6.10.1+ (MSVC 2019 64-bit)
 
 ### macOS
 
@@ -39,13 +39,13 @@
   ```bash
   brew install ninja
   ```
-- Qt 6.5.2+ (macOS universal)
+- Qt 6.10.1+ (macOS universal)
 
 ### Linux
 
 - **GCC 11+** 或 **Clang 14+**
 - **Ninja** 构建系统 (推荐)
-- Qt 6.5.2+ (gcc_64)
+- Qt 6.10.1+ (gcc_64)
 - 系统依赖包：
   ```bash
   # Ubuntu/Debian
@@ -74,7 +74,7 @@ git submodule update --init --recursive
 
 ```powershell
 $env:VCPKG_ROOT = "D:\tools\vcpkg"
-$env:QTDIR = "C:\Qt\6.5.2\msvc2019_64"
+$env:QTDIR = "C:\Qt\6.10.1\msvc2019_64"
 ```
 </details>
 
@@ -83,8 +83,8 @@ $env:QTDIR = "C:\Qt\6.5.2\msvc2019_64"
 
 ```bash
 export VCPKG_ROOT="/path/to/vcpkg"
-export QTDIR="/path/to/Qt/6.5.2/macos"  # macOS
-# export QTDIR="/path/to/Qt/6.5.2/gcc_64"  # Linux
+export QTDIR="/path/to/Qt/6.10.1/macos"  # macOS
+# export QTDIR="/path/to/Qt/6.10.1/gcc_64"  # Linux
 ```
 </details>
 
@@ -116,7 +116,7 @@ cmake --build --preset windows-debug-user   # Windows
 
 2. **安装 Qt**
    - 下载 [Qt Online Installer](https://www.qt.io/download-qt-installer)
-   - 安装 Qt 6.5.2，选择 "MSVC 2019 64-bit" 组件
+   - 安装 Qt 6.10.1，选择 "MSVC 2019 64-bit" 组件
 
 3. **安装 vcpkg**
    ```powershell
@@ -135,7 +135,7 @@ cmake --build --preset windows-debug-user   # Windows
      "name": "windows-msvc-user",
      "environment": {
        "VCPKG_ROOT": "D:\\tools\\vcpkg",
-       "QTDIR": "C:\\Qt\\6.5.2\\msvc2019_64"
+       "QTDIR": "C:\\Qt\\6.10.1\\msvc2019_64"
      }
    }
    ```
@@ -189,7 +189,7 @@ cmake --build build --config Release
 
 3. **安装 Qt**
    - 下载 [Qt Online Installer](https://www.qt.io/download-qt-installer)
-   - 安装 Qt 6.5.2，选择 "macOS" 组件
+   - 安装 Qt 6.10.1，选择 "macOS" 组件
 
 4. **安装 vcpkg**
    ```bash
@@ -300,7 +300,7 @@ create-dmg \
 
 2. **安装 Qt**
    - 下载 [Qt Online Installer](https://www.qt.io/download-qt-installer)
-   - 安装 Qt 6.5.2，选择 "Desktop gcc 64-bit" 组件
+   - 安装 Qt 6.10.1，选择 "Desktop gcc 64-bit" 组件
 
 3. **安装 vcpkg**
    ```bash
@@ -317,7 +317,7 @@ create-dmg \
   "name": "ubuntu-amd64-user",
   "environment": {
     "VCPKG_ROOT": "/home/yourname/vcpkg",
-    "QTDIR": "/home/yourname/Qt/6.5.2/gcc_64"
+    "QTDIR": "/home/yourname/Qt/6.10.1/gcc_64"
   }
 }
 ```
@@ -459,11 +459,11 @@ CMake Error: Could not find Qt6Config.cmake
 ```bash
 # Windows
 echo $env:QTDIR
-# 应输出类似: C:\Qt\6.5.2\msvc2019_64
+# 应输出类似: C:\Qt\6.10.1\msvc2019_64
 
 # macOS/Linux
 echo $QTDIR
-# 应输出类似: /Users/yourname/Qt/6.5.2/macos
+# 应输出类似: /Users/yourname/Qt/6.10.1/macos
 ```
 
 ### Q: macOS Universal Binary 构建失败

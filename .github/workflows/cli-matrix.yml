@@ -26,24 +26,26 @@ jobs:
           git fetch --tags --force
           # 读取 CHANGELOG.md 文件内容
           if [ -f "CHANGELOG.md" ]; then
-            CHANGELOG_CONTENT=$(cat CHANGELOG.md)
-            # 处理换行与百分号，适配 GitHub 输出格式
-            CHANGELOG_CONTENT="${CHANGELOG_CONTENT//'%'/'%25'}"
-            CHANGELOG_CONTENT="${CHANGELOG_CONTENT//$'\n'/'%0A'}"
-            CHANGELOG_CONTENT="${CHANGELOG_CONTENT//$'\r'/'%0D'}"
-            echo "body=${CHANGELOG_CONTENT}" >> "$GITHUB_OUTPUT"
+            {
+              echo "body<<'EOF'"
+              cat CHANGELOG.md
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
           else
             # 如果 CHANGELOG.md 不存在，回退到使用最后一个 commit 消息
             LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
-            LAST_COMMIT_MSG="${LAST_COMMIT_MSG//'%'/'%25'}"
-            LAST_COMMIT_MSG="${LAST_COMMIT_MSG//$'\n'/'%0A'}"
-            echo "body=${LAST_COMMIT_MSG}" >> "$GITHUB_OUTPUT"
+            {
+              echo "body<<'EOF'"
+              printf "%s\n" "$LAST_COMMIT_MSG"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
+          name: GDownload ${{ github.ref_name }} autobuild
           body: ${{ steps.release_body.outputs.body }}
           draft: false
           prerelease: false
@@ -68,7 +70,7 @@ jobs:
         include:
           - target: linux
             os: ubuntu-latest
-            qt_version: 6.5.2
+            qt_version: 6.10.1
             qt_arch: gcc_64
             vcpkg_triplet: x64-linux-release
             install_prefix: linux_package
@@ -77,7 +79,7 @@ jobs:
             pdb_archive: ""
           - target: macos-arm64
             os: macos-latest
-            qt_version: 6.5.2
+            qt_version: 6.10.1
             qt_arch: clang_64
             vcpkg_triplet: arm64-osx-release
             install_prefix: macos_arm64_package
@@ -88,7 +90,7 @@ jobs:
             pdb_archive: ""
           - target: macos-x64
             os: macos-latest
-            qt_version: 6.5.2
+            qt_version: 6.10.1
             qt_arch: clang_64
             vcpkg_triplet: x64-osx-release
             install_prefix: macos_x64_package
@@ -99,7 +101,7 @@ jobs:
             pdb_archive: ""
           - target: windows
             os: windows-latest
-            qt_version: 6.5.2
+            qt_version: 6.10.1
             qt_arch: win64_msvc2019_64
             vcpkg_triplet: x64-windows-release
             install_prefix: windows_package
