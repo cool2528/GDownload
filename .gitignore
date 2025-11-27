@@ -157,3 +157,7 @@ GEMINI.md
 /browser-extension/
 #website
 /cool2528.github.io/
+#osx build scripts
+build_macos.sh
+check_translations.sh
+setup_env.sh
