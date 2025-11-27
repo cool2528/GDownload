@@ -38,6 +38,10 @@
         <file>images/toast/warning.svg</file>
         <file>images/logo/logo.svg</file>
         <file>images/logo/logo.icns</file>
+        <file>images/logo/tray_template.svg</file>
+        <file>images/logo/tray_template_brand.svg</file>
+        <file>images/logo/tray_template_minimal.svg</file>
+        <file>images/logo/tray_template_apple.svg</file>
         <file>images/browser/FolderType.png</file>
         <file>images/browser/OtherType.png</file>
         <file>images/browser-extension/chrome.svg</file>

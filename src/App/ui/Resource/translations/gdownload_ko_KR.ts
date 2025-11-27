@@ -1031,6 +1031,53 @@
         <source>Open Source Licenses</source>
         <translation>오픈 소스 라이선스</translation>
     </message>
+    <message>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="257"/>
+        <source># GDownload
+
+**A modern cross-platform download manager**
+
+## Core Features
+
+✅ **Multi-Platform Support** - Windows, macOS, Linux
+✅ **High-Performance Engine** - Powered by aria2c
+✅ **Multi-Protocol Support** - HTTP/HTTPS/FTP/BitTorrent/Metalink
+✅ **Smart Download Management** - Multi-threaded, resume capability
+✅ **Modern UI** - Built with Qt Quick and Element Plus design
+
+## Technology Stack
+
+- **Frontend**: Qt Quick (QML) + Element Plus Design
+- **Backend**: Qt C++ + Modern C++20
+- **Download Engine**: aria2c
+- **Network**: Boost.Asio with SSL
+- **BitTorrent**: LibtorrentRasterbar
+- **Build System**: CMake + vcpkg
+
+## Development Team
+
+GDownload is maintained by passionate developers who believe in:
+- Open source software
+- Modern UI/UX design
+- High-quality code
+- Community collaboration
+
+## Get Involved
+
+🔗 **GitHub**: [https://github.com/cool2528/GDownload](https://github.com/cool2528/GDownload)
+🐛 **Issues**: [Report bugs or request features](https://github.com/cool2528/GDownload/issues)
+📝 **Contribute**: Pull requests are welcome!
+
+## License
+
+Copyright © 2024 GDownload Team
+Licensed under the Apache License 2.0
+
+---
+
+*Thank you to all contributors and users who make GDownload better!* 🚀</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>InstallationGuideCard</name>
@@ -1922,22 +1969,32 @@
         <translation>릴리스 정보</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="174"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="175"/>
+        <source>Enable GitHub Accelerated Download</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="181"/>
+        <source>Use a GitHub mirror (ghproxy) when fetching update packages.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="197"/>
         <source>Updating...</source>
         <translation>업데이트 중...</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="226"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="249"/>
         <source>Go to Download Page</source>
         <translation>다운로드 페이지로 이동</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="240"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="263"/>
         <source>Cancel</source>
         <translation>취소</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="250"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="273"/>
         <source>Update Now</source>
         <translation>지금 업데이트</translation>
     </message>
