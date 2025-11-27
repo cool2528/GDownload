@@ -123,8 +123,8 @@ FramelessWindow{
     // 系统托盘
     SystemTrayIcon {
         id: systemTray
-        icon.mask: Qt.platform.os === "osx" ? false : true  // 这个属性会自动处理 macOS 下的 template 模式
-        icon.source: Qt.platform.os === "osx" ? "qrc:/images/logo/logo.svg" : "qrc:/images/logo/icon.ico"
+        icon.mask: Qt.platform.os === "osx" ? true : true  // macOS 启用 mask 以支持自动主题适配
+        icon.source: Qt.platform.os === "osx" ? "qrc:/images/logo/tray_template_apple.svg" : "qrc:/images/logo/icon.ico"
         visible: true
         tooltip: "GDownload"
 
