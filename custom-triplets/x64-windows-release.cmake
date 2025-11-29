@@ -4,6 +4,9 @@ set(VCPKG_LIBRARY_LINKAGE dynamic)
 
 set(VCPKG_BUILD_TYPE release)
 
+# 允许 QTDIR 环境变量传递到 vcpkg 构建环境
+set(VCPKG_ENV_PASSTHROUGH QTDIR)
+
 # 从环境变量获取 Qt 路径并添加到 CMake 搜索路径
 # 这样 vcpkg 构建的包（如 FramelessHelper）也能找到 Qt
 if(DEFINED ENV{QTDIR})
