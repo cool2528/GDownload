@@ -24,22 +24,18 @@ jobs:
         id: release_body
         run: |
           git fetch --tags --force
-          # 读取 CHANGELOG.md 文件内容
+          RELEASE_BODY_FILE=$(mktemp)
           if [ -f "CHANGELOG.md" ]; then
-            {
-              echo "body<<'EOF'"
-              cat CHANGELOG.md
-              echo "EOF"
-            } >> "$GITHUB_OUTPUT"
+            cat CHANGELOG.md > "$RELEASE_BODY_FILE"
           else
-            # 如果 CHANGELOG.md 不存在，回退到使用最后一个 commit 消息
-            LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
-            {
-              echo "body<<'EOF'"
-              printf "%s\n" "$LAST_COMMIT_MSG"
-              echo "EOF"
-            } >> "$GITHUB_OUTPUT"
+            git log -1 --pretty=%B > "$RELEASE_BODY_FILE"
           fi
+          {
+            echo "body<<EOF"
+            cat "$RELEASE_BODY_FILE"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          rm -f "$RELEASE_BODY_FILE"
 
       - name: Create Release
         id: create_release
