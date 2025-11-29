@@ -7,6 +7,44 @@ ARM64_APP="$1"
 X64_APP="$2"
 UNIVERSAL_APP="$3"
 
+resolve_bundle_path() {
+    local requested="$1"
+    local label="$2"
+
+    if [ -d "$requested" ]; then
+        echo "$requested"
+        return 0
+    fi
+
+    local parent_dir
+    parent_dir="$(dirname "$requested")"
+    local bundle_name
+    bundle_name="$(basename "$requested")"
+
+    if [ -d "$parent_dir" ]; then
+        local found_path
+        found_path="$(find "$parent_dir" -maxdepth 4 -type d -name "$bundle_name" | head -n 1)"
+        if [ -n "$found_path" ]; then
+            echo "信息: 自动调整 ${label} bundle 路径 -> ${found_path}"
+            echo "$found_path"
+            return 0
+        fi
+    fi
+
+    return 1
+}
+
+ARM64_APP_RESOLVED="$(resolve_bundle_path "$ARM64_APP" "ARM64")" || {
+    echo "错误: 找不到输入的 ARM64 .app bundle ($ARM64_APP)"
+    exit 1
+}
+X64_APP_RESOLVED="$(resolve_bundle_path "$X64_APP" "x64")" || {
+    echo "错误: 找不到输入的 x64 .app bundle ($X64_APP)"
+    exit 1
+}
+ARM64_APP="$ARM64_APP_RESOLVED"
+X64_APP="$X64_APP_RESOLVED"
+
 # 验证输入
 if [ ! -d "$ARM64_APP" ] || [ ! -d "$X64_APP" ]; then
     echo "错误: 找不到输入的 .app bundle"
