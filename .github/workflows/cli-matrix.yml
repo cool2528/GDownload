@@ -128,18 +128,35 @@ jobs:
       - name: Set QTDIR (Unix)
         if: runner.os != 'Windows'
         run: |
-          echo "QTDIR=${Qt6_DIR}/../.." >> "$GITHUB_ENV"
+          QT_DIR_VALUE="${QT_ROOT_DIR:-}"
+          if [ -z "${QT_DIR_VALUE}" ] && [ -n "${Qt6_DIR:-}" ]; then
+            QT_DIR_VALUE="$(cd "${Qt6_DIR}/../.." && pwd)"
+          fi
+          if [ -z "${QT_DIR_VALUE}" ]; then
+            echo "Neither QT_ROOT_DIR nor Qt6_DIR is set after install-qt-action."
+            exit 1
+          fi
+          echo "QTDIR=${QT_DIR_VALUE}" >> "$GITHUB_ENV"
 
       - name: Set QTDIR (Windows)
         if: runner.os == 'Windows'
         shell: cmd
         run: |
-          if "%Qt6_DIR%"=="" (
-            echo Qt6_DIR is not defined after install-qt-action.
+          setlocal
+          if "%QT_ROOT_DIR%"=="" (
+            if "%Qt6_DIR%"=="" (
+              echo Neither QT_ROOT_DIR nor Qt6_DIR is defined after install-qt-action.
+              exit /b 1
+            )
+            for %%I in ("%Qt6_DIR%\..\..") do set "QT_ROOT_DIR=%%~fI"
+          )
+          set "QTDIR=%QT_ROOT_DIR%"
+          if "%QTDIR%"=="" (
+            echo QTDIR could not be determined.
             exit /b 1
           )
-          for %%I in ("%Qt6_DIR%\..\..") do set "QTDIR=%%~fI"
-          echo QTDIR=%QTDIR%>>%GITHUB_ENV%
+          echo QTDIR=%QTDIR%>>"%GITHUB_ENV%"
+          endlocal
 
       - name: Install Linux Dependencies
         if: matrix.target == 'linux'
@@ -209,7 +226,10 @@ jobs:
       - name: Configure & Build (Unix)
         if: matrix.target != 'windows'
         run: |
-          export QTDIR="${Qt6_DIR}/../.."
+          if [ -z "${QTDIR:-}" ]; then
+            echo "QTDIR is not set."
+            exit 1
+          fi
           EXTRA_CMAKE_ARGS=""
           if [[ "${{ matrix.target }}" == macos-* ]]; then
             EXTRA_CMAKE_ARGS="-DCMAKE_OSX_ARCHITECTURES=${{ matrix.cmake_arch }}"
@@ -236,7 +256,10 @@ jobs:
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.msvc_arch }}
-          set QTDIR=%Qt6_DIR%\..\..
+          if "%QTDIR%"=="" (
+            echo QTDIR is not set.
+            exit /b 1
+          )
           cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\${{ matrix.install_prefix }} -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=%QTDIR% -DGDL_UI_GENERATE_TRANSLATIONS=on -GNinja -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00"
           cmake --build build --config Release --parallel
           mkdir windows_pdb
