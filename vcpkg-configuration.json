@@ -4,6 +4,12 @@
     "baseline": "f0f811770e0538fcb295a1750c0a5e0de5131d29",
     "repository": "https://github.com/microsoft/vcpkg"
   },
+  "overlay-ports": [
+    "vcpkg-ports"
+  ],
+  "overlay-triplets": [
+    "custom-triplets"
+  ],
   "registries": [
     {
       "kind": "artifact",
