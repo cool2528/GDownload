@@ -70,7 +70,7 @@ jobs:
             qt_arch: linux_gcc_64
             vcpkg_triplet: x64-linux-release
             install_prefix: linux_package
-            release_glob: gdownload-*.AppImag*
+            release_glob: release_artifacts/linux/*.AppImag*
             cmake_extra: ""
             pdb_archive: ""
           - target: macos-arm64
@@ -101,9 +101,9 @@ jobs:
             qt_arch: win64_msvc2022_64
             vcpkg_triplet: x64-windows-release
             install_prefix: windows_package
-            release_glob: build/release/GDownloader_windows_*.exe
+            release_glob: release_artifacts/windows/*.exe
             msvc_arch: x64
-            pdb_archive: windows_pdb.zip
+            pdb_archive: release_artifacts/windows/windows_pdb.zip
             cmake_extra: ""
 
     steps:
@@ -113,6 +113,10 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
           submodules: recursive
+
+      - name: Prepare Release Directory
+        run: |
+          mkdir -p release_artifacts/${{ matrix.target }}
 
       - name: Setup Qt
         uses: jurplel/install-qt-action@v4
@@ -247,6 +251,17 @@ jobs:
             cmake --install build --config Release
           fi
 
+      - name: Build AppImage
+        if: matrix.target == 'linux'
+        id: build_appimage
+        run: |
+          chmod +x scripts/build_appimage.sh
+          RELEASE_DIR="${{ github.workspace }}/release_artifacts/linux"
+          mkdir -p "$RELEASE_DIR"
+          APPIMAGE_PATH="$RELEASE_DIR/gdownload-linux-${{ github.run_number }}.AppImage"
+          scripts/build_appimage.sh "${{ github.workspace }}/${{ matrix.install_prefix }}" "$APPIMAGE_PATH"
+          echo "path=$APPIMAGE_PATH" >> "$GITHUB_OUTPUT"
+
       - name: Configure & Build (Windows)
         if: matrix.target == 'windows'
         shell: cmd
@@ -269,6 +284,11 @@ jobs:
         if: matrix.target == 'windows'
         shell: pwsh
         run: |
+          $dest = "${{ matrix.pdb_archive }}"
+          $destDir = Split-Path -Parent $dest
+          if (-not [string]::IsNullOrWhiteSpace($destDir)) {
+            New-Item -ItemType Directory -Force -Path $destDir | Out-Null
+          }
           Compress-Archive -Path windows_pdb -DestinationPath ${{ matrix.pdb_archive }} -Force
 
       - name: Install Inno Setup
@@ -296,14 +316,31 @@ jobs:
           }
           & $iscc /V5 "$env:GITHUB_WORKSPACE\build\release\windows_installer.iss"
 
+      - name: Collect Windows Installer
+        if: matrix.target == 'windows'
+        shell: pwsh
+        run: |
+          $releaseDir = Join-Path $env:GITHUB_WORKSPACE "release_artifacts/windows"
+          New-Item -ItemType Directory -Force -Path $releaseDir | Out-Null
+          $setupFiles = Get-ChildItem "$env:GITHUB_WORKSPACE\build\release\GDownloader_windows_*.exe"
+          if (-not $setupFiles) {
+            Write-Error "No installer exe found under build\release"
+            exit 1
+          }
+          foreach ($file in $setupFiles) {
+            Copy-Item $file.FullName -Destination $releaseDir -Force
+          }
+
       - name: Create AppImage zsync
         if: matrix.target == 'linux'
+        env:
+          APPIMAGE_PATH: ${{ steps.build_appimage.outputs.path }}
         run: |
-          APPIMAGE_NAME=$(find ${{ github.workspace }} -maxdepth 1 -name "*.AppImage" | head -n 1)
-          if [ -z "$APPIMAGE_NAME" ]; then
+          if [ -z "${APPIMAGE_PATH:-}" ] || [ ! -f "${APPIMAGE_PATH}" ]; then
             echo "AppImage not found, skipping zsync generation"
-          elif [ ! -f "${{ github.workspace }}/${{ matrix.install_prefix }}/gdownload.desktop" ]; then
-            appimagetool -u "gh-releases-zsync|cool2528|GDownload|latest|gdownload-*.AppImage.zsync" ${{ github.workspace }}/${{ matrix.install_prefix }} "$APPIMAGE_NAME"
+          else
+            export APPIMAGE_EXTRACT_AND_RUN=1
+            appimagetool -u "gh-releases-zsync|cool2528|GDownload|latest|gdownload-*.AppImage.zsync" ${{ github.workspace }}/${{ matrix.install_prefix }} "${APPIMAGE_PATH}"
           fi
 
       - name: Upload Build Artifact
@@ -324,7 +361,7 @@ jobs:
           retention-days: 1
 
       - name: Upload Release Artifact
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') && matrix.release_glob != ''
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}

@@ -305,6 +305,7 @@ elseif(APPLE)
     endif()
 elseif(UNIX AND NOT APPLE)
     include(GNUInstallDirs)
+    option(GDL_GENERATE_APPIMAGE "使用 linuxdeploy 生成 AppImage（仅限 Linux）" OFF)
     
     # 获取所有注册的目标
     get_property(PROJECT_TARGETS GLOBAL PROPERTY PROJECT_TARGETS)
@@ -358,43 +359,43 @@ elseif(UNIX AND NOT APPLE)
         RENAME "gdownload.svg"
     )
     
-    # 查找 linuxdeploy
-    find_program(LINUXDEPLOY_PATH 
-        NAMES 
-            "linuxdeploy-x86_64.AppImage"
-            "linuxdeploy"
-        DOC "Path to linuxdeploy AppImage"
-    )
+    if(GDL_GENERATE_APPIMAGE)
+        find_program(LINUXDEPLOY_PATH 
+            NAMES 
+                "linuxdeploy-x86_64.AppImage"
+                "linuxdeploy"
+            DOC "Path to linuxdeploy AppImage"
+        )
 
-    if(NOT LINUXDEPLOY_PATH)
-        message(STATUS "LinuxDeploy not found in system")
-    else()
-        message(STATUS "Found LinuxDeploy: ${LINUXDEPLOY_PATH}")
-        
-        install(CODE "
-            # 设置环境变量
-            set(ENV{LD_LIBRARY_PATH} \"${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin:${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/usr/lib:${Qt6_DIR}/../../../lib:\$ENV{LD_LIBRARY_PATH}\")
-            set(ENV{QML_SOURCES_PATHS} \"${CMAKE_SOURCE_DIR}/src/App/ui/Resource/qml\")
-            set(ENV{QMAKE} \"${Qt6_DIR}/../../../bin/qmake\")
-            set(ENV{QT_PLUGIN_PATH} \"${Qt6_DIR}/../../../plugins\")
-            set(ENV{QML_IMPORT_PATH} \"${Qt6_DIR}/../../../qml\")
-            set(ENV{UPDATE_INFORMATION} \"gh-releases-zsync|cool2528|GDownload|latest|gdownload-*.AppImage.zsync\")
+        if(NOT LINUXDEPLOY_PATH)
+            message(STATUS "LinuxDeploy not found in system")
+        else()
+            message(STATUS "Found LinuxDeploy: ${LINUXDEPLOY_PATH}")
             
-            execute_process(
-                COMMAND \"${LINUXDEPLOY_PATH}\"
-                        --appdir=${CMAKE_INSTALL_PREFIX}
-                        --executable=${CMAKE_INSTALL_PREFIX}/usr/bin/gdownload
-                        --desktop-file=${CMAKE_INSTALL_PREFIX}/usr/share/applications/gdownload.desktop
-                        --icon-file=${CMAKE_INSTALL_PREFIX}/usr/share/icons/hicolor/256x256/apps/gdownload.svg
-                        --plugin qt
-                        --output appimage
-                        --verbosity=3
-                RESULT_VARIABLE DEPLOY_RESULT
-            )
-            
-            if(NOT DEPLOY_RESULT EQUAL 0)
-                message(WARNING \" failed: ${DEPLOY_RESULT}\")
-            endif()
-        ")
+            install(CODE "
+                set(ENV{LD_LIBRARY_PATH} \"${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin:${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/usr/lib:${Qt6_DIR}/../../../lib:\$ENV{LD_LIBRARY_PATH}\")
+                set(ENV{QML_SOURCES_PATHS} \"${CMAKE_SOURCE_DIR}/src/App/ui/Resource/qml\")
+                set(ENV{QMAKE} \"${Qt6_DIR}/../../../bin/qmake\")
+                set(ENV{QT_PLUGIN_PATH} \"${Qt6_DIR}/../../../plugins\")
+                set(ENV{QML_IMPORT_PATH} \"${Qt6_DIR}/../../../qml\")
+                set(ENV{UPDATE_INFORMATION} \"gh-releases-zsync|cool2528|GDownload|latest|gdownload-*.AppImage.zsync\")
+                
+                execute_process(
+                    COMMAND \"${LINUXDEPLOY_PATH}\"
+                            --appdir=${CMAKE_INSTALL_PREFIX}
+                            --executable=${CMAKE_INSTALL_PREFIX}/usr/bin/gdownload
+                            --desktop-file=${CMAKE_INSTALL_PREFIX}/usr/share/applications/gdownload.desktop
+                            --icon-file=${CMAKE_INSTALL_PREFIX}/usr/share/icons/hicolor/256x256/apps/gdownload.svg
+                            --plugin qt
+                            --output appimage
+                            --verbosity=3
+                    RESULT_VARIABLE DEPLOY_RESULT
+                )
+                
+                if(NOT DEPLOY_RESULT EQUAL 0)
+                    message(WARNING \"linuxdeploy failed: ${DEPLOY_RESULT}\")
+                endif()
+            ")
+        endif()
     endif()
 endif()
