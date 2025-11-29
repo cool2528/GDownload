@@ -132,10 +132,14 @@ jobs:
 
       - name: Set QTDIR (Windows)
         if: runner.os == 'Windows'
-        shell: pwsh
+        shell: cmd
         run: |
-          $qtRoot = [System.IO.Path]::GetFullPath((Join-Path $env:Qt6_DIR "..\.."))
-          "QTDIR=$qtRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          if "%Qt6_DIR%"=="" (
+            echo Qt6_DIR is not defined after install-qt-action.
+            exit /b 1
+          )
+          for %%I in ("%Qt6_DIR%\..\..") do set "QTDIR=%%~fI"
+          echo QTDIR=%QTDIR%>>%GITHUB_ENV%
 
       - name: Install Linux Dependencies
         if: matrix.target == 'linux'
