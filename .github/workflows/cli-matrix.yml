@@ -70,7 +70,6 @@ jobs:
             install_prefix: linux_package
             release_glob: release_artifacts/linux/*.AppImag*
             cmake_extra: ""
-            pdb_archive: ""
           - target: macos-arm64
             os: macos-latest
             qt_version: 6.10.1
@@ -81,7 +80,6 @@ jobs:
             artifact_name: macos-arm64-app
             release_glob: ""
             cmake_extra: "-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang"
-            pdb_archive: ""
           - target: macos-x64
             os: macos-latest
             qt_version: 6.10.1
@@ -92,7 +90,6 @@ jobs:
             artifact_name: macos-x64-app
             release_glob: ""
             cmake_extra: "-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang"
-            pdb_archive: ""
           - target: windows
             os: windows-latest
             qt_version: 6.10.1
@@ -101,7 +98,6 @@ jobs:
             install_prefix: windows_package
             release_glob: release_artifacts/windows/*.exe
             msvc_arch: x64
-            pdb_archive: release_artifacts/windows/windows_pdb.zip
             cmake_extra: ""
 
     steps:
@@ -327,28 +323,6 @@ jobs:
             Copy-Item $file.FullName -Destination $releaseDir -Force
           }
 
-      - name: Package Windows PDB
-        if: matrix.target == 'windows'
-        shell: pwsh
-        run: |
-          Set-Location $env:GITHUB_WORKSPACE
-          $source = Join-Path $PWD "windows_pdb"
-          if (-not (Test-Path $source)) {
-            Write-Error "windows_pdb directory not found at $source"
-            exit 1
-          }
-          $archive = Join-Path $PWD "${{ matrix.pdb_archive }}"
-          $destDir = Split-Path -Parent $archive
-          if (-not [string]::IsNullOrWhiteSpace($destDir)) {
-            New-Item -ItemType Directory -Force -Path $destDir | Out-Null
-          }
-          Compress-Archive -Path $source -DestinationPath $archive -Force
-          if (-not (Test-Path $archive)) {
-            Write-Error "Failed to create PDB archive at $archive"
-            exit 1
-          }
-          Get-Item $archive
-
       - name: Create AppImage zsync
         if: matrix.target == 'linux'
         env:
@@ -398,15 +372,6 @@ jobs:
           tag: ${{ github.ref_name }}
           file_glob: true
           file: ${{ matrix.release_glob }}
-          overwrite: true
-
-      - name: Upload Windows PDB
-        if: matrix.target == 'windows' && startsWith(github.ref, 'refs/tags/')
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref_name }}
-          file: ${{ matrix.pdb_archive }}
           overwrite: true
 
   merge-macos-universal:
