@@ -64,6 +64,13 @@ find "$ARM64_APP" \( -type f -perm +111 -o -name "*.dylib" \) | while read -r AR
 
     if [ -f "$X64_FILE" ]; then
         echo "合并: $RELATIVE_PATH"
+        ARM64_ARCHS="$(lipo -archs "$ARM64_FILE" 2>/dev/null || echo "")"
+        X64_ARCHS="$(lipo -archs "$X64_FILE" 2>/dev/null || echo "")"
+        if [ -n "$ARM64_ARCHS" ] && [ "$ARM64_ARCHS" = "$X64_ARCHS" ]; then
+            echo "警告: $RELATIVE_PATH 两个输入具有相同架构 (${ARM64_ARCHS})，跳过合并，使用 ARM64 版本"
+            cp "$ARM64_FILE" "$UNIVERSAL_FILE"
+            continue
+        fi
         lipo -create "$ARM64_FILE" "$X64_FILE" -output "$UNIVERSAL_FILE"
     else
         echo "警告: $RELATIVE_PATH 在 x64 版本中不存在，保留 ARM64 版本"
