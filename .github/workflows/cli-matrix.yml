@@ -4,8 +4,6 @@ on:
   push:
     tags:
       - '*'
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
@@ -254,11 +252,20 @@ jobs:
       - name: Build AppImage
         if: matrix.target == 'linux'
         id: build_appimage
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          REF: ${{ github.ref }}
+          RUN_NUMBER: ${{ github.run_number }}
         run: |
           chmod +x scripts/build_appimage.sh
           RELEASE_DIR="${{ github.workspace }}/release_artifacts/linux"
           mkdir -p "$RELEASE_DIR"
-          APPIMAGE_PATH="$RELEASE_DIR/gdownload-linux-${{ github.run_number }}.AppImage"
+          if [[ "${REF:-}" == refs/tags/* ]]; then
+            APPIMAGE_BASENAME="gdownload-linux-${REF_NAME}.AppImage"
+          else
+            APPIMAGE_BASENAME="gdownload-linux-${RUN_NUMBER}.AppImage"
+          fi
+          APPIMAGE_PATH="$RELEASE_DIR/${APPIMAGE_BASENAME}"
           scripts/build_appimage.sh "${{ github.workspace }}/${{ matrix.install_prefix }}" "$APPIMAGE_PATH"
           echo "path=$APPIMAGE_PATH" >> "$GITHUB_OUTPUT"
 
@@ -340,7 +347,19 @@ jobs:
             echo "AppImage not found, skipping zsync generation"
           else
             export APPIMAGE_EXTRACT_AND_RUN=1
-            appimagetool -u "gh-releases-zsync|cool2528|GDownload|latest|gdownload-*.AppImage.zsync" ${{ github.workspace }}/${{ matrix.install_prefix }} "${APPIMAGE_PATH}"
+            APPIMAGE_DIR="$(dirname "${APPIMAGE_PATH}")"
+            APPIMAGE_FILE="$(basename "${APPIMAGE_PATH}")"
+            pushd "${APPIMAGE_DIR}" >/dev/null
+            appimagetool -u "gh-releases-zsync|cool2528|GDownload|latest|gdownload-*.AppImage.zsync" \
+              ${{ github.workspace }}/${{ matrix.install_prefix }} \
+              "${APPIMAGE_FILE}"
+            popd >/dev/null
+            if [ -f "${APPIMAGE_PATH}.zsync" ]; then
+              echo "zsync generated at ${APPIMAGE_PATH}.zsync"
+            else
+              echo "AppImage .zsync file not found after generation" >&2
+              exit 1
+            fi
           fi
 
       - name: Upload Build Artifact
@@ -368,7 +387,7 @@ jobs:
           tag: ${{ github.ref_name }}
           file_glob: true
           file: ${{ matrix.release_glob }}
-          overwrite: false
+          overwrite: true
 
       - name: Upload Windows PDB
         if: matrix.target == 'windows' && startsWith(github.ref, 'refs/tags/')
@@ -377,7 +396,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
           file: ${{ matrix.pdb_archive }}
-          overwrite: false
+          overwrite: true
 
   merge-macos-universal:
     needs: build
