@@ -388,13 +388,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: macos-arm64-app
-          path: build-arm64
+          path: build-arm64/GDownload.app
 
       - name: Download x64 Build
         uses: actions/download-artifact@v4
         with:
           name: macos-x64-app
-          path: build-x64
+          path: build-x64/GDownload.app
 
       - name: Merge Universal Binary
         run: |
