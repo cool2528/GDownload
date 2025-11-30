@@ -287,24 +287,13 @@ jobs:
           del /S /Q build\Release\bin\*.exp
           cmake --install build --config Release
 
-      - name: Package PDB
-        if: matrix.target == 'windows'
-        shell: pwsh
-        run: |
-          $dest = "${{ matrix.pdb_archive }}"
-          $destDir = Split-Path -Parent $dest
-          if (-not [string]::IsNullOrWhiteSpace($destDir)) {
-            New-Item -ItemType Directory -Force -Path $destDir | Out-Null
-          }
-          Compress-Archive -Path windows_pdb -DestinationPath ${{ matrix.pdb_archive }} -Force
-
       - name: Install Inno Setup
         if: matrix.target == 'windows'
         run: |
           choco install innosetup -y --no-progress
           # 验证安装
           if (Test-Path "C:\Program Files (x86)\Inno Setup 6\ISCC.exe") {
-            Write-Host "Inno Setup installed at: C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+            Write-Host "Inno Setup installed at: C:\ Program Files (x86)\Inno Setup 6\ISCC.exe"
           } else {
             Write-Host "Inno Setup not found in default location"
             Get-ChildItem "C:\Program Files*" -Recurse -Filter "ISCC.exe" -ErrorAction SilentlyContinue
@@ -337,6 +326,28 @@ jobs:
           foreach ($file in $setupFiles) {
             Copy-Item $file.FullName -Destination $releaseDir -Force
           }
+
+      - name: Package Windows PDB
+        if: matrix.target == 'windows'
+        shell: pwsh
+        run: |
+          Set-Location $env:GITHUB_WORKSPACE
+          $source = Join-Path $PWD "windows_pdb"
+          if (-not (Test-Path $source)) {
+            Write-Error "windows_pdb directory not found at $source"
+            exit 1
+          }
+          $archive = Join-Path $PWD "${{ matrix.pdb_archive }}"
+          $destDir = Split-Path -Parent $archive
+          if (-not [string]::IsNullOrWhiteSpace($destDir)) {
+            New-Item -ItemType Directory -Force -Path $destDir | Out-Null
+          }
+          Compress-Archive -Path $source -DestinationPath $archive -Force
+          if (-not (Test-Path $archive)) {
+            Write-Error "Failed to create PDB archive at $archive"
+            exit 1
+          }
+          Get-Item $archive
 
       - name: Create AppImage zsync
         if: matrix.target == 'linux'
