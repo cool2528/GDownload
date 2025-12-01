@@ -159,6 +159,18 @@ if(APPLE)
         )
     endif()
     # 复制logo.icns到捆绑包的资源目录中
+    # Determine the correct engine directory based on target architecture
+    if(CMAKE_OSX_ARCHITECTURES MATCHES "arm64;x86_64" OR CMAKE_OSX_ARCHITECTURES MATCHES "x86_64;arm64")
+        set(ENGINE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/extra/darwin/universal/engine/")
+    elseif(CMAKE_OSX_ARCHITECTURES STREQUAL "arm64")
+        set(ENGINE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/extra/darwin/arm64/engine/")
+    elseif(CMAKE_OSX_ARCHITECTURES STREQUAL "x86_64")
+        set(ENGINE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/extra/darwin/x86_64/engine/")
+    else()
+        # Fallback to CMAKE_SYSTEM_PROCESSOR (may be incorrect for cross-compilation)
+        set(ENGINE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/extra/${CMAKE_SYSTEM_NAME}/${CMAKE_SYSTEM_PROCESSOR}/engine/")
+    endif()
+
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         ${CMAKE_CURRENT_SOURCE_DIR}/Resource/images/logo/logo.icns
@@ -166,7 +178,7 @@ if(APPLE)
         COMMAND ${CMAKE_COMMAND} -E make_directory
             ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/${PROJECT_NAME}.app/Contents/Resources/engine
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_SOURCE_DIR}/extra/${CMAKE_SYSTEM_NAME}/${CMAKE_SYSTEM_PROCESSOR}/engine/
+            ${ENGINE_SOURCE_DIR}
             ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/${PROJECT_NAME}.app/Contents/Resources/engine
         COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${CMAKE_CURRENT_SOURCE_DIR}/Resource/translations
