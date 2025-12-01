@@ -469,4 +469,4 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
           file: GDownload-Universal.dmg
-          overwrite: false
+          overwrite: true

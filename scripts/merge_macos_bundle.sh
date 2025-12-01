@@ -99,7 +99,12 @@ find "$ARM64_APP" -type f \( -perm -111 -o -name "*.dylib" -o -path "*/Contents/
             cp "$ARM64_FILE" "$UNIVERSAL_FILE"
             continue
         fi
+        ORIGINAL_PERMISSIONS="$(stat -f "%OLp" "$UNIVERSAL_FILE" 2>/dev/null || echo "")"
         lipo -create "$ARM64_FILE" "$X64_FILE" -output "$UNIVERSAL_FILE"
+        if [ -n "$ORIGINAL_PERMISSIONS" ]; then
+            # lipo resets permissions, so restore the executable bits from the source file
+            chmod "$ORIGINAL_PERMISSIONS" "$UNIVERSAL_FILE"
+        fi
     else
         echo "警告: $RELATIVE_PATH 在 x64 版本中不存在，保留 ARM64 版本"
     fi
