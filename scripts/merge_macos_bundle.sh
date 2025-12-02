@@ -79,14 +79,19 @@ if [ -e "$UNIVERSAL_APP" ]; then
 fi
 cp -R "$ARM64_APP" "$UNIVERSAL_APP"
 
-# 查找所有可执行文件和动态库
-echo "开始合并二进制文件..."
-find "$ARM64_APP" -type f \( -perm -111 -o -name "*.dylib" -o -path "*/Contents/MacOS/*" \) | while read -r ARM64_FILE; do
+# 查找所有文件并检查是否为 Mach-O，不再依赖文件权限来查找
+echo "开始扫描并合并二进制文件..."
+find "$ARM64_APP" -type f | while read -r ARM64_FILE; do
     RELATIVE_PATH="${ARM64_FILE#$ARM64_APP/}"
     X64_FILE="$X64_APP/$RELATIVE_PATH"
     UNIVERSAL_FILE="$UNIVERSAL_APP/$RELATIVE_PATH"
 
-    if ! file "$ARM64_FILE" | grep -q "Mach-O"; then
+    # 检查是否为 Mach-O 文件，忽略符号链接
+    if [ -L "$ARM64_FILE" ]; then
+        continue
+    fi
+    
+    if ! file -b "$ARM64_FILE" | grep -q "Mach-O"; then
         continue
     fi
 
@@ -94,20 +99,31 @@ find "$ARM64_APP" -type f \( -perm -111 -o -name "*.dylib" -o -path "*/Contents/
         echo "合并: $RELATIVE_PATH"
         ARM64_ARCHS="$(lipo -archs "$ARM64_FILE" 2>/dev/null || echo "")"
         X64_ARCHS="$(lipo -archs "$X64_FILE" 2>/dev/null || echo "")"
+        
+        # 确保目标目录存在（虽然 cp -R 应该已经创建了目录结构，但为了保险）
+        mkdir -p "$(dirname "$UNIVERSAL_FILE")"
+
         if [ -n "$ARM64_ARCHS" ] && [ -n "$X64_ARCHS" ] && contains_all_archs "$ARM64_ARCHS" "$X64_ARCHS"; then
             echo "信息: $RELATIVE_PATH ARM64 版本已包含所有所需架构 (${ARM64_ARCHS})，跳过合并"
+            # 即使跳过合并，也要确保权限正确
             cp "$ARM64_FILE" "$UNIVERSAL_FILE"
-            continue
+        else
+            lipo -create "$ARM64_FILE" "$X64_FILE" -output "$UNIVERSAL_FILE"
         fi
-        ORIGINAL_PERMISSIONS="$(stat -f "%OLp" "$UNIVERSAL_FILE" 2>/dev/null || echo "")"
-        lipo -create "$ARM64_FILE" "$X64_FILE" -output "$UNIVERSAL_FILE"
-        if [ -n "$ORIGINAL_PERMISSIONS" ]; then
-            # lipo resets permissions, so restore the executable bits from the source file
-            chmod "$ORIGINAL_PERMISSIONS" "$UNIVERSAL_FILE"
-        fi
+        
+        # 强制修复权限：所有 Mach-O 文件都赋予 755 (rwxr-xr-x)
+        # 这解决了 CI artifact 下载后权限可能丢失导致无法运行的问题
+        chmod 755 "$UNIVERSAL_FILE"
     else
         echo "警告: $RELATIVE_PATH 在 x64 版本中不存在，保留 ARM64 版本"
+        # 同样确保保留的文件有正确权限
+        chmod 755 "$UNIVERSAL_FILE"
     fi
 done
+
+# 重新进行 ad-hoc 签名
+# lipo 操作可能会破坏原有的签名，导致在 ARM64 macOS 上无法运行
+echo "重新对 Universal Bundle 进行 ad-hoc 签名..."
+codesign --force --deep --sign - "$UNIVERSAL_APP"
 
 echo "Universal Binary 创建成功: $UNIVERSAL_APP"
