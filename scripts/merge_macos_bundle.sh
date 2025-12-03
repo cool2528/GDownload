@@ -122,17 +122,35 @@ find "$ARM64_APP" -type f | while read -r ARM64_FILE; do
 done
 
 # 重新进行 ad-hoc 签名
-# lipo 操作可能会破坏原有的签名，导致在 ARM64 macOS 上无法运行
+# lipo 操作可能会破坏原有的签名，导致在 ARM64 macOS 上无法���行
 echo "重新对 Universal Bundle 进行 ad-hoc 签名..."
-# 先对框架进行签名，然后对应用签名，避免 bundle format ambiguous 错误
-find "$UNIVERSAL_APP/Contents/Frameworks" -name "*.framework" -type d | while read -r framework; do
-    codesign --force --sign - "$framework"
-done
-# 对动态库进行签名
+
+# 对所有动态库进行签名（需要先签名dylib，因为framework可能依赖它们）
 find "$UNIVERSAL_APP/Contents/Frameworks" -name "*.dylib" -type f | while read -r dylib; do
-    codesign --force --sign - "$dylib"
+    echo "签名 dylib: $(basename "$dylib")"
+    codesign --force --sign - "$dylib" 2>&1 | grep -v "replacing existing signature" || true
 done
-# 最后对整个应用签名，不使用 --deep 避免重复签名导致的歧义
-codesign --force --sign - "$UNIVERSAL_APP"
+
+# 对框架进行签名（从最深层开始）
+find "$UNIVERSAL_APP/Contents/Frameworks" -name "*.framework" -type d | sort -r | while read -r framework; do
+    framework_name=$(basename "$framework" .framework)
+    # 签名framework内的主要二进制文件
+    if [ -f "$framework/Versions/A/$framework_name" ]; then
+        echo "签名 framework: $framework_name"
+        codesign --force --sign - "$framework/Versions/A/$framework_name" 2>&1 | grep -v "replacing existing signature" || true
+    elif [ -f "$framework/$framework_name" ]; then
+        echo "签名 framework: $framework_name"
+        codesign --force --sign - "$framework/$framework_name" 2>&1 | grep -v "replacing existing signature" || true
+    fi
+done
+
+# 对插件进行签名
+find "$UNIVERSAL_APP/Contents/PlugIns" -name "*.dylib" -type f | while read -r plugin; do
+    codesign --force --sign - "$plugin" 2>&1 | grep -v "replacing existing signature" || true
+done
+
+# 最后对整个应用签名
+echo "签名整个应用..."
+codesign --force --sign - "$UNIVERSAL_APP" 2>&1 | grep -v "replacing existing signature" || true
 
 echo "Universal Binary 创建成功: $UNIVERSAL_APP"
