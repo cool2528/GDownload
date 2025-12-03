@@ -124,6 +124,15 @@ done
 # 重新进行 ad-hoc 签名
 # lipo 操作可能会破坏原有的签名，导致在 ARM64 macOS 上无法运行
 echo "重新对 Universal Bundle 进行 ad-hoc 签名..."
-codesign --force --deep --sign - "$UNIVERSAL_APP"
+# 先对框架进行签名，然后对应用签名，避免 bundle format ambiguous 错误
+find "$UNIVERSAL_APP/Contents/Frameworks" -name "*.framework" -type d | while read -r framework; do
+    codesign --force --sign - "$framework"
+done
+# 对动态库进行签名
+find "$UNIVERSAL_APP/Contents/Frameworks" -name "*.dylib" -type f | while read -r dylib; do
+    codesign --force --sign - "$dylib"
+done
+# 最后对整个应用签名，不使用 --deep 避免重复签名导致的歧义
+codesign --force --sign - "$UNIVERSAL_APP"
 
 echo "Universal Binary 创建成功: $UNIVERSAL_APP"
