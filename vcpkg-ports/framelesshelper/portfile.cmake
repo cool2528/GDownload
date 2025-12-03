@@ -10,6 +10,7 @@ vcpkg_from_github(
         remove-agl-framework.patch
         add-qt-private-components.patch
         fix-quickcontrols2-private.patch
+        fix-qt-6.10-compatibility.patch
         fix-qt-6.10-constexpr.patch
         fix-qt-6.10-darkmode.patch
         fix-qt-6.10-compositing.patch
