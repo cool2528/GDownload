@@ -15,6 +15,24 @@
 #include <nlohmann/json.hpp>
 #include <thread>
 
+namespace {
+\tstd::string NormalizeReleaseNotes(std::string raw) {
+\t\tauto replace_all = [](std::string& s, const std::string& from, const std::string& to) {
+\t\t\tsize_t pos = 0;
+\t\t\twhile ((pos = s.find(from, pos)) != std::string::npos) {
+\t\t\t\ts.replace(pos, from.length(), to);
+\t\t\t\tpos += to.length();
+\t\t\t}
+\t\t};
+\t\treplace_all(raw, "\r\n", "\n");
+\t\treplace_all(raw, "\r", "\n");
+\t\treplace_all(raw, "<br>", "\n");
+\t\treplace_all(raw, "<br/>", "\n");
+\t\treplace_all(raw, "<br />", "\n");
+\t\treturn raw;
+\t}
+}  // namespace
+
 namespace gdl {
 	namespace update {
 
@@ -94,7 +112,7 @@ namespace gdl {
 				QString published_at = QString::fromStdString(doc["published_at"].get<std::string>());
 				info.release_date =
 					QDateTime::fromString(published_at, Qt::ISODate).toString("yyyy-MM-dd hh:mm:ss").toStdString();
-				info.release_notes = doc["body"].get<std::string>();
+				info.release_notes = NormalizeReleaseNotes(doc["body"].get<std::string>());
 				if (doc.contains("assets") && doc["assets"].is_array()) {
 					for (auto asset : doc["assets"]) {
 						if (asset.contains("browser_download_url") && asset.contains("name")) {
