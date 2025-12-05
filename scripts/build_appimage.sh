@@ -35,6 +35,11 @@ export APPIMAGE_EXTRACT_AND_RUN=1
 export APPIMAGE_NAME="$(basename "$OUTPUT_PATH")"
 export LD_LIBRARY_PATH="$APPDIR/lib:$APPDIR/usr/lib:${LD_LIBRARY_PATH:-}"
 export UPDATE_INFORMATION="gh-releases-zsync|cool2528|GDownload|latest|gdownload-*.AppImage.zsync"
+# QML 依赖收集：让 linuxdeploy-plugin-qt 找到实际的 QML 源文件
+if [[ -z "${QML_SOURCES_PATHS:-}" ]]; then
+    SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+    export QML_SOURCES_PATHS="${SCRIPT_ROOT}/src/App/ui/Resource/qml"
+fi
 
 if [[ -n "${QTDIR:-}" ]]; then
     export QT_PLUGIN_PATH="$QTDIR/plugins"
@@ -48,6 +53,7 @@ pushd "$TMPDIR" >/dev/null
     --executable "$APPDIR/usr/bin/gdownload" \
     --desktop-file "$APPDIR/usr/share/applications/gdownload.desktop" \
     --icon-file "$APPDIR/usr/share/icons/hicolor/256x256/apps/gdownload.svg" \
+    --qmldir "$QML_SOURCES_PATHS" \
     --plugin qt \
     --output appimage
 

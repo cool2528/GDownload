@@ -13,6 +13,22 @@ namespace gdl {
         namespace {
             constexpr const char* kGithubMirrorPrefix = "https://gh-proxy.com/";
 
+            std::string NormalizeReleaseNotes(std::string raw) {
+                auto replace_all = [](std::string& s, const std::string& from, const std::string& to) {
+                    size_t pos = 0;
+                    while ((pos = s.find(from, pos)) != std::string::npos) {
+                        s.replace(pos, from.length(), to);
+                        pos += to.length();
+                    }
+                };
+                replace_all(raw, "\r\n", "\n");
+                replace_all(raw, "\r", "\n");
+                replace_all(raw, "<br>", "\n");
+                replace_all(raw, "<br/>", "\n");
+                replace_all(raw, "<br />", "\n");
+                return raw;
+            }
+
             std::string ApplyGithubMirrorIfNeeded(const std::string& original_url) {
                 if (original_url.empty()) {
                     return original_url;
@@ -465,7 +481,7 @@ namespace gdl {
                 QString published_at = QString::fromStdString(doc["published_at"].get<std::string>());
                 info.release_date =
                     QDateTime::fromString(published_at, Qt::ISODate).toString("yyyy-MM-dd hh:mm:ss").toStdString();
-                info.release_notes = doc["body"].get<std::string>();
+                info.release_notes = NormalizeReleaseNotes(doc["body"].get<std::string>());
                 if (doc.contains("assets") && doc["assets"].is_array()) {
                     for (auto asset : doc["assets"]) {
                         if (asset.contains("browser_download_url") && asset.contains("name")) {
