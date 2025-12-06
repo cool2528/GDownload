@@ -959,10 +959,17 @@ namespace gdl {
 			}
 
 			DownloadTaskInfo BrowserManager::Aria2QueryByGidTaskInfo(const std::string& gid) {
-				DownloadTaskInfo task_info;
-				auto rpc_port = std::to_string(settings::Settings::Instance().GetRpcListenPort());
-				if (rpc_port.empty()) rpc_port = kEngineRpcPort;
-				const std::string host = std::string("http://127.0.0.1:") + rpc_port;
+			DownloadTaskInfo task_info;
+			// 获取并验证 RPC 端口
+			int port_value = settings::Settings::Instance().GetRpcListenPort();
+			std::string rpc_port;
+			// 验证端口范围，如果无效则使用默认值
+			if (port_value < 1024 || port_value > 65535) {
+				rpc_port = kEngineRpcPort;
+			} else {
+				rpc_port = std::to_string(port_value);
+			}
+			const std::string host = std::string("http://127.0.0.1:") + rpc_port;
 				engine::Aria2cHttpClient client(host);
 				auto http_result = client.TellStatus(gid, keys);
 				if (http_result.HasError()) {
