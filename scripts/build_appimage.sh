@@ -53,7 +53,6 @@ pushd "$TMPDIR" >/dev/null
     --executable "$APPDIR/usr/bin/gdownload" \
     --desktop-file "$APPDIR/usr/share/applications/gdownload.desktop" \
     --icon-file "$APPDIR/usr/share/icons/hicolor/256x256/apps/gdownload.svg" \
-    --qmldir "$QML_SOURCES_PATHS" \
     --plugin qt \
     --output appimage
 
