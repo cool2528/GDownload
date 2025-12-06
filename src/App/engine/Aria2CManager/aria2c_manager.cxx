@@ -31,9 +31,18 @@ namespace gdl {
 			  pub_sub_system_(io_context_),
 			  flush_timer_(io_context_),
 			  websocket_client_([]() {
-				  auto rpc_port = config::GetValue(config::Keys::RpcListenPort).AsString();
-				  if (rpc_port.empty()) rpc_port = kEngineRpcPort;
-				  return std::string("ws://127.0.0.1:") + rpc_port + "/jsonrpc";
+			auto rpc_port = config::GetValue(config::Keys::RpcListenPort).AsString();
+			// 验证端口范围，如果为空或无效则使用默认值
+			int port_value = 0;
+			try {
+				port_value = std::stoi(rpc_port);
+			} catch (...) {
+				port_value = 0;
+			}
+			if (port_value < 1024 || port_value > 65535) {
+				rpc_port = kEngineRpcPort;
+			}
+			return std::string("ws://127.0.0.1:") + rpc_port + "/jsonrpc";
 			  }(), io_context_) {
 
 			websocket_client_.SetMessageCallback([this](const std::string& msg) {
@@ -124,9 +133,19 @@ namespace gdl {
 			aria2c_settings["no-proxy"]					  = "";
 			aria2c_settings["pause-metadata"]			  = "false";
 			aria2c_settings["pause"]					  = "false";
-			// 使用配置的 RPC 监听端口，如果配置为空则使用默认端口
-			auto rpc_port = config::GetValue(config::Keys::RpcListenPort).AsString();
-			aria2c_settings["rpc-listen-port"] = rpc_port.empty() ? kEngineRpcPort : rpc_port;
+			// 使用配置的 RPC 监听端口，如果配置为空或无效则使用默认端口
+		auto rpc_port = config::GetValue(config::Keys::RpcListenPort).AsString();
+		int port_value = 0;
+		try {
+			port_value = std::stoi(rpc_port);
+		} catch (...) {
+			port_value = 0;
+		}
+		// 验证端口范围，如果无效则使用默认值
+		if (port_value < 1024 || port_value > 65535) {
+			rpc_port = kEngineRpcPort;
+		}
+		aria2c_settings["rpc-listen-port"] = rpc_port;
 			// 使用配置的 RPC Secret，如果配置为空则使用默认值
 			auto rpc_secret = config::GetValue(config::Keys::RpcSecret).AsString();
 			aria2c_settings["rpc-secret"]				  = rpc_secret.empty() ? kDefaultRpcSecret : rpc_secret;
@@ -314,10 +333,19 @@ namespace gdl {
 		}
 
 		void Aria2cDownloadManager::SyncGlobalStatInfo() {
-			// Engine 层使用 config 系统
-			auto rpc_port = config::GetValue(config::Keys::RpcListenPort).AsString();
-			if (rpc_port.empty()) rpc_port = kEngineRpcPort;
-			const std::string host = std::string("http://127.0.0.1:") + rpc_port;
+		// Engine 层使用 config 系统
+		auto rpc_port = config::GetValue(config::Keys::RpcListenPort).AsString();
+		// 验证端口范围，如果为空或无效则使用默认值
+		int port_value = 0;
+		try {
+			port_value = std::stoi(rpc_port);
+		} catch (...) {
+			port_value = 0;
+		}
+		if (port_value < 1024 || port_value > 65535) {
+			rpc_port = kEngineRpcPort;
+		}
+		const std::string host = std::string("http://127.0.0.1:") + rpc_port;
 			Aria2cHttpClient client(host);
 			auto http_result = client.GetGlobalStat();
 			if (auto res = std::get_if<ErrorResult>(&http_result.Value().result)) {
@@ -339,12 +367,21 @@ namespace gdl {
 		}
 
         std::string Aria2cDownloadManager::SyncActiveTaskInfo() {
-            std::string result_string				   = "{}";
-            static const std::vector<std::string> keys = {"status", "totalLength", "completedLength"};
-            // Engine 层使用 config 系统
-            auto rpc_port = config::GetValue(config::Keys::RpcListenPort).AsString();
-            if (rpc_port.empty()) rpc_port = kEngineRpcPort;
-            const std::string host					   = std::string("http://127.0.0.1:") + rpc_port;
+		std::string result_string				   = "{}";
+		static const std::vector<std::string> keys = {"status", "totalLength", "completedLength"};
+		// Engine 层使用 config 系统
+		auto rpc_port = config::GetValue(config::Keys::RpcListenPort).AsString();
+		// 验证端口范围，如果为空或无效则使用默认值
+		int port_value = 0;
+		try {
+			port_value = std::stoi(rpc_port);
+		} catch (...) {
+			port_value = 0;
+		}
+		if (port_value < 1024 || port_value > 65535) {
+			rpc_port = kEngineRpcPort;
+		}
+		const std::string host					   = std::string("http://127.0.0.1:") + rpc_port;
             Aria2cHttpClient client(host);
             auto http_result = client.TellActive(keys);
             if (auto res = std::get_if<ErrorResult>(&http_result.Value().result)) {
