@@ -16,21 +16,21 @@
 #include <thread>
 
 namespace {
-\tstd::string NormalizeReleaseNotes(std::string raw) {
-\t\tauto replace_all = [](std::string& s, const std::string& from, const std::string& to) {
-\t\t\tsize_t pos = 0;
-\t\t\twhile ((pos = s.find(from, pos)) != std::string::npos) {
-\t\t\t\ts.replace(pos, from.length(), to);
-\t\t\t\tpos += to.length();
-\t\t\t}
-\t\t};
-\t\treplace_all(raw, "\r\n", "\n");
-\t\treplace_all(raw, "\r", "\n");
-\t\treplace_all(raw, "<br>", "\n");
-\t\treplace_all(raw, "<br/>", "\n");
-\t\treplace_all(raw, "<br />", "\n");
-\t\treturn raw;
-\t}
+	std::string NormalizeReleaseNotes(std::string raw) {
+		auto replace_all = [](std::string& s, const std::string& from, const std::string& to) {
+			size_t pos = 0;
+			while ((pos = s.find(from, pos)) != std::string::npos) {
+				s.replace(pos, from.length(), to);
+				pos += to.length();
+			}
+		};
+		replace_all(raw, "\r\n", "\n");
+		replace_all(raw, "\r", "\n");
+		replace_all(raw, "<br>", "\n");
+		replace_all(raw, "<br/>", "\n");
+		replace_all(raw, "<br />", "\n");
+		return raw;
+	}
 }  // namespace
 
 namespace gdl {
