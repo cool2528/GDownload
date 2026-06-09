@@ -35,7 +35,7 @@ namespace gdl {
 			QDateTime last_check = settings.value("update/last_check_time").toDateTime();
 			QDateTime now		 = QDateTime::currentDateTime();
 			// If auto-check is enabled and interval is greater than 0
-			if (config.check_interval_hours > 0 && config.disable_auto_check) {
+			if (config.check_interval_hours > 0 && config.enable_auto_check) {
 				// Set timer to check at specified interval
 				check_timer_.setInterval(config.check_interval_hours * 60 * 60 * 1000);
 				check_timer_.start();
@@ -43,9 +43,6 @@ namespace gdl {
 				// If never checked before or interval has passed, check immediately
 				if (!last_check.isValid() || last_check.addSecs(config.check_interval_hours * 3600) <= now) {
 					// Use silent mode for automatic check
-					QTimer::singleShot(5000, [this]() { CheckForUpdates(true); });
-				}
-				else {
 					QTimer::singleShot(5000, [this]() { CheckForUpdates(true); });
 				}
 			}

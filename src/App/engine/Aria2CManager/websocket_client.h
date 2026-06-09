@@ -2,12 +2,12 @@
 #include <boost/asio/strand.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/websocket.hpp>
+#include <chrono>
 #include <functional>
 #include <memory>
 #include <mutex>
 #include <queue>
 #include <string>
-#include <thread>
 
 namespace gdl {
 	namespace engine {
@@ -166,11 +166,13 @@ namespace gdl {
 				if (auto_reconnect_) {
 					if (max_retries_ == -1 || retry_count_ < max_retries_) {
 						retry_count_++;
-						net::post(ws_.get_executor(), 
-							[self = shared_from_this()]() {
-								std::this_thread::sleep_for(std::chrono::seconds(self->retry_interval_));
+						reconnect_timer_ = std::make_shared<net::steady_timer>(
+							ws_.get_executor(), std::chrono::seconds(retry_interval_));
+						reconnect_timer_->async_wait([self = shared_from_this()](beast::error_code ec) {
+							if (!ec) {
 								self->reconnect();
-							});
+							}
+						});
 						return;
 					}
 				}
@@ -200,6 +202,7 @@ namespace gdl {
 			ConnectCallback connect_callback_;
 			DisconnectCallback disconnect_callback_;
 			ErrorCallback error_callback_;
+			std::shared_ptr<net::steady_timer> reconnect_timer_;
 
 			bool auto_reconnect_ = false;
 			int max_retries_ = -1;        // -1 表示无限重试

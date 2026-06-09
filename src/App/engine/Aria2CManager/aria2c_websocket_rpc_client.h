@@ -1,5 +1,6 @@
 #pragma once
 #include <rapidjson/document.h>
+#include <unordered_map>
 #include "Engine_export.h"
 #include "result/result.h"
 #include "websocket_client.h"

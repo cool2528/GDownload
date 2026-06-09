@@ -114,7 +114,10 @@ namespace gdl {
 				{
 					std::lock_guard lock(mutex_);
 					if (remove_task_id_.contains(task.task_id())) {
-						return;
+						if (task.task_state() == TaskState::kRemoved) {
+							return;
+						}
+						remove_task_id_.remove(task.task_id());
 					}
 				}
 				beginInsertRows(QModelIndex(), 0, 0);
@@ -186,6 +189,10 @@ namespace gdl {
 				if (!task_lists_.isEmpty()) {
 					beginResetModel();
 					task_lists_.clear();
+					{
+						std::lock_guard lock(mutex_);
+						remove_task_id_.clear();
+					}
 					endResetModel();
 				}
 			}

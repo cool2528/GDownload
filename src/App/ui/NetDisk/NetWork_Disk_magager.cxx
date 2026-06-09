@@ -102,8 +102,13 @@ namespace gdl {
                             for (const auto info : download_info) {
                                 auto download_urls =
                                     info.mirrors.empty() ? std::vector<std::string>{info.real_url} : info.mirrors;
+                                auto options = info.headers;
+                                options.insert({"dir", settings::Settings::Instance().GetDir().toStdString()});
+                                if (!info.file_name.empty()) {
+                                    options.insert({"out", info.file_name});
+                                }
                                 auto res = gdl::engine::Aria2cDownloadManager::Instance().AddHttpTask(download_urls,
-                                                                                                      info.headers);
+                                                                                                      options);
                                 if (res.HasError()) {
                                     LOG_ERR("AddHttpTask error:{}", res.GetError().what());
                                     QString error_msg = QString("AddHttpTask %1 error: ")

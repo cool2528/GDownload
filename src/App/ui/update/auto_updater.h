@@ -33,7 +33,7 @@ namespace gdl {
             bool allow_beta			 = false;  // Whether to accept beta versions
             int check_interval_hours = 24;	   // Auto check interval (hours)
             bool silent_mode		 = false;  // Silent update mode
-            bool disable_auto_check	 = false;  // Disable automatic check
+            bool enable_auto_check	 = false;  // Enable automatic check
         };
 
         // Update information

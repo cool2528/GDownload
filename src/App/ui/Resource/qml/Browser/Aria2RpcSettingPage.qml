@@ -124,7 +124,7 @@ GCard {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 32
                     text: SettingsManager.qRpcSecret
-                    placeholderText: "GDownload_secret"
+                    placeholderText: qsTr("Generated automatically on first launch")
                     echoMode: showSecretCheckbox.checked ? TextInput.Normal : TextInput.Password
                 }
 
@@ -152,13 +152,7 @@ GCard {
                     Layout.preferredWidth: 120
                     Layout.preferredHeight: 32
                     onClicked: {
-                        // 生成随机 32 字符密钥
-                        let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-                        let randomSecret = ""
-                        for (let i = 0; i < 32; i++) {
-                            randomSecret += chars.charAt(Math.floor(Math.random() * chars.length))
-                        }
-                        secretInput.text = randomSecret
+                        secretInput.text = SettingsManager.GenerateRpcSecret()
                     }
                 }
             }
@@ -180,10 +174,11 @@ GCard {
                 Layout.preferredWidth: 120
                 Layout.preferredHeight: 36
                 onClicked: {
+                    let randomSecret = SettingsManager.GenerateRpcSecret()
                     portInput.text = "16888"
-                    secretInput.text = "GDownload_secret"
+                    secretInput.text = randomSecret
                     SettingsManager.SetRpcListenPort(16888)
-                    SettingsManager.SetRpcSecret("GDownload_secret")
+                    SettingsManager.SetRpcSecret(randomSecret)
 
 
                     ToastManager.ShowWarning(
@@ -300,7 +295,7 @@ GCard {
                     text: qsTr("• The RPC port is used for communication between the application and Aria2 engine<br>" +
                               "• Default port is <b>16888</b><br>" +
                               "• The RPC secret is used for authentication between the application and Aria2 engine<br>" +
-                              "• Default secret is <b>GDownload_secret</b><br>" +
+                              "• The RPC secret is generated automatically on first launch<br>" +
                               "• It's recommended to use a strong random secret for security<br>" +
                               "• Make sure the port is not used by other applications<br>" +
                               "• <b style='color: %1'>⚠️ You MUST restart the application after changing the port or secret!</b><br>" +
