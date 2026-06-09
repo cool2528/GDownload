@@ -2,12 +2,14 @@
 #include <cpr/cpr.h>
 #include <boost/url.hpp>
 #include <nlohmann/json.hpp>
+#include <algorithm>
+#include <cstdint>
+#include <unordered_map>
 #include <unordered_set>
 #include <sstream>
 #include <chrono>
 #include <thread>
 #include <set>
-#include <random>
 #include "engine_def.h"
 #include "logger.h"
 #include "os/os.h"
@@ -23,7 +25,59 @@
 namespace gdl {
 	namespace engine {
 
-		namespace detail {}
+		namespace detail {
+			std::string GetValidRpcPort() {
+				auto rpc_port = config::GetValue(config::Keys::RpcListenPort).AsString();
+				int port_value = 0;
+				try {
+					port_value = std::stoi(rpc_port);
+				} catch (...) {
+					port_value = 0;
+				}
+				if (port_value < 1024 || port_value > 65535) {
+					return kEngineRpcPort;
+				}
+				return rpc_port;
+			}
+
+			std::string GetRpcSecret() {
+				auto rpc_secret = config::GetValue(config::Keys::RpcSecret).AsString();
+				if (rpc_secret.empty()) {
+					rpc_secret = kDefaultRpcSecret;
+				}
+				return rpc_secret;
+			}
+
+			std::string KilobytesPerSecondToBytesPerSecond(config::ConfigValue value) {
+				return std::to_string(static_cast<std::int64_t>(value.AsInt()) * 1024);
+			}
+
+			nlohmann::json DefaultTrackerSourceNames() {
+				return nlohmann::json::array({"ngosang-best-link",
+											  "ngosang-best-mirror",
+											  "ngosang-best-cdn",
+											  "ngosang-all-link",
+											  "ngosang-all-mirror",
+											  "ngosang-all-cdn",
+											  "ngosang-all_udp-link",
+											  "ngosang-all_udp-mirror",
+											  "ngosang-all_udp-cdn",
+											  "ngosang-all_http-link",
+											  "ngosang-all_http-mirror",
+											  "ngosang-all_http-cdn",
+											  "ngosang-all_https-link",
+											  "ngosang-all_https-mirror",
+											  "ngosang-all_https-cdn",
+											  "XIU2-best-link",
+											  "XIU2-best-cdn",
+											  "XIU2-all-link",
+											  "XIU2-all-cdn",
+											  "XIU2-http-link",
+											  "XIU2-http-cdn",
+											  "XIU2-nohttp-link",
+											  "XIU2-nohttp-cdn"});
+			}
+		}  // namespace detail
 		Aria2cDownloadManager::Aria2cDownloadManager()
 			: work_(boost::asio::make_work_guard(io_context_)),
 			  daily_task_timer_(io_context_),
@@ -31,17 +85,7 @@ namespace gdl {
 			  pub_sub_system_(io_context_),
 			  flush_timer_(io_context_),
 			  websocket_client_([]() {
-			auto rpc_port = config::GetValue(config::Keys::RpcListenPort).AsString();
-			// 验证端口范围，如果为空或无效则使用默认值
-			int port_value = 0;
-			try {
-				port_value = std::stoi(rpc_port);
-			} catch (...) {
-				port_value = 0;
-			}
-			if (port_value < 1024 || port_value > 65535) {
-				rpc_port = kEngineRpcPort;
-			}
+			auto rpc_port = detail::GetValidRpcPort();
 			return std::string("ws://127.0.0.1:") + rpc_port + "/jsonrpc";
 			  }(), io_context_) {
 
@@ -89,7 +133,8 @@ namespace gdl {
 				}
 			});
 			// io 线程放在最后
-			auto max_thread_number = std::thread::hardware_concurrency() * 3 / 2;
+			auto hardware_threads = std::max(1u, std::thread::hardware_concurrency());
+			auto max_thread_number = std::max(1u, hardware_threads * 3 / 2);
 			for (auto i = 0; i < max_thread_number; ++i) {
 				worker_threads_.emplace_back(std::thread([this] { io_context_.run(); }));
 			}
@@ -97,13 +142,9 @@ namespace gdl {
 
 		std::vector<String> Aria2cDownloadManager::InitAria2cSettingsArgs() {
 			std::vector<String> result;
-			// 处理包含空格的路径
+			// 参数作为 argv 传入，由 process::Execute 统一处理空格和引号。
 			auto quote_path = [](const String& path) {
-#if defined(_WIN32) || defined(_WIN64)
-				return "\"" + path + "\"";
-#else
 				return path;
-#endif
 			};
 			std::unordered_map<std::string, std::string> aria2c_settings;
 			aria2c_settings["no-conf"]				  = "false";  //no-conf
@@ -125,45 +166,45 @@ namespace gdl {
 			aria2c_settings["follow-metalink"] = "true";
 			aria2c_settings["follow-torrent"]  = "true";
 			aria2c_settings["listen-port"]	   = config::GetValue(config::Keys::ListenPort).AsString();	 //"21301"
-			aria2c_settings["max-concurrent-downloads"]	  = "5";
-			aria2c_settings["max-connection-per-server"]  = "64";
-			aria2c_settings["max-download-limit"]		  = "0";
-			aria2c_settings["max-overall-download-limit"] = "0";
-			aria2c_settings["max-overall-upload-limit"]	  = "0";
+			aria2c_settings["max-concurrent-downloads"]	  = config::GetValue(config::Keys::MaxConcurrentDownloads).AsString();
+			aria2c_settings["max-connection-per-server"]  = config::GetValue(config::Keys::MaxConnectionPerServer).AsString();
+			aria2c_settings["max-download-limit"]		  = detail::KilobytesPerSecondToBytesPerSecond(config::GetValue(config::Keys::MaxDownloadLimit));
+			aria2c_settings["max-overall-download-limit"] = detail::KilobytesPerSecondToBytesPerSecond(config::GetValue(config::Keys::MaxOverallDownloadLimit));
+			aria2c_settings["max-upload-limit"]			  = detail::KilobytesPerSecondToBytesPerSecond(config::GetValue(config::Keys::MaxUploadLimit));
+			aria2c_settings["max-overall-upload-limit"]	  = detail::KilobytesPerSecondToBytesPerSecond(config::GetValue(config::Keys::MaxOverallUploadLimit));
+			aria2c_settings["lowest-speed-limit"]		  = detail::KilobytesPerSecondToBytesPerSecond(config::GetValue(config::Keys::LowestSpeedLimit));
+			aria2c_settings["min-split-size"]			  = config::GetValue(config::Keys::MinSplitSize).AsString() + "M";
+			aria2c_settings["timeout"]					  = config::GetValue(config::Keys::Timeout).AsString();
+			aria2c_settings["connect-timeout"]			  = config::GetValue(config::Keys::ConnectTimeout).AsString();
+			aria2c_settings["max-tries"]				  = config::GetValue(config::Keys::MaxTries).AsString();
+			aria2c_settings["retry-wait"]				  = config::GetValue(config::Keys::RetryWait).AsString();
+			aria2c_settings["enable-dht"]				  = config::GetValue(config::Keys::EnableDht).AsString();
+			aria2c_settings["bt-max-peers"]				  = config::GetValue(config::Keys::BtMaxPeers).AsString();
+			aria2c_settings["bt-require-crypto"]		  = config::GetValue(config::Keys::BtRequireCrypto).AsString();
 			aria2c_settings["no-proxy"]					  = "";
 			aria2c_settings["pause-metadata"]			  = "false";
 			aria2c_settings["pause"]					  = "false";
-			// 使用配置的 RPC 监听端口，如果配置为空或无效则使用默认端口
-		auto rpc_port = config::GetValue(config::Keys::RpcListenPort).AsString();
-		int port_value = 0;
-		try {
-			port_value = std::stoi(rpc_port);
-		} catch (...) {
-			port_value = 0;
-		}
-		// 验证端口范围，如果无效则使用默认值
-		if (port_value < 1024 || port_value > 65535) {
-			rpc_port = kEngineRpcPort;
-		}
-		aria2c_settings["rpc-listen-port"] = rpc_port;
-			// 使用配置的 RPC Secret，如果配置为空则使用默认值
-			auto rpc_secret = config::GetValue(config::Keys::RpcSecret).AsString();
-			aria2c_settings["rpc-secret"]				  = rpc_secret.empty() ? kDefaultRpcSecret : rpc_secret;
+			aria2c_settings["rpc-listen-port"]			  = detail::GetValidRpcPort();
+			aria2c_settings["rpc-secret"]				  = detail::GetRpcSecret();
 			aria2c_settings["seed-ratio"]				  = "2";
 			aria2c_settings["seed-time"]				  = "2880";
-			aria2c_settings["split"]					  = "64";
-			aria2c_settings["user-agent"]				  = quote_path(
-				"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) "
-								"Chrome/111.0.0.0 Safari/537.36");
-			aria2c_settings["check-certificate"] = "false";
+			aria2c_settings["split"]					  = config::GetValue(config::Keys::Split).AsString();
+			auto user_agent = config::GetValue(config::Keys::UserAgent).AsString();
+			if (user_agent.empty()) {
+				user_agent =
+					"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) "
+					"Chrome/111.0.0.0 Safari/537.36";
+			}
+			aria2c_settings["user-agent"] = quote_path(user_agent);
+			aria2c_settings["check-certificate"] = "true";
 #if (defined(DEBUG) || defined(_DEBUG))
 			aria2c_settings["quiet"] = "false";
 #else
 			aria2c_settings["quiet"] = "true";
 #endif
 			aria2c_settings["enable-rpc"]			= "true";
-			aria2c_settings["rpc-listen-all"]		= "true";
-			aria2c_settings["rpc-allow-origin-all"] = "true";
+			aria2c_settings["rpc-listen-all"]		= "false";
+			aria2c_settings["rpc-allow-origin-all"] = "false";
             auto is_save_session					= config::GetValue(config::Keys::IsSaveSession).AsBool();
             auto session_path						= config::GetValue(config::Keys::SaveSession).AsString();
             if (is_save_session) aria2c_settings["save-session"] = quote_path(session_path);
@@ -247,12 +288,11 @@ namespace gdl {
 					LOG_WARN("Failed to fetch tracker blacklist");
 				}
 
-				// 2. 获取配置的源列表
+				// 2. 获取配置的源列表，配置损坏时回退到内置默认源。
 				auto json_data = config::GetValue(config::Keys::TrackerSourceNames).AsString();
-				nlohmann::json tracker_source_names = nlohmann::json::parse(json_data.c_str());
-
-				if (!tracker_source_names.is_array()) {
-					throw std::runtime_error("Invalid tracker_source_names format");
+				nlohmann::json tracker_source_names = nlohmann::json::parse(json_data.c_str(), nullptr, false);
+				if (tracker_source_names.is_discarded() || !tracker_source_names.is_array()) {
+					tracker_source_names = detail::DefaultTrackerSourceNames();
 				}
 
 				// 3. 使用 unordered_set 去重
@@ -442,7 +482,13 @@ namespace gdl {
 					proxy_str =
 						"http://" + system_proxy.value().first + ":" + std::to_string(system_proxy.value().second);
 				}
-				auto reply = cpr::Get(cpr::Url(url), cpr::Proxies({{"http", proxy_str}, {"https", proxy_str}}));
+				cpr::Response reply;
+				if (proxy_str.empty()) {
+					reply = cpr::Get(cpr::Url(url));
+				}
+				else {
+					reply = cpr::Get(cpr::Url(url), cpr::Proxies({{"http", proxy_str}, {"https", proxy_str}}));
+				}
 				if (reply.status_code != 200) {
 					LOG_ERR("sync manget trackers server list faild error {}", reply.error.message);
 					return result;
@@ -524,18 +570,6 @@ namespace gdl {
 			return cdn_url;
 		}
 
-		std::string Aria2cDownloadManager::ConvertToGitHubProxy(const std::string& url) {
-			// https://raw.githubusercontent.com/...
-			// -> https://gh-proxy.com/https://raw.githubusercontent.com/...
-			std::vector<std::string> domains = {"https://ghfast.top/", "https://gh-proxy.com/"};
-			// 随机返回一个域名
-			std::random_device rd;
-			std::mt19937 gen(rd());
-			std::uniform_int_distribution<int> dis(0, domains.size() - 1);
-			std::string domain = domains[dis(gen)];
-			return domain + url;
-		}
-
 		std::string Aria2cDownloadManager::GetBitTorrentUrlWithFallback(const std::string& url) {
 			if (url.empty() || !engine_is_runing_) return "";
 
@@ -545,7 +579,6 @@ namespace gdl {
 			// 如果是 GitHub Raw，添加 CDN 镜像
 			if (url.find("raw.githubusercontent.com") != std::string::npos) {
 				fallback_urls.push_back(ConvertToJsDelivrCDN(url));
-				fallback_urls.push_back(ConvertToGitHubProxy(url));
 			}
 
 			// 获取系统代理
@@ -643,11 +676,9 @@ namespace gdl {
 			// 初始化 ETag 缓存数据库
 			InitializeETagCache();
 
-			// 启动 更新当前aria2c 的所有 暂停 正在下载 停止的任务状态列表 定时器
-			if (config::GetValue(config::Keys::EnableTrackerSourceAutoUpdate).AsBool()) {
-				update_aria2c_tasks_timer_.Start(std::bind(&Aria2cDownloadManager::UpdateAria2cTasks, this),
-												 std::chrono::milliseconds(300), true);
-			}
+			// 启动任务状态轮询。Tracker 自动更新开关不应影响任务列表刷新。
+			update_aria2c_tasks_timer_.Start(std::bind(&Aria2cDownloadManager::UpdateAria2cTasks, this),
+											 std::chrono::milliseconds(300), true);
 			// 链接 aria2c websocket
 			websocket_client_.Open();
 			engine_is_runing_ = true;

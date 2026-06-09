@@ -1,12 +1,23 @@
 #include "aria2c_websocket_rpc_client.h"
+#include <format>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 #include <boost/url.hpp>
+#include "config/config.h"
 #include "engine_def.h"
 #include "logger.h"
 #include "websocket_client.h"
 namespace gdl {
 	namespace engine {
+		namespace {
+			std::string BuildRpcToken() {
+				auto rpc_secret = config::GetValue(config::Keys::RpcSecret).AsString();
+				if (rpc_secret.empty()) {
+					rpc_secret = kDefaultRpcSecret;
+				}
+				return std::format("token:{}", rpc_secret);
+			}
+		}  // namespace
 
 		Aria2cWebSocketClient::Aria2cWebSocketClient(const std::string& url, boost::asio::io_context& ioc) : url_(url) {
 			websocket_ = std::make_shared<WebSocketClient>(ioc);
@@ -59,14 +70,13 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::AddUri(const std::vector<std::string>& uris, const Options& options) {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// params.push_back(uris);
 			// params.push_back(options);
 			// return Send("aria2.addUri", params);
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			rapidjson::Value uriList(rapidjson::kArrayType);
@@ -91,7 +101,6 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::AddTorrent(const std::string& torrent, const Options& options) {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// params.push_back(torrent);
 			//          params.push_back(nlohmann::json::array());
 			// params.push_back(options);
@@ -99,7 +108,7 @@ namespace gdl {
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			rapidjson::Value torrentValue;
@@ -122,14 +131,13 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::AddMetalink(const std::string& metalink, const Options& options) {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// params.push_back(metalink);
 			// params.push_back(options);
 			// return Send("aria2.addMetalink", params);
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			rapidjson::Value metalinkValue;
@@ -150,13 +158,12 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::Remove(const std::string& gid) {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// params.push_back(gid);
 			// return Send("aria2.remove", params);
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			rapidjson::Value gidValue;
@@ -167,13 +174,12 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::ForceRemove(const std::string& gid) {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// params.push_back(gid);
 			// return Send("aria2.forceRemove", params);
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			rapidjson::Value gidValue;
@@ -184,13 +190,12 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::Pause(const std::string& gid) {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// params.push_back(gid);
 			// return Send("aria2.pause", params);
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			rapidjson::Value gidValue;
@@ -201,12 +206,11 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::PauseAll() {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// return Send("aria2.pauseAll", params);
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			return Send("aria2.pauseAll", params);
@@ -214,13 +218,12 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::ForcePause(const std::string& gid) {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// params.push_back(gid);
 			// return Send("aria2.forcePause", params);
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			rapidjson::Value gidValue;
@@ -231,12 +234,11 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::ForcePauseAll() {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// return Send("aria2.forcePauseAll", params);
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			return Send("aria2.forcePauseAll", params);
@@ -244,13 +246,12 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::Unpause(const std::string& gid) {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// params.push_back(gid);
 			// return Send("aria2.unpause", params);
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			rapidjson::Value gidValue;
@@ -261,12 +262,11 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::UnpauseAll() {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// return Send("aria2.unpauseAll", params);
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			return Send("aria2.unpauseAll", params);
@@ -274,14 +274,13 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::TellStatus(const std::string& gid, const std::vector<std::string>& keys) {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// params.push_back(gid);
 			// params.push_back(keys);
 			// return Send("aria2.tellStatus", params);
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			rapidjson::Value gidValue;
@@ -299,13 +298,12 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::GetUris(const std::string& gid) {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// params.push_back(gid);
 			// return Send("aria2.getUris", params);
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			rapidjson::Value gidValue;
@@ -316,13 +314,12 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::GetFiles(const std::string& gid) {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// params.push_back(gid);
 			// return Send("aria2.getFiles", params);
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			rapidjson::Value gidValue;
@@ -333,13 +330,12 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::GetPeers(const std::string& gid) {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// params.push_back(gid);
 			// return Send("aria2.getPeers", params);
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			rapidjson::Value gidValue;
@@ -350,13 +346,12 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::GetServers(const std::string& gid) {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// params.push_back(gid);
 			// return Send("aria2.getServers", params);
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			rapidjson::Value gidValue;
@@ -367,13 +362,12 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::TellActive(const std::vector<std::string>& keys) {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// params.push_back(keys);
 			// return Send("aria2.tellActive", params);
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			rapidjson::Value keysValue(rapidjson::kArrayType);
@@ -388,7 +382,6 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::TellWaiting(int offset, int num, const std::vector<std::string>& keys) {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// params.push_back(offset);
 			// params.push_back(num);
 			// params.push_back(keys);
@@ -398,7 +391,7 @@ namespace gdl {
 			rapidjson::Value token;
 			rapidjson::Value offsetValue;
 			rapidjson::Value numValue;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			params.PushBack(offsetValue.SetInt(offset), doc_.GetAllocator());
@@ -415,7 +408,6 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::TellStopped(int offset, int num, const std::vector<std::string>& keys) {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// params.push_back(offset);
 			// params.push_back(num);
 			// params.push_back(keys);
@@ -425,7 +417,7 @@ namespace gdl {
 			rapidjson::Value token;
 			rapidjson::Value offsetValue;
 			rapidjson::Value numValue;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			params.PushBack(offsetValue.SetInt(offset), doc_.GetAllocator());
@@ -442,7 +434,6 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::ChangePosition(const std::string& gid, int pos, int how) {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// params.push_back(gid);
 			// params.push_back(pos);
 			// params.push_back(how);
@@ -453,7 +444,7 @@ namespace gdl {
 			rapidjson::Value gidValue;
 			rapidjson::Value posValue;
 			rapidjson::Value howValue;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			gidValue.SetString(gid.c_str(), gid.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
@@ -465,14 +456,13 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::GetOption(const std::string& gid) {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// params.push_back(gid);
 			// return Send("aria2.getOption", params);
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			rapidjson::Value gidValue;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			gidValue.SetString(gid.c_str(), gid.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
@@ -482,7 +472,6 @@ namespace gdl {
 
 		Result<bool> Aria2cWebSocketClient::changeOption(const std::string& gid, const Options& options) {
 			// nlohmann::json params = nlohmann::json::array();
-			// params.push_back(std::format("token:{}", kDefaultRpcSecret));
 			// params.push_back(gid);
 			// params.push_back(options);
 			// return Send("aria2.changeOption", params);
@@ -490,7 +479,7 @@ namespace gdl {
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			rapidjson::Value gidValue;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			gidValue.SetString(gid.c_str(), gid.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
@@ -511,7 +500,7 @@ namespace gdl {
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			return Send("aria2.getGlobalOption", params);
@@ -521,7 +510,7 @@ namespace gdl {
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			rapidjson::Value optionsValue(rapidjson::kObjectType);
@@ -540,7 +529,7 @@ namespace gdl {
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			return Send("aria2.getGlobalStat", params);
@@ -550,7 +539,7 @@ namespace gdl {
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			return Send("aria2.purgeDownloadResult", params);
@@ -560,7 +549,7 @@ namespace gdl {
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			rapidjson::Value gidValue;
@@ -573,7 +562,7 @@ namespace gdl {
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			return Send("aria2.getVersion", params);
@@ -583,7 +572,7 @@ namespace gdl {
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			return Send("aria2.shutdown", params);
@@ -593,7 +582,7 @@ namespace gdl {
 			doc_.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
-			std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+			std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 			return Send("aria2.forceShutdown", params);
@@ -604,7 +593,7 @@ namespace gdl {
 				doc_.SetObject();
 				rapidjson::Value params(rapidjson::kArrayType);
 				rapidjson::Value token;
-				std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+				std::string token_str = BuildRpcToken();
 				token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 				params.PushBack(token, doc_.GetAllocator());
 

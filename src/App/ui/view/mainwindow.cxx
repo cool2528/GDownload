@@ -76,7 +76,7 @@ namespace gd {
 			gdl::update::RegisterTypes(engine);
 			gdl::update::UpdateConfig update_config;
 			update_config.current_version	 = GDownload_VERSION_STRING;
-			update_config.disable_auto_check = gdl::ui::settings::Settings::Instance().GetEnableAutoUpdate();
+			update_config.enable_auto_check = gdl::ui::settings::Settings::Instance().GetEnableAutoUpdate();
 			update_config.update_url = "https://api.github.com/repos/cool2528/gdownload/releases/latest";
 			std::map<std::string, std::string> headers;
 			headers["Content-Type"] = "application/json";

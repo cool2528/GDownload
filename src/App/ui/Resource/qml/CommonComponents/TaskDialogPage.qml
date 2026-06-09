@@ -241,7 +241,7 @@ Popup {
                             options["out"] = generalConfig.renameText
                         }
                         if (generalConfig.splitsValue > 0) {
-                            options["max-concurrent-downloads"] = String("%1").arg(generalConfig.splitsValue)
+                            options["split"] = String("%1").arg(generalConfig.splitsValue)
                         }
                         if (generalConfig.saveDirectory.length > 0) {
                             options["dir"] = generalConfig.saveDirectory

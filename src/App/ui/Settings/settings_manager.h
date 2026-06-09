@@ -74,6 +74,8 @@ namespace gdl {
                 static Settings* create(QQmlEngine*, QJSEngine*);
                 bool Init();
                 void UnInit();
+                Q_INVOKABLE QString GenerateRpcSecret() const;
+                Q_INVOKABLE void SetAria2Dir(const QString& dir);
                 Q_INVOKABLE void SetAria2GlobalProxy(const QString& proxy);
                 Q_INVOKABLE void SetAria2AutoResumeTask(bool enable);
                 Q_INVOKABLE void SetAria2MaxDownloadLimit(int value);

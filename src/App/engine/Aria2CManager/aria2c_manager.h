@@ -221,8 +221,6 @@ namespace gdl {
 			std::string GetBitTorrentUrlWithFallback(const std::string& url);
 			/// GitHub Raw 转 jsDelivr CDN
 			std::string ConvertToJsDelivrCDN(const std::string& url);
-			/// GitHub Raw 转 GitHub 代理
-			std::string ConvertToGitHubProxy(const std::string& url);
 			/// 统计 Tracker 数量
 			int CountTrackers(const std::string& tracker_list);
 

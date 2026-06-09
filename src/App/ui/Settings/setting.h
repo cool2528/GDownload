@@ -194,7 +194,7 @@ namespace gdl {
 			// RpcSecret
 			SETTING_IMP_BEGIN(RpcSecret, CONFIG_KEY_PATH(RpcSecret), QString)
 			void Default() override {
-				value_ = "GDownload_secret";
+				value_ = "";
 			}
 			void Put(const QVariant& value) override {
 				value_ = value.toString();
@@ -1015,7 +1015,15 @@ namespace gdl {
 				value_ = true;
 			}
 			void Put(const QVariant& value) override {
-				value_ = value.toBool();
+				if (value.canConvert<bool>()) {
+					value_ = value.toBool();
+				}
+				else if (value.canConvert<QString>()) {
+					value_ = value.toString() == "true" || value.toString() == "1";
+				}
+				else if (value.canConvert<int>()) {
+					value_ = value.toInt() == 1;
+				}
 			}
 			VALUE_TYPE Get() const {
 				return value_;
@@ -1047,7 +1055,15 @@ namespace gdl {
 				value_ = false;
 			}
 			void Put(const QVariant& value) override {
-				value_ = value.toBool();
+				if (value.canConvert<bool>()) {
+					value_ = value.toBool();
+				}
+				else if (value.canConvert<QString>()) {
+					value_ = value.toString() == "true" || value.toString() == "1";
+				}
+				else if (value.canConvert<int>()) {
+					value_ = value.toInt() == 1;
+				}
 			}
 			VALUE_TYPE Get() const {
 				return value_;

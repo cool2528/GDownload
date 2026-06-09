@@ -244,7 +244,7 @@ Rectangle {
                         Layout.preferredHeight: 38
                         path: SettingsManager.qDir
                         onActived: function(){
-                            SettingsManager.SetDir(folderSelector.path)
+                            SettingsManager.SetAria2Dir(folderSelector.path)
                             folderSelector.path = Qt.binding(function(){return SettingsManager.qDir})
                         }
                     }

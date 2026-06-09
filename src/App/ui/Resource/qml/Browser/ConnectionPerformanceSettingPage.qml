@@ -65,7 +65,7 @@ GCard {
                     Layout.preferredWidth: 150
                     implicitHeight: 32
                     from: 1
-                    to: 16
+                    to: 64
                     value: SettingsManager.qMaxConcurrentDownloads
                 }
 
@@ -111,7 +111,7 @@ GCard {
                     Layout.preferredWidth: 150
                     implicitHeight: 32
                     from: 1
-                    to: 16
+                    to: 64
                     value: SettingsManager.qMaxConnectionPerServer
                 }
 
@@ -157,7 +157,7 @@ GCard {
                     Layout.preferredWidth: 150
                     implicitHeight: 32
                     from: 1
-                    to: 16
+                    to: 64
                     value: SettingsManager.qSplit
                 }
 

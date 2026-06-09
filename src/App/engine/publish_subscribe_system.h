@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <boost/asio.hpp>
 #include <map>
 #include <vector>
@@ -44,7 +45,17 @@ namespace gdl {
 			}
 
 			void Unsubscribe(std::shared_ptr<Subscription> subscription) {
-				boost::asio::post(strand_, [this, subscription]() { subscription->active = false; });
+				boost::asio::post(strand_, [this, subscription]() {
+					if (!subscription) {
+						return;
+					}
+					subscription->active = false;
+					for (auto& [_, subscribers] : subscribers_) {
+						subscribers.erase(std::remove_if(subscribers.begin(), subscribers.end(),
+														 [](const auto& sub) { return !sub || !sub->active; }),
+										  subscribers.end());
+					}
+				});
 			}
 		};
 	}  // namespace engine
