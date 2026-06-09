@@ -493,13 +493,13 @@ namespace gdl {
 				else if (page_index == 1) {
 					if (waiting_model_) {
 						engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kTellWaiting,
-																				   keys);
+																				   0, 100, keys);
 					}
 				}
 				else if (page_index == 2) {
 					if (stoped_model_) {
 						engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kTellStopped,
-																				   keys);
+																				   0, 100, keys);
 					}
 				}
 				else {
@@ -653,6 +653,9 @@ namespace gdl {
 									else {
 										waiting_model_->AddTask(task_info);
 									}
+									if (active_model_->ContainsTask(task_id)) {
+										active_model_->RemoveTaskById(task_id);
+									}
 								} break;
 								case TaskState::kPause: {
 									if (active_model_->ContainsTask(task_id)) {
@@ -663,10 +666,7 @@ namespace gdl {
 									}
 
 									if (waiting_model_->ContainsTask(task_id)) {
-										waiting_model_->UpdateTaskById(task_id, task_info);
-									}
-									else {
-										waiting_model_->AddTask(task_info);
+										waiting_model_->RemoveTaskById(task_id);
 									}
 								} break;
 								case TaskState::kComplete:
@@ -997,16 +997,12 @@ namespace gdl {
 								QString file_path, download_url;
 								for (const auto& file : files) {
 									file_path = QString::fromStdString(file["path"].get<std::string>());
-									for (const auto& file : files) {
-										file_path = QString::fromStdString(file["path"].get<std::string>());
-										if (file.contains("uris") && file["uris"].is_array()) {
-											auto uris = file["uris"];
-											for (const auto& uri : uris) {
-												download_url = QString::fromStdString(uri["uri"].get<std::string>());
-												break;
-											}
+									if (file.contains("uris") && file["uris"].is_array()) {
+										auto uris = file["uris"];
+										for (const auto& uri : uris) {
+											download_url = QString::fromStdString(uri["uri"].get<std::string>());
+											break;
 										}
-										if (!file_path.isEmpty()) break;
 									}
 									if (!file_path.isEmpty()) break;
 								}

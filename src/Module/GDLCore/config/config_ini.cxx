@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <random>
 #include <sstream>
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -61,6 +62,20 @@ namespace gdl {
 					std::filesystem::create_directories(session_dir, ec);
 				}
 				return path;
+			}
+
+			inline std::string GenerateRpcSecret() {
+				static constexpr char kChars[] =
+					"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+				std::random_device rd;
+				std::uniform_int_distribution<std::size_t> dist(0, sizeof(kChars) - 2);
+
+				std::string secret;
+				secret.reserve(32);
+				for (int i = 0; i < 32; ++i) {
+					secret.push_back(kChars[dist(rd)]);
+				}
+				return secret;
 			}
 		}  // namespace
 
@@ -368,6 +383,9 @@ namespace gdl {
 			if (key_path == config::Keys::SaveSession.get()) {
 				return EnsureSessionPath();
 			}
+			if (key_path == config::Keys::RpcSecret.get()) {
+				return GenerateRpcSecret();
+			}
 			if (key_path == config::Keys::TrackerSourceNames.get()) {
 				return BuildTrackerJson(tracker_source_server_, /*use_name*/ true);
 			}
@@ -404,6 +422,9 @@ namespace gdl {
 			}
 			if (key_path == config::Keys::SaveSession.get() && cur.empty()) {
 				return EnsureSessionPath();
+			}
+			if (key_path == config::Keys::RpcSecret.get() && (cur.empty() || cur == "GDownload_secret")) {
+				return GenerateRpcSecret();
 			}
 			if (key_path == config::Keys::TrackerSourceNames.get() && cur.empty()) {
 				return BuildTrackerJson(tracker_source_server_, /*use_name*/ true);

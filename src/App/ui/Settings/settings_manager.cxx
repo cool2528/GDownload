@@ -1,5 +1,7 @@
 #include "settings_manager.h"
+#include <unordered_map>
 #include <QQmlEngine>
+#include <QRandomGenerator>
 #include "Definitions/appDef.h"
 #include "config/config.h"
 #include "Aria2CManager/aria2c_manager.h"
@@ -32,6 +34,27 @@ namespace gdl {
                 Save();
             }
             Settings::Settings(QObject* parent) {}
+
+            QString Settings::GenerateRpcSecret() const
+            {
+                static constexpr char kChars[] =
+                    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+                QString secret;
+                secret.reserve(32);
+                auto* generator = QRandomGenerator::system();
+                for (int i = 0; i < 32; ++i) {
+                    secret.append(QLatin1Char(kChars[generator->bounded(static_cast<int>(sizeof(kChars) - 1))]));
+                }
+                return secret;
+            }
+
+            void Settings::SetAria2Dir(const QString& dir)
+            {
+                SetDir(dir);
+                std::unordered_multimap<std::string, std::string> opt;
+                opt.insert({"dir", dir.toStdString()});
+                engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
+            }
 
             void Settings::SetAria2GlobalProxy(const QString &proxy)
             {

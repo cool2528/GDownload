@@ -7,25 +7,65 @@
 #include <spawn.h>
 #include <sys/types.h>
 #include <unistd.h>
-extern char** environ;	// Add this declaration
 #elif defined(__linux__)
 #include <spawn.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <cstring>     // for strerror
 #include <sys/wait.h>  // for waitpid
-#include <errno.h>     // for errno
 #endif
+#ifndef _WIN32
+#include <cerrno>
+#include <cstring>     // for strerror
+extern char** environ;
+#endif
+#include <string_view>
 #include <thread>
 #include "logger.h"
 #include "encoding/encoding.h"
 namespace gdl {
 	namespace process {
 		namespace detail {
+#ifdef _WIN32
+			std::wstring QuoteWindowsArgument(std::wstring_view arg) {
+				if (arg.empty()) return L"\"\"";
+
+				bool needs_quotes = false;
+				for (wchar_t ch : arg) {
+					if (ch == L' ' || ch == L'\t' || ch == L'\n' || ch == L'\v' || ch == L'"') {
+						needs_quotes = true;
+						break;
+					}
+				}
+				if (!needs_quotes) return std::wstring(arg);
+
+				std::wstring result = L"\"";
+				std::size_t backslashes = 0;
+				for (wchar_t ch : arg) {
+					if (ch == L'\\') {
+						++backslashes;
+					}
+					else if (ch == L'"') {
+						result.append(backslashes * 2 + 1, L'\\');
+						result.push_back(ch);
+						backslashes = 0;
+					}
+					else {
+						result.append(backslashes, L'\\');
+						backslashes = 0;
+						result.push_back(ch);
+					}
+				}
+				result.append(backslashes * 2, L'\\');
+				result.push_back(L'"');
+				return result;
+			}
+#endif
+
 			std::vector<std::int64_t> GetPidsByName(const String_View& name) {
 				std::vector<std::int64_t> pids;
+				const String name_string(name);
 #ifdef _WIN32
-				std::wstring wname = gdl::encoding::Utf8ToWString(name.data());
+				std::wstring wname = gdl::encoding::Utf8ToWString(name_string);
 				HANDLE hSnapshot   = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 				if (hSnapshot == INVALID_HANDLE_VALUE) {
 					return pids;
@@ -43,7 +83,7 @@ namespace gdl {
 				} while (Process32Next(hSnapshot, &pe32));
 				CloseHandle(hSnapshot);
 #else
-				String command = "pgrep " + String(name);
+				String command = "pgrep " + name_string;
 				FILE* pipe	   = popen(command.c_str(), "r");
 				if (!pipe) {
 					return pids;
@@ -61,6 +101,8 @@ namespace gdl {
 		int64_t Execute(const String_View& command, const std::vector<String>& arguments,
 						 const String_View& working_directory) {
 			std::int64_t pid{-1};
+			const String command_string(command);
+			const String working_directory_string(working_directory);
 #ifdef _WIN32
 			STARTUPINFO si;
 			PROCESS_INFORMATION pi;
@@ -74,13 +116,14 @@ namespace gdl {
 			si.wShowWindow = FALSE;
 #endif
 
-			std::wstring command_line = gdl::encoding::Utf8ToWString(command.data());
+			std::wstring application_name = gdl::encoding::Utf8ToWString(command_string);
+			std::wstring command_line = detail::QuoteWindowsArgument(application_name);
 			for (const auto& args : arguments) {
-				command_line += L" " + gdl::encoding::Utf8ToWString(args.data());
+				command_line += L" " + detail::QuoteWindowsArgument(gdl::encoding::Utf8ToWString(args.data()));
 			}
-			std::wstring working_directory_w = gdl::encoding::Utf8ToWString(working_directory.data());
+			std::wstring working_directory_w = gdl::encoding::Utf8ToWString(working_directory_string);
 			BOOL ret =
-				CreateProcess(nullptr,command_line.data(), nullptr, nullptr, FALSE, 0, nullptr,
+				CreateProcess(application_name.data(), command_line.data(), nullptr, nullptr, FALSE, 0, nullptr,
 							   working_directory_w.empty() ? nullptr : working_directory_w.data(), &si, &pi);
 			if (!ret) {
 				LOG_ERR("CreateProcessW failed: {}", GetLastError());
@@ -93,6 +136,7 @@ namespace gdl {
 #else
 			pid_t native_pid;
 			std::vector<char*> argv;
+			argv.push_back(const_cast<char*>(command_string.c_str()));
 			for (const auto& arg : arguments) {
 				argv.push_back(const_cast<char*>(arg.data()));
 			}
@@ -104,10 +148,10 @@ namespace gdl {
 			posix_spawnattr_t attr;
 			posix_spawnattr_init(&attr);
 			// 如果有工作目录，设置它
-			if (!working_directory.empty()) {
-				posix_spawn_file_actions_addchdir_np(&actions, working_directory.data());
+			if (!working_directory_string.empty()) {
+				posix_spawn_file_actions_addchdir_np(&actions, working_directory_string.c_str());
 			}
-			int ret = posix_spawn(&native_pid, command.data(), &actions, &attr, argv.data(), environ);
+			int ret = posix_spawn(&native_pid, command_string.c_str(), &actions, &attr, argv.data(), environ);
 
 			posix_spawn_file_actions_destroy(&actions);
 			posix_spawnattr_destroy(&attr);

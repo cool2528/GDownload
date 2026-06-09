@@ -3,10 +3,20 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 #include <format>
+#include "config/config.h"
 #include "engine_def.h"
 #include "logger.h"
 namespace gdl {
 	namespace engine {
+		namespace {
+			std::string BuildRpcToken() {
+				auto rpc_secret = config::GetValue(config::Keys::RpcSecret).AsString();
+				if (rpc_secret.empty()) {
+					rpc_secret = kDefaultRpcSecret;
+				}
+				return std::format("token:{}", rpc_secret);
+			}
+		}  // namespace
 
 		Aria2cHttpClient::Aria2cHttpClient(std::string_view host) : host_(host) {}
 
@@ -16,7 +26,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -49,7 +59,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -82,7 +92,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -111,7 +121,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -129,7 +139,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -147,7 +157,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -165,7 +175,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -178,7 +188,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -196,7 +206,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -209,7 +219,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -227,7 +237,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -240,7 +250,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -267,7 +277,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -285,7 +295,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -303,7 +313,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -321,7 +331,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -339,7 +349,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -361,7 +371,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -389,7 +399,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -417,7 +427,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -441,7 +451,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -459,7 +469,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -488,7 +498,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -501,7 +511,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -525,7 +535,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -538,7 +548,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -551,7 +561,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -569,7 +579,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -582,7 +592,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
@@ -595,7 +605,7 @@ namespace gdl {
 
 			// Add token
 			rapidjson::Value token;
-            std::string token_str = std::format("token:{}", kDefaultRpcSecret);
+            std::string token_str = BuildRpcToken();
 			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
 			params.PushBack(token, doc_.GetAllocator());
 
