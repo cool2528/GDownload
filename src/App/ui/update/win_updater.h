@@ -4,6 +4,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QProcess>
+#include <atomic>
 #include <memory>
 #include "auto_updater.h"
 
@@ -30,8 +31,14 @@ namespace gdl {
             QNetworkAccessManager network_manager_;
             QFile download_file_;
             QString update_package_path_;
-            bool update_available_	 = false;
-            bool update_in_progress_ = false;
+            QNetworkReply* current_check_reply_ = nullptr;
+            // 当前下载请求，供 CancelUpdate 中止；errorOccurred 与 finished 均会清理。
+            QNetworkReply* current_download_reply_ = nullptr;
+            std::shared_ptr<std::atomic<bool>> alive_{std::make_shared<std::atomic<bool>>(true)};
+            // 防止 errorOccurred 与 finished 重复触发失败通知。
+            std::atomic<bool> update_available_{false};
+            std::atomic<bool> update_in_progress_{false};
+            std::atomic<bool> download_failed_notified_{false};
         };
 
     }  // namespace update

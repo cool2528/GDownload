@@ -90,7 +90,7 @@ namespace gdl {
 			  }(), io_context_) {
 
 			websocket_client_.SetMessageCallback([this](const std::string& msg) {
-				// 直接收到的所有消息 通过发布订阅回客户端
+				// Forward direct messages to clients through pub/sub.
 				try {
 					std::string_view msg_view(msg);
 					nlohmann::json doc = nlohmann::json::parse(msg_view, nullptr, false);
@@ -122,7 +122,7 @@ namespace gdl {
 				}
 			});
 			websocket_client_.SetStateChanageCallback([this](const State& state, std::string msg) {
-				// 只有web socket 链接上 aria2c 服务端后才去同步BitTorrent 服务器列表这样才能设置上去
+				// Sync BitTorrent server list only after the websocket connects to aria2.
 				if (!daily_task_timer_is_runing.load() && state == State::kConnected) {
 					LOG_DBG("start daily_task_timer");
 					daily_task_timer_.Start(std::bind(&Aria2cDownloadManager::SyncMagnetServerList, this));
@@ -132,7 +132,7 @@ namespace gdl {
 					LOG_WARN("websocket_client_ state {} error {}", static_cast<int>(state), msg);
 				}
 			});
-			// io 线程放在最后
+			// Start IO workers after callbacks are registered.
 			auto hardware_threads = std::max(1u, std::thread::hardware_concurrency());
 			auto max_thread_number = std::max(1u, hardware_threads * 3 / 2);
 			for (auto i = 0; i < max_thread_number; ++i) {
@@ -142,7 +142,7 @@ namespace gdl {
 
 		std::vector<String> Aria2cDownloadManager::InitAria2cSettingsArgs() {
 			std::vector<String> result;
-			// 参数作为 argv 传入，由 process::Execute 统一处理空格和引号。
+			// Arguments are passed as argv; process::Execute handles spaces and quoting.
 			auto quote_path = [](const String& path) {
 				return path;
 			};
@@ -212,7 +212,7 @@ namespace gdl {
             if (std::filesystem::exists(session_path, ec) && std::filesystem::file_size(session_path) != 0) {
                 aria2c_settings["input-file"] = quote_path(session_path);
             }
-            // 检查是否开启全局代理
+            // Check whether the global proxy is enabled.
             auto is_proxy_enable	 = config::GetValue(config::Keys::EnableGlobalProxy).AsBool();
             auto global_proxy_string = config::GetValue(config::Keys::GlobalProxy).AsString();
             if (is_proxy_enable && !global_proxy_string.empty()) {
@@ -238,7 +238,9 @@ namespace gdl {
 		}
 
 		void Aria2cDownloadManager::UpdateAria2cTasks() {
-			// 更新当前aria2c 的所有 暂停 正在下载 停止的任务状态列表
+			// Skip updates during shutdown to avoid racing with Shutdown/Purge calls.
+			if (!engine_is_runing_) return;
+			// Refresh aria2 task state lists.
 			static const std::vector<std::string> keys = {
 				"status", "totalLength", "completedLength", "downloadSpeed", "infoHash", "numSeeders",
 				"seeder", "connections", "errorCode",		"errorMessage",	 "dir",		 "files",
@@ -271,12 +273,12 @@ namespace gdl {
 		void Aria2cDownloadManager::SyncMagnetServerList() {
 			auto start_time = std::chrono::steady_clock::now();
 
-			// 发布开始状态
+			// Publish start status.
 			pub_sub_system_.Publish(kAria2TrackerUpdateStatus,
 			                        R"({"status":"started","message":"Updating tracker list..."})");
 
 			try {
-				// 1. 下载黑名单
+				// 1. Download blacklist.
 				const std::string trackers_black_url(
 					"https://bitbucket.org/xiu2/trackerslistcollection/raw/master/blacklist.txt");
 				auto bt_exclude_tracker = GetBitTorrentUrlWithFallback(trackers_black_url);
@@ -288,14 +290,14 @@ namespace gdl {
 					LOG_WARN("Failed to fetch tracker blacklist");
 				}
 
-				// 2. 获取配置的源列表，配置损坏时回退到内置默认源。
+				// 2. Load configured sources and fall back to defaults on invalid config.
 				auto json_data = config::GetValue(config::Keys::TrackerSourceNames).AsString();
 				nlohmann::json tracker_source_names = nlohmann::json::parse(json_data.c_str(), nullptr, false);
 				if (tracker_source_names.is_discarded() || !tracker_source_names.is_array()) {
 					tracker_source_names = detail::DefaultTrackerSourceNames();
 				}
 
-				// 3. 使用 unordered_set 去重
+				// 3. Deduplicate trackers.
 				std::unordered_set<std::string> unique_trackers;
 				int successful_sources = 0;
 				int failed_sources = 0;
@@ -310,7 +312,7 @@ namespace gdl {
 					auto bt_tracker_urls = GetBitTorrentUrlWithFallback(source_url);
 
 					if (!bt_tracker_urls.empty()) {
-						// 拆分并添加到 set（自动去重）
+						// Split and insert into the set for deduplication.
 						std::istringstream stream(bt_tracker_urls);
 						std::string url;
 						while (std::getline(stream, url, ',')) {
@@ -326,7 +328,7 @@ namespace gdl {
 					}
 				}
 
-				// 4. 转换为逗号分隔字符串
+				// 4. Convert to comma-separated string.
 				std::string bt_tracker;
 				for (const auto& url : unique_trackers) {
 					if (!bt_tracker.empty()) bt_tracker += ",";
@@ -337,10 +339,10 @@ namespace gdl {
 					std::chrono::steady_clock::now() - start_time);
 
 				if (!bt_tracker.empty()) {
-					// 5. 同步到 aria2c
+					// 5. Sync to aria2c.
 					websocket_client_.ChangeGlobalOption({{"bt-tracker", bt_tracker}});
 
-					// 6. 发布成功通知
+					// 6. Publish success notification.
 					std::string bt_tracker_display = bt_tracker;
 					std::replace(bt_tracker_display.begin(), bt_tracker_display.end(), ',', '\n');
 					pub_sub_system_.Publish(kAria2SyncMagnetServerList, bt_tracker_display);
@@ -373,9 +375,9 @@ namespace gdl {
 		}
 
 		void Aria2cDownloadManager::SyncGlobalStatInfo() {
-		// Engine 层使用 config 系统
+		// Engine layer uses the config system.
 		auto rpc_port = config::GetValue(config::Keys::RpcListenPort).AsString();
-		// 验证端口范围，如果为空或无效则使用默认值
+		// Validate port range; use default when empty or invalid.
 		int port_value = 0;
 		try {
 			port_value = std::stoi(rpc_port);
@@ -409,9 +411,9 @@ namespace gdl {
         std::string Aria2cDownloadManager::SyncActiveTaskInfo() {
 		std::string result_string				   = "{}";
 		static const std::vector<std::string> keys = {"status", "totalLength", "completedLength"};
-		// Engine 层使用 config 系统
+		// Engine layer uses the config system.
 		auto rpc_port = config::GetValue(config::Keys::RpcListenPort).AsString();
-		// 验证端口范围，如果为空或无效则使用默认值
+		// Validate port range; use default when empty or invalid.
 		int port_value = 0;
 		try {
 			port_value = std::stoi(rpc_port);
@@ -548,18 +550,18 @@ namespace gdl {
 			size_t pos = cdn_url.find("raw.githubusercontent.com");
 
 			if (pos != std::string::npos) {
-				// 替换域名
+				// Replace host.
 				cdn_url.replace(pos, 25, "cdn.jsdelivr.net/gh");
 
-				// 找到第三个 '/' 并替换为 '@'
-				// 格式: https://cdn.jsdelivr.net/gh/user/repo/branch/file
+				// Replace the separator after user/repo with '@'.
+				// Format: https://cdn.jsdelivr.net/gh/user/repo/branch/file
 				//                                      ^1   ^2  ^3
 				size_t start_pos = cdn_url.find("gh/") + 3;
 				int slash_count = 0;
 				for (size_t i = start_pos; i < cdn_url.size(); ++i) {
 					if (cdn_url[i] == '/') {
 						slash_count++;
-						if (slash_count == 2) {  // user/repo 之后的第一个 '/'
+						if (slash_count == 2) {  // First slash after user/repo.
 							cdn_url[i] = '@';
 							break;
 						}
@@ -573,15 +575,15 @@ namespace gdl {
 		std::string Aria2cDownloadManager::GetBitTorrentUrlWithFallback(const std::string& url) {
 			if (url.empty() || !engine_is_runing_) return "";
 
-			// 构建降级 URL 列表
+			// Build fallback URL list.
 			std::vector<std::string> fallback_urls = {url};
 
-			// 如果是 GitHub Raw，添加 CDN 镜像
+			// Add CDN mirrors for GitHub raw URLs.
 			if (url.find("raw.githubusercontent.com") != std::string::npos) {
 				fallback_urls.push_back(ConvertToJsDelivrCDN(url));
 			}
 
-			// 获取系统代理
+			// Get system proxy.
 			auto system_proxy = os::GetSystemHTTPProxy();
 			std::string proxy_str;
 			if (system_proxy.has_value()) {
@@ -589,9 +591,9 @@ namespace gdl {
 				            std::to_string(system_proxy.value().second);
 			}
 
-			// 尝试每个 URL（带重试）
+			// Try each URL with retries.
 			for (const auto& try_url : fallback_urls) {
-				// 从数据库检查是否有缓存的 ETag
+				// Check cached ETag from database.
 				std::string cached_etag;
 				auto cached_entry = cache::TrackerETagCache::Instance().GetEntry(try_url);
 				if (cached_entry) {
@@ -603,7 +605,7 @@ namespace gdl {
 					try {
 						LOG_INFO("Fetching from: {} (attempt {})", try_url, retry + 1);
 
-						// 构建请求头
+						// Build request headers.
 						cpr::Header headers;
 						if (!cached_etag.empty()) {
 							headers["If-None-Match"] = cached_etag;
@@ -612,10 +614,10 @@ namespace gdl {
 
 						auto reply = cpr::Get(cpr::Url(try_url),
 						                      cpr::Proxies({{"http", proxy_str}, {"https", proxy_str}}),
-						                      cpr::Timeout(10000),  // 10秒超时
+						                      cpr::Timeout(10000),  // 10 seconds timeout.
 						                      headers);
 
-						// 处理 304 Not Modified - 使用缓存内容
+						// Handle 304 Not Modified by using cached content.
 						if (reply.status_code == 304) {
 							if (cached_entry) {
 								LOG_INFO("HTTP 304 Not Modified, using cached content for: {}", try_url);
@@ -626,11 +628,11 @@ namespace gdl {
 							}
 						}
 
-						// 处理 200 OK - 保存新内容和 ETag
+						// Handle 200 OK by saving content and ETag.
 						if (reply.status_code == 200) {
 							auto result = ParseTextUrls(reply.text);
 
-							// 提取并保存 ETag
+							// Extract and save ETag.
 							auto etag_it = reply.header.find("etag");
 							if (etag_it != reply.header.end()) {
 								std::string new_etag = etag_it->second;
@@ -650,7 +652,7 @@ namespace gdl {
 						LOG_WARN("Exception fetching from {}: {}", try_url, e.what());
 					}
 
-					// 重试前等待（指数退避：1s, 2s）
+					// Wait before retrying with exponential backoff: 1s, 2s.
 					if (retry < 2) {
 						std::this_thread::sleep_for(std::chrono::seconds(1 << retry));
 					}
@@ -664,7 +666,7 @@ namespace gdl {
 		Aria2cDownloadManager::~Aria2cDownloadManager() {}
 
 		bool Aria2cDownloadManager::InitAria2cEngine(const String_View& aria2c_path) {
-			// todo 初始化aria2c
+			// TODO: initialize aria2c.
 			aria2c_path_			 = String(aria2c_path);
 			std::vector<String> args = InitAria2cSettingsArgs();
 			auto pid				 = process::Execute(aria2c_path, args);
@@ -673,13 +675,13 @@ namespace gdl {
 				return false;
 			}
 
-			// 初始化 ETag 缓存数据库
+			// Initialize ETag cache database.
 			InitializeETagCache();
 
-			// 启动任务状态轮询。Tracker 自动更新开关不应影响任务列表刷新。
+			// Start task polling. Tracker auto-update must not affect task list refresh.
 			update_aria2c_tasks_timer_.Start(std::bind(&Aria2cDownloadManager::UpdateAria2cTasks, this),
 											 std::chrono::milliseconds(300), true);
-			// 链接 aria2c websocket
+			// Connect aria2c websocket.
 			websocket_client_.Open();
 			engine_is_runing_ = true;
 
@@ -687,7 +689,7 @@ namespace gdl {
 		}
 
 		void Aria2cDownloadManager::UninitAria2cEngine() {
-			// todo 卸载aria2c
+			// TODO: unload aria2c.
 			engine_is_runing_ = false;
 			update_aria2c_tasks_timer_.Stop();
 			daily_task_timer_.Stop();
@@ -708,7 +710,7 @@ namespace gdl {
             const std::vector<String>& url, const std::unordered_multimap<std::string, std::string>& options) {
 
 			std::unordered_multimap<std::string, std::string> real_options = options;
-			// 直接添加到下载引擎任务队列中
+			// Add directly to the download engine queue.
             return websocket_client_.AddUri(url, real_options);
 		}
 
