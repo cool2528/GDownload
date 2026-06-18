@@ -144,6 +144,7 @@ namespace gdl {
         WinUpdater::WinUpdater() = default;
 
         WinUpdater::~WinUpdater() {
+            alive_->store(false);
             CancelUpdate();
         }
 
@@ -182,8 +183,16 @@ namespace gdl {
                 last_error_ = "Failed to create network request";
                 return;
             }
-            QObject::connect(reply, &QNetworkReply::finished, [this, reply, callback]() {
+            current_check_reply_ = reply;
+            QObject::connect(reply, &QNetworkReply::finished, [this, reply, callback, alive = alive_]() {
+                if (!alive->load()) {
+                    reply->deleteLater();
+                    return;
+                }
                 this->handleNetworkReply(reply, callback);
+                if (current_check_reply_ == reply) {
+                    current_check_reply_ = nullptr;
+                }
                 reply->deleteLater();
             });
         }
@@ -258,9 +267,12 @@ namespace gdl {
                 download_file_.close();
                 return false;
             }
+            current_download_reply_	   = reply;  // 供 CancelUpdate 中止
+            download_failed_notified_ = false;    // 重置失败通知标志
 
             // Connect signals
-			QObject::connect(reply, &QNetworkReply::readyRead, [this, reply]() {
+			QObject::connect(reply, &QNetworkReply::readyRead, [this, reply, alive = alive_]() {
+                if (!alive->load()) return;
                 if (download_file_.isOpen() && reply) {
                     download_file_.write(reply->readAll());
                 }
@@ -268,7 +280,8 @@ namespace gdl {
 
             QObject::connect(
                 reply, &QNetworkReply::downloadProgress,
-				[this, downloaded_bytes, reply](qint64 bytesReceived, qint64 bytesTotal) {
+				[this, downloaded_bytes, reply, alive = alive_](qint64 bytesReceived, qint64 bytesTotal) {
+                    if (!alive->load()) return;
                     if (!progress_callback_) return;
 
                     // Calculate actual progress (considering resume)
@@ -284,11 +297,20 @@ namespace gdl {
                                        "KB / " + std::to_string(actual_total / 1024) + "KB";
                     progress_callback_(progress);
                 });
-			QObject::connect(reply, &QNetworkReply::errorOccurred, [this, reply](QNetworkReply::NetworkError error) {
+			QObject::connect(reply, &QNetworkReply::errorOccurred, [this, reply, alive = alive_](QNetworkReply::NetworkError error) {
+                if (!alive->load()) {
+                    reply->deleteLater();
+                    return;
+                }
                 last_error_			= reply->errorString().toStdString();
                 update_in_progress_ = false;
                 download_file_.close();
-				if (progress_callback_) {
+                if (current_download_reply_ == reply) {
+                    current_download_reply_ = nullptr;
+                }
+                // finished 也会触发，用标志避免重复的失败通知。
+                bool expected = false;
+                if (download_failed_notified_.compare_exchange_strong(expected, true) && progress_callback_) {
 					UpdateProgress progress;
 					progress.stage		= UpdateProgress::Stage::kFailed;
 					progress.percentage = 0;
@@ -299,16 +321,24 @@ namespace gdl {
 				reply->deleteLater();
 				return;
             });
-            QObject::connect(reply, &QNetworkReply::finished, [this, reply]() {
+            QObject::connect(reply, &QNetworkReply::finished, [this, reply, alive = alive_]() {
+                if (!alive->load()) {
+                    reply->deleteLater();
+                    return;
+                }
                 if (download_file_.isOpen()) {
                     download_file_.close();
+                }
+                if (current_download_reply_ == reply) {
+                    current_download_reply_ = nullptr;
                 }
 
                 if (reply->error() != QNetworkReply::NoError) {
                     last_error_			= reply->errorString().toStdString();
                     update_in_progress_ = false;
 
-                    if (progress_callback_) {
+                    bool expected = false;
+                    if (download_failed_notified_.compare_exchange_strong(expected, true) && progress_callback_) {
                         UpdateProgress progress;
                         progress.stage		= UpdateProgress::Stage::kFailed;
                         progress.percentage = 0;
@@ -363,6 +393,15 @@ namespace gdl {
         }
 
         void WinUpdater::CancelUpdate() {
+            if (current_check_reply_) {
+                current_check_reply_->abort();
+                current_check_reply_ = nullptr;
+            }
+            // 中止正在进行的下载请求，否则后台仍会下载并触发回调访问 this。
+            if (current_download_reply_) {
+                current_download_reply_->abort();
+                current_download_reply_ = nullptr;
+            }
 
             if (download_file_.isOpen()) {
                 download_file_.close();
@@ -445,6 +484,7 @@ namespace gdl {
                 if (callback) {
                     callback(false, UpdateInfo{});
                 }
+                return;  // 必须返回，否则下方 reply->error() 空指针解引用崩溃
             }
             auto error = reply->error();
             if (error != QNetworkReply::NoError) {

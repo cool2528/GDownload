@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Controls
 import "../CommonComponents"
 import gdl.sdk 1.0
 
@@ -127,6 +128,27 @@ Rectangle {
                 iconColor: hovered ? GTheme.dangerColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
                 backgroundColor: hovered ? GTheme.fillLight : "transparent"
                 onClicked: {
+                    // 删除全部任务不可逆（含文件），需确认后执行
+                    deleteAllConfirmDialog.open()
+                }
+            }
+
+            // 删除全部任务确认对话框
+            Dialog {
+                id: deleteAllConfirmDialog
+                anchors.centerIn: parent
+                modal: true
+                width: 420
+                title: qsTr("Delete Confirmation")
+                standardButtons: Dialog.Cancel | Dialog.Ok
+
+                contentItem: Text {
+                    text: qsTr("Are you sure you want to delete all tasks in this list? This action cannot be undone.")
+                    wrapMode: Text.WordWrap
+                    color: GTheme.textPrimary
+                }
+
+                onAccepted: {
                     BrowserManager.RemoveAllTask(control.type, true)
                 }
             }

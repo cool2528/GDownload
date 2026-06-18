@@ -1,5 +1,7 @@
 #pragma once
 #include <rapidjson/document.h>
+#include <atomic>
+#include <mutex>
 #include <unordered_map>
 #include "Engine_export.h"
 #include "result/result.h"
@@ -83,10 +85,16 @@ namespace gdl {
 		   private:
 			std::string url_;
 			std::shared_ptr<WebSocketClient> websocket_;
-            rapidjson::Document doc_;
+			// 注：原共享成员 doc_ 已移除，改为各 RPC 方法内使用局部 rapidjson::Document，
+			// 避免多线程并发调用时对同一 Document 的数据竞争。
 
-			std::function<void(const State&, std::string)> state_chanage_callback_{nullptr};
-			std::function<void(const std::string&)> text_message_callback_{nullptr};
+			struct CallbackState {
+				std::mutex mutex;
+				std::atomic<bool> alive{true};
+				std::function<void(const State&, std::string)> state_chanage_callback{nullptr};
+				std::function<void(const std::string&)> text_message_callback{nullptr};
+			};
+			std::shared_ptr<CallbackState> callback_state_;
 		};
 	}  // namespace engine
 }  // namespace gdl

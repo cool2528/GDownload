@@ -2,6 +2,7 @@
 #include <boost/asio/strand.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/websocket.hpp>
+#include <atomic>
 #include <chrono>
 #include <functional>
 #include <memory>
@@ -27,7 +28,14 @@ namespace gdl {
 
 			WebSocketClient(net::io_context& ioc) : resolver_(net::make_strand(ioc)), ws_(net::make_strand(ioc)) {}
 
-			~WebSocketClient() { disconnect(); }
+			// 析构时不能调用 shared_from_this()：此时控制块已失效会抛 bad_weak_ptr，
+			// 改为同步关闭（错误码吞掉），由上层保证 io_context 已停止后再析构。
+			~WebSocketClient() {
+				boost::system::error_code ec;
+				if (ws_.is_open()) {
+					ws_.close(websocket::close_code::normal, ec);
+				}
+			}
 
 			bool connect(const std::string& host, const std::string& port, const std::string& path) {
 				host_ = host;
@@ -38,14 +46,22 @@ namespace gdl {
 				return true;
 			}
 
+			// 必须投递到 ws_ 所在的 strand 上执行，避免与 async_read/write 并发，
+			// 违反 Beast stream 串行化要求导致数据竞争。
 			void disconnect() {
-				if (ws_.is_open()) {
-					ws_.async_close(websocket::close_code::normal,
-									beast::bind_front_handler(&WebSocketClient::onClose, shared_from_this()));
-				}
+				connected_.store(false);
+				net::post(ws_.get_executor(), [self = shared_from_this()]() {
+					if (self->ws_.is_open()) {
+						self->ws_.async_close(websocket::close_code::normal,
+											  beast::bind_front_handler(&WebSocketClient::onClose, self));
+					}
+				});
 			}
 
 			bool send(const std::string& message) {
+				if (!connected_.load()) {
+					return false;
+				}
 				net::post(ws_.get_executor(), [self = shared_from_this(), message]() { self->onSend(message); });
 				return true;
 			}
@@ -54,7 +70,7 @@ namespace gdl {
 			void setConnectCallback(ConnectCallback cb) { connect_callback_ = std::move(cb); }
 			void setDisconnectCallback(DisconnectCallback cb) { disconnect_callback_ = std::move(cb); }
 			void setErrorCallback(ErrorCallback cb) { error_callback_ = std::move(cb); }
-			bool isConnected() const { return ws_.is_open(); }
+			bool isConnected() const { return connected_.load(); }
 
 			void setAutoReconnect(bool enabled, int maxRetries = -1, int retryInterval = 5) {
 				auto_reconnect_ = enabled;
@@ -88,6 +104,7 @@ namespace gdl {
 					return;
 				}
 
+				connected_.store(true);
 				retry_count_ = 0;
 
 				if (connect_callback_) {
@@ -149,6 +166,7 @@ namespace gdl {
 			}
 
 			void onClose(beast::error_code ec) {
+				connected_.store(false);
 				if (ec) {
 					handleError("Close failed: " + ec.message());
 				}
@@ -159,6 +177,7 @@ namespace gdl {
 			}
 
 			void handleError(const std::string& error) {
+				connected_.store(false);
 				if (error_callback_) {
 					error_callback_(error);
 				}
@@ -205,6 +224,7 @@ namespace gdl {
 			std::shared_ptr<net::steady_timer> reconnect_timer_;
 
 			bool auto_reconnect_ = false;
+			std::atomic<bool> connected_{false};
 			int max_retries_ = -1;        // -1 表示无限重试
 			int retry_count_ = 0;
 			int retry_interval_ = 5;      // 重试间隔（秒）
