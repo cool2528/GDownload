@@ -2,6 +2,7 @@
 #if defined(__linux__)
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <atomic>
 #include <memory>
 #include <thread>
 #include "auto_updater.h"
@@ -35,13 +36,15 @@ namespace gdl {
             UpdateCheckCallback check_callback_;
             QNetworkAccessManager network_manager_;
             QNetworkReply* current_reply_ = nullptr;
+            std::shared_ptr<std::atomic<bool>> alive_{std::make_shared<std::atomic<bool>>(true)};
 
             // libappimageupdate instance
             std::unique_ptr<appimage::update::Updater> updater_;
             std::thread update_thread_;
-            bool update_available_	 = false;
-            bool update_in_progress_ = false;
-            bool should_stop_thread_ = false;
+            // 跨线程访问（UI 线程写、update 线程读），必须为原子以避免数据竞争。
+            std::atomic<bool> update_available_{false};
+            std::atomic<bool> update_in_progress_{false};
+            std::atomic<bool> should_stop_thread_{false};
         };
 
     }  // namespace update

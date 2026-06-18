@@ -1,4 +1,5 @@
 #include "aria2c_websocket_rpc_client.h"
+#include <atomic>
 #include <format>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
@@ -17,38 +18,94 @@ namespace gdl {
 				}
 				return std::format("token:{}", rpc_secret);
 			}
+
+			Result<bool> SendRpcMessage(const std::shared_ptr<WebSocketClient>& websocket,
+										const std::string_view& method,
+										rapidjson::Value& params) {
+				static std::atomic<int> id{0};
+				rapidjson::Document doc;
+				doc.SetObject();
+				auto& alloc = doc.GetAllocator();
+				doc.AddMember("jsonrpc", "2.0", alloc);
+				doc.AddMember("method", rapidjson::Value(method.data(), method.size()), alloc);
+				doc.AddMember("params", params, alloc);
+				doc.AddMember("id", rapidjson::Value(std::to_string(++id).c_str(), alloc), alloc);
+				if (!websocket || !websocket->isConnected()) {
+					return MakeFail(static_cast<std::int64_t>(gdl::ErrorType::kUnknownError));
+				}
+				rapidjson::StringBuffer buffer;
+				rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+				doc.Accept(writer);
+				return websocket->send(buffer.GetString());
+			}
+
+			void RequestVersion(const std::shared_ptr<WebSocketClient>& websocket) {
+				rapidjson::Document doc;
+				doc.SetObject();
+				rapidjson::Value params(rapidjson::kArrayType);
+				rapidjson::Value token;
+				std::string token_str = BuildRpcToken();
+				token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+				params.PushBack(token, doc.GetAllocator());
+				(void)SendRpcMessage(websocket, "aria2.getVersion", params);
+			}
 		}  // namespace
 
 		Aria2cWebSocketClient::Aria2cWebSocketClient(const std::string& url, boost::asio::io_context& ioc) : url_(url) {
 			websocket_ = std::make_shared<WebSocketClient>(ioc);
+			callback_state_ = std::make_shared<CallbackState>();
+			auto callback_state = callback_state_;
+			auto websocket = websocket_;
 			// connected
-			websocket_->setConnectCallback([this] {
-				if (state_chanage_callback_) {
-					state_chanage_callback_(State::kConnected, "");
-					GetVersion();
+			websocket_->setConnectCallback([callback_state, websocket] {
+				std::function<void(const State&, std::string)> cb;
+				{
+					std::lock_guard lock(callback_state->mutex);
+					if (!callback_state->alive.load()) return;
+					cb = callback_state->state_chanage_callback;
 				}
+				if (cb) cb(State::kConnected, "");
+				if (callback_state->alive.load()) RequestVersion(websocket);
 			});
 			// closed
-			websocket_->setDisconnectCallback([this] {
-				if (state_chanage_callback_) {
-					state_chanage_callback_(State::kClosed, "");
+			websocket_->setDisconnectCallback([callback_state] {
+				std::function<void(const State&, std::string)> cb;
+				{
+					std::lock_guard lock(callback_state->mutex);
+					if (!callback_state->alive.load()) return;
+					cb = callback_state->state_chanage_callback;
 				}
+				if (cb) cb(State::kClosed, "");
 			});
 			// error message
-			websocket_->setErrorCallback([this](const std::string& error) {
-				if (state_chanage_callback_) {
-					state_chanage_callback_(State::kClosed, error);
+			websocket_->setErrorCallback([callback_state](const std::string& error) {
+				std::function<void(const State&, std::string)> cb;
+				{
+					std::lock_guard lock(callback_state->mutex);
+					if (!callback_state->alive.load()) return;
+					cb = callback_state->state_chanage_callback;
 				}
+				if (cb) cb(State::kClosed, error);
 			});
 			// receive message
-			websocket_->setMessageCallback([this](const std::string& msg) {
-				if (text_message_callback_) {
-					text_message_callback_(msg);
+			websocket_->setMessageCallback([callback_state](const std::string& msg) {
+				std::function<void(const std::string&)> cb;
+				{
+					std::lock_guard lock(callback_state->mutex);
+					if (!callback_state->alive.load()) return;
+					cb = callback_state->text_message_callback;
 				}
+				if (cb) cb(msg);
 			});
 		}
 
 		Aria2cWebSocketClient::~Aria2cWebSocketClient() {
+			if (callback_state_) {
+				callback_state_->alive.store(false);
+				std::lock_guard lock(callback_state_->mutex);
+				callback_state_->state_chanage_callback = nullptr;
+				callback_state_->text_message_callback = nullptr;
+			}
 			websocket_->disconnect();
 		}
 
@@ -73,29 +130,30 @@ namespace gdl {
 			// params.push_back(uris);
 			// params.push_back(options);
 			// return Send("aria2.addUri", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			rapidjson::Value uriList(rapidjson::kArrayType);
 			for (const auto& uri : uris) {
 				rapidjson::Value uriValue;
-				uriValue.SetString(uri.c_str(), uri.size(), doc_.GetAllocator());
-				uriList.PushBack(uriValue, doc_.GetAllocator());
+				uriValue.SetString(uri.c_str(), uri.size(), doc.GetAllocator());
+				uriList.PushBack(uriValue, doc.GetAllocator());
 			}
-			params.PushBack(uriList, doc_.GetAllocator());
+			params.PushBack(uriList, doc.GetAllocator());
 			rapidjson::Value optionsValue;
 			optionsValue.SetObject();
 			for (const auto& [key, value] : options) {
 				rapidjson::Value keyName;
-				keyName.SetString(key.c_str(), key.size(), doc_.GetAllocator());
+				keyName.SetString(key.c_str(), key.size(), doc.GetAllocator());
 				rapidjson::Value keyValue;
-				keyValue.SetString(value.c_str(), value.size(), doc_.GetAllocator());
-				optionsValue.AddMember(keyName, keyValue, doc_.GetAllocator());
+				keyValue.SetString(value.c_str(), value.size(), doc.GetAllocator());
+				optionsValue.AddMember(keyName, keyValue, doc.GetAllocator());
 			}
-			params.PushBack(optionsValue, doc_.GetAllocator());
+			params.PushBack(optionsValue, doc.GetAllocator());
 			return Send("aria2.addUri", params);
 		}
 
@@ -105,27 +163,28 @@ namespace gdl {
 			//          params.push_back(nlohmann::json::array());
 			// params.push_back(options);
 			// return Send("aria2.addTorrent", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			rapidjson::Value torrentValue;
-			torrentValue.SetString(torrent.c_str(), torrent.size(), doc_.GetAllocator());
-			params.PushBack(torrentValue, doc_.GetAllocator());
+			torrentValue.SetString(torrent.c_str(), torrent.size(), doc.GetAllocator());
+			params.PushBack(torrentValue, doc.GetAllocator());
 			rapidjson::Value emptyArray(rapidjson::kArrayType);
-			params.PushBack(emptyArray, doc_.GetAllocator());
+			params.PushBack(emptyArray, doc.GetAllocator());
 			rapidjson::Value optionsValue;
 			optionsValue.SetObject();
 			for (const auto& [key, value] : options) {
 				rapidjson::Value keyName;
-				keyName.SetString(key.c_str(), key.size(), doc_.GetAllocator());
+				keyName.SetString(key.c_str(), key.size(), doc.GetAllocator());
 				rapidjson::Value keyValue;
-				keyValue.SetString(value.c_str(), value.size(), doc_.GetAllocator());
-				optionsValue.AddMember(keyName, keyValue, doc_.GetAllocator());
+				keyValue.SetString(value.c_str(), value.size(), doc.GetAllocator());
+				optionsValue.AddMember(keyName, keyValue, doc.GetAllocator());
 			}
-			params.PushBack(optionsValue, doc_.GetAllocator());
+			params.PushBack(optionsValue, doc.GetAllocator());
 			return Send("aria2.addTorrent", params);
 		}
 
@@ -134,25 +193,26 @@ namespace gdl {
 			// params.push_back(metalink);
 			// params.push_back(options);
 			// return Send("aria2.addMetalink", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			rapidjson::Value metalinkValue;
-			metalinkValue.SetString(metalink.c_str(), metalink.size(), doc_.GetAllocator());
-			params.PushBack(metalinkValue, doc_.GetAllocator());
+			metalinkValue.SetString(metalink.c_str(), metalink.size(), doc.GetAllocator());
+			params.PushBack(metalinkValue, doc.GetAllocator());
 			rapidjson::Value optionsValue;
 			optionsValue.SetObject();
 			for (const auto& [key, value] : options) {
 				rapidjson::Value keyName;
-				keyName.SetString(key.c_str(), key.size(), doc_.GetAllocator());
+				keyName.SetString(key.c_str(), key.size(), doc.GetAllocator());
 				rapidjson::Value keyValue;
-				keyValue.SetString(value.c_str(), value.size(), doc_.GetAllocator());
-				optionsValue.AddMember(keyName, keyValue, doc_.GetAllocator());
+				keyValue.SetString(value.c_str(), value.size(), doc.GetAllocator());
+				optionsValue.AddMember(keyName, keyValue, doc.GetAllocator());
 			}
-			params.PushBack(optionsValue, doc_.GetAllocator());
+			params.PushBack(optionsValue, doc.GetAllocator());
 			return Send("aria2.addMetalink", params);
 		}
 
@@ -160,15 +220,16 @@ namespace gdl {
 			// nlohmann::json params = nlohmann::json::array();
 			// params.push_back(gid);
 			// return Send("aria2.remove", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			rapidjson::Value gidValue;
-			gidValue.SetString(gid.c_str(), gid.size(), doc_.GetAllocator());
-			params.PushBack(gidValue, doc_.GetAllocator());
+			gidValue.SetString(gid.c_str(), gid.size(), doc.GetAllocator());
+			params.PushBack(gidValue, doc.GetAllocator());
 			return Send("aria2.remove", params);
 		}
 
@@ -176,15 +237,16 @@ namespace gdl {
 			// nlohmann::json params = nlohmann::json::array();
 			// params.push_back(gid);
 			// return Send("aria2.forceRemove", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			rapidjson::Value gidValue;
-			gidValue.SetString(gid.c_str(), gid.size(), doc_.GetAllocator());
-			params.PushBack(gidValue, doc_.GetAllocator());
+			gidValue.SetString(gid.c_str(), gid.size(), doc.GetAllocator());
+			params.PushBack(gidValue, doc.GetAllocator());
 			return Send("aria2.forceRemove", params);
 		}
 
@@ -192,27 +254,29 @@ namespace gdl {
 			// nlohmann::json params = nlohmann::json::array();
 			// params.push_back(gid);
 			// return Send("aria2.pause", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			rapidjson::Value gidValue;
-			gidValue.SetString(gid.c_str(), gid.size(), doc_.GetAllocator());
-			params.PushBack(gidValue, doc_.GetAllocator());
+			gidValue.SetString(gid.c_str(), gid.size(), doc.GetAllocator());
+			params.PushBack(gidValue, doc.GetAllocator());
 			return Send("aria2.pause", params);
 		}
 
 		Result<bool> Aria2cWebSocketClient::PauseAll() {
 			// nlohmann::json params = nlohmann::json::array();
 			// return Send("aria2.pauseAll", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			return Send("aria2.pauseAll", params);
 		}
 
@@ -220,27 +284,29 @@ namespace gdl {
 			// nlohmann::json params = nlohmann::json::array();
 			// params.push_back(gid);
 			// return Send("aria2.forcePause", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			rapidjson::Value gidValue;
-			gidValue.SetString(gid.c_str(), gid.size(), doc_.GetAllocator());
-			params.PushBack(gidValue, doc_.GetAllocator());
+			gidValue.SetString(gid.c_str(), gid.size(), doc.GetAllocator());
+			params.PushBack(gidValue, doc.GetAllocator());
 			return Send("aria2.forcePause", params);
 		}
 
 		Result<bool> Aria2cWebSocketClient::ForcePauseAll() {
 			// nlohmann::json params = nlohmann::json::array();
 			// return Send("aria2.forcePauseAll", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			return Send("aria2.forcePauseAll", params);
 		}
 
@@ -248,27 +314,29 @@ namespace gdl {
 			// nlohmann::json params = nlohmann::json::array();
 			// params.push_back(gid);
 			// return Send("aria2.unpause", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			rapidjson::Value gidValue;
-			gidValue.SetString(gid.c_str(), gid.size(), doc_.GetAllocator());
-			params.PushBack(gidValue, doc_.GetAllocator());
+			gidValue.SetString(gid.c_str(), gid.size(), doc.GetAllocator());
+			params.PushBack(gidValue, doc.GetAllocator());
 			return Send("aria2.unpause", params);
 		}
 
 		Result<bool> Aria2cWebSocketClient::UnpauseAll() {
 			// nlohmann::json params = nlohmann::json::array();
 			// return Send("aria2.unpauseAll", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			return Send("aria2.unpauseAll", params);
 		}
 
@@ -277,22 +345,23 @@ namespace gdl {
 			// params.push_back(gid);
 			// params.push_back(keys);
 			// return Send("aria2.tellStatus", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			rapidjson::Value gidValue;
-			gidValue.SetString(gid.c_str(), gid.size(), doc_.GetAllocator());
-			params.PushBack(gidValue, doc_.GetAllocator());
+			gidValue.SetString(gid.c_str(), gid.size(), doc.GetAllocator());
+			params.PushBack(gidValue, doc.GetAllocator());
 			rapidjson::Value keysValue(rapidjson::kArrayType);
 			for (const auto& key : keys) {
 				rapidjson::Value keyName;
-				keyName.SetString(key.c_str(), key.size(), doc_.GetAllocator());
-				keysValue.PushBack(keyName, doc_.GetAllocator());
+				keyName.SetString(key.c_str(), key.size(), doc.GetAllocator());
+				keysValue.PushBack(keyName, doc.GetAllocator());
 			}
-			params.PushBack(keysValue, doc_.GetAllocator());
+			params.PushBack(keysValue, doc.GetAllocator());
 			return Send("aria2.tellStatus", params);
 		}
 
@@ -300,15 +369,16 @@ namespace gdl {
 			// nlohmann::json params = nlohmann::json::array();
 			// params.push_back(gid);
 			// return Send("aria2.getUris", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			rapidjson::Value gidValue;
-			gidValue.SetString(gid.c_str(), gid.size(), doc_.GetAllocator());
-			params.PushBack(gidValue, doc_.GetAllocator());
+			gidValue.SetString(gid.c_str(), gid.size(), doc.GetAllocator());
+			params.PushBack(gidValue, doc.GetAllocator());
 			return Send("aria2.getUris", params);
 		}
 
@@ -316,15 +386,16 @@ namespace gdl {
 			// nlohmann::json params = nlohmann::json::array();
 			// params.push_back(gid);
 			// return Send("aria2.getFiles", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			rapidjson::Value gidValue;
-			gidValue.SetString(gid.c_str(), gid.size(), doc_.GetAllocator());
-			params.PushBack(gidValue, doc_.GetAllocator());
+			gidValue.SetString(gid.c_str(), gid.size(), doc.GetAllocator());
+			params.PushBack(gidValue, doc.GetAllocator());
 			return Send("aria2.getFiles", params);
 		}
 
@@ -332,15 +403,16 @@ namespace gdl {
 			// nlohmann::json params = nlohmann::json::array();
 			// params.push_back(gid);
 			// return Send("aria2.getPeers", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			rapidjson::Value gidValue;
-			gidValue.SetString(gid.c_str(), gid.size(), doc_.GetAllocator());
-			params.PushBack(gidValue, doc_.GetAllocator());
+			gidValue.SetString(gid.c_str(), gid.size(), doc.GetAllocator());
+			params.PushBack(gidValue, doc.GetAllocator());
 			return Send("aria2.getPeers", params);
 		}
 
@@ -348,15 +420,16 @@ namespace gdl {
 			// nlohmann::json params = nlohmann::json::array();
 			// params.push_back(gid);
 			// return Send("aria2.getServers", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			rapidjson::Value gidValue;
-			gidValue.SetString(gid.c_str(), gid.size(), doc_.GetAllocator());
-			params.PushBack(gidValue, doc_.GetAllocator());
+			gidValue.SetString(gid.c_str(), gid.size(), doc.GetAllocator());
+			params.PushBack(gidValue, doc.GetAllocator());
 			return Send("aria2.getServers", params);
 		}
 
@@ -364,19 +437,20 @@ namespace gdl {
 			// nlohmann::json params = nlohmann::json::array();
 			// params.push_back(keys);
 			// return Send("aria2.tellActive", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			rapidjson::Value keysValue(rapidjson::kArrayType);
 			for (const auto& key : keys) {
 				rapidjson::Value keyName;
-				keyName.SetString(key.c_str(), key.size(), doc_.GetAllocator());
-				keysValue.PushBack(keyName, doc_.GetAllocator());
+				keyName.SetString(key.c_str(), key.size(), doc.GetAllocator());
+				keysValue.PushBack(keyName, doc.GetAllocator());
 			}
-			params.PushBack(keysValue, doc_.GetAllocator());
+			params.PushBack(keysValue, doc.GetAllocator());
 			return Send("aria2.tellActive", params);
 		}
 
@@ -386,23 +460,24 @@ namespace gdl {
 			// params.push_back(num);
 			// params.push_back(keys);
 			// return Send("aria2.tellWaiting", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			rapidjson::Value offsetValue;
 			rapidjson::Value numValue;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
-			params.PushBack(offsetValue.SetInt(offset), doc_.GetAllocator());
-			params.PushBack(numValue.SetInt(num), doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
+			params.PushBack(offsetValue.SetInt(offset), doc.GetAllocator());
+			params.PushBack(numValue.SetInt(num), doc.GetAllocator());
 			rapidjson::Value keysValue(rapidjson::kArrayType);
 			for (const auto& key : keys) {
 				rapidjson::Value keyName;
-				keyName.SetString(key.c_str(), key.size(), doc_.GetAllocator());
-				keysValue.PushBack(keyName, doc_.GetAllocator());
+				keyName.SetString(key.c_str(), key.size(), doc.GetAllocator());
+				keysValue.PushBack(keyName, doc.GetAllocator());
 			}
-			params.PushBack(keysValue, doc_.GetAllocator());
+			params.PushBack(keysValue, doc.GetAllocator());
 			return Send("aria2.tellWaiting", params);
 		}
 
@@ -412,23 +487,24 @@ namespace gdl {
 			// params.push_back(num);
 			// params.push_back(keys);
 			// return Send("aria2.tellStopped", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			rapidjson::Value offsetValue;
 			rapidjson::Value numValue;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
-			params.PushBack(offsetValue.SetInt(offset), doc_.GetAllocator());
-			params.PushBack(numValue.SetInt(num), doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
+			params.PushBack(offsetValue.SetInt(offset), doc.GetAllocator());
+			params.PushBack(numValue.SetInt(num), doc.GetAllocator());
 			rapidjson::Value keysValue(rapidjson::kArrayType);
 			for (const auto& key : keys) {
 				rapidjson::Value keyName;
-				keyName.SetString(key.c_str(), key.size(), doc_.GetAllocator());
-				keysValue.PushBack(keyName, doc_.GetAllocator());
+				keyName.SetString(key.c_str(), key.size(), doc.GetAllocator());
+				keysValue.PushBack(keyName, doc.GetAllocator());
 			}
-			params.PushBack(keysValue, doc_.GetAllocator());
+			params.PushBack(keysValue, doc.GetAllocator());
 			return Send("aria2.tellStopped", params);
 		}
 
@@ -438,19 +514,20 @@ namespace gdl {
 			// params.push_back(pos);
 			// params.push_back(how);
 			// return Send("aria2.changePosition", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			rapidjson::Value gidValue;
 			rapidjson::Value posValue;
 			rapidjson::Value howValue;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			gidValue.SetString(gid.c_str(), gid.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
-			params.PushBack(gidValue, doc_.GetAllocator());
-			params.PushBack(posValue.SetInt(pos), doc_.GetAllocator());
-			params.PushBack(howValue.SetInt(how), doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			gidValue.SetString(gid.c_str(), gid.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
+			params.PushBack(gidValue, doc.GetAllocator());
+			params.PushBack(posValue.SetInt(pos), doc.GetAllocator());
+			params.PushBack(howValue.SetInt(how), doc.GetAllocator());
 			return Send("aria2.changePosition", params);
 		}
 
@@ -458,15 +535,16 @@ namespace gdl {
 			// nlohmann::json params = nlohmann::json::array();
 			// params.push_back(gid);
 			// return Send("aria2.getOption", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			rapidjson::Value gidValue;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			gidValue.SetString(gid.c_str(), gid.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
-			params.PushBack(gidValue, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			gidValue.SetString(gid.c_str(), gid.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
+			params.PushBack(gidValue, doc.GetAllocator());
 			return Send("aria2.getOption", params);
 		}
 
@@ -475,177 +553,182 @@ namespace gdl {
 			// params.push_back(gid);
 			// params.push_back(options);
 			// return Send("aria2.changeOption", params);
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			rapidjson::Value gidValue;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			gidValue.SetString(gid.c_str(), gid.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
-			params.PushBack(gidValue, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			gidValue.SetString(gid.c_str(), gid.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
+			params.PushBack(gidValue, doc.GetAllocator());
 			rapidjson::Value optionsValue(rapidjson::kObjectType);
 			for (const auto& [key, value] : options) {
 				rapidjson::Value keyName;
-				keyName.SetString(key.c_str(), key.size(), doc_.GetAllocator());
+				keyName.SetString(key.c_str(), key.size(), doc.GetAllocator());
 				rapidjson::Value valueName;
-				valueName.SetString(value.c_str(), value.size(), doc_.GetAllocator());
-				optionsValue.AddMember(keyName, valueName, doc_.GetAllocator());
+				valueName.SetString(value.c_str(), value.size(), doc.GetAllocator());
+				optionsValue.AddMember(keyName, valueName, doc.GetAllocator());
 			}
-			params.PushBack(optionsValue, doc_.GetAllocator());
+			params.PushBack(optionsValue, doc.GetAllocator());
 			return Send("aria2.changeOption", params);
 		}
 
 		Result<bool> Aria2cWebSocketClient::GetGlobalOption() {
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			return Send("aria2.getGlobalOption", params);
 		}
 
 		Result<bool> Aria2cWebSocketClient::ChangeGlobalOption(const Options& options) {
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			rapidjson::Value optionsValue(rapidjson::kObjectType);
 			for (const auto& [key, value] : options) {
 				rapidjson::Value keyName;
-				keyName.SetString(key.c_str(), key.size(), doc_.GetAllocator());
+				keyName.SetString(key.c_str(), key.size(), doc.GetAllocator());
 				rapidjson::Value valueName;
-				valueName.SetString(value.c_str(), value.size(), doc_.GetAllocator());
-				optionsValue.AddMember(keyName, valueName, doc_.GetAllocator());
+				valueName.SetString(value.c_str(), value.size(), doc.GetAllocator());
+				optionsValue.AddMember(keyName, valueName, doc.GetAllocator());
 			}
-			params.PushBack(optionsValue, doc_.GetAllocator());
+			params.PushBack(optionsValue, doc.GetAllocator());
 			return Send("aria2.changeGlobalOption", params);
 		}
 
 		Result<bool> Aria2cWebSocketClient::GetGlobalStat() {
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			return Send("aria2.getGlobalStat", params);
 		}
 
 		Result<bool> Aria2cWebSocketClient::PurgeDownloadResult() {
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			return Send("aria2.purgeDownloadResult", params);
 		}
 
 		Result<bool> Aria2cWebSocketClient::RemoveDownloadResult(const std::string& gid) {
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			rapidjson::Value gidValue;
-			gidValue.SetString(gid.c_str(), gid.size(), doc_.GetAllocator());
-			params.PushBack(gidValue, doc_.GetAllocator());
+			gidValue.SetString(gid.c_str(), gid.size(), doc.GetAllocator());
+			params.PushBack(gidValue, doc.GetAllocator());
 			return Send("aria2.removeDownloadResult", params);
 		}
 
 		Result<bool> Aria2cWebSocketClient::GetVersion() {
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			return Send("aria2.getVersion", params);
 		}
 
 		Result<bool> Aria2cWebSocketClient::Shutdown() {
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			return Send("aria2.shutdown", params);
 		}
 
 		Result<bool> Aria2cWebSocketClient::ForceShutdown() {
-			doc_.SetObject();
+			rapidjson::Document doc;
+			doc.SetObject();
 			rapidjson::Value params(rapidjson::kArrayType);
 			rapidjson::Value token;
 			std::string token_str = BuildRpcToken();
-			token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-			params.PushBack(token, doc_.GetAllocator());
+			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+			params.PushBack(token, doc.GetAllocator());
 			return Send("aria2.forceShutdown", params);
 		}
 
 		Result<bool> Aria2cWebSocketClient::Multicall(const Options& methods) {
 			try {
-				doc_.SetObject();
+				rapidjson::Document doc;
+			doc.SetObject();
 				rapidjson::Value params(rapidjson::kArrayType);
 				rapidjson::Value token;
 				std::string token_str = BuildRpcToken();
-				token.SetString(token_str.c_str(), token_str.size(), doc_.GetAllocator());
-				params.PushBack(token, doc_.GetAllocator());
+				token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+				params.PushBack(token, doc.GetAllocator());
 
 				for (const auto& method : methods) {
 					rapidjson::Document methodDoc;
 					methodDoc.Parse(method.second.c_str());
 					if (methodDoc.HasParseError()) {
-						return false;
+						return MakeFail(static_cast<std::int64_t>(gdl::ErrorType::kUnknownError), "multicall parse failed");
 					}
 
 					rapidjson::Value methodObj(rapidjson::kObjectType);
 					rapidjson::Value methodName;
-					methodName.SetString(method.first.c_str(), method.first.size(), doc_.GetAllocator());
-					methodObj.AddMember("methodName", methodName, doc_.GetAllocator());
+					methodName.SetString(method.first.c_str(), method.first.size(), doc.GetAllocator());
+					methodObj.AddMember("methodName", methodName, doc.GetAllocator());
 
 					// 将解析后的参数复制到主文档中
 					rapidjson::Value parsedParams;
-					parsedParams.CopyFrom(methodDoc, doc_.GetAllocator());
-					methodObj.AddMember("params", parsedParams, doc_.GetAllocator());
+					parsedParams.CopyFrom(methodDoc, doc.GetAllocator());
+					methodObj.AddMember("params", parsedParams, doc.GetAllocator());
 
-					params.PushBack(methodObj, doc_.GetAllocator());
+					params.PushBack(methodObj, doc.GetAllocator());
 				}
 				return Send("system.multicall", params);
+			} catch (const std::exception& e) {
+				LOG_ERR("multicall failed: {}", e.what());
+				return MakeFail(static_cast<std::int64_t>(gdl::ErrorType::kUnknownError), "multicall exception");
 			} catch (...) {
-				return false;
+				return MakeFail(static_cast<std::int64_t>(gdl::ErrorType::kUnknownError), "multicall unknown exception");
 			}
 		}
 
 		void Aria2cWebSocketClient::SetMessageCallback(const std::function<void(const std::string&)>& cb) {
-			text_message_callback_ = cb;
+			std::lock_guard lock(callback_state_->mutex);
+			callback_state_->text_message_callback = cb;
 		}
 
 		void Aria2cWebSocketClient::SetStateChanageCallback(const std::function<void(const State&, std::string)>& cb) {
-			state_chanage_callback_ = cb;
+			std::lock_guard lock(callback_state_->mutex);
+			callback_state_->state_chanage_callback = cb;
 		}
 
 		Result<bool> Aria2cWebSocketClient::Send(const std::string_view& method, rapidjson::Value& params) {
-			static int id = 0;
-			doc_.AddMember("jsonrpc", "2.0", doc_.GetAllocator());
-			doc_.AddMember("method", rapidjson::Value(method.data(), method.size()), doc_.GetAllocator());
-			doc_.AddMember("params", params, doc_.GetAllocator());
-			doc_.AddMember("id", rapidjson::Value(std::to_string(++id).c_str(), doc_.GetAllocator()),
-						   doc_.GetAllocator());
-			if (!websocket_->isConnected()) {
-				return MakeFail(static_cast<std::int64_t>(gdl::ErrorType::kUnknownError));
-			}
-			rapidjson::StringBuffer buffer;
-			rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-			doc_.Accept(writer);
-			const auto data = buffer.GetString();
-			// LOG_DBG("Send: {}", data);
-			return websocket_->send(data);
+			// 用局部 Document 而非共享成员 doc_，避免多线程并发 RPC 时对同一 rapidjson::Document
+			// 的数据竞争（破坏 JSON 结构/崩溃）。id 改为原子，消除 ++id 的数据竞争 UB。
+			// 注意：params 由调用方用其局部 allocator 构造，其字符串内存指向调用方 doc；
+			// 本函数在调用方 doc 析构前同步完成序列化，访问安全。
+			return SendRpcMessage(websocket_, method, params);
 		}
 
 	}  // namespace engine

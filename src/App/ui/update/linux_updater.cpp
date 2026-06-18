@@ -39,6 +39,7 @@ namespace gdl {
 		LinuxUpdater::LinuxUpdater() = default;
 
 		LinuxUpdater::~LinuxUpdater() {
+			alive_->store(false);
 			CancelUpdate();
 		}
 
@@ -77,6 +78,7 @@ namespace gdl {
 				if (callback) {
 					callback(false, UpdateInfo{});
 				}
+				return;  // 必须返回，否则下方 reply->error() 空指针解引用崩溃
 			}
 			auto error = reply->error();
 			if (error != QNetworkReply::NoError) {
@@ -171,8 +173,16 @@ namespace gdl {
 				last_error_ = "Failed to create network request";
 				return;
 			}
-			QObject::connect(reply, &QNetworkReply::finished, [this, reply, callback]() {
+			current_reply_ = reply;  // 保存以便 CancelUpdate 能中止请求
+			QObject::connect(reply, &QNetworkReply::finished, [this, reply, callback, alive = alive_]() {
+				if (!alive->load()) {
+					reply->deleteLater();
+					return;
+				}
 				this->handleNetworkReply(reply, callback);
+				if (current_reply_ == reply) {
+					current_reply_ = nullptr;
+				}
 				reply->deleteLater();
 			});
 		}
@@ -211,14 +221,18 @@ namespace gdl {
 				}
 
 				// Start update thread
-				update_thread_ = std::thread([this]() {
+				update_thread_ = std::thread([this, alive = alive_]() {
 					try {
+						if (!alive->load()) return;
 						// Start update
 						updater_->start();
 
 						// Monitor update progress
-						UpdateProgressThread();
+						if (alive->load()) {
+							UpdateProgressThread();
+						}
 					} catch (const std::exception& e) {
+						if (!alive->load()) return;
 						qCritical() << "Exception in update thread:" << e.what();
 						last_error_			= std::string("Update thread error: ") + e.what();
 						update_in_progress_ = false;
@@ -311,11 +325,10 @@ namespace gdl {
 		}
 
 		void LinuxUpdater::LogMessages() {
-			// Log all messages
+			// 仅记录日志，正常进度消息不应污染 last_error_（GetLastError 仅应返回真实错误）。
 			std::string message;
 			while (updater_->nextStatusMessage(message)) {
 				if (!message.empty()) {
-					last_error_ += message + "\n";
 					qInfo() << "Update message:" << QString::fromStdString(message);
 				}
 			}

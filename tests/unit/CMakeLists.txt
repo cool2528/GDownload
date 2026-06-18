@@ -3,11 +3,13 @@ cmake_minimum_required(VERSION 3.18)
 
 # 添加 GTest（包含 GMock）
 find_package(GTest CONFIG REQUIRED)
+find_package(boost_asio CONFIG REQUIRED)
 
 # 创建单元测试主程序
 add_executable(gdownload_unit_tests
     main.cpp
     core/test_core_functions.cpp
+    engine/test_publish_subscribe_system.cpp
     utils/test_relaunch_function.cpp
     ${CMAKE_SOURCE_DIR}/src/App/ui/utils/utils.cxx
 )
@@ -23,6 +25,7 @@ target_link_libraries(gdownload_unit_tests
     Qt6::Gui
     Qt6::Widgets
     GDLCore
+    Boost::asio
 )
 
 # 包含目录
@@ -31,6 +34,7 @@ target_include_directories(gdownload_unit_tests
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/App/ui
+    ${CMAKE_SOURCE_DIR}/src/App/engine
     ${CMAKE_SOURCE_DIR}/src/App/ui/Definitions
     ${CMAKE_SOURCE_DIR}/src/Module/GDLCore
 )

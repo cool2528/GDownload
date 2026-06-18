@@ -1,5 +1,6 @@
 #pragma once
 #include <algorithm>
+#include <atomic>
 #include <boost/asio.hpp>
 #include <map>
 #include <vector>
@@ -10,7 +11,7 @@ namespace gdl {
 		   public:
 			struct Subscription {
 				std::function<void(const T&)> handler;
-				bool active = true;
+				std::atomic<bool> active{true};
 			};
 
 		   private:
@@ -26,8 +27,14 @@ namespace gdl {
 					auto it = subscribers_.find(topic);
 					if (it != subscribers_.end()) {
 						for (auto& sub : it->second) {
-							if (sub->active) {
-								boost::asio::post(io_context_, [sub, message]() { sub->handler(message); });
+							if (sub->active.load()) {
+								boost::asio::post(io_context_, [sub, message]() {
+									// 派发前再次检查 active，避免在 Unsubscribe 之后仍调用 handler
+									// 导致访问已释放对象（UAF）。
+									if (sub->active.load()) {
+										sub->handler(message);
+									}
+								});
 							}
 						}
 					}
@@ -45,14 +52,14 @@ namespace gdl {
 			}
 
 			void Unsubscribe(std::shared_ptr<Subscription> subscription) {
+				if (!subscription) {
+					return;
+				}
+				subscription->active.store(false);
 				boost::asio::post(strand_, [this, subscription]() {
-					if (!subscription) {
-						return;
-					}
-					subscription->active = false;
 					for (auto& [_, subscribers] : subscribers_) {
 						subscribers.erase(std::remove_if(subscribers.begin(), subscribers.end(),
-														 [](const auto& sub) { return !sub || !sub->active; }),
+														 [](const auto& sub) { return !sub || !sub->active.load(); }),
 										  subscribers.end());
 					}
 				});
