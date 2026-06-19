@@ -15,12 +15,8 @@ ElementPlusColorProvider::ElementPlusColorProvider(QObject* parent) : QObject(pa
 
 QColor ElementPlusColorProvider::primaryLight(int level) const {
     switch (level) {
-        case 1: return QColor(Primary::kPrimaryLight1);
-        case 2: return QColor(Primary::kPrimaryLight2);
         case 3: return QColor(Primary::kPrimaryLight3);
-        case 4: return QColor(Primary::kPrimaryLight4);
         case 5: return QColor(Primary::kPrimaryLight5);
-        case 6: return QColor(Primary::kPrimaryLight6);
         case 7: return QColor(Primary::kPrimaryLight7);
         case 8: return QColor(Primary::kPrimaryLight8);
         case 9: return QColor(Primary::kPrimaryLight9);
