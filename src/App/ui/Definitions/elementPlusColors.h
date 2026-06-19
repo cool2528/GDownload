@@ -6,59 +6,55 @@
 namespace ElementPlusColors {
 Q_NAMESPACE
 
-// Ant Design 主色系 - 科技蓝（两种主题通用）
+// Element Plus 主色系 - 基础蓝(#409EFF),色阶严格对齐 EP 官方 light3/5/7/8/9 + dark2
 namespace Primary {
-    constexpr const char* kPrimary = "#1890FF";        // Ant Design 主色 level-6
-    constexpr const char* kPrimaryLight1 = "#E6F7FF";  // level-1
-    constexpr const char* kPrimaryLight2 = "#BAE7FF";  // level-2
-    constexpr const char* kPrimaryLight3 = "#91D5FF";  // level-3
-    constexpr const char* kPrimaryLight4 = "#69C0FF";  // level-4
-    constexpr const char* kPrimaryLight5 = "#40A9FF";  // level-5 (hover)
-    constexpr const char* kPrimaryLight6 = "#1890FF";  // level-6 (主色)
-    constexpr const char* kPrimaryLight7 = "#096DD9";  // level-7 (active)
-    constexpr const char* kPrimaryLight8 = "#0050B3";  // level-8
-    constexpr const char* kPrimaryLight9 = "#003A8C";  // level-9
-    constexpr const char* kPrimaryDark2 = "#096DD9";   // active 状态
+    constexpr const char* kPrimary = "#409EFF";        // Element Plus 主色
+    constexpr const char* kPrimaryLight3 = "#79BBFF";  // EP light3(hover)
+    constexpr const char* kPrimaryLight5 = "#A0CFFF";  // EP light5
+    constexpr const char* kPrimaryLight7 = "#C6E2FF";  // EP light7(浅背景)
+    constexpr const char* kPrimaryLight8 = "#D9ECFF";  // EP light8(更浅背景)
+    constexpr const char* kPrimaryLight9 = "#ECF5FF";  // EP light9(最浅背景)
+    constexpr const char* kPrimaryDark2 = "#337ECC";   // EP dark2(active)
 }
 
-// Ant Design 状态色
+// Element Plus 状态色
 namespace Status {
-    // 成功色 - Ant Design Green
-    constexpr const char* kSuccess = "#52C41A";
-    constexpr const char* kSuccessLight3 = "#73D13D";
-    constexpr const char* kSuccessLight5 = "#95DE64";
-    constexpr const char* kSuccessLight7 = "#B7EB8F";
-    constexpr const char* kSuccessLight8 = "#D9F7BE";
-    constexpr const char* kSuccessLight9 = "#F6FFED";
-    constexpr const char* kSuccessDark2 = "#389E0D";
+    // 成功色 - Element Plus Success #67C23A
+    constexpr const char* kSuccess = "#67C23A";
+    constexpr const char* kSuccessLight3 = "#95D475";
+    constexpr const char* kSuccessLight5 = "#B3E19D";
+    constexpr const char* kSuccessLight7 = "#D1EDC4";
+    constexpr const char* kSuccessLight8 = "#E1F3D8";
+    constexpr const char* kSuccessLight9 = "#F0F9EB";
+    constexpr const char* kSuccessDark2 = "#529B2E";
 
-    // 警告色 - Ant Design Gold
-    constexpr const char* kWarning = "#FAAD14";
-    constexpr const char* kWarningLight3 = "#FFC53D";
-    constexpr const char* kWarningLight5 = "#FFD666";
-    constexpr const char* kWarningLight7 = "#FFE58F";
-    constexpr const char* kWarningLight8 = "#FFF1B8";
-    constexpr const char* kWarningLight9 = "#FFFBE6";
-    constexpr const char* kWarningDark2 = "#D48806";
+    // 警告色 - Element Plus Warning #E6A23C
+    constexpr const char* kWarning = "#E6A23C";
+    constexpr const char* kWarningLight3 = "#EEBE77";
+    constexpr const char* kWarningLight5 = "#F3D19E";
+    constexpr const char* kWarningLight7 = "#F8D3A0";
+    constexpr const char* kWarningLight8 = "#FAECD8";
+    constexpr const char* kWarningLight9 = "#FDF6EC";
+    constexpr const char* kWarningDark2 = "#B88230";
 
-    // 危险色 - Ant Design Red
-    constexpr const char* kDanger = "#F5222D";
-    constexpr const char* kError = "#F5222D";
-    constexpr const char* kDangerLight3 = "#FF4D4F";
-    constexpr const char* kDangerLight5 = "#FF7875";
-    constexpr const char* kDangerLight7 = "#FFA39E";
-    constexpr const char* kDangerLight8 = "#FFCCC7";
-    constexpr const char* kDangerLight9 = "#FFF1F0";
-    constexpr const char* kDangerDark2 = "#CF1322";
+    // 危险色 - Element Plus Danger #F56C6C
+    constexpr const char* kDanger = "#F56C6C";
+    constexpr const char* kError = "#F56C6C";
+    constexpr const char* kDangerLight3 = "#F89898";
+    constexpr const char* kDangerLight5 = "#FAB6B6";
+    constexpr const char* kDangerLight7 = "#FBC4C4";
+    constexpr const char* kDangerLight8 = "#FDE2E2";
+    constexpr const char* kDangerLight9 = "#FEF0F0";
+    constexpr const char* kDangerDark2 = "#C45656";
 
-    // 信息色 - 使用主色
-    constexpr const char* kInfo = "#1890FF";
-    constexpr const char* kInfoLight3 = "#40A9FF";
-    constexpr const char* kInfoLight5 = "#69C0FF";
-    constexpr const char* kInfoLight7 = "#91D5FF";
-    constexpr const char* kInfoLight8 = "#BAE7FF";
-    constexpr const char* kInfoLight9 = "#E6F7FF";
-    constexpr const char* kInfoDark2 = "#096DD9";
+    // 信息色 - Element Plus Info #909399(灰,不再复用主蓝)
+    constexpr const char* kInfo = "#909399";
+    constexpr const char* kInfoLight3 = "#B1B3B8";
+    constexpr const char* kInfoLight5 = "#C8C9CC";
+    constexpr const char* kInfoLight7 = "#DEDEDF";
+    constexpr const char* kInfoLight8 = "#E9E9EB";
+    constexpr const char* kInfoLight9 = "#F4F4F5";
+    constexpr const char* kInfoDark2 = "#73767A";
 }
 
 // Ant Design 中性色 - 浅色模式

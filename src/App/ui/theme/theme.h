@@ -104,7 +104,7 @@ namespace gdl {
 				int spaceSM() const { return ElementPlusColors::Sizes::kSpaceSM; }
 
 				// 工具方法：获取主色的不同层级
-				Q_INVOKABLE QColor primaryLight(int level = 1) const;
+				Q_INVOKABLE QColor primaryLight(int level = 3) const;
 				Q_INVOKABLE QColor successLight(int level = 3) const;
 				Q_INVOKABLE QColor warningLight(int level = 3) const;
 				Q_INVOKABLE QColor dangerLight(int level = 3) const;
