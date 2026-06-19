@@ -124,7 +124,7 @@ namespace VSCodeDark {
     constexpr const char* kBgOverlay = "#1D1D1D";
 }
 
-// Element Plus 尺寸规范
+// Element Plus 尺寸与设计令牌规范
 namespace Sizes {
     // 组件尺寸
     constexpr int kLarge = 40;
@@ -145,6 +145,29 @@ namespace Sizes {
     constexpr int kSpaceXL = 20;
     constexpr int kSpace2XL = 24;
     constexpr int kSpace3XL = 32;
+
+    // 字号(px)
+    constexpr int kFontCaption = 12;
+    constexpr int kFontBody = 14;
+    constexpr int kFontSubtitle = 16;
+    constexpr int kFontTitle = 18;
+    constexpr int kFontH1 = 24;
+
+    // 字重
+    constexpr int kWeightRegular = 400;
+    constexpr int kWeightMedium = 500;
+    constexpr int kWeightDemiBold = 600;
+
+    // 动效时长(ms)
+    constexpr int kDurationFast = 100;
+    constexpr int kDurationBase = 150;
+    constexpr int kDurationSlow = 250;
+
+    // 布局尺寸
+    constexpr int kNavBarWidth = 74;
+    constexpr int kTitleBarHeight = 40;
+    constexpr int kSidebarWidth = 240;
+    constexpr int kNavItemHeight = 44;
 }
 
 // 工具函数：根据主题模式获取颜色
