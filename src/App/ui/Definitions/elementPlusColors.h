@@ -90,37 +90,38 @@ namespace AntDesignLight {
     constexpr const char* kBgOverlay = "#FFFFFF";
 }
 
-// VS Code 中性色 - 暗色模式
+// Element Plus 中性色 - 暗色模式
+// 命名空间沿用历史名 VSCodeDark,实际值为 Element Plus 暗色色板,勿再增删 VS Code 色值
 namespace VSCodeDark {
-    // 文字色 - VS Code 标准文本色
-    constexpr const char* kTextPrimary = "#CCCCCC";        // VS Code 主要文本
-    constexpr const char* kTextRegular = "#BBBBBB";        // 常规文本
-    constexpr const char* kTextSecondary = "#969696";      // VS Code 次要文本
-    constexpr const char* kTextPlaceholder = "#6A6A6A";    // placeholder
-    constexpr const char* kTextDisabled = "#656565";       // VS Code 禁用文本
+    // 文字色 - Element Plus 暗色
+    constexpr const char* kTextPrimary = "#E5EAF3";
+    constexpr const char* kTextRegular = "#CFD3DC";
+    constexpr const char* kTextSecondary = "#A3A6AD";
+    constexpr const char* kTextPlaceholder = "#8D9095";
+    constexpr const char* kTextDisabled = "#4C4D4F";
 
-    // 边框色 - VS Code 层次色
-    constexpr const char* kBorderDarker = "#474747";
-    constexpr const char* kBorderDark = "#3E3E42";
-    constexpr const char* kBorderBase = "#3E3E42";         // VS Code 标准边框
-    constexpr const char* kBorderLight = "#2D2D30";
-    constexpr const char* kBorderLighter = "#252526";
-    constexpr const char* kBorderExtraLight = "#1E1E1E";
+    // 边框色 - Element Plus 暗色
+    constexpr const char* kBorderDarker = "#636466";
+    constexpr const char* kBorderDark = "#4C4D4F";
+    constexpr const char* kBorderBase = "#4C4D4F";
+    constexpr const char* kBorderLight = "#414243";
+    constexpr const char* kBorderLighter = "#313134";
+    constexpr const char* kBorderExtraLight = "#1D1D1D";
 
-    // 填充色 - VS Code 背景层次
-    constexpr const char* kFillDarker = "#474747";
-    constexpr const char* kFillDark = "#3E3E42";
-    constexpr const char* kFillBase = "#252526";
-    constexpr const char* kFillLight = "#2D2D30";
-    constexpr const char* kFillLighter = "#333333";
-    constexpr const char* kFillBlank = "#1E1E1E";
+    // 填充色 - Element Plus 暗色
+    constexpr const char* kFillDarker = "#4C4D4F";
+    constexpr const char* kFillDark = "#313134";
+    constexpr const char* kFillBase = "#303030";
+    constexpr const char* kFillLight = "#262727";
+    constexpr const char* kFillLighter = "#1D1D1D";
+    constexpr const char* kFillBlank = "#141414";
 
-    // 背景色 - VS Code 标准背景色
-    constexpr const char* kBgWhite = "#1E1E1E";            // 编辑器背景（最深）
-    constexpr const char* kBgPage = "#1E1E1E";             // 编辑器背景
-    constexpr const char* kBgBase = "#252526";             // 侧边栏背景
-    constexpr const char* kBgElevated = "#2D2D30";         // 活动项背景
-    constexpr const char* kBgOverlay = "#333333";          // 活动栏背景
+    // 背景色 - Element Plus 暗色
+    constexpr const char* kBgWhite = "#141414";
+    constexpr const char* kBgPage = "#0A0A0A";
+    constexpr const char* kBgBase = "#141414";
+    constexpr const char* kBgElevated = "#1D1D1D";
+    constexpr const char* kBgOverlay = "#1D1D1D";
 }
 
 // Element Plus 尺寸规范
