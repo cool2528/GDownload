@@ -238,15 +238,11 @@ namespace gdl {
 							  : QColor(ElementPlusColors::AntDesignLight::kBgWhite);
 			}
 
-			// 工具方法：获取颜色的不同层级
+			// 主色色阶:严格对齐 Element Plus light3/5/7/8/9 + dark2
 			QColor GTheme::primaryLight(int level) const {
 				switch (level) {
-					case 1: return QColor(ElementPlusColors::Primary::kPrimaryLight1);
-					case 2: return QColor(ElementPlusColors::Primary::kPrimaryLight2);
 					case 3: return QColor(ElementPlusColors::Primary::kPrimaryLight3);
-					case 4: return QColor(ElementPlusColors::Primary::kPrimaryLight4);
 					case 5: return QColor(ElementPlusColors::Primary::kPrimaryLight5);
-					case 6: return QColor(ElementPlusColors::Primary::kPrimaryLight6);
 					case 7: return QColor(ElementPlusColors::Primary::kPrimaryLight7);
 					case 8: return QColor(ElementPlusColors::Primary::kPrimaryLight8);
 					case 9: return QColor(ElementPlusColors::Primary::kPrimaryLight9);
