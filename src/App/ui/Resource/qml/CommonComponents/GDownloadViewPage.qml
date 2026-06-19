@@ -9,11 +9,6 @@ Control {
     property alias model: downloadListView.model
     property int pageType: -1 // 0 downloadPage 1 waitingPage  2 completedPage
 
-    // Element Plus 设计标准
-    readonly property int standardSpacing: 16
-    readonly property int cardSpacing: 12
-    readonly property int contentMargin: 16
-
     background: Rectangle {
         color: GTheme.bgPage
 
@@ -25,14 +20,14 @@ Control {
 
             Behavior on opacity {
                 NumberAnimation {
-                    duration: 200
-                    easing.type: Easing.OutCubic
+                    duration: GTheme.durationBase
+                    easing.type: GTheme.easingStandard
                 }
             }
 
             ColumnLayout {
                 anchors.centerIn: parent
-                spacing: downloadView.standardSpacing
+                spacing: GTheme.spaceLG
 
                 Image {
                     id: emptyStateImage
@@ -52,15 +47,15 @@ Control {
                             default: return qsTr("No downloads")
                         }
                     }
-                    font.pixelSize: 16
-                    font.weight: Font.Medium
+                    font.pixelSize: GTheme.fontSubtitle
+                    font.weight: GTheme.weightMedium
                     color: GTheme.textSecondary
                     Layout.alignment: Qt.AlignHCenter
                 }
 
                 Text {
                     text: qsTr("Add some download links to get started")
-                    font.pixelSize: 14
+                    font.pixelSize: GTheme.fontBody
                     color: GTheme.textPlaceholder
                     Layout.alignment: Qt.AlignHCenter
                 }
@@ -76,11 +71,11 @@ Control {
 
         ListView {
             id: downloadListView
-            spacing: 8
-            topMargin: downloadView.standardSpacing
-            bottomMargin: downloadView.standardSpacing
-            leftMargin: 8
-            rightMargin: 8
+            spacing: GTheme.spaceSM
+            topMargin: GTheme.spaceLG
+            bottomMargin: GTheme.spaceLG
+            leftMargin: GTheme.spaceSM
+            rightMargin: GTheme.spaceSM
             clip: true
             interactive: true
             orientation: ListView.Vertical
@@ -89,30 +84,30 @@ Control {
             delegate: GCard {
                 width: downloadListView.width - downloadListView.leftMargin - downloadListView.rightMargin
                 height: 120
-                padding: downloadView.standardSpacing
+                padding: GTheme.spaceLG
                 outlined: true
                 hoverEnabled: true
                 selected: hovered
 
                 ColumnLayout {
                     anchors.fill: parent
-                    spacing: 8
+                    spacing: GTheme.spaceSM
                     // 文件名和操作按钮行
                     RowLayout {
                         Layout.fillWidth: true
-                        Layout.leftMargin: 8
-                        Layout.rightMargin: 8
-                        spacing: downloadView.standardSpacing
+                        Layout.leftMargin: GTheme.spaceSM
+                        Layout.rightMargin: GTheme.spaceSM
+                        spacing: GTheme.spaceLG
 
                         // 文件名区域
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: 4
+                            spacing: GTheme.spaceXS
 
                             Text {
                                 text: model.fileName
-                                font.pixelSize: 15
-                                font.weight: Font.Medium
+                                font.pixelSize: GTheme.fontBody
+                                font.weight: GTheme.weightMedium
                                 color: GTheme.textPrimary
                                 elide: Text.ElideRight
                                 Layout.fillWidth: true
@@ -122,7 +117,7 @@ Control {
                             Text {
                                 visible: pageType !== 2
                                 text: qsTr("Size: %1 • Progress: %2%").arg(model.totalSize).arg(model.progress)
-                                font.pixelSize: 12
+                                font.pixelSize: GTheme.fontCaption
                                 color: GTheme.textSecondary
                                 Layout.fillWidth: true
                             }
@@ -130,18 +125,16 @@ Control {
 
                         // 操作按钮区域
                         RowLayout {
-                            spacing: 4
+                            spacing: GTheme.spaceXS
 
                             // 开始/恢复按钮
-                            IconButton {
+                            GButton {
                                 visible: model.taskState !== 1
                                 iconSource: downloadView.pageType === 2 ?
                                            SegoeFluentIcons.OpenFile : SegoeFluentIcons.Play
-                                iconSize: 14
-                                Layout.preferredWidth: 28
-                                Layout.preferredHeight: 28
-                                iconColor: hovered ? GTheme.primaryColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
-                                backgroundColor: hovered ? GTheme.fillLight : "transparent"
+                                iconSize: GTheme.fontBody
+                                Layout.preferredWidth: GTheme.sizeSmall + GTheme.spaceXS
+                                Layout.preferredHeight: GTheme.sizeSmall + GTheme.spaceXS
                                 onClicked: {
                                     if (downloadView.pageType === 2) {
                                         Qt.openUrlExternally(model.savePath)
@@ -154,14 +147,12 @@ Control {
                             }
 
                             // 暂停按钮
-                            IconButton {
+                            GButton {
                                 visible: model.taskState === 1
                                 iconSource: SegoeFluentIcons.Pause
-                                iconSize: 14
-                                Layout.preferredWidth: 28
-                                Layout.preferredHeight: 28
-                                iconColor: hovered ? GTheme.primaryColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
-                                backgroundColor: hovered ? GTheme.fillLight : "transparent"
+                                iconSize: GTheme.fontBody
+                                Layout.preferredWidth: GTheme.sizeSmall + GTheme.spaceXS
+                                Layout.preferredHeight: GTheme.sizeSmall + GTheme.spaceXS
                                 onClicked: {
                                     if (downloadView.pageType === 0) {
                                         BrowserManager.PauseTask(0, model.taskId)
@@ -174,32 +165,28 @@ Control {
                             // 分隔线
                             Rectangle {
                                 Layout.preferredWidth: 1
-                                Layout.preferredHeight: 16
+                                Layout.preferredHeight: GTheme.spaceLG
                                 color: GTheme.borderLight
                                 Layout.alignment: Qt.AlignVCenter
                             }
 
                             // 打开文件夹按钮
-                            IconButton {
+                            GButton {
                                 iconSource: SegoeFluentIcons.Folder
-                                iconSize: 14
-                                Layout.preferredWidth: 28
-                                Layout.preferredHeight: 28
-                                iconColor: hovered ? GTheme.primaryColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
-                                backgroundColor: hovered ? GTheme.fillLight : "transparent"
+                                iconSize: GTheme.fontBody
+                                Layout.preferredWidth: GTheme.sizeSmall + GTheme.spaceXS
+                                Layout.preferredHeight: GTheme.sizeSmall + GTheme.spaceXS
                                 onClicked: {
                                     BrowserManager.OpenFileLocation(model.savePath)
                                 }
                             }
 
                             // 复制链接按钮
-                            IconButton {
+                            GButton {
                                 iconSource: SegoeFluentIcons.Link
-                                iconSize: 14
-                                Layout.preferredWidth: 28
-                                Layout.preferredHeight: 28
-                                iconColor: hovered ? GTheme.primaryColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
-                                backgroundColor: hovered ? GTheme.fillLight : "transparent"
+                                iconSize: GTheme.fontBody
+                                Layout.preferredWidth: GTheme.sizeSmall + GTheme.spaceXS
+                                Layout.preferredHeight: GTheme.sizeSmall + GTheme.spaceXS
                                 onClicked: {
                                     UtilsToolsManager.SetClipboardText(model.downloadLink)
                                     ToastManager.ShowSuccess(qsTr("Link copied to clipboard"))
@@ -207,13 +194,12 @@ Control {
                             }
 
                             // 删除按钮
-                            IconButton {
+                            GButton {
+                                buttonType: "danger"
                                 iconSource: SegoeFluentIcons.Delete
-                                iconSize: 14
-                                Layout.preferredWidth: 28
-                                Layout.preferredHeight: 28
-                                iconColor: hovered ? GTheme.dangerColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
-                                backgroundColor: hovered ? GTheme.fillLight : "transparent"
+                                iconSize: GTheme.fontBody
+                                Layout.preferredWidth: GTheme.sizeSmall + GTheme.spaceXS
+                                Layout.preferredHeight: GTheme.sizeSmall + GTheme.spaceXS
                                 onClicked: {
                                     // 打开删除确认对话框
                                     deleteConfirmDialog.pageType = downloadView.pageType
@@ -229,8 +215,8 @@ Control {
                     GProgressBar {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 6
-                        Layout.leftMargin: 8
-                        Layout.rightMargin: 8
+                        Layout.leftMargin: GTheme.spaceSM
+                        Layout.rightMargin: GTheme.spaceSM
                         from: 0
                         to: 100
                         value: model.progress
@@ -240,14 +226,14 @@ Control {
                     // 下载状态信息行
                     RowLayout {
                         Layout.fillWidth: true
-                        Layout.leftMargin: 8
-                        Layout.rightMargin: 8
-                        Layout.bottomMargin: 8
-                        spacing: downloadView.standardSpacing
+                        Layout.leftMargin: GTheme.spaceSM
+                        Layout.rightMargin: GTheme.spaceSM
+                        Layout.bottomMargin: GTheme.spaceSM
+                        spacing: GTheme.spaceLG
 
                         Text {
                             text: model.currentSize + "/" + model.totalSize
-                            font.pixelSize: 12
+                            font.pixelSize: GTheme.fontCaption
                             color: GTheme.textSecondary
                             Layout.alignment: Qt.AlignLeft
                         }
@@ -259,7 +245,7 @@ Control {
                         // 下载速度
                         Text {
                             text: model.downloadSpeed
-                            font.pixelSize: 12
+                            font.pixelSize: GTheme.fontCaption
                             color: GTheme.textSecondary
                             visible: downloadView.pageType === 0 && model.taskState === 1
                         }
@@ -267,24 +253,24 @@ Control {
                         // 剩余时间
                         Text {
                             text: qsTr("Remaining ") + model.remainingTime
-                            font.pixelSize: 12
+                            font.pixelSize: GTheme.fontCaption
                             color: GTheme.textSecondary
                             visible: downloadView.pageType === 0 && model.taskState === 1
                         }
 
                         // 连接数
                         RowLayout {
-                            spacing: 4
+                            spacing: GTheme.spaceXS
                             visible: downloadView.pageType === 0
                             FontIcon {
                                 iconSource: SegoeFluentIcons.Connected
-                                iconSize: 12
+                                iconSize: GTheme.fontCaption
                                 color: GTheme.textSecondary
                             }
 
                             Text {
                                 text: String("%1").arg(model.connections)
-                                font.pixelSize: 12
+                                font.pixelSize: GTheme.fontCaption
                                 color: GTheme.textSecondary
                             }
                         }

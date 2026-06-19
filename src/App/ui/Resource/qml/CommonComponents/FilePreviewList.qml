@@ -28,7 +28,9 @@ Rectangle {
                 
                 GCheckBox {
                     checked: true
+                    enabled: previewModel !== null
                     onClicked: {
+                        if (!previewModel) return  // previewModel 为空时点击会空指针崩溃
                         if (checked) previewModel.selectAll()
                         else previewModel.unselectAll()
                     }
@@ -118,6 +120,9 @@ Rectangle {
                         checked: model.isSelected
                         onClicked: {
                             previewModel.toggleSelection(index)
+                            // Controls2 的 CheckBox 点击会自动 toggle checked，破坏上面的绑定，
+                            // 之后 selectAll/unselectAll 更新 model.isSelected 时该复选框不再同步，需重建绑定。
+                            checked = Qt.binding(function() { return model.isSelected })
                         }
                     }
                     

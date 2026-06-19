@@ -69,36 +69,39 @@ Item {
                     }
                 }
                 // Element Plus 风格导航项
-                GNavButton {
+                GButton {
+                    variant: "nav"
                     id: basic
                     checkable: true
                     checked: true
                     ButtonGroup.group: titleGroup
                     iconSource: SegoeFluentIcons.PlayerSettings
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 44  // Element Plus 标准菜单高度
+                    Layout.preferredHeight: GTheme.navItemHeight
                     text: qsTr("Basic")
                     onClicked: { checked = true }
                 }
 
-                GNavButton {
+                GButton {
+                    variant: "nav"
                     id: advanced
                     checkable: true
                     ButtonGroup.group: titleGroup
                     iconSource: SegoeFluentIcons.KeyboardSettings
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 44
+                    Layout.preferredHeight: GTheme.navItemHeight
                     text: qsTr("Advanced")
                     onClicked: { checked = true }
                 }
 
-                GNavButton {
+                GButton {
+                    variant: "nav"
                     id: lab
                     checkable: true
                     ButtonGroup.group: titleGroup
                     iconSource: SegoeFluentIcons.ExploitProtectionSettings
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 44
+                    Layout.preferredHeight: GTheme.navItemHeight
                     text: qsTr("Lab")
                     onClicked: { checked = true }
                 }

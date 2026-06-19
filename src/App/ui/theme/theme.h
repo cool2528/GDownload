@@ -2,6 +2,7 @@
 
 #include <QtQml/qqml.h>
 #include <QColor>
+#include <QEasingCurve>
 #include <QObject>
 #include "Definitions/appDef.h"
 #include "Definitions/autoProperty.h"
@@ -68,6 +69,10 @@ namespace gdl {
 				Q_PROPERTY(int durationFast READ durationFast CONSTANT)
 				Q_PROPERTY(int durationBase READ durationBase CONSTANT)
 				Q_PROPERTY(int durationSlow READ durationSlow CONSTANT)
+
+				// 动效缓动令牌(QEasingCurve::Type,QML 用 easing.type: GTheme.easingStandard)
+				Q_PROPERTY(int easingStandard READ easingStandard CONSTANT)
+				Q_PROPERTY(int easingEmphasized READ easingEmphasized CONSTANT)
 
 				// 字号令牌(px)
 				Q_PROPERTY(int fontCaption READ fontCaption CONSTANT)
@@ -156,6 +161,10 @@ namespace gdl {
 				int durationFast() const { return ElementPlusColors::Sizes::kDurationFast; }
 				int durationBase() const { return ElementPlusColors::Sizes::kDurationBase; }
 				int durationSlow() const { return ElementPlusColors::Sizes::kDurationSlow; }
+
+				// 动效缓动令牌方法:返回 QEasingCurve::Type 枚举值(int),避免在 QML 里写裸枚举
+				int easingStandard() const { return QEasingCurve::OutCubic; }
+				int easingEmphasized() const { return QEasingCurve::OutQuint; }
 
 				// 字号令牌方法
 				int fontCaption() const { return ElementPlusColors::Sizes::kFontCaption; }

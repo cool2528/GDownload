@@ -98,12 +98,13 @@ Popup {
                                 { name: qsTr("Baidu"), icon: SegoeFluentIcons.Cloud }
                             ]
 
-                            GNavButton {
+                            GButton {
+                                variant: "nav"
                                 required property int index
                                 required property var modelData
 
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 44
+                                Layout.preferredHeight: GTheme.navItemHeight
                                 checkable: true
                                 checked: index === tabNavigation.currentIndex
                                 iconSource: modelData.icon
@@ -162,12 +163,17 @@ Popup {
                                     }
 
                                     Component.onCompleted: {
-                                        ClipboardWatcher.clipboardChanged.connect(function(text) {
-                                            if (text.length > 3) {
+                                        input.text = ClipboardWatcher.GetClipboardText()
+                                    }
+                                    // 用 Connections 而非匿名 connect：组件销毁时自动断开，
+                                    // 避免对话框关闭后仍向已销毁的 input 写入（UAF）。
+                                    Connections {
+                                        target: ClipboardWatcher
+                                        function onClipboardChanged(text) {
+                                            if (taskPage.visible && text.length > 3) {
                                                 input.text = text
                                             }
-                                        })
-                                        input.text = ClipboardWatcher.GetClipboardText()
+                                        }
                                     }
                                 }
                             }
@@ -260,8 +266,13 @@ Popup {
                             options["referer"] = additionalConfig.referrerText
                         }
                         if (currentIndex === 1) {
-                            let select_files = filePreview.previewModel.getSelectedFiles()
-                            options["select-file"] = select_files.join()
+                            // previewModel 初始为 null（未拖入 torrent 时），直接访问会空指针崩溃
+                            if (filePreview.previewModel) {
+                                let select_files = filePreview.previewModel.getSelectedFiles()
+                                if (select_files && select_files.length > 0) {
+                                    options["select-file"] = select_files.join()
+                                }
+                            }
                         }
                         let customHeaders = additionalConfig.collectRequestHeaders()
                         if (customHeaders.length > 0) {

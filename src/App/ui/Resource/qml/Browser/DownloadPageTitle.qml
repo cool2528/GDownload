@@ -8,13 +8,8 @@ import gdl.sdk 1.0
 Rectangle {
     id: control
     property int type: 0
-    implicitHeight: 64
-    color: GTheme.bgPage  // 改为与下方内容区域一致的背景色
-
-    // Element Plus 设计标准
-    readonly property int standardSpacing: 16
-    readonly property int buttonSize: 32
-    readonly property int iconSize: 16
+    implicitHeight: GTheme.titleBarHeight + GTheme.space2XL
+    color: GTheme.bgPage  // 与下方内容区域一致的背景色
 
     // 底部分隔线
     Rectangle {
@@ -27,14 +22,14 @@ Rectangle {
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: control.standardSpacing + 8  // 额外间距与左侧导航对齐
-        anchors.rightMargin: control.standardSpacing + 8
-        spacing: control.standardSpacing
+        anchors.leftMargin: GTheme.space2XL  // 与左侧导航对齐
+        anchors.rightMargin: GTheme.space2XL
+        spacing: GTheme.spaceLG
 
         // 标题区域
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: 4
+            spacing: GTheme.spaceXS
 
             Text {
                 text: {
@@ -45,8 +40,8 @@ Rectangle {
                         default: return qsTr("Downloads")
                     }
                 }
-                font.pixelSize: 18
-                font.weight: Font.DemiBold
+                font.pixelSize: GTheme.fontTitle
+                font.weight: GTheme.weightDemiBold
                 color: GTheme.textPrimary
             }
 
@@ -59,7 +54,7 @@ Rectangle {
                         default: return qsTr("Manage your downloads")
                     }
                 }
-                font.pixelSize: 12
+                font.pixelSize: GTheme.fontCaption
                 color: GTheme.textSecondary
                 visible: text.length > 0
             }
@@ -68,31 +63,27 @@ Rectangle {
         // 操作按钮区域 - 全部靠右
         RowLayout {
             Layout.alignment: Qt.AlignRight
-            spacing: 8
+            spacing: GTheme.spaceSM
 
             // 恢复/开始所有按钮
-            IconButton {
+            GButton {
                 visible: control.type !== 2
                 iconSource: SegoeFluentIcons.PlayBadge12
-                iconSize: control.iconSize
-                Layout.preferredWidth: control.buttonSize
-                Layout.preferredHeight: control.buttonSize
-                iconColor: hovered ? GTheme.primaryColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
-                backgroundColor: hovered ? GTheme.fillLight : "transparent"
+                iconSize: GTheme.fontBody
+                Layout.preferredWidth: GTheme.sizeDefault
+                Layout.preferredHeight: GTheme.sizeDefault
                 onClicked: {
                     BrowserManager.UnpauseAllTask(control.type)
                 }
             }
 
             // 暂停所有按钮
-            IconButton {
+            GButton {
                 visible: control.type !== 2
                 iconSource: SegoeFluentIcons.PauseBadge12
-                iconSize: control.iconSize
-                Layout.preferredWidth: control.buttonSize
-                Layout.preferredHeight: control.buttonSize
-                iconColor: hovered ? GTheme.primaryColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
-                backgroundColor: hovered ? GTheme.fillLight : "transparent"
+                iconSize: GTheme.fontBody
+                Layout.preferredWidth: GTheme.sizeDefault
+                Layout.preferredHeight: GTheme.sizeDefault
                 onClicked: {
                     BrowserManager.PauseAllTask(control.type)
                 }
@@ -101,32 +92,29 @@ Rectangle {
             // 分隔线
             Rectangle {
                 Layout.preferredWidth: 1
-                Layout.preferredHeight: 20
+                Layout.preferredHeight: GTheme.spaceXL
                 color: GTheme.borderLight
                 Layout.alignment: Qt.AlignVCenter
             }
 
             // 刷新按钮
-            IconButton {
+            GButton {
                 iconSource: SegoeFluentIcons.Refresh
-                iconSize: control.iconSize
-                Layout.preferredWidth: control.buttonSize
-                Layout.preferredHeight: control.buttonSize
-                iconColor: hovered ? GTheme.primaryColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
-                backgroundColor: hovered ? GTheme.fillLight : "transparent"
+                iconSize: GTheme.fontBody
+                Layout.preferredWidth: GTheme.sizeDefault
+                Layout.preferredHeight: GTheme.sizeDefault
                 onClicked: {
                     BrowserManager.RefreshTaskList(control.type)
                 }
             }
 
             // 删除按钮
-            IconButton {
+            GButton {
+                buttonType: "danger"
                 iconSource: SegoeFluentIcons.Delete
-                iconSize: control.iconSize
-                Layout.preferredWidth: control.buttonSize
-                Layout.preferredHeight: control.buttonSize
-                iconColor: hovered ? GTheme.dangerColor : (GTheme.dark ? GTheme.textPrimary : GTheme.textSecondary)
-                backgroundColor: hovered ? GTheme.fillLight : "transparent"
+                iconSize: GTheme.fontBody
+                Layout.preferredWidth: GTheme.sizeDefault
+                Layout.preferredHeight: GTheme.sizeDefault
                 onClicked: {
                     // 删除全部任务不可逆（含文件），需确认后执行
                     deleteAllConfirmDialog.open()

@@ -18,7 +18,12 @@ FramelessWindow{
     FramelessHelper.onReady: {
         FramelessHelper.titleBarItem = title_bar;
         FramelessHelper.moveWindowToDesktopCenter()
-        if(SettingsManager.qRememberWindowPosition && (SettingsManager.qWindowPosition.x > 0 || SettingsManager.qWindowPosition.y > 0)){
+        // 以尺寸有效性作为“已初始化”判据：旧逻辑用 x>0||y>0，
+        // 当窗口停在屏幕左上角(0,0)时条件为 false 导致位置/尺寸都不恢复；
+        // 同时对尺寸做下限保护，避免保存的 (0,0) 把窗口设为不可见。
+        if(SettingsManager.qRememberWindowPosition
+           && SettingsManager.qWindowSize.width > 100
+           && SettingsManager.qWindowSize.height > 100){
             mainWindow.x = SettingsManager.qWindowPosition.x
             mainWindow.y = SettingsManager.qWindowPosition.y
             mainWindow.width = SettingsManager.qWindowSize.width
@@ -39,18 +44,17 @@ FramelessWindow{
         SettingsManager.qWindowPosition = Qt.point(x,y)
         SettingsManager.qWindowSize = Qt.size(width,height)
     }
-    onWidthChanged: {
-        Qt.callLater(onWindowResize)
+    // 拖动/缩放窗口时事件高频触发，用 Timer 防抖，停止移动后再持久化，避免大量 I/O 造成卡顿。
+    Timer {
+        id: resizeSaveTimer
+        interval: 400
+        repeat: false
+        onTriggered: onWindowResize()
     }
-    onHeightChanged: {
-        Qt.callLater(onWindowResize)
-    }
-    onXChanged: {
-         Qt.callLater(onWindowResize)
-    }
-    onYChanged: {
-        Qt.callLater(onWindowResize)
-    }
+    onWidthChanged: resizeSaveTimer.restart()
+    onHeightChanged: resizeSaveTimer.restart()
+    onXChanged: resizeSaveTimer.restart()
+    onYChanged: resizeSaveTimer.restart()
     onVisibilityChanged: {
         if(Qt.platform.os === "osx"){
             UtilsToolsManager.HideMacOsxWindowStandardButtons(mainWindow)
@@ -72,13 +76,16 @@ FramelessWindow{
 
         handle: Rectangle{
             id:handleDelegate
-            implicitWidth: 0
-            color: "transparent"
+            // 默认 1px 分隔线,悬停/拖动时加宽到 3px 并显示主色提示
+            implicitWidth: (SplitHandle.hovered || SplitHandle.pressed) ? 3 : 1
+            color: (SplitHandle.hovered || SplitHandle.pressed) ? GTheme.primaryColor : GTheme.borderLight
+            Behavior on implicitWidth { NumberAnimation { duration: GTheme.durationBase; easing.type: GTheme.easingStandard } }
+            Behavior on color { ColorAnimation { duration: GTheme.durationBase } }
         }
         NavigatorView{
             id:navigator_view
-            SplitView.minimumWidth: 74
-            SplitView.maximumWidth: 74
+            SplitView.minimumWidth: GTheme.navBarWidth
+            SplitView.maximumWidth: GTheme.navBarWidth
         }
 
         BrowserView{
@@ -94,26 +101,6 @@ FramelessWindow{
         id: toastContainer
         anchors.fill: parent
         z: 999999  // 确保显示在最上层
-    }
-
-    // GMessage 消息容器（增强版）
-    GMessageContainer {
-        id: messageContainer
-        anchors.fill: parent
-        z: 1000000  // 比 ToastContainer 更高，确保显示在最上层
-
-        Component.onCompleted: {
-            // 连接 MessageManager 信号
-            MessageManager.messageRequested.connect(function(options) {
-                if (options.action === "close") {
-                    messageContainer.closeMessageById(options.id)
-                } else if (options.action === "closeAll") {
-                    messageContainer.closeAllMessages()
-                } else {
-                    messageContainer.showMessage(options)
-                }
-            })
-        }
     }
 
     UpdateDialog{

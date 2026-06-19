@@ -52,8 +52,8 @@ Dialog {
 
     // ========== 内部属性 ==========
 
-    readonly property int standardPadding: 20
-    readonly property int standardSpacing: 16
+    readonly property int standardPadding: GTheme.spaceXL
+    readonly property int standardSpacing: GTheme.spaceLG
 
     // ========== 信号 ==========
 
@@ -114,36 +114,36 @@ Dialog {
 
     background: Rectangle {
         color: GTheme.bgWhite
-        radius: 8
+        radius: GTheme.radiusBase * 2
         border.width: 1
         border.color: GTheme.borderLight
 
         layer.enabled: true
         layer.effect: DropShadow {
-            radius: 16
-            samples: 33
-            color: Qt.rgba(0, 0, 0, 0.15)
-            horizontalOffset: 0
-            verticalOffset: 4
+            radius: GTheme.elevation4.blur
+            samples: GTheme.elevation4.blur * 2 + 1
+            color: GTheme.elevation4.color
+            horizontalOffset: GTheme.elevation4.offsetX
+            verticalOffset: GTheme.elevation4.offsetY
         }
     }
 
     // ========== 标题栏样式 ==========
 
     header: Rectangle {
-        height: 50
+        height: GTheme.titleBarHeight + GTheme.spaceSM
         color: "transparent"
 
         RowLayout {
             anchors.fill: parent
             anchors.leftMargin: root.standardPadding
             anchors.rightMargin: root.standardPadding
-            spacing: 12
+            spacing: GTheme.spaceMD
 
             // 图标
             FontIcon {
                 iconSource: getTypeIcon()
-                iconSize: 20
+                iconSize: GTheme.fontTitle
                 color: getTypeColor()
                 Layout.alignment: Qt.AlignVCenter
             }
@@ -151,8 +151,8 @@ Dialog {
             // 标题文本
             Label {
                 text: root.title
-                font.pixelSize: 16
-                font.bold: true
+                font.pixelSize: GTheme.fontSubtitle
+                font.weight: GTheme.weightDemiBold
                 color: GTheme.textPrimary
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignVCenter
@@ -172,21 +172,21 @@ Dialog {
 
     contentItem: Item {
         implicitWidth: contentColumn.implicitWidth + root.standardPadding * 2
-        implicitHeight: contentColumn.implicitHeight + 20
+        implicitHeight: contentColumn.implicitHeight + GTheme.spaceXL
 
         ColumnLayout {
             id: contentColumn
             anchors.fill: parent
             anchors.leftMargin: root.standardPadding
             anchors.rightMargin: root.standardPadding
-            anchors.topMargin: 10
-            anchors.bottomMargin: 10
+            anchors.topMargin: GTheme.spaceSM
+            anchors.bottomMargin: GTheme.spaceSM
             spacing: root.standardSpacing
 
             // 消息文本
             Label {
                 text: root.message
-                font.pixelSize: 14
+                font.pixelSize: GTheme.fontBody
                 color: GTheme.textRegular
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
@@ -203,9 +203,9 @@ Dialog {
 
             // 按钮区域
             RowLayout {
-                spacing: 10
+                spacing: GTheme.spaceSM
                 Layout.fillWidth: true
-                Layout.topMargin: 5
+                Layout.topMargin: GTheme.spaceXS
                 visible: root.buttons.length > 0
 
                 Item {
@@ -222,7 +222,7 @@ Dialog {
 
                         text: modelData.text || ""
                         implicitWidth: modelData.width || 90
-                        implicitHeight: 32
+                        implicitHeight: GTheme.sizeDefault
 
                         // 使用 GButton 的 buttonType 属性
                         buttonType: {

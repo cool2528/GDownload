@@ -1,118 +1,31 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Qt5Compat.GraphicalEffects
 import gdl.sdk
 
-// Element Plus 风格帮助对话框
-Popup {
+// 关于对话框:复用 GDialogShell 外壳(背景/阴影/进出动效/表头/分隔线)
+GDialogShell {
     id: helpDialog
     width: 640
     height: 520
-    x: (parent.width - width) / 2
-    y: (parent.height - height) / 2
-    modal: true
-    visible: false
-    closePolicy: Popup.CloseOnEscape
 
-    // Element Plus 设计标准
-    readonly property int standardPadding: 24
-    readonly property int standardSpacing: 16
-    readonly property int headerHeight: 64
+    title: qsTr("About GDownload")
+    subtitle: String("Version %1").arg(UtilsToolsManager.Version())
+    iconImage: "/images/logo/icon.ico"
+    iconBgColor: GTheme.infoLight(9)
 
-    // Element Plus 风格背景
-    background: Rectangle {
-        color: GTheme.bgWhite
-        radius: 8
-        border.width: 1
-        border.color: GTheme.borderLight
-
-        // Element Plus 风格阴影
-        layer.enabled: true
-        layer.effect: DropShadow {
-            radius: 16
-            samples: 33
-            color: Qt.rgba(0, 0, 0, 0.1)
-            horizontalOffset: 0
-            verticalOffset: 4
-        }
-    }
-
-    contentItem: ColumnLayout {
-        spacing: 0
-
-        // 头部区域
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.preferredHeight: helpDialog.headerHeight
-            color: "transparent"
-
-            RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin: helpDialog.standardPadding
-                anchors.rightMargin: helpDialog.standardPadding
-                spacing: helpDialog.standardSpacing
-
-                // 图标区域
-                Rectangle {
-                    Layout.preferredWidth: 40
-                    Layout.preferredHeight: 40
-                    Layout.alignment: Qt.AlignVCenter
-                    color: GTheme.infoLight(9)
-                    radius: 8
-
-                    Image {
-                        anchors.centerIn: parent
-                        source: "/images/logo/icon.ico"
-                        sourceSize: Qt.size(24, 24)
-                    }
-                }
-
-                // 标题和版本信息
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 4
-
-                    Text {
-                        text: qsTr("About GDownload")
-                        font.pixelSize: 18
-                        font.weight: Font.DemiBold
-                        color: GTheme.textPrimary
-                    }
-
-                    Text {
-                        text: String("Version %1").arg(UtilsToolsManager.Version())
-                        font.pixelSize: 14
-                        color: GTheme.textSecondary
-                    }
-                }
-
-                // 关闭按钮
-                IconButton {
-                    iconSource: SegoeFluentIcons.ChromeClose
-                    iconSize: 14
-                    Layout.preferredWidth: 28
-                    Layout.preferredHeight: 28
-                    iconColor: hovered ? GTheme.textPrimary : GTheme.textSecondary
-                    backgroundColor: hovered ? GTheme.fillLight : "transparent"
-                    onClicked: helpDialog.close()
-                }
-            }
-        }
-
-        // 分隔线
-        Divider {
-            Layout.fillWidth: true
-        }
+    // ===== body:标签页导航 + 内容堆栈 =====
+    ColumnLayout {
+        anchors.fill: parent
+        spacing: GTheme.spaceLG
 
         // 标签页导航
-        Rectangle {
+        Item {
             Layout.fillWidth: true
-            Layout.preferredHeight: 48
-            Layout.topMargin: helpDialog.standardSpacing
-            Layout.leftMargin: helpDialog.standardPadding
-            Layout.rightMargin: helpDialog.standardPadding
-            color: "transparent"
+            Layout.preferredHeight: GTheme.navItemHeight + GTheme.spaceXS
+            Layout.topMargin: GTheme.spaceLG
+            Layout.leftMargin: GTheme.space2XL
+            Layout.rightMargin: GTheme.space2XL
 
             RowLayout {
                 anchors.fill: parent
@@ -124,12 +37,13 @@ Popup {
                         { name: qsTr("About"), icon: SegoeFluentIcons.Info }
                     ]
 
-                    GNavButton {
+                    GButton {
+                        variant: "nav"
                         required property int index
                         required property var modelData
 
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 44
+                        Layout.preferredHeight: GTheme.navItemHeight
                         checkable: true
                         checked: index === tabNavigation.currentIndex
                         iconSource: modelData.icon
@@ -141,24 +55,24 @@ Popup {
                     }
                 }
             }
+        }
 
-            ButtonGroup {
-                id: tabGroup
-            }
+        ButtonGroup {
+            id: tabGroup
+        }
 
-            QtObject {
-                id: tabNavigation
-                property int currentIndex: 0
-            }
+        QtObject {
+            id: tabNavigation
+            property int currentIndex: 0
         }
 
         // 内容区域
         StackLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.leftMargin: helpDialog.standardPadding
-            Layout.rightMargin: helpDialog.standardPadding
-            Layout.bottomMargin: helpDialog.standardSpacing
+            Layout.leftMargin: GTheme.space2XL
+            Layout.rightMargin: GTheme.space2XL
+            Layout.bottomMargin: GTheme.spaceLG
             currentIndex: tabNavigation.currentIndex
 
 
@@ -166,16 +80,16 @@ Popup {
             // 许可证页面
             GCard {
                 outlined: true
-                padding: helpDialog.standardSpacing
+                padding: GTheme.spaceLG
 
                 ColumnLayout {
                     anchors.fill: parent
-                    spacing: 8
+                    spacing: GTheme.spaceSM
 
                     Text {
                         text: qsTr("Open Source Licenses")
-                        font.pixelSize: 16
-                        font.weight: Font.Medium
+                        font.pixelSize: GTheme.fontSubtitle
+                        font.weight: GTheme.weightMedium
                         color: GTheme.textPrimary
                     }
 
@@ -183,7 +97,7 @@ Popup {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         text: UtilsToolsManager.GetNoticeContent()
-                        font.pixelSize: 12
+                        font.pixelSize: GTheme.fontCaption
                     }
                 }
             }
@@ -191,16 +105,16 @@ Popup {
             // 关于页面
             GCard {
                 outlined: true
-                padding: helpDialog.standardSpacing
+                padding: GTheme.spaceLG
 
                 ColumnLayout {
                     anchors.fill: parent
-                    spacing: 8
+                    spacing: GTheme.spaceSM
 
                     Text {
                         text: qsTr("About GDownload")
-                        font.pixelSize: 16
-                        font.weight: Font.Medium
+                        font.pixelSize: GTheme.fontSubtitle
+                        font.weight: GTheme.weightMedium
                         color: GTheme.textPrimary
                     }
 
@@ -208,7 +122,7 @@ Popup {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         textFormat: Text.MarkdownText
-                        font.pixelSize: 13
+                        font.pixelSize: GTheme.fontBody
                         text: qsTr(`# GDownload
 
 **A modern cross-platform download manager**
@@ -254,46 +168,6 @@ Licensed under the Apache License 2.0
 *Thank you to all contributors and users who make GDownload better!* 🚀`)
                     }
                 }
-            }
-        }
-    }
-
-    // 打开动画
-    enter: Transition {
-        ParallelAnimation {
-            NumberAnimation {
-                property: "scale"
-                from: 0.9
-                to: 1.0
-                duration: 200
-                easing.type: Easing.OutCubic
-            }
-            NumberAnimation {
-                property: "opacity"
-                from: 0.0
-                to: 1.0
-                duration: 200
-                easing.type: Easing.OutCubic
-            }
-        }
-    }
-
-    // 关闭动画
-    exit: Transition {
-        ParallelAnimation {
-            NumberAnimation {
-                property: "scale"
-                from: 1.0
-                to: 0.9
-                duration: 150
-                easing.type: Easing.InCubic
-            }
-            NumberAnimation {
-                property: "opacity"
-                from: 1.0
-                to: 0.0
-                duration: 150
-                easing.type: Easing.InCubic
             }
         }
     }

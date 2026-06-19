@@ -9,11 +9,6 @@ Item {
     id: control
     property alias currentIndex: navigationBar.currentIndex
 
-    // Element Plus 设计标准
-    readonly property int standardSpacing: 16
-    readonly property int standardRadius: 4
-    readonly property int sidebarWidth: 240
-
     RowLayout {
         id: browserLayout
         anchors.fill: parent
@@ -24,9 +19,9 @@ Item {
             id: leftSidebar
             color: GTheme.bgPage
             Layout.fillHeight: true
-            Layout.minimumWidth: control.sidebarWidth
-            Layout.preferredWidth: control.sidebarWidth
-            Layout.maximumWidth: control.sidebarWidth
+            Layout.minimumWidth: GTheme.sidebarWidth
+            Layout.preferredWidth: GTheme.sidebarWidth
+            Layout.maximumWidth: GTheme.sidebarWidth
 
             // 右侧分隔线
             Rectangle {
@@ -39,24 +34,24 @@ Item {
 
             ColumnLayout {
                 anchors.fill: parent
-                anchors.margins: control.standardSpacing
-                spacing: control.standardSpacing
+                anchors.margins: GTheme.spaceLG
+                spacing: GTheme.spaceLG
 
                 // 页面标题
                 Text {
                     text: qsTr("Download Tasks")
-                    font.pixelSize: 18
-                    font.weight: Font.DemiBold
+                    font.pixelSize: GTheme.fontTitle
+                    font.weight: GTheme.weightDemiBold
                     color: GTheme.textPrimary
                     Layout.fillWidth: true
-                    Layout.bottomMargin: 8
+                    Layout.bottomMargin: GTheme.spaceSM
                 }
 
                 // 导航按钮组
                 ColumnLayout {
                     id: navigationBar
                     Layout.fillWidth: true
-                    spacing: 4
+                    spacing: GTheme.spaceXS
                     property int currentIndex: 0
                     property var buttonsArr: [downloadingBtn, waitingBtn, stoppedBtn]
 
@@ -70,10 +65,11 @@ Item {
                     }
 
                     // 下载中按钮
-                    GNavButton {
+                    GButton {
                         id: downloadingBtn
+                        variant: "nav"
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 44
+                        Layout.preferredHeight: GTheme.navItemHeight
                         checkable: true
                         checked: true
                         ButtonGroup.group: navigationGroup
@@ -85,10 +81,11 @@ Item {
                     }
 
                     // 等待中按钮
-                    GNavButton {
+                    GButton {
                         id: waitingBtn
+                        variant: "nav"
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 44
+                        Layout.preferredHeight: GTheme.navItemHeight
                         checkable: true
                         ButtonGroup.group: navigationGroup
                         iconSource: SegoeFluentIcons.PauseBold
@@ -99,10 +96,11 @@ Item {
                     }
 
                     // 已停止按钮
-                    GNavButton {
+                    GButton {
                         id: stoppedBtn
+                        variant: "nav"
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 44
+                        Layout.preferredHeight: GTheme.navItemHeight
                         checkable: true
                         ButtonGroup.group: navigationGroup
                         iconSource: SegoeFluentIcons.Stop

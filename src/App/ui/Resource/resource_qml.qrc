@@ -2,15 +2,11 @@
     <qresource prefix="/">
         <file>qml/mainWindow.qml</file>
         <file>qml/titlebar/TitleBar.qml</file>
-        <file>qml/CommonComponents/IconButton.qml</file>
         <file>qml/CommonComponents/FontIcon.qml</file>
-        <file>qml/CommonComponents/ImageButton.qml</file>
-        <file>qml/CommonComponents/TitleIconButton.qml</file>
         <file>qml/Navigator/NavigatorView.qml</file>
         <file>qml/Browser/BrowserView.qml</file>
         <file>qml/Browser/DownloadPageView.qml</file>
         <file>qml/Browser/SettingsPageView.qml</file>
-        <file>qml/CommonComponents/TttleButton.qml</file>
         <file>qml/Browser/DownloadPageTitle.qml</file>
         <file>qml/CommonComponents/TaskDialogPage.qml</file>
         <file>qml/CommonComponents/GSpinBox.qml</file>
@@ -18,6 +14,7 @@
         <file>qml/Utils/utils.js</file>
         <file>qml/CommonComponents/GCheckBox.qml</file>
         <file>qml/CommonComponents/GButton.qml</file>
+        <file>qml/CommonComponents/GImageButton.qml</file>
         <file>qml/CommonComponents/GTextField.qml</file>
         <file>qml/CommonComponents/GDropArea.qml</file>
         <file>qml/CommonComponents/GDownloadViewPage.qml</file>
@@ -37,12 +34,10 @@
         <file>qml/CommonComponents/HelpDialog.qml</file>
         <file>qml/CommonComponents/CustomVScrollBar.qml</file>
         <file>qml/CommonComponents/ScrollText.qml</file>
-        <file>qml/CommonComponents/MessageToast.qml</file>
         <file>qml/CommonComponents/ToastContainer.qml</file>
         <file>qml/CommonComponents/GMessage.qml</file>
-        <file>qml/CommonComponents/GMessageContainer.qml</file>
         <file>qml/CommonComponents/GMessageBox.qml</file>
-        <file>qml/CommonComponents/GMessageTest.qml</file>
+        <file>qml/CommonComponents/GDialogShell.qml</file>
         <file>qml/CommonComponents/CloseConfirmDialog.qml</file>
         <file>qml/CommonComponents/DeleteConfirmDialog.qml</file>
         <file>qml/CommonComponents/TaskDialogHeader.qml</file>
@@ -52,7 +47,6 @@
         <file>qml/CommonComponents/NetDiskPageView.qml</file>
         <file>qml/Browser/BaiduCookieSettingPage.qml</file>
         <file>qml/Browser/TrackerServerSettingPage.qml</file>
-        <file>qml/CommonComponents/GNavButton.qml</file>
         <file>qml/Browser/Aria2RpcSettingPage.qml</file>
         <file>qml/Browser/SpeedControlSettingPage.qml</file>
         <file>qml/Browser/ConnectionPerformanceSettingPage.qml</file>

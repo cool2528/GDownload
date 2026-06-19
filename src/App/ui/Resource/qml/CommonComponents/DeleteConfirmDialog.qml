@@ -44,23 +44,23 @@ GMessageBox {
     // 自定义内容：文件名显示 + 删除选项
     customContent: Component {
         ColumnLayout {
-            spacing: 12
+            spacing: GTheme.spaceMD
 
             // 文件名显示框
             Rectangle {
                 Layout.fillWidth: true
-                height: 40
+                height: GTheme.sizeLarge
                 color: GTheme.fillLight
-                radius: 4
+                radius: GTheme.radiusBase
                 border.width: 1
                 border.color: GTheme.borderLighter
 
                 Label {
                     anchors.fill: parent
-                    anchors.leftMargin: 12
-                    anchors.rightMargin: 12
+                    anchors.leftMargin: GTheme.spaceMD
+                    anchors.rightMargin: GTheme.spaceMD
                     text: root.taskFileName
-                    font.pixelSize: 13
+                    font.pixelSize: GTheme.fontBody
                     color: GTheme.textPrimary
                     elide: Text.ElideMiddle
                     verticalAlignment: Text.AlignVCenter
@@ -90,7 +90,7 @@ GMessageBox {
                         return qsTr("This will only remove the task record. The downloaded file will be kept.")
                     }
                 }
-                font.pixelSize: 12
+                font.pixelSize: GTheme.fontCaption
                 color: (root.deleteFileChecked && (root.pageType === 0 || root.pageType === 2)) ?
                        GTheme.dangerColor : GTheme.textSecondary
                 wrapMode: Text.WordWrap

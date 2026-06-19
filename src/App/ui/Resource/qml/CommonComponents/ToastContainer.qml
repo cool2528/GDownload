@@ -1,55 +1,60 @@
 import QtQuick
-import QtQuick.Layouts
 import gdl.sdk
 
+// 顶部消息堆叠容器:监听 ToastManager.messageRequested,用统一的 GMessage 模板渲染
+// (System A 的 C++ 接口与所有调用点不变;此处仅把渲染模板从 MessageToast 切到 GMessage)
 Item {
     id: root
-    
-    // 消息之间的间距
-    property int spacing: 10
-    
-    // 存储所有活动的toast
-    property var activeToasts: []
-    
-    // 用于创建新的toast的组件
+
+    // 消息之间的垂直间距
+    property int spacing: GTheme.spaceMD
+
+    // 存储所有活动消息
+    property var activeMessages: []
+
+    // GMessage 模板组件
     Component {
-        id: toastComponent
-        MessageToast {
-            onClosed: {
-                // 当toast关闭时从队列中移除
-                let index = root.activeToasts.indexOf(this)
+        id: messageComponent
+        GMessage {
+            // GMessage 关闭时(定时器到点或手动)会发出 messageClosed,并在 onClosed 中自销毁
+            onMessageClosed: {
+                let index = root.activeMessages.indexOf(this)
                 if (index !== -1) {
-                    root.activeToasts.splice(index, 1)
-                    root.repositionToasts()
+                    root.activeMessages.splice(index, 1)
+                    root.repositionMessages()
                 }
-                this.destroy()
+                // 不在此处 destroy:GMessage 自身 onClosed 已延迟销毁,避免双重释放
             }
         }
     }
-    
-    // 重新定位所有toast的位置
-    function repositionToasts() {
-        let currentY = 20
-        for (let i = 0; i < activeToasts.length; i++) {
-            let toast = activeToasts[i]
-            toast.y = currentY
-            currentY += toast.height + spacing
+
+    // 重新堆叠所有消息的纵向位置
+    function repositionMessages() {
+        let currentY = GTheme.spaceXL
+        for (let i = 0; i < activeMessages.length; i++) {
+            let msg = activeMessages[i]
+            msg.y = currentY
+            currentY += msg.height + spacing
         }
     }
-    
-    // 显示新的toast
+
+    // 显示新消息;type 为 ToastManager 的整型(0=Success,1=Warning,2=Info,3=Error)
+    // GMessage 枚举为 Primary=0/Success=1/Warning=2/Info=3/Error=4,故 +1 映射
     function showToast(message, type, duration, id) {
-        let toast = toastComponent.createObject(root, {
-            x: Math.round((root.width - 500) / 2), // 500是最大宽度
-            y: 20
+        let msg = messageComponent.createObject(root, {
+            placement: GMessage.Top
         })
-        
-        activeToasts.push(toast)
-        repositionToasts()
-        toast.show(message, type, duration)
+        if (msg === null) {
+            console.error("ToastContainer: failed to create GMessage")
+            return
+        }
+
+        activeMessages.push(msg)
+        repositionMessages()
+        msg.show(message, type + 1, duration)
     }
-    
+
     Component.onCompleted: {
         ToastManager.messageRequested.connect(showToast)
     }
-} 
+}
