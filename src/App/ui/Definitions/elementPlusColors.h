@@ -57,36 +57,37 @@ namespace Status {
     constexpr const char* kInfoDark2 = "#73767A";
 }
 
-// Ant Design 中性色 - 浅色模式
+// Element Plus 中性色 - 浅色模式
+// 命名空间沿用历史名 AntDesignLight,实际值为 Element Plus 浅色色板,勿再增删 Ant Design 色值
 namespace AntDesignLight {
-    // 文字色 - 模拟黑色透明度效果（Qt 不支持 #RRGGBBAA 格式）
-    constexpr const char* kTextPrimary = "#262626";        // 模拟 rgba(0,0,0,0.85)
-    constexpr const char* kTextRegular = "#595959";        // 模拟 rgba(0,0,0,0.65)
-    constexpr const char* kTextSecondary = "#8C8C8C";      // 模拟 rgba(0,0,0,0.45)
-    constexpr const char* kTextPlaceholder = "#BFBFBF";    // 模拟 rgba(0,0,0,0.25)
-    constexpr const char* kTextDisabled = "#D9D9D9";       // 禁用文本更浅
+    // 文字色 - Element Plus 浅色
+    constexpr const char* kTextPrimary = "#303133";
+    constexpr const char* kTextRegular = "#606266";
+    constexpr const char* kTextSecondary = "#909399";
+    constexpr const char* kTextPlaceholder = "#A8ABB2";
+    constexpr const char* kTextDisabled = "#C0C4CC";
 
-    // 边框色
-    constexpr const char* kBorderDarker = "#BFBFBF";
-    constexpr const char* kBorderDark = "#D9D9D9";
-    constexpr const char* kBorderBase = "#D9D9D9";         // Ant Design 标准边框
-    constexpr const char* kBorderLight = "#E8E8E8";        // 调整为更明显的浅灰（原 #F0F0F0 太浅）
-    constexpr const char* kBorderLighter = "#F0F0F0";
-    constexpr const char* kBorderExtraLight = "#FAFAFA";
+    // 边框色 - Element Plus 浅色
+    constexpr const char* kBorderDarker = "#C0C4CC";
+    constexpr const char* kBorderDark = "#DCDFE6";
+    constexpr const char* kBorderBase = "#DCDFE6";
+    constexpr const char* kBorderLight = "#E4E7ED";
+    constexpr const char* kBorderLighter = "#EBEEF5";
+    constexpr const char* kBorderExtraLight = "#F2F6FC";
 
-    // 填充色
+    // 填充色 - Element Plus 浅色
     constexpr const char* kFillDarker = "#E6E6E6";
-    constexpr const char* kFillDark = "#F0F0F0";
-    constexpr const char* kFillBase = "#FAFAFA";
-    constexpr const char* kFillLight = "#F5F5F5";
+    constexpr const char* kFillDark = "#EBEEF5";
+    constexpr const char* kFillBase = "#F0F2F5";
+    constexpr const char* kFillLight = "#F5F7FA";
     constexpr const char* kFillLighter = "#FAFAFA";
     constexpr const char* kFillBlank = "#FFFFFF";
 
-    // 背景色
-    constexpr const char* kBgWhite = "#FFFFFF";            // 纯白高亮
-    constexpr const char* kBgPage = "#F0F2F5";             // Ant Design 页面背景
-    constexpr const char* kBgBase = "#FAFAFA";             // 卡片默认背景
-    constexpr const char* kBgOverlay = "#FFFFFF";          // 浮层背景
+    // 背景色 - Element Plus 浅色
+    constexpr const char* kBgWhite = "#FFFFFF";
+    constexpr const char* kBgPage = "#F2F3F5";
+    constexpr const char* kBgBase = "#FAFAFA";
+    constexpr const char* kBgOverlay = "#FFFFFF";
 }
 
 // VS Code 中性色 - 暗色模式
