@@ -199,7 +199,8 @@ GCard {
                 onClicked: {
                     // 验证端口
                     let portValue = parseInt(portInput.text)
-                    if (portValue < 1024 || portValue > 65535) {
+                    // 空输入时 parseInt 返回 NaN，NaN 的所有比较均为 false 会绕过校验，必须显式判断
+                    if (isNaN(portValue) || portValue < 1024 || portValue > 65535) {
                         statusText.text = qsTr("✗ Invalid port. Please enter a value between 1024 and 65535.")
                         statusText.color = GTheme.dangerColor
                         ToastManager.ShowError(qsTr("Invalid port number!"), 3000)

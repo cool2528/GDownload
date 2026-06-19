@@ -69,7 +69,7 @@ Rectangle {
         anchors.leftMargin: 10
         anchors.topMargin: 10
         visible: Qt.platform.os === "osx"
-        ImageButton{
+        GImageButton{
             id:close
             Layout.preferredHeight: 15
             Layout.preferredWidth: 15
@@ -81,7 +81,7 @@ Rectangle {
             }
         }
 
-        ImageButton{
+        GImageButton{
             id:minsize
             Layout.preferredHeight: 15
             Layout.preferredWidth: 15
@@ -93,7 +93,7 @@ Rectangle {
             }
         }
 
-        ImageButton{
+        GImageButton{
             id:maxsize
             Layout.preferredHeight: 15
             Layout.preferredWidth: 15
@@ -114,7 +114,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         visible: Qt.platform.os !== "osx"
-        ImageButton{
+        GImageButton{
             id:win_minsize
             Layout.preferredHeight: 32
             Layout.preferredWidth: 40
@@ -127,7 +127,7 @@ Rectangle {
                 mainWindow.showMinimized2()
             }
         }
-        ImageButton{
+        GImageButton{
             id:win_maxsize
             visible: !mainWindow.maximized
             Layout.preferredHeight: 32
@@ -143,7 +143,7 @@ Rectangle {
         }
         //windows-restore
 
-        ImageButton{
+        GImageButton{
             id:win_restore
              visible: mainWindow.maximized
             Layout.preferredHeight: 32
@@ -157,7 +157,7 @@ Rectangle {
                 mainWindow.toggleMaximized()
             }
         }
-        ImageButton{
+        GImageButton{
             id:win_close
             Layout.preferredHeight: 32
             Layout.preferredWidth: 40

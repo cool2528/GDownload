@@ -14,7 +14,9 @@ ScrollBar {
     property real fixWidth: 0
 
     property real minPosition: 0.0
-    property real maxPosition: (viewContentHeight - viewHeight) / viewContentHeight
+    // 内容为空时 viewContentHeight=0 会除零得 NaN，NaN<=0 为 false 导致滚动条误显且后续计算连锁异常
+    property real maxPosition: viewContentHeight > 0
+        ? Math.max(0, (viewContentHeight - viewHeight) / viewContentHeight) : 0
 
     property alias running: anim.running
 
@@ -115,7 +117,7 @@ ScrollBar {
         id: hoverHandler
 
         onHoveredChanged: {
-            if (!hovered) contentItem.implicitWidth = 5
+            if (!hovered) contentItem.implicitWidth = fixWidth > 0 ? fixWidth : 5
         }
 
         onPointChanged: {

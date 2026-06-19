@@ -82,23 +82,21 @@ GCard {
                             checked: checkboxGroup.selectedItems.indexOf(modelData) !== -1
                             Layout.fillWidth: true
                             onClicked: {
-                                let pos = checkboxGroup.selectedItems.indexOf(modelData)
+                                // 原地 push/splice 修改 property var 数组不触发变更信号，
+                                // 改用 concat/filter 返回新数组重新赋值，确保 UI 同步。
+                                let items = checkboxGroup.selectedItems
+                                let pos = items.indexOf(modelData)
+                                let newItems
                                 if (checked) {
-                                    if(pos === -1){
-                                        checkboxGroup.selectedItems.push(modelData)
-                                    }
+                                    newItems = pos === -1 ? items.concat(modelData) : items
                                 } else {
-                                    if(pos !== -1){
-                                        removeAllInPlace(checkboxGroup.selectedItems, modelData)
-                                    }
+                                    newItems = pos !== -1 ? items.filter(i => i !== modelData) : items
                                 }
-                                let new_names = JSON.stringify(checkboxGroup.selectedItems)
+                                checkboxGroup.selectedItems = newItems
+                                // 点击会破坏 checked 绑定，重建以保持与 selectedItems 同步
+                                checked = Qt.binding(function() { return checkboxGroup.selectedItems.indexOf(modelData) !== -1 })
+                                let new_names = JSON.stringify(newItems)
                                 SettingsManager.SetTrackerSourceNames(new_names)
-                            }
-
-                            function removeAllInPlace(arr, value) {
-                                for (var i = arr.length - 1; i >= 0; --i)
-                                    if (arr[i] === value) arr.splice(i, 1);
                             }
                         }
                     }

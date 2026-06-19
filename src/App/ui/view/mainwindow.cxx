@@ -18,7 +18,6 @@
 #include "os/os.h"
 #include "theme/theme.h"
 #include "toast/toast_manager.h"
-#include "message/message_manager.h"
 #include "update/update_manager.h"
 #include "utils/utils.h"
 #include "version.h"
@@ -72,7 +71,6 @@ namespace gd {
 			}
 			gdl::ui::browser::RegisterTypes(engine);
 			gdl::ui::toast::RegisterTypes(engine);
-			gdl::ui::message::RegisterTypes(engine);
 			gdl::update::RegisterTypes(engine);
 			gdl::update::UpdateConfig update_config;
 			update_config.current_version	 = GDownload_VERSION_STRING;
