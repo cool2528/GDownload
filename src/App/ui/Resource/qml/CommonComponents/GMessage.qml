@@ -370,26 +370,18 @@ Popup {
             }
         }
         
-        // 关闭按钮
-        IconButton {
+        // 关闭按钮(GButton icon-only,自带悬停底)
+        GButton {
             id: closeButton
             visible: root.showClose
             iconSource: SegoeFluentIcons.ChromeClose
-            iconSize: 14
-            
+            iconSize: GTheme.fontBody
+
             Layout.alignment: Qt.AlignTop
             Layout.topMargin: 2
             Layout.preferredWidth: root.closeButtonSize
             Layout.preferredHeight: root.closeButtonSize
-            
-            // 悬停背景
-            background: Rectangle {
-                color: closeButton.hovered 
-                    ? Qt.rgba(0, 0, 0, 0.06) 
-                    : "transparent"
-                radius: 4
-            }
-            
+
             onClicked: {
                 root.closeMessage()
             }

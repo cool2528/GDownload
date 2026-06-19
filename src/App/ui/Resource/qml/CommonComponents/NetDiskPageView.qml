@@ -235,6 +235,8 @@ Rectangle {
                     checked: model.isSelected
                     onClicked: {
                         NetWorkDiskManager.ToggleSelection(index,!model.isSelected)
+                        // 点击会自动 toggle checked 破坏绑定，之后 selectAll/unselectAll 不再同步，需重建
+                        checked = Qt.binding(function() { return model.isSelected })
                     }
                 }
 
@@ -305,9 +307,13 @@ Rectangle {
             GButton{
                 text: qsTr("Back")
                 onClicked: {
-                    if(netDiskPage.parentPath.length > 0 && netDiskPage.parentPath.length >= netDiskPage.homePath.length){
-                        netDiskPage.parentPath = Utils.getParentPath(netDiskPage.parentPath)
-                        if(netDiskPage.parentPath.length != 0){
+                    // 旧逻辑用 parentPath.length >= homePath.length 判断层级，字符串长度不等于路径深度，
+                    // 边界情况（如 /a/bc 与 /a/b/c 长度相近）会误判。改为：
+                    // 当 getParentPath 返回值与传入值相同即已到根，不再回退。
+                    if(netDiskPage.parentPath.length > 0){
+                        let next = Utils.getParentPath(netDiskPage.parentPath)
+                        if(next.length > 0 && next !== netDiskPage.parentPath){
+                            netDiskPage.parentPath = next
                             NetWorkDiskManager.ChangeDir(netDiskPage.parentPath,"")
                             netDiskPage.isBusy = true
                         }

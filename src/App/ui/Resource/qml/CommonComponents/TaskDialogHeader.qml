@@ -30,7 +30,7 @@ Item {
                 Layout.preferredWidth: 40
                 Layout.preferredHeight: 40
                 Layout.alignment: Qt.AlignVCenter
-                color: GTheme.primaryLight(1)
+                color: GTheme.primaryLight(9)
                 radius: 8
 
                 FontIcon {
@@ -60,13 +60,11 @@ Item {
                 }
             }
 
-            IconButton {
+            GButton {
                 iconSource: SegoeFluentIcons.ChromeClose
-                iconSize: 14
-                Layout.preferredWidth: 28
-                Layout.preferredHeight: 28
-                iconColor: hovered ? GTheme.textPrimary : GTheme.textSecondary
-                backgroundColor: hovered ? GTheme.fillLight : "transparent"
+                iconSize: GTheme.fontBody
+                Layout.preferredWidth: GTheme.sizeSmall + GTheme.spaceXS
+                Layout.preferredHeight: GTheme.sizeSmall + GTheme.spaceXS
                 onClicked: headerRoot.closeRequested()
             }
         }

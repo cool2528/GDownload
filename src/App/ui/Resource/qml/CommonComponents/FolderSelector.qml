@@ -262,14 +262,14 @@ Item {
                         font.pixelSize: 14
                     }
                     
-                    IconButton {
-                        Layout.preferredWidth: 24
-                        Layout.preferredHeight: 24
+                    GButton {
+                        buttonType: "danger"
+                        Layout.preferredWidth: GTheme.sizeSmall
+                        Layout.preferredHeight: GTheme.sizeSmall
                         visible: parent.parent.hovered
                         iconSource: 0xE711
-                        iconSize: 12
-                        iconColor: colors.historyIcon
-                        
+                        iconSize: GTheme.fontCaption
+
                         onClicked: {
                             folderSelector.historyModel.removePath(index)
                         }

@@ -374,6 +374,17 @@ GCard {
                     Layout.fillWidth: true
                     Layout.topMargin: 4
                     implicitHeight: childrenRect.height
+
+                    // 让放入的 stepContent 铺满容器宽度:contentContainer 是普通 Item,
+                    // 其子布局不会自动继承宽度;若不绑定,内部 Layout.fillWidth 的子项会因
+                    // 容器宽度未定义而坍缩到 ~0,导致文字相互重叠。
+                    onChildrenChanged: bindChildWidths()
+                    Component.onCompleted: bindChildWidths()
+                    function bindChildWidths() {
+                        for (var i = 0; i < children.length; i++) {
+                            children[i].width = Qt.binding(function () { return contentContainer.width })
+                        }
+                    }
                 }
             }
         }
