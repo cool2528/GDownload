@@ -54,6 +54,45 @@ namespace gdl {
 				Q_PROPERTY(int spaceMD READ spaceMD CONSTANT)
 				Q_PROPERTY(int spaceSM READ spaceSM CONSTANT)
 
+				// 间距令牌
+				Q_PROPERTY(int spaceXS READ spaceXS CONSTANT)
+				Q_PROPERTY(int spaceXL READ spaceXL CONSTANT)
+				Q_PROPERTY(int space2XL READ space2XL CONSTANT)
+				Q_PROPERTY(int space3XL READ space3XL CONSTANT)
+
+				// 圆角令牌
+				Q_PROPERTY(int radiusRound READ radiusRound CONSTANT)
+				Q_PROPERTY(int radiusCircle READ radiusCircle CONSTANT)
+
+				// 动效令牌
+				Q_PROPERTY(int durationFast READ durationFast CONSTANT)
+				Q_PROPERTY(int durationBase READ durationBase CONSTANT)
+				Q_PROPERTY(int durationSlow READ durationSlow CONSTANT)
+
+				// 字号令牌(px)
+				Q_PROPERTY(int fontCaption READ fontCaption CONSTANT)
+				Q_PROPERTY(int fontBody READ fontBody CONSTANT)
+				Q_PROPERTY(int fontSubtitle READ fontSubtitle CONSTANT)
+				Q_PROPERTY(int fontTitle READ fontTitle CONSTANT)
+				Q_PROPERTY(int fontH1 READ fontH1 CONSTANT)
+
+				// 字重令牌
+				Q_PROPERTY(int weightRegular READ weightRegular CONSTANT)
+				Q_PROPERTY(int weightMedium READ weightMedium CONSTANT)
+				Q_PROPERTY(int weightDemiBold READ weightDemiBold CONSTANT)
+
+				// 布局令牌
+				Q_PROPERTY(int navBarWidth READ navBarWidth CONSTANT)
+				Q_PROPERTY(int titleBarHeight READ titleBarHeight CONSTANT)
+				Q_PROPERTY(int sidebarWidth READ sidebarWidth CONSTANT)
+				Q_PROPERTY(int navItemHeight READ navItemHeight CONSTANT)
+
+				// 阴影层级(返回 QVariantMap,含 color/blur/offsetX/offsetY,供 GElevation 消费)
+				Q_PROPERTY(QVariantMap elevation1 READ elevation1 NOTIFY darkChanged)
+				Q_PROPERTY(QVariantMap elevation2 READ elevation2 NOTIFY darkChanged)
+				Q_PROPERTY(QVariantMap elevation3 READ elevation3 NOTIFY darkChanged)
+				Q_PROPERTY(QVariantMap elevation4 READ elevation4 NOTIFY darkChanged)
+
 				QML_AUTO_PROPERTY(GThemeType::ThemeMode, theme)
 				QML_AUTO_PROPERTY(QColor, backgroundColor)
 				QML_NAMED_ELEMENT(GTheme)
@@ -103,7 +142,46 @@ namespace gdl {
 				int spaceMD() const { return ElementPlusColors::Sizes::kSpaceMD; }
 				int spaceSM() const { return ElementPlusColors::Sizes::kSpaceSM; }
 
-				// 工具方法：获取主色的不同层级
+				// 间距令牌方法
+				int spaceXS() const { return ElementPlusColors::Sizes::kSpaceXS; }
+				int spaceXL() const { return ElementPlusColors::Sizes::kSpaceXL; }
+				int space2XL() const { return ElementPlusColors::Sizes::kSpace2XL; }
+				int space3XL() const { return ElementPlusColors::Sizes::kSpace3XL; }
+
+				// 圆角令牌方法
+				int radiusRound() const { return ElementPlusColors::Sizes::kRadiusRound; }
+				int radiusCircle() const { return ElementPlusColors::Sizes::kRadiusCircle; }
+
+				// 动效令牌方法
+				int durationFast() const { return ElementPlusColors::Sizes::kDurationFast; }
+				int durationBase() const { return ElementPlusColors::Sizes::kDurationBase; }
+				int durationSlow() const { return ElementPlusColors::Sizes::kDurationSlow; }
+
+				// 字号令牌方法
+				int fontCaption() const { return ElementPlusColors::Sizes::kFontCaption; }
+				int fontBody() const { return ElementPlusColors::Sizes::kFontBody; }
+				int fontSubtitle() const { return ElementPlusColors::Sizes::kFontSubtitle; }
+				int fontTitle() const { return ElementPlusColors::Sizes::kFontTitle; }
+				int fontH1() const { return ElementPlusColors::Sizes::kFontH1; }
+
+				// 字重令牌方法
+				int weightRegular() const { return ElementPlusColors::Sizes::kWeightRegular; }
+				int weightMedium() const { return ElementPlusColors::Sizes::kWeightMedium; }
+				int weightDemiBold() const { return ElementPlusColors::Sizes::kWeightDemiBold; }
+
+				// 布局令牌方法
+				int navBarWidth() const { return ElementPlusColors::Sizes::kNavBarWidth; }
+				int titleBarHeight() const { return ElementPlusColors::Sizes::kTitleBarHeight; }
+				int sidebarWidth() const { return ElementPlusColors::Sizes::kSidebarWidth; }
+				int navItemHeight() const { return ElementPlusColors::Sizes::kNavItemHeight; }
+
+				// 阴影层级方法(深浅色不同,跟随主题)
+				QVariantMap elevation1() const;
+				QVariantMap elevation2() const;
+				QVariantMap elevation3() const;
+				QVariantMap elevation4() const;
+
+				// 工具方法：获取主色色阶
 				Q_INVOKABLE QColor primaryLight(int level = 3) const;
 				Q_INVOKABLE QColor successLight(int level = 3) const;
 				Q_INVOKABLE QColor warningLight(int level = 3) const;
