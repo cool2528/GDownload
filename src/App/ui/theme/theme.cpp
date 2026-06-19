@@ -294,6 +294,41 @@ namespace gdl {
 				}
 			}
 
+			// 阴影层级:对应 Element Plus box-shadow 四档,深浅色取色不同
+			static QVariantMap makeElevation(const QColor& color, int blur, int offsetY, int spread = 0) {
+				QVariantMap m;
+				m.insert("color", color);
+				m.insert("blur", blur);
+				m.insert("offsetX", 0);
+				m.insert("offsetY", offsetY);
+				m.insert("spread", spread);
+				return m;
+			}
+
+			QVariantMap GTheme::elevation1() const {
+				// 轻微阴影:卡片默认
+				QColor c = dark() ? QColor(0, 0, 0, 80) : QColor(0, 0, 0, 16);
+				return makeElevation(c, 4, 1);
+			}
+
+			QVariantMap GTheme::elevation2() const {
+				// 悬浮阴影:hover/floating
+				QColor c = dark() ? QColor(0, 0, 0, 120) : QColor(0, 0, 0, 24);
+				return makeElevation(c, 8, 2);
+			}
+
+			QVariantMap GTheme::elevation3() const {
+				// 弹层阴影:dropdown/popover
+				QColor c = dark() ? QColor(0, 0, 0, 150) : QColor(0, 0, 0, 32);
+				return makeElevation(c, 12, 4);
+			}
+
+			QVariantMap GTheme::elevation4() const {
+				// 对话框阴影:dialog
+				QColor c = dark() ? QColor(0, 0, 0, 180) : QColor(0, 0, 0, 40);
+				return makeElevation(c, 16, 8);
+			}
+
 			void RegisterTypes(QQmlEngine* engine) {
 				qmlRegisterUncreatableMetaObject(GThemeType::staticMetaObject, GEXPORT_MODULE_URL, 1, 0, "GThemeType",
 												 "theme type enum");
