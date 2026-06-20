@@ -45,6 +45,20 @@ namespace gdl {
 				Q_PROPERTY(QColor bgBase READ bgBase NOTIFY darkChanged)
 				Q_PROPERTY(QColor bgElevated READ bgElevated NOTIFY darkChanged)
 
+				// 告警语义令牌(背景/边框/文字,info/success/warning/danger),浅暗色随主题切换
+				Q_PROPERTY(QColor bgInfo READ bgInfo NOTIFY darkChanged)
+				Q_PROPERTY(QColor bgSuccess READ bgSuccess NOTIFY darkChanged)
+				Q_PROPERTY(QColor bgWarning READ bgWarning NOTIFY darkChanged)
+				Q_PROPERTY(QColor bgDanger READ bgDanger NOTIFY darkChanged)
+				Q_PROPERTY(QColor borderInfo READ borderInfo NOTIFY darkChanged)
+				Q_PROPERTY(QColor borderSuccess READ borderSuccess NOTIFY darkChanged)
+				Q_PROPERTY(QColor borderWarning READ borderWarning NOTIFY darkChanged)
+				Q_PROPERTY(QColor borderDanger READ borderDanger NOTIFY darkChanged)
+				Q_PROPERTY(QColor textInfo READ textInfo NOTIFY darkChanged)
+				Q_PROPERTY(QColor textSuccess READ textSuccess NOTIFY darkChanged)
+				Q_PROPERTY(QColor textWarning READ textWarning NOTIFY darkChanged)
+				Q_PROPERTY(QColor textDanger READ textDanger NOTIFY darkChanged)
+
 				// Element Plus 尺寸属性
 				Q_PROPERTY(int sizeLarge READ sizeLarge CONSTANT)
 				Q_PROPERTY(int sizeDefault READ sizeDefault CONSTANT)
@@ -136,6 +150,20 @@ namespace gdl {
 				QColor bgPage() const;
 				QColor bgBase() const;
 				QColor bgElevated() const;
+
+				// 告警语义令牌方法(背景/边框/文字 × info/success/warning/danger)
+				QColor bgInfo() const;
+				QColor bgSuccess() const;
+				QColor bgWarning() const;
+				QColor bgDanger() const;
+				QColor borderInfo() const;
+				QColor borderSuccess() const;
+				QColor borderWarning() const;
+				QColor borderDanger() const;
+				QColor textInfo() const;
+				QColor textSuccess() const;
+				QColor textWarning() const;
+				QColor textDanger() const;
 
 				// Element Plus 尺寸方法
 				int sizeLarge() const { return ElementPlusColors::Sizes::kLarge; }

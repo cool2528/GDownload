@@ -1,20 +1,15 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import "../CommonComponents"
 import gdl.sdk
-import "../Utils/utils.js" as Utils
 
-// Element Plus 风格高级设置页面
+// Element Plus 风格高级设置页面(A 类纯容器)
+// 仅作容器嵌入 9 个 B 类设置卡片,自身不承载设置项;
+// 颜色/尺寸/间距一律取自 GTheme 令牌,零魔法数字(原本地三常量已删除)
 Rectangle {
     id: advancedSetting
-    color: GTheme.bgPage  // 使用 Element Plus 页面背景色
+    color: GTheme.bgPage
     clip: true
-
-    // Element Plus 设计标准
-    readonly property int standardSpacing: 16
-    readonly property int cardSpacing: 12
-    readonly property int contentMargin: 2
 
     ScrollView {
         id: scrollView
@@ -22,77 +17,76 @@ Rectangle {
         ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
         clip: true
         contentWidth: availableWidth
-        contentHeight: columnLayout.implicitHeight + 40  // 底部间距
+        contentHeight: columnLayout.implicitHeight + GTheme.space2XL  // 底部留白
 
         ColumnLayout {
             id: columnLayout
             width: scrollView.availableWidth
-            spacing: advancedSetting.cardSpacing
-            anchors.margins: 0
-            anchors.topMargin: advancedSetting.standardSpacing  // 顶部间距
+            spacing: GTheme.spaceMD  // 卡片间距(原本地常量已令牌化)
 
             // 速度控制设置卡片
             SpeedControlSettingPage {
                 Layout.fillWidth: true
-                Layout.leftMargin: advancedSetting.contentMargin
-                Layout.rightMargin: advancedSetting.contentMargin
+                Layout.topMargin: GTheme.spaceLG  // 顶部留白
+                Layout.leftMargin: GTheme.spaceLG
+                Layout.rightMargin: GTheme.spaceLG
             }
 
             // 连接和性能参数设置卡片
             ConnectionPerformanceSettingPage {
                 Layout.fillWidth: true
-                Layout.leftMargin: advancedSetting.contentMargin
-                Layout.rightMargin: advancedSetting.contentMargin
+                Layout.leftMargin: GTheme.spaceLG
+                Layout.rightMargin: GTheme.spaceLG
             }
 
             // 下载完成后操作设置卡片
             PostDownloadActionsSettingPage {
                 Layout.fillWidth: true
-                Layout.leftMargin: advancedSetting.contentMargin
-                Layout.rightMargin: advancedSetting.contentMargin
+                Layout.leftMargin: GTheme.spaceLG
+                Layout.rightMargin: GTheme.spaceLG
             }
 
             // 超时和重试设置卡片
             TimeoutRetrySettingPage {
                 Layout.fillWidth: true
-                Layout.leftMargin: advancedSetting.contentMargin
-                Layout.rightMargin: advancedSetting.contentMargin
+                Layout.leftMargin: GTheme.spaceLG
+                Layout.rightMargin: GTheme.spaceLG
             }
 
             // BitTorrent 高级设置卡片
             BitTorrentAdvancedSettingPage {
                 Layout.fillWidth: true
-                Layout.leftMargin: advancedSetting.contentMargin
-                Layout.rightMargin: advancedSetting.contentMargin
+                Layout.leftMargin: GTheme.spaceLG
+                Layout.rightMargin: GTheme.spaceLG
             }
 
             // User-Agent 设置卡片
             UserAgentSettingPage {
                 Layout.fillWidth: true
-                Layout.leftMargin: advancedSetting.contentMargin
-                Layout.rightMargin: advancedSetting.contentMargin
+                Layout.leftMargin: GTheme.spaceLG
+                Layout.rightMargin: GTheme.spaceLG
             }
 
             // Aria2 RPC 设置卡片
             Aria2RpcSettingPage {
                 Layout.fillWidth: true
-                Layout.leftMargin: advancedSetting.contentMargin
-                Layout.rightMargin: advancedSetting.contentMargin
+                Layout.leftMargin: GTheme.spaceLG
+                Layout.rightMargin: GTheme.spaceLG
             }
 
             // 百度网盘设置卡片
             BaiduCookieSettingPage {
                 Layout.fillWidth: true
-                Layout.leftMargin: advancedSetting.contentMargin
-                Layout.rightMargin: advancedSetting.contentMargin
+                Layout.leftMargin: GTheme.spaceLG
+                Layout.rightMargin: GTheme.spaceLG
             }
 
             // Tracker 服务器设置卡片
             TrackerServerSettingPage {
                 Layout.fillWidth: true
-                Layout.leftMargin: advancedSetting.contentMargin
-                Layout.rightMargin: advancedSetting.contentMargin
-                Layout.bottomMargin: advancedSetting.standardSpacing  // 底部间距
+                Layout.leftMargin: GTheme.spaceLG
+                Layout.rightMargin: GTheme.spaceLG
+                Layout.bottomMargin: GTheme.spaceLG  // 底部留白
             }
         }
     }
