@@ -1,58 +1,40 @@
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
 import "../CommonComponents"
 import gdl.sdk
 
-// Element Plus 风格下载完成后操作设置卡片
-GCard {
+// Element Plus 风格下载完成后操作设置卡片(B 类,即时提交派)
+// 控件事件直接 SetXxx 提交,无暂存-保存操作区,故不使用 SettingFormActions
+// 骨架走 SettingCard;告警/示例框走 AlertTip(修复原 info 文字色幽灵令牌);分隔线统一 Divider
+// 颜色/尺寸/间距/字号/动效一律取自 GTheme 令牌,零魔法数字
+SettingCard {
     id: postDownloadActionsSettingPage
     Layout.fillWidth: true
-    Layout.preferredHeight: contentLayout.implicitHeight + 48
-    outlined: true
-    padding: 16  // Element Plus 标准内边距
 
+    title: qsTr("Post-Download Actions")
+    description: qsTr("Configure automated actions after download completes, fails, or starts")
+
+    // 卡片正文:三段操作组 + 分隔线,段间距沿用原 16(spaceLG)
     ColumnLayout {
-        id: contentLayout
-        anchors.fill: parent
-        anchors.margins: 16
-        spacing: 16
+        Layout.fillWidth: true
+        spacing: GTheme.spaceLG
 
-        // 卡片标题和描述
+        // ===== 下载完成后操作 =====
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: 4
-
-            Text {
-                text: qsTr("Post-Download Actions")
-                font.pixelSize: 16
-                font.weight: Font.Medium
-                color: GTheme.textPrimary
-            }
-
-            Text {
-                text: qsTr("Configure automated actions after download completes, fails, or starts")
-                font.pixelSize: 12
-                color: GTheme.textSecondary
-            }
-        }
-
-        // 下载完成后操作
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 12
+            spacing: GTheme.spaceMD
 
             Text {
                 text: qsTr("When Download Completes")
-                font.pixelSize: 14
-                font.weight: Font.Medium
+                font.pixelSize: GTheme.fontBody
+                font.weight: GTheme.weightMedium
                 color: GTheme.textPrimary
             }
 
             GComBoBox {
                 id: completeActionComboBox
                 Layout.fillWidth: true
-                Layout.preferredHeight: 40
+                Layout.preferredHeight: GTheme.sizeDefault
                 model: [
                     qsTr("Do Nothing"),
                     qsTr("Open File"),
@@ -69,22 +51,22 @@ GCard {
                 }
             }
 
-            // 自定义完成命令（仅在选择"自定义命令"时显示）
+            // 自定义完成命令(仅在选择"自定义命令"时显示)
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: 8
+                spacing: GTheme.spaceSM
                 visible: completeActionComboBox.currentIndex === 4
 
                 Text {
                     text: qsTr("Custom Command")
-                    font.pixelSize: 13
+                    font.pixelSize: GTheme.fontBody
                     color: GTheme.textPrimary
                 }
 
                 GTextField {
                     id: customCompleteCommandField
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 40
+                    Layout.preferredHeight: GTheme.sizeDefault
                     placeholderText: qsTr("e.g., notify-send \"Download Complete\" \"{file}\"")
                     text: SettingsManager.qCustomCompleteCommand
                     onTextChanged: {
@@ -94,60 +76,57 @@ GCard {
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: 4
+                    spacing: GTheme.spaceXS
 
                     Text {
                         text: qsTr("Available variables:")
-                        font.pixelSize: 12
+                        font.pixelSize: GTheme.fontCaption
                         color: GTheme.textSecondary
-                        font.weight: Font.Medium
+                        font.weight: GTheme.weightMedium
                     }
 
                     Text {
                         text: qsTr("  {file} - Downloaded file path") + "\n" +
                               qsTr("  {dir} - Download directory path") + "\n" +
                               qsTr("  {gid} - Download task ID")
-                        font.pixelSize: 12
+                        font.pixelSize: GTheme.fontCaption
                         color: GTheme.textSecondary
                         lineHeight: 1.5
                     }
 
-                    Text {
+                    // 示例框:原裸 Text 的 info 文字色幽灵令牌 → AlertTip(info)
+                    AlertTip {
+                        Layout.fillWidth: true
+                        severity: "info"
                         text: qsTr("Example:") + "\n" +
                               "  Windows: powershell -Command \"Write-Host '{file}'\"\n" +
                               "  macOS/Linux: /usr/local/bin/process.sh \"{file}\" \"{dir}\""
-                        font.pixelSize: 12
-                        color: GTheme.textInfo
-                        lineHeight: 1.5
-                        font.family: "Consolas, Monaco, monospace"
                     }
                 }
             }
         }
 
-        // 分隔线
-        Rectangle {
+        // 分隔线(统一 Divider,色 borderLight)
+        Divider {
             Layout.fillWidth: true
-            Layout.preferredHeight: 1
-            color: GTheme.borderBase
         }
 
-        // 下载失败后操作
+        // ===== 下载失败后操作 =====
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: 12
+            spacing: GTheme.spaceMD
 
             Text {
                 text: qsTr("When Download Fails")
-                font.pixelSize: 14
-                font.weight: Font.Medium
+                font.pixelSize: GTheme.fontBody
+                font.weight: GTheme.weightMedium
                 color: GTheme.textPrimary
             }
 
             GComBoBox {
                 id: errorActionComboBox
                 Layout.fillWidth: true
-                Layout.preferredHeight: 40
+                Layout.preferredHeight: GTheme.sizeDefault
                 model: [
                     qsTr("Do Nothing"),
                     qsTr("Play Sound"),
@@ -159,22 +138,22 @@ GCard {
                 }
             }
 
-            // 自定义错误命令（仅在选择"自定义命令"时显示）
+            // 自定义错误命令(仅在选择"自定义命令"时显示)
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: 8
+                spacing: GTheme.spaceSM
                 visible: errorActionComboBox.currentIndex === 2
 
                 Text {
                     text: qsTr("Custom Command")
-                    font.pixelSize: 13
+                    font.pixelSize: GTheme.fontBody
                     color: GTheme.textPrimary
                 }
 
                 GTextField {
                     id: customErrorCommandField
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 40
+                    Layout.preferredHeight: GTheme.sizeDefault
                     placeholderText: qsTr("e.g., logger \"Download failed: {gid}\"")
                     text: SettingsManager.qCustomErrorCommand
                     onTextChanged: {
@@ -184,60 +163,57 @@ GCard {
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: 4
+                    spacing: GTheme.spaceXS
 
                     Text {
                         text: qsTr("Available variables:")
-                        font.pixelSize: 12
+                        font.pixelSize: GTheme.fontCaption
                         color: GTheme.textSecondary
-                        font.weight: Font.Medium
+                        font.weight: GTheme.weightMedium
                     }
 
                     Text {
                         text: qsTr("  {file} - Downloaded file path") + "\n" +
                               qsTr("  {dir} - Download directory path") + "\n" +
                               qsTr("  {gid} - Download task ID")
-                        font.pixelSize: 12
+                        font.pixelSize: GTheme.fontCaption
                         color: GTheme.textSecondary
                         lineHeight: 1.5
                     }
 
-                    Text {
+                    // 示例框:原裸 Text 的 info 文字色幽灵令牌 → AlertTip(info)
+                    AlertTip {
+                        Layout.fillWidth: true
+                        severity: "info"
                         text: qsTr("Example:") + "\n" +
                               "  Windows: powershell -Command \"Write-EventLog -LogName Application -Source GDownload -EventId 1001 -Message 'Failed: {gid}'\"\n" +
                               "  macOS/Linux: echo \"Download error: {file}\" >> ~/download_errors.log"
-                        font.pixelSize: 12
-                        color: GTheme.textInfo
-                        lineHeight: 1.5
-                        font.family: "Consolas, Monaco, monospace"
                     }
                 }
             }
         }
 
-        // 分隔线
-        Rectangle {
+        // 分隔线(统一 Divider,色 borderLight)
+        Divider {
             Layout.fillWidth: true
-            Layout.preferredHeight: 1
-            color: GTheme.borderBase
         }
 
-        // 下载开始后操作
+        // ===== 下载开始后操作 =====
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: 12
+            spacing: GTheme.spaceMD
 
             Text {
                 text: qsTr("When Download Starts")
-                font.pixelSize: 14
-                font.weight: Font.Medium
+                font.pixelSize: GTheme.fontBody
+                font.weight: GTheme.weightMedium
                 color: GTheme.textPrimary
             }
 
             GComBoBox {
                 id: startActionComboBox
                 Layout.fillWidth: true
-                Layout.preferredHeight: 40
+                Layout.preferredHeight: GTheme.sizeDefault
                 model: [
                     qsTr("Do Nothing"),
                     qsTr("Play Sound")

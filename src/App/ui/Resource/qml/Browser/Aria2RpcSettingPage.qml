@@ -1,309 +1,213 @@
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
 import "../CommonComponents"
 import gdl.sdk
 
-// Element Plus 风格 Aria2 RPC 设置卡片
-GCard {
+// Aria2 RPC 设置卡片:暂存-保存派,配置 Aria2 远程 RPC 监听端口与密钥
+// 骨架走 SettingCard;端口行走 SettingRow;操作区走 SettingFormActions;信息提示框走 AlertTip
+// 颜色/尺寸/间距/字号/动效一律取自 GTheme 令牌;labelWidth/inputWidth/buttonWidth 为页面级布局常量
+SettingCard {
     id: aria2RpcSettingPage
     Layout.fillWidth: true
-    Layout.preferredHeight: contentLayout.implicitHeight + 48
-    outlined: true
-    padding: 16  // Element Plus 标准内边距
 
+    title: qsTr("Aria2 RPC Settings")
+    description: qsTr("Configure Aria2 remote RPC listening port")
+
+    // 页面级布局常量(非设计令牌,spec 2.2/2.3 约定:label/input/button 宽度)
+    readonly property int labelWidth: 60
+    readonly property int inputWidth: 150
+    readonly property int buttonWidth: 120
+
+    // RPC 端口配置区域
     ColumnLayout {
-        id: contentLayout
-        anchors.fill: parent
-        anchors.margins: 16
-        spacing: 16
+        Layout.fillWidth: true
+        spacing: GTheme.spaceMD
 
-        // 卡片标题和描述
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 4
-
-            Text {
-                text: qsTr("Aria2 RPC Settings")
-                font.pixelSize: 16
-                font.weight: Font.Medium
-                color: GTheme.textPrimary
-            }
-
-            Text {
-                text: qsTr("Configure Aria2 remote RPC listening port")
-                font.pixelSize: 12
-                color: GTheme.textSecondary
-            }
+        // 子标题
+        Text {
+            text: qsTr("RPC Listen Port")
+            font.pixelSize: GTheme.fontBody
+            font.weight: GTheme.weightMedium
+            color: GTheme.textPrimary
         }
 
-
-        // RPC 端口配置区域
-        ColumnLayout {
+        // 端口输入行
+        SettingRow {
             Layout.fillWidth: true
-            spacing: 12
+            label: qsTr("Port:")
+            labelWidth: aria2RpcSettingPage.labelWidth
+            control: GTextField {
+                id: portInput
+                Layout.preferredWidth: aria2RpcSettingPage.inputWidth
+                text: SettingsManager.qRpcListenPort.toString()
+                placeholderText: "16888"
 
-            // 子标题
-            Text {
-                text: qsTr("RPC Listen Port")
-                font.pixelSize: 14
-                font.weight: Font.Medium
-                color: GTheme.textPrimary
-            }
-
-            // 端口输入区域
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: 12
-
-                Text {
-                    text: qsTr("Port:")
-                    font.pixelSize: 14
-                    color: GTheme.textRegular
-                    Layout.preferredWidth: 60
-                }
-
-                GTextField {
-                    id: portInput
-                    Layout.preferredWidth: 150
-                    Layout.preferredHeight: 32
-                    text: SettingsManager.qRpcListenPort.toString()
-                    placeholderText: "16888"
-
-                    // 只允许输入数字
-                    validator: IntValidator {
-                        bottom: 1024
-                        top: 65535
-                    }
-                }
-
-                Text {
-                    text: qsTr("(1024-65535)")
-                    font.pixelSize: 12
-                    color: GTheme.textPlaceholder
+                // 只允许输入数字(业务值:端口上下界)
+                validator: IntValidator {
+                    bottom: 1024
+                    top: 65535
                 }
             }
+            hint: qsTr("(1024-65535)")
+        }
+    }
+
+    // 分隔线:统一 Divider(色 borderLight,spec 3)
+    Divider {
+        Layout.fillWidth: true
+    }
+
+    // RPC Secret 配置区域
+    ColumnLayout {
+        Layout.fillWidth: true
+        spacing: GTheme.spaceMD
+
+        // 子标题
+        Text {
+            text: qsTr("RPC Secret")
+            font.pixelSize: GTheme.fontBody
+            font.weight: GTheme.weightMedium
+            color: GTheme.textPrimary
         }
 
-        // RPC Secret 配置区域
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 12
-
-            // 分隔线
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 1
-                color: GTheme.borderLight
-                Layout.topMargin: 8
-                Layout.bottomMargin: 8
-            }
-
-            // 子标题
-            Text {
-                text: qsTr("RPC Secret")
-                font.pixelSize: 14
-                font.weight: Font.Medium
-                color: GTheme.textPrimary
-            }
-
-            // Secret 输入区域
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: 12
-
-                Text {
-                    text: qsTr("Secret:")
-                    font.pixelSize: 14
-                    color: GTheme.textRegular
-                    Layout.preferredWidth: 60
-                }
-
-                GTextField {
-                    id: secretInput
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 32
-                    text: SettingsManager.qRpcSecret
-                    placeholderText: qsTr("Generated automatically on first launch")
-                    echoMode: showSecretCheckbox.checked ? TextInput.Normal : TextInput.Password
-                }
-
-                // 显示/隐藏密码
-                Row {
-                    spacing: 6
-
-                    GCheckBox {
-                        id: showSecretCheckbox
-                        checked: false
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    Text {
-                        text: qsTr("Show")
-                        font.pixelSize: 12
-                        color: GTheme.textRegular
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-
-                GButton {
-                    text: qsTr("Generate Random")
-                    type: 3
-                    Layout.preferredWidth: 120
-                    Layout.preferredHeight: 32
-                    onClicked: {
-                        secretInput.text = SettingsManager.GenerateRpcSecret()
-                    }
-                }
-            }
-        }
-
-        // 统一操作按钮区域
+        // Secret 输入行:复合控件(输入框 + 显示切换 + 生成按钮)
+        // 因控件为复合结构且密钥为 32 位需 fillWidth 展开容纳,保留令牌化 RowLayout 而非 SettingRow
         RowLayout {
             Layout.fillWidth: true
-            spacing: 12
-            Layout.topMargin: 16
+            spacing: GTheme.spaceMD
 
-            Item {
+            Text {
+                text: qsTr("Secret:")
+                font.pixelSize: GTheme.fontBody
+                font.weight: GTheme.weightRegular
+                color: GTheme.textRegular
+                Layout.preferredWidth: aria2RpcSettingPage.labelWidth
+                Layout.alignment: Qt.AlignVCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            GTextField {
+                id: secretInput
                 Layout.fillWidth: true
+                Layout.preferredHeight: GTheme.sizeDefault
+                text: SettingsManager.qRpcSecret
+                placeholderText: qsTr("Generated automatically on first launch")
+                echoMode: showSecretCheckbox.checked ? TextInput.Normal : TextInput.Password
             }
 
-            GButton {
-                text: qsTr("Reset to Default")
-                type: 3
-                Layout.preferredWidth: 120
-                Layout.preferredHeight: 36
-                onClicked: {
-                    let randomSecret = SettingsManager.GenerateRpcSecret()
-                    portInput.text = "16888"
-                    secretInput.text = randomSecret
-                    SettingsManager.SetRpcListenPort(16888)
-                    SettingsManager.SetRpcSecret(randomSecret)
+            // 显示/隐藏密码
+            Row {
+                spacing: GTheme.spaceSM
+                Layout.alignment: Qt.AlignVCenter
 
-
-                    ToastManager.ShowWarning(
-                        qsTr("RPC settings reset to default. Please restart the application!"),
-                        5000
-                    )
-
-                    statusText.text = qsTr("✓ Settings reset to default (Restart required)")
-                    statusText.color = GTheme.warningColor
-                }
-            }
-
-            GButton {
-                text: qsTr("Save Settings")
-                type: 1  // 主要按钮样式
-                Layout.preferredWidth: 120
-                Layout.preferredHeight: 36
-                onClicked: {
-                    // 验证端口
-                    let portValue = parseInt(portInput.text)
-                    // 空输入时 parseInt 返回 NaN，NaN 的所有比较均为 false 会绕过校验，必须显式判断
-                    if (isNaN(portValue) || portValue < 1024 || portValue > 65535) {
-                        statusText.text = qsTr("✗ Invalid port. Please enter a value between 1024 and 65535.")
-                        statusText.color = GTheme.dangerColor
-                        ToastManager.ShowError(qsTr("Invalid port number!"), 3000)
-                        return
-                    }
-
-                    // 验证密钥
-                    if (secretInput.text.trim() === "") {
-                        statusText.text = qsTr("✗ Secret cannot be empty!")
-                        statusText.color = GTheme.dangerColor
-                        ToastManager.ShowError(qsTr("Secret cannot be empty!"), 3000)
-                        return
-                    }
-
-                    // 检查是否有更改
-                    let originalPort = SettingsManager.qRpcListenPort
-                    let originalSecret = SettingsManager.qRpcSecret
-                    let hasChanges = (portValue !== originalPort) || (secretInput.text.trim() !== originalSecret)
-
-                    // 显示 Toast 通知
-                    if (hasChanges) {
-                        ToastManager.ShowSuccess(
-                            qsTr("✓ RPC settings saved successfully! Please restart the application to apply changes."),
-                            5000
-                        )
-                        statusText.text = qsTr("✓ Settings saved: Port=%1, Secret updated (Restart required)").arg(portValue)
-                        statusText.color = GTheme.successColor
-                        // 保存设置
-                        SettingsManager.SetRpcListenPort(portValue)
-                        SettingsManager.SetRpcSecret(secretInput.text.trim())
-                        UtilsToolsManager.RelaunchAfterExit(3000)
-                        Qt.quit()
-                    } else {
-                        ToastManager.ShowInfo(qsTr("No changes detected."), 2000)
-                        statusText.text = qsTr("Settings unchanged.")
-                        statusText.color = GTheme.textSecondary
-                    }
-                }
-            }
-        }
-
-        // 状态提示文本
-        Text {
-            id: statusText
-            Layout.fillWidth: true
-            Layout.topMargin: 8
-            font.pixelSize: 12
-            color: GTheme.textSecondary
-            wrapMode: Text.WordWrap
-            text: ""
-        }
-
-        // 帮助信息区域
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.preferredHeight: helpText.implicitHeight + 50
-            color: GTheme.fillLight
-            border.color: GTheme.borderLight
-            border.width: 1
-            radius: 4
-
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: 12
-                spacing: 8
-
-                Row {
-                    spacing: 6
-
-                    Text {
-                        text: "ⓘ"
-                        font.pixelSize: 16
-                        color: GTheme.primaryColor
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    Text {
-                        text: qsTr("Important Information")
-                        font.pixelSize: 13
-                        font.weight: Font.Medium
-                        color: GTheme.textPrimary
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
+                GCheckBox {
+                    id: showSecretCheckbox
+                    checked: false
+                    anchors.verticalCenter: parent.verticalCenter
                 }
 
                 Text {
-                    id: helpText
-                    Layout.fillWidth: true
-                    font.pixelSize: 12
+                    text: qsTr("Show")
+                    font.pixelSize: GTheme.fontCaption
                     color: GTheme.textRegular
-                    wrapMode: Text.WordWrap
-                    textFormat: Text.RichText
-                    text: qsTr("• The RPC port is used for communication between the application and Aria2 engine<br>" +
-                              "• Default port is <b>16888</b><br>" +
-                              "• The RPC secret is used for authentication between the application and Aria2 engine<br>" +
-                              "• The RPC secret is generated automatically on first launch<br>" +
-                              "• It's recommended to use a strong random secret for security<br>" +
-                              "• Make sure the port is not used by other applications<br>" +
-                              "• <b style='color: %1'>⚠️ You MUST restart the application after changing the port or secret!</b><br>" +
-                              "• Choose a port number between 1024 and 65535<br>" +
-                              "• Changes are saved immediately but only take effect after restart").arg(GTheme.warningColor)
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+
+            GButton {
+                text: qsTr("Generate Random")
+                type: 3  // 次要按钮(default 样式)
+                Layout.preferredWidth: aria2RpcSettingPage.buttonWidth
+                onClicked: {
+                    secretInput.text = SettingsManager.GenerateRpcSecret()
                 }
             }
         }
+    }
+
+    // 操作区:暂存-保存派 Reset/Save + 状态提示(spec 2.3)
+    SettingFormActions {
+        id: formActions
+        Layout.fillWidth: true
+        Layout.topMargin: GTheme.spaceLG
+        buttonWidth: aria2RpcSettingPage.buttonWidth
+        defaultStatusText: ""
+        hasChanges: (parseInt(portInput.text) !== SettingsManager.qRpcListenPort) ||
+                    (secretInput.text.trim() !== SettingsManager.qRpcSecret)
+
+        onReset: {
+            let randomSecret = SettingsManager.GenerateRpcSecret()
+            portInput.text = "16888"
+            secretInput.text = randomSecret
+            SettingsManager.SetRpcListenPort(16888)
+            SettingsManager.SetRpcSecret(randomSecret)
+
+            ToastManager.ShowWarning(
+                qsTr("RPC settings reset to default. Please restart the application!"),
+                5000
+            )
+
+            formActions.statusText = qsTr("✓ Settings reset to default (Restart required)")
+            formActions.statusColor = GTheme.warningColor
+        }
+
+        onSave: {
+            // 验证端口
+            let portValue = parseInt(portInput.text)
+            // 空输入时 parseInt 返回 NaN,NaN 的所有比较均为 false 会绕过校验,必须显式判断
+            if (isNaN(portValue) || portValue < 1024 || portValue > 65535) {
+                formActions.statusText = qsTr("✗ Invalid port. Please enter a value between 1024 and 65535.")
+                formActions.statusColor = GTheme.dangerColor
+                ToastManager.ShowError(qsTr("Invalid port number!"), 3000)
+                return
+            }
+
+            // 验证密钥
+            if (secretInput.text.trim() === "") {
+                formActions.statusText = qsTr("✗ Secret cannot be empty!")
+                formActions.statusColor = GTheme.dangerColor
+                ToastManager.ShowError(qsTr("Secret cannot be empty!"), 3000)
+                return
+            }
+
+            // 检查是否有更改
+            let originalPort = SettingsManager.qRpcListenPort
+            let originalSecret = SettingsManager.qRpcSecret
+            let hasChanges = (portValue !== originalPort) || (secretInput.text.trim() !== originalSecret)
+
+            // 显示 Toast 通知
+            if (hasChanges) {
+                ToastManager.ShowSuccess(
+                    qsTr("✓ RPC settings saved successfully! Please restart the application to apply changes."),
+                    5000
+                )
+                formActions.statusText = qsTr("✓ Settings saved: Port=%1, Secret updated (Restart required)").arg(portValue)
+                formActions.statusColor = GTheme.successColor
+                // 保存设置
+                SettingsManager.SetRpcListenPort(portValue)
+                SettingsManager.SetRpcSecret(secretInput.text.trim())
+                UtilsToolsManager.RelaunchAfterExit(3000)
+                Qt.quit()
+            } else {
+                ToastManager.ShowInfo(qsTr("No changes detected."), 2000)
+                formActions.statusText = qsTr("Settings unchanged.")
+                formActions.statusColor = GTheme.textSecondary
+            }
+        }
+    }
+
+    // 重要信息提示框:端口/密钥使用说明与重启要求(告警框→AlertTip,spec 2.4)
+    AlertTip {
+        Layout.fillWidth: true
+        severity: "info"
+        text: qsTr("• The RPC port is used for communication between the application and Aria2 engine\n" +
+                   "• Default port is 16888\n" +
+                   "• The RPC secret is used for authentication between the application and Aria2 engine\n" +
+                   "• The RPC secret is generated automatically on first launch\n" +
+                   "• It's recommended to use a strong random secret for security\n" +
+                   "• Make sure the port is not used by other applications\n" +
+                   "• ⚠️ You MUST restart the application after changing the port or secret!\n" +
+                   "• Choose a port number between 1024 and 65535\n" +
+                   "• Changes are saved immediately but only take effect after restart")
     }
 }

@@ -5,16 +5,13 @@ import "./BrowserExtension"
 import "../CommonComponents"
 import gdl.sdk
 
-// 实验功能页面 - 浏览器插件引导
+// 实验功能页面 - 浏览器插件引导(A 类整页容器)
+// 颜色/尺寸/间距/字号/动效一律取自 GTheme 令牌,零魔法数字
+// 4 个 BrowserExtension 子卡片为独立组件,本页仅做布局编排,不重复卡片骨架
 Rectangle {
     id: labSetting
     color: GTheme.bgPage
     clip: true
-
-    // Element Plus 设计标准
-    readonly property int standardSpacing: 16
-    readonly property int cardSpacing: 12
-    readonly property int contentMargin: 2
 
     ScrollView {
         id: scrollView
@@ -22,54 +19,55 @@ Rectangle {
         ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
         clip: true
         contentWidth: availableWidth
-        contentHeight: columnLayout.implicitHeight + 40
+        // 底部留白:2 倍大间距 + 小间距,保证内容可完整滚动
+        contentHeight: columnLayout.implicitHeight + GTheme.spaceLG * 2 + GTheme.spaceSM
 
         ColumnLayout {
             id: columnLayout
             width: scrollView.availableWidth
-            spacing: labSetting.cardSpacing
+            spacing: GTheme.spaceMD
             anchors.margins: 0
-            anchors.topMargin: labSetting.standardSpacing
+            anchors.topMargin: GTheme.spaceLG
 
             // 页面标题和描述
             ColumnLayout {
                 Layout.fillWidth: true
-                Layout.leftMargin: labSetting.contentMargin + 16
-                Layout.rightMargin: labSetting.contentMargin + 16
-                spacing: 8
+                Layout.leftMargin: GTheme.spaceLG
+                Layout.rightMargin: GTheme.spaceLG
+                spacing: GTheme.spaceSM
 
                 RowLayout {
-                    spacing: 12
+                    spacing: GTheme.spaceMD
 
                     Text {
-                        text: "\uEA86"  // extension/puzzle icon
+                        text: ""  // extension/puzzle icon
                         font.family: "Segoe Fluent Icons"
-                        font.pixelSize: 28
+                        font.pixelSize: 28  // 图标尺寸,保留(非设计令牌)
                         color: GTheme.primaryColor
                     }
 
                     Text {
                         text: qsTr("Browser Extension")
-                        font.pixelSize: 20
-                        font.weight: Font.Bold
+                        font.pixelSize: GTheme.fontTitle
+                        font.weight: GTheme.weightDemiBold
                         color: GTheme.textPrimary
                     }
                 }
 
                 Text {
                     text: qsTr("Enhance your download experience with our browser extension. Capture links from any webpage and send them directly to GDownload.")
-                    font.pixelSize: 13
+                    font.pixelSize: GTheme.fontBody
                     color: GTheme.textSecondary
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
                     lineHeight: 1.5
                 }
 
-                // 分隔线
+                // 分隔线(色 borderLight)
                 Divider {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 1
-                    Layout.topMargin: 8
+                    Layout.topMargin: GTheme.spaceSM
                     color: GTheme.borderLight
                 }
             }
@@ -77,30 +75,30 @@ Rectangle {
             // 功能亮点卡片
             FeatureHighlightCard {
                 Layout.fillWidth: true
-                Layout.leftMargin: labSetting.contentMargin
-                Layout.rightMargin: labSetting.contentMargin
+                Layout.leftMargin: GTheme.spaceLG
+                Layout.rightMargin: GTheme.spaceLG
             }
 
             // 安装指南卡片
             InstallationGuideCard {
                 Layout.fillWidth: true
-                Layout.leftMargin: labSetting.contentMargin
-                Layout.rightMargin: labSetting.contentMargin
+                Layout.leftMargin: GTheme.spaceLG
+                Layout.rightMargin: GTheme.spaceLG
             }
 
             // 配置助手卡片
             ConfigHelperCard {
                 Layout.fillWidth: true
-                Layout.leftMargin: labSetting.contentMargin
-                Layout.rightMargin: labSetting.contentMargin
+                Layout.leftMargin: GTheme.spaceLG
+                Layout.rightMargin: GTheme.spaceLG
             }
 
             // FAQ 卡片
             FAQCard {
                 Layout.fillWidth: true
-                Layout.leftMargin: labSetting.contentMargin
-                Layout.rightMargin: labSetting.contentMargin
-                Layout.bottomMargin: labSetting.standardSpacing
+                Layout.leftMargin: GTheme.spaceLG
+                Layout.rightMargin: GTheme.spaceLG
+                Layout.bottomMargin: GTheme.spaceLG
             }
         }
     }

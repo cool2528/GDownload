@@ -21,6 +21,10 @@
         <file>qml/CommonComponents/GProgressBar.qml</file>
         <file>qml/CommonComponents/GCard.qml</file>
         <file>qml/CommonComponents/GElevation.qml</file>
+        <file>qml/CommonComponents/SettingCard.qml</file>
+        <file>qml/CommonComponents/SettingRow.qml</file>
+        <file>qml/CommonComponents/SettingFormActions.qml</file>
+        <file>qml/CommonComponents/AlertTip.qml</file>
         <file>qml/CommonComponents/Divider.qml</file>
         <file>qml/Browser/SettingPageTitle.qml</file>
         <file>qml/Browser/BasicSettingPage.qml</file>

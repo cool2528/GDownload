@@ -294,6 +294,67 @@ namespace gdl {
 				}
 			}
 
+			// 告警语义令牌实现:浅色复用 Status::* 色阶常量,暗色按 spec Section 1.2 表
+			QColor GTheme::bgInfo() const {
+				return dark() ? QColor("#1D1D1D")
+							  : QColor(ElementPlusColors::Status::kInfoLight9);
+			}
+
+			QColor GTheme::borderInfo() const {
+				return dark() ? QColor("#313134")
+							  : QColor(ElementPlusColors::Status::kInfoLight7);
+			}
+
+			QColor GTheme::textInfo() const {
+				return dark() ? QColor(ElementPlusColors::VSCodeDark::kTextSecondary)
+							  : QColor(ElementPlusColors::Status::kInfo);
+			}
+
+			QColor GTheme::bgSuccess() const {
+				return dark() ? QColor("#16281B")
+							  : QColor(ElementPlusColors::Status::kSuccessLight9);
+			}
+
+			QColor GTheme::borderSuccess() const {
+				return dark() ? QColor("#1B3A23")
+							  : QColor(ElementPlusColors::Status::kSuccessLight7);
+			}
+
+			QColor GTheme::textSuccess() const {
+				// 浅暗色均为 Element Plus success 主色
+				return QColor(ElementPlusColors::Status::kSuccess);
+			}
+
+			QColor GTheme::bgWarning() const {
+				return dark() ? QColor("#292418")
+							  : QColor(ElementPlusColors::Status::kWarningLight9);
+			}
+
+			QColor GTheme::borderWarning() const {
+				return dark() ? QColor("#3A2F18")
+							  : QColor(ElementPlusColors::Status::kWarningLight7);
+			}
+
+			QColor GTheme::textWarning() const {
+				// 浅暗色均为 Element Plus warning 主色
+				return QColor(ElementPlusColors::Status::kWarning);
+			}
+
+			QColor GTheme::bgDanger() const {
+				return dark() ? QColor("#2B1A1A")
+							  : QColor(ElementPlusColors::Status::kDangerLight9);
+			}
+
+			QColor GTheme::borderDanger() const {
+				return dark() ? QColor("#3A2222")
+							  : QColor(ElementPlusColors::Status::kDangerLight7);
+			}
+
+			QColor GTheme::textDanger() const {
+				// 浅暗色均为 Element Plus danger 主色
+				return QColor(ElementPlusColors::Status::kDanger);
+			}
+
 			// 阴影层级:对应 Element Plus box-shadow 四档,深浅色取色不同
 			static QVariantMap makeElevation(const QColor& color, int blur, int offsetY, int spread = 0) {
 				QVariantMap m;
