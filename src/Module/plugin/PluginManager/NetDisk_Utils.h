@@ -35,7 +35,8 @@ namespace gdl {
                 return *this;
             }
 
-            CookiesUtils& operator+(const CookiesUtils& other) noexcept {
+            // +=/-= 修改自身并返回引用；+/- 返回新对象，符合惯用语义。
+            CookiesUtils& operator+=(const CookiesUtils& other) {
                 for (const auto& [key, value] : other.cookies_map_) {
                     cookies_map_[key] = value;
                 }
@@ -43,7 +44,7 @@ namespace gdl {
                 return *this;
             }
 
-            CookiesUtils& operator-(const CookiesUtils& other) noexcept {
+            CookiesUtils& operator-=(const CookiesUtils& other) {
                 for (const auto& [key, value] : other.cookies_map_) {
                     cookies_map_.erase(key);
                 }
@@ -51,9 +52,16 @@ namespace gdl {
                 return *this;
             }
 
-            ~CookiesUtils() {
-                cookies_.clear();
-                cookies_map_.clear();
+            CookiesUtils operator+(const CookiesUtils& other) const {
+                CookiesUtils tmp(*this);
+                tmp += other;
+                return tmp;
+            }
+
+            CookiesUtils operator-(const CookiesUtils& other) const {
+                CookiesUtils tmp(*this);
+                tmp -= other;
+                return tmp;
             }
 
             bool HasCookie(const std::string& key) const {

@@ -52,11 +52,11 @@ class INetDiskDownloadPlugin {
     struct FileInfo {
         std::string path;
         std::string name;
-        size_t size;
-        bool is_dir;
-        FileType type;
+        size_t size{0};
+        bool is_dir{false};
+        FileType type{FileType::FILE};
         std::string file_id;
-        std::uint64_t create_time;
+        std::uint64_t create_time{0};
 		std::string root_path;
     };
 

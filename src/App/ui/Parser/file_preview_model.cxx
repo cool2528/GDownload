@@ -72,6 +72,7 @@ namespace gdl {
             }
 
             void FilePreviewModel::selectAll() {
+                if (files_.isEmpty()) return;  // 空列表保护，避免 index(-1) 无效索引
                 for (auto& file : files_) {
                     file.is_selected = true;
                 }
@@ -80,6 +81,7 @@ namespace gdl {
             }
 
             void FilePreviewModel::unselectAll() {
+                if (files_.isEmpty()) return;
                 for (auto& file : files_) {
                     file.is_selected = false;
                 }

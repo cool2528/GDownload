@@ -165,12 +165,10 @@ namespace gdl {
         BaiduPcsApi::~BaiduPcsApi() {}
 
         void BaiduPcsApi::InitRequestConfig() {
+            // 旧实现通过 cpr::priv::set_ssl_option 禁用了证书校验并强制 TLSv1.0，
+            // 且 use_debug_settings_ 恒为 false 使该分支永不生效（死代码）。
+            // 删除：保留默认的安全 TLS 配置，避免中间人攻击风险与对 cpr 私有 API 的强耦合。
             use_debug_settings_ = false;
-            ssl_opts_			= cpr::Ssl(cpr::ssl::TLSv1_0{});
-            cpr::priv::set_ssl_option(ssl_opts_, cpr::ssl::VerifyPeer(false), cpr::ssl::VerifyHost(false));
-            if (use_debug_settings_) {
-                proxy_settings_ = {{"http", "http://127.0.0.1:8866"}, {"https", "http://127.0.0.1:8866"}};
-            }
         }
 
         std::optional<std::vector<INetDiskDownloadPlugin::FileInfo>> BaiduPcsApi::ParseShareUrl(
@@ -554,6 +552,13 @@ namespace gdl {
 								file_info.is_dir = item["isdir"].get<std::uint64_t>() == 1;
 							}
                         }
+                        // 必填字段缺失时跳过该文件，避免单个异常项让整批解析返回 nullopt
+                        if (!item.contains("server_filename") || !item["server_filename"].is_string()) {
+                            continue;
+                        }
+                        if (!item.contains("path") || !item["path"].is_string()) {
+                            continue;
+                        }
                         file_info.name = item["server_filename"].get<std::string>();
                         file_info.path = item["path"].get<std::string>();
 						if (item.contains("size")) {
@@ -830,9 +835,8 @@ namespace gdl {
         }
 
         void BaiduPcsApi::ClearCookies() {
-            while (baidu_cookies_.begin() != baidu_cookies_.end()) {
-                baidu_cookies_.pop_back();
-            }
+            // cpr::Cookies 没有 clear()，用赋空对象的方式清空，避免逐个 pop_back 的 O(n²) 开销
+            baidu_cookies_ = cpr::Cookies{};
         }
 
         bool BaiduPcsApi::ExtractShareInfo(const std::string& html_content) {

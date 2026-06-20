@@ -24,7 +24,13 @@ namespace gdl {
                     QString key		  = i.key();
                     auto setting	  = i.value();
                     std::string value = config::GetValue(key.toStdString()).AsString();
-                    setting->Put(QString::fromStdString(value));
+                    if (value.empty()) {
+                        // 配置缺失（首次运行或配置损坏）时使用各 Setting 自身的默认值，
+                        // 否则端口、主题、并发数等会得到空值/零值而非 Default() 定义的值。
+                        setting->Default();
+                    } else {
+                        setting->Put(QString::fromStdString(value));
+                    }
                 }
                 Save();
                 return true;
@@ -33,7 +39,7 @@ namespace gdl {
             void Settings::UnInit() {
                 Save();
             }
-            Settings::Settings(QObject* parent) {}
+            Settings::Settings(QObject* parent) : QObject(parent) {}
 
             QString Settings::GenerateRpcSecret() const
             {
