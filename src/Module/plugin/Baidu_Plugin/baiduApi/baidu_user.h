@@ -3,6 +3,8 @@
 #include <openssl/md5.h>
 #include <openssl/sha.h>
 #include <algorithm>
+#include <cctype>
+#include <cstdint>
 #include <ctime>
 #include <iomanip>
 #include <map>
@@ -381,13 +383,14 @@ namespace gdl {
         }
 
        inline static std::string sum_IMEI(const std::string& key) {
-            int64_t hs = 53202347234687234;
-            for (char k : key) {
-                hs += (hs << 5) + static_cast<int>(k);
+            // 改用无符号类型做哈希：有符号整数溢出是 UB，无符号溢出是良定义的回绕。
+            uint64_t hs = 53202347234687234ULL;
+            for (unsigned char k : key) {
+                hs += (hs << 5) + k;
             }
-            hs %= static_cast<int64_t>(1e15);
-            if (hs < static_cast<int64_t>(1e14)) {
-                hs += static_cast<int64_t>(1e14);
+            hs %= static_cast<uint64_t>(1e15);
+            if (hs < static_cast<uint64_t>(1e14)) {
+                hs += static_cast<uint64_t>(1e14);
             }
             return std::to_string(hs);
         }
@@ -397,11 +400,12 @@ namespace gdl {
                 return "S3";
             }
 
-            int hs = 2134;
-            for (char k : key) {
-                hs += (hs << 4) + static_cast<int>(k);
+            // 改用无符号类型做哈希，避免有符号溢出 UB
+            unsigned int hs = 2134;
+            for (unsigned char k : key) {
+                hs += (hs << 4) + k;
             }
-            hs %= PHONE_MODEL_DATABASE.size();
+            hs %= static_cast<unsigned int>(PHONE_MODEL_DATABASE.size());
             return PHONE_MODEL_DATABASE[hs];
         }
 
@@ -410,15 +414,16 @@ namespace gdl {
 			escaped.fill('0');
 			escaped << std::hex;
 
-			for (char c : value) {
-				if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+			for (unsigned char c : value) {
+				// 用 unsigned char 遍历，避免对负 char 调用 isalnum 的 UB
+				if (std::isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
 					escaped << c;
 				}
 				else if (c == ' ') {
 					escaped << '+';
 				}
 				else {
-					escaped << '%' << std::setw(2) << int((unsigned char)c);
+					escaped << '%' << std::setw(2) << int(c);
 				}
 			}
 			return escaped.str();
@@ -476,7 +481,8 @@ namespace gdl {
                                        {"client_logid", timestamp + "416"},
                                        {"Connection", "Keep-Alive"}};
 
-                cpr::Response resp = cpr::Post(cpr::Url{"http://tieba.baidu.com/c/s/login"}, headers,
+                // 使用 HTTPS 传输 BDUSS 等长期登录凭证，避免明文 HTTP 被中间人截获导致账号被盗
+                cpr::Response resp = cpr::Post(cpr::Url{"https://tieba.baidu.com/c/s/login"}, headers,
                                                payload);
 
                 if (resp.status_code == 200) {

@@ -7,6 +7,13 @@
 namespace gdl {
 	namespace cache {
 
+		// 安全读取 SQLite 文本列：列值为 NULL 时返回空串，避免用 nullptr 构造 std::string 的 UB。
+		inline std::string ColumnText(sqlite3_stmt* stmt, int col) {
+			const auto* p = sqlite3_column_text(stmt, col);
+			return p ? reinterpret_cast<const char*>(p) : std::string{};
+		}
+
+
 		class DownloadHistoryCache::Impl {
 		   public:
 			~Impl() {
@@ -19,10 +26,10 @@ namespace gdl {
 			// Convert SQLite statement to DownloadRecord object
 			DownloadRecord RecordFromStatement(sqlite3_stmt* stmt) {
 				DownloadRecord record;
-				record.task_id		   = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
-				record.file_name	   = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
-				record.save_path	   = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
-				record.download_url	   = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+				record.task_id		   = ColumnText(stmt, 0);
+				record.file_name	   = ColumnText(stmt, 1);
+				record.save_path	   = ColumnText(stmt, 2);
+				record.download_url	   = ColumnText(stmt, 3);
 				record.total_size	   = sqlite3_column_int64(stmt, 4);
 				record.downloaded_size = sqlite3_column_int64(stmt, 5);
 				record.download_speed  = sqlite3_column_int(stmt, 6);
@@ -30,12 +37,7 @@ namespace gdl {
 				record.state		   = static_cast<DownloadState>(sqlite3_column_int(stmt, 8));
 				record.created_time	   = sqlite3_column_int64(stmt, 9);
 				record.completed_time  = sqlite3_column_int64(stmt, 10);
-
-				// Get error message if exists
-				const unsigned char* error_msg = sqlite3_column_text(stmt, 11);
-				if (error_msg) {
-					record.error_message = reinterpret_cast<const char*>(error_msg);
-				}
+				record.error_message   = ColumnText(stmt, 11);
 
 				return record;
 			}
@@ -50,7 +52,11 @@ namespace gdl {
 
 				int rc = sqlite3_open(db_path.c_str(), &db_);
 				if (rc) {
+					// 即使打开失败 db_ 也可能非 NULL，必须 close 并置空，
+					// 否则后续 Initialize 会误判已初始化，所有操作静默失败。
 					LOG_ERR("Can't open database: {}", sqlite3_errmsg(db_));
+					sqlite3_close(db_);
+					db_ = nullptr;
 					return false;
 				}
 
@@ -417,7 +423,10 @@ namespace gdl {
 
 				int rc = sqlite3_open(db_path.c_str(), &db_);
 				if (rc) {
+					// 即使打开失败 db_ 也可能非 NULL，必须 close 并置空。
 					LOG_ERR("Can't open database: {}", sqlite3_errmsg(db_));
+					sqlite3_close(db_);
+					db_ = nullptr;
 					return false;
 				}
 
@@ -454,9 +463,9 @@ namespace gdl {
 
 			TrackerETagEntry EntryFromStatement(sqlite3_stmt* stmt) {
 				TrackerETagEntry entry;
-				entry.url = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
-				entry.etag = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
-				entry.content = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+				entry.url = ColumnText(stmt, 0);
+				entry.etag = ColumnText(stmt, 1);
+				entry.content = ColumnText(stmt, 2);
 				entry.timestamp = sqlite3_column_int64(stmt, 3);
 				return entry;
 			}

@@ -88,10 +88,16 @@ namespace gdl {
                     unique_urls.append(normalized);
                 }
 
-                clipboard_text_.clear();
+                // 与上次内容比较去重：内容未变化时不重复发射信号，
+                // 避免重复复制相同 URL 反复弹下载提示、以及非 URL 操作触发空信号。
+                QString new_text;
                 if (!unique_urls.isEmpty()) {
-                    clipboard_text_ = unique_urls.join("\n");
+                    new_text = unique_urls.join("\n");
                 }
+                if (new_text == clipboard_text_) {
+                    return;
+                }
+                clipboard_text_ = new_text;
                 Q_EMIT clipboardChanged(clipboard_text_);
             }
 
