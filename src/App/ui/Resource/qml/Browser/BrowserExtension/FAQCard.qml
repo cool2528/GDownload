@@ -5,45 +5,48 @@ import "../../CommonComponents"
 import gdl.sdk
 
 // 常见问题卡片 - FAQ 和支持信息
+// 颜色/尺寸/间距/字号/动效一律取自 GTheme 令牌,零魔法数字
+// 图标字形尺寸/链接项尺寸/Toast 时长为本地业务常量,非设计令牌(已注释标注)
 GCard {
     id: faqCard
     Layout.fillWidth: true
-    Layout.preferredHeight: contentLayout.implicitHeight + 48
+    // 高度 = 内容隐式高度 + 上下内边距(单层 spaceLG,消除原双重 16 边距)
+    Layout.preferredHeight: contentLayout.implicitHeight + GTheme.spaceLG * 2
     outlined: true
-    padding: 16
+    padding: GTheme.spaceLG
 
     ColumnLayout {
         id: contentLayout
         anchors.fill: parent
-        anchors.margins: 16
-        spacing: 20
+        anchors.margins: 0
+        spacing: GTheme.spaceXL
 
         // 卡片标题
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: 4
+            spacing: GTheme.spaceXS
 
             RowLayout {
-                spacing: 8
+                spacing: GTheme.spaceSM
 
                 Text {
                     text: "\uE897"  // help-circle icon
                     font.family: "Segoe Fluent Icons"
-                    font.pixelSize: 18
+                    font.pixelSize: 18  // 图标尺寸,保留(非设计令牌)
                     color: GTheme.primaryColor
                 }
 
                 Text {
                     text: qsTr("Frequently Asked Questions")
-                    font.pixelSize: 16
-                    font.weight: Font.Medium
+                    font.pixelSize: GTheme.fontSubtitle
+                    font.weight: GTheme.weightMedium
                     color: GTheme.textPrimary
                 }
             }
 
             Text {
                 text: qsTr("Find answers to common questions")
-                font.pixelSize: 12
+                font.pixelSize: GTheme.fontCaption
                 color: GTheme.textSecondary
             }
         }
@@ -51,7 +54,7 @@ GCard {
         // FAQ 列表
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: 12
+            spacing: GTheme.spaceMD
 
             // FAQ 1
             FAQItem {
@@ -96,7 +99,7 @@ GCard {
             }
         }
 
-        // 分隔线
+        // 分隔线(色 borderLight)
         Divider {
             Layout.fillWidth: true
             Layout.preferredHeight: 1
@@ -106,22 +109,22 @@ GCard {
         // 需要更多帮助
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: 12
+            spacing: GTheme.spaceMD
 
             Text {
                 text: qsTr("📖 Need more help?")
-                font.pixelSize: 13
-                font.weight: Font.Medium
+                font.pixelSize: GTheme.fontBody
+                font.weight: GTheme.weightMedium
                 color: GTheme.textPrimary
             }
 
             RowLayout {
-                spacing: 20
+                spacing: GTheme.spaceXL
                 Layout.fillWidth: true
 
                 // GitHub 问题
                 HelpLinkItem {
-                    icon: "\uebef"  // github icon
+                    icon: "\uEBEF"  // github icon
                     label: qsTr("GitHub Issues")
                     description: qsTr("Report bugs")
                     onClicked: {
@@ -132,7 +135,7 @@ GCard {
 
                 // 官方文档
                 HelpLinkItem {
-                    icon: "\ue85d"  // book icon
+                    icon: "\uE85D"  // book icon
                     label: qsTr("Documentation")
                     description: qsTr("Full user guide")
                     onClicked: {
@@ -143,7 +146,7 @@ GCard {
 
                 // 官网
                 HelpLinkItem {
-                    icon: "\ue86f"  // globe icon
+                    icon: "\uE86F"  // globe icon
                     label: qsTr("Official Website")
                     description: qsTr("Visit gdownload.uk")
                     onClicked: {
@@ -157,37 +160,39 @@ GCard {
         // 社区支持
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: communityLayout.implicitHeight + 20
-            color: Qt.rgba(GTheme.primaryColor.r, GTheme.primaryColor.g, GTheme.primaryColor.b, 0.05)
-            radius: 6
+            // 高度 = 内容隐式高度 + 上下内边距(单层 spaceLG)
+            Layout.preferredHeight: communityLayout.implicitHeight + GTheme.spaceLG * 2
+            // 主色淡底:浅色用 primaryLight(9),深色回退 fillLight(替代原 Qt.rgba 透明叠加)
+            color: GTheme.dark ? GTheme.fillLight : GTheme.primaryLight(9)
+            radius: GTheme.radiusBase
 
             ColumnLayout {
                 id: communityLayout
                 anchors.fill: parent
-                anchors.margins: 16
-                spacing: 8
+                anchors.margins: GTheme.spaceLG
+                spacing: GTheme.spaceSM
 
                 RowLayout {
-                    spacing: 8
+                    spacing: GTheme.spaceSM
 
                     Text {
                         text: "\uE716"  // people icon
                         font.family: "Segoe Fluent Icons"
-                        font.pixelSize: 18
+                        font.pixelSize: 18  // 图标尺寸,保留(非设计令牌)
                         color: GTheme.primaryColor
                     }
 
                     Text {
                         text: qsTr("Join Our Community")
-                        font.pixelSize: 13
-                        font.weight: Font.Medium
+                        font.pixelSize: GTheme.fontBody
+                        font.weight: GTheme.weightMedium
                         color: GTheme.textPrimary
                     }
                 }
 
                 Text {
                     text: qsTr("Get help from other users, share tips, and stay updated with the latest features. Star us on GitHub to show your support!")
-                    font.pixelSize: 12
+                    font.pixelSize: GTheme.fontCaption
                     color: GTheme.textRegular
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
@@ -197,9 +202,9 @@ GCard {
                 GButton {
                     text: qsTr("⭐ Star on GitHub")
                     type: 1
-                    Layout.preferredWidth: 140
-                    Layout.preferredHeight: 32
-                    Layout.topMargin: 4
+                    Layout.preferredWidth: 140  // 按钮宽度(本地布局常量,非设计令牌)
+                    Layout.preferredHeight: GTheme.sizeDefault
+                    Layout.topMargin: GTheme.spaceXS
                     onClicked: {
                         Qt.openUrlExternally("https://github.com/cool2528/GDownload")
                         ToastManager.ShowSuccess(qsTr("Thank you for your support!"), 2000)
@@ -214,17 +219,19 @@ GCard {
         property string question: ""
         property string answer: ""
         property bool expanded: false
+        // 折叠态固定高度(本地布局常量,非设计令牌)
+        readonly property int collapsedHeight: 56
 
-        implicitHeight: expanded ? (itemLayout.implicitHeight + 24) : 56
+        implicitHeight: expanded ? (itemLayout.implicitHeight + GTheme.spaceMD * 2) : collapsedHeight
         color: hoverHandler.hovered ? GTheme.fillLighter : GTheme.bgBase
-        radius: 6
+        radius: GTheme.radiusBase
 
         Behavior on implicitHeight {
-            NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+            NumberAnimation { duration: GTheme.durationBase; easing.type: GTheme.easingStandard }
         }
 
         Behavior on color {
-            ColorAnimation { duration: 200 }
+            ColorAnimation { duration: GTheme.durationBase }
         }
 
         HoverHandler {
@@ -234,31 +241,31 @@ GCard {
         ColumnLayout {
             id: itemLayout
             anchors.fill: parent
-            anchors.margins: 12
-            spacing: 8
+            anchors.margins: GTheme.spaceMD
+            spacing: GTheme.spaceSM
 
             // 问题行
             RowLayout {
-                spacing: 12
+                spacing: GTheme.spaceMD
                 Layout.fillWidth: true
 
                 // 展开/收起图标
                 Text {
                     text: expanded ? "\uE70D" : "\uE76C"  // chevron-down / chevron-right
                     font.family: "Segoe Fluent Icons"
-                    font.pixelSize: 20
+                    font.pixelSize: 20  // 图标尺寸,保留(非设计令牌)
                     color: GTheme.primaryColor
 
                     Behavior on rotation {
-                        NumberAnimation { duration: 200 }
+                        NumberAnimation { duration: GTheme.durationBase }
                     }
                 }
 
                 // 问题文本
                 Text {
                     text: question
-                    font.pixelSize: 13
-                    font.weight: Font.Medium
+                    font.pixelSize: GTheme.fontBody
+                    font.weight: GTheme.weightMedium
                     color: GTheme.textPrimary
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
@@ -268,17 +275,17 @@ GCard {
             // 答案（可展开）
             Text {
                 text: answer
-                font.pixelSize: 12
+                font.pixelSize: GTheme.fontCaption
                 color: GTheme.textRegular
                 Layout.fillWidth: true
-                Layout.leftMargin: 32
+                Layout.leftMargin: GTheme.space3XL
                 wrapMode: Text.WordWrap
                 lineHeight: 1.5
                 visible: expanded
                 opacity: expanded ? 1.0 : 0.0
 
                 Behavior on opacity {
-                    NumberAnimation { duration: 200 }
+                    NumberAnimation { duration: GTheme.durationBase }
                 }
             }
         }
@@ -299,9 +306,9 @@ GCard {
         property string description: ""
         signal clicked()
 
-        implicitWidth: 140
-        implicitHeight: 80
-        radius: 6
+        implicitWidth: 140  // 链接项宽度(本地布局常量,非设计令牌)
+        implicitHeight: 80  // 链接项高度(本地布局常量,非设计令牌)
+        radius: GTheme.radiusBase
         color: hovered ? GTheme.fillLight : "transparent"
         border.width: 1
         border.color: GTheme.borderBase
@@ -313,37 +320,37 @@ GCard {
         }
 
         Behavior on color {
-            ColorAnimation { duration: 200 }
+            ColorAnimation { duration: GTheme.durationBase }
         }
 
         ColumnLayout {
             anchors.centerIn: parent
-            spacing: 6
+            spacing: GTheme.spaceSM
 
             Text {
                 text: icon
                 font.family: "Segoe Fluent Icons"
-                font.pixelSize: 24
+                font.pixelSize: 24  // 图标尺寸,保留(非设计令牌)
                 color: GTheme.primaryColor
                 Layout.alignment: Qt.AlignHCenter
 
                 scale: hovered ? 1.15 : 1.0
                 Behavior on scale {
-                    NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+                    NumberAnimation { duration: GTheme.durationBase; easing.type: GTheme.easingStandard }
                 }
             }
 
             Text {
                 text: label
-                font.pixelSize: 12
-                font.weight: Font.Medium
+                font.pixelSize: GTheme.fontCaption
+                font.weight: GTheme.weightMedium
                 color: GTheme.textPrimary
                 Layout.alignment: Qt.AlignHCenter
             }
 
             Text {
                 text: description
-                font.pixelSize: 11
+                font.pixelSize: GTheme.fontCaption
                 color: GTheme.textSecondary
                 Layout.alignment: Qt.AlignHCenter
             }

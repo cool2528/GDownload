@@ -1,12 +1,16 @@
 import QtQuick
-import gdl.sdk 1.0
-import QtQuick.Layouts
 import "../CommonComponents"
+import gdl.sdk
 
-// Element Plus 风格页面标题
+// Element Plus 风格页面标题(仅用于 3 个主页:Basic/Advanced/Lab)
+// type:0=Basic / 1=Advanced / 2=Lab;其余子页用各自 SettingCard 标题,不用本组件
+// 颜色/尺寸/间距/字号一律取自 GTheme 令牌,零魔法数字
 Item {
     property int type: 0
-    height: 56  // Element Plus 标准页面标题高度
+
+    // 标题区固定高度:标题字号 + 描述字号 + 行间留白(令牌组合,保留原视觉高度)
+    height: GTheme.fontTitle + GTheme.fontBody + GTheme.space2XL
+
     // Element Plus 风格标题文本
     Text {
         id: titleText
@@ -21,8 +25,8 @@ Item {
                 return qsTr("Lab Settings")
             }
         }
-        font.pixelSize: 20
-        font.weight: Font.Medium
+        font.pixelSize: GTheme.fontTitle
+        font.weight: GTheme.weightMedium
         color: GTheme.textPrimary
     }
 
@@ -31,7 +35,7 @@ Item {
         id: descriptionText
         anchors.left: parent.left
         anchors.top: titleText.bottom
-        anchors.topMargin: 4
+        anchors.topMargin: GTheme.spaceXS
         text: {
             if (type === 0) {
                 return qsTr("Configure basic download preferences")
@@ -41,15 +45,17 @@ Item {
                 return qsTr("Experimental features and settings")
             }
         }
-        font.pixelSize: 14
+        font.pixelSize: GTheme.fontBody
         color: GTheme.textSecondary
         visible: text.length > 0
     }
-    // Element Plus 风格分隔线
+
+    // Element Plus 风格分隔线(统一 Divider,色 borderLight)
     Divider {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottomMargin: 8
+        anchors.bottomMargin: GTheme.spaceSM
+        color: GTheme.borderLight
     }
 }

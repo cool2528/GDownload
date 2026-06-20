@@ -193,13 +193,13 @@ Popup {
             case GMessage.Primary:
                 return GTheme.primaryLight(8)
             case GMessage.Success:
-                return GTheme.successLight(8)
+                return GTheme.bgSuccess
             case GMessage.Warning:
-                return GTheme.warningLight(8)
+                return GTheme.bgWarning
             case GMessage.Info:
-                return GTheme.infoLight(8)
+                return GTheme.bgInfo
             case GMessage.Error:
-                return GTheme.dangerLight(8)
+                return GTheme.bgDanger
             default:
                 return GTheme.bgWhite
         }
