@@ -22,18 +22,18 @@ namespace gdl {
 			this->msg_	= other.msg_;
 			return *this;
 		}
-		Error(Error&& other) { *this = other; }
-		Error& operator=(Error&& other) {
-			this->code_ = std::move(other.code_);
+		Error(Error&& other) noexcept { *this = std::move(other); }
+		Error& operator=(Error&& other) noexcept {
+			this->code_ = other.code_;
 			this->msg_	= std::move(other.msg_);
 			return *this;
 		}
 		std::int64_t Code() const { return code_; }
-		const char* what() const { return msg_.data(); }
+		const char* what() const { return msg_.c_str(); }
 
 	   private:
 		std::int64_t code_{0};
-		std::string_view msg_;
+		std::string msg_;
 	};
 
 	template <typename T>

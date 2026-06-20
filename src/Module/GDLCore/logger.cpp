@@ -43,9 +43,11 @@ namespace gdl {
 		return true;
 	}
 	bool ShutdownLoggers() {
+		// 先置标志阻止新日志写入，再 flush + shutdown，
+		// 避免 shutdown 期间其他线程仍调用 spdlog 造成数据竞争或访问已析构 registry。
+		kIsShutdown = true;
 		spdlog::apply_all([](std::shared_ptr<spdlog::logger> logger) { logger->flush(); });
 		spdlog::shutdown();
-		kIsShutdown = true;
 		return true;
 	}
 

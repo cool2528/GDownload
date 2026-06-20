@@ -80,7 +80,30 @@ namespace gdl {
 		}  // namespace
 
 		ApplicationConfig::~ApplicationConfig() {
-			Save();
+			// 程序退出阶段 spdlog 可能已析构，且其他线程可能仍持有锁。
+			// 用 try_lock 避免死锁，直接原子写文件，不调用依赖 spdlog 的 Save()。
+			try {
+				std::unique_lock lock(mutex_, std::defer_lock);
+				if (lock.try_lock()) {
+					std::string tmp_path = config_file_path_ + ".tmp";
+					{
+						std::ofstream config(tmp_path, std::ios::trunc | std::ios::binary);
+						if (config.is_open()) {
+							config << toml_root_;
+							config.flush();
+						}
+					}
+					std::error_code ec;
+					if (std::filesystem::exists(tmp_path, ec)) {
+						std::filesystem::rename(tmp_path, config_file_path_, ec);
+						if (ec) {
+							std::filesystem::remove(tmp_path, ec);
+						}
+					}
+				}
+			} catch (...) {
+				// 析构中吞掉所有异常
+			}
 		}
 
 		std::string ApplicationConfig::GetTrackerServerUrlByName(const std::string& name) {
@@ -210,12 +233,29 @@ namespace gdl {
 				if (!EnsureConfigFileExists()) {
 					return false;
 				}
-				std::ofstream config(config_file_path_, std::ios::trunc);
-				if (!config.is_open()) {
-					LOG_ERR("Failed to open config file for writing: {}", config_file_path_);
+				// 原子写入：先写临时文件再重命名，避免写入过程中崩溃/断电导致
+				// 配置文件被截断而丢失全部用户配置。
+				std::string tmp_path = config_file_path_ + ".tmp";
+				{
+					std::ofstream config(tmp_path, std::ios::trunc | std::ios::binary);
+					if (!config.is_open()) {
+						LOG_ERR("Failed to open config file for writing: {}", tmp_path);
+						return false;
+					}
+					config << toml_root_;
+					config.flush();
+					if (!config.good()) {
+						LOG_ERR("Failed to write config file: {}", tmp_path);
+						return false;
+					}
+				}
+				std::error_code ec;
+				std::filesystem::rename(tmp_path, config_file_path_, ec);
+				if (ec) {
+					LOG_ERR("Failed to rename config file: {}", ec.message());
+					std::filesystem::remove(tmp_path, ec);
 					return false;
 				}
-				config << toml_root_;
 			} catch (std::exception& e) {
 				LOG_ERR("save toml fail error {}", e.what());
 				return false;

@@ -11,6 +11,7 @@ namespace gdl {
         NetWorkDiskModel::~NetWorkDiskModel() {}
 
         int NetWorkDiskModel::rowCount(const QModelIndex& parent) const {
+            if (parent.isValid()) return 0;  // 扁平列表，父项有效时无子项
             return files_.size();
         }
 
@@ -74,6 +75,7 @@ namespace gdl {
         }
 
         void NetWorkDiskModel::SelectAll() {
+            if (files_.isEmpty()) return;  // 空列表时 index(-1) 为无效索引，避免违反模型契约
             for (auto& file : files_) {
                 file.is_selected = true;
             }
@@ -81,6 +83,7 @@ namespace gdl {
         }
 
         void NetWorkDiskModel::UnselectAll() {
+            if (files_.isEmpty()) return;
             for (auto& file : files_) {
                 file.is_selected = false;
             }

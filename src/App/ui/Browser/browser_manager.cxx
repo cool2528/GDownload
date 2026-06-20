@@ -776,7 +776,7 @@ namespace gdl {
 										}
 										if (!file_path.isEmpty()) break;
 									}
-									if (file_path.isEmpty()) return;
+									if (file_path.isEmpty()) continue;  // BT/元数据阶段可能无路径，跳过此任务而非退出整个函数
 									task_info.set_task_download_speed(download_speed);
 									task_info.set_task_id(task_id);
 									task_info.set_task_current_size(completed_length);
@@ -938,8 +938,8 @@ namespace gdl {
 					nlohmann::json doc = nlohmann::json::parse(msg);
 					if (doc.is_object()) {
 						if (doc.contains("totalLength") && doc.contains("completedLength")) {
-							std::int64_t total_length	  = doc["totalLength"].get<std::int64_t>();
-							std::int64_t completed_length = doc["completedLength"].get<std::int64_t>();
+							std::int64_t total_length	  = doc["totalLength"].is_string() ? std::stoll(doc["totalLength"].get<std::string>()) : doc["totalLength"].get<std::int64_t>();
+							std::int64_t completed_length = doc["completedLength"].is_string() ? std::stoll(doc["completedLength"].get<std::string>()) : doc["completedLength"].get<std::int64_t>();
 							double progress				  = 0.0;
 							if (total_length > 0) {
 								progress = completed_length * 1.0 / total_length;
@@ -1147,7 +1147,7 @@ namespace gdl {
 
 				// 异步执行命令
 				LOG_INFO("Executing custom command: {}", cmd.toStdString());
-				QProcess::startDetached(cmd);
+				{ auto parts = QProcess::splitCommand(cmd); if (!parts.isEmpty()) QProcess::startDetached(parts.takeFirst(), parts); }
 			}
 
 			// 播放通知声音

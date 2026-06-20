@@ -38,10 +38,12 @@ namespace gdl {
                 bool InitPlugin();
 
                private:
-                loader::PluginLoader loader_;
+                // loader 共享所有权：plugin_ 的自定义 deleter 会持有其副本，
+                // 保证 guard 析构后、最后一个 plugin_ 引用释放前库仍存活，避免 UAF。
+                std::shared_ptr<loader::PluginLoader> loader_;
                 INetDiskDownloadPlugin::IDownloadPluginPtr plugin_;
-                CreatePluginFunc create_plugin_;
-                DestroyPluginFunc destroy_plugin_;
+                CreatePluginFunc create_plugin_{nullptr};
+                DestroyPluginFunc destroy_plugin_{nullptr};
                 std::string path_;
 			};
 

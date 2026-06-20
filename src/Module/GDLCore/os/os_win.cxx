@@ -127,30 +127,38 @@ namespace gdl {
 
 			std::optional<std::pair<String, int>> GetSystemHTTPProxy() {
 #if defined(_WIN32) || defined(_WIN64)
-				WINHTTP_CURRENT_USER_IE_PROXY_CONFIG proxyInfo;
+				WINHTTP_CURRENT_USER_IE_PROXY_CONFIG proxyInfo{};
+				std::optional<std::pair<String, int>> result;
 
 				if (WinHttpGetIEProxyConfigForCurrentUser(&proxyInfo)) {
 					if (proxyInfo.lpszProxy) {
 						String proxyServer = gdl::encoding::WStringToAnsi(proxyInfo.lpszProxy);
 						int proxyPort	   = 0;
-						size_t colonPos	   = proxyServer.find(":");
-						if (colonPos != std::wstring::npos) {
-							proxyPort	= std::stoi(proxyServer.substr(colonPos + 1));
+						size_t colonPos	   = proxyServer.find(':');
+						if (colonPos != String::npos) {
+							// 端口可能缺失或非数字，stoi 会抛异常导致崩溃，需捕获。
+							try {
+								proxyPort = std::stoi(proxyServer.substr(colonPos + 1));
+							} catch (const std::exception&) {
+								proxyPort = 0;
+							}
 							proxyServer = proxyServer.substr(0, colonPos);
 						}
-						if (proxyInfo.lpszProxy) {
-							GlobalFree(proxyInfo.lpszProxy);
-						}
-						if (proxyInfo.lpszProxyBypass) {
-							GlobalFree(proxyInfo.lpszProxyBypass);
-						}
-						if (proxyInfo.lpszAutoConfigUrl) {
-							GlobalFree(proxyInfo.lpszAutoConfigUrl);
-						}
-						return std::make_pair(proxyServer, proxyPort);
+						result = std::make_pair(proxyServer, proxyPort);
+					}
+					// 三个字段必须无条件释放：当 lpszProxy 为空但其他字段非空时，
+					// 旧代码因释放逻辑嵌套在 if(lpszProxy) 内会泄漏 lpszProxyBypass / lpszAutoConfigUrl。
+					if (proxyInfo.lpszProxy) {
+						GlobalFree(proxyInfo.lpszProxy);
+					}
+					if (proxyInfo.lpszProxyBypass) {
+						GlobalFree(proxyInfo.lpszProxyBypass);
+					}
+					if (proxyInfo.lpszAutoConfigUrl) {
+						GlobalFree(proxyInfo.lpszAutoConfigUrl);
 					}
 				}
-				return std::nullopt;
+				return result;
 #else
 				return std::nullopt;
 #endif

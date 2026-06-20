@@ -18,6 +18,10 @@
 #include <cstring>     // for strerror
 extern char** environ;
 #endif
+#include <algorithm>
+#include <cctype>
+#include <filesystem>
+#include <fstream>
 #include <string_view>
 #include <thread>
 #include "logger.h"
@@ -82,16 +86,52 @@ namespace gdl {
 					}
 				} while (Process32Next(hSnapshot, &pe32));
 				CloseHandle(hSnapshot);
+#elif defined(__linux__)
+				// Linux 遍历 /proc 而非 popen("pgrep " + name)：避免 shell 命令注入，
+				// 且避免 pgrep 输出非数字时 std::stoi 抛异常导致崩溃。
+				const String target = name_string;
+				std::error_code ec;
+				for (const auto& entry : std::filesystem::directory_iterator("/proc", ec)) {
+					const auto fname = entry.path().filename().string();
+					if (fname.empty() ||
+						!std::all_of(fname.begin(), fname.end(),
+									 [](unsigned char c) { return std::isdigit(c); })) {
+						continue;  // 仅处理纯数字目录名（即 PID）
+					}
+					std::ifstream cmdline(entry.path() / "cmdline", std::ios::binary);
+					std::string first_arg;
+					if (!std::getline(cmdline, first_arg, '\0') || first_arg.empty()) {
+						continue;
+					}
+					auto pos = first_arg.find_last_of('/');
+					std::string exe_name = (pos != std::string::npos) ? first_arg.substr(pos + 1) : first_arg;
+					if (exe_name == target) {
+						try {
+							pids.push_back(static_cast<std::int64_t>(std::stoll(fname)));
+						} catch (const std::exception&) {
+							continue;
+						}
+					}
+				}
 #else
-				String command = "pgrep " + name_string;
+				// macOS 等无 /proc 的平台仍用 pgrep，但 name 仅含字母数字时才执行，
+				// 并对输出做异常保护，避免命令注入与 stoi 崩溃。
+				bool safe_name = !name_string.empty() &&
+					std::all_of(name_string.begin(), name_string.end(),
+								[](unsigned char c) { return std::isalnum(c) || c == '_' || c == '-' || c == '.'; });
+				if (!safe_name) return pids;
+				String command = "pgrep -x " + name_string;
 				FILE* pipe	   = popen(command.c_str(), "r");
 				if (!pipe) {
 					return pids;
 				}
 				char buffer[128];
 				while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
-					pid_t pid = std::stoi(buffer);
-					pids.push_back(pid);
+					try {
+						pids.push_back(static_cast<std::int64_t>(std::stoll(buffer)));
+					} catch (const std::exception&) {
+						continue;
+					}
 				}
 				pclose(pipe);
 #endif
