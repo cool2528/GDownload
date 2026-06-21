@@ -138,8 +138,12 @@ namespace gd {
 		}
 
 		void MainWindow::UnInitEngine() {
+			// 与 Init 侧对称:测试模式下未启动 aria2c,跳过 uninit 避免对未初始化状态调用
+			const bool is_test = gdl::ui::isTestMode();
 			gdl::ui::browser::BrowserManager::Instance().UnInit();
-			gdl::engine::Aria2cDownloadManager::Instance().UninitAria2cEngine();
+			if (!is_test) {
+				gdl::engine::Aria2cDownloadManager::Instance().UninitAria2cEngine();
+			}
 			gdl::cache::DownloadHistoryCache::Instance().Uninitialize();
 			gdl::ui::settings::Settings::Instance().UnInit();
 		}
