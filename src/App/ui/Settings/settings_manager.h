@@ -2,6 +2,7 @@
 #include <QtQml/qqml.h>
 #include <QObject>
 #include <QReadWriteLock>
+#include "ISettings.h"
 #include "setting.h"
 #include "singleton.hpp"
 class QQmlEngine;
@@ -10,8 +11,11 @@ namespace gdl {
     namespace ui {
         namespace settings {
 
-            class Settings : public QObject, public Singleton<Settings> {
-                SINGLETON_DECLARE(Settings)
+            // 下载设置实现类,继承 ISettings 纯虚接口与 Singleton<SettingsImpl>
+            // QObject 必须置于基类列表首位,moc 依此链接 staticMetaObject;ISettings 为非 Q_OBJECT 纯虚接口
+            // 保留 Q_INVOKABLE 以确保 moc 注册元对象信息,QML 侧方法调用不受影响
+            class SettingsImpl : public QObject, public ISettings, public Singleton<SettingsImpl> {
+                SINGLETON_DECLARE(SettingsImpl)
                 Q_OBJECT
                 QML_SINGLETON
                 SETTING_PROPERTY(QSize, WindowSize)
@@ -70,8 +74,8 @@ namespace gdl {
                 SETTING_PROPERTY(bool, BtRequireCrypto)
 
                public:
-                ~Settings() override;
-                static Settings* create(QQmlEngine*, QJSEngine*);
+                ~SettingsImpl() override;
+                static SettingsImpl* create(QQmlEngine*, QJSEngine*);
                 bool Init();
                 void UnInit();
                 Q_INVOKABLE QString GenerateRpcSecret() const;
@@ -97,7 +101,7 @@ namespace gdl {
                 Q_INVOKABLE void SetAria2UserAgent(const QString& userAgent);
 
                private:
-                explicit Settings(QObject* parent = nullptr);
+                explicit SettingsImpl(QObject* parent = nullptr);
                 void Save();
                 template <class SETTING, class VALUE_TYPE>
                 void SetValue(const QString& key, const VALUE_TYPE& value) {
@@ -131,6 +135,8 @@ namespace gdl {
                private:
                 mutable QReadWriteLock lock_;
             };
+            // 类型别名:保现有 Settings::Instance() 调用点零改动
+            using Settings = SettingsImpl;
             void RegisterTypes(QQmlEngine* engine);
         }  // namespace settings
     }  // namespace ui

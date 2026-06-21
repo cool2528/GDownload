@@ -46,10 +46,10 @@ namespace gdl {
    private:                                                                      \
 	Q_PROPERTY(TYPE q##NAME READ Get##NAME WRITE Set##NAME NOTIFY NAME##Changed) \
    public:                                                                       \
-	Q_INVOKABLE TYPE Get##NAME() const {                                         \
+	Q_INVOKABLE TYPE Get##NAME() const override {                                \
 		return GetValue<NAME, TYPE>(NAME::setting_key);                          \
 	}                                                                            \
-	Q_INVOKABLE void Set##NAME(TYPE value) {                                     \
+	Q_INVOKABLE void Set##NAME(TYPE value) override {                            \
 		SetValue<NAME, TYPE>(NAME::setting_key, value);                          \
 		Q_EMIT NAME##Changed();                                                  \
 	}                                                                            \

@@ -9,15 +9,15 @@ namespace gdl {
     namespace ui {
         namespace settings {
 
-            Settings::~Settings() {}
+            SettingsImpl::~SettingsImpl() {}
 
-            Settings* Settings::create(QQmlEngine* qmlengine, QJSEngine* jsengine) {
+            Settings* SettingsImpl::create(QQmlEngine* qmlengine, QJSEngine* jsengine) {
                 Q_UNUSED(qmlengine)
                 Q_UNUSED(jsengine);
-                return &Settings::Instance();
+                return &SettingsImpl::Instance();
             }
 
-            bool Settings::Init() {
+            bool SettingsImpl::Init() {
                 QHashIterator<QString, Setting*> i(Setting::settings_);
                 while (i.hasNext()) {
                     i.next();
@@ -36,12 +36,12 @@ namespace gdl {
                 return true;
             }
 
-            void Settings::UnInit() {
+            void SettingsImpl::UnInit() {
                 Save();
             }
-            Settings::Settings(QObject* parent) : QObject(parent) {}
+            SettingsImpl::SettingsImpl(QObject* parent) : QObject(parent) {}
 
-            QString Settings::GenerateRpcSecret() const
+            QString SettingsImpl::GenerateRpcSecret() const
             {
                 static constexpr char kChars[] =
                     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -54,7 +54,7 @@ namespace gdl {
                 return secret;
             }
 
-            void Settings::SetAria2Dir(const QString& dir)
+            void SettingsImpl::SetAria2Dir(const QString& dir)
             {
                 SetDir(dir);
                 std::unordered_multimap<std::string, std::string> opt;
@@ -62,7 +62,7 @@ namespace gdl {
                 engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
             }
 
-            void Settings::SetAria2GlobalProxy(const QString &proxy)
+            void SettingsImpl::SetAria2GlobalProxy(const QString &proxy)
             {
                 SetGlobalProxy(proxy);
                 std::unordered_multimap<std::string, std::string> opt;
@@ -70,7 +70,7 @@ namespace gdl {
                 engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
             }
 
-            void Settings::SetAria2AutoResumeTask(bool enable)
+            void SettingsImpl::SetAria2AutoResumeTask(bool enable)
             {
                 SetAutoResumeTask(enable);
                 std::unordered_multimap<std::string, std::string> opt;
@@ -78,7 +78,7 @@ namespace gdl {
                 engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
             }
 
-            void Settings::SetAria2MaxDownloadLimit(int value)
+            void SettingsImpl::SetAria2MaxDownloadLimit(int value)
             {
                 SetMaxDownloadLimit(value);
                 std::unordered_multimap<std::string, std::string> opt;
@@ -86,7 +86,7 @@ namespace gdl {
                 engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
             }
 
-            void Settings::SetAria2MaxOverallDownloadLimit(int value)
+            void SettingsImpl::SetAria2MaxOverallDownloadLimit(int value)
             {
                 SetMaxOverallDownloadLimit(value);
                 std::unordered_multimap<std::string, std::string> opt;
@@ -94,7 +94,7 @@ namespace gdl {
                 engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
             }
 
-            void Settings::SetAria2MaxUploadLimit(int value)
+            void SettingsImpl::SetAria2MaxUploadLimit(int value)
             {
                 SetMaxUploadLimit(value);
                 std::unordered_multimap<std::string, std::string> opt;
@@ -102,7 +102,7 @@ namespace gdl {
                 engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
             }
 
-            void Settings::SetAria2MaxOverallUploadLimit(int value)
+            void SettingsImpl::SetAria2MaxOverallUploadLimit(int value)
             {
                 SetMaxOverallUploadLimit(value);
                 std::unordered_multimap<std::string, std::string> opt;
@@ -110,7 +110,7 @@ namespace gdl {
                 engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
             }
 
-            void Settings::SetAria2LowestSpeedLimit(int value)
+            void SettingsImpl::SetAria2LowestSpeedLimit(int value)
             {
                 SetLowestSpeedLimit(value);
                 std::unordered_multimap<std::string, std::string> opt;
@@ -118,7 +118,7 @@ namespace gdl {
                 engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
             }
 
-            void Settings::SetAria2MaxConcurrentDownloads(int value)
+            void SettingsImpl::SetAria2MaxConcurrentDownloads(int value)
             {
                 SetMaxConcurrentDownloads(value);
                 std::unordered_multimap<std::string, std::string> opt;
@@ -126,7 +126,7 @@ namespace gdl {
                 engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
             }
 
-            void Settings::SetAria2Split(int value)
+            void SettingsImpl::SetAria2Split(int value)
             {
                 SetSplit(value);
                 std::unordered_multimap<std::string, std::string> opt;
@@ -134,7 +134,7 @@ namespace gdl {
                 engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
             }
 
-            void Settings::SetAria2MaxConnectionPerServer(int value)
+            void SettingsImpl::SetAria2MaxConnectionPerServer(int value)
             {
                 SetMaxConnectionPerServer(value);
                 std::unordered_multimap<std::string, std::string> opt;
@@ -142,7 +142,7 @@ namespace gdl {
                 engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
             }
 
-            void Settings::SetAria2MinSplitSize(int sizeMB)
+            void SettingsImpl::SetAria2MinSplitSize(int sizeMB)
             {
                 SetMinSplitSize(sizeMB);
                 // 转换为字节（MB -> Bytes）并添加 "M" 后缀
@@ -151,7 +151,7 @@ namespace gdl {
                 engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kChangeGlobalOption,opt);
             }
 
-            void Settings::SetAria2Timeout(int value)
+            void SettingsImpl::SetAria2Timeout(int value)
             {
                 SetTimeout(value);
 
@@ -161,7 +161,7 @@ namespace gdl {
                     engine::Aria2Method::kChangeGlobalOption, opt);
             }
 
-            void Settings::SetAria2ConnectTimeout(int value)
+            void SettingsImpl::SetAria2ConnectTimeout(int value)
             {
                 SetConnectTimeout(value);
 
@@ -171,7 +171,7 @@ namespace gdl {
                     engine::Aria2Method::kChangeGlobalOption, opt);
             }
 
-            void Settings::SetAria2MaxTries(int value)
+            void SettingsImpl::SetAria2MaxTries(int value)
             {
                 SetMaxTries(value);
 
@@ -181,7 +181,7 @@ namespace gdl {
                     engine::Aria2Method::kChangeGlobalOption, opt);
             }
 
-            void Settings::SetAria2RetryWait(int value)
+            void SettingsImpl::SetAria2RetryWait(int value)
             {
                 SetRetryWait(value);
 
@@ -191,7 +191,7 @@ namespace gdl {
                     engine::Aria2Method::kChangeGlobalOption, opt);
             }
 
-            void Settings::SetAria2EnableDht(bool enable)
+            void SettingsImpl::SetAria2EnableDht(bool enable)
             {
                 SetEnableDht(enable);
 
@@ -201,7 +201,7 @@ namespace gdl {
                     engine::Aria2Method::kChangeGlobalOption, opt);
             }
 
-            void Settings::SetAria2BtMaxPeers(int value)
+            void SettingsImpl::SetAria2BtMaxPeers(int value)
             {
                 SetBtMaxPeers(value);
 
@@ -211,7 +211,7 @@ namespace gdl {
                     engine::Aria2Method::kChangeGlobalOption, opt);
             }
 
-            void Settings::SetAria2BtRequireCrypto(bool enable)
+            void SettingsImpl::SetAria2BtRequireCrypto(bool enable)
             {
                 SetBtRequireCrypto(enable);
 
@@ -221,7 +221,7 @@ namespace gdl {
                     engine::Aria2Method::kChangeGlobalOption, opt);
             }
 
-            void Settings::SetAria2UserAgent(const QString& userAgent)
+            void SettingsImpl::SetAria2UserAgent(const QString& userAgent)
             {
                 SetUserAgent(userAgent);
 
@@ -231,7 +231,7 @@ namespace gdl {
                     engine::Aria2Method::kChangeGlobalOption, opt);
             }
 
-            void Settings::Save() {
+            void SettingsImpl::Save() {
                 QHashIterator<QString, Setting*> i(Setting::settings_);
                 while (i.hasNext()) {
                     i.next();
@@ -243,9 +243,9 @@ namespace gdl {
             }
 
             void RegisterTypes(QQmlEngine* engine) {
-                gdl::ui::settings::Settings::Instance().Init();
+                gdl::ui::settings::SettingsImpl::Instance().Init();
                 qmlRegisterSingletonInstance<Settings>(GEXPORT_MODULE_URL, 1, 0, "SettingsManager",
-                                                       &Settings::Instance());
+                                                       &SettingsImpl::Instance());
             }
 
         }  // namespace settings
