@@ -34,6 +34,7 @@ Item {
 
             GButton {
                 id: home
+                objectName: "navHome"
                 Layout.alignment: Qt.AlignHCenter
                 implicitWidth: GTheme.sizeLarge
                 implicitHeight: GTheme.sizeLarge
@@ -45,6 +46,7 @@ Item {
             }
             GButton {
                 id: download
+                objectName: "navDownloading"
                 Layout.alignment: Qt.AlignHCenter
                 implicitWidth: GTheme.sizeLarge
                 implicitHeight: GTheme.sizeLarge
