@@ -1,6 +1,8 @@
 # qml_ui_support:测试期共享设施静态库
 # - ScreenshotHelper:QML 端通过 Screenshot.capture(item, tag) 触发截图
-# - FakeBrowserManager / FakeSettingsManager:继承 Impl 的测试替身
+# - FakeBrowserManager / FakeSettingsManager:继承 Impl 的测试替身(Phase 4 启用)
+# - TestStubs:Phase 3 视觉用例桩对象(TestGTheme / TestBrowserManager 等),
+#   在主项目重构为库之前(Task 9)替代真实单例,使页面可加载可渲染
 # - PageHarness.qml:单页加载外壳(经 qrc 注册到 /tests/qml_ui/support/)
 qt_add_library(qml_ui_support STATIC
     ScreenshotHelper.h
@@ -9,19 +11,28 @@ qt_add_library(qml_ui_support STATIC
     FakeBrowserManager.cxx
     FakeSettingsManager.h
     FakeSettingsManager.cxx
+    TestStubs.h
+    TestStubs.cxx
+    # 枚举头文件:AUTOMOC 处理 Q_NAMESPACE + Q_ENUM_NS + QML_NAMED_ELEMENT,
+    # 生成静态初始化器把 GThemeType / SegoeFluentIcons 自动注册到 "gdl.sdk" 模块,
+    # 使 QML 端 `GThemeType.ThemeMode.Dark` 等枚举引用可解析
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Definitions/appDef.h
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Definitions/fluentEnumDef.h
 )
 
 # 包含路径:
-# - 本目录(support/):Fake 头文件互引
+# - 本目录(support/):Fake / TestStubs 头文件互引
 # - src/App/ui:Parser/file_preview_model.h 等
 # - src/App/ui/Browser:browser_manager.h / IBrowserManager.h / download_task_model.h
 # - src/App/ui/Settings:settings_manager.h / ISettings.h / setting.h
+# - src/App/ui/Definitions:appDef.h(GThemeType 枚举) / fluentEnumDef.h(SegoeFluentIcons)
 # - src/App/engine:Aria2CManager/ 头文件(browser_manager.h 传递依赖)
 target_include_directories(qml_ui_support PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src/App/ui
     ${CMAKE_SOURCE_DIR}/src/App/ui/Browser
     ${CMAKE_SOURCE_DIR}/src/App/ui/Settings
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Definitions
     ${CMAKE_SOURCE_DIR}/src/App/engine
 )
 
