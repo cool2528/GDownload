@@ -74,6 +74,17 @@ bool ScreenshotHelper::captureWindow(QQuickItem* item, const QString& tag, const
         qWarning() << "ScreenshotHelper::captureWindow: window has no contentItem";
         return false;
     }
+    // 窗口默认 color 是黑/透明,Popup 内容(尤其 GDialogShell 白底+阴影)
+    // 渲染在 Overlay 上时,边缘外的窗口背景会泄漏到截图里成为黑底。
+    // 按主题设置窗口背景色,与 GTheme.bgBase 保持一致:
+    //   - light: 接近白色 (Element Plus light9 #ffffff)
+    //   - dark:  接近深灰 (Element Plus dark bgBase #141414)
+    // theme 参数为空时不改写(保持原行为)。
+    if (theme == QStringLiteral("light")) {
+        window->setColor(QColor(0xff, 0xff, 0xff));
+    } else if (theme == QStringLiteral("dark")) {
+        window->setColor(QColor(0x14, 0x14, 0x14));
+    }
     // grab 目标切到窗口 contentItem(含 Overlay 层,Popup/Dialog 渲染其上);
     // testName 解析仍走原 item 父链(contentItem 是窗口根,父链不含 TestCase)
     return captureImpl(contentItem, item, tag, theme);
