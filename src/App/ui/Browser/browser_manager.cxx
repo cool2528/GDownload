@@ -28,31 +28,31 @@ namespace gdl {
 				 "status", "totalLength", "completedLength", "downloadSpeed", "infoHash", "numSeeders",
 				 "seeder", "connections", "errorCode",		 "errorMessage",  "dir",	  "files",
 				 "gid",	   "bittorrent"};
-			BrowserManager* BrowserManager::create(QQmlEngine* qmlengine, QJSEngine* jsengine) {
+			BrowserManager* BrowserManagerImpl::create(QQmlEngine* qmlengine, QJSEngine* jsengine) {
 				Q_UNUSED(qmlengine)
 				Q_UNUSED(jsengine);
-				return &BrowserManager::Instance();
+				return &BrowserManagerImpl::Instance();
 			}
 
-			BrowserManager::~BrowserManager() {}
+			BrowserManagerImpl::~BrowserManagerImpl() {}
 
-			Q_INVOKABLE void BrowserManager::SyncTrackersServerlist(){
+			Q_INVOKABLE void BrowserManagerImpl::SyncTrackersServerlist(){
 				engine::Aria2cDownloadManager::Instance().UpdateMagnetServerList();
 			}
 
-			DownloadTaskModel* BrowserManager::GetActiveDownloadModel() {
+			DownloadTaskModel* BrowserManagerImpl::GetActiveDownloadModel() {
 				return active_model_.get();
 			}
 
-			DownloadTaskModel* BrowserManager::GetStopedDownloadModel() {
+			DownloadTaskModel* BrowserManagerImpl::GetStopedDownloadModel() {
 				return stoped_model_.get();
 			}
 
-			DownloadTaskModel* BrowserManager::GetWaitingDownloadModel() {
+			DownloadTaskModel* BrowserManagerImpl::GetWaitingDownloadModel() {
 				return waiting_model_.get();
 			}
 
-			bool BrowserManager::AddHttpTask(const QVariantList& urls, const QVariantMap& options) {
+			bool BrowserManagerImpl::AddHttpTask(const QVariantList& urls, const QVariantMap& options) {
 				std::unordered_multimap<std::string, std::string> opt;
 				for (auto it = options.cbegin(); it != options.cend(); ++it) {
 					auto key   = it.key();
@@ -83,7 +83,7 @@ namespace gdl {
 				return count > 0;
 			}
 
-			bool BrowserManager::AddTorrentTask(const QString& tarrent, const QVariantMap& options) {
+			bool BrowserManagerImpl::AddTorrentTask(const QString& tarrent, const QVariantMap& options) {
 				std::unordered_multimap<std::string, std::string> opt;
 				for (auto it = options.cbegin(); it != options.cend(); ++it) {
 					auto key   = it.key();
@@ -116,7 +116,7 @@ namespace gdl {
 				return true;
 			}
 
-			bool BrowserManager::AddMetalinkTask(const QString& metalink, const QVariantMap& options) {
+			bool BrowserManagerImpl::AddMetalinkTask(const QString& metalink, const QVariantMap& options) {
 				std::unordered_multimap<std::string, std::string> opt;
 				for (auto it = options.cbegin(); it != options.cend(); ++it) {
 					auto key   = it.key();
@@ -149,7 +149,7 @@ namespace gdl {
 				return true;
 			}
 
-			bool BrowserManager::PauseTask(int page_index, const QString& gid) {
+			bool BrowserManagerImpl::PauseTask(int page_index, const QString& gid) {
 				if (gid.isEmpty()) return false;
 				if (page_index == 0) {
 
@@ -169,7 +169,7 @@ namespace gdl {
 				return false;
 			}
 
-			bool BrowserManager::PauseAllTask(int page_index) {
+			bool BrowserManagerImpl::PauseAllTask(int page_index) {
 				if (page_index == 0) {
 					if (active_model_) {
 						for (const auto& task : active_model_->GetTaskIds()) {
@@ -192,7 +192,7 @@ namespace gdl {
 				return false;
 			}
 
-			bool BrowserManager::ForcePauseTask(int page_index, const QString& gid) {
+			bool BrowserManagerImpl::ForcePauseTask(int page_index, const QString& gid) {
 				if (gid.isEmpty()) return false;
 				if (page_index == 0) {
 					if (active_model_) {
@@ -214,13 +214,13 @@ namespace gdl {
 				return false;
 			}
 
-			bool BrowserManager::ForcePauseAllTask() {
+			bool BrowserManagerImpl::ForcePauseAllTask() {
 				return engine::Aria2cDownloadManager::Instance()
 					.CallAria2cMethod(engine::Aria2Method::kForcePauseAll)
 					.IsOk();
 			}
 
-			bool BrowserManager::UnpauseTask(int page_index, const QString& gid) {
+			bool BrowserManagerImpl::UnpauseTask(int page_index, const QString& gid) {
 				if (gid.isEmpty()) return false;
 				if (page_index == 0) {
 					if (active_model_) {
@@ -242,7 +242,7 @@ namespace gdl {
 				return false;
 			}
 
-			bool BrowserManager::UnpauseAllTask(int page_index) {
+			bool BrowserManagerImpl::UnpauseAllTask(int page_index) {
 				if (page_index == 0) {
 					if (active_model_) {
 						for (const auto& task : active_model_->GetTaskIds()) {
@@ -265,7 +265,7 @@ namespace gdl {
 				return false;
 			}
 
-			bool BrowserManager::RemoveTask(int page_index, const QString& gid, bool is_remove_file) {
+			bool BrowserManagerImpl::RemoveTask(int page_index, const QString& gid, bool is_remove_file) {
 				if (gid.isEmpty()) return false;
                 if (page_index != 0 && page_index != 1) {
 					return false;
@@ -321,7 +321,7 @@ namespace gdl {
 				return true;
 			}
 
-			bool BrowserManager::RemoveAllTask(int page_index, bool is_remove_file) {
+			bool BrowserManagerImpl::RemoveAllTask(int page_index, bool is_remove_file) {
 				if (page_index == 0) {
 					if (active_model_) {
 						for (const auto& task : active_model_->GetTaskIds()) {
@@ -347,7 +347,7 @@ namespace gdl {
 				return false;
 			}
 
-			bool BrowserManager::ForceRemoveTask(const QString& gid) {
+			bool BrowserManagerImpl::ForceRemoveTask(const QString& gid) {
 				if (gid.isEmpty()) return false;
 				const auto res = engine::Aria2cDownloadManager::Instance()
 									 .CallAria2cMethod(engine::Aria2Method::kForceRemove, gid.toStdString())
@@ -362,20 +362,20 @@ namespace gdl {
 				return res;
 			}
 
-			bool BrowserManager::RemoveDownloadResult(const QString& gid) {
+			bool BrowserManagerImpl::RemoveDownloadResult(const QString& gid) {
 				if (gid.isEmpty()) return false;
 				return engine::Aria2cDownloadManager::Instance()
 					.CallAria2cMethod(engine::Aria2Method::kRemoveDownloadResult, gid.toStdString())
 					.IsOk();
 			}
 
-			bool BrowserManager::PurgeDownloadResult() {
+			bool BrowserManagerImpl::PurgeDownloadResult() {
 				return engine::Aria2cDownloadManager::Instance()
 					.CallAria2cMethod(engine::Aria2Method::kPurgeDownloadResult)
 					.IsOk();
 			}
 
-			bool BrowserManager::ChangeOption(const QString& gid, const QVariantMap& options) {
+			bool BrowserManagerImpl::ChangeOption(const QString& gid, const QVariantMap& options) {
 				if (gid.isEmpty()) return false;
 				std::unordered_multimap<std::string, std::string> opt;
 				for (auto it = options.cbegin(); it != options.cend(); ++it) {
@@ -388,7 +388,7 @@ namespace gdl {
 					.IsOk();
 			}
 
-			bool BrowserManager::ChangeGlobalOption(const QVariantMap& options) {
+			bool BrowserManagerImpl::ChangeGlobalOption(const QVariantMap& options) {
 				std::unordered_multimap<std::string, std::string> opt;
 				for (auto it = options.cbegin(); it != options.cend(); ++it) {
 					auto key   = it.key();
@@ -400,7 +400,7 @@ namespace gdl {
 					.IsOk();
 			}
 
-			void BrowserManager::OpenFileLocation(const QString& file_path) {
+			void BrowserManagerImpl::OpenFileLocation(const QString& file_path) {
 				QFileInfo fileInfo(file_path);
 				if (!fileInfo.exists()) return;
 
@@ -423,7 +423,7 @@ namespace gdl {
 				QProcess::startDetached(program, args);
 			}
 
-			bool BrowserManager::RemoveStopTask(const QString& gid, bool is_remove_file) const {
+			bool BrowserManagerImpl::RemoveStopTask(const QString& gid, bool is_remove_file) const {
 				if (gid.isEmpty()) return false;
 				if (stoped_model_) {
 					const auto task = stoped_model_->GetTaskById(gid);
@@ -447,7 +447,7 @@ namespace gdl {
 				return false;
 			}
 
-			bool BrowserManager::RemoveStopTask(int index, bool is_remove_file) const {
+			bool BrowserManagerImpl::RemoveStopTask(int index, bool is_remove_file) const {
 				if (stoped_model_) {
 					auto task = stoped_model_->GetTask(index);
 					if (!task) {
@@ -471,7 +471,7 @@ namespace gdl {
 				return false;
 			}
 
-			bool BrowserManager::RemoveAllStopTask(bool is_remove_file) const {
+			bool BrowserManagerImpl::RemoveAllStopTask(bool is_remove_file) const {
 				if (stoped_model_) {
 					auto tasks = stoped_model_->GetTaskIds();
 					bool res   = false;
@@ -483,7 +483,7 @@ namespace gdl {
 				return false;
 			}
 
-			void BrowserManager::RefreshTaskList(int page_index) {
+			void BrowserManagerImpl::RefreshTaskList(int page_index) {
 				if (page_index == 0) {
 					if (active_model_) {
 						engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kTellActive,
@@ -507,7 +507,7 @@ namespace gdl {
 				}
 			}
 
-			parser::FilePreviewModel* BrowserManager::GetFilePreviewModel(const QString& file_path) {
+			parser::FilePreviewModel* BrowserManagerImpl::GetFilePreviewModel(const QString& file_path) {
 				QFileInfo file_info(file_path);
 				if (!file_info.exists()) return nullptr;
 				const auto suffix = file_info.suffix().toLower();
@@ -550,7 +550,7 @@ namespace gdl {
 				return nullptr;
 			}
 
-			bool BrowserManager::Init() {
+			bool BrowserManagerImpl::Init() {
 				// subscribe aria2 responce
 				auto res = engine::Aria2cDownloadManager::Instance().SubscriptionAria2Message(
 					kAria2Responce, [this](const std::string& msg) { OnHandleAria2Message(msg); });
@@ -576,7 +576,7 @@ namespace gdl {
 				return true;
 			}
 
-			void BrowserManager::UnInit() {
+			void BrowserManagerImpl::UnInit() {
 				if (aria2_responce_subcription_) {
 					engine::Aria2cDownloadManager::Instance().UnSubscribeAria2Message(aria2_responce_subcription_);
 				}
@@ -594,7 +594,7 @@ namespace gdl {
 				}
 			}
 
-			gdl::cache::DownloadRecord BrowserManager::DownloadTaskInfoToRecord(const DownloadTaskInfo& info) {
+			gdl::cache::DownloadRecord BrowserManagerImpl::DownloadTaskInfoToRecord(const DownloadTaskInfo& info) {
 				gdl::cache::DownloadRecord record;
 				record.completed_time  = std::time(nullptr);
 				record.created_time	   = std::time(nullptr);
@@ -610,7 +610,7 @@ namespace gdl {
 				return record;
 			}
 
-			DownloadTaskInfo BrowserManager::DownloadRecordToTaskInfo(const gdl::cache::DownloadRecord& record) {
+			DownloadTaskInfo BrowserManagerImpl::DownloadRecordToTaskInfo(const gdl::cache::DownloadRecord& record) {
 				DownloadTaskInfo info;
 				info.set_task_id(QString::fromStdString(record.task_id));
 				info.set_task_file_name(QString::fromStdString(record.file_name));
@@ -624,13 +624,13 @@ namespace gdl {
 				return info;
 			}
 
-			BrowserManager::BrowserManager(QObject* parent) : QObject(parent) {
+			BrowserManagerImpl::BrowserManagerImpl(QObject* parent) : QObject(parent) {
 				active_model_  = std::make_unique<DownloadTaskModel>();
 				waiting_model_ = std::make_unique<DownloadTaskModel>();
 				stoped_model_  = std::make_unique<DownloadTaskModel>();
 				InitDownloadHistoryCache();
 				connect(
-					this, &BrowserManager::sigUpdateTasksMessage, this,
+					this, &BrowserManagerImpl::sigUpdateTasksMessage, this,
 					[this](const DownloadTaskInfo& task_info) {
 						try {
 							const auto task_id = task_info.task_id();
@@ -706,7 +706,7 @@ namespace gdl {
 					Qt::QueuedConnection);
 
 				connect(
-					this, &BrowserManager::sigUpdateActiveProgress, this,
+					this, &BrowserManagerImpl::sigUpdateActiveProgress, this,
 					[this](double progress) {
 #if defined(_WIN32)
                         if (qApp->allWindows().isEmpty()) return;
@@ -720,17 +720,17 @@ namespace gdl {
 					Qt::QueuedConnection);
 
                 connect(
-                    this, &BrowserManager::sigErrorMessage, this,
+                    this, &BrowserManagerImpl::sigErrorMessage, this,
                     [this](const QString& message) { toast::ToastManager::Instance().ShowError(message); },
                     Qt::QueuedConnection);
 				connect(
-					this, &BrowserManager::sigUpdateSyncServerList, this,
+					this, &BrowserManagerImpl::sigUpdateSyncServerList, this,
 					[this](const QString& list) { 
 						utils::UtilsToolsManager::Instance().SetserverList(list);
 					},Qt::QueuedConnection);
 				
 			}
-			void BrowserManager::InitDownloadHistoryCache() const {
+			void BrowserManagerImpl::InitDownloadHistoryCache() const {
 				const auto records = gdl::cache::DownloadHistoryCache::Instance().GetRecords();
 				for (const auto& record : records) {
 					DownloadTaskInfo info = DownloadRecordToTaskInfo(record);
@@ -744,7 +744,7 @@ namespace gdl {
 					}
 				}
 			}
-			void BrowserManager::OnHandleAria2Message(const std::string& msg) {
+			void BrowserManagerImpl::OnHandleAria2Message(const std::string& msg) {
 				try {
 
 					nlohmann::json doc = nlohmann::json::parse(msg);
@@ -933,7 +933,7 @@ namespace gdl {
 				}
 			}
 
-			void BrowserManager::OnHandleAria2ActiveProgress(const std::string& msg) {
+			void BrowserManagerImpl::OnHandleAria2ActiveProgress(const std::string& msg) {
 				try {
 					nlohmann::json doc = nlohmann::json::parse(msg);
 					if (doc.is_object()) {
@@ -954,11 +954,11 @@ namespace gdl {
 				}
 			}
 
-			void BrowserManager::OnHandleTrackerUpdateStatus(const std::string& msg) {
+			void BrowserManagerImpl::OnHandleTrackerUpdateStatus(const std::string& msg) {
 				Q_EMIT sigTrackerUpdateStatus(QString::fromStdString(msg));
 			}
 
-			DownloadTaskInfo BrowserManager::Aria2QueryByGidTaskInfo(const std::string& gid) {
+			DownloadTaskInfo BrowserManagerImpl::Aria2QueryByGidTaskInfo(const std::string& gid) {
 			DownloadTaskInfo task_info;
 			// 获取并验证 RPC 端口
 			int port_value = settings::Settings::Instance().GetRpcListenPort();
@@ -1052,7 +1052,7 @@ namespace gdl {
 			}
 
 			// 执行下载完成后的操作
-			void BrowserManager::ExecutePostDownloadAction(
+			void BrowserManagerImpl::ExecutePostDownloadAction(
 				const DownloadTaskInfo& task,
 				int actionType,
 				const QString& customCommand) {
@@ -1133,7 +1133,7 @@ namespace gdl {
 			}
 
 			// 执行自定义命令（替换变量）
-			void BrowserManager::ExecuteCustomCommand(
+			void BrowserManagerImpl::ExecuteCustomCommand(
 				const QString& command,
 				const QString& filePath,
 				const QString& dir,
@@ -1151,7 +1151,7 @@ namespace gdl {
 			}
 
 			// 播放通知声音
-			void BrowserManager::PlayNotificationSound() {
+			void BrowserManagerImpl::PlayNotificationSound() {
 				#ifdef _WIN32
 					// Windows 使用系统通知声音
 					QProcess::startDetached("powershell", {"-Command", "(New-Object Media.SoundPlayer 'C:\\Windows\\Media\\Windows Notify.wav').PlaySync();"});
@@ -1166,7 +1166,7 @@ namespace gdl {
 
 			void RegisterTypes(QQmlEngine* engine) {
                 qmlRegisterSingletonInstance<BrowserManager>(GEXPORT_MODULE_URL, 1, 0, "BrowserManager",
-                                                             &BrowserManager::Instance());
+                                                             &BrowserManagerImpl::Instance());
 				const QString app_path = QString::fromStdString(os::GetExecutableDir());
 				QString aria2c_engine_path;
 #ifdef __APPLE__
@@ -1179,7 +1179,7 @@ namespace gdl {
 				aria2c_engine_path = app_path + "/engine/aria2c";
 #endif
 				gdl::engine::Aria2cDownloadManager::Instance().InitAria2cEngine(aria2c_engine_path.toStdString());
-				BrowserManager::Instance().Init();
+				BrowserManagerImpl::Instance().Init();
 			}
 
 		}  // namespace browser
