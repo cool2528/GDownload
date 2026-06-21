@@ -1,12 +1,12 @@
 #pragma once
 
-#include "browser_manager.h"  // BrowserManagerImpl
-
 #include <QList>
+#include <QObject>
 #include <QString>
 #include <QVariant>
 #include <QVariantList>
 #include <QVariantMap>
+#include <QtQml/qqml.h>
 
 namespace gdl {
 namespace tests {
@@ -17,118 +17,140 @@ struct FakeRpcCall {
 	QVariantList args;
 };
 
-// 测试期 BrowserManager 替身
+// 测试期 BrowserManager 替身(独立 QObject 版)
 //
-// 硬约束:必须继承 BrowserManagerImpl(非 IBrowserManager 接口)。
-// 原因:mainwindow.cxx 用 qmlRegisterSingletonInstance<BrowserManagerImpl>
-//   + static_cast<BrowserManagerImpl*>(IBrowserManager*) 注册单例。
-//   若 Fake 继承 IBrowserManager,该 static_cast 为未定义行为(对象实际类型非
-//   BrowserManagerImpl 子类)。继承 Impl 后,FakeBrowserManager* 可安全
-//   static_cast 为 BrowserManagerImpl*,虚表与元对象链完整。
+// 设计变更说明(原 Task 9 版本继承 BrowserManagerImpl,现改为独立 QObject):
+// 原设计 Fake 继承 BrowserManagerImpl,期望经 Impl::qt_metacall 虚派发命中 Fake override。
+// 但 BrowserManagerImpl 的 staticMetaObject / vtable / 构造析构 / 全部 *Changed 信号等
+// 符号仅存在于 gdownload.exe(可执行文件,非可链接库),集成测试 exe 无法链接这些符号
+// (LNK2019: 86 个未解析外部符号)。将主项目重构为可链接库超出 Phase 4 范围,
+// 故改为独立 QObject:自带 Q_OBJECT 元对象,不依赖任何 Impl 符号,可被测试 exe 直接
+// 链接 + 实例化 + 经 qmlRegisterSingletonInstance<FakeBrowserManager> 注册为
+// "BrowserManager" 单例。QML 端调用经 Fake 自身元对象派发,直接命中本类 Q_INVOKABLE。
 //
-// 不加 Q_OBJECT:避免 moc 生成引用 BrowserManagerImpl::staticMetaObject 等
-//   Impl 符号的代码 —— 这些符号仅存在于 gdownload.exe,qml_ui_support 无法链接。
-//   Fake 继承 Impl 的元对象,QML 侧元对象访问不受影响。
+// 与视觉用例 TestStubs.h::TestBrowserManager 的区别:本类记录调用历史(history_),
+// 供集成测试断言;TestBrowserManager 为空实现桩,仅供视觉渲染。
 //
-// QML 调用如何命中 Fake override:
-//   Fake 无独立 moc 元对象,QML 调用 BrowserManager.AddHttpTask(...) 经
-//   BrowserManagerImpl::staticMetaObject 派发到 Impl::qt_metacall,后者对
-//   Q_INVOKABLE 槽以 `this->AddHttpTask(...)` 形式调用。AddHttpTask 在
-//   IBrowserManager 中为纯虚,Impl 内为 override,故该调用经虚表派发到
-//   最派生类(Fake)的 override 实现。因此 Fake 即使无 Q_OBJECT,QML 侧
-//   调用与 C++ 直接调用都会命中 Fake 的 override。
-//
-// Phase 4(Task 9):override 关键 RPC 方法,记录调用历史到 history_,
-//   不真正调用 aria2c。其余方法继承 Impl 行为(测试期不触发)。
-class FakeBrowserManager : public gdl::ui::browser::BrowserManagerImpl {
+// 接口对齐 BrowserManagerImpl 的 QML 面:覆盖 QML 页面实际引用的全部 Q_INVOKABLE 方法
+// (AddHttpTask / AddTorrentTask / AddMetalinkTask / PauseTask / ... / GetActiveDownloadModel
+// 等模型方法返回 nullptr,使页面以空状态渲染)。信号声明与生产一致(供 QML Connections
+// 解析,测试期不发射)。
+class FakeBrowserManager : public QObject {
+	Q_OBJECT
+
    public:
-	explicit FakeBrowserManager(QObject* parent = nullptr)
-		: gdl::ui::browser::BrowserManagerImpl(parent) {}
+	explicit FakeBrowserManager(QObject* parent = nullptr) : QObject(parent) {}
 
-	// ===== 任务添加 =====
-	// 记录 URL/参数,返回 true 模拟添加成功,不调用 aria2c
-	bool AddHttpTask(const QVariantList& urls, const QVariantMap& options) override {
-		QVariantList args;
-		args.append(QVariant(urls));
-		args.append(QVariant(options));
-		record(QStringLiteral("AddHttpTask"), args);
+	// ===== 任务添加(记录到 history_)=====
+	Q_INVOKABLE bool AddHttpTask(const QVariantList& urls, const QVariantMap& options) {
+		record(QStringLiteral("AddHttpTask"), {QVariant(urls), QVariant(options)});
+		return true;
+	}
+	Q_INVOKABLE bool AddTorrentTask(const QString& torrent, const QVariantMap& options) {
+		record(QStringLiteral("AddTorrentTask"), {QVariant(torrent), QVariant(options)});
+		return true;
+	}
+	Q_INVOKABLE bool AddMetalinkTask(const QString& metalink, const QVariantMap& options) {
+		record(QStringLiteral("AddMetalinkTask"), {QVariant(metalink), QVariant(options)});
 		return true;
 	}
 
-	bool AddTorrentTask(const QString& torrent, const QVariantMap& options) override {
-		QVariantList args;
-		args.append(QVariant(torrent));
-		args.append(QVariant(options));
-		record(QStringLiteral("AddTorrentTask"), args);
+	// ===== 任务暂停/恢复(记录)=====
+	Q_INVOKABLE bool PauseTask(int page_index, const QString& gid) {
+		record(QStringLiteral("PauseTask"), {page_index, QVariant(gid)});
+		return true;
+	}
+	Q_INVOKABLE bool ForcePauseTask(int page_index, const QString& gid) {
+		record(QStringLiteral("ForcePauseTask"), {page_index, QVariant(gid)});
+		return true;
+	}
+	Q_INVOKABLE bool UnpauseTask(int page_index, const QString& gid) {
+		record(QStringLiteral("UnpauseTask"), {page_index, QVariant(gid)});
+		return true;
+	}
+	Q_INVOKABLE bool PauseAllTask(int page_index) {
+		record(QStringLiteral("PauseAllTask"), {page_index});
+		return true;
+	}
+	Q_INVOKABLE bool UnpauseAllTask(int page_index) {
+		record(QStringLiteral("UnpauseAllTask"), {page_index});
+		return true;
+	}
+	Q_INVOKABLE bool ForcePauseAllTask() {
+		record(QStringLiteral("ForcePauseAllTask"), {});
 		return true;
 	}
 
-	bool AddMetalinkTask(const QString& metalink, const QVariantMap& options) override {
-		QVariantList args;
-		args.append(QVariant(metalink));
-		args.append(QVariant(options));
-		record(QStringLiteral("AddMetalinkTask"), args);
+	// ===== 任务删除(记录)=====
+	Q_INVOKABLE bool RemoveTask(int page_index, const QString& gid, bool is_remove_file = false) {
+		record(QStringLiteral("RemoveTask"), {page_index, QVariant(gid), is_remove_file});
+		return true;
+	}
+	Q_INVOKABLE bool RemoveAllTask(int page_index, bool is_remove_file = true) {
+		record(QStringLiteral("RemoveAllTask"), {page_index, is_remove_file});
+		return true;
+	}
+	Q_INVOKABLE bool ForceRemoveTask(const QString& gid) {
+		record(QStringLiteral("ForceRemoveTask"), {QVariant(gid)});
+		return true;
+	}
+	Q_INVOKABLE bool RemoveDownloadResult(const QString& gid) {
+		record(QStringLiteral("RemoveDownloadResult"), {QVariant(gid)});
+		return true;
+	}
+	Q_INVOKABLE bool PurgeDownloadResult() {
+		record(QStringLiteral("PurgeDownloadResult"), {});
 		return true;
 	}
 
-	// ===== 任务暂停/恢复 =====
-	bool PauseTask(int page_index, const QString& gid) override {
-		QVariantList args;
-		args.append(QVariant(page_index));
-		args.append(QVariant(gid));
-		record(QStringLiteral("PauseTask"), args);
+	// ===== 选项变更(记录)=====
+	Q_INVOKABLE bool ChangeOption(const QString& gid, const QVariantMap& options) {
+		record(QStringLiteral("ChangeOption"), {QVariant(gid), QVariant(options)});
+		return true;
+	}
+	Q_INVOKABLE bool ChangeGlobalOption(const QVariantMap& options) {
+		record(QStringLiteral("ChangeGlobalOption"), {QVariant(options)});
 		return true;
 	}
 
-	bool ForcePauseTask(int page_index, const QString& gid) override {
-		QVariantList args;
-		args.append(QVariant(page_index));
-		args.append(QVariant(gid));
-		record(QStringLiteral("ForcePauseTask"), args);
+	// ===== 非记录类(QML 兼容,空实现)=====
+	Q_INVOKABLE void SyncTrackersServerlist() {}
+	Q_INVOKABLE QObject* GetActiveDownloadModel() { return nullptr; }
+	Q_INVOKABLE QObject* GetStopedDownloadModel() { return nullptr; }
+	Q_INVOKABLE QObject* GetWaitingDownloadModel() { return nullptr; }
+	Q_INVOKABLE void OpenFileLocation(const QString& file_path) { Q_UNUSED(file_path); }
+	Q_INVOKABLE bool RemoveStopTask(const QString& gid, bool is_remove_file = true) const {
+		Q_UNUSED(gid);
+		Q_UNUSED(is_remove_file);
 		return true;
 	}
-
-	bool UnpauseTask(int page_index, const QString& gid) override {
-		QVariantList args;
-		args.append(QVariant(page_index));
-		args.append(QVariant(gid));
-		record(QStringLiteral("UnpauseTask"), args);
+	Q_INVOKABLE bool RemoveStopTask(int index, bool is_remove_file = true) const {
+		Q_UNUSED(index);
+		Q_UNUSED(is_remove_file);
 		return true;
 	}
-
-	bool PauseAllTask(int page_index) override {
-		QVariantList args;
-		args.append(QVariant(page_index));
-		record(QStringLiteral("PauseAllTask"), args);
+	Q_INVOKABLE bool RemoveAllStopTask(bool is_remove_file = true) const {
+		Q_UNUSED(is_remove_file);
 		return true;
 	}
-
-	bool UnpauseAllTask(int page_index) override {
-		QVariantList args;
-		args.append(QVariant(page_index));
-		record(QStringLiteral("UnpauseAllTask"), args);
-		return true;
+	Q_INVOKABLE void RefreshTaskList(int page_index) { Q_UNUSED(page_index); }
+	Q_INVOKABLE QObject* GetFilePreviewModel(const QString& file_path) {
+		Q_UNUSED(file_path);
+		return nullptr;
 	}
 
-	// ===== 任务删除 =====
-	bool RemoveTask(int page_index, const QString& gid, bool is_remove_file = false) override {
-		QVariantList args;
-		args.append(QVariant(page_index));
-		args.append(QVariant(gid));
-		args.append(QVariant(is_remove_file));
-		record(QStringLiteral("RemoveTask"), args);
-		return true;
-	}
+	// ===== 信号(与生产签名兼容,QML Connections 解析用;测试期不发射)=====
+	// sigUpdateTasksMessage 用 QVariant 替代 DownloadTaskInfo(避免引入 download_task_model.h
+	// 传递依赖),QML 信号处理器按名连接,参数类型不强制校验
+   Q_SIGNALS:
+	void sigErrorMessage(const QString& error);
+	void sigUpdateTasksMessage(const QVariant& info);
+	void sigUpdateActiveProgress(qreal progress);
+	void sigUpdateSyncServerList(const QString& list);
+	void sigTrackerUpdateStatus(const QString& status);
 
-	bool RemoveAllTask(int page_index, bool is_remove_file = true) override {
-		QVariantList args;
-		args.append(QVariant(page_index));
-		args.append(QVariant(is_remove_file));
-		record(QStringLiteral("RemoveAllTask"), args);
-		return true;
-	}
-
-	// ===== 测试访问器(非 Q_INVOKABLE,仅 C++ 集成测试调用) =====
+   public:
+	// ===== 测试访问器(非 Q_INVOKABLE,仅 C++ 集成测试调用)=====
 
 	// 全部调用历史
 	const QList<FakeRpcCall>& rpcCallHistory() const { return history_; }
@@ -146,7 +168,7 @@ class FakeBrowserManager : public gdl::ui::browser::BrowserManagerImpl {
 	// 调用次数
 	int rpcCallCount() const { return history_.size(); }
 
-	// 清空历史(测试 init 调用)
+	// 清空历史(测试 init 调用)。仅清调用历史,不影响单例状态
 	void clearHistory() { history_.clear(); }
 
    private:
