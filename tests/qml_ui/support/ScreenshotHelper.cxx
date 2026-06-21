@@ -2,6 +2,7 @@
 
 #include <QCryptographicHash>
 #include <QDateTime>
+#include <QDebug>
 #include <QDir>
 #include <QEventLoop>
 #include <QFile>
@@ -10,6 +11,7 @@
 #include <QJsonObject>
 #include <QQuickItem>
 #include <QQuickItemGrabResult>
+#include <QRegularExpression>
 #include <QTest>
 #include <QTimer>
 
@@ -50,25 +52,34 @@ QString ScreenshotHelper::resolveTestName(QQuickItem* item) const {
 
 bool ScreenshotHelper::capture(QQuickItem* item, const QString& tag, const QString& theme) {
     if (item == nullptr) {
+        qWarning() << "ScreenshotHelper::capture: null item";
         return false;
     }
 
     const QString artifactDir = resolveArtifactDir();
     if (artifactDir.isEmpty()) {
         // 产物目录未配置(非 ctest 运行场景),无法写盘
+        qWarning() << "ScreenshotHelper::capture: artifact dir not configured (QML_UI_ARTIFACT_DIR unset)";
         return false;
     }
+
+    // 路径净化:tag 用于拼文件名,必须屏蔽路径分隔符与 ".." 等目录穿越片段
+    // 仅保留字母数字下划线短横,其余(含 / \ .. 空格)统一替换为下划线
+    QString sanitizedTag = tag;
+    sanitizedTag.replace(QRegularExpression(QStringLiteral("[^a-zA-Z0-9_-]")), QStringLiteral("_"));
 
     const QString testName = resolveTestName(item);
     const QString caseDir = artifactDir + QLatin1Char('/') + testName;
     // 创建测试子目录(已存在则为 no-op)
     if (!QDir().mkpath(caseDir)) {
+        qWarning() << "ScreenshotHelper::capture: failed to create dir" << caseDir;
         return false;
     }
 
     // 异步截图:grabToImage 返回共享指针,ready 信号触发时图像可用
     QSharedPointer<QQuickItemGrabResult> grabResult = item->grabToImage();
     if (grabResult == nullptr) {
+        qWarning() << "ScreenshotHelper::capture: grabToImage returned null";
         return false;
     }
 
@@ -86,24 +97,28 @@ bool ScreenshotHelper::capture(QQuickItem* item, const QString& tag, const QStri
 
     if (!succeeded) {
         // ready 未在超时内触发(grab 失败或 offscreen 平台未渲染)
+        qWarning() << "ScreenshotHelper::capture: grab timed out after 5s for tag" << sanitizedTag;
         return false;
     }
 
     const QImage img = grabResult->image();
     if (img.isNull()) {
+        qWarning() << "ScreenshotHelper::capture: image is null after grab";
         return false;
     }
 
-    // PNG 文件名:tag + .png
-    const QString pngFileName = tag + QStringLiteral(".png");
+    // PNG 文件名:净化后的 tag + .png
+    const QString pngFileName = sanitizedTag + QStringLiteral(".png");
     const QString fullPath = caseDir + QLatin1Char('/') + pngFileName;
     if (!img.save(fullPath, "PNG")) {
+        qWarning() << "ScreenshotHelper::capture: failed to save PNG to" << fullPath;
         return false;
     }
 
     // 计算 MD5(读回 PNG 文件字节,保证与落盘内容一致)
     QFile pngFile(fullPath);
     if (!pngFile.open(QIODevice::ReadOnly)) {
+        qWarning() << "ScreenshotHelper::capture: failed to open PNG for MD5 read" << fullPath;
         return false;
     }
     const QByteArray pngBytes = pngFile.readAll();
@@ -111,17 +126,17 @@ bool ScreenshotHelper::capture(QQuickItem* item, const QString& tag, const QStri
     const QByteArray md5hex =
         QCryptographicHash::hash(pngBytes, QCryptographicHash::Md5).toHex();
 
-    // manifest 相对路径:testName/tag.png(相对 artifactDir,正斜杠保证跨平台一致)
+    // manifest 相对路径:testName/sanitizedTag.png(相对 artifactDir,正斜杠保证跨平台一致)
     const QString relPath = testName + QLatin1Char('/') + pngFileName;
 
     // ISO8601 UTC 时间戳
     const QString ts = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
 
-    // 构建 JSONL 行(case/page 均填 tag;Phase 3 视觉用例若需区分 page 可扩展 API)
+    // 构建 JSONL 行(case/page 均填净化后 tag,与文件名保持一致;Phase 3 视觉用例若需区分 page 可扩展 API)
     QJsonObject line;
     line[QStringLiteral("test")] = testName;
-    line[QStringLiteral("case")] = tag;
-    line[QStringLiteral("page")] = tag;
+    line[QStringLiteral("case")] = sanitizedTag;
+    line[QStringLiteral("page")] = sanitizedTag;
     line[QStringLiteral("theme")] = theme;
     line[QStringLiteral("file")] = relPath;
     line[QStringLiteral("md5")] = QString::fromUtf8(md5hex);
@@ -130,10 +145,12 @@ bool ScreenshotHelper::capture(QQuickItem* item, const QString& tag, const QStri
         QJsonDocument(line).toJson(QJsonDocument::Compact);
 
     // 追加写入 manifest.jsonl(每行一个紧凑 JSON 对象 + 换行)
+    // 不使用 QIODevice::Text:Windows 下 Text 模式会把 "\n" 转 "\r\n",破坏跨平台一致性
     const QString manifestPath =
         artifactDir + QLatin1Char('/') + QStringLiteral("manifest.jsonl");
     QFile manifestFile(manifestPath);
-    if (!manifestFile.open(QIODevice::Append | QIODevice::Text)) {
+    if (!manifestFile.open(QIODevice::Append)) {
+        qWarning() << "ScreenshotHelper::capture: failed to open manifest.jsonl for append";
         return false;
     }
     manifestFile.write(jsonLine);
