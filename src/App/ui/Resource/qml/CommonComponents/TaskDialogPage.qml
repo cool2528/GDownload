@@ -144,6 +144,7 @@ Popup {
                                 anchors.fill: parent
                                 TextArea {
                                     id: input
+                                    objectName: "inputUrl"
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     font.pixelSize: 13
@@ -349,6 +350,7 @@ Popup {
                 // 提交按钮
                 GButton {
                     type: 1  // Primary
+                    objectName: "btnCreateTask"
                     text: qsTr("Add Task")
                     Layout.preferredWidth: 100
                     Layout.preferredHeight: taskPage.buttonHeight

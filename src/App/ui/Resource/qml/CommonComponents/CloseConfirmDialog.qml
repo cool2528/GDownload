@@ -54,6 +54,7 @@ GMessageBox {
 
             GCheckBox {
                 id: dontAskAgainCheckbox
+                objectName: "chkDontAskAgain"
                 text: qsTr("Don't ask again, remember my choice")
                 checked: root.dontAskAgain
                 onCheckedChanged: root.dontAskAgain = checked
@@ -62,6 +63,7 @@ GMessageBox {
     }
 
     // 按钮配置:取消 / 最小化到托盘(推荐) / 退出(危险)
+    // 退出按钮带 objectName "btnConfirmClose":确认关闭应用,供集成测试 findChild 定位
     buttons: [
         {
             text: qsTr("Cancel"),
@@ -76,7 +78,8 @@ GMessageBox {
         {
             text: qsTr("Quit"),
             type: "danger",
-            width: 90
+            width: 90,
+            objectName: "btnConfirmClose"
         }
     ]
     defaultButtonIndex: -1
