@@ -11,6 +11,7 @@
 #include <QJsonObject>
 #include <QQuickItem>
 #include <QQuickItemGrabResult>
+#include <QQuickWindow>
 #include <QRegularExpression>
 #include <QTest>
 #include <QTimer>
@@ -55,11 +56,40 @@ bool ScreenshotHelper::capture(QQuickItem* item, const QString& tag, const QStri
         qWarning() << "ScreenshotHelper::capture: null item";
         return false;
     }
+    return captureImpl(item, item, tag, theme);
+}
+
+bool ScreenshotHelper::captureWindow(QQuickItem* item, const QString& tag, const QString& theme) {
+    if (item == nullptr) {
+        qWarning() << "ScreenshotHelper::captureWindow: null item";
+        return false;
+    }
+    QQuickWindow* window = item->window();
+    if (window == nullptr) {
+        qWarning() << "ScreenshotHelper::captureWindow: item has no associated window";
+        return false;
+    }
+    QQuickItem* contentItem = window->contentItem();
+    if (contentItem == nullptr) {
+        qWarning() << "ScreenshotHelper::captureWindow: window has no contentItem";
+        return false;
+    }
+    // grab 目标切到窗口 contentItem(含 Overlay 层,Popup/Dialog 渲染其上);
+    // testName 解析仍走原 item 父链(contentItem 是窗口根,父链不含 TestCase)
+    return captureImpl(contentItem, item, tag, theme);
+}
+
+bool ScreenshotHelper::captureImpl(QQuickItem* grab_item, QQuickItem* name_item, const QString& tag,
+                                   const QString& theme) {
+    if (grab_item == nullptr) {
+        qWarning() << "ScreenshotHelper::captureImpl: null grab_item";
+        return false;
+    }
 
     const QString artifactDir = resolveArtifactDir();
     if (artifactDir.isEmpty()) {
         // 产物目录未配置(非 ctest 运行场景),无法写盘
-        qWarning() << "ScreenshotHelper::capture: artifact dir not configured (QML_UI_ARTIFACT_DIR unset)";
+        qWarning() << "ScreenshotHelper::captureImpl: artifact dir not configured (QML_UI_ARTIFACT_DIR unset)";
         return false;
     }
 
@@ -68,18 +98,18 @@ bool ScreenshotHelper::capture(QQuickItem* item, const QString& tag, const QStri
     QString sanitizedTag = tag;
     sanitizedTag.replace(QRegularExpression(QStringLiteral("[^a-zA-Z0-9_-]")), QStringLiteral("_"));
 
-    const QString testName = resolveTestName(item);
+    const QString testName = resolveTestName(name_item);
     const QString caseDir = artifactDir + QLatin1Char('/') + testName;
     // 创建测试子目录(已存在则为 no-op)
     if (!QDir().mkpath(caseDir)) {
-        qWarning() << "ScreenshotHelper::capture: failed to create dir" << caseDir;
+        qWarning() << "ScreenshotHelper::captureImpl: failed to create dir" << caseDir;
         return false;
     }
 
     // 异步截图:grabToImage 返回共享指针,ready 信号触发时图像可用
-    QSharedPointer<QQuickItemGrabResult> grabResult = item->grabToImage();
+    QSharedPointer<QQuickItemGrabResult> grabResult = grab_item->grabToImage();
     if (grabResult == nullptr) {
-        qWarning() << "ScreenshotHelper::capture: grabToImage returned null";
+        qWarning() << "ScreenshotHelper::captureImpl: grabToImage returned null";
         return false;
     }
 
@@ -97,13 +127,13 @@ bool ScreenshotHelper::capture(QQuickItem* item, const QString& tag, const QStri
 
     if (!succeeded) {
         // ready 未在超时内触发(grab 失败或 offscreen 平台未渲染)
-        qWarning() << "ScreenshotHelper::capture: grab timed out after 5s for tag" << sanitizedTag;
+        qWarning() << "ScreenshotHelper::captureImpl: grab timed out after 5s for tag" << sanitizedTag;
         return false;
     }
 
     const QImage img = grabResult->image();
     if (img.isNull()) {
-        qWarning() << "ScreenshotHelper::capture: image is null after grab";
+        qWarning() << "ScreenshotHelper::captureImpl: image is null after grab";
         return false;
     }
 
@@ -111,14 +141,14 @@ bool ScreenshotHelper::capture(QQuickItem* item, const QString& tag, const QStri
     const QString pngFileName = sanitizedTag + QStringLiteral(".png");
     const QString fullPath = caseDir + QLatin1Char('/') + pngFileName;
     if (!img.save(fullPath, "PNG")) {
-        qWarning() << "ScreenshotHelper::capture: failed to save PNG to" << fullPath;
+        qWarning() << "ScreenshotHelper::captureImpl: failed to save PNG to" << fullPath;
         return false;
     }
 
     // 计算 MD5(读回 PNG 文件字节,保证与落盘内容一致)
     QFile pngFile(fullPath);
     if (!pngFile.open(QIODevice::ReadOnly)) {
-        qWarning() << "ScreenshotHelper::capture: failed to open PNG for MD5 read" << fullPath;
+        qWarning() << "ScreenshotHelper::captureImpl: failed to open PNG for MD5 read" << fullPath;
         return false;
     }
     const QByteArray pngBytes = pngFile.readAll();
@@ -150,7 +180,7 @@ bool ScreenshotHelper::capture(QQuickItem* item, const QString& tag, const QStri
         artifactDir + QLatin1Char('/') + QStringLiteral("manifest.jsonl");
     QFile manifestFile(manifestPath);
     if (!manifestFile.open(QIODevice::Append)) {
-        qWarning() << "ScreenshotHelper::capture: failed to open manifest.jsonl for append";
+        qWarning() << "ScreenshotHelper::captureImpl: failed to open manifest.jsonl for append";
         return false;
     }
     manifestFile.write(jsonLine);

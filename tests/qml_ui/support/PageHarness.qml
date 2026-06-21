@@ -12,6 +12,9 @@ Item {
     id: harness
     property string themeMode: "light"
     property alias source: loader.source
+    // 已加载项引用(Loader.item):供视觉用例对 Popup/Dialog 类组件调用 open()
+    // 等方法。Loader 未加载时为 null。
+    property alias loadedItem: loader.item
     function load(url) { loader.source = url }
 
     // 主题切换:GThemeType 枚举值 kSystem=0 kLight=1 kDark=2
