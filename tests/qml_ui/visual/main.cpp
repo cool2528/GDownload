@@ -1,7 +1,9 @@
 #include <QtQuickTest>
+#include <QGuiApplication>
 #include <QQmlEngine>
 #include <QQmlContext>
 #include <QFontDatabase>
+#include <QFont>
 
 #include "ScreenshotHelper.h"
 #include "TestStubs.h"
@@ -113,6 +115,31 @@ class TestSetup : public QObject {
 		} else {
 			// 字体加载失败回退:Windows 11 系统自带 "Segoe Fluent Icons",族名直接设
 			engine->rootContext()->setContextProperty("FluentIcons", QStringLiteral("Segoe Fluent Icons"));
+		}
+
+		// 中文字体回退:`-platform offscreen` 在 Windows 上不读系统字体目录,
+		// 所有非 ASCII 字符(包括汉字与中文标点)缺少字形回退到 .notdef → 方框。
+		// 显式加载系统中文字体到 QFontDatabase,并通过 QGuiApplication::setFont
+		// 设为应用默认字体族,使所有未显式指定 font.family 的文本节点能够回退到
+		// 这些字体绘制中文。优先 Microsoft YaHei,回退 SimSun。
+		const QStringList cn_font_paths = {
+			QStringLiteral("C:/Windows/Fonts/msyh.ttc"),
+			QStringLiteral("C:/Windows/Fonts/msyhbd.ttc"),
+			QStringLiteral("C:/Windows/Fonts/simsun.ttc"),
+			QStringLiteral("C:/Windows/Fonts/simhei.ttf"),
+		};
+		QString default_cn_family;
+		for (const auto& path : cn_font_paths) {
+			const int id = QFontDatabase::addApplicationFont(path);
+			if (id == -1) continue;
+			const auto families = QFontDatabase::applicationFontFamilies(id);
+			if (families.isEmpty()) continue;
+			if (default_cn_family.isEmpty()) default_cn_family = families.first();
+		}
+		if (!default_cn_family.isEmpty()) {
+			QFont app_font(default_cn_family);
+			app_font.setPointSize(9);
+			QGuiApplication::setFont(app_font);
 		}
 	}
 };
