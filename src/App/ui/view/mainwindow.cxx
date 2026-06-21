@@ -3,7 +3,10 @@
 #include <QFontDatabase>
 #include <QQmlContext>
 #include <QUrl>
+#include <filesystem>
 #include "Browser/browser_manager.h"
+#include "Browser/browser_manager_factory.h"
+#include "test_mode.h"
 #include "Definitions/appDef.h"
 #include "Definitions/fluentEnumDef.h"
 #include "FramelessHelper/Core/private/framelessconfig_p.h"
@@ -13,6 +16,7 @@
 #include "NetDisk/NetWork_Disk_magager.h"
 #include "PluginManager/plugin_manager.h"
 #include "Settings/settings_manager.h"
+#include "Settings/settings_manager_factory.h"
 #include "language/language_manager.h"
 #include "logger.h"
 #include "os/os.h"
@@ -41,7 +45,9 @@ namespace gd {
 			QApplication app(argc, argv);
 			InitIcon(&app);
 			QQmlApplicationEngine engine;
-            InitNetDiskPlugins();
+			if (!gdl::ui::isTestMode()) {
+				InitNetDiskPlugins();
+			}
 			InitQmlEngine(&engine);
 			InitFont(&engine);
 			QObject::connect(
@@ -56,6 +62,18 @@ namespace gd {
 		}
 
 		void MainWindow::InitQmlEngine(QQmlEngine* engine) {
+			const bool is_test = gdl::ui::isTestMode();
+			// 经工厂创建 manager 并注册为 QML 单例
+			// 模板参数用 Impl 类型:IBrowserManager/ISettings 未继承 QObject,不能作为
+			// qmlRegisterSingletonInstance 的模板实参;Phase 2 若 Fake 继承 Impl 则无需改此行
+			auto* settings_ptr = gdl::ui::settings::createSettingsManager(is_test);
+			auto* browser_ptr  = gdl::ui::browser::createBrowserManager(is_test);
+			qmlRegisterSingletonInstance<gdl::ui::settings::SettingsImpl>(
+				GEXPORT_MODULE_URL, 1, 0, "SettingsManager",
+				static_cast<gdl::ui::settings::SettingsImpl*>(settings_ptr));
+			qmlRegisterSingletonInstance<gdl::ui::browser::BrowserManagerImpl>(
+				GEXPORT_MODULE_URL, 1, 0, "BrowserManager",
+				static_cast<gdl::ui::browser::BrowserManagerImpl*>(browser_ptr));
 			gdl::ui::settings::RegisterTypes(engine);
 			qmlRegisterType<gdl::ui::models::FolderHistoryModel>("gdl.sdk", 1, 0, "FolderHistoryModel");
 			gdl::ui::language::RegisterTypes(engine);
@@ -72,17 +90,35 @@ namespace gd {
 			gdl::ui::browser::RegisterTypes(engine);
 			gdl::ui::toast::RegisterTypes(engine);
 			gdl::update::RegisterTypes(engine);
-			gdl::update::UpdateConfig update_config;
-			update_config.current_version	 = GDownload_VERSION_STRING;
-			update_config.enable_auto_check = gdl::ui::settings::Settings::Instance().GetEnableAutoUpdate();
-			update_config.update_url = "https://api.github.com/repos/cool2528/gdownload/releases/latest";
-			std::map<std::string, std::string> headers;
-			headers["Content-Type"] = "application/json";
-			headers["User-Agent"]	= "GDownloader-Update-Client";
-			headers["Accept"]				= "application/vnd.github.v3+json";
-			gdl::update::UpdateManager::Instance().SetRequestHeaders(headers);
-			gdl::update::UpdateManager::Instance().Initialize(update_config);
-            gdl::ui::netdisk::RegisterTypes(engine);
+			gdl::ui::netdisk::RegisterTypes(engine);
+			// 启动期副作用:测试模式下跳过 aria2c 子进程、自动更新 HTTP
+			if (!is_test) {
+				// aria2c 引擎初始化(原 browser_manager.cxx RegisterTypes 内的逻辑)
+				const QString app_path = QString::fromStdString(gdl::os::GetExecutableDir());
+				QString aria2c_engine_path;
+#ifdef __APPLE__
+				QString app_path_dir =
+					QString::fromStdString(std::filesystem::path(app_path.toStdString()).parent_path().string());
+				aria2c_engine_path = app_path_dir + "/Resources/engine/aria2c";
+#elif _WIN32 || defined(_WIN64)
+				aria2c_engine_path = app_path + "/engine/aria2c.exe";
+#else
+				aria2c_engine_path = app_path + "/engine/aria2c";
+#endif
+				gdl::engine::Aria2cDownloadManager::Instance().InitAria2cEngine(aria2c_engine_path.toStdString());
+				gdl::ui::browser::BrowserManagerImpl::Instance().Init();
+				// 自动更新检查
+				gdl::update::UpdateConfig update_config;
+				update_config.current_version	 = GDownload_VERSION_STRING;
+				update_config.enable_auto_check = gdl::ui::settings::Settings::Instance().GetEnableAutoUpdate();
+				update_config.update_url = "https://api.github.com/repos/cool2528/gdownload/releases/latest";
+				std::map<std::string, std::string> headers;
+				headers["Content-Type"] = "application/json";
+				headers["User-Agent"]	= "GDownloader-Update-Client";
+				headers["Accept"]				= "application/vnd.github.v3+json";
+				gdl::update::UpdateManager::Instance().SetRequestHeaders(headers);
+				gdl::update::UpdateManager::Instance().Initialize(update_config);
+			}
 		}
 		void MainWindow::InitTranslation(QGuiApplication* app) {}
 		void MainWindow::InitFont(QQmlEngine* engine) {

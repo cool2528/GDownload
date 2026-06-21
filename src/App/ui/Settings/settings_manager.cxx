@@ -243,9 +243,9 @@ namespace gdl {
             }
 
             void RegisterTypes(QQmlEngine* engine) {
+                Q_UNUSED(engine);
                 gdl::ui::settings::SettingsImpl::Instance().Init();
-                qmlRegisterSingletonInstance<Settings>(GEXPORT_MODULE_URL, 1, 0, "SettingsManager",
-                                                       &SettingsImpl::Instance());
+                // 单例注册已迁移至 MainWindow::InitQmlEngine,经由 createSettingsManager 工厂注入
             }
 
         }  // namespace settings

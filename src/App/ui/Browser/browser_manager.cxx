@@ -1165,21 +1165,9 @@ namespace gdl {
 			}
 
 			void RegisterTypes(QQmlEngine* engine) {
-                qmlRegisterSingletonInstance<BrowserManager>(GEXPORT_MODULE_URL, 1, 0, "BrowserManager",
-                                                             &BrowserManagerImpl::Instance());
-				const QString app_path = QString::fromStdString(os::GetExecutableDir());
-				QString aria2c_engine_path;
-#ifdef __APPLE__
-				QString app_path_dir =
-					QString::fromStdString(std::filesystem::path(app_path.toStdString()).parent_path().string());
-				aria2c_engine_path = app_path_dir + "/Resources/engine/aria2c";
-#elif _WIN32 || defined(_WIN64)
-				aria2c_engine_path = app_path + "/engine/aria2c.exe";
-#else
-				aria2c_engine_path = app_path + "/engine/aria2c";
-#endif
-				gdl::engine::Aria2cDownloadManager::Instance().InitAria2cEngine(aria2c_engine_path.toStdString());
-				BrowserManagerImpl::Instance().Init();
+				Q_UNUSED(engine);
+				// 单例注册已迁移至 MainWindow::InitQmlEngine,经由 createBrowserManager 工厂注入
+				// aria2c 引擎初始化与 BrowserManagerImpl::Init() 迁移至 MainWindow,按测试模式跳过
 			}
 
 		}  // namespace browser
