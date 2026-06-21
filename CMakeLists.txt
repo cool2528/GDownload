@@ -134,6 +134,9 @@ option(BUILD_TESTS "Build tests" OFF)
 if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
+    # QML UI 测试设施:视觉用例(quicktest)+ 集成用例(QtTest C++)
+    # 详见 docs/superpowers/specs/2026-06-20-qml-ui-test-harness-design.md
+    add_subdirectory(tests/qml_ui)
 endif()
 
 # 安装规则

@@ -90,8 +90,12 @@ namespace gdl {
 				void sigUpdateSyncServerList(const QString& list) override;
 				void sigTrackerUpdateStatus(const QString& status) override;
 
-			   private:
+			   protected:
+				// 构造函数为 protected:允许测试替身 FakeBrowserManager 继承并构造基类子对象
+				// Singleton<BrowserManagerImpl> 作为 friend 仍可访问(friend 绕过访问控制)
+				// 外部代码仍无法直接构造(protected 对非派生类不可见),单例约束保持不变
 				explicit BrowserManagerImpl(QObject* parent = nullptr);
+			   private:
 				void OnHandleAria2Message(const std::string& msg);
                 void OnHandleAria2ActiveProgress(const std::string& msg);
 				void OnHandleTrackerUpdateStatus(const std::string& msg);
