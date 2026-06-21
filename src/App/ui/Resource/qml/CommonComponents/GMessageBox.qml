@@ -220,6 +220,9 @@ Dialog {
                         required property int index
                         required property var modelData
 
+                        // 调用方可在 buttons 数组项中传 objectName 字段,
+                        // 供集成测试 findChild 定位特定按钮(如 CloseConfirmDialog 的退出按钮)
+                        objectName: modelData.objectName || ""
                         text: modelData.text || ""
                         implicitWidth: modelData.width || 90
                         implicitHeight: GTheme.sizeDefault

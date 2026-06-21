@@ -83,7 +83,10 @@ ColumnLayout {
         }
 
         // Reset:次要按钮(type:3 = default 样式),始终可用
+        // objectName "btnCancel":设置页为页面(非对话框),Reset 即放弃改动,
+        // 与"取消"语义等价,供集成测试 findChild 定位
         GButton {
+            objectName: "btnCancel"
             text: qsTr("Reset")
             type: 3
             Layout.preferredWidth: root.buttonWidth
@@ -92,6 +95,7 @@ ColumnLayout {
 
         // Save:主要按钮(type:1 = primary 样式),仅在有改动时启用
         GButton {
+            objectName: "btnSave"
             text: qsTr("Save Settings")
             type: 1
             enabled: root.hasChanges

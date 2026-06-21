@@ -98,6 +98,7 @@ Item {
                     // 已停止按钮
                     GButton {
                         id: stoppedBtn
+                        objectName: "navCompleted"
                         variant: "nav"
                         Layout.fillWidth: true
                         Layout.preferredHeight: GTheme.navItemHeight
