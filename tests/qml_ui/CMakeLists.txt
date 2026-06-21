@@ -18,11 +18,14 @@ set_tests_properties(qml_ui_clean_artifacts PROPERTIES
 # fixture CLEANUP:测试结束后把 manifest.jsonl 折叠为 manifest.json
 # 不设 WORKING_DIRECTORY:Phase 1 smoke 不写产物,目录可能不存在;
 # finalize_manifest.cmake 用绝对路径 + if(EXISTS) 守卫,无产物时为空操作
+# 注意:`cmake -P` 脚本模式下 CMAKE_BINARY_DIR 未定义,通过 ENVIRONMENT 把
+# QML_UI_ARTIFACT_DIR 注入给 finalize_manifest.cmake 用作产物目录绝对路径
 add_test(NAME qml_ui_finalize_manifest
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/finalize_manifest.cmake)
 set_tests_properties(qml_ui_finalize_manifest PROPERTIES
     FIXTURES_CLEANUP qml_ui_artifacts
-    LABELS qml_ui)
+    LABELS qml_ui
+    ENVIRONMENT "QML_UI_ARTIFACT_DIR=${CMAKE_BINARY_DIR}/test_artifacts/qml_ui")
 
 # 一键跑全部 qml_ui 测试的便利目标
 add_custom_target(run_qml_ui_tests
