@@ -309,8 +309,10 @@ class TestGTheme : public QObject {
 	bool dark_ = false;
 };
 
-// BrowserManager 桩:仅提供 DownloadPageView 在 QML 中调用的 3 个 Q_INVOKABLE
-// 返回 nullptr 使 GDownloadViewPage 以空模型渲染
+// BrowserManager 桩:提供 DownloadPageView 与 TrackerServerSettingPage 引用的 Q_INVOKABLE
+// 数据模型方法返回 nullptr,使 GDownloadViewPage 以空模型渲染;
+// SyncTrackersServerlist 空实现,sigTrackerUpdateStatus 信号声明供 TrackerServerSettingPage
+// 的 Connections 处理器解析(不发射,仅满足 QML 类型检查)。
 class TestBrowserManager : public QObject {
 	Q_OBJECT
    public:
@@ -318,12 +320,21 @@ class TestBrowserManager : public QObject {
 	Q_INVOKABLE QObject* GetActiveDownloadModel() { return nullptr; }
 	Q_INVOKABLE QObject* GetWaitingDownloadModel() { return nullptr; }
 	Q_INVOKABLE QObject* GetStopedDownloadModel() { return nullptr; }
+	// TrackerServerSettingPage 同步按钮调用(空实现)
+	Q_INVOKABLE void SyncTrackersServerlist() {}
+   Q_SIGNALS:
+	// TrackerServerSettingPage Connections 监听此信号更新同步状态(桩不发射)
+	void sigTrackerUpdateStatus(const QString& status);
 };
 
-// SettingsManager 桩:提供 mainWindow / TitleBar / NetDiskPageView 引用的 qXxx 属性
-// 命名沿用 SETTING_PROPERTY 宏生成的 q 前缀
+// SettingsManager 桩:提供 mainWindow / TitleBar / NetDiskPageView 及全部 Settings 页面
+// 引用的 qXxx 属性与 SetXxx 方法。命名沿用 SETTING_PROPERTY 宏生成的 q 前缀。
+// Task 7(设置页视觉用例)覆盖 14 个 SettingPage,这些页面读取 30+ 个 qXxx 属性
+// 并调用对应 SetXxx Q_INVOKABLE 保存改动。桩提供全部属性(合理默认值,使页面
+// 渲染出有意义的视觉内容)与全部 SetXxx(空实现,视觉用例不验证保存行为)。
 class TestSettingsManager : public QObject {
 	Q_OBJECT
+	// 主窗口/通用(已存在属性沿用 Task 6)
 	Q_PROPERTY(bool qRememberWindowPosition MEMBER remember_window_position_ CONSTANT)
 	Q_PROPERTY(QSize qWindowSize MEMBER window_size_ CONSTANT)
 	Q_PROPERTY(QPoint qWindowPosition MEMBER window_position_ CONSTANT)
@@ -333,8 +344,114 @@ class TestSettingsManager : public QObject {
 	Q_PROPERTY(QString qTheme MEMBER theme_ CONSTANT)
 	Q_PROPERTY(QString qLanguage MEMBER language_ CONSTANT)
 
+	// BasicSettingPage:应用行为 / 下载路径 / 网络代理 / 剪贴板监听
+	Q_PROPERTY(bool qEnableAutoUpdate MEMBER enable_auto_update_ CONSTANT)
+	Q_PROPERTY(bool qAutoStart MEMBER auto_start_ CONSTANT)
+	Q_PROPERTY(bool qAutoResumeTask MEMBER auto_resume_task_ CONSTANT)
+	Q_PROPERTY(QString qDir MEMBER dir_ CONSTANT)
+	Q_PROPERTY(bool qEnableGlobalProxy MEMBER enable_global_proxy_ CONSTANT)
+	Q_PROPERTY(QString qGlobalProxy MEMBER global_proxy_ CONSTANT)
+	Q_PROPERTY(bool qListenClipboard MEMBER listen_clipboard_ CONSTANT)
+
+	// Aria2RpcSettingPage:RPC 端口与密钥
+	Q_PROPERTY(int qRpcListenPort MEMBER rpc_listen_port_ CONSTANT)
+	Q_PROPERTY(QString qRpcSecret MEMBER rpc_secret_ CONSTANT)
+
+	// BitTorrentAdvancedSettingPage:BT 高级
+	Q_PROPERTY(bool qEnableDht MEMBER enable_dht_ CONSTANT)
+	Q_PROPERTY(int qBtMaxPeers MEMBER bt_max_peers_ CONSTANT)
+	Q_PROPERTY(bool qBtRequireCrypto MEMBER bt_require_crypto_ CONSTANT)
+
+	// ConnectionPerformanceSettingPage:并发与分片
+	Q_PROPERTY(int qMaxConcurrentDownloads MEMBER max_concurrent_downloads_ CONSTANT)
+	Q_PROPERTY(int qMaxConnectionPerServer MEMBER max_connection_per_server_ CONSTANT)
+	Q_PROPERTY(int qSplit MEMBER split_ CONSTANT)
+	Q_PROPERTY(int qMinSplitSize MEMBER min_split_size_ CONSTANT)
+
+	// PostDownloadActionsSettingPage:完成/错误/启动动作
+	Q_PROPERTY(int qOnCompleteAction MEMBER on_complete_action_ CONSTANT)
+	Q_PROPERTY(QString qCustomCompleteCommand MEMBER custom_complete_command_ CONSTANT)
+	Q_PROPERTY(int qOnErrorAction MEMBER on_error_action_ CONSTANT)
+	Q_PROPERTY(QString qCustomErrorCommand MEMBER custom_error_command_ CONSTANT)
+	Q_PROPERTY(int qOnStartAction MEMBER on_start_action_ CONSTANT)
+
+	// SpeedControlSettingPage:全局上下行限速
+	Q_PROPERTY(int qMaxOverallDownloadLimit MEMBER max_overall_download_limit_ CONSTANT)
+	Q_PROPERTY(int qMaxOverallUploadLimit MEMBER max_overall_upload_limit_ CONSTANT)
+	Q_PROPERTY(int qLowestSpeedLimit MEMBER lowest_speed_limit_ CONSTANT)
+
+	// TimeoutRetrySettingPage:超时与重试
+	Q_PROPERTY(int qTimeout MEMBER timeout_ CONSTANT)
+	Q_PROPERTY(int qConnectTimeout MEMBER connect_timeout_ CONSTANT)
+	Q_PROPERTY(int qMaxTries MEMBER max_tries_ CONSTANT)
+	Q_PROPERTY(int qRetryWait MEMBER retry_wait_ CONSTANT)
+
+	// TrackerServerSettingPage:tracker 源
+	// qTrackerSourceNames 必须为合法 JSON 字符串,页面 Component.onCompleted
+	// 调 JSON.parse 解析;空数组 "[]" 保证不抛 SyntaxError。
+	Q_PROPERTY(QString qTrackerSourceNames MEMBER tracker_source_names_ CONSTANT)
+	Q_PROPERTY(bool qEnableTrackerSourceAutoUpdate MEMBER enable_tracker_source_auto_update_ CONSTANT)
+
+	// UserAgentSettingPage:UA
+	Q_PROPERTY(QString qUserAgent MEMBER user_agent_ CONSTANT)
+
    public:
 	explicit TestSettingsManager(QObject* parent = nullptr) : QObject(parent) {}
+
+	// BasicSettingPage setters(空实现,视觉用例不验证保存)
+	Q_INVOKABLE void SetEnableAutoUpdate(bool v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetAutoStart(bool v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetRememberWindowPosition(bool v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetAria2AutoResumeTask(bool v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetShowCloseConfirm(bool v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetAria2Dir(const QString& v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetEnableGlobalProxy(bool v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetAria2GlobalProxy(const QString& v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetListenClipboard(bool v) { Q_UNUSED(v); }
+
+	// Aria2RpcSettingPage setters + GenerateRpcSecret
+	Q_INVOKABLE void SetRpcListenPort(int v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetRpcSecret(const QString& v) { Q_UNUSED(v); }
+	Q_INVOKABLE QString GenerateRpcSecret() { return QStringLiteral("test-secret-stub-0123456789abcdef"); }
+
+	// BaiduCookieSettingPage setter
+	Q_INVOKABLE void SetBaiduPanCookies(const QString& v) { Q_UNUSED(v); }
+
+	// BitTorrentAdvancedSettingPage setters
+	Q_INVOKABLE void SetAria2EnableDht(bool v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetAria2BtMaxPeers(int v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetAria2BtRequireCrypto(bool v) { Q_UNUSED(v); }
+
+	// ConnectionPerformanceSettingPage setters
+	Q_INVOKABLE void SetAria2MaxConcurrentDownloads(int v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetAria2MaxConnectionPerServer(int v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetAria2Split(int v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetAria2MinSplitSize(int v) { Q_UNUSED(v); }
+
+	// PostDownloadActionsSettingPage setters
+	Q_INVOKABLE void SetOnCompleteAction(int v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetCustomCompleteCommand(const QString& v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetOnErrorAction(int v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetCustomErrorCommand(const QString& v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetOnStartAction(int v) { Q_UNUSED(v); }
+
+	// SpeedControlSettingPage setters
+	Q_INVOKABLE void SetAria2MaxOverallDownloadLimit(int v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetAria2MaxOverallUploadLimit(int v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetAria2LowestSpeedLimit(int v) { Q_UNUSED(v); }
+
+	// TimeoutRetrySettingPage setters
+	Q_INVOKABLE void SetAria2Timeout(int v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetAria2ConnectTimeout(int v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetAria2MaxTries(int v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetAria2RetryWait(int v) { Q_UNUSED(v); }
+
+	// TrackerServerSettingPage setters
+	Q_INVOKABLE void SetTrackerSourceNames(const QString& v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetEnableTrackerSourceAutoUpdate(bool v) { Q_UNUSED(v); }
+
+	// UserAgentSettingPage setter
+	Q_INVOKABLE void SetAria2UserAgent(const QString& v) { Q_UNUSED(v); }
 
    private:
 	bool remember_window_position_ = false;
@@ -345,6 +462,55 @@ class TestSettingsManager : public QObject {
 	bool close_to_tray_ = false;
 	QString theme_ = QStringLiteral("light");
 	QString language_ = QStringLiteral("en_US");
+
+	// BasicSettingPage 默认值(开关为合理开启态,使页面视觉更饱满)
+	bool enable_auto_update_ = true;
+	bool auto_start_ = false;
+	bool auto_resume_task_ = true;
+	QString dir_ = QStringLiteral("C:/Downloads");
+	bool enable_global_proxy_ = false;
+	QString global_proxy_;
+	bool listen_clipboard_ = true;
+
+	// Aria2RpcSettingPage(端口 6800 为 aria2 默认 RPC 端口)
+	int rpc_listen_port_ = 6800;
+	QString rpc_secret_ = QStringLiteral("test-secret-stub");
+
+	// BitTorrentAdvancedSettingPage
+	bool enable_dht_ = true;
+	int bt_max_peers_ = 55;
+	bool bt_require_crypto_ = false;
+
+	// ConnectionPerformanceSettingPage(aria2 推荐默认)
+	int max_concurrent_downloads_ = 5;
+	int max_connection_per_server_ = 1;
+	int split_ = 5;
+	int min_split_size_ = 20;
+
+	// PostDownloadActionsSettingPage(0 = 无动作)
+	int on_complete_action_ = 0;
+	QString custom_complete_command_;
+	int on_error_action_ = 0;
+	QString custom_error_command_;
+	int on_start_action_ = 0;
+
+	// SpeedControlSettingPage(0 = 不限速)
+	int max_overall_download_limit_ = 0;
+	int max_overall_upload_limit_ = 0;
+	int lowest_speed_limit_ = 0;
+
+	// TimeoutRetrySettingPage(秒)
+	int timeout_ = 60;
+	int connect_timeout_ = 60;
+	int max_tries_ = 5;
+	int retry_wait_ = 0;
+
+	// TrackerServerSettingPage(合法 JSON 空数组,避免 JSON.parse 抛异常)
+	QString tracker_source_names_ = QStringLiteral("[]");
+	bool enable_tracker_source_auto_update_ = false;
+
+	// UserAgentSettingPage
+	QString user_agent_ = QStringLiteral("Mozilla/5.0 (Windows NT 10.0; Win64; x64) GDownload/test-stub");
 };
 
 // ToastManager 桩:ShowXxx 空实现,避免 QML 调用时缺少方法
@@ -374,8 +540,11 @@ class TestUpdateManager : public QObject {
 };
 
 // UtilsToolsManager 桩:HideMacOsxWindowStandardButtons 等空实现
+// BasicSettingPage 调 SetAutoStart;Aria2RpcSettingPage 调 RelaunchAfterExit;
+// TrackerServerSettingPage 绑定 serverList 文本。三者均提供桩,使页面加载与渲染不抛异常。
 class TestUtilsToolsManager : public QObject {
 	Q_OBJECT
+	Q_PROPERTY(QString serverList MEMBER server_list_ CONSTANT)
    public:
 	explicit TestUtilsToolsManager(QObject* parent = nullptr) : QObject(parent) {}
 	Q_INVOKABLE void HideMacOsxWindowStandardButtons(QObject* window) { Q_UNUSED(window); }
@@ -384,13 +553,29 @@ class TestUtilsToolsManager : public QObject {
 		return false;
 	}
 	Q_INVOKABLE QString Version() const { return QStringLiteral("test-stub"); }
+	// BasicSettingPage:开机自启动(空实现)
+	Q_INVOKABLE void SetAutoStart(bool v) { Q_UNUSED(v); }
+	// Aria2RpcSettingPage:保存后重启应用(空实现)
+	Q_INVOKABLE void RelaunchAfterExit(int delayMs) { Q_UNUSED(delayMs); }
+
+   private:
+	// TrackerServerSettingPage TextArea 绑定此属性展示 tracker 列表
+	QString server_list_ = QStringLiteral("udp://tracker.example.com:1337\nhttp://tracker.example.com/announce");
 };
 
-// LanguageManager 桩:空对象
+// LanguageManager 桩:BasicSettingPage 语言下拉引用 GetSupportedLanguages /
+// GetCurrentLanguage / SwitchLanguage。返回固定列表与当前语言,使下拉能渲染选项。
 class TestLanguageManager : public QObject {
 	Q_OBJECT
    public:
 	explicit TestLanguageManager(QObject* parent = nullptr) : QObject(parent) {}
+	// BasicSettingPage 语言下拉 model 与 values 数据源
+	Q_INVOKABLE QVariantList GetSupportedLanguages() const {
+		return {QStringLiteral("en_US"), QStringLiteral("zh_CN"), QStringLiteral("zh_TW"),
+				QStringLiteral("ja_JP"), QStringLiteral("ko_KR")};
+	}
+	Q_INVOKABLE QString GetCurrentLanguage() const { return QStringLiteral("en_US"); }
+	Q_INVOKABLE void SwitchLanguage(const QString& lang) { Q_UNUSED(lang); }
 };
 
 // FolderHistoryModel 桩:QAbstractListModel 子类,提供 maxHistoryCount 属性
