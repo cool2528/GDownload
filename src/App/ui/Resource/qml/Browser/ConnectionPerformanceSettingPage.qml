@@ -42,6 +42,8 @@ SettingCard {
             hint: qsTr("Number of downloads running at the same time")
             control: GSpinBox {
                 id: maxConcurrentDownloadsInput
+                // 测试可驱动性钩子:集成测试 findChild 定位此 SpinBox 以触发 hasChanges
+                objectName: "maxConcurrentDownloadsInput"
                 Layout.preferredWidth: root.inputWidth
                 Layout.preferredHeight: GTheme.sizeDefault
                 // aria2 配置范围(业务值,非设计令牌)
