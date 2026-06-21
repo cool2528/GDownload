@@ -11,6 +11,8 @@ qt_add_library(qml_ui_support STATIC
     FakeBrowserManager.cxx
     FakeSettingsManager.h
     FakeSettingsManager.cxx
+    IntegrationHelper.h
+    IntegrationHelper.cxx
     TestStubs.h
     TestStubs.cxx
     # 枚举头文件:AUTOMOC 处理 Q_NAMESPACE + Q_ENUM_NS + QML_NAMED_ELEMENT,
