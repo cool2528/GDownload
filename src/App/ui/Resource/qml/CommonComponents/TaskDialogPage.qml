@@ -48,9 +48,6 @@ Popup {
 
         // 头部区域
         TaskDialogHeader {
-            headerHeight: taskPage.headerHeight
-            standardPadding: taskPage.standardPadding
-            standardSpacing: taskPage.standardSpacing
             onCloseRequested: taskPage.close()
         }
 
