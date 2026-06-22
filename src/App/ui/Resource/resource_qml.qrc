@@ -20,6 +20,8 @@
         <file>qml/CommonComponents/GDownloadViewPage.qml</file>
         <file>qml/CommonComponents/GProgressBar.qml</file>
         <file>qml/CommonComponents/GCard.qml</file>
+        <file>qml/CommonComponents/SummaryMetricCard.qml</file>
+        <file>qml/CommonComponents/QuickActionCard.qml</file>
         <file>qml/CommonComponents/GElevation.qml</file>
         <file>qml/CommonComponents/SettingCard.qml</file>
         <file>qml/CommonComponents/SettingRow.qml</file>
