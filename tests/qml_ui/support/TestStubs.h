@@ -24,7 +24,7 @@
 // 桩原则:
 //   - 只暴露 QML 页面在视觉用例中实际引用的 Q_PROPERTY / Q_INVOKABLE
 //   - 颜色/尺寸/字号令牌取 Element Plus 标准值,与 GTheme 真实实现一致
-//   - 数据相关方法(GetActiveDownloadModel 等)返回 nullptr,页面以空状态渲染
+//   - 数据相关方法(GetActiveDownloadModel 等)返回视觉样例模型,页面以任务卡片态渲染
 //   - 副作用方法(ShowError / ParseShareUrl 等)空实现
 //
 // 注册:由 visual/main.cpp 的 TestSetup::qmlEngineAvailable 通过
@@ -309,22 +309,111 @@ class TestGTheme : public QObject {
 	bool dark_ = false;
 };
 
-// BrowserManager 桩:提供 DownloadPageView 与 TrackerServerSettingPage 引用的 Q_INVOKABLE
-// 数据模型方法返回 nullptr,使 GDownloadViewPage 以空模型渲染;
-// SyncTrackersServerlist 空实现,sigTrackerUpdateStatus 信号声明供 TrackerServerSettingPage
-// 的 Connections 处理器解析(不发射,仅满足 QML 类型检查)。
+// 下载任务视觉模型桩:给 DownloadPageView 截图提供稳定样例数据
+class TestDownloadTaskModel : public QAbstractListModel {
+	Q_OBJECT
+   public:
+	enum Roles {
+		kTaskId = Qt::UserRole + 1,
+		kTaskState,
+		kTaskFileName,
+		kTaskSavePath,
+		kTaskTotalSize,
+		kTaskCurrentSize,
+		kTaskDownloadSpeed,
+		kTaskProgress,
+		kTaskRemainingTime,
+		kTaskConnections,
+		kTaskDownloadLink,
+	};
+
+	explicit TestDownloadTaskModel(QObject* parent = nullptr) : QAbstractListModel(parent) {}
+
+	int rowCount(const QModelIndex& parent = QModelIndex()) const override {
+		if (parent.isValid()) return 0;
+		return rows_.size();
+	}
+
+	QVariant data(const QModelIndex& index, int role) const override {
+		if (!index.isValid() || index.row() < 0 || index.row() >= rows_.size()) return {};
+		return rows_.at(index.row()).value(QString::fromUtf8(roleNames().value(role)));
+	}
+
+	QHash<int, QByteArray> roleNames() const override {
+		return {{kTaskId, "taskId"},
+			{kTaskState, "taskState"},
+			{kTaskFileName, "fileName"},
+			{kTaskSavePath, "savePath"},
+			{kTaskTotalSize, "totalSize"},
+			{kTaskCurrentSize, "currentSize"},
+			{kTaskDownloadSpeed, "downloadSpeed"},
+			{kTaskProgress, "progress"},
+			{kTaskRemainingTime, "remainingTime"},
+			{kTaskConnections, "connections"},
+			{kTaskDownloadLink, "downloadLink"}};
+	}
+
+	void setRows(const QList<QVariantMap>& rows) {
+		beginResetModel();
+		rows_ = rows;
+		endResetModel();
+	}
+
+   private:
+	QList<QVariantMap> rows_;
+};
+
+// BrowserManager 桩:视觉用例返回稳定样例模型,使下载页截图覆盖任务卡片态
 class TestBrowserManager : public QObject {
 	Q_OBJECT
    public:
-	explicit TestBrowserManager(QObject* parent = nullptr) : QObject(parent) {}
-	Q_INVOKABLE QObject* GetActiveDownloadModel() { return nullptr; }
-	Q_INVOKABLE QObject* GetWaitingDownloadModel() { return nullptr; }
-	Q_INVOKABLE QObject* GetStopedDownloadModel() { return nullptr; }
-	// TrackerServerSettingPage 同步按钮调用(空实现)
+	explicit TestBrowserManager(QObject* parent = nullptr) : QObject(parent) {
+		active_model_.setRows({
+			{{"taskId", "active-1"}, {"taskState", 1}, {"fileName", "Ubuntu Desktop 26.04.iso"},
+			 {"savePath", "C:/Downloads/Linux/Ubuntu Desktop 26.04.iso"}, {"totalSize", "4.1 GB"},
+			 {"currentSize", "2.8 GB"}, {"downloadSpeed", "18.4 MB/s"}, {"progress", 68},
+			 {"remainingTime", "12 min"}, {"connections", 16},
+			 {"downloadLink", "https://releases.ubuntu.com/26.04/ubuntu-desktop.iso"}},
+			{{"taskId", "active-2"}, {"taskState", 1}, {"fileName", "gdownload-assets.zip"},
+			 {"savePath", "C:/Downloads/gdownload-assets.zip"}, {"totalSize", "820 MB"},
+			 {"currentSize", "610 MB"}, {"downloadSpeed", "6.4 MB/s"}, {"progress", 74},
+			 {"remainingTime", "3 min"}, {"connections", 8},
+			 {"downloadLink", "https://example.com/gdownload-assets.zip"}},
+			{{"taskId", "active-3"}, {"taskState", 0}, {"fileName", "DesignCourse-Part-12.mp4"},
+			 {"savePath", "C:/Downloads/Courses/DesignCourse-Part-12.mp4"}, {"totalSize", "1.8 GB"},
+			 {"currentSize", "420 MB"}, {"downloadSpeed", "0 B/s"}, {"progress", 23},
+			 {"remainingTime", "Paused"}, {"connections", 0},
+			 {"downloadLink", "https://example.com/design-course-part-12.mp4"}},
+		});
+
+		waiting_model_.setRows({
+			{{"taskId", "waiting-1"}, {"taskState", 0}, {"fileName", "Qt Documentation Offline.7z"},
+			 {"savePath", "C:/Downloads/Qt Documentation Offline.7z"}, {"totalSize", "640 MB"},
+			 {"currentSize", "0 B"}, {"downloadSpeed", "0 B/s"}, {"progress", 0},
+			 {"remainingTime", "Waiting"}, {"connections", 0}, {"downloadLink", "https://example.com/qt-docs.7z"}},
+		});
+
+		stopped_model_.setRows({
+			{{"taskId", "stopped-1"}, {"taskState", 2}, {"fileName", "GDownload-Installer.exe"},
+			 {"savePath", "C:/Downloads/GDownload-Installer.exe"}, {"totalSize", "86 MB"},
+			 {"currentSize", "86 MB"}, {"downloadSpeed", "0 B/s"}, {"progress", 100},
+			 {"remainingTime", "Completed"}, {"connections", 0},
+			 {"downloadLink", "https://example.com/GDownload-Installer.exe"}},
+		});
+	}
+
+	Q_INVOKABLE QObject* GetActiveDownloadModel() { return &active_model_; }
+	Q_INVOKABLE QObject* GetWaitingDownloadModel() { return &waiting_model_; }
+	Q_INVOKABLE QObject* GetStopedDownloadModel() { return &stopped_model_; }
 	Q_INVOKABLE void SyncTrackersServerlist() {}
+
    Q_SIGNALS:
-	// TrackerServerSettingPage Connections 监听此信号更新同步状态(桩不发射)
 	void sigTrackerUpdateStatus(const QString& status);
+
+   private:
+	TestDownloadTaskModel active_model_{this};
+	TestDownloadTaskModel waiting_model_{this};
+	TestDownloadTaskModel stopped_model_{this};
 };
 
 // SettingsManager 桩:提供 mainWindow / TitleBar / NetDiskPageView 及全部 Settings 页面
