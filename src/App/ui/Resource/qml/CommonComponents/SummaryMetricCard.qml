@@ -25,6 +25,7 @@ GCard {
     }
     padding: GTheme.spaceSM
     radius: GTheme.radiusBase
+    implicitHeight: GTheme.sizeLarge + GTheme.spaceSM * 2
 
     readonly property color accentColor: {
         switch (accent) {
