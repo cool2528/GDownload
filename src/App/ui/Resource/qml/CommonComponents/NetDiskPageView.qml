@@ -190,11 +190,11 @@ Rectangle {
         width: fileListView.width
         visible: fileListView.visible
         anchors.top: parent.top
-        height: 30
+        height: netDiskPage.rowHeight
         RowLayout{
             id:headerLayout
             anchors.fill: parent
-            spacing: 10
+            spacing: GTheme.spaceSM
             GCheckBox {
                 id:selectAllCheckBox
                 onClicked: {
@@ -208,23 +208,23 @@ Rectangle {
             Label {
                 text: qsTr("File Name")
                 Layout.fillWidth: true
-                Layout.minimumWidth: 200
+                Layout.minimumWidth: netDiskPage.fileNameMinWidth
                 color: GTheme.textRegular
-                font.pixelSize: 14
+                font.pixelSize: GTheme.fontBody
             }
             Label {
                 text: qsTr("Size")
                 Layout.fillWidth: true
-                Layout.minimumWidth: 100
+                Layout.minimumWidth: netDiskPage.fileSizeMinWidth
                 color: GTheme.textRegular
-                font.pixelSize: 14
+                font.pixelSize: GTheme.fontBody
             }
             Label {
                 text: qsTr("Date")
                 Layout.fillWidth: true
-                Layout.minimumWidth: 100
+                Layout.minimumWidth: netDiskPage.fileDateMinWidth
                 color: GTheme.textRegular
-                font.pixelSize: 14
+                font.pixelSize: GTheme.fontBody
             }
         }
 
@@ -244,10 +244,10 @@ Rectangle {
         }
         delegate: Rectangle{
             width: fileListView.width
-            height: 30
+            height: netDiskPage.rowHeight
             RowLayout{
                 anchors.fill: parent
-                spacing: 5
+                spacing: GTheme.spaceXS
                 GCheckBox {
                     checked: model.isSelected
                     onClicked: {
@@ -258,39 +258,39 @@ Rectangle {
                 }
 
                 Image {
-                    width: 20
-                    height: 20
+                    width: netDiskPage.fileIconSize
+                    height: netDiskPage.fileIconSize
                     source: model.isDir ? "/images/browser/FolderType.png" : "/images/browser/OtherType.png"
                 }
 
                 Label {
                     text: model.fileName
                     Layout.fillWidth: true
-                    Layout.minimumWidth: 200
+                    Layout.minimumWidth: netDiskPage.fileNameMinWidth
                     color: GTheme.textPrimary
-                    font.pixelSize: 14
+                    font.pixelSize: GTheme.fontBody
                 }
 
                 Label {
                     text: model.fileSize
                     Layout.fillWidth: true
-                    Layout.minimumWidth: 100
+                    Layout.minimumWidth: netDiskPage.fileSizeMinWidth
                     color: GTheme.textPrimary
-                    font.pixelSize: 14
+                    font.pixelSize: GTheme.fontBody
                 }
 
                 Label {
                     text: model.createTime
                     Layout.fillWidth: true
-                    Layout.minimumWidth: 100
+                    Layout.minimumWidth: netDiskPage.fileDateMinWidth
                     color: GTheme.textPrimary
-                    font.pixelSize: 14
+                    font.pixelSize: GTheme.fontBody
                 }
 
             }
             MouseArea{
                 anchors.left: parent.left
-                anchors.leftMargin: 30
+                anchors.leftMargin: netDiskPage.rowHeight
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
@@ -317,12 +317,13 @@ Rectangle {
         anchors.bottom: parent.bottom
         width: fileListView.width
         visible: fileListView.visible
-        height: 30
+        height: netDiskPage.rowHeight
         RowLayout{
             anchors.fill: parent
-            spacing: 10
+            spacing: GTheme.spaceSM
             GButton{
                 text: qsTr("Back")
+                Layout.preferredHeight: GTheme.sizeDefault
                 onClicked: {
                     // 旧逻辑用 parentPath.length >= homePath.length 判断层级，字符串长度不等于路径深度，
                     // 边界情况（如 /a/bc 与 /a/b/c 长度相近）会误判。改为：
@@ -340,6 +341,7 @@ Rectangle {
             GButton{
                 text: qsTr("Return parsing")
                 type: 1
+                Layout.preferredHeight: GTheme.sizeDefault
                 onClicked: {
                     topBar.visible = true
                     netDiskPage.parentPath = ""
