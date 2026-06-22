@@ -10,31 +10,45 @@ Rectangle {
     property string homePath:""
     property bool isBusy: false
 
+    // 页面级布局常量:网盘解析页的行高、列宽与图标尺寸只服务本页面
+    readonly property int parseRowHeight: GTheme.sizeLarge
+    readonly property int rowHeight: GTheme.sizeDefault
+    readonly property int fileIconSize: GTheme.fontTitle
+    readonly property int fileNameMinWidth: 200
+    readonly property int fileSizeMinWidth: 100
+    readonly property int fileDateMinWidth: 100
+
     Rectangle{
         id:topBar
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
         color: GTheme.bgWhite
-        height: visible ? 50 : 0
+        height: visible ? netDiskPage.parseRowHeight : 0
         visible: true
         RowLayout {
             id:parseLayout
             Layout.topMargin: 0
-            spacing: 10
+            spacing: GTheme.spaceSM
             TextArea{
                 id:urlInput
-                Layout.preferredWidth: netDiskPage.width - parseUrlBtn.width - 10
+                Layout.preferredWidth: netDiskPage.width - parseUrlBtn.width - GTheme.spaceSM
                 Layout.fillHeight: true
-                font.pixelSize: 12
+                font.pixelSize: GTheme.fontCaption
                 placeholderText: qsTr("Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)")
                 color: GTheme.textPrimary
                 placeholderTextColor: GTheme.textPlaceholder
                 background: Rectangle{
                     implicitHeight: parent.height
                     implicitWidth: parent.width
-                    color: GTheme.bgWhite
-                    border.color: urlInput.enabled ? GTheme.primaryColor : GTheme.borderBase
+                    color: GTheme.fillLighter
+                    radius: GTheme.radiusBase
+                    border.width: 1
+                    border.color: urlInput.activeFocus ? GTheme.primaryColor : GTheme.borderLight
+
+                    Behavior on border.color {
+                        ColorAnimation { duration: GTheme.durationBase }
+                    }
                 }
             }
 
@@ -42,6 +56,7 @@ Rectangle {
             GButton {
                 id: parseUrlBtn
                 type: 1
+                Layout.preferredHeight: GTheme.sizeDefault
                 text: qsTr("Parse")
                 onClicked: {
                     if(!checkShareUrl(urlInput.text)){
@@ -67,44 +82,47 @@ Rectangle {
         anchors.top: topBar.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        height: 100
+        implicitHeight: tipLayout.implicitHeight
+        height: visible ? implicitHeight : 0
         visible: topBar.visible
         color: "transparent"
         ColumnLayout{
+            id: tipLayout
             anchors.fill: parent
-            spacing: 10
+            anchors.margins: GTheme.spaceSM
+            spacing: GTheme.spaceSM
             Label{
                 id:tipLabel
                 text: qsTr("Precautions for parsing Baidu Netdisk share links:")
-                color: GTheme.dangerColor
-                font.pixelSize: 18
-                font.bold: true
+                color: GTheme.textDanger
+                font.pixelSize: GTheme.fontTitle
+                font.weight: GTheme.weightDemiBold
             }
             Label{
                 text: qsTr("1.Please go to Software Settings -> Advanced Settings -> Set Baidu Netdisk cookies")
-                color: GTheme.dangerColor
-                font.pixelSize: 15
+                color: GTheme.textDanger
+                font.pixelSize: GTheme.fontBody
             }
             Label{
                 text: qsTr("2.Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)")
-                color: GTheme.dangerColor
-                font.pixelSize: 15
+                color: GTheme.textDanger
+                font.pixelSize: GTheme.fontBody
             }
             Label{
                 text: qsTr("3.Please ensure that your account has sufficient storage space before downloading, as the file needs to be saved to your cloud drive first.")
-                color: GTheme.dangerColor
+                color: GTheme.textDanger
                 Layout.fillWidth: true
-                Layout.preferredWidth: parent.width - 50
-                font.pixelSize: 15
+                Layout.preferredWidth: parent.width - GTheme.space3XL
+                font.pixelSize: GTheme.fontBody
                 wrapMode: Text.Wrap
                 elide: Text.ElideNone
             }
             Label{
                 text: qsTr("4.Unable to achieve accelerated downloading, only standard downloading is supported. For high-speed downloads, please purchase the official VIP.")
-                color: GTheme.dangerColor
+                color: GTheme.textDanger
                 Layout.fillWidth: true
-                Layout.preferredWidth: parent.width - 50
-                font.pixelSize: 15
+                Layout.preferredWidth: parent.width - GTheme.space3XL
+                font.pixelSize: GTheme.fontBody
                 wrapMode: Text.Wrap
                 elide: Text.ElideNone
             }
@@ -113,6 +131,7 @@ Rectangle {
                 type: 1
                 text: qsTr("Click me to go to settings")
                 Layout.alignment: Qt.AlignCenter
+                Layout.preferredHeight: GTheme.sizeDefault
                 onClicked: {
                     brower_view.index = 1
                     brower_view.switchSettingPage(1)
@@ -126,14 +145,12 @@ Rectangle {
         target: NetWorkDiskManager
         function onTaskFinished(msg,isSuccess,taskType){
             netDiskPage.isBusy = false
-            console.log("busyIndicator ",busyIndicator.height ," ",busyIndicator.x," ",busyIndicator.y)
             if(taskType === 0){
                 //ParseShareUrl
                 if(isSuccess){
                     Qt.callLater(function(){
                         topBar.visible = false
                         fileListView.forceLayout()
-                        console.log("busyIndicator ",busyIndicator.height ," ",busyIndicator.x," ",busyIndicator.y)
                     })
 
                 }else{
