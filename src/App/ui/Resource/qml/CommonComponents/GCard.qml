@@ -14,7 +14,7 @@ Control {
 
     // 消费级卡片变体:基于 GTheme 的低饱和表面,不引入页面私有颜色
     property string variant: "default"   // default | muted | elevated | accentPrimary | accentSuccess | accentWarning | accentInfo
-    property bool interactive: false
+    property bool interactive: true
     property bool compact: false
 
     // 外观属性
