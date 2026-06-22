@@ -4,10 +4,11 @@ import QtQuick.Controls
 import "../CommonComponents"
 import gdl.sdk 1.0
 
-// Element Plus 风格下载页面标题栏
+// V5 下载中心标题区:主标题 + 状态说明 + 添加任务 + 批量操作
 Rectangle {
     id: control
     property int type: 0
+    signal addTaskRequested()
     implicitHeight: GTheme.titleBarHeight + GTheme.spaceLG
     color: GTheme.bgPage  // 与下载中心背景一致
 
@@ -32,14 +33,7 @@ Rectangle {
             spacing: GTheme.spaceXS
 
             Text {
-                text: {
-                    switch(control.type) {
-                        case 0: return qsTr("Downloading")
-                        case 1: return qsTr("Waiting")
-                        case 2: return qsTr("Stopped")
-                        default: return qsTr("Downloads")
-                    }
-                }
+                text: qsTr("Downloads")
                 font.pixelSize: GTheme.fontTitle
                 font.weight: GTheme.weightDemiBold
                 color: GTheme.textPrimary
@@ -48,9 +42,9 @@ Rectangle {
             Text {
                 text: {
                     switch(control.type) {
-                        case 0: return qsTr("Active download tasks")
-                        case 1: return qsTr("Queued download tasks")
-                        case 2: return qsTr("Completed or stopped tasks")
+                        case 0: return qsTr("Everything is running smoothly · active downloads")
+                        case 1: return qsTr("Queued tasks are ready to start")
+                        case 2: return qsTr("Completed and stopped tasks")
                         default: return qsTr("Manage your downloads")
                     }
                 }
@@ -64,6 +58,16 @@ Rectangle {
         RowLayout {
             Layout.alignment: Qt.AlignRight
             spacing: GTheme.spaceSM
+
+            // 添加任务主按钮
+            GButton {
+                type: 1
+                text: qsTr("Add Download")
+                iconSource: SegoeFluentIcons.Add
+                iconSize: GTheme.fontBody
+                Layout.preferredHeight: GTheme.sizeDefault
+                onClicked: control.addTaskRequested()
+            }
 
             // 恢复/开始所有按钮
             GButton {
