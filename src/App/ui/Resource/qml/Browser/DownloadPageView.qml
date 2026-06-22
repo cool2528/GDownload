@@ -114,11 +114,20 @@ Item {
                     property int currentIndex: 0
                     property var buttonsArr: [downloadingBtn, waitingBtn, stoppedBtn]
 
+                    onCurrentIndexChanged: {
+                        const button = buttonsArr[currentIndex]
+                        if (button && !button.checked) {
+                            button.checked = true
+                        }
+                    }
+
                     ButtonGroup {
                         id: navigationGroup
                         onCheckedButtonChanged: {
                             let index = navigationBar.buttonsArr.indexOf(navigationGroup.checkedButton)
-                            navigationBar.currentIndex = index
+                            if (index >= 0) {
+                                navigationBar.currentIndex = index
+                            }
                         }
                     }
 
