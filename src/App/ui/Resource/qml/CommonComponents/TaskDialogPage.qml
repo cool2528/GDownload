@@ -8,37 +8,43 @@ import "../Utils/utils.js" as Utils
 // Element Plus 风格任务添加对话框
 Popup {
     id: taskPage
-    width: 720
-    implicitHeight: contentLayout.implicitHeight + standardPadding * 2
-    height: Math.min(parent ? parent.height - standardPadding * 2 : 1000, implicitHeight)
+    width: dialogWidth
+    implicitHeight: contentLayout.implicitHeight
+    height: Math.min(parent ? parent.height - dialogViewportMargin * 2 : implicitHeight, implicitHeight)
     x: (parent.width - width) / 2
     y: (parent.height - height) / 2
     modal: true
     closePolicy: Popup.CloseOnEscape
     focus: true
 
-    // Element Plus 设计标准
-    readonly property int standardPadding: 24
-    readonly property int standardSpacing: 5
-    readonly property int headerHeight: 64
-    readonly property int buttonHeight: 32
+    // 页面级布局常量:对话框宽度和内容高度只服务本弹窗,不是通用设计令牌
+    readonly property int dialogWidth: 720
+    readonly property int dialogViewportMargin: GTheme.space2XL
     readonly property int contentMinHeight: 460
+    readonly property int urlPanelHeight: 150
+    readonly property int torrentPanelHeight: 150
+    readonly property int netDiskPanelHeight: 300
+    readonly property int footerHeight: GTheme.titleBarHeight + GTheme.space2XL
+    readonly property int actionButtonWidth: 100
+    readonly property int cancelButtonWidth: 80
+
+    // 视觉令牌别名:减少本文件重复,仍全部来自 GTheme
+    readonly property int contentPadding: GTheme.space2XL
+    readonly property int contentSpacing: GTheme.spaceSM
+    readonly property int cardPadding: GTheme.spaceSM
 
     // Element Plus 风格背景
     background: Rectangle {
         color: GTheme.bgWhite
-        radius: 8
+        radius: GTheme.radiusBase
         border.width: 1
         border.color: GTheme.borderLight
 
-        // Element Plus 风格阴影
-        layer.enabled: true
-        layer.effect: DropShadow {
-            radius: 16
-            samples: 33
-            color: Qt.rgba(0, 0, 0, 0.1)
-            horizontalOffset: 0
-            verticalOffset: 4
+        Behavior on color {
+            ColorAnimation { duration: GTheme.durationBase }
+        }
+        Behavior on border.color {
+            ColorAnimation { duration: GTheme.durationBase }
         }
     }
 
@@ -72,15 +78,15 @@ Popup {
             // 使用默认 Flickable 作为 contentItem，直接提供内容列
             ColumnLayout {
                 id: contentArea
-                width: scrollArea.availableWidth - taskPage.standardPadding * 2
-                x: taskPage.standardPadding
-                y: taskPage.standardPadding
-                spacing: taskPage.standardSpacing
+                width: scrollArea.availableWidth - taskPage.contentPadding * 2
+                x: taskPage.contentPadding
+                y: taskPage.contentPadding
+                spacing: taskPage.contentSpacing
 
                 // 标签页导航
                 Rectangle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 48
+                    Layout.preferredHeight: GTheme.navItemHeight + GTheme.spaceXS
                     color: "transparent"
 
                     RowLayout {
@@ -131,8 +137,8 @@ Popup {
                     // URL 输入页面
                     GCard {
                         outlined: true
-                        padding: taskPage.standardSpacing
-                        Layout.preferredHeight: 150
+                        padding: taskPage.cardPadding
+                        Layout.preferredHeight: taskPage.urlPanelHeight
                         ColumnLayout {
                             anchors.fill: parent
                             spacing: 0
@@ -144,7 +150,7 @@ Popup {
                                     objectName: "inputUrl"
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    font.pixelSize: 13
+                                    font.pixelSize: GTheme.fontBody
                                     placeholderText: qsTr("Enter download URLs (one per line, supports magnet links)")
                                     color: GTheme.textPrimary
                                     placeholderTextColor: GTheme.textPlaceholder
@@ -155,9 +161,11 @@ Popup {
                                         color: GTheme.fillLighter
                                         border.width: 1
                                         border.color: input.activeFocus ? GTheme.primaryColor : GTheme.borderLight
-                                        radius: 6
+                                        radius: GTheme.radiusBase
 
-                                        Behavior on border.color { ColorAnimation { duration: 150 } }
+                                        Behavior on border.color {
+                                            ColorAnimation { duration: GTheme.durationBase }
+                                        }
                                     }
 
                                     Component.onCompleted: {
@@ -181,8 +189,8 @@ Popup {
                     // Torrent 文件页面
                     GCard {
                         outlined: true
-                        padding: taskPage.standardSpacing
-                        Layout.preferredHeight: 150
+                        padding: taskPage.cardPadding
+                        Layout.preferredHeight: taskPage.torrentPanelHeight
                         GDropArea {
                             id: dropTorrent
                             anchors.fill: parent
@@ -211,9 +219,9 @@ Popup {
                     // 百度网盘页面
                     GCard {
                         outlined: true
-                        padding: taskPage.standardSpacing
+                        padding: taskPage.cardPadding
                         Layout.fillHeight: true
-                        Layout.preferredHeight: 300
+                        Layout.preferredHeight: taskPage.netDiskPanelHeight
                         NetDiskPageView {
                             id: netDiskPageView
                             anchors.fill: parent
@@ -287,20 +295,20 @@ Popup {
                 TaskGeneralOptionsCard {
                     id: generalConfig
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 150
-                    standardSpacing: taskPage.standardSpacing
+                    Layout.preferredHeight: taskPage.urlPanelHeight
+                    standardSpacing: taskPage.contentSpacing
                     visible: tabNavigation.currentIndex !== 2
                 }
 
                 // 高级配置区域
                 TaskAdvancedOptionsCard {
                     id: additionalConfig
-                    standardSpacing: taskPage.standardSpacing
+                    standardSpacing: taskPage.contentSpacing
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Layout.topMargin: advanced.checked && tabNavigation.currentIndex !== 2 ? 8 : 0
+                    Layout.topMargin: advanced.checked && tabNavigation.currentIndex !== 2 ? GTheme.spaceSM : 0
                     visible: advanced.checked && tabNavigation.currentIndex !== 2
-                    Layout.preferredHeight: visible ? additionalConfig.view.implicitHeight + 50 + taskPage.standardSpacing : 0
+                    Layout.preferredHeight: visible ? additionalConfig.view.implicitHeight + GTheme.sizeLarge + taskPage.contentSpacing : 0
                     Layout.minimumHeight: Layout.preferredHeight
                 }
             }
@@ -314,14 +322,14 @@ Popup {
         // 底部按钮区域
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: taskPage.headerHeight
+            Layout.preferredHeight: taskPage.footerHeight
             color: "transparent"
 
             RowLayout {
                 anchors.fill: parent
-                anchors.leftMargin: taskPage.standardPadding
-                anchors.rightMargin: taskPage.standardPadding
-                spacing: taskPage.standardSpacing
+                anchors.leftMargin: taskPage.contentPadding
+                anchors.rightMargin: taskPage.contentPadding
+                spacing: taskPage.contentSpacing
 
                 // 高级选项开关
                 GCheckBox {
@@ -339,8 +347,8 @@ Popup {
                 // 取消按钮
                 GButton {
                     text: qsTr("Cancel")
-                    Layout.preferredWidth: 80
-                    Layout.preferredHeight: taskPage.buttonHeight
+                    Layout.preferredWidth: taskPage.cancelButtonWidth
+                    Layout.preferredHeight: GTheme.sizeDefault
                     onClicked: taskPage.close()
                 }
 
@@ -349,8 +357,8 @@ Popup {
                     type: 1  // Primary
                     objectName: "btnCreateTask"
                     text: qsTr("Add Task")
-                    Layout.preferredWidth: 100
-                    Layout.preferredHeight: taskPage.buttonHeight
+                    Layout.preferredWidth: taskPage.actionButtonWidth
+                    Layout.preferredHeight: GTheme.sizeDefault
                     onClicked: {
                         if (tabNavigation.currentIndex !== 2) {
                             let url = taskPageLayout.geturls()
@@ -383,15 +391,15 @@ Popup {
                 property: "scale"
                 from: 0.9
                 to: 1.0
-                duration: 200
-                easing.type: Easing.OutCubic
+                duration: GTheme.durationSlow
+                easing.type: GTheme.easingStandard
             }
             NumberAnimation {
                 property: "opacity"
                 from: 0.0
                 to: 1.0
-                duration: 200
-                easing.type: Easing.OutCubic
+                duration: GTheme.durationSlow
+                easing.type: GTheme.easingStandard
             }
         }
     }
@@ -403,15 +411,15 @@ Popup {
                 property: "scale"
                 from: 1.0
                 to: 0.9
-                duration: 150
-                easing.type: Easing.InCubic
+                duration: GTheme.durationBase
+                easing.type: GTheme.easingStandard
             }
             NumberAnimation {
                 property: "opacity"
                 from: 1.0
                 to: 0.0
-                duration: 150
-                easing.type: Easing.InCubic
+                duration: GTheme.durationBase
+                easing.type: GTheme.easingStandard
             }
         }
     }
