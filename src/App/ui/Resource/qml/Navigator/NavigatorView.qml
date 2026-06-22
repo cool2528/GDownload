@@ -36,6 +36,7 @@ Item {
                 id: home
                 objectName: "navHome"
                 Layout.alignment: Qt.AlignHCenter
+                radius: GTheme.radiusBase
                 implicitWidth: GTheme.sizeLarge
                 implicitHeight: GTheme.sizeLarge
                 iconSource: SegoeFluentIcons.HomeSolid
@@ -48,12 +49,12 @@ Item {
                 id: download
                 objectName: "navDownloading"
                 Layout.alignment: Qt.AlignHCenter
+                radius: GTheme.radiusBase
                 implicitWidth: GTheme.sizeLarge
                 implicitHeight: GTheme.sizeLarge
                 iconSource: SegoeFluentIcons.SubscriptionAdd
                 iconSize: GTheme.fontH1
                 onClicked: {
-                    console.debug("select download page")
                     brower_view.index = 0
                 }
             }
@@ -61,6 +62,7 @@ Item {
             GButton {
                 id: addTask
                 Layout.alignment: Qt.AlignHCenter
+                radius: GTheme.radiusBase
                 implicitWidth: GTheme.sizeLarge
                 implicitHeight: GTheme.sizeLarge
                 // 用字体图标(随主题 textSecondary→primary),替代仅适配深色栏的白色 SVG,
@@ -68,7 +70,6 @@ Item {
                 iconSource: SegoeFluentIcons.Add
                 iconSize: GTheme.fontH1
                 onClicked: {
-                    console.debug("open add task dialog")
                     let task = addDownloadTask()
                     if (task) {
                         task.open()
@@ -88,24 +89,24 @@ Item {
             GButton {
                 id: setting
                 Layout.alignment: Qt.AlignHCenter
+                radius: GTheme.radiusBase
                 implicitWidth: GTheme.sizeLarge
                 implicitHeight: GTheme.sizeLarge
                 iconSource: SegoeFluentIcons.SettingsSolid
                 iconSize: GTheme.fontH1
                 onClicked: {
-                    console.debug("open settings dialog")
                     brower_view.index = 1
                 }
             }
             GButton {
                 id: help
                 Layout.alignment: Qt.AlignHCenter
+                radius: GTheme.radiusBase
                 implicitWidth: GTheme.sizeLarge
                 implicitHeight: GTheme.sizeLarge
                 iconSource: SegoeFluentIcons.Info
                 iconSize: GTheme.fontH1
                 onClicked: {
-                    console.debug("open help dialog")
                     let about = showAboutDialog()
                     if (about) {
                         about.open()
