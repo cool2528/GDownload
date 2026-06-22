@@ -9,6 +9,20 @@ Item {
     id: control
     property alias currentIndex: navigationBar.currentIndex
 
+    // 快捷入口复用现有 TaskDialogPage,不新增第二套任务创建 UI
+    Component { id: taskDialogComponent; TaskDialogPage {} }
+
+    function openTaskDialog() {
+        let parentItem = typeof mainWindow !== "undefined" && mainWindow ? mainWindow : control
+        let task = taskDialogComponent.createObject(parentItem)
+        if (task === null) {
+            console.error("Error creating task dialog")
+            return
+        }
+        task.closed.connect(function(){ task.destroy() })
+        task.open()
+    }
+
     RowLayout {
         id: browserLayout
         anchors.fill: parent
@@ -136,6 +150,96 @@ Item {
                     id: downloadTitle
                     Layout.fillWidth: true
                     type: navigationBar.currentIndex
+                }
+
+                // 下载中心摘要条:紧凑展示当前分类计数与密度模式
+                GCard {
+                    Layout.fillWidth: true
+                    Layout.leftMargin: GTheme.space2XL
+                    Layout.rightMargin: GTheme.space2XL
+                    Layout.topMargin: GTheme.spaceMD
+                    Layout.bottomMargin: GTheme.spaceSM
+                    padding: GTheme.spaceSM
+                    outlined: true
+                    hoverEnabled: false
+                    variant: "elevated"
+
+                    RowLayout {
+                        anchors.fill: parent
+                        spacing: GTheme.spaceSM
+
+                        SummaryMetricCard {
+                            Layout.fillWidth: true
+                            title: qsTr("Active")
+                            value: String(downloadPage.taskCount)
+                            unit: qsTr("tasks")
+                            iconSource: SegoeFluentIcons.Download
+                            accent: "primary"
+                        }
+
+                        SummaryMetricCard {
+                            Layout.fillWidth: true
+                            title: qsTr("Waiting")
+                            value: String(waitingPage.taskCount)
+                            unit: qsTr("tasks")
+                            iconSource: SegoeFluentIcons.History
+                            accent: "warning"
+                        }
+
+                        SummaryMetricCard {
+                            Layout.fillWidth: true
+                            title: qsTr("Stopped")
+                            value: String(completedPage.taskCount)
+                            unit: qsTr("tasks")
+                            iconSource: SegoeFluentIcons.Completed
+                            accent: "success"
+                        }
+
+                        SummaryMetricCard {
+                            Layout.fillWidth: true
+                            title: qsTr("Density")
+                            value: qsTr("Comfort")
+                            unit: ""
+                            iconSource: SegoeFluentIcons.View
+                            accent: "info"
+                        }
+                    }
+                }
+
+                // 快捷入口:当前批次打开现有 TaskDialog,初始 tab 路由留到 TaskDialog 批次
+                RowLayout {
+                    Layout.fillWidth: true
+                    Layout.leftMargin: GTheme.space2XL
+                    Layout.rightMargin: GTheme.space2XL
+                    Layout.bottomMargin: GTheme.spaceMD
+                    spacing: GTheme.spaceSM
+
+                    QuickActionCard {
+                        Layout.fillWidth: true
+                        title: qsTr("URL")
+                        description: qsTr("Paste download links")
+                        iconSource: SegoeFluentIcons.Link
+                        accent: "primary"
+                        onClicked: control.openTaskDialog()
+                    }
+
+                    QuickActionCard {
+                        Layout.fillWidth: true
+                        title: qsTr("Torrent")
+                        description: qsTr("Drop torrent files")
+                        iconSource: SegoeFluentIcons.CloudDownload
+                        accent: "success"
+                        onClicked: control.openTaskDialog()
+                    }
+
+                    QuickActionCard {
+                        Layout.fillWidth: true
+                        title: qsTr("Baidu")
+                        description: qsTr("Parse cloud links")
+                        iconSource: SegoeFluentIcons.Cloud
+                        accent: "warning"
+                        onClicked: control.openTaskDialog()
+                    }
                 }
 
                 // 下载列表堆栈视图

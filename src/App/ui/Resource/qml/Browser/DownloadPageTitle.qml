@@ -8,8 +8,8 @@ import gdl.sdk 1.0
 Rectangle {
     id: control
     property int type: 0
-    implicitHeight: GTheme.titleBarHeight + GTheme.space2XL
-    color: GTheme.bgPage  // 与下方内容区域一致的背景色
+    implicitHeight: GTheme.titleBarHeight + GTheme.spaceLG
+    color: GTheme.bgPage  // 与下载中心背景一致
 
     // 底部分隔线
     Rectangle {
