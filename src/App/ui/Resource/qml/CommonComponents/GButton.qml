@@ -13,7 +13,7 @@ Button {
     property int type: 0
     // buttonType: default | primary | success | warning | danger | info(优先于 numeric type)
     property string buttonType: ""
-    // variant: default | plain | round | circle | link | nav
+    // variant: default | plain | round | circle | link | nav | chip
     property string variant: "default"
     // size: large | default | small
     property string size: "default"
@@ -35,6 +35,7 @@ Button {
 
     // ===== 派生状态 =====
     readonly property bool isNav: variant === "nav"
+    readonly property bool isChip: variant === "chip"
     readonly property bool hasIcon: iconSource > 0
     readonly property bool hasImage: String(imageSource).length > 0
     readonly property bool hasText: control.text !== ""
@@ -53,9 +54,9 @@ Button {
     readonly property color onAccentText: "#FFFFFF"
 
     // 尺寸规格(令牌)
-    readonly property int implicitH: isNav ? GTheme.navItemHeight : (size === "large" ? GTheme.sizeLarge : (size === "small" ? GTheme.sizeSmall : GTheme.sizeDefault))
-    readonly property int hPadding: size === "large" ? GTheme.spaceLG : (size === "small" ? GTheme.spaceSM : GTheme.spaceMD)
-    readonly property int fontPx: fontSize > 0 ? fontSize : (size === "large" ? GTheme.fontSubtitle : (size === "small" ? GTheme.fontCaption : GTheme.fontBody))
+    readonly property int implicitH: isNav ? GTheme.navItemHeight : (isChip ? GTheme.sizeSmall : (size === "large" ? GTheme.sizeLarge : (size === "small" ? GTheme.sizeSmall : GTheme.sizeDefault)))
+    readonly property int hPadding: isChip ? GTheme.spaceSM : (size === "large" ? GTheme.spaceLG : (size === "small" ? GTheme.spaceSM : GTheme.spaceMD))
+    readonly property int fontPx: fontSize > 0 ? fontSize : (isChip ? GTheme.fontCaption : (size === "large" ? GTheme.fontSubtitle : (size === "small" ? GTheme.fontCaption : GTheme.fontBody)))
 
     padding: 0
 
@@ -255,7 +256,7 @@ Button {
     readonly property color effIconColor: Qt.colorEqual(iconColor, "transparent") ? contentColor : iconColor
 
     background: Rectangle {
-        radius: (variant === "round" || variant === "circle") ? GTheme.radiusRound : (control.isNav ? GTheme.radiusBase : control.radius)
+        radius: (variant === "round" || variant === "circle") ? GTheme.radiusRound : (control.isNav ? GTheme.radiusBase : (control.isChip ? GTheme.radiusRound : control.radius))
         implicitHeight: control.implicitH
         implicitWidth: control.isNav ? (GTheme.spaceLG + control.iconSize + GTheme.spaceMD + navText.implicitWidth + GTheme.spaceLG) : (control.iconOnly ? control.implicitH : Math.max(implicitHeight, stdRow.implicitWidth + control.hPadding * 2))
         color: {

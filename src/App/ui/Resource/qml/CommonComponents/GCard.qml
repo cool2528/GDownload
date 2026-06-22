@@ -12,10 +12,40 @@ Control {
     property bool outlined: false
     property bool disabled: false
 
+    // 消费级卡片变体:基于 GTheme 的低饱和表面,不引入页面私有颜色
+    property string variant: "default"   // default | muted | elevated | accentPrimary | accentSuccess | accentWarning | accentInfo
+    property bool interactive: false
+    property bool compact: false
+
     // 外观属性
     property int radius: 4
     padding: 2
     clip: true
+
+    readonly property int resolvedPadding: compact ? GTheme.spaceSM : padding
+
+    function variantBackground() {
+        switch (variant) {
+        case "muted": return GTheme.fillLighter
+        case "elevated": return GTheme.bgElevated
+        case "accentPrimary": return GTheme.primaryLight(9)
+        case "accentSuccess": return GTheme.bgSuccess
+        case "accentWarning": return GTheme.bgWarning
+        case "accentInfo": return GTheme.bgInfo
+        default: return GTheme.bgBase
+        }
+    }
+
+    function variantBorder() {
+        if (selected) return GTheme.primaryColor
+        switch (variant) {
+        case "accentPrimary": return GTheme.primaryLight(7)
+        case "accentSuccess": return GTheme.borderSuccess
+        case "accentWarning": return GTheme.borderWarning
+        case "accentInfo": return GTheme.borderInfo
+        default: return outlined ? GTheme.borderLight : "transparent"
+        }
+    }
 
     implicitWidth: Math.max(background ? background.implicitWidth : 0,
                              contentItem ? contentItem.implicitWidth + padding : 0)
@@ -27,22 +57,13 @@ Control {
         radius: card.radius
         // Ant Design + VS Code 配色方案
         color: {
-            if (card.disabled) {
-                return GTheme.fillLighter
-            }
-
-            if (hoverHandler.hovered && card.hoverEnabled) {
-                // Ant Design (浅色): #FFFFFF 纯白高亮
-                // VS Code (暗色): #2D2D30 活动项背景
-                return GTheme.bgElevated
-            }
-
-            // Ant Design (浅色): #FAFAFA 浅灰卡片
-            // VS Code (暗色): #252526 侧边栏色
-            return GTheme.bgBase
+            if (card.disabled) return GTheme.fillLighter
+            if ((hoverHandler.hovered && card.hoverEnabled && card.interactive) || card.selected)
+                return card.variant === "default" ? GTheme.bgElevated : card.variantBackground()
+            return card.variantBackground()
         }
-        border.width: card.selected ? 2 : (card.outlined ? 1 : 0)
-        border.color: card.selected ? GTheme.primaryColor : (card.outlined ? GTheme.borderBase : "transparent")
+        border.width: card.selected ? 2 : (card.outlined || card.variant !== "default" ? 1 : 0)
+        border.color: card.variantBorder()
     }
 
     contentItem: Item {
