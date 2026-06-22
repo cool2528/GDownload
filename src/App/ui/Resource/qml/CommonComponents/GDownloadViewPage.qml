@@ -8,6 +8,9 @@ Control {
     id: downloadView
     property alias model: downloadListView.model
     property int pageType: -1 // 0 downloadPage 1 waitingPage  2 completedPage
+    readonly property int taskCount: downloadListView.count
+    readonly property int taskCardHeight: 104
+    readonly property int taskIconSize: GTheme.sizeLarge
 
     background: Rectangle {
         color: GTheme.bgPage
@@ -72,10 +75,10 @@ Control {
         ListView {
             id: downloadListView
             spacing: GTheme.spaceSM
-            topMargin: GTheme.spaceLG
+            topMargin: GTheme.spaceSM
             bottomMargin: GTheme.spaceLG
-            leftMargin: GTheme.spaceSM
-            rightMargin: GTheme.spaceSM
+            leftMargin: GTheme.space2XL
+            rightMargin: GTheme.space2XL
             clip: true
             interactive: true
             orientation: ListView.Vertical
@@ -83,10 +86,13 @@ Control {
 
             delegate: GCard {
                 width: downloadListView.width - downloadListView.leftMargin - downloadListView.rightMargin
-                height: 120
-                padding: GTheme.spaceLG
+                height: downloadView.taskCardHeight
+                padding: GTheme.spaceMD
                 outlined: true
                 hoverEnabled: true
+                interactive: true
+                radius: GTheme.radiusBase
+                variant: "elevated"
                 selected: hovered
 
                 ColumnLayout {
@@ -98,6 +104,29 @@ Control {
                         Layout.leftMargin: GTheme.spaceSM
                         Layout.rightMargin: GTheme.spaceSM
                         spacing: GTheme.spaceLG
+
+                        // 文件类型徽标:不依赖平台图标,使用扩展名文本保持跨平台一致
+                        Rectangle {
+                            Layout.preferredWidth: downloadView.taskIconSize
+                            Layout.preferredHeight: downloadView.taskIconSize
+                            Layout.alignment: Qt.AlignVCenter
+                            radius: GTheme.radiusBase
+                            color: GTheme.primaryLight(9)
+                            border.width: 1
+                            border.color: GTheme.primaryLight(7)
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: {
+                                    const parts = String(model.fileName).split(".")
+                                    if (parts.length <= 1) return qsTr("FILE")
+                                    return parts[parts.length - 1].slice(0, 3).toUpperCase()
+                                }
+                                font.pixelSize: GTheme.fontCaption
+                                font.weight: GTheme.weightDemiBold
+                                color: GTheme.primaryColor
+                            }
+                        }
 
                         // 文件名区域
                         ColumnLayout {
@@ -115,8 +144,9 @@ Control {
                             }
 
                             Text {
-                                visible: pageType !== 2
-                                text: qsTr("Size: %1 • Progress: %2%").arg(model.totalSize).arg(model.progress)
+                                text: downloadView.pageType === 2
+                                      ? qsTr("Saved to %1").arg(model.savePath)
+                                      : qsTr("%1 of %2 • %3% • %4 left").arg(model.currentSize).arg(model.totalSize).arg(model.progress).arg(model.remainingTime)
                                 font.pixelSize: GTheme.fontCaption
                                 color: GTheme.textSecondary
                                 Layout.fillWidth: true
@@ -220,6 +250,8 @@ Control {
                         from: 0
                         to: 100
                         value: model.progress
+                        fgColor: model.taskState === 1 ? GTheme.successColor : GTheme.warningColor
+                        status: model.taskState === 1 ? "success" : "warning"
                         visible: downloadView.pageType !== 2  // 已完成任务不显示进度条
                     }
 
@@ -246,7 +278,7 @@ Control {
                         Text {
                             text: model.downloadSpeed
                             font.pixelSize: GTheme.fontCaption
-                            color: GTheme.textSecondary
+                            color: GTheme.textSuccess
                             visible: downloadView.pageType === 0 && model.taskState === 1
                         }
 
