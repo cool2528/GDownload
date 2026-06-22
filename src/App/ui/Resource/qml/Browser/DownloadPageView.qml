@@ -23,48 +23,93 @@ Item {
         task.open()
     }
 
-    RowLayout {
-        id: browserLayout
+    Rectangle {
+        id: mainContent
         anchors.fill: parent
-        spacing: 0
+        color: GTheme.bgPage
 
-        // 左侧导航栏
-        Rectangle {
-            id: leftSidebar
-            color: GTheme.bgPage
-            Layout.fillHeight: true
-            Layout.minimumWidth: GTheme.sidebarWidth
-            Layout.preferredWidth: GTheme.sidebarWidth
-            Layout.maximumWidth: GTheme.sidebarWidth
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 0
 
-            // 右侧分隔线
-            Rectangle {
-                anchors.right: parent.right
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                width: 1
-                color: GTheme.borderLight
+            // 页面标题栏
+            DownloadPageTitle {
+                id: downloadTitle
+                Layout.fillWidth: true
+                type: navigationBar.currentIndex
+                onAddTaskRequested: control.openTaskDialog()
             }
 
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: GTheme.spaceLG
-                spacing: GTheme.spaceLG
+            // 下载中心摘要条:紧凑展示当前分类计数与密度模式
+            GCard {
+                Layout.fillWidth: true
+                Layout.preferredHeight: GTheme.sizeLarge + GTheme.spaceSM * 4
+                Layout.leftMargin: GTheme.space2XL
+                Layout.rightMargin: GTheme.space2XL
+                Layout.topMargin: GTheme.spaceMD
+                Layout.bottomMargin: GTheme.spaceSM
+                padding: GTheme.spaceSM
+                outlined: true
+                hoverEnabled: false
+                variant: "elevated"
 
-                // 页面标题
-                Text {
-                    text: qsTr("Download Tasks")
-                    font.pixelSize: GTheme.fontTitle
-                    font.weight: GTheme.weightDemiBold
-                    color: GTheme.textPrimary
-                    Layout.fillWidth: true
-                    Layout.bottomMargin: GTheme.spaceSM
+                RowLayout {
+                    anchors.fill: parent
+                    spacing: GTheme.spaceSM
+
+                    SummaryMetricCard {
+                        Layout.fillWidth: true
+                        title: qsTr("Active")
+                        value: String(downloadPage.taskCount)
+                        unit: qsTr("tasks")
+                        iconSource: SegoeFluentIcons.Download
+                        accent: "primary"
+                    }
+
+                    SummaryMetricCard {
+                        Layout.fillWidth: true
+                        title: qsTr("Waiting")
+                        value: String(waitingPage.taskCount)
+                        unit: qsTr("tasks")
+                        iconSource: SegoeFluentIcons.History
+                        accent: "warning"
+                    }
+
+                    SummaryMetricCard {
+                        Layout.fillWidth: true
+                        title: qsTr("Stopped")
+                        value: String(completedPage.taskCount)
+                        unit: qsTr("tasks")
+                        iconSource: SegoeFluentIcons.Completed
+                        accent: "success"
+                    }
+
+                    SummaryMetricCard {
+                        Layout.fillWidth: true
+                        title: qsTr("Density")
+                        value: qsTr("Comfort")
+                        unit: ""
+                        iconSource: SegoeFluentIcons.View
+                        accent: "info"
+                    }
                 }
+            }
 
-                // 导航按钮组
-                ColumnLayout {
+            // V5 分类筛选:替代旧二级侧栏,保留 currentIndex alias 给 BrowserView 使用
+            GCard {
+                Layout.fillWidth: true
+                Layout.preferredHeight: GTheme.sizeLarge + GTheme.spaceSM
+                Layout.leftMargin: GTheme.space2XL
+                Layout.rightMargin: GTheme.space2XL
+                Layout.bottomMargin: GTheme.spaceSM
+                padding: GTheme.spaceXS
+                outlined: true
+                hoverEnabled: false
+                variant: "muted"
+
+                RowLayout {
                     id: navigationBar
-                    Layout.fillWidth: true
+                    anchors.fill: parent
                     spacing: GTheme.spaceXS
                     property int currentIndex: 0
                     property var buttonsArr: [downloadingBtn, waitingBtn, stoppedBtn]
@@ -74,11 +119,9 @@ Item {
                         onCheckedButtonChanged: {
                             let index = navigationBar.buttonsArr.indexOf(navigationGroup.checkedButton)
                             navigationBar.currentIndex = index
-                            console.debug("Navigation index:", index)
                         }
                     }
 
-                    // 下载中按钮
                     GButton {
                         id: downloadingBtn
                         variant: "nav"
@@ -88,13 +131,10 @@ Item {
                         checked: true
                         ButtonGroup.group: navigationGroup
                         iconSource: SegoeFluentIcons.PlaySolid
-                        text: qsTr("Downloading")
-                        onClicked: {
-                            checked = true
-                        }
+                        text: qsTr("Active")
+                        onClicked: checked = true
                     }
 
-                    // 等待中按钮
                     GButton {
                         id: waitingBtn
                         variant: "nav"
@@ -102,14 +142,11 @@ Item {
                         Layout.preferredHeight: GTheme.navItemHeight
                         checkable: true
                         ButtonGroup.group: navigationGroup
-                        iconSource: SegoeFluentIcons.PauseBold
+                        iconSource: SegoeFluentIcons.History
                         text: qsTr("Waiting")
-                        onClicked: {
-                            checked = true
-                        }
+                        onClicked: checked = true
                     }
 
-                    // 已停止按钮
                     GButton {
                         id: stoppedBtn
                         objectName: "navCompleted"
@@ -120,160 +157,77 @@ Item {
                         ButtonGroup.group: navigationGroup
                         iconSource: SegoeFluentIcons.Stop
                         text: qsTr("Stopped")
-                        onClicked: {
-                            checked = true
-                        }
-                    }
-
-                    // 填充空间
-                    Item {
-                        Layout.fillHeight: true
+                        onClicked: checked = true
                     }
                 }
             }
-        }
 
-        // 主内容区域
-        Rectangle {
-            id: mainContent
-            color: GTheme.bgWhite
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.minimumWidth: 400
+            // 快捷入口:当前批次打开现有 TaskDialog,初始 tab 路由留到 TaskDialog 批次
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.preferredHeight: GTheme.sizeLarge + GTheme.spaceSM * 2
+                Layout.leftMargin: GTheme.space2XL
+                Layout.rightMargin: GTheme.space2XL
+                Layout.bottomMargin: GTheme.spaceMD
+                spacing: GTheme.spaceSM
 
-            ColumnLayout {
-                anchors.fill: parent
-                spacing: 0
-
-                // 页面标题栏
-                DownloadPageTitle {
-                    id: downloadTitle
+                QuickActionCard {
                     Layout.fillWidth: true
-                    type: navigationBar.currentIndex
+                    title: qsTr("URL")
+                    description: qsTr("Paste download links")
+                    iconSource: SegoeFluentIcons.Link
+                    accent: "primary"
+                    onClicked: control.openTaskDialog()
                 }
 
-                // 下载中心摘要条:紧凑展示当前分类计数与密度模式
-                GCard {
+                QuickActionCard {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: GTheme.sizeLarge + GTheme.spaceSM * 4
-                    Layout.leftMargin: GTheme.space2XL
-                    Layout.rightMargin: GTheme.space2XL
-                    Layout.topMargin: GTheme.spaceMD
-                    Layout.bottomMargin: GTheme.spaceSM
-                    padding: GTheme.spaceSM
-                    outlined: true
-                    hoverEnabled: false
-                    variant: "elevated"
-
-                    RowLayout {
-                        anchors.fill: parent
-                        spacing: GTheme.spaceSM
-
-                        SummaryMetricCard {
-                            Layout.fillWidth: true
-                            title: qsTr("Active")
-                            value: String(downloadPage.taskCount)
-                            unit: qsTr("tasks")
-                            iconSource: SegoeFluentIcons.Download
-                            accent: "primary"
-                        }
-
-                        SummaryMetricCard {
-                            Layout.fillWidth: true
-                            title: qsTr("Waiting")
-                            value: String(waitingPage.taskCount)
-                            unit: qsTr("tasks")
-                            iconSource: SegoeFluentIcons.History
-                            accent: "warning"
-                        }
-
-                        SummaryMetricCard {
-                            Layout.fillWidth: true
-                            title: qsTr("Stopped")
-                            value: String(completedPage.taskCount)
-                            unit: qsTr("tasks")
-                            iconSource: SegoeFluentIcons.Completed
-                            accent: "success"
-                        }
-
-                        SummaryMetricCard {
-                            Layout.fillWidth: true
-                            title: qsTr("Density")
-                            value: qsTr("Comfort")
-                            unit: ""
-                            iconSource: SegoeFluentIcons.View
-                            accent: "info"
-                        }
-                    }
+                    title: qsTr("Torrent")
+                    description: qsTr("Drop torrent files")
+                    iconSource: SegoeFluentIcons.CloudDownload
+                    accent: "success"
+                    onClicked: control.openTaskDialog()
                 }
 
-                // 快捷入口:当前批次打开现有 TaskDialog,初始 tab 路由留到 TaskDialog 批次
-                RowLayout {
+                QuickActionCard {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: GTheme.sizeLarge + GTheme.spaceSM * 2
-                    Layout.leftMargin: GTheme.space2XL
-                    Layout.rightMargin: GTheme.space2XL
-                    Layout.bottomMargin: GTheme.spaceMD
-                    spacing: GTheme.spaceSM
+                    title: qsTr("Baidu")
+                    description: qsTr("Parse cloud links")
+                    iconSource: SegoeFluentIcons.Cloud
+                    accent: "warning"
+                    onClicked: control.openTaskDialog()
+                }
+            }
 
-                    QuickActionCard {
-                        Layout.fillWidth: true
-                        title: qsTr("URL")
-                        description: qsTr("Paste download links")
-                        iconSource: SegoeFluentIcons.Link
-                        accent: "primary"
-                        onClicked: control.openTaskDialog()
-                    }
+            // 下载列表堆栈视图
+            StackLayout {
+                id: downloadStack
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                currentIndex: navigationBar.currentIndex
 
-                    QuickActionCard {
-                        Layout.fillWidth: true
-                        title: qsTr("Torrent")
-                        description: qsTr("Drop torrent files")
-                        iconSource: SegoeFluentIcons.CloudDownload
-                        accent: "success"
-                        onClicked: control.openTaskDialog()
-                    }
-
-                    QuickActionCard {
-                        Layout.fillWidth: true
-                        title: qsTr("Baidu")
-                        description: qsTr("Parse cloud links")
-                        iconSource: SegoeFluentIcons.Cloud
-                        accent: "warning"
-                        onClicked: control.openTaskDialog()
-                    }
+                // 下载中页面
+                GDownloadViewPage {
+                    id: downloadPage
+                    pageType: 0
+                    objectName: "downloadPage"
+                    model: BrowserManager.GetActiveDownloadModel()
                 }
 
-                // 下载列表堆栈视图
-                StackLayout {
-                    id: downloadStack
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    currentIndex: navigationBar.currentIndex
+                // 等待中页面
+                GDownloadViewPage {
+                    id: waitingPage
+                    pageType: 1
+                    objectName: "waitingPage"
+                    model: BrowserManager.GetWaitingDownloadModel()
+                }
 
-                    // 下载中页面
-                    GDownloadViewPage {
-                        id: downloadPage
-                        pageType: 0
-                        objectName: "downloadPage"
-                        model: BrowserManager.GetActiveDownloadModel()
-                    }
-
-                    // 等待中页面
-                    GDownloadViewPage {
-                        id: waitingPage
-                        pageType: 1
-                        objectName: "waitingPage"
-                        model: BrowserManager.GetWaitingDownloadModel()
-                    }
-
-                    // 已停止页面
-                    GDownloadViewPage {
-                        id: completedPage
-                        pageType: 2
-                        objectName: "completedPage"
-                        model: BrowserManager.GetStopedDownloadModel()
-                    }
+                // 已停止页面
+                GDownloadViewPage {
+                    id: completedPage
+                    pageType: 2
+                    objectName: "completedPage"
+                    model: BrowserManager.GetStopedDownloadModel()
                 }
             }
         }
