@@ -155,6 +155,7 @@ Item {
                 // 下载中心摘要条:紧凑展示当前分类计数与密度模式
                 GCard {
                     Layout.fillWidth: true
+                    Layout.preferredHeight: GTheme.sizeLarge + GTheme.spaceSM * 4
                     Layout.leftMargin: GTheme.space2XL
                     Layout.rightMargin: GTheme.space2XL
                     Layout.topMargin: GTheme.spaceMD
@@ -209,6 +210,7 @@ Item {
                 // 快捷入口:当前批次打开现有 TaskDialog,初始 tab 路由留到 TaskDialog 批次
                 RowLayout {
                     Layout.fillWidth: true
+                    Layout.preferredHeight: GTheme.sizeLarge + GTheme.spaceSM * 2
                     Layout.leftMargin: GTheme.space2XL
                     Layout.rightMargin: GTheme.space2XL
                     Layout.bottomMargin: GTheme.spaceMD
