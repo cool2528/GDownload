@@ -16,6 +16,9 @@ GCard {
     interactive: true
     outlined: true
     hoverEnabled: true
+    // hover 时复用 GCard selected 视觉反馈(加粗主色边框),弥补 accent 变体下
+    // GCard 自身 hover 背景无变化的缺失,给可点击卡片以明确 hover 反馈
+    selected: actionArea.containsMouse
     variant: {
         switch (accent) {
         case "success": return "accentSuccess"
@@ -81,7 +84,9 @@ GCard {
     }
 
     MouseArea {
+        id: actionArea
         anchors.fill: parent
+        hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: root.clicked()
     }
