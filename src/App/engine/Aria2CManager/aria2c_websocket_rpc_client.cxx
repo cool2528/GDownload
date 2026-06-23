@@ -1,6 +1,5 @@
 #include "aria2c_websocket_rpc_client.h"
 #include <atomic>
-#include <format>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 #include <boost/url.hpp>
@@ -16,7 +15,7 @@ namespace gdl {
 				if (rpc_secret.empty()) {
 					rpc_secret = kDefaultRpcSecret;
 				}
-				return std::format("token:{}", rpc_secret);
+				return "token:" + rpc_secret;
 			}
 
 			Result<bool> SendRpcMessage(const std::shared_ptr<WebSocketClient>& websocket,
