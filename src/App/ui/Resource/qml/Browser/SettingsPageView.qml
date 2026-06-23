@@ -10,10 +10,12 @@ Item {
     id: control
     property alias currentIndex: bar.currentIndex
 
-    // Element Plus 设计标准
-    readonly property int standardSpacing: 16
-    readonly property int standardRadius: 4
-    readonly property int sidebarWidth: 240  // 更宽的侧边栏
+    objectName: "settingsShell"
+
+    // 设置页壳布局令牌:只做别名,数值仍由 GTheme 统一管理
+    readonly property int shellSpacing: GTheme.spaceLG
+    readonly property int shellRadius: GTheme.radiusRound
+    readonly property int shellSidebarWidth: GTheme.sidebarWidth
 
     RowLayout {
         id: browserLayout
@@ -22,11 +24,12 @@ Item {
         // Element Plus 风格侧边栏
         Rectangle {
             id: leftMenuBar
-            color: GTheme.dark ? GTheme.fillBase : GTheme.bgPage
+            objectName: "settingsSidebar"
+            color: GTheme.bgPage
             Layout.fillHeight: true
-            Layout.minimumWidth: control.sidebarWidth
-            Layout.preferredWidth: control.sidebarWidth
-            Layout.maximumWidth: control.sidebarWidth
+            Layout.minimumWidth: control.shellSidebarWidth
+            Layout.preferredWidth: control.shellSidebarWidth
+            Layout.maximumWidth: control.shellSidebarWidth
 
             // Element Plus 风格右侧分隔线
             Rectangle {
@@ -39,25 +42,27 @@ Item {
             // Element Plus 风格标题
             Text {
                 id: title
+                objectName: "settingsTitle"
                 text: qsTr("Preferences")
                 anchors.left: parent.left
-                anchors.leftMargin: control.standardSpacing * 1.5  // 24px
+                anchors.leftMargin: control.shellSpacing + GTheme.spaceSM
                 anchors.top: parent.top
-                anchors.topMargin: control.standardSpacing * 2     // 32px
-                font.pixelSize: 18
-                font.weight: Font.Medium
+                anchors.topMargin: GTheme.space3XL
+                font.pixelSize: GTheme.fontTitle
+                font.weight: GTheme.weightMedium
                 color: GTheme.textPrimary
             }
             // Element Plus 风格导航菜单
             ColumnLayout {
                 id: bar
+                objectName: "settingsNav"
                 anchors.top: title.bottom
-                anchors.topMargin: control.standardSpacing * 1.5  // 24px
+                anchors.topMargin: GTheme.space2XL
                 anchors.left: parent.left
-                anchors.leftMargin: control.standardSpacing
+                anchors.leftMargin: control.shellSpacing
                 anchors.right: parent.right
-                anchors.rightMargin: control.standardSpacing
-                spacing: 4  // Element Plus 菜单项间距
+                anchors.rightMargin: control.shellSpacing
+                spacing: GTheme.spaceXS
                 property int currentIndex: 0
                 property var buttonsArr: [basic, advanced, lab]
                 ButtonGroup{
@@ -119,9 +124,9 @@ Item {
             // Element Plus 风格容器背景
             Rectangle {
                 anchors.fill: parent
-                anchors.margins: control.standardSpacing
-                color: GTheme.dark ? GTheme.fillBase : GTheme.bgWhite
-                radius: control.standardRadius
+                anchors.margins: control.shellSpacing
+                color: GTheme.bgWhite
+                radius: control.shellRadius
 
                 // 微妙的阴影效果
                 layer.enabled: !GTheme.dark
@@ -136,23 +141,24 @@ Item {
                 id: settingTitle
                 type: bar.currentIndex
                 anchors.top: parent.top
-                anchors.topMargin: control.standardSpacing * 2  // 32px
+                anchors.topMargin: GTheme.space3XL
                 anchors.left: parent.left
-                anchors.leftMargin: control.standardSpacing * 2
+                anchors.leftMargin: GTheme.space2XL
                 anchors.right: parent.right
-                anchors.rightMargin: control.standardSpacing * 2
+                anchors.rightMargin: GTheme.space2XL
             }
 
             StackLayout {
                 id: settingsStack
+                objectName: "settingsStack"
                 anchors.top: settingTitle.bottom
-                anchors.topMargin: control.standardSpacing
+                anchors.topMargin: control.shellSpacing
                 anchors.left: parent.left
-                anchors.leftMargin: control.standardSpacing * 2
+                anchors.leftMargin: GTheme.space2XL
                 anchors.right: parent.right
-                anchors.rightMargin: control.standardSpacing * 2
+                anchors.rightMargin: GTheme.space2XL
                 anchors.bottom: parent.bottom
-                anchors.bottomMargin: control.standardSpacing * 2
+                anchors.bottomMargin: GTheme.space2XL
                 currentIndex: bar.currentIndex
 
                 BasicSettingPage {

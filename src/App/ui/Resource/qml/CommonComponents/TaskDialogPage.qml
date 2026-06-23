@@ -7,6 +7,7 @@ import "../Utils/utils.js" as Utils
 // Element Plus 风格任务添加对话框
 Popup {
     id: taskPage
+    objectName: "taskDialogPage"
     width: dialogWidth
     implicitHeight: contentLayout.implicitHeight
     height: Math.min(parent ? parent.height - dialogViewportMargin * 2 : implicitHeight, implicitHeight)
@@ -15,6 +16,10 @@ Popup {
     modal: true
     closePolicy: Popup.CloseOnEscape
     focus: true
+
+    // 打开时预选的标签页:0=URL,1=Torrent,2=Baidu。
+    // 供下载页空状态快捷入口(Add URL / Torrent / Baidu)按入口类型直达对应标签。
+    property int initialTab: 0
 
     // 页面级布局常量:对话框宽度和内容高度只服务本弹窗,不是通用设计令牌
     readonly property int dialogWidth: 720
@@ -66,7 +71,9 @@ Popup {
             id: scrollArea
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.minimumHeight: taskPage.contentMinHeight
+            // 最小高度取小值:窗口较矮时本区可收缩、内部滚动,
+            // 保证底部按钮区(footer)始终留在弹窗内不被挤出窗口
+            Layout.minimumHeight: GTheme.sizeLarge * 3
             Layout.preferredHeight: taskPage.contentMinHeight
             implicitHeight: taskPage.contentMinHeight
             clip: true
@@ -87,6 +94,7 @@ Popup {
                     Layout.fillWidth: true
                     Layout.preferredHeight: GTheme.navItemHeight + GTheme.spaceXS
                     color: "transparent"
+                    objectName: "taskDialogTabs"
 
                     RowLayout {
                         anchors.fill: parent
@@ -121,11 +129,12 @@ Popup {
                 }
 
                 ButtonGroup { id: tabGroup }
-                QtObject { id: tabNavigation; property int currentIndex: 0 }
+                QtObject { id: tabNavigation; property int currentIndex: taskPage.initialTab }
 
                 // 标签页内容区域
                 StackLayout {
                     id: taskPageLayout
+                    objectName: "taskDialogStack"
                     Layout.fillWidth: true
                     // 自适应当前页内容高度，避免固定 200 导致可视区过小
                     //Layout.preferredHeight: 300
@@ -320,9 +329,11 @@ Popup {
 
         // 底部按钮区域
         Rectangle {
+            id: footerArea
+            objectName: "taskDialogFooter"
             Layout.fillWidth: true
             Layout.preferredHeight: taskPage.footerHeight
-            color: "transparent"
+            color: GTheme.bgWhite
 
             RowLayout {
                 anchors.fill: parent

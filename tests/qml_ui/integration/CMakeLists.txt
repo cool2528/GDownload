@@ -49,6 +49,7 @@ set(QML_UI_INTEGRATION_TESTS
     close_confirm
     theme_toggle
     navigation
+    design_system_contract
 )
 
 set(QML_UI_APP_RESOURCES
@@ -67,6 +68,8 @@ foreach(name ${QML_UI_INTEGRATION_TESTS})
         qml_ui_support
     )
     target_compile_features(qml_ui_tst_${name} PRIVATE cxx_std_20)
+    # 暴露源码根路径给契约测试(SOURCE_ROOT 宏),用于按文件路径读取生产 QML 做静态断言
+    target_compile_definitions(qml_ui_tst_${name} PRIVATE SOURCE_ROOT="${CMAKE_SOURCE_DIR}")
     # AUTOMOC:测试类含 Q_OBJECT;AUTORCC:resource_qml.qrc / resource_icons.qrc
     # 编译为 qrc_*.cpp 链入二进制,使 qrc:/qml/... 路径可解析
     set_target_properties(qml_ui_tst_${name} PROPERTIES AUTOMOC ON AUTORCC ON)

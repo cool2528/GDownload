@@ -17,7 +17,8 @@ Button {
     property string variant: "default"
     // size: large | default | small
     property string size: "default"
-    property real radius: GTheme.radiusSmall
+    // 消费级默认按钮圆角(V5 设计稿,原 radiusSmall=2 过于尖锐)
+    property real radius: GTheme.radiusLarge
     // 如未设置则按 size 自适应
     property real fontSize: 0
 
@@ -263,7 +264,8 @@ Button {
             if (control.isNav)
                 return (control.hovered || control.checked) ? (GTheme.dark ? GTheme.fillLight : GTheme.primaryLight(9)) : "transparent";
             if (control.iconOnly)
-                return control.hovered ? (GTheme.dark ? GTheme.fillBase : GTheme.fillLight) : "transparent";
+                return control.checked ? (GTheme.dark ? GTheme.fillLight : GTheme.primaryLight(9))
+                                       : (control.hovered ? (GTheme.dark ? GTheme.fillBase : GTheme.fillLight) : "transparent");
             if (!control.enabled)
                 return GTheme.dark ? GTheme.fillBase : GTheme.fillLight;
             if (variant === "plain" || variant === "link")

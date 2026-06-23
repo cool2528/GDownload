@@ -32,26 +32,52 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: GTheme.space2XL
 
+            // 品牌标识:蓝色圆角方块 + G(对齐设计稿 App Shell 导航顶部 logo)
+            Rectangle {
+                id: brandLogo
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: GTheme.sizeLarge
+                Layout.preferredHeight: GTheme.sizeLarge
+                radius: GTheme.radiusLarge
+                color: GTheme.primaryColor
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "G"
+                    color: "#FFFFFF"
+                    font.pixelSize: GTheme.fontTitle
+                    font.weight: GTheme.weightDemiBold
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: Qt.openUrlExternally("https://github.com/cool2528/GDownload")
+                }
+            }
+
             GButton {
                 id: home
                 objectName: "navHome"
                 Layout.alignment: Qt.AlignHCenter
-                radius: GTheme.radiusBase
+                radius: GTheme.radiusLarge
                 implicitWidth: GTheme.sizeLarge
                 implicitHeight: GTheme.sizeLarge
+                checked: (typeof brower_view !== "undefined") && brower_view.index === 2
                 iconSource: SegoeFluentIcons.HomeSolid
                 iconSize: GTheme.fontH1
                 onClicked: {
-                    Qt.openUrlExternally("https://github.com/cool2528/GDownload")
+                    brower_view.index = 2
                 }
             }
             GButton {
                 id: download
                 objectName: "navDownloading"
                 Layout.alignment: Qt.AlignHCenter
-                radius: GTheme.radiusBase
+                radius: GTheme.radiusLarge
                 implicitWidth: GTheme.sizeLarge
                 implicitHeight: GTheme.sizeLarge
+                checked: (typeof brower_view !== "undefined") && brower_view.index === 0 && brower_view.downloadIndex === 0
                 iconSource: SegoeFluentIcons.Download
                 iconSize: GTheme.fontH1
                 onClicked: {
@@ -64,9 +90,10 @@ Item {
                 id: waiting
                 objectName: "navWaiting"
                 Layout.alignment: Qt.AlignHCenter
-                radius: GTheme.radiusBase
+                radius: GTheme.radiusLarge
                 implicitWidth: GTheme.sizeLarge
                 implicitHeight: GTheme.sizeLarge
+                checked: (typeof brower_view !== "undefined") && brower_view.index === 0 && brower_view.downloadIndex === 1
                 iconSource: SegoeFluentIcons.History
                 iconSize: GTheme.fontH1
                 onClicked: {
@@ -79,9 +106,10 @@ Item {
                 id: completed
                 objectName: "navCompleted"
                 Layout.alignment: Qt.AlignHCenter
-                radius: GTheme.radiusBase
+                radius: GTheme.radiusLarge
                 implicitWidth: GTheme.sizeLarge
                 implicitHeight: GTheme.sizeLarge
+                checked: (typeof brower_view !== "undefined") && brower_view.index === 0 && brower_view.downloadIndex === 2
                 iconSource: SegoeFluentIcons.Completed
                 iconSize: GTheme.fontH1
                 onClicked: {
@@ -93,7 +121,7 @@ Item {
             GButton {
                 id: addTask
                 Layout.alignment: Qt.AlignHCenter
-                radius: GTheme.radiusBase
+                radius: GTheme.radiusLarge
                 implicitWidth: GTheme.sizeLarge
                 implicitHeight: GTheme.sizeLarge
                 // 用字体图标(随主题 textSecondary→primary),替代仅适配深色栏的白色 SVG,
@@ -120,9 +148,10 @@ Item {
             GButton {
                 id: setting
                 Layout.alignment: Qt.AlignHCenter
-                radius: GTheme.radiusBase
+                radius: GTheme.radiusLarge
                 implicitWidth: GTheme.sizeLarge
                 implicitHeight: GTheme.sizeLarge
+                checked: (typeof brower_view !== "undefined") && brower_view.index === 1
                 iconSource: SegoeFluentIcons.SettingsSolid
                 iconSize: GTheme.fontH1
                 onClicked: {
@@ -132,7 +161,7 @@ Item {
             GButton {
                 id: help
                 Layout.alignment: Qt.AlignHCenter
-                radius: GTheme.radiusBase
+                radius: GTheme.radiusLarge
                 implicitWidth: GTheme.sizeLarge
                 implicitHeight: GTheme.sizeLarge
                 iconSource: SegoeFluentIcons.Info
