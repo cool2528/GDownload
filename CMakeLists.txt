@@ -46,10 +46,8 @@ set(CURRENT_VERSION_BUILD ${BUILD})
 set(CURRENT_VERSION_COMMIT ${COMMIT})
 set(APP_VERSION "${CURRENT_VERSION_MAJOR}.${CURRENT_VERSION_MINOR}.${CURRENT_VERSION_BUILD}")
 
-# 设置 vcpkg 的 manifest 模式，允许 CI 复用预安装依赖时从命令行关闭
-if(NOT DEFINED VCPKG_MANIFEST_MODE)
-    set(VCPKG_MANIFEST_MODE ON)
-endif()
+# 设置vcpkg的manifest模式
+set(VCPKG_MANIFEST_MODE ON)
 # 设置vcpkg的overlay ports路径
 set(VCPKG_OVERLAY_PORTS "${CMAKE_SOURCE_DIR}/vcpkg-ports")
 

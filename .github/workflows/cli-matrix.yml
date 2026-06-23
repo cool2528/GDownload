@@ -320,7 +320,7 @@ jobs:
           where cl
           set "CC=cl"
           set "CXX=cl"
-          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\${{ matrix.install_prefix }} -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=%QTDIR% -DGDL_UI_GENERATE_TRANSLATIONS=on -GNinja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00" -DVCPKG_INSTALLED_DIR=%GITHUB_WORKSPACE%\vcpkg_installed
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\${{ matrix.install_prefix }} -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=%QTDIR% -DGDL_UI_GENERATE_TRANSLATIONS=on -GNinja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00"
           cmake --build build --config Release --parallel
           mkdir windows_pdb
           copy /Y build\Release\bin\*.pdb windows_pdb
