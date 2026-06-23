@@ -1,5 +1,5 @@
 #pragma once
-#include <format>
+#include <fmt/format.h>
 #include <memory>
 #include <source_location>
 #include <string>
@@ -36,45 +36,45 @@ namespace gdl {
     GDLCore_API LogLevel GetLoggerLevel();
 
 	template <typename... Args>
-	void LogDebug(const std::string& fmt, Args... args) {
-		LogMessage(LogLevel::kDebug, std::vformat(fmt, std::make_format_args(args...)));
+	void LogDebug(const std::string& format, Args... args) {
+		LogMessage(LogLevel::kDebug, fmt::vformat(format, fmt::make_format_args(args...)));
 	}
 	template <typename... Args>
-	void LogInfo(const std::string& fmt, Args... args) {
-		LogMessage(LogLevel::kInfo, std::vformat(fmt, std::make_format_args(args...)));
+	void LogInfo(const std::string& format, Args... args) {
+		LogMessage(LogLevel::kInfo, fmt::vformat(format, fmt::make_format_args(args...)));
 	}
 	template <typename... Args>
-	void LogWarning(const std::string& fmt, Args... args) {
-		LogMessage(LogLevel::kWarn, std::vformat(fmt, std::make_format_args(args...)));
+	void LogWarning(const std::string& format, Args... args) {
+		LogMessage(LogLevel::kWarn, fmt::vformat(format, fmt::make_format_args(args...)));
 	}
 	template <typename... Args>
-	void LogError(const std::string& fmt, Args... args) {
-		LogMessage(LogLevel::kError, std::vformat(fmt, std::make_format_args(args...)));
+	void LogError(const std::string& format, Args... args) {
+		LogMessage(LogLevel::kError, fmt::vformat(format, fmt::make_format_args(args...)));
 	}
 	template <typename... Args>
-	void LogCritical(const std::string& fmt, Args... args) {
-		LogMessage(LogLevel::kCritical, std::vformat(fmt, std::make_format_args(args...)));
+	void LogCritical(const std::string& format, Args... args) {
+		LogMessage(LogLevel::kCritical, fmt::vformat(format, fmt::make_format_args(args...)));
 	}
 
 	template <typename... Args>
-	void LogDebug(const std::source_location& loc, const std::string& fmt, Args... args) {
-		LogMessage(LogLevel::kDebug, loc, std::vformat(fmt, std::make_format_args(args...)));
+	void LogDebug(const std::source_location& loc, const std::string& format, Args... args) {
+		LogMessage(LogLevel::kDebug, loc, fmt::vformat(format, fmt::make_format_args(args...)));
 	}
 	template <typename... Args>
-	void LogInfo(const std::source_location& loc, const std::string& fmt, Args... args) {
-		LogMessage(LogLevel::kInfo, loc, std::vformat(fmt, std::make_format_args(args...)));
+	void LogInfo(const std::source_location& loc, const std::string& format, Args... args) {
+		LogMessage(LogLevel::kInfo, loc, fmt::vformat(format, fmt::make_format_args(args...)));
 	}
 	template <typename... Args>
-	void LogWarning(const std::source_location& loc, const std::string& fmt, Args... args) {
-		LogMessage(LogLevel::kWarn, loc, std::vformat(fmt, std::make_format_args(args...)));
+	void LogWarning(const std::source_location& loc, const std::string& format, Args... args) {
+		LogMessage(LogLevel::kWarn, loc, fmt::vformat(format, fmt::make_format_args(args...)));
 	}
 	template <typename... Args>
-	void LogError(const std::source_location& loc, const std::string& fmt, Args... args) {
-		LogMessage(LogLevel::kError, loc, std::vformat(fmt, std::make_format_args(args...)));
+	void LogError(const std::source_location& loc, const std::string& format, Args... args) {
+		LogMessage(LogLevel::kError, loc, fmt::vformat(format, fmt::make_format_args(args...)));
 	}
 	template <typename... Args>
-	void LogCritical(const std::source_location& loc, const std::string& fmt, Args... args) {
-		LogMessage(LogLevel::kCritical, loc, std::vformat(fmt, std::make_format_args(args...)));
+	void LogCritical(const std::source_location& loc, const std::string& format, Args... args) {
+		LogMessage(LogLevel::kCritical, loc, fmt::vformat(format, fmt::make_format_args(args...)));
 	}
 
 }  // namespace gdl

@@ -47,7 +47,7 @@ endif()
 
 register_target(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog Boost::property_tree Boost::beast Boost::locale unofficial::sqlite3::sqlite3 tomlplusplus::tomlplusplus)
+target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog PRIVATE Boost::property_tree Boost::beast Boost::locale unofficial::sqlite3::sqlite3 tomlplusplus::tomlplusplus)
 
 if(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE
