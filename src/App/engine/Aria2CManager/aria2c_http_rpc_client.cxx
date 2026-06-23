@@ -2,7 +2,6 @@
 #include <cpr/cpr.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
-#include <format>
 #include "config/config.h"
 #include "engine_def.h"
 #include "logger.h"
@@ -14,7 +13,7 @@ namespace gdl {
 				if (rpc_secret.empty()) {
 					rpc_secret = kDefaultRpcSecret;
 				}
-				return std::format("token:{}", rpc_secret);
+				return "token:" + rpc_secret;
 			}
 		}  // namespace
 

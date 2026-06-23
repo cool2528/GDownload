@@ -742,8 +742,7 @@ namespace gdl {
                                                        {"jsToken", js_token_},
                                                        {"dp-logid", detail::DpLogId().GetDpLogId()}};
 
-                std::string extra_str =
-                    std::format(R"({{"sekey":"{}"}})", plugin::CookiesUtils::UrlDecode(rand_sk_string_));
+                std::string extra_str = R"({"sekey":")" + plugin::CookiesUtils::UrlDecode(rand_sk_string_) + R"("})";
                 cpr::Payload download_payload	 = {{"encrypt", "0"},
                                                     {"extra", extra_str},
                                                     {"product", "share"},
@@ -963,7 +962,7 @@ namespace gdl {
 
 			cpr::Header headers = {{"User-Agent", baidu::BAIDU_CLIENT_UA}, {"Connection", "Keep-Alive"}};
 			std::string url		= baidu::PCS_BAIDU_COM + "/rest/2.0/pcs/file?" + params_str;
-            url += std::format("&rand={}&devuid={}&cuid={}", rand, devuid, devuid);
+            url += "&rand=" + rand + "&devuid=" + devuid + "&cuid=" + devuid;
 			std::vector<std::string> urls;
 			auto response = cpr::Get(cpr::Url{url}, headers, cpr::Cookies{{"BDUSS", bduss_cookie}});
 			if (response.status_code != 200) return urls;
