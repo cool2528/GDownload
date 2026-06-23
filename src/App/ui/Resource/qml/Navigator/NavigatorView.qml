@@ -52,10 +52,41 @@ Item {
                 radius: GTheme.radiusBase
                 implicitWidth: GTheme.sizeLarge
                 implicitHeight: GTheme.sizeLarge
-                iconSource: SegoeFluentIcons.SubscriptionAdd
+                iconSource: SegoeFluentIcons.Download
                 iconSize: GTheme.fontH1
                 onClicked: {
                     brower_view.index = 0
+                    brower_view.switchDownloadPage(0)
+                }
+            }
+
+            GButton {
+                id: waiting
+                objectName: "navWaiting"
+                Layout.alignment: Qt.AlignHCenter
+                radius: GTheme.radiusBase
+                implicitWidth: GTheme.sizeLarge
+                implicitHeight: GTheme.sizeLarge
+                iconSource: SegoeFluentIcons.History
+                iconSize: GTheme.fontH1
+                onClicked: {
+                    brower_view.index = 0
+                    brower_view.switchDownloadPage(1)
+                }
+            }
+
+            GButton {
+                id: completed
+                objectName: "navCompleted"
+                Layout.alignment: Qt.AlignHCenter
+                radius: GTheme.radiusBase
+                implicitWidth: GTheme.sizeLarge
+                implicitHeight: GTheme.sizeLarge
+                iconSource: SegoeFluentIcons.Completed
+                iconSize: GTheme.fontH1
+                onClicked: {
+                    brower_view.index = 0
+                    brower_view.switchDownloadPage(2)
                 }
             }
 
