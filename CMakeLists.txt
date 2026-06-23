@@ -86,12 +86,7 @@ elseif(WIN32)
     # 使用自定义的 triplets（用于传递 Qt 路径给 vcpkg 构建的包）
     set(VCPKG_OVERLAY_TRIPLETS ${CMAKE_SOURCE_DIR}/custom-triplets)
     # MSVC 使用 Ninja 生成器时需要显式开启异常处理，避免影响 MinGW 等非 MSVC 编译器
-    if(MSVC)
-        if(CMAKE_GENERATOR STREQUAL "Ninja" OR CMAKE_GENERATOR STREQUAL "Ninja Multi-Config")
-            add_compile_options(/EHsc)
-        endif()
-        add_compile_options(/utf-8)
-    endif()
+    add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/EHsc> $<$<CXX_COMPILER_ID:MSVC>:/utf-8>)
     # 设置Windows目标版本
     add_compile_definitions(_WIN32_WINNT=0x0A00) # Windows 10
 elseif(UNIX AND NOT APPLE)

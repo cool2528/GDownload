@@ -186,8 +186,20 @@ namespace gdl {
 				try {
 					std::error_code ec;
 					if (std::filesystem::file_size(config_file_path_, ec) > 0 && !ec) {
+#if TOML_EXCEPTIONS
 						toml_root_ = toml::parse_file(config_file_path_);
 						parsed_toml = true;
+#else
+						auto parse_result = toml::parse_file(config_file_path_);
+						if (parse_result) {
+							toml_root_ = std::move(parse_result).table();
+							parsed_toml = true;
+						} else {
+							const auto& err = parse_result.error();
+							LOG_ERR("Failed to parse {}: {} (line {}, column {})", config_file_path_, err.description(),
+									err.source().begin.line, err.source().begin.column);
+						}
+#endif
 					}
 				} catch (const toml::parse_error& err) {
 					LOG_ERR("Failed to parse {}: {} (line {}, column {})", config_file_path_, err.description(),
