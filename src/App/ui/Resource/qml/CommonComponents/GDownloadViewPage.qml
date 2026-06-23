@@ -35,9 +35,12 @@ Control {
                 Image {
                     id: emptyStateImage
                     source: "/images/browser/no-task.svg"
+                    Layout.preferredWidth: GTheme.space3XL * 4
+                    Layout.preferredHeight: GTheme.space3XL * 3
                     Layout.alignment: Qt.AlignHCenter
-                    sourceSize.width: 120
-                    sourceSize.height: 120
+                    sourceSize.width: Layout.preferredWidth
+                    sourceSize.height: Layout.preferredHeight
+                    fillMode: Image.PreserveAspectFit
                     opacity: 0.6
                 }
 
