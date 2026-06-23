@@ -60,6 +60,15 @@ if(APPLE)
     # 使用自定义的 triplets
     set(VCPKG_OVERLAY_TRIPLETS  ${CMAKE_SOURCE_DIR}/custom-triplets)
 
+    # 最低支持 macOS 11.0 (Big Sur)。Qt 6.5.2 最低要求 11.0；
+    # 未显式指定时锁定 11.0，避免在更高 SDK (如 macOS 26 Tahoe) 上编译时默认取 SDK 版本，
+    # 导致产物 LC_BUILD_VERSION 声明 minos 过高、旧系统 LaunchServices 拒绝启动 (error -10825)。
+    # 可用 -DCMAKE_OSX_DEPLOYMENT_TARGET=12 覆盖。
+    if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+        set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0")
+    endif()
+    message(STATUS "macOS deployment target: ${CMAKE_OSX_DEPLOYMENT_TARGET}")
+
     # macOS 架构配置
     # 支持三种模式：
     # 1. 手动指定单架构：-DCMAKE_OSX_ARCHITECTURES=arm64 或 x86_64

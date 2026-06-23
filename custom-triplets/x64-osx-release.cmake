@@ -4,6 +4,8 @@ set(VCPKG_LIBRARY_LINKAGE dynamic)
 
 set(VCPKG_CMAKE_SYSTEM_NAME Darwin)
 set(VCPKG_OSX_ARCHITECTURES x86_64)
+# 最低支持 macOS 11.0，避免在 macOS 26 SDK 上默认取 26.0 导致旧系统无法启动 (error -10825)
+set(VCPKG_OSX_DEPLOYMENT_TARGET "11.0")
 set(VCPKG_BUILD_TYPE release)
 
 # 允许 QTDIR 环境变量传递到 vcpkg 构建环境
