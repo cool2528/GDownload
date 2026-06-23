@@ -5,10 +5,16 @@ import gdl.sdk
 import "../Utils/utils.js" as Utils
 Rectangle {
     id: netDiskPage
+    objectName: "netDiskPage"
     color: GTheme.bgWhite
     property string parentPath:""
     property string homePath:""
     property bool isBusy: false
+
+    // 解析/浏览两态的单一状态源:true=粘贴解析态(显示输入行+工作流引导卡),
+    // false=文件浏览态(显示文件列表)。原实现命令式写 topBar.visible=false 切换,
+    // 导致 visible 绑定被破坏且多处可见性彼此耦合脆弱;统一由本属性驱动。
+    property bool parseMode: true
 
     // 页面级布局常量:网盘解析页的行高、列宽与图标尺寸只服务本页面
     readonly property int parseRowHeight: GTheme.sizeLarge
@@ -25,10 +31,10 @@ Rectangle {
         anchors.top: parent.top
         color: GTheme.bgWhite
         height: visible ? netDiskPage.parseRowHeight : 0
-        visible: true
+        visible: netDiskPage.parseMode
         RowLayout {
             id:parseLayout
-            Layout.topMargin: 0
+            anchors.fill: parent
             spacing: GTheme.spaceSM
             TextArea{
                 id:urlInput
@@ -42,7 +48,7 @@ Rectangle {
                     implicitHeight: parent.height
                     implicitWidth: parent.width
                     color: GTheme.fillLighter
-                    radius: GTheme.radiusBase
+                    radius: GTheme.radiusMedium
                     border.width: 1
                     border.color: urlInput.activeFocus ? GTheme.primaryColor : GTheme.borderLight
 
@@ -77,60 +83,137 @@ Rectangle {
         }
     }
 
-    Rectangle{
-        id:tipRect
-        anchors.top: topBar.bottom
+    // 解析工作流引导卡:三步流程 + Cookie 告警 + 去设置入口
+    // 关键:卡片被 anchors 定位(非置于父 Layout 中),不能用 anchors.fill 的内层
+    // Layout 反向驱动卡片高度 —— 那会与卡片高度形成绑定循环,Qt 断环后 implicitHeight
+    // 归零导致整卡坍缩。此处内层 ColumnLayout 仅锚 top/left/right(不 fill、无 bottom),
+    // 其高度即自身 implicitHeight(只由内容决定,不读卡片高度);卡片高度再据此显式计算,
+    // 彻底断开循环。
+    GCard {
+        id: workflowCard
+        objectName: "netDiskWorkflow"
+        // 锚到页面顶部 + 固定偏移(输入行高 + 间距),不依赖 topBar.height 的渲染时序
+        anchors.top: parent.top
+        anchors.topMargin: netDiskPage.parseRowHeight + GTheme.spaceLG
         anchors.left: parent.left
         anchors.right: parent.right
-        implicitHeight: tipLayout.implicitHeight
-        height: visible ? implicitHeight : 0
-        visible: topBar.visible
-        color: "transparent"
-        ColumnLayout{
-            id: tipLayout
-            anchors.fill: parent
-            anchors.margins: GTheme.spaceSM
-            spacing: GTheme.spaceSM
-            Label{
-                id:tipLabel
-                text: qsTr("Precautions for parsing Baidu Netdisk share links:")
-                color: GTheme.textDanger
+        anchors.leftMargin: GTheme.spaceLG
+        anchors.rightMargin: GTheme.spaceLG
+        visible: netDiskPage.parseMode
+        height: workflowColumn.implicitHeight + GTheme.spaceLG * 2
+        variant: "elevated"
+        outlined: true
+        padding: GTheme.spaceLG
+        radius: GTheme.radiusRound
+        hoverEnabled: false
+        shadow: true
+
+        ColumnLayout {
+            id: workflowColumn
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            spacing: GTheme.spaceMD
+
+            Text {
+                text: qsTr("Cloud link parser")
                 font.pixelSize: GTheme.fontTitle
                 font.weight: GTheme.weightDemiBold
-            }
-            Label{
-                text: qsTr("1.Please go to Software Settings -> Advanced Settings -> Set Baidu Netdisk cookies")
-                color: GTheme.textDanger
-                font.pixelSize: GTheme.fontBody
-            }
-            Label{
-                text: qsTr("2.Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)")
-                color: GTheme.textDanger
-                font.pixelSize: GTheme.fontBody
-            }
-            Label{
-                text: qsTr("3.Please ensure that your account has sufficient storage space before downloading, as the file needs to be saved to your cloud drive first.")
-                color: GTheme.textDanger
+                color: GTheme.textPrimary
                 Layout.fillWidth: true
-                Layout.preferredWidth: parent.width - GTheme.space3XL
-                font.pixelSize: GTheme.fontBody
-                wrapMode: Text.Wrap
-                elide: Text.ElideNone
-            }
-            Label{
-                text: qsTr("4.Unable to achieve accelerated downloading, only standard downloading is supported. For high-speed downloads, please purchase the official VIP.")
-                color: GTheme.textDanger
-                Layout.fillWidth: true
-                Layout.preferredWidth: parent.width - GTheme.space3XL
-                font.pixelSize: GTheme.fontBody
-                wrapMode: Text.Wrap
-                elide: Text.ElideNone
             }
 
-            GButton{
-                type: 1
-                text: qsTr("Click me to go to settings")
-                Layout.alignment: Qt.AlignCenter
+            Text {
+                text: qsTr("Paste a Baidu share link, preview files, then add selected items to the queue.")
+                font.pixelSize: GTheme.fontBody
+                color: GTheme.textSecondary
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: GTheme.spaceMD
+
+                Repeater {
+                    model: [
+                        { indexText: "1", title: qsTr("Paste link"), description: qsTr("Validate share URL and cookie."), accent: "primary" },
+                        { indexText: "2", title: qsTr("Preview files"), description: qsTr("Select files before downloading."), accent: "info" },
+                        { indexText: "3", title: qsTr("Add queue"), description: qsTr("Send selected files to aria2."), accent: "success" }
+                    ]
+
+                    GCard {
+                        required property var modelData
+                        Layout.fillWidth: true
+                        // 显式 implicitHeight:内容用 anchors.fill 不会反向撑高卡片,
+                        // 必须给定高度否则卡片坍缩(参照 QuickActionCard)
+                        implicitHeight: GTheme.sizeLarge + GTheme.spaceMD * 3
+                        padding: GTheme.spaceMD
+                        outlined: true
+                        hoverEnabled: false
+                        variant: modelData.accent === "success" ? "accentSuccess" : (modelData.accent === "info" ? "accentInfo" : "accentPrimary")
+
+                        RowLayout {
+                            anchors.fill: parent
+                            spacing: GTheme.spaceSM
+
+                            Rectangle {
+                                Layout.preferredWidth: GTheme.sizeDefault
+                                Layout.preferredHeight: GTheme.sizeDefault
+                                Layout.alignment: Qt.AlignVCenter
+                                radius: GTheme.radiusMedium
+                                color: GTheme.bgWhite
+                                border.width: 1
+                                border.color: GTheme.borderLight
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: modelData.indexText
+                                    font.pixelSize: GTheme.fontBody
+                                    font.weight: GTheme.weightDemiBold
+                                    color: GTheme.primaryColor
+                                }
+                            }
+
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: GTheme.spaceXS
+
+                                Text {
+                                    text: modelData.title
+                                    font.pixelSize: GTheme.fontBody
+                                    font.weight: GTheme.weightMedium
+                                    color: GTheme.textPrimary
+                                    elide: Text.ElideRight
+                                    Layout.fillWidth: true
+                                }
+
+                                Text {
+                                    text: modelData.description
+                                    font.pixelSize: GTheme.fontCaption
+                                    color: GTheme.textSecondary
+                                    elide: Text.ElideRight
+                                    Layout.fillWidth: true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            AlertTip {
+                Layout.fillWidth: true
+                severity: SettingsManager.qBaiduPanCookies.length === 0 ? "warning" : "info"
+                text: SettingsManager.qBaiduPanCookies.length === 0
+                      ? qsTr("Cookie required. Set Baidu Netdisk cookies in Preferences before parsing share links.")
+                      : qsTr("Ready to parse. The parser will preview files before adding them to the download queue.")
+            }
+
+            GButton {
+                text: qsTr("Open Baidu cookie settings")
+                visible: SettingsManager.qBaiduPanCookies.length === 0
+                buttonType: "primary"
+                Layout.alignment: Qt.AlignRight
                 Layout.preferredHeight: GTheme.sizeDefault
                 onClicked: {
                     brower_view.index = 1
@@ -149,7 +232,7 @@ Rectangle {
                 //ParseShareUrl
                 if(isSuccess){
                     Qt.callLater(function(){
-                        topBar.visible = false
+                        netDiskPage.parseMode = false
                         fileListView.forceLayout()
                     })
 
@@ -231,7 +314,8 @@ Rectangle {
     }
     ListView{
         id:fileListView
-        visible: !topBar.visible
+        objectName: "netDiskFileList"
+        visible: !netDiskPage.parseMode
         anchors.top: header.bottom
         anchors.left: parent.left
         anchors.right: parent.right
@@ -343,7 +427,7 @@ Rectangle {
                 type: 1
                 Layout.preferredHeight: GTheme.sizeDefault
                 onClicked: {
-                    topBar.visible = true
+                    netDiskPage.parseMode = true
                     netDiskPage.parentPath = ""
                     netDiskPage.homePath = ""
                 }

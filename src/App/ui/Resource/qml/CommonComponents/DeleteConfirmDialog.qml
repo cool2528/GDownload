@@ -10,6 +10,7 @@ import gdl.sdk
  */
 GMessageBox {
     id: root
+    objectName: "deleteConfirmDialog"
 
     // ========== 公开属性 ==========
 

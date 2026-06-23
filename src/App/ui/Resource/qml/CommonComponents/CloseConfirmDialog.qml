@@ -14,6 +14,7 @@ import gdl.sdk
  */
 GMessageBox {
     id: root
+    objectName: "closeConfirmDialog"
 
     // Center on the full-window overlay
     parent: Overlay.overlay

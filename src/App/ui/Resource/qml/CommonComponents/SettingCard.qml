@@ -39,9 +39,13 @@ GCard {
 
     outlined: true
     padding: GTheme.spaceLG
-    radius: GTheme.radiusBase
+    radius: GTheme.radiusRound
     // 设置卡片为静态容器,关闭 GCard 默认悬停高亮
     hoverEnabled: false
+    // 浮起表面 + 柔和阴影:在设置面板上形成层级(暗色 #1D1D1D 高于面板 #141414),
+    // 与下载页任务卡一致,贴合设计稿"卡片浮起"观感
+    variant: "elevated"
+    shadow: true
 
     // 修正隐式尺寸:GCard 基类隐式宽高按 +padding(单侧)计,会少算一侧导致内容被裁;
     // 此处按 +2*padding(双侧)计,使内容槽在隐式高度下完整显示

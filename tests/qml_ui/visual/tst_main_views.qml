@@ -61,6 +61,14 @@ TestCase {
         loadAndCapture("qrc:/qml/Browser/DownloadPageView.qml", "download_dark", "dark")
     }
 
+    // ---- HomePage (Browser/HomePage.qml) ----
+    function test_home_light() {
+        loadAndCapture("qrc:/qml/Browser/HomePage.qml", "home_light", "light")
+    }
+    function test_home_dark() {
+        loadAndCapture("qrc:/qml/Browser/HomePage.qml", "home_dark", "dark")
+    }
+
     // ---- NetDiskPageView (CommonComponents/NetDiskPageView.qml) ----
     function test_netdisk_light() {
         loadAndCapture("qrc:/qml/CommonComponents/NetDiskPageView.qml", "netdisk_light", "light")

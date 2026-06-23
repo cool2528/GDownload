@@ -16,6 +16,7 @@ GCard {
     interactive: true
     outlined: true
     hoverEnabled: true
+    shadow: true
     // hover 时复用 GCard selected 视觉反馈(加粗主色边框),弥补 accent 变体下
     // GCard 自身 hover 背景无变化的缺失,给可点击卡片以明确 hover 反馈
     selected: actionArea.containsMouse
@@ -28,7 +29,7 @@ GCard {
         }
     }
     padding: GTheme.spaceSM
-    radius: GTheme.radiusBase
+    radius: GTheme.radiusRound
     implicitHeight: GTheme.sizeLarge + GTheme.spaceSM * 2
 
     readonly property color accentColor: {
@@ -40,6 +41,16 @@ GCard {
         }
     }
 
+    // 图标气泡底色:取 accent 低饱和底(V5 彩色气泡)
+    readonly property color accentBubble: {
+        switch (accent) {
+        case "success": return GTheme.bgSuccess
+        case "warning": return GTheme.bgWarning
+        case "info": return GTheme.bgInfo
+        default: return GTheme.primaryLight(9)
+        }
+    }
+
     RowLayout {
         anchors.fill: parent
         spacing: GTheme.spaceSM
@@ -47,11 +58,11 @@ GCard {
         Rectangle {
             Layout.preferredWidth: GTheme.sizeDefault
             Layout.preferredHeight: GTheme.sizeDefault
+            Layout.minimumWidth: GTheme.sizeDefault
+            Layout.minimumHeight: GTheme.sizeDefault
             Layout.alignment: Qt.AlignVCenter
-            radius: GTheme.radiusBase
-            color: GTheme.bgWhite
-            border.width: 1
-            border.color: GTheme.borderLight
+            radius: GTheme.radiusMedium
+            color: root.accentBubble
 
             FontIcon {
                 anchors.centerIn: parent

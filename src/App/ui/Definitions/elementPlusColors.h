@@ -60,68 +60,68 @@ namespace Status {
 // Element Plus 中性色 - 浅色模式
 // 命名空间沿用历史名 AntDesignLight,实际值为 Element Plus 浅色色板,勿再增删 Ant Design 色值
 namespace AntDesignLight {
-    // 文字色 - Element Plus 浅色
+    // 文字色 - Element Plus 浅色(次级/占位色微调冷调,贴合设计稿)
     constexpr const char* kTextPrimary = "#303133";
     constexpr const char* kTextRegular = "#606266";
-    constexpr const char* kTextSecondary = "#909399";
-    constexpr const char* kTextPlaceholder = "#A8ABB2";
+    constexpr const char* kTextSecondary = "#7B8798";
+    constexpr const char* kTextPlaceholder = "#97A3B6";
     constexpr const char* kTextDisabled = "#C0C4CC";
 
-    // 边框色 - Element Plus 浅色
-    constexpr const char* kBorderDarker = "#C0C4CC";
-    constexpr const char* kBorderDark = "#DCDFE6";
-    constexpr const char* kBorderBase = "#DCDFE6";
-    constexpr const char* kBorderLight = "#E4E7ED";
-    constexpr const char* kBorderLighter = "#EBEEF5";
-    constexpr const char* kBorderExtraLight = "#F2F6FC";
+    // 边框色 - 冷调蓝灰(对齐设计稿 #E8EEF7 卡片边框系)
+    constexpr const char* kBorderDarker = "#B4C0D4";
+    constexpr const char* kBorderDark = "#CAD8EC";
+    constexpr const char* kBorderBase = "#D5DEEA";
+    constexpr const char* kBorderLight = "#E8EEF7";
+    constexpr const char* kBorderLighter = "#EEF3FA";
+    constexpr const char* kBorderExtraLight = "#F4F8FD";
 
-    // 填充色 - Element Plus 浅色
-    constexpr const char* kFillDarker = "#E6E6E6";
-    constexpr const char* kFillDark = "#EBEEF5";
-    constexpr const char* kFillBase = "#F0F2F5";
-    constexpr const char* kFillLight = "#F5F7FA";
-    constexpr const char* kFillLighter = "#FAFAFA";
+    // 填充色 - 冷调蓝灰(输入框/内嵌区)
+    constexpr const char* kFillDarker = "#E2E8F2";
+    constexpr const char* kFillDark = "#E8EEF7";
+    constexpr const char* kFillBase = "#EDF2FA";
+    constexpr const char* kFillLight = "#F2F6FC";
+    constexpr const char* kFillLighter = "#F7FAFE";
     constexpr const char* kFillBlank = "#FFFFFF";
 
-    // 背景色 - Element Plus 浅色
+    // 背景色 - 冷调蓝灰页面底 + 纯白卡片(设计稿 App Shell)
     constexpr const char* kBgWhite = "#FFFFFF";
-    constexpr const char* kBgPage = "#F2F3F5";
-    constexpr const char* kBgBase = "#FAFAFA";
+    constexpr const char* kBgPage = "#EEF2F7";
+    constexpr const char* kBgBase = "#F7FAFE";
     constexpr const char* kBgOverlay = "#FFFFFF";
 }
 
 // Element Plus 中性色 - 暗色模式
 // 命名空间沿用历史名 VSCodeDark,实际值为 Element Plus 暗色色板,勿再增删 VS Code 色值
 namespace VSCodeDark {
-    // 文字色 - Element Plus 暗色
+    // 文字色 - 暗色(次级/占位色冷调,贴合设计稿)
     constexpr const char* kTextPrimary = "#E5EAF3";
     constexpr const char* kTextRegular = "#CFD3DC";
-    constexpr const char* kTextSecondary = "#A3A6AD";
-    constexpr const char* kTextPlaceholder = "#8D9095";
+    constexpr const char* kTextSecondary = "#8896AE";
+    constexpr const char* kTextPlaceholder = "#6E7C99";
     constexpr const char* kTextDisabled = "#4C4D4F";
 
-    // 边框色 - Element Plus 暗色
-    constexpr const char* kBorderDarker = "#636466";
-    constexpr const char* kBorderDark = "#4C4D4F";
-    constexpr const char* kBorderBase = "#4C4D4F";
-    constexpr const char* kBorderLight = "#414243";
-    constexpr const char* kBorderLighter = "#313134";
-    constexpr const char* kBorderExtraLight = "#1D1D1D";
+    // 边框色 - 深蓝调(对齐设计稿 #263146 暗卡边框系)
+    constexpr const char* kBorderDarker = "#3C4C68";
+    constexpr const char* kBorderDark = "#2E3C58";
+    constexpr const char* kBorderBase = "#2C3A55";
+    constexpr const char* kBorderLight = "#263146";
+    constexpr const char* kBorderLighter = "#222E44";
+    constexpr const char* kBorderExtraLight = "#1A2438";
 
-    // 填充色 - Element Plus 暗色
-    constexpr const char* kFillDarker = "#4C4D4F";
-    constexpr const char* kFillDark = "#313134";
-    constexpr const char* kFillBase = "#303030";
-    constexpr const char* kFillLight = "#262727";
-    constexpr const char* kFillLighter = "#1D1D1D";
-    constexpr const char* kFillBlank = "#141414";
+    // 填充色 - 深蓝调(输入框/内嵌区)
+    constexpr const char* kFillDarker = "#2C3A55";
+    constexpr const char* kFillDark = "#222E44";
+    constexpr const char* kFillBase = "#243049";
+    constexpr const char* kFillLight = "#1B2335";
+    constexpr const char* kFillLighter = "#131C2E";
+    constexpr const char* kFillBlank = "#161E2E";
 
-    // 背景色 - Element Plus 暗色
-    constexpr const char* kBgWhite = "#141414";
-    constexpr const char* kBgPage = "#0A0A0A";
-    constexpr const char* kBgBase = "#141414";
-    constexpr const char* kBgElevated = "#1D1D1D";
-    constexpr const char* kBgOverlay = "#1D1D1D";
+    // 背景色 - 深蓝黑(非中性灰黑):页面底 < 普通面 < 高层卡片
+    constexpr const char* kBgWhite = "#161E2E";
+    constexpr const char* kBgPage = "#0E1524";
+    constexpr const char* kBgBase = "#161E2E";
+    constexpr const char* kBgElevated = "#1A2438";
+    constexpr const char* kBgOverlay = "#1A2438";
 }
 
 // Element Plus 尺寸与设计令牌规范
@@ -134,6 +134,10 @@ namespace Sizes {
     // 圆角
     constexpr int kRadiusBase = 4;
     constexpr int kRadiusSmall = 2;
+    // 消费级中等圆角:输入框、图标气泡、文件徽标等中小元素(V5 设计稿 ~12)
+    constexpr int kRadiusMedium = 12;
+    // 消费级大圆角:按钮、中型卡片(V5 设计稿 ~16)
+    constexpr int kRadiusLarge = 16;
     constexpr int kRadiusRound = 20;
     constexpr int kRadiusCircle = 100;
 
@@ -218,6 +222,8 @@ public:
 
     Q_INVOKABLE int radiusBase() const { return Sizes::kRadiusBase; }
     Q_INVOKABLE int radiusSmall() const { return Sizes::kRadiusSmall; }
+    Q_INVOKABLE int radiusMedium() const { return Sizes::kRadiusMedium; }
+    Q_INVOKABLE int radiusLarge() const { return Sizes::kRadiusLarge; }
     Q_INVOKABLE int radiusRound() const { return Sizes::kRadiusRound; }
 
     Q_INVOKABLE int spaceLG() const { return Sizes::kSpaceLG; }

@@ -17,6 +17,7 @@ Control {
 
         // 空状态显示
         Item {
+            objectName: "downloadEmptyState"
             anchors.fill: parent
             opacity: downloadListView.count > 0 ? 0 : 1
             visible: opacity > 0
@@ -32,16 +33,27 @@ Control {
                 anchors.centerIn: parent
                 spacing: GTheme.spaceLG
 
-                Image {
-                    id: emptyStateImage
-                    source: "/images/browser/no-task.svg"
-                    Layout.preferredWidth: GTheme.space3XL * 4
-                    Layout.preferredHeight: GTheme.space3XL * 3
+                // 空状态插图:渐变圆角瓦片 + 下载箭头(替换原破损 no-task.svg),
+                // 规格参照 design-system component-polish 的 empty-illustration:
+                // 柔和的 primary→success 浅色渐变底 + 主色箭头,跨平台一致、无外部资源依赖
+                Rectangle {
+                    id: emptyStateTile
+                    Layout.preferredWidth: 112
+                    Layout.preferredHeight: 88
                     Layout.alignment: Qt.AlignHCenter
-                    sourceSize.width: Layout.preferredWidth
-                    sourceSize.height: Layout.preferredHeight
-                    fillMode: Image.PreserveAspectFit
-                    opacity: 0.6
+                    radius: GTheme.radiusRound
+                    gradient: Gradient {
+                        orientation: Gradient.Horizontal
+                        GradientStop { position: 0.0; color: GTheme.primaryLight(9) }
+                        GradientStop { position: 1.0; color: GTheme.successLight(9) }
+                    }
+
+                    FontIcon {
+                        anchors.centerIn: parent
+                        iconSource: SegoeFluentIcons.Download
+                        iconSize: GTheme.fontH1 + GTheme.spaceMD
+                        color: GTheme.primaryColor
+                    }
                 }
 
                 Text {
@@ -94,7 +106,7 @@ Control {
                 outlined: true
                 hoverEnabled: true
                 interactive: true
-                radius: GTheme.radiusBase
+                radius: GTheme.radiusRound
                 variant: "elevated"
                 selected: hovered
 
@@ -113,7 +125,7 @@ Control {
                             Layout.preferredWidth: downloadView.taskIconSize
                             Layout.preferredHeight: downloadView.taskIconSize
                             Layout.alignment: Qt.AlignVCenter
-                            radius: GTheme.radiusBase
+                            radius: GTheme.radiusMedium
                             color: GTheme.primaryLight(9)
                             border.width: 1
                             border.color: GTheme.primaryLight(7)
@@ -247,7 +259,7 @@ Control {
                     // 进度条
                     GProgressBar {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 6
+                        Layout.preferredHeight: 8
                         Layout.leftMargin: GTheme.spaceSM
                         Layout.rightMargin: GTheme.spaceSM
                         from: 0
