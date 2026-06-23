@@ -6,6 +6,9 @@ set(VCPKG_CMAKE_SYSTEM_NAME Darwin)
 # Universal Binary 需要同时构建两个架构
 set(VCPKG_OSX_ARCHITECTURES "arm64;x86_64")
 
+# 最低支持 macOS 11.0，避免在 macOS 26 SDK 上默认取 26.0 导致旧系统无法启动 (error -10825)
+set(VCPKG_OSX_DEPLOYMENT_TARGET "11.0")
+
 # 优化编译选项
 set(VCPKG_BUILD_TYPE release)
 
