@@ -22,6 +22,12 @@ ProgressBar {
             default: return GTheme.primaryColor;
         }
     })()
+    // 渐变末端色:正常/成功态走 primary→success 的消费级渐变(V5),
+    // 警告/异常态用同色系自身的浅色起点,保持语义色不混入绿色
+    readonly property color gradStart: (status === "warning" || status === "exception")
+                                       ? Qt.lighter(resolvedBarColor, 1.25) : GTheme.primaryColor
+    readonly property color gradEnd: (status === "warning" || status === "exception")
+                                     ? resolvedBarColor : GTheme.successColor
     background: Rectangle {
         implicitWidth: control.width
         implicitHeight: control.height
@@ -37,7 +43,11 @@ ProgressBar {
             width: control.visualPosition * control.width
             height: control.height
             radius: height / 2
-            color: resolvedBarColor
+            gradient: Gradient {
+                orientation: Gradient.Horizontal
+                GradientStop { position: 0.0; color: control.gradStart }
+                GradientStop { position: 1.0; color: control.gradEnd }
+            }
         }
 
         // 进度文本（可选）

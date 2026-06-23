@@ -13,18 +13,15 @@ GCard {
     property string accent: "primary" // primary | success | warning | info
 
     compact: true
-    outlined: true
+    // 摘要指标卡用于容器内的指标条:无独立边框/阴影,避免与外层容器形成"卡中卡"双重边框。
+    // 用 variant "default"(GCard 仅在 variant!="default" 时强制 1px 边框),配合 outlined:false
+    // 实现真正无边框;仅呈现彩色气泡 + 数字 + 标签(对齐设计稿摘要条)
+    outlined: false
     hoverEnabled: false
-    variant: {
-        switch (accent) {
-        case "success": return "accentSuccess"
-        case "warning": return "accentWarning"
-        case "info": return "accentInfo"
-        default: return "accentPrimary"
-        }
-    }
+    shadow: false
+    variant: "default"
     padding: GTheme.spaceSM
-    radius: GTheme.radiusBase
+    radius: GTheme.radiusRound
     implicitHeight: GTheme.sizeLarge + GTheme.spaceSM * 2
 
     readonly property color accentColor: {
@@ -36,6 +33,16 @@ GCard {
         }
     }
 
+    // 图标气泡底色:取对应 accent 的低饱和底(V5 彩色气泡),不再用白底+边框
+    readonly property color accentBubble: {
+        switch (accent) {
+        case "success": return GTheme.bgSuccess
+        case "warning": return GTheme.bgWarning
+        case "info": return GTheme.bgInfo
+        default: return GTheme.primaryLight(9)
+        }
+    }
+
     RowLayout {
         anchors.fill: parent
         spacing: GTheme.spaceSM
@@ -43,11 +50,11 @@ GCard {
         Rectangle {
             Layout.preferredWidth: GTheme.sizeDefault
             Layout.preferredHeight: GTheme.sizeDefault
+            Layout.minimumWidth: GTheme.sizeDefault
+            Layout.minimumHeight: GTheme.sizeDefault
             Layout.alignment: Qt.AlignVCenter
-            radius: GTheme.radiusBase
-            color: GTheme.bgWhite
-            border.width: 1
-            border.color: GTheme.borderLight
+            radius: GTheme.radiusMedium
+            color: root.accentBubble
 
             FontIcon {
                 anchors.centerIn: parent

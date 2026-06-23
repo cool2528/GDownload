@@ -65,6 +65,8 @@ namespace gdl {
 				Q_PROPERTY(int sizeSmall READ sizeSmall CONSTANT)
 				Q_PROPERTY(int radiusBase READ radiusBase CONSTANT)
 				Q_PROPERTY(int radiusSmall READ radiusSmall CONSTANT)
+				Q_PROPERTY(int radiusMedium READ radiusMedium CONSTANT)
+				Q_PROPERTY(int radiusLarge READ radiusLarge CONSTANT)
 				Q_PROPERTY(int spaceLG READ spaceLG CONSTANT)
 				Q_PROPERTY(int spaceMD READ spaceMD CONSTANT)
 				Q_PROPERTY(int spaceSM READ spaceSM CONSTANT)
@@ -171,6 +173,8 @@ namespace gdl {
 				int sizeSmall() const { return ElementPlusColors::Sizes::kSmall; }
 				int radiusBase() const { return ElementPlusColors::Sizes::kRadiusBase; }
 				int radiusSmall() const { return ElementPlusColors::Sizes::kRadiusSmall; }
+				int radiusMedium() const { return ElementPlusColors::Sizes::kRadiusMedium; }
+				int radiusLarge() const { return ElementPlusColors::Sizes::kRadiusLarge; }
 				int spaceLG() const { return ElementPlusColors::Sizes::kSpaceLG; }
 				int spaceMD() const { return ElementPlusColors::Sizes::kSpaceMD; }
 				int spaceSM() const { return ElementPlusColors::Sizes::kSpaceSM; }

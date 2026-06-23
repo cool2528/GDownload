@@ -50,6 +50,7 @@ tests/qml_ui/
 │   ├── tst_settings_pages.qml   # 28 张:14 设置页 × 2 主题
 │   ├── tst_lab_subcards.qml     # 8 张:4 Lab 子卡片 × 2 主题
 │   ├── tst_dialogs.qml          # 10 张:5 对话框 × 2 主题
+│   ├── tst_design_system_pages.qml # Design-system screenshots: task dialog, NetDisk workflow, download empty state, feedback
 │   ├── tst_screenshot_helper.qml # smoke:验证 ScreenshotHelper 自身能抓图
 │   └── tst_smoke.qml            # smoke:验证 qml_ui_visual exe 起得来
 └── integration/            # QtTest C++ 集成用例(每用例独立 exe)
@@ -73,6 +74,7 @@ build/test_artifacts/qml_ui/
 ├── tst_settings_pages/     # 28 张 PNG
 ├── tst_lab_subcards/       # 8 张 PNG
 ├── tst_dialogs/            # 10 张 PNG
+├── tst_design_system_pages/ # Design-system page family screenshots
 └── tst_screenshot_helper/  # smoke 1 张 PNG
 ```
 

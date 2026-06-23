@@ -98,7 +98,7 @@ Control {
     padding: GTheme.spaceMD
 
     background: Rectangle {
-        radius: GTheme.radiusBase
+        radius: GTheme.radiusLarge
         color: root.alertBg
         border.width: 1
         border.color: root.alertBorder

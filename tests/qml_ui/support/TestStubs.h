@@ -92,6 +92,8 @@ class TestGTheme : public QObject {
 	Q_PROPERTY(int sizeSmall READ sizeSmall CONSTANT)
 	Q_PROPERTY(int radiusBase READ radiusBase CONSTANT)
 	Q_PROPERTY(int radiusSmall READ radiusSmall CONSTANT)
+	Q_PROPERTY(int radiusMedium READ radiusMedium CONSTANT)
+	Q_PROPERTY(int radiusLarge READ radiusLarge CONSTANT)
 	Q_PROPERTY(int spaceLG READ spaceLG CONSTANT)
 	Q_PROPERTY(int spaceMD READ spaceMD CONSTANT)
 	Q_PROPERTY(int spaceSM READ spaceSM CONSTANT)
@@ -158,25 +160,25 @@ class TestGTheme : public QObject {
 	// 文字色
 	QColor textPrimary() const { return dark() ? QColor("#E5EAF3") : QColor("#303133"); }
 	QColor textRegular() const { return dark() ? QColor("#CFD3DC") : QColor("#606266"); }
-	QColor textSecondary() const { return dark() ? QColor("#A3A6AD") : QColor("#909399"); }
-	QColor textPlaceholder() const { return dark() ? QColor("#8D9095") : QColor("#A8ABB2"); }
+	QColor textSecondary() const { return dark() ? QColor("#8896AE") : QColor("#7B8798"); }
+	QColor textPlaceholder() const { return dark() ? QColor("#6E7C99") : QColor("#97A3B6"); }
 	QColor textDisabled() const { return dark() ? QColor("#6C6E72") : QColor("#C0C4CC"); }
 
 	// 边框色
-	QColor borderBase() const { return dark() ? QColor("#4C4D4F") : QColor("#DCDFE6"); }
-	QColor borderLight() const { return dark() ? QColor("#414243") : QColor("#E4E7ED"); }
-	QColor borderLighter() const { return dark() ? QColor("#363637") : QColor("#EBEEF5"); }
+	QColor borderBase() const { return dark() ? QColor("#2C3A55") : QColor("#D5DEEA"); }
+	QColor borderLight() const { return dark() ? QColor("#263146") : QColor("#E8EEF7"); }
+	QColor borderLighter() const { return dark() ? QColor("#222E44") : QColor("#EEF3FA"); }
 
 	// 填充色
-	QColor fillBase() const { return dark() ? QColor("#303030") : QColor("#F0F2F5"); }
-	QColor fillLight() const { return dark() ? QColor("#1D1D1D") : QColor("#F5F7FA"); }
-	QColor fillLighter() const { return dark() ? QColor("#1D1D1D") : QColor("#FAFAFA"); }
+	QColor fillBase() const { return dark() ? QColor("#243049") : QColor("#EDF2FA"); }
+	QColor fillLight() const { return dark() ? QColor("#1B2335") : QColor("#F2F6FC"); }
+	QColor fillLighter() const { return dark() ? QColor("#131C2E") : QColor("#F7FAFE"); }
 
 	// 背景色
-	QColor bgWhite() const { return dark() ? QColor("#1D1D1D") : QColor("#FFFFFF"); }
-	QColor bgPage() const { return dark() ? QColor("#252526") : QColor("#F2F3F5"); }
-	QColor bgBase() const { return dark() ? QColor("#1D1D1D") : QColor("#FFFFFF"); }
-	QColor bgElevated() const { return dark() ? QColor("#252526") : QColor("#FFFFFF"); }
+	QColor bgWhite() const { return dark() ? QColor("#161E2E") : QColor("#FFFFFF"); }
+	QColor bgPage() const { return dark() ? QColor("#0E1524") : QColor("#EEF2F7"); }
+	QColor bgBase() const { return dark() ? QColor("#161E2E") : QColor("#F7FAFE"); }
+	QColor bgElevated() const { return dark() ? QColor("#1A2438") : QColor("#FFFFFF"); }
 
 	// 告警语义令牌
 	QColor bgInfo() const { return dark() ? QColor("#1D1D1D") : QColor("#F4F4F5"); }
@@ -198,6 +200,8 @@ class TestGTheme : public QObject {
 	int sizeSmall() const { return 24; }
 	int radiusBase() const { return 4; }
 	int radiusSmall() const { return 2; }
+	int radiusMedium() const { return 12; }
+	int radiusLarge() const { return 16; }
 	int spaceLG() const { return 16; }
 	int spaceMD() const { return 12; }
 	int spaceSM() const { return 8; }
@@ -205,7 +209,7 @@ class TestGTheme : public QObject {
 	int spaceXL() const { return 20; }
 	int space2XL() const { return 24; }
 	int space3XL() const { return 32; }
-	int radiusRound() const { return 999; }
+	int radiusRound() const { return 20; }
 	int radiusCircle() const { return 999; }
 
 	// 动效

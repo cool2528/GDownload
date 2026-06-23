@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Effects
 import gdl.sdk
 
 // 通用卡片容器：统一背景/圆角/边框/hover/selected/disabled
@@ -12,15 +13,21 @@ Control {
     property bool outlined: false
     property bool disabled: false
 
+    // 柔和投影(V5 消费级卡片高级感):opt-in,默认关闭。
+    // 仅在非列表的少量卡片上开启;列表逐行卡片为性能不开启。
+    // 开启时关闭 clip,否则阴影会被自身边界裁掉。
+    property bool shadow: false
+
     // 消费级卡片变体:基于 GTheme 的低饱和表面,不引入页面私有颜色
     property string variant: "default"   // default | muted | elevated | accentPrimary | accentSuccess | accentWarning | accentInfo
     property bool interactive: true
     property bool compact: false
 
     // 外观属性
-    property int radius: 4
+    // 消费级卡片默认大圆角(V5 设计稿),工具型场景调用方可覆盖为 radiusBase
+    property int radius: GTheme.radiusLarge
     padding: 2
-    clip: true
+    clip: !shadow
 
     readonly property int resolvedPadding: compact ? GTheme.spaceSM : padding
 
@@ -64,6 +71,16 @@ Control {
         }
         border.width: card.selected ? 2 : (card.outlined || card.variant !== "default" ? 1 : 0)
         border.color: card.variantBorder()
+
+        // 柔和投影:走 QtQuick.Effects 原生 MultiEffect(暗色更深、浅色更轻)
+        layer.enabled: card.shadow
+        layer.effect: MultiEffect {
+            shadowEnabled: true
+            shadowColor: GTheme.dark ? Qt.rgba(0, 0, 0, 0.55) : Qt.rgba(0.11, 0.15, 0.22, 0.20)
+            shadowBlur: 0.7
+            shadowVerticalOffset: GTheme.spaceSM
+            autoPaddingEnabled: true
+        }
     }
 
     contentItem: Item {
