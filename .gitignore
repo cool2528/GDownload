@@ -162,3 +162,4 @@ GEMINI.md
 build_macos.sh
 check_translations.sh
 setup_env.sh
+.superpowers/

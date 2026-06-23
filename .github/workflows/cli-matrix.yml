@@ -6,6 +6,13 @@ on:
       - '*'
   workflow_dispatch:
 
+# 并发控制:按 ref(tag / 手动触发)分组,重复触发同一 ref 时取消旧运行,
+# 避免重复占用 runner。按 ref 分组而非全局,确保不同 tag 的发布互不打断,
+# 不会因新推一个 tag 而掐断另一个正在进行的发布构建(防止半成品 release)。
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # 创建 Release（只运行一次，避免重复创建）
   create-release:
