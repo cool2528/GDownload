@@ -29,7 +29,8 @@ namespace gdl {
            private:
             void UpdateProgressThread();
             void LogMessages();
-            void handleNetworkReply(QNetworkReply* reply, UpdateCheckCallback callback);
+            void startCheckRequest(const std::string& update_url, bool is_fallback, UpdateCheckCallback callback);
+            void handleNetworkReply(QNetworkReply* reply, bool is_fallback, UpdateCheckCallback callback);
             UpdateConfig config_;
             UpdateInfo update_info_;
             ProgressCallback progress_callback_;

@@ -27,7 +27,8 @@ namespace gdl {
 
         // Update configuration
         struct UpdateConfig {
-            std::string update_url;			   // Update server URL
+            std::string update_url;			   // 主更新信息地址
+            std::string fallback_update_url;   // 主地址不可用时的备用更新信息地址
             std::string current_version;	   // Current version number
             std::string temp_dir;			   // Temporary file directory
             bool allow_beta			 = false;  // Whether to accept beta versions

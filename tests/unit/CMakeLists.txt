@@ -10,6 +10,7 @@ add_executable(gdownload_unit_tests
     main.cpp
     core/test_core_functions.cpp
     engine/test_publish_subscribe_system.cpp
+    update/test_update_config.cpp
     utils/test_relaunch_function.cpp
     ${CMAKE_SOURCE_DIR}/src/App/ui/utils/utils.cxx
 )
