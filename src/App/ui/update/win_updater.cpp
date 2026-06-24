@@ -173,7 +173,25 @@ namespace gdl {
                 }
                 return;
             }
-            QNetworkRequest request(QUrl(QString::fromStdString(config_.update_url)));
+
+            startCheckRequest(config_.update_url, false, callback);
+        }
+
+        void WinUpdater::startCheckRequest(const std::string& update_url, bool is_fallback,
+                                           UpdateCheckCallback callback) {
+            if (update_url.empty()) {
+                last_error_ = is_fallback ? "Fallback update URL is empty" : "Update URL is empty";
+                if (!is_fallback && !config_.fallback_update_url.empty()) {
+                    startCheckRequest(config_.fallback_update_url, true, callback);
+                    return;
+                }
+                if (callback) {
+                    callback(false, UpdateInfo{});
+                }
+                return;
+            }
+
+            QNetworkRequest request(QUrl(QString::fromStdString(update_url)));
             request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
             for (const auto& header : request_headers_) {
                 request.setRawHeader(header.first.c_str(), header.second.c_str());
@@ -181,15 +199,22 @@ namespace gdl {
             auto reply = network_manager_.get(request);
             if (!reply) {
                 last_error_ = "Failed to create network request";
+                if (!is_fallback && !config_.fallback_update_url.empty()) {
+                    startCheckRequest(config_.fallback_update_url, true, callback);
+                    return;
+                }
+                if (callback) {
+                    callback(false, UpdateInfo{});
+                }
                 return;
             }
             current_check_reply_ = reply;
-            QObject::connect(reply, &QNetworkReply::finished, [this, reply, callback, alive = alive_]() {
+            QObject::connect(reply, &QNetworkReply::finished, [this, reply, is_fallback, callback, alive = alive_]() {
                 if (!alive->load()) {
                     reply->deleteLater();
                     return;
                 }
-                this->handleNetworkReply(reply, callback);
+                this->handleNetworkReply(reply, is_fallback, callback);
                 if (current_check_reply_ == reply) {
                     current_check_reply_ = nullptr;
                 }
@@ -478,9 +503,13 @@ namespace gdl {
             return true;
         }
 
-        void WinUpdater::handleNetworkReply(QNetworkReply* reply, UpdateCheckCallback callback) {
+        void WinUpdater::handleNetworkReply(QNetworkReply* reply, bool is_fallback, UpdateCheckCallback callback) {
             if (!reply) {
                 last_error_ = "Network reply is nullptr";
+                if (!is_fallback && !config_.fallback_update_url.empty()) {
+                    startCheckRequest(config_.fallback_update_url, true, callback);
+                    return;
+                }
                 if (callback) {
                     callback(false, UpdateInfo{});
                 }
@@ -488,7 +517,19 @@ namespace gdl {
             }
             auto error = reply->error();
             if (error != QNetworkReply::NoError) {
+                // 用户主动取消检查请求（CancelUpdate 调用 abort）时不应触发 fallback，
+                // 保持取消语义：直接回调失败，不切换到备用更新源。
+                if (error == QNetworkReply::OperationCanceledError) {
+                    if (callback) {
+                        callback(false, UpdateInfo{});
+                    }
+                    return;
+                }
                 last_error_ = reply->errorString().toStdString();
+                if (!is_fallback && !config_.fallback_update_url.empty()) {
+                    startCheckRequest(config_.fallback_update_url, true, callback);
+                    return;
+                }
                 if (callback) {
                     callback(false, UpdateInfo{});
                 }
@@ -502,6 +543,10 @@ namespace gdl {
                 UpdateInfo info;
                 if (!doc.contains("tag_name")) {
                     last_error_ = "Invalid update info";
+                    if (!is_fallback && !config_.fallback_update_url.empty()) {
+                        startCheckRequest(config_.fallback_update_url, true, callback);
+                        return;
+                    }
                     if (callback) {
                         callback(false, UpdateInfo{});
                     }
@@ -535,6 +580,8 @@ namespace gdl {
                         }
                     }
                     if (!info.download_url.empty()) {
+                        // 成功找到可更新的安装包，清空可能残留的上次检查错误信息
+                        last_error_.clear();
                         update_available_ = true;
                         update_info_	  = info;
                         if (callback) {
@@ -543,12 +590,21 @@ namespace gdl {
                         return;
                     }
                 }
+                if (!is_fallback && !config_.fallback_update_url.empty()) {
+                    last_error_ = "No Windows update package found in primary update info";
+                    startCheckRequest(config_.fallback_update_url, true, callback);
+                    return;
+                }
                 if (callback) {
                     callback(false, UpdateInfo{});
                 }
 
             } catch (std::exception& e) {
                 last_error_ = e.what();
+                if (!is_fallback && !config_.fallback_update_url.empty()) {
+                    startCheckRequest(config_.fallback_update_url, true, callback);
+                    return;
+                }
                 if (callback) {
                     callback(false, UpdateInfo{});
                 }

@@ -72,9 +72,13 @@ namespace gdl {
 			return true;
 		}
 
-		void LinuxUpdater::handleNetworkReply(QNetworkReply* reply, UpdateCheckCallback callback) {
+		void LinuxUpdater::handleNetworkReply(QNetworkReply* reply, bool is_fallback, UpdateCheckCallback callback) {
 			if (!reply) {
 				last_error_ = "Network reply is nullptr";
+				if (!is_fallback && !config_.fallback_update_url.empty()) {
+					startCheckRequest(config_.fallback_update_url, true, callback);
+					return;
+				}
 				if (callback) {
 					callback(false, UpdateInfo{});
 				}
@@ -82,7 +86,19 @@ namespace gdl {
 			}
 			auto error = reply->error();
 			if (error != QNetworkReply::NoError) {
+				// 用户主动取消检查请求（CancelUpdate 调用 abort）时不应触发 fallback，
+				// 保持取消语义：直接回调失败，不切换到备用更新源。
+				if (error == QNetworkReply::OperationCanceledError) {
+					if (callback) {
+						callback(false, UpdateInfo{});
+					}
+					return;
+				}
 				last_error_ = reply->errorString().toStdString();
+				if (!is_fallback && !config_.fallback_update_url.empty()) {
+					startCheckRequest(config_.fallback_update_url, true, callback);
+					return;
+				}
 				if (callback) {
 					callback(false, UpdateInfo{});
 				}
@@ -103,6 +119,10 @@ namespace gdl {
 				UpdateInfo info;
 				if (!doc.contains("tag_name")) {
 					last_error_ = "Invalid update info";
+					if (!is_fallback && !config_.fallback_update_url.empty()) {
+						startCheckRequest(config_.fallback_update_url, true, callback);
+						return;
+					}
 					if (callback) {
 						callback(false, UpdateInfo{});
 					}
@@ -129,20 +149,34 @@ namespace gdl {
 					}
 					update_info_ = info;
 				}
-				bool update_available = false;
-				if (!updater_->checkForChanges(update_available)) {
-					// Log error messages
-					std::string message;
-					while (updater_->nextStatusMessage(message)) {
-						last_error_ += message + "\n";
-						qWarning() << "Update check error:" << QString::fromStdString(message);
+				if (info.download_url.empty()) {
+					last_error_ = "No Linux update package found in update info";
+					if (!is_fallback && !config_.fallback_update_url.empty()) {
+						startCheckRequest(config_.fallback_update_url, true, callback);
+						return;
 					}
-
 					if (callback) {
 						callback(false, UpdateInfo{});
 					}
 					return;
 				}
+				bool update_available = false;
+				if (!updater_->checkForChanges(update_available)) {
+					// AppImage updater 本地检查失败（如读取 AppImage 更新信息、校验等），
+					// 属于本地错误而非更新源（GitHub API / fallback URL）不可用，
+					// 因此不应 fallback 到 GitHub API，直接回调失败即可。
+					std::string message;
+					while (updater_->nextStatusMessage(message)) {
+						last_error_ += message + "\n";
+						qWarning() << "Update check error:" << QString::fromStdString(message);
+					}
+					if (callback) {
+						callback(false, UpdateInfo{});
+					}
+					return;
+				}
+				// 更新检查成功完成，清空可能残留的上次检查错误信息
+				last_error_.clear();
 				update_available_ = update_available;
 				if (update_available) {
 					std::string message;
@@ -156,6 +190,10 @@ namespace gdl {
 
 			} catch (std::exception& e) {
 				last_error_ = e.what();
+				if (!is_fallback && !config_.fallback_update_url.empty()) {
+					startCheckRequest(config_.fallback_update_url, true, callback);
+					return;
+				}
 				if (callback) {
 					callback(false, UpdateInfo{});
 				}
@@ -163,7 +201,23 @@ namespace gdl {
 			}
 		}
 		void LinuxUpdater::CheckForUpdates(UpdateCheckCallback callback) {
-			QNetworkRequest request(QUrl(QString::fromStdString(config_.update_url)));
+			startCheckRequest(config_.update_url, false, callback);
+		}
+		void LinuxUpdater::startCheckRequest(const std::string& update_url, bool is_fallback,
+											 UpdateCheckCallback callback) {
+			if (update_url.empty()) {
+				last_error_ = is_fallback ? "Fallback update URL is empty" : "Update URL is empty";
+				if (!is_fallback && !config_.fallback_update_url.empty()) {
+					startCheckRequest(config_.fallback_update_url, true, callback);
+					return;
+				}
+				if (callback) {
+					callback(false, UpdateInfo{});
+				}
+				return;
+			}
+
+			QNetworkRequest request(QUrl(QString::fromStdString(update_url)));
 			request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 			for (const auto& header : request_headers_) {
 				request.setRawHeader(header.first.c_str(), header.second.c_str());
@@ -171,15 +225,22 @@ namespace gdl {
 			auto reply = network_manager_.get(request);
 			if (!reply) {
 				last_error_ = "Failed to create network request";
+				if (!is_fallback && !config_.fallback_update_url.empty()) {
+					startCheckRequest(config_.fallback_update_url, true, callback);
+					return;
+				}
+				if (callback) {
+					callback(false, UpdateInfo{});
+				}
 				return;
 			}
 			current_reply_ = reply;  // 保存以便 CancelUpdate 能中止请求
-			QObject::connect(reply, &QNetworkReply::finished, [this, reply, callback, alive = alive_]() {
+			QObject::connect(reply, &QNetworkReply::finished, [this, reply, is_fallback, callback, alive = alive_]() {
 				if (!alive->load()) {
 					reply->deleteLater();
 					return;
 				}
-				this->handleNetworkReply(reply, callback);
+				this->handleNetworkReply(reply, is_fallback, callback);
 				if (current_reply_ == reply) {
 					current_reply_ = nullptr;
 				}

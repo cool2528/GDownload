@@ -23,7 +23,8 @@ namespace gdl {
             bool ApplyUpdate(bool restart_app = true) override;
 
            private:
-            void handleNetworkReply(QNetworkReply* reply, UpdateCheckCallback callback);
+            void startCheckRequest(const std::string& update_url, bool is_fallback, UpdateCheckCallback callback);
+            void handleNetworkReply(QNetworkReply* reply, bool is_fallback, UpdateCheckCallback callback);
 
             UpdateConfig config_;
             UpdateInfo update_info_;

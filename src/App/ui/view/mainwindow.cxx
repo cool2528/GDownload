@@ -111,7 +111,8 @@ namespace gd {
 				gdl::update::UpdateConfig update_config;
 				update_config.current_version	 = GDownload_VERSION_STRING;
 				update_config.enable_auto_check = gdl::ui::settings::Settings::Instance().GetEnableAutoUpdate();
-				update_config.update_url = "https://api.github.com/repos/cool2528/gdownload/releases/latest";
+				update_config.update_url = "https://gdownload.uk/update/latest.json";
+				update_config.fallback_update_url = "https://api.github.com/repos/cool2528/gdownload/releases/latest";
 				std::map<std::string, std::string> headers;
 				headers["Content-Type"] = "application/json";
 				headers["User-Agent"]	= "GDownloader-Update-Client";
