@@ -46,8 +46,9 @@ SettingCard {
                     qsTr("Restart Computer")
                 ]
                 currentIndex: SettingsManager.qOnCompleteAction
-                onCurrentIndexChanged: {
-                    SettingsManager.SetOnCompleteAction(currentIndex)
+                // 仅用户交互提交,避免语言切换重建 model 时 currentIndex 复位被写回(Q2)
+                onActivated: function(index) {
+                    SettingsManager.SetOnCompleteAction(index)
                 }
             }
 
@@ -133,8 +134,8 @@ SettingCard {
                     qsTr("Run Custom Command")
                 ]
                 currentIndex: SettingsManager.qOnErrorAction
-                onCurrentIndexChanged: {
-                    SettingsManager.SetOnErrorAction(currentIndex)
+                onActivated: function(index) {
+                    SettingsManager.SetOnErrorAction(index)
                 }
             }
 
@@ -219,8 +220,8 @@ SettingCard {
                     qsTr("Play Sound")
                 ]
                 currentIndex: SettingsManager.qOnStartAction
-                onCurrentIndexChanged: {
-                    SettingsManager.SetOnStartAction(currentIndex)
+                onActivated: function(index) {
+                    SettingsManager.SetOnStartAction(index)
                 }
             }
         }

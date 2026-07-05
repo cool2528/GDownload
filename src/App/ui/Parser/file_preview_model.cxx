@@ -128,7 +128,7 @@ namespace gdl {
                         if (parts.size() == 2) {
                             double size	 = parts[0].toDouble();
                             QString unit = parts[1];
-                            if (unit == "TB") size *= 1024 * 1024 * 1024 * 1024;
+                            if (unit == "TB") size *= 1024LL * 1024 * 1024 * 1024;
                             else if (unit == "GB") size *= 1024 * 1024 * 1024;
                             else if (unit == "MB") size *= 1024 * 1024;
                             else if (unit == "KB") size *= 1024;

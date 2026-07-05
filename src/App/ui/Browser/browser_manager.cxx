@@ -7,6 +7,7 @@
 #include <QQmlEngine>
 #include <nlohmann/json.hpp>
 #include "Aria2CManager/engine_def.h"
+#include "Browser/download_url_utils.h"
 #include "Definitions/appDef.h"
 #include "Parser/file_parser.h"
 #include "PluginManager/plugin_manager.h"
@@ -28,6 +29,118 @@ namespace gdl {
 				 "status", "totalLength", "completedLength", "downloadSpeed", "infoHash", "numSeeders",
 				 "seeder", "connections", "errorCode",		 "errorMessage",  "dir",	  "files",
 				 "gid",	   "bittorrent"};
+
+			namespace {
+				// 从单个 aria2 任务对象解析出 DownloadTaskInfo,统一 OnHandleAria2Message 与
+				// Aria2QueryByGidTaskInfo 两处重复逻辑。task_id 为空表示对象无有效路径(应跳过)。
+				DownloadTaskInfo ParseAria2TaskObject(const nlohmann::json& object) {
+					DownloadTaskInfo task_info;
+					if (!object.is_object() || !object.contains("gid")) {
+						return task_info;
+					}
+					// aria2 数值字段以字符串下发,容错解析为 0
+					auto parse_ll = [&object](const char* key) -> std::int64_t {
+						if (object.contains(key) && object[key].is_string()) {
+							try {
+								return std::stoll(object[key].get<std::string>());
+							} catch (...) {
+							}
+						}
+						return 0;
+					};
+
+					const std::string status = object.value("status", std::string());
+					const QString task_id = QString::fromStdString(object["gid"].get<std::string>());
+					const std::int64_t completed = parse_ll("completedLength");
+					const std::int64_t connections = parse_ll("connections");
+					const std::int64_t speed = parse_ll("downloadSpeed");
+					const std::int64_t total_length = parse_ll("totalLength");
+
+					// 收集文件路径与下载源
+					QString first_path, download_url;
+					int file_count = 0;
+					if (object.contains("files") && object["files"].is_array()) {
+						const auto& files = object["files"];
+						file_count = static_cast<int>(files.size());
+						for (const auto& file : files) {
+							if (first_path.isEmpty() && file.contains("path")) {
+								first_path = QString::fromStdString(file["path"].get<std::string>());
+							}
+							if (download_url.isEmpty() && file.contains("uris") && file["uris"].is_array()) {
+								for (const auto& uri : file["uris"]) {
+									if (uri.contains("uri")) {
+										download_url = QString::fromStdString(uri["uri"].get<std::string>());
+										break;
+									}
+								}
+							}
+						}
+					}
+
+					// 种子名(多文件任务用作显示名与根目录)
+					QString torrent_name;
+					if (object.contains("bittorrent") && object["bittorrent"].is_object()) {
+						const auto& bt = object["bittorrent"];
+						if (bt.contains("info") && bt["info"].is_object() && bt["info"].contains("name")) {
+							torrent_name = QString::fromStdString(bt["info"]["name"].get<std::string>());
+						}
+					}
+					QString task_dir;
+					if (object.contains("dir")) {
+						task_dir = QString::fromStdString(object["dir"].get<std::string>());
+					}
+
+					QString file_name, save_path;
+					if (file_count > 1) {
+						// 多文件 BT:显示种子名,保存路径落到种子根目录(dir/种子名),"打开目录"落到种子根
+						if (!torrent_name.isEmpty() && !task_dir.isEmpty()) {
+							save_path = task_dir + "/" + torrent_name;
+							file_name = torrent_name;
+						} else if (!task_dir.isEmpty()) {
+							save_path = task_dir;
+							file_name = QFileInfo(first_path).fileName();
+						} else {
+							save_path = first_path;
+							file_name = QFileInfo(first_path).fileName();
+						}
+					} else {
+						// 单文件:沿用第一个文件的完整路径
+						save_path = first_path;
+						file_name = QFileInfo(first_path).fileName();
+					}
+
+					if (save_path.isEmpty()) {
+						return task_info;  // 无有效路径,task_id 保持为空,调用方跳过
+					}
+
+					task_info.set_task_id(task_id);
+					task_info.set_task_download_speed(speed);
+					task_info.set_task_current_size(completed);
+					task_info.set_task_total_size(total_length);
+					task_info.set_task_connections(connections);
+					task_info.set_task_file_name(file_name);
+					task_info.set_task_save_path(save_path);
+					task_info.set_task_download_link(download_url);
+
+					if (status == "active") {
+						task_info.set_task_state(TaskState::kActive);
+					} else if (status == "waiting") {
+						task_info.set_task_state(TaskState::kWaiting);
+					} else if (status == "complete") {
+						task_info.set_task_state(TaskState::kComplete);
+					} else if (status == "paused") {
+						task_info.set_task_state(TaskState::kPause);
+					} else if (status == "error") {
+						task_info.set_task_state(TaskState::kError);
+					} else if (status == "removed") {
+						task_info.set_task_state(TaskState::kRemoved);
+					} else {
+						LOG_WARN("Unknown state type: {}", status);
+					}
+					return task_info;
+				}
+			}  // namespace
+
 			BrowserManager* BrowserManagerImpl::create(QQmlEngine* qmlengine, QJSEngine* jsengine) {
 				Q_UNUSED(qmlengine)
 				Q_UNUSED(jsengine);
@@ -45,7 +158,7 @@ namespace gdl {
 			}
 
 			DownloadTaskModel* BrowserManagerImpl::GetStopedDownloadModel() {
-				return stoped_model_.get();
+				return stopped_model_.get();
 			}
 
 			DownloadTaskModel* BrowserManagerImpl::GetWaitingDownloadModel() {
@@ -70,8 +183,15 @@ namespace gdl {
 				int count = 0;
 				for (const auto& url : urls) {
 					if (url.canConvert<QString>()) {
+						const QString url_str = url.toString().trimmed();
+						const auto normalized_url = NormalizeDownloadUrlForAria2(url_str);
+						if (!normalized_url.has_value()) {
+							LOG_WARN("Skip invalid download URL: {}", url_str.toStdString());
+							Q_EMIT sigErrorMessage(tr("Invalid download link: %1").arg(url_str));
+							continue;
+						}
 						auto res =
-                            engine::Aria2cDownloadManager::Instance().AddHttpTask({url.toString().toStdString()}, opt);
+                            engine::Aria2cDownloadManager::Instance().AddHttpTask({normalized_url->toStdString()}, opt);
 						if (res.HasError()) {
 							LOG_ERR("Failed to add HTTP download task Download address {} error {}",
 									url.toString().toStdString(), res.GetError().what());
@@ -425,14 +545,14 @@ namespace gdl {
 
 			bool BrowserManagerImpl::RemoveStopTask(const QString& gid, bool is_remove_file) const {
 				if (gid.isEmpty()) return false;
-				if (stoped_model_) {
-					const auto task = stoped_model_->GetTaskById(gid);
+				if (stopped_model_) {
+					const auto task = stopped_model_->GetTaskById(gid);
 					if (!task) {
 						return false;
 					}
                     const QString save_path		  = task->task_save_path();
                     const QString cache_file_path = save_path + ".aria2";
-                    const auto res				  = stoped_model_->RemoveTaskById(gid);
+                    const auto res				  = stopped_model_->RemoveTaskById(gid);
 					gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
 					if (is_remove_file) {
 						if (QFile::exists(save_path)) {
@@ -448,15 +568,15 @@ namespace gdl {
 			}
 
 			bool BrowserManagerImpl::RemoveStopTask(int index, bool is_remove_file) const {
-				if (stoped_model_) {
-					auto task = stoped_model_->GetTask(index);
+				if (stopped_model_) {
+					auto task = stopped_model_->GetTask(index);
 					if (!task) {
 						return false;
 					}
                     QString gid					  = task->task_id();
                     const QString save_path		  = task->task_save_path();
                     const QString cache_file_path = save_path + ".aria2";
-                    const auto res				  = stoped_model_->RemoveTask(index);
+                    const auto res				  = stopped_model_->RemoveTask(index);
 					gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
 					if (is_remove_file) {
 						if (QFile::exists(save_path)) {
@@ -472,8 +592,8 @@ namespace gdl {
 			}
 
 			bool BrowserManagerImpl::RemoveAllStopTask(bool is_remove_file) const {
-				if (stoped_model_) {
-					auto tasks = stoped_model_->GetTaskIds();
+				if (stopped_model_) {
+					auto tasks = stopped_model_->GetTaskIds();
 					bool res   = false;
 					for (const auto& task : tasks) {
 						res = RemoveStopTask(task, is_remove_file);
@@ -497,7 +617,7 @@ namespace gdl {
 					}
 				}
 				else if (page_index == 2) {
-					if (stoped_model_) {
+					if (stopped_model_) {
 						engine::Aria2cDownloadManager::Instance().CallAria2cMethod(engine::Aria2Method::kTellStopped,
 																				   0, 100, keys);
 					}
@@ -551,9 +671,12 @@ namespace gdl {
 			}
 
 			bool BrowserManagerImpl::Init() {
+				// 下载历史读取需在 DownloadHistoryCache::Initialize(mainwindow.cxx:86) 之后,
+				// 故从构造函数移到此处;测试模式不调用 Init(),Fake 路径不加载历史(U1)
+				InitDownloadHistoryCache();
 				// subscribe aria2 responce
 				auto res = engine::Aria2cDownloadManager::Instance().SubscriptionAria2Message(
-					kAria2Responce, [this](const std::string& msg) { OnHandleAria2Message(msg); });
+					kAria2Response, [this](const std::string& msg) { OnHandleAria2Message(msg); });
 				if (res.HasError()) return false;
 				aria2_responce_subcription_ = res.Value();
 				// subscribe active progress
@@ -627,8 +750,7 @@ namespace gdl {
 			BrowserManagerImpl::BrowserManagerImpl(QObject* parent) : QObject(parent) {
 				active_model_  = std::make_unique<DownloadTaskModel>();
 				waiting_model_ = std::make_unique<DownloadTaskModel>();
-				stoped_model_  = std::make_unique<DownloadTaskModel>();
-				InitDownloadHistoryCache();
+				stopped_model_  = std::make_unique<DownloadTaskModel>();
 				connect(
 					this, &BrowserManagerImpl::sigUpdateTasksMessage, this,
 					[this](const DownloadTaskInfo& task_info) {
@@ -678,15 +800,15 @@ namespace gdl {
 									if (waiting_model_->ContainsTask(task_id)) {
 										waiting_model_->RemoveTaskById(task_id);
 									}
-									if (stoped_model_->ContainsTask(task_id)) {
-										stoped_model_->UpdateTaskById(task_id, task_info);
+									if (stopped_model_->ContainsTask(task_id)) {
+										stopped_model_->UpdateTaskById(task_id, task_info);
 										gdl::cache::DownloadRecord record = DownloadTaskInfoToRecord(task_info);
 										if (!gdl::cache::DownloadHistoryCache::Instance().UpdateRecord(record)) {
 											LOG_ERR("Failed to UPDATE record to history cache {}", record.save_path);
 										}
 									}
 									else {
-										stoped_model_->AddTask(task_info);
+										stopped_model_->AddTask(task_info);
 										gdl::cache::DownloadRecord record = DownloadTaskInfoToRecord(task_info);
 										if (!gdl::cache::DownloadHistoryCache::Instance().AddRecord(record)) {
 											LOG_ERR("Failed to add record to history cache {}", record.save_path);
@@ -734,9 +856,9 @@ namespace gdl {
 				const auto records = gdl::cache::DownloadHistoryCache::Instance().GetRecords();
 				for (const auto& record : records) {
 					DownloadTaskInfo info = DownloadRecordToTaskInfo(record);
-					if (stoped_model_ && !stoped_model_->ContainsTask(info.task_id())) {
+					if (stopped_model_ && !stopped_model_->ContainsTask(info.task_id())) {
 						if (QFile::exists(info.task_save_path())) {
-							stoped_model_->AddTask(info);
+							stopped_model_->AddTask(info);
 						}
 						else {
 							gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(info.task_id().toStdString());
@@ -756,56 +878,9 @@ namespace gdl {
 							if (!result.empty()) {
 								// task result array
 								for (const auto& object : result) {
-									std::string status = object["status"].get<std::string>();
-									DownloadTaskInfo task_info;
-									QString task_id		  = QString::fromStdString(object["gid"].get<std::string>());
-									auto completed_length = std::stoll(object["completedLength"].get<std::string>());
-									auto connections	  = std::stoll(object["connections"].get<std::string>());
-									auto download_speed	  = std::stoll(object["downloadSpeed"].get<std::string>());
-									auto totalLength	  = std::stoll(object["totalLength"].get<std::string>());
-									auto files			  = object["files"];
-									QString file_path, download_url;
-									for (const auto& file : files) {
-										file_path = QString::fromStdString(file["path"].get<std::string>());
-										if (file.contains("uris") && file["uris"].is_array()) {
-											auto uris = file["uris"];
-											for (const auto& uri : uris) {
-												download_url = QString::fromStdString(uri["uri"].get<std::string>());
-												break;
-											}
-										}
-										if (!file_path.isEmpty()) break;
-									}
-									if (file_path.isEmpty()) continue;  // BT/元数据阶段可能无路径，跳过此任务而非退出整个函数
-									task_info.set_task_download_speed(download_speed);
-									task_info.set_task_id(task_id);
-									task_info.set_task_current_size(completed_length);
-									task_info.set_task_total_size(totalLength);
-									task_info.set_task_connections(connections);
-									task_info.set_task_file_name(QFileInfo(file_path).fileName());
-									task_info.set_task_save_path(file_path);
-									task_info.set_task_download_link(download_url);
-									if (status == "active") {
-										task_info.set_task_state(TaskState::kActive);
-									}
-									else if (status == "waiting") {
-										task_info.set_task_state(TaskState::kWaiting);
-									}
-									else if (status == "complete") {
-										task_info.set_task_state(TaskState::kComplete);
-									}
-									else if (status == "paused") {
-										task_info.set_task_state(TaskState::kPause);
-									}
-									else if (status == "error") {
-										task_info.set_task_state(TaskState::kError);
-									}
-									else if (status == "removed") {
-										task_info.set_task_state(TaskState::kRemoved);
-									}
-									else {
-										LOG_WARN("Unknown state type: {}", status);
-									}
+									DownloadTaskInfo task_info = ParseAria2TaskObject(object);
+									// task_id 为空表示 BT/元数据阶段无有效路径,跳过此任务
+									if (task_info.task_id().isEmpty()) continue;
 									Q_EMIT sigUpdateTasksMessage(task_info);
 								}
 								//LOG_DBG("OnHandleAria2Message  array {}", result.dump());
@@ -987,57 +1062,9 @@ namespace gdl {
 							// succeed messgae
 							auto object = doc["result"];
 							if (object.is_object()) {
-								std::string status	  = object["status"].get<std::string>();
-								QString task_id		  = QString::fromStdString(object["gid"].get<std::string>());
-								auto completed_length = std::stoll(object["completedLength"].get<std::string>());
-								auto connections	  = std::stoll(object["connections"].get<std::string>());
-								auto download_speed	  = std::stoll(object["downloadSpeed"].get<std::string>());
-								auto totalLength	  = std::stoll(object["totalLength"].get<std::string>());
-								auto files			  = object["files"];
-								QString file_path, download_url;
-								for (const auto& file : files) {
-									file_path = QString::fromStdString(file["path"].get<std::string>());
-									if (file.contains("uris") && file["uris"].is_array()) {
-										auto uris = file["uris"];
-										for (const auto& uri : uris) {
-											download_url = QString::fromStdString(uri["uri"].get<std::string>());
-											break;
-										}
-									}
-									if (!file_path.isEmpty()) break;
-								}
-								if (file_path.isEmpty()) {
+								task_info = ParseAria2TaskObject(object);
+								if (task_info.task_id().isEmpty()) {
 									LOG_WARN("Failed to get file path by gid:{}", gid)
-									return task_info;
-								}
-								task_info.set_task_download_speed(download_speed);
-								task_info.set_task_id(task_id);
-								task_info.set_task_current_size(completed_length);
-								task_info.set_task_total_size(totalLength);
-								task_info.set_task_connections(connections);
-								task_info.set_task_file_name(QFileInfo(file_path).fileName());
-								task_info.set_task_save_path(file_path);
-								task_info.set_task_download_link(download_url);
-								if (status == "active") {
-									task_info.set_task_state(TaskState::kActive);
-								}
-								else if (status == "waiting") {
-									task_info.set_task_state(TaskState::kWaiting);
-								}
-								else if (status == "complete") {
-									task_info.set_task_state(TaskState::kComplete);
-								}
-								else if (status == "paused") {
-									task_info.set_task_state(TaskState::kPause);
-								}
-								else if (status == "error") {
-									task_info.set_task_state(TaskState::kError);
-								}
-								else if (status == "removed") {
-									task_info.set_task_state(TaskState::kRemoved);
-								}
-								else {
-									LOG_WARN("Unknown state type: {}", status);
 								}
 							}
 						}

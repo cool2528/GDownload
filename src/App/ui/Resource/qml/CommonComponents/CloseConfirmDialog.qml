@@ -60,6 +60,14 @@ GMessageBox {
                 checked: root.dontAskAgain
                 onCheckedChanged: root.dontAskAgain = checked
             }
+
+            // 每次打开重建复选框绑定:点击会打断 checked 绑定,避免二次打开视觉与 dontAskAgain 不一致(Q1)
+            Connections {
+                target: root
+                function onOpened() {
+                    dontAskAgainCheckbox.checked = Qt.binding(function() { return root.dontAskAgain })
+                }
+            }
         }
     }
 

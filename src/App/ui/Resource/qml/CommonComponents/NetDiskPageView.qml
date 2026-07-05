@@ -319,7 +319,7 @@ Rectangle {
         anchors.top: header.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        implicitHeight: 200
+        anchors.bottom: footer.top
         clip: true
         model: NetWorkDiskManager.GetNetWorkDiskModel()
         ScrollBar.vertical: ScrollBar {
@@ -397,7 +397,6 @@ Rectangle {
 
     Rectangle{
         id:footer
-        anchors.top: fileListView.bottom
         anchors.bottom: parent.bottom
         width: fileListView.width
         visible: fileListView.visible

@@ -11,7 +11,7 @@ namespace gdl {
 		kSuccessful = 0,
 		kUnknownError,
 		kTimeOut,
-		kNotFount,
+		kNotFound,
 	};
 
 	struct Error {

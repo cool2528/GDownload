@@ -86,6 +86,8 @@ namespace gdl {
             bool silent_check_	   = false;
             QString last_error_;
             bool apply_requested_ = false;
+            UpdateProgressData* progress_data_ = nullptr;  // 复用的进度对象（M1）
+            UpdateDataInfo* update_data_ = nullptr;        // 复用的更新信息对象（M1）
         };
 
         void RegisterTypes(QQmlEngine* engine);

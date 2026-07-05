@@ -1,8 +1,52 @@
 #include "plugin_manager.h"
 #include <filesystem>
 #include "logger.h"
+#include <algorithm>
+#include <fstream>
+#include <openssl/evp.h>
 namespace gdl {
 	namespace plugin {
+
+		namespace {
+			// 计算文件 SHA-256（OpenSSL EVP），返回小写十六进制串；失败返回空串（S1）
+			std::string ComputeFileSha256(const std::string& path) {
+				std::ifstream file(path, std::ios::binary);
+				if (!file) return {};
+				EVP_MD_CTX* ctx = EVP_MD_CTX_new();
+				if (!ctx) return {};
+				std::string result;
+				if (EVP_DigestInit_ex(ctx, EVP_sha256(), nullptr) == 1) {
+					char buf[8192];
+					bool ok = true;
+					while (file) {
+						file.read(buf, sizeof(buf));
+						std::streamsize n = file.gcount();
+						if (n > 0 && EVP_DigestUpdate(ctx, buf, static_cast<size_t>(n)) != 1) {
+							ok = false;
+							break;
+						}
+					}
+					if (ok) {
+						unsigned char digest[EVP_MAX_MD_SIZE];
+						unsigned int len = 0;
+						if (EVP_DigestFinal_ex(ctx, digest, &len) == 1) {
+							static const char* kHex = "0123456789abcdef";
+							result.reserve(static_cast<size_t>(len) * 2);
+							for (unsigned int i = 0; i < len; ++i) {
+								result.push_back(kHex[digest[i] >> 4]);
+								result.push_back(kHex[digest[i] & 0x0F]);
+							}
+						}
+					}
+				}
+				EVP_MD_CTX_free(ctx);
+				return result;
+			}
+
+			bool ContainsHash(const std::vector<std::string>& list, const std::string& hash) {
+				return std::find(list.begin(), list.end(), hash) != list.end();
+			}
+		}  // namespace
 
 		DownloadPluginManager::~DownloadPluginManager() {
 			plugins_.clear();
@@ -21,7 +65,7 @@ namespace gdl {
 						if (name.find("Plugin") == std::string::npos) {
 							continue;
 						}
-						if (LoadPlugin(entry.path().string())) {
+						if (LoadPlugin(entry.path().string(), options)) {
 							any_loaded = true;
 						} else {
 							LOG_WARN("loader plugin faild {}", entry.path().string());
@@ -35,15 +79,31 @@ namespace gdl {
 			return any_loaded;
 		}
 
-		bool DownloadPluginManager::LoadPlugin(const std::string& plugin_path) {
+		bool DownloadPluginManager::LoadPlugin(const std::string& plugin_path, const LoadPluginOptions& options) {
 			std::error_code ec;
 			if (!std::filesystem::exists(plugin_path, ec)) return false;
-			auto guard_plugin = std::make_shared<PluginResourceGuard>(plugin_path);
 
+			// 计算文件 SHA-256 做黑/白名单校验（S1）；默认 validate_signature=false、黑名单为空则行为不变
+			const std::string hash = ComputeFileSha256(plugin_path);
+			if (hash.empty()) {
+				LOG_WARN("compute plugin sha256 failed, skip: {}", plugin_path);
+				return false;
+			}
+			if (ContainsHash(options.blocked_plugins_hash_list, hash)) {
+				LOG_WARN("plugin blocked by hash blacklist: {} ({})", plugin_path, hash);
+				return false;
+			}
+			if (options.validate_signature && !ContainsHash(options.allowed_plugins_hash_list, hash)) {
+				LOG_WARN("plugin not in allowed hash list, rejected: {} ({})", plugin_path, hash);
+				return false;
+			}
+
+			auto guard_plugin = std::make_shared<PluginResourceGuard>(plugin_path);
 			if (!guard_plugin->InitPlugin()) {
 				return false;
 			}
 			plugins_.push_back(guard_plugin);
+			LOG_INFO("plugin loaded: {} (sha256={})", plugin_path, hash);
 			return true;
 		}
 

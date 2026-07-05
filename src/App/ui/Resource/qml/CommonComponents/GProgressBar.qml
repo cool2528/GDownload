@@ -13,15 +13,8 @@ ProgressBar {
     property bool showText: false
     // 进度条类型：当前实现 line；后续可扩展 circle/dashboard
     property string progressType: "line"
-    readonly property color resolvedBarColor: (function(){
-        if (fgColor) return fgColor;
-        switch(status){
-            case "success": return GTheme.successColor;
-            case "warning": return GTheme.warningColor;
-            case "exception": return GTheme.dangerColor;
-            default: return GTheme.primaryColor;
-        }
-    })()
+    // fgColor 为 color 属性恒有效,原 if(fgColor)+switch 分支不可达(死逻辑),直接取 fgColor(T5)
+    readonly property color resolvedBarColor: fgColor
     // 渐变末端色:正常/成功态走 primary→success 的消费级渐变(V5),
     // 警告/异常态用同色系自身的浅色起点,保持语义色不混入绿色
     readonly property color gradStart: (status === "warning" || status === "exception")

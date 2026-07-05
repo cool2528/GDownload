@@ -33,10 +33,10 @@ Item {
         task.open()
     }
 
-    // 隐藏计数器:绑定模型读取 count(无可视开销)
-    Repeater { id: activeCounter; model: control.activeModel; delegate: Item {} }
-    Repeater { id: waitingCounter; model: control.waitingModel; delegate: Item {} }
-    Repeater { id: completedCounter; model: control.completedModel; delegate: Item {} }
+    // 计数改为直接绑定 C++ 模型的 count 属性(NOTIFY 驱动),移除隐藏 Repeater(P4)
+    readonly property int activeCount: control.activeModel ? control.activeModel.count : 0
+    readonly property int waitingCount: control.waitingModel ? control.waitingModel.count : 0
+    readonly property int completedCount: control.completedModel ? control.completedModel.count : 0
 
     Rectangle {
         anchors.fill: parent
@@ -92,7 +92,7 @@ Item {
                         SummaryMetricCard {
                             Layout.fillWidth: true
                             title: qsTr("Active")
-                            value: String(activeCounter.count)
+                            value: String(control.activeCount)
                             unit: qsTr("tasks")
                             iconSource: SegoeFluentIcons.Download
                             accent: "primary"
@@ -100,7 +100,7 @@ Item {
                         SummaryMetricCard {
                             Layout.fillWidth: true
                             title: qsTr("Waiting")
-                            value: String(waitingCounter.count)
+                            value: String(control.waitingCount)
                             unit: qsTr("tasks")
                             iconSource: SegoeFluentIcons.History
                             accent: "warning"
@@ -108,7 +108,7 @@ Item {
                         SummaryMetricCard {
                             Layout.fillWidth: true
                             title: qsTr("Completed")
-                            value: String(completedCounter.count)
+                            value: String(control.completedCount)
                             unit: qsTr("tasks")
                             iconSource: SegoeFluentIcons.Completed
                             accent: "success"
@@ -162,7 +162,7 @@ Item {
                     // 空状态
                     Text {
                         Layout.fillWidth: true
-                        visible: completedCounter.count === 0
+                        visible: control.completedCount === 0
                         text: qsTr("No completed downloads yet.")
                         font.pixelSize: GTheme.fontBody
                         color: GTheme.textPlaceholder
@@ -171,8 +171,8 @@ Item {
                     // 最近完成列表(最多 5 条)
                     ListView {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: Math.min(5, completedCounter.count) * control.recentRowHeight
-                        visible: completedCounter.count > 0
+                        Layout.preferredHeight: Math.min(5, control.completedCount) * control.recentRowHeight
+                        visible: control.completedCount > 0
                         interactive: false
                         clip: true
                         model: control.completedModel

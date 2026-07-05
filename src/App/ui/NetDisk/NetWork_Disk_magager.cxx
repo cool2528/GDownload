@@ -111,7 +111,7 @@ namespace gdl {
                                                                                                       options);
                                 if (res.HasError()) {
                                     LOG_ERR("AddHttpTask error:{}", res.GetError().what());
-                                    QString error_msg = QString("AddHttpTask %1 error: ")
+                                    QString error_msg = QString("AddHttpTask %1 error: %2")
                                                             .arg(info.file_name.c_str(), res.GetError().what());
                                     toast::ToastManager::Instance().ShowError(error_msg);
                                     continue;

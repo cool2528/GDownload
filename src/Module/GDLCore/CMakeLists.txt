@@ -4,12 +4,12 @@ else()
     project(GDLCore LANGUAGES CXX C)
 endif()
 
-file(GLOB_RECURSE SOURCES_FILES
+file(GLOB_RECURSE SOURCES_FILES CONFIGURE_DEPENDS
     *.cpp
     *.cxx
     *.c
 )
-file(GLOB_RECURSE HEADERS_FILES
+file(GLOB_RECURSE HEADERS_FILES CONFIGURE_DEPENDS
     *.h
     *.hpp
     *.hxx
@@ -19,6 +19,7 @@ find_package(boost_property_tree CONFIG REQUIRED)
 find_package(boost_beast CONFIG REQUIRED)
 find_package(boost_locale CONFIG REQUIRED)
 find_package(unofficial-sqlite3 CONFIG REQUIRED)
+find_package(OpenSSL REQUIRED)
 find_path(TOMLPLUSPLUS_INCLUDE_DIR
     NAMES "toml++/toml.h"
     HINTS ${CMAKE_PREFIX_PATH}
@@ -31,7 +32,7 @@ add_library(tomlplusplus INTERFACE)
 target_include_directories(tomlplusplus INTERFACE ${TOMLPLUSPLUS_INCLUDE_DIR})
 add_library(tomlplusplus::tomlplusplus ALIAS tomlplusplus)
 if(APPLE)
-    file(GLOB_RECURSE SOURCE_OBJ_FILES
+    file(GLOB_RECURSE SOURCE_OBJ_FILES CONFIGURE_DEPENDS
         *.mm
     )
     find_library(COREFOUNDATION_FRAMEWORK CoreFoundation)
@@ -47,7 +48,7 @@ endif()
 
 register_target(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog PRIVATE Boost::property_tree Boost::beast Boost::locale unofficial::sqlite3::sqlite3 tomlplusplus::tomlplusplus)
+target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog PRIVATE Boost::property_tree Boost::beast Boost::locale unofficial::sqlite3::sqlite3 tomlplusplus::tomlplusplus OpenSSL::Crypto)
 
 if(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE

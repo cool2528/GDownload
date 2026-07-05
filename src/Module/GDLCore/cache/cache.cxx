@@ -161,7 +161,7 @@ namespace gdl {
 			std::optional<DownloadRecord> GetRecord(const std::string& task_id) {
 				if (!db_) return std::nullopt;
 
-				const char* sql = "SELECT * FROM download_history WHERE task_id = ?";
+				const char* sql = "SELECT task_id, file_name, save_path, download_url, total_size, downloaded_size, download_speed, connections, state, created_time, completed_time, error_message FROM download_history WHERE task_id = ?";
 				sqlite3_stmt* stmt;
 				int rc = sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr);
 				if (rc != SQLITE_OK) {
@@ -184,7 +184,7 @@ namespace gdl {
 				std::vector<DownloadRecord> results;
 				if (!db_) return results;
 
-				std::string sql = "SELECT * FROM download_history ORDER BY created_time DESC";
+				std::string sql = "SELECT task_id, file_name, save_path, download_url, total_size, downloaded_size, download_speed, connections, state, created_time, completed_time, error_message FROM download_history ORDER BY created_time DESC";
 				if (limit > 0) {
 					sql += " LIMIT " + std::to_string(limit);
 					if (offset > 0) {
@@ -211,7 +211,7 @@ namespace gdl {
 				std::vector<DownloadRecord> results;
 				if (!db_) return results;
 
-				const char* sql = "SELECT * FROM download_history WHERE file_name LIKE ? ORDER BY created_time DESC";
+				const char* sql = "SELECT task_id, file_name, save_path, download_url, total_size, downloaded_size, download_speed, connections, state, created_time, completed_time, error_message FROM download_history WHERE file_name LIKE ? ORDER BY created_time DESC";
 				sqlite3_stmt* stmt;
 				int rc = sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr);
 				if (rc != SQLITE_OK) {
@@ -234,7 +234,7 @@ namespace gdl {
 				std::vector<DownloadRecord> results;
 				if (!db_) return results;
 
-				const char* sql = "SELECT * FROM download_history WHERE state = ? ORDER BY created_time DESC";
+				const char* sql = "SELECT task_id, file_name, save_path, download_url, total_size, downloaded_size, download_speed, connections, state, created_time, completed_time, error_message FROM download_history WHERE state = ? ORDER BY created_time DESC";
 				sqlite3_stmt* stmt;
 				int rc = sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr);
 				if (rc != SQLITE_OK) {
@@ -257,7 +257,7 @@ namespace gdl {
 				if (!db_) return results;
 
 				const char* sql =
-					"SELECT * FROM download_history WHERE created_time BETWEEN ? AND ? ORDER BY created_time DESC";
+					"SELECT task_id, file_name, save_path, download_url, total_size, downloaded_size, download_speed, connections, state, created_time, completed_time, error_message FROM download_history WHERE created_time BETWEEN ? AND ? ORDER BY created_time DESC";
 				sqlite3_stmt* stmt;
 				int rc = sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr);
 				if (rc != SQLITE_OK) {
@@ -499,7 +499,7 @@ namespace gdl {
 			std::optional<TrackerETagEntry> GetEntry(const std::string& url) {
 				if (!db_) return std::nullopt;
 
-				const char* sql = "SELECT * FROM tracker_etag_cache WHERE url = ?";
+				const char* sql = "SELECT url, etag, content, timestamp FROM tracker_etag_cache WHERE url = ?";
 				sqlite3_stmt* stmt;
 				int rc = sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr);
 				if (rc != SQLITE_OK) {
@@ -544,7 +544,7 @@ namespace gdl {
 				std::vector<TrackerETagEntry> results;
 				if (!db_) return results;
 
-				const char* sql = "SELECT * FROM tracker_etag_cache ORDER BY timestamp DESC";
+				const char* sql = "SELECT url, etag, content, timestamp FROM tracker_etag_cache ORDER BY timestamp DESC";
 				sqlite3_stmt* stmt;
 				int rc = sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr);
 				if (rc != SQLITE_OK) {

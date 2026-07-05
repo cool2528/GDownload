@@ -80,6 +80,15 @@ GMessageBox {
                 }
             }
 
+            // 每次打开重建复选框绑定:点击会打断 checked 声明式绑定,
+            // 不重建会导致二次打开时视觉勾选与 deleteFileChecked 不一致(Q1)
+            Connections {
+                target: root
+                function onOpened() {
+                    deleteFileCheckbox.checked = Qt.binding(function() { return root.deleteFileChecked })
+                }
+            }
+
             // 提示文字
             Label {
                 text: {

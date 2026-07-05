@@ -92,8 +92,8 @@ Item {
 
     FileDialog {
         id: fileDialog
-        title: "Please choose a torrent file"
-        nameFilters: ["Torrent files (*.torrent)","Metalink Files (*.metalink)","Meta4 Files (*.meta4)"]
+        title: qsTr("Please choose a torrent file")
+        nameFilters: [qsTr("Torrent files (*.torrent)"), qsTr("Metalink Files (*.metalink)"), qsTr("Meta4 Files (*.meta4)")]
         onAccepted: {
             handleFile(fileDialog.currentFile)
         }

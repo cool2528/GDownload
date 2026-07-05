@@ -677,17 +677,16 @@ namespace gdl {
 		Result<bool> Aria2cWebSocketClient::Multicall(const Options& methods) {
 			try {
 				rapidjson::Document doc;
-			doc.SetObject();
-				rapidjson::Value params(rapidjson::kArrayType);
-				rapidjson::Value token;
+				doc.SetObject();
 				std::string token_str = BuildRpcToken();
-				token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
-				params.PushBack(token, doc.GetAllocator());
 
+				// aria2 协议：system.multicall 参数是单元素外层数组，元素为方法调用对象数组；
+				// 每个子调用 params 首位需各自带 token（E5）
+				rapidjson::Value method_array(rapidjson::kArrayType);
 				for (const auto& method : methods) {
 					rapidjson::Document methodDoc;
 					methodDoc.Parse(method.second.c_str());
-					if (methodDoc.HasParseError()) {
+					if (methodDoc.HasParseError() || !methodDoc.IsArray()) {
 						return MakeFail(static_cast<std::int64_t>(gdl::ErrorType::kUnknownError), "multicall parse failed");
 					}
 
@@ -696,13 +695,24 @@ namespace gdl {
 					methodName.SetString(method.first.c_str(), method.first.size(), doc.GetAllocator());
 					methodObj.AddMember("methodName", methodName, doc.GetAllocator());
 
-					// 将解析后的参数复制到主文档中
-					rapidjson::Value parsedParams;
-					parsedParams.CopyFrom(methodDoc, doc.GetAllocator());
-					methodObj.AddMember("params", parsedParams, doc.GetAllocator());
+					// 子调用 params：token 置首，随后拼接原参数
+					rapidjson::Value sub_params(rapidjson::kArrayType);
+					rapidjson::Value token;
+					token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
+					sub_params.PushBack(token, doc.GetAllocator());
+					for (auto& arg : methodDoc.GetArray()) {
+						rapidjson::Value copied;
+						copied.CopyFrom(arg, doc.GetAllocator());
+						sub_params.PushBack(copied, doc.GetAllocator());
+					}
+					methodObj.AddMember("params", sub_params, doc.GetAllocator());
 
-					params.PushBack(methodObj, doc.GetAllocator());
+					method_array.PushBack(methodObj, doc.GetAllocator());
 				}
+
+				// 外层单元素数组包裹方法数组
+				rapidjson::Value params(rapidjson::kArrayType);
+				params.PushBack(method_array, doc.GetAllocator());
 				return Send("system.multicall", params);
 			} catch (const std::exception& e) {
 				LOG_ERR("multicall failed: {}", e.what());

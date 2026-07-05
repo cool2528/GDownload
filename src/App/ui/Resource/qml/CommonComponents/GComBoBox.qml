@@ -13,7 +13,7 @@ ComboBox {
     // clearable: 支持一键清空（Element Plus 特性）
     property bool clearable: false
     // placeholder: 占位文本
-    property string placeholder: "Please select"
+    property string placeholder: qsTr("Please select")
 
     readonly property int implicitH: (size === "large" ? 40 : (size === "small" ? 24 : 32))
     readonly property int radiusPx: 4
@@ -193,15 +193,8 @@ ComboBox {
         layer.enabled: control.visualFocus
         layer.effect: MultiEffect {
             shadowEnabled: true
-            shadowColor: {
-                const focusColor = colors.borderFocus
-                return Qt.rgba(
-                    Qt.colorEqual(focusColor, focusColor) ? focusColor.r : 0.25,
-                    Qt.colorEqual(focusColor, focusColor) ? focusColor.g : 0.59,
-                    Qt.colorEqual(focusColor, focusColor) ? focusColor.b : 1.0,
-                    0.2
-                )
-            }
+            // colorEqual(x,x) 恒真,三目死逻辑,直接取 focus 色(T5)
+            shadowColor: Qt.rgba(colors.borderFocus.r, colors.borderFocus.g, colors.borderFocus.b, 0.2)
             shadowBlur: 6
             shadowVerticalOffset: 0
             shadowHorizontalOffset: 0

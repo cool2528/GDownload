@@ -12,7 +12,7 @@ namespace gdl {
 		   public:
 			~DownloadPluginManager() override;
 			struct LoadPluginOptions {
-				bool validate_signature;
+				bool validate_signature = false;
 				std::vector<std::string> allowed_plugins_hash_list;
 				std::vector<std::string> blocked_plugins_hash_list;
 			};
@@ -23,7 +23,7 @@ namespace gdl {
             INetDiskDownloadPlugin::IDownloadPluginPtr GetPluginByName(std::string_view name);
 
 		   private:
-			bool LoadPlugin(const std::string& plugin_path);
+			bool LoadPlugin(const std::string& plugin_path, const LoadPluginOptions& options);
 			explicit DownloadPluginManager();
 
             // 插件资源管理类 用于安全加载和卸载插件

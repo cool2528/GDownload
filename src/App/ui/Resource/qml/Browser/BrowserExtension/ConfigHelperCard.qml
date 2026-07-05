@@ -180,7 +180,7 @@ GCard {
                     }
 
                     Text {
-                        text: qsTr("Status: Connected (aria2c running)")
+                        text: qsTr("Requires GDownload running")
                         font.pixelSize: GTheme.fontCaption
                         color: GTheme.successColor
                         font.weight: GTheme.weightMedium

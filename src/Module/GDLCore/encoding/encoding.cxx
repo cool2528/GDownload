@@ -1,5 +1,5 @@
 #include "encoding.h"
-#include <boost/beast/core/detail/base64.hpp>
+#include <openssl/evp.h>
 #include <boost/locale.hpp>
 #if defined(_WIN32)
 #include <Windows.h>
@@ -87,20 +87,28 @@ namespace gdl {
 		}
 
 		std::string StringToBase64(const std::string& str) {
+			// OpenSSL EVP 实现，避免依赖 boost::beast::detail 非公共 API（T6）
+			if (str.empty()) return {};
+			const int in_len = static_cast<int>(str.size());
 			std::string result;
-			result.resize(boost::beast::detail::base64::encoded_size(str.size()));
-
-			size_t encoded_size = boost::beast::detail::base64::encode(result.data(), str.data(), str.size());
-			result.resize(encoded_size);
+			result.resize(static_cast<size_t>(4 * ((in_len + 2) / 3)));
+			const int out_len = EVP_EncodeBlock(reinterpret_cast<unsigned char*>(result.data()),
+				                                    reinterpret_cast<const unsigned char*>(str.data()), in_len);
+			result.resize(out_len < 0 ? 0 : static_cast<size_t>(out_len));
 			return result;
 		}
 		std::string Base64ToString(const std::string& base64) {
+			if (base64.empty()) return {};
+			const int in_len = static_cast<int>(base64.size());
 			std::string result;
-			result.resize(boost::beast::detail::base64::decoded_size(base64.size()));
-
-			size_t decoded_size =
-				boost::beast::detail::base64::decode(result.data(), base64.data(), base64.size()).first;
-			result.resize(decoded_size);
+			result.resize(static_cast<size_t>(3 * (in_len / 4)));
+			int out_len = EVP_DecodeBlock(reinterpret_cast<unsigned char*>(result.data()),
+				                              reinterpret_cast<const unsigned char*>(base64.data()), in_len);
+			if (out_len < 0) return {};
+			// EVP_DecodeBlock 不剥离 '=' 填充产生的尾部零字节，按填充数修正（T6）
+			if (base64.back() == '=') --out_len;
+			if (base64.size() >= 2 && base64[base64.size() - 2] == '=') --out_len;
+			result.resize(out_len < 0 ? 0 : static_cast<size_t>(out_len));
 			return result;
 		}
 	}  // namespace encoding

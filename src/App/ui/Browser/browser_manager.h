@@ -110,7 +110,7 @@ namespace gdl {
 
 			   private:
 				std::unique_ptr<DownloadTaskModel> active_model_{nullptr};
-				std::unique_ptr<DownloadTaskModel> stoped_model_{nullptr};
+				std::unique_ptr<DownloadTaskModel> stopped_model_{nullptr};
 				std::unique_ptr<DownloadTaskModel> waiting_model_{nullptr};
                 engine::Subscription aria2_responce_subcription_{nullptr};
                 engine::Subscription aria2_active_progress_subcription_{nullptr};

@@ -52,7 +52,8 @@ set(VCPKG_MANIFEST_MODE ON)
 set(VCPKG_OVERLAY_PORTS "${CMAKE_SOURCE_DIR}/vcpkg-ports")
 
 # 生成版本头文件
-configure_file(${CMAKE_SOURCE_DIR}/version.h.in ${CMAKE_SOURCE_DIR}/src/version.h)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/src)  # 确保输出目录存在（C1）
+configure_file(${CMAKE_SOURCE_DIR}/version.h.in ${CMAKE_BINARY_DIR}/src/version.h)  # 生成到构建目录，避免污染源码树（C1）
 
 # 设置依赖库的根路径（仅保留 Sparkle 自动更新框架）
 if(APPLE)
@@ -86,7 +87,7 @@ elseif(WIN32)
     # 使用自定义的 triplets（用于传递 Qt 路径给 vcpkg 构建的包）
     set(VCPKG_OVERLAY_TRIPLETS ${CMAKE_SOURCE_DIR}/custom-triplets)
     # MSVC 使用 Ninja 生成器时需要显式开启异常处理，避免影响 MinGW 等非 MSVC 编译器
-    add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/EHsc> $<$<CXX_COMPILER_ID:MSVC>:/utf-8>)
+    add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/EHsc> $<$<CXX_COMPILER_ID:MSVC>:/utf-8> $<$<CXX_COMPILER_ID:MSVC>:/FS>)
     # 设置Windows目标版本
     add_compile_definitions(_WIN32_WINNT=0x0A00) # Windows 10
 elseif(UNIX AND NOT APPLE)

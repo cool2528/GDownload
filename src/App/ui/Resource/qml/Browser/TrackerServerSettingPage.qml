@@ -48,7 +48,14 @@ SettingCard {
                 columnSpacing: GTheme.spaceLG
                 rowSpacing: GTheme.spaceSM
 
-                property var selectedItems: JSON.parse(SettingsManager.qTrackerSourceNames)
+                property var selectedItems: {
+                    // 防御:配置被外部写成空串/非法 JSON 时 JSON.parse 会抛异常(Q3)
+                    try {
+                        return JSON.parse(SettingsManager.qTrackerSourceNames || "[]")
+                    } catch (e) {
+                        return []
+                    }
+                }
 
                 Repeater {
                     model: ["ngosang-best-link","ngosang-best-mirror","ngosang-best-cdn","ngosang-all-link","ngosang-all-mirror","ngosang-all-cdn",
@@ -104,7 +111,6 @@ SettingCard {
                 text: qsTr("Sync Trackers")
                 Layout.preferredHeight: GTheme.sizeDefault
                 onClicked: {
-                    console.debug("sync trackers")
                     BrowserManager.SyncTrackersServerlist()
                 }
             }

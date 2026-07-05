@@ -10,7 +10,7 @@ GDialogShell {
     height: 520
 
     title: qsTr("About GDownload")
-    subtitle: String("Version %1").arg(UtilsToolsManager.Version())
+    subtitle: qsTr("Version %1").arg(UtilsToolsManager.Version())
     iconImage: "/images/logo/icon.ico"
     iconBgColor: GTheme.infoLight(9)
 

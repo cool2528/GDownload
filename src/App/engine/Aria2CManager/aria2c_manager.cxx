@@ -83,7 +83,6 @@ namespace gdl {
 			  daily_task_timer_(io_context_),
 			  update_aria2c_tasks_timer_(io_context_),
 			  pub_sub_system_(io_context_),
-			  flush_timer_(io_context_),
 			  websocket_client_([]() {
 			auto rpc_port = detail::GetValidRpcPort();
 			return std::string("ws://127.0.0.1:") + rpc_port + "/jsonrpc";
@@ -113,7 +112,7 @@ namespace gdl {
 						}
 					}
 
-					pub_sub_system_.Publish(kAria2Responce, msg);
+					pub_sub_system_.Publish(kAria2Response, msg);
 
 				} catch (const nlohmann::json::exception& e) {
 					LOG_ERR("JSON parse error: {} for data: {}", e.what(), msg);
@@ -122,20 +121,30 @@ namespace gdl {
 				}
 			});
 			websocket_client_.SetStateChanageCallback([this](const State& state, std::string msg) {
-				// Sync BitTorrent server list only after the websocket connects to aria2.
-				if (!daily_task_timer_is_runing.load() && state == State::kConnected) {
-					LOG_DBG("start daily_task_timer");
-					daily_task_timer_.Start(std::bind(&Aria2cDownloadManager::SyncMagnetServerList, this));
-					daily_task_timer_is_runing.store(true);
-				}
-				else {
-					LOG_WARN("websocket_client_ state {} error {}", static_cast<int>(state), msg);
+				// 按连接状态分派：首次连接才启动每日 tracker 同步，重连/正常关闭不再误报 WARN（B6）
+				switch (state) {
+					case State::kConnected:
+						if (!daily_task_timer_is_runing.load()) {
+							LOG_DBG("start daily_task_timer");
+							daily_task_timer_.Start([this] { DispatchMagnetServerSync(); });
+							daily_task_timer_is_runing.store(true);
+						}
+						else {
+							LOG_DBG("websocket reconnected");
+						}
+						break;
+					case State::kClosed:
+						LOG_INFO("websocket closed: {}", msg);
+						break;
+					case State::kError:
+						LOG_WARN("websocket error: {}", msg);
+						break;
 				}
 			});
 			// Start IO workers after callbacks are registered.
 			auto hardware_threads = std::max(1u, std::thread::hardware_concurrency());
 			auto max_thread_number = std::max(1u, hardware_threads * 3 / 2);
-			for (auto i = 0; i < max_thread_number; ++i) {
+			for (auto i = 0u; i < max_thread_number; ++i) {
 				worker_threads_.emplace_back(std::thread([this] { io_context_.run(); }));
 			}
 		}
@@ -261,7 +270,8 @@ namespace gdl {
 				if (waiting_num_ > 0) {
 					websocket_client_.TellWaiting(0, 100, keys);
 				}
-				if (stopped_num_ > 0 && (active_num_ > 0 || waiting_num_ > 0)) {
+				// 放宽守卫：纯已完成会话重启后也能刷新已停止列表（B5）
+				if (stopped_num_ > 0) {
 					websocket_client_.TellStopped(0, 100, keys);
 				}
 
@@ -282,6 +292,7 @@ namespace gdl {
 				const std::string trackers_black_url(
 					"https://bitbucket.org/xiu2/trackerslistcollection/raw/master/blacklist.txt");
 				auto bt_exclude_tracker = GetBitTorrentUrlWithFallback(trackers_black_url);
+				if (!engine_is_runing_) return;
 
 				if (!bt_exclude_tracker.empty()) {
 					websocket_client_.ChangeGlobalOption({{"bt-exclude-tracker", bt_exclude_tracker}});
@@ -331,6 +342,7 @@ namespace gdl {
 				// 4. Convert to comma-separated string.
 				std::string bt_tracker;
 				for (const auto& url : unique_trackers) {
+					if (!engine_is_runing_) return;
 					if (!bt_tracker.empty()) bt_tracker += ",";
 					bt_tracker += url;
 				}
@@ -372,6 +384,19 @@ namespace gdl {
 				error_msg["error"] = e.what();
 				pub_sub_system_.Publish(kAria2TrackerUpdateStatus, error_msg.dump());
 			}
+		}
+
+		void Aria2cDownloadManager::DispatchMagnetServerSync() {
+			// 上一次同步未结束则跳过，避免并发重复拉取
+			bool expected = false;
+			if (!tracker_sync_running_.compare_exchange_strong(expected, true)) {
+				return;
+			}
+			// 阻塞式 HTTP + 退避 sleep 放到独立线程，避免占死 io worker（E3）
+			tracker_sync_future_ = std::async(std::launch::async, [this] {
+				SyncMagnetServerList();
+				tracker_sync_running_.store(false);
+			});
 		}
 
 		void Aria2cDownloadManager::SyncGlobalStatInfo() {
@@ -474,33 +499,6 @@ namespace gdl {
 			return oss.str();
 		}
 
-		std::string Aria2cDownloadManager::GetBitTorrentUrl(const std::string& url) {
-			std::string result;
-			try {
-				if (url.empty() || !engine_is_runing_) return result;
-				auto system_proxy = os::GetSystemHTTPProxy();
-				std::string proxy_str;
-				if (system_proxy.has_value()) {
-					proxy_str =
-						"http://" + system_proxy.value().first + ":" + std::to_string(system_proxy.value().second);
-				}
-				cpr::Response reply;
-				if (proxy_str.empty()) {
-					reply = cpr::Get(cpr::Url(url));
-				}
-				else {
-					reply = cpr::Get(cpr::Url(url), cpr::Proxies({{"http", proxy_str}, {"https", proxy_str}}));
-				}
-				if (reply.status_code != 200) {
-					LOG_ERR("sync manget trackers server list faild error {}", reply.error.message);
-					return result;
-				}
-				result = ParseTextUrls(reply.text);
-			} catch (std::exception& e) {
-				LOG_ERR("{}", e.what());
-			}
-			return result;
-		}
 
 		int Aria2cDownloadManager::CountTrackers(const std::string& tracker_list) {
 			if (tracker_list.empty()) return 0;
@@ -514,15 +512,6 @@ namespace gdl {
 			}
 		}
 
-		std::optional<std::string> Aria2cDownloadManager::GetCachedContent(const std::string& url,
-																			const std::string& etag) {
-			auto entry_opt = cache::TrackerETagCache::Instance().GetEntry(url);
-			if (entry_opt && entry_opt->etag == etag) {
-				LOG_INFO("Using cached content for: {} (ETag: {})", url, etag);
-				return entry_opt->content;
-			}
-			return std::nullopt;
-		}
 
 		void Aria2cDownloadManager::UpdateCacheEntry(const std::string& url, const std::string& etag,
 													  const std::string& content) {
@@ -593,6 +582,8 @@ namespace gdl {
 
 			// Try each URL with retries.
 			for (const auto& try_url : fallback_urls) {
+				if (!engine_is_runing_) return "";
+
 				// Check cached ETag from database.
 				std::string cached_etag;
 				auto cached_entry = cache::TrackerETagCache::Instance().GetEntry(try_url);
@@ -602,6 +593,7 @@ namespace gdl {
 				}
 
 				for (int retry = 0; retry < 3; ++retry) {
+					if (!engine_is_runing_) return "";
 					try {
 						LOG_INFO("Fetching from: {} (attempt {})", try_url, retry + 1);
 
@@ -612,10 +604,15 @@ namespace gdl {
 							LOG_INFO("Sending If-None-Match: {}", cached_etag);
 						}
 
-						auto reply = cpr::Get(cpr::Url(try_url),
-						                      cpr::Proxies({{"http", proxy_str}, {"https", proxy_str}}),
-						                      cpr::Timeout(10000),  // 10 seconds timeout.
-						                      headers);
+						// 无系统代理时不设置 cpr::Proxies，避免空代理串导致请求失败（B4）
+						cpr::Response reply;
+						if (proxy_str.empty()) {
+							reply = cpr::Get(cpr::Url(try_url), cpr::Timeout(10000), headers);
+						} else {
+							reply = cpr::Get(cpr::Url(try_url),
+							                 cpr::Proxies({{"http", proxy_str}, {"https", proxy_str}}),
+							                 cpr::Timeout(10000), headers);
+						}
 
 						// Handle 304 Not Modified by using cached content.
 						if (reply.status_code == 304) {
@@ -654,7 +651,13 @@ namespace gdl {
 
 					// Wait before retrying with exponential backoff: 1s, 2s.
 					if (retry < 2) {
-						std::this_thread::sleep_for(std::chrono::seconds(1 << retry));
+						const auto delay = std::chrono::seconds(1 << retry);
+						const auto deadline = std::chrono::steady_clock::now() + delay;
+						while (engine_is_runing_ && std::chrono::steady_clock::now() < deadline) {
+							const auto remaining = deadline - std::chrono::steady_clock::now();
+							std::this_thread::sleep_for(std::min<std::chrono::steady_clock::duration>(
+								remaining, std::chrono::milliseconds(100)));
+						}
 					}
 				}
 			}
@@ -663,7 +666,10 @@ namespace gdl {
 			return "";
 		}
 
-		Aria2cDownloadManager::~Aria2cDownloadManager() {}
+		Aria2cDownloadManager::~Aria2cDownloadManager() {
+			// 兜底：任何未显式调用 UninitAria2cEngine 的退出路径也能停 io、join 线程（E4）
+			UninitAria2cEngine();
+		}
 
 		bool Aria2cDownloadManager::InitAria2cEngine(const String_View& aria2c_path) {
 			// TODO: initialize aria2c.
@@ -674,6 +680,7 @@ namespace gdl {
 				LOG_ERR("Failed to initialise aria2c Failed to start the process");
 				return false;
 			}
+			aria2c_pid_ = pid;  // 登记 pid，退出时优雅关闭并回收（S3）
 
 			// Initialize ETag cache database.
 			InitializeETagCache();
@@ -689,13 +696,26 @@ namespace gdl {
 		}
 
 		void Aria2cDownloadManager::UninitAria2cEngine() {
-			// TODO: unload aria2c.
+			// 幂等化：显式 Uninit 与析构兜底可能重复调用，二次进入直接返回（E4）
+			bool expected = false;
+			if (!uninited_.compare_exchange_strong(expected, true)) {
+				return;
+			}
 			engine_is_runing_ = false;
+			// 等待可能在途的 tracker 同步线程结束（内部循环见 engine_is_runing_ 会尽快退出）（E3）
+			if (tracker_sync_future_.valid()) {
+				tracker_sync_future_.wait();
+			}
 			update_aria2c_tasks_timer_.Stop();
 			daily_task_timer_.Stop();
 			websocket_client_.PurgeDownloadResult();
 			websocket_client_.Shutdown();
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			// 给 RPC/stop-with-process 优雅退出宽限，超时强制终止并回收，避免 POSIX 僵尸（S3）
+			if (aria2c_pid_ > 0) {
+				process::ShutdownProcess(aria2c_pid_, 2000);
+			} else {
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			}
 			websocket_client_.Disconnect();
 			work_.reset();
 			io_context_.stop();
@@ -734,8 +754,7 @@ namespace gdl {
 		}
 
 		void Aria2cDownloadManager::UpdateMagnetServerList() {
-			boost::asio::post(io_context_, [this]() { SyncMagnetServerList(); });
-
+			DispatchMagnetServerSync();
 		}
 
 		void Aria2cDownloadManager::UnSubscribeAria2Message(Subscription subscription) {

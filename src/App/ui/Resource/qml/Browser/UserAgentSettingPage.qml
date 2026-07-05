@@ -151,20 +151,18 @@ SettingCard {
             Layout.preferredHeight: GTheme.sizeDefault
             placeholderText: qsTr("Enter custom User-Agent string...")
 
-            onTextChanged: {
-                // 当用户手动编辑时,自动切换到 "Custom" 预设
-                if (activeFocus) {
-                    var isPreset = false;
-                    for (var i = 0; i < userAgentPresets.length - 1; i++) {
-                        if (userAgentPresets[i].value === text) {
-                            isPreset = true;
-                            userAgentPresetComboBox.currentIndex = i;
-                            break;
-                        }
+            onEditingFinished: {
+                // 编辑完成后才做预设匹配,避免逐字输入时预设回填覆盖用户文本(X4)
+                var isPreset = false;
+                for (var i = 0; i < userAgentPresets.length - 1; i++) {
+                    if (userAgentPresets[i].value === text) {
+                        isPreset = true;
+                        userAgentPresetComboBox.currentIndex = i;
+                        break;
                     }
-                    if (!isPreset && userAgentPresetComboBox.currentIndex !== userAgentPresets.length - 1) {
-                        userAgentPresetComboBox.currentIndex = userAgentPresets.length - 1;  // Custom
-                    }
+                }
+                if (!isPreset && userAgentPresetComboBox.currentIndex !== userAgentPresets.length - 1) {
+                    userAgentPresetComboBox.currentIndex = userAgentPresets.length - 1;  // Custom
                 }
             }
         }

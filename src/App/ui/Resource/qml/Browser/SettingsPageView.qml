@@ -70,7 +70,6 @@ Item {
                     onCheckedButtonChanged: {
                         let index  = bar.buttonsArr.indexOf(titleGroup.checkedButton)
                         bar.currentIndex = index
-                        console.debug("index ",index)
                     }
                 }
                 // Element Plus 风格导航项
