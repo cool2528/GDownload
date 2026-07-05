@@ -54,6 +54,11 @@ namespace gdl {
                 return secret;
             }
 
+            QString SettingsImpl::GetDefaultBrowserUserAgent() const
+            {
+                return DefaultBrowserUserAgent();
+            }
+
             void SettingsImpl::SetAria2Dir(const QString& dir)
             {
                 SetDir(dir);
@@ -223,10 +228,12 @@ namespace gdl {
 
             void SettingsImpl::SetAria2UserAgent(const QString& userAgent)
             {
-                SetUserAgent(userAgent);
+                const QString effectiveUserAgent =
+                    userAgent.trimmed().isEmpty() ? DefaultBrowserUserAgent() : userAgent.trimmed();
+                SetUserAgent(effectiveUserAgent);
 
                 std::unordered_multimap<std::string, std::string> opt;
-                opt.insert({"user-agent", userAgent.toStdString()});
+                opt.insert({"user-agent", effectiveUserAgent.toStdString()});
                 engine::Aria2cDownloadManager::Instance().CallAria2cMethod(
                     engine::Aria2Method::kChangeGlobalOption, opt);
             }

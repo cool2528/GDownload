@@ -39,7 +39,7 @@ namespace gdl {
 			CONFIG_PATH(ListenPort, "aria2c.listen-port", "21301");
 			CONFIG_PATH(RpcListenPort, "aria2c.rpc-listen-port", "16888");
 			CONFIG_PATH(RpcSecret, "aria2c.rpc-secret", "");
-			CONFIG_PATH(Split, "aria2c.split", "16");
+			CONFIG_PATH(Split, "aria2c.split", "64");
 			CONFIG_PATH(UserAgent, "aria2c.user-agent", "");
 			CONFIG_PATH(AllProxy, "aria2c.all-proxy", "");
 			CONFIG_PATH(DhtListenPort, "aria2c.dht-listen-port", "6881");

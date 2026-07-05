@@ -70,6 +70,7 @@ class TstCreateTask : public QObject {
 
 	void init() {
 		fakeBrowser_->clearHistory();
+		fakeBrowser_->setAddTaskResult(true);
 		fakeSettings_->clearHistory();
 		stubBrowserView_->setIndex(-1);
 	}
@@ -107,6 +108,31 @@ class TstCreateTask : public QObject {
 			}
 		}
 		QVERIFY2(url_found, "AddHttpTask 参数应含输入的 URL");
+
+		const auto options = args.at(1).toMap();
+		QCOMPARE(options.value(QStringLiteral("split")).toString(), QStringLiteral("64"));
+	}
+
+	void test_addUri_failure_stays_on_dialog() {
+		fakeBrowser_->setAddTaskResult(false);
+
+		QQmlComponent comp(&engine_, QUrl("qrc:/qml/CommonComponents/TaskDialogPage.qml"));
+		QVERIFY2(!comp.isError(), qPrintable(comp.errorString()));
+		QScopedPointer<QObject> dialog(comp.create());
+		QVERIFY2(!dialog.isNull(), "TaskDialogPage 实例化失败");
+
+		auto* inputUrl = dialog->findChild<QQuickItem*>("inputUrl");
+		QVERIFY2(inputUrl, "未找到 inputUrl");
+		QVERIFY2(inputUrl->setProperty("text", "http://example.com/fail.zip"),
+				 "设置 inputUrl.text 失败");
+
+		auto* btnCreateTask = dialog->findChild<QQuickItem*>("btnCreateTask");
+		QVERIFY2(btnCreateTask, "未找到 btnCreateTask");
+		QMetaObject::invokeMethod(btnCreateTask, "clicked");
+
+		QTRY_COMPARE_WITH_TIMEOUT(fakeBrowser_->lastRpcMethod(),
+								  QStringLiteral("AddHttpTask"), 1000);
+		QCOMPARE(stubBrowserView_->index(), -1);
 	}
 
    private:

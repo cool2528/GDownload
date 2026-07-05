@@ -544,6 +544,11 @@ class TestSettingsManager : public QObject {
 	Q_INVOKABLE void SetEnableTrackerSourceAutoUpdate(bool v) { Q_UNUSED(v); }
 
 	// UserAgentSettingPage setter
+	Q_INVOKABLE QString GetDefaultBrowserUserAgent() const {
+		return QStringLiteral(
+			"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+			"Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0");
+	}
 	Q_INVOKABLE void SetAria2UserAgent(const QString& v) { Q_UNUSED(v); }
 
    private:
@@ -576,8 +581,8 @@ class TestSettingsManager : public QObject {
 
 	// ConnectionPerformanceSettingPage(aria2 推荐默认)
 	int max_concurrent_downloads_ = 5;
-	int max_connection_per_server_ = 1;
-	int split_ = 5;
+	int max_connection_per_server_ = 16;
+	int split_ = 64;
 	int min_split_size_ = 20;
 
 	// PostDownloadActionsSettingPage(0 = 无动作)
@@ -603,7 +608,9 @@ class TestSettingsManager : public QObject {
 	bool enable_tracker_source_auto_update_ = false;
 
 	// UserAgentSettingPage
-	QString user_agent_ = QStringLiteral("Mozilla/5.0 (Windows NT 10.0; Win64; x64) GDownload/test-stub");
+	QString user_agent_ =
+		QStringLiteral("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+					   "Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0");
 };
 
 // ToastManager 桩:ShowXxx 空实现,避免 QML 调用时缺少方法

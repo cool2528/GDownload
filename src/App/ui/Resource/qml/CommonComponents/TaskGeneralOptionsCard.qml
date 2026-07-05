@@ -62,7 +62,7 @@ GCard {
                 Layout.preferredHeight: 32
                 from: 1
                 to: 64
-                value: 16
+                value: 64
             }
 
             Text {

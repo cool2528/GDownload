@@ -70,11 +70,11 @@ namespace gdl {
 
 				Q_INVOKABLE void OpenFileLocation(const QString& file_path) override;
 
-                Q_INVOKABLE bool RemoveStopTask(const QString& gid, bool is_remove_file = true) const override;
+                Q_INVOKABLE bool RemoveStopTask(const QString& gid, bool is_remove_file = true) override;
 
-                Q_INVOKABLE bool RemoveStopTask(int index, bool is_remove_file = true) const override;
+                Q_INVOKABLE bool RemoveStopTask(int index, bool is_remove_file = true) override;
 
-                Q_INVOKABLE bool RemoveAllStopTask(bool is_remove_file = true) const override;
+                Q_INVOKABLE bool RemoveAllStopTask(bool is_remove_file = true) override;
 
                 Q_INVOKABLE void RefreshTaskList(int page_index) override;
                 Q_INVOKABLE parser::FilePreviewModel* GetFilePreviewModel(const QString& file_path) override;
@@ -103,6 +103,7 @@ namespace gdl {
 				static gdl::cache::DownloadRecord DownloadTaskInfoToRecord(const DownloadTaskInfo& info);
 				static DownloadTaskInfo DownloadRecordToTaskInfo(const gdl::cache::DownloadRecord& record);
 				static DownloadTaskInfo Aria2QueryByGidTaskInfo(const std::string& gid);
+				static QString Aria2QueryByGidErrorMessage(const std::string& gid);
 				// 下载完成后操作相关方法
 				void ExecutePostDownloadAction(const DownloadTaskInfo& task, int actionType, const QString& customCommand);
 				void PlayNotificationSound();

@@ -34,7 +34,7 @@ struct FakeSettingsWrite {
 // (private Q_PROPERTY + public Q_INVOKABLE Get/Set + Q_SIGNAL Changed),moc 可正确处理。
 //
 // 默认值:initDefaults() 设置集成测试触碰的 4 个 ConnectionPerformance 字段
-// (MaxConcurrentDownloads=5 / MaxConnectionPerServer=16 / Split=16 / MinSplitSize=20)
+// (MaxConcurrentDownloads=5 / MaxConnectionPerServer=16 / Split=64 / MinSplitSize=20)
 // 与 ShowCloseConfirm/CloseToTray/Dir 等,使页面 SpinBox 不因 0 值被 clamp 导致
 // hasChanges 误真。clearHistory() 仅清 write_history_,保留 store_ 默认值。
 class FakeSettingsManager : public QObject {
@@ -114,6 +114,11 @@ class FakeSettingsManager : public QObject {
 	Q_INVOKABLE QString GenerateRpcSecret() const {
 		return QStringLiteral("test-fake-secret-0123456789abcdef");
 	}
+	Q_INVOKABLE QString GetDefaultBrowserUserAgent() const {
+		return QStringLiteral(
+			"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+			"Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0");
+	}
 	Q_INVOKABLE void SetAria2Dir(const QString& dir) { SetDir(dir); }
 	Q_INVOKABLE void SetAria2GlobalProxy(const QString& proxy) { SetGlobalProxy(proxy); }
 	Q_INVOKABLE void SetAria2AutoResumeTask(bool enable) { SetAutoResumeTask(enable); }
@@ -173,8 +178,9 @@ class FakeSettingsManager : public QObject {
 	void initDefaults() {
 		store_[QStringLiteral("MaxConcurrentDownloads")] = 5;
 		store_[QStringLiteral("MaxConnectionPerServer")] = 16;
-		store_[QStringLiteral("Split")] = 16;
+		store_[QStringLiteral("Split")] = 64;
 		store_[QStringLiteral("MinSplitSize")] = 20;
+		store_[QStringLiteral("UserAgent")] = GetDefaultBrowserUserAgent();
 		store_[QStringLiteral("ShowCloseConfirm")] = true;
 		store_[QStringLiteral("CloseToTray")] = false;
 		store_[QStringLiteral("Dir")] = QStringLiteral("C:/Downloads");

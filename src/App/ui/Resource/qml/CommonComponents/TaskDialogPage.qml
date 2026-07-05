@@ -25,9 +25,10 @@ Popup {
     readonly property int dialogWidth: 720
     readonly property int dialogViewportMargin: GTheme.space2XL
     readonly property int contentMinHeight: 460
-    readonly property int urlPanelHeight: 150
+    readonly property int urlPanelHeight: 120
     readonly property int torrentPanelHeight: 150
     readonly property int netDiskPanelHeight: 300
+    readonly property int generalPanelHeight: 150
     readonly property int footerHeight: GTheme.titleBarHeight + GTheme.space2XL
     readonly property int actionButtonWidth: 100
     readonly property int cancelButtonWidth: 80
@@ -136,9 +137,11 @@ Popup {
                     id: taskPageLayout
                     objectName: "taskDialogStack"
                     Layout.fillWidth: true
-                    // 自适应当前页内容高度，避免固定 200 导致可视区过小
-                    //Layout.preferredHeight: 300
-                    Layout.fillHeight: true
+                    Layout.preferredHeight: tabNavigation.currentIndex === 2
+                                            ? taskPage.netDiskPanelHeight
+                                            : (tabNavigation.currentIndex === 1
+                                               ? taskPage.torrentPanelHeight
+                                               : taskPage.urlPanelHeight)
                     currentIndex: tabNavigation.currentIndex
                     property int urlType: 0
 
@@ -152,7 +155,8 @@ Popup {
                             spacing: 0
                             ScrollView{
                                 id:view_input
-                                anchors.fill: parent
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
                                 TextArea {
                                     id: input
                                     objectName: "inputUrl"
@@ -303,7 +307,7 @@ Popup {
                 TaskGeneralOptionsCard {
                     id: generalConfig
                     Layout.fillWidth: true
-                    Layout.preferredHeight: taskPage.urlPanelHeight
+                    Layout.preferredHeight: taskPage.generalPanelHeight
                     standardSpacing: taskPage.contentSpacing
                     visible: tabNavigation.currentIndex !== 2
                 }
@@ -370,18 +374,23 @@ Popup {
                     Layout.preferredWidth: taskPage.actionButtonWidth
                     Layout.preferredHeight: GTheme.sizeDefault
                     onClicked: {
+                        let taskAdded = true
                         if (tabNavigation.currentIndex !== 2) {
+                            taskAdded = false
                             let url = taskPageLayout.geturls()
                             let options = taskPageLayout.getOptions()
                             if (taskPageLayout.urlType === 0) {
-                                BrowserManager.AddHttpTask(url, options)
+                                taskAdded = BrowserManager.AddHttpTask(url, options)
                             } else if (taskPageLayout.urlType === 1) {
-                                BrowserManager.AddMetalinkTask(url, options)
+                                taskAdded = BrowserManager.AddMetalinkTask(url, options)
                             } else if (taskPageLayout.urlType === 2) {
-                                BrowserManager.AddTorrentTask(url, options)
+                                taskAdded = BrowserManager.AddTorrentTask(url, options)
                             }
                         } else {
                             NetWorkDiskManager.DownloadSelectedFiles()
+                        }
+                        if (!taskAdded) {
+                            return
                         }
                         brower_view.index = 0
                         brower_view.switchDownloadPage(0)

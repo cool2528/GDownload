@@ -239,7 +239,7 @@ Popup {
             case GMessage.Info:
                 return SegoeFluentIcons.Info
             case GMessage.Error:
-                return SegoeFluentIcons.DismissCircle
+                return SegoeFluentIcons.ErrorBadge
             default:
                 return SegoeFluentIcons.Info
         }

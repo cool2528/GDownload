@@ -6,6 +6,7 @@
 #include <QSize>
 #include <nlohmann/json.hpp>
 #include "config/config_key.h"
+#include "default_user_agent.h"
 namespace gdl {
 	namespace ui {
 		namespace settings {
@@ -210,7 +211,7 @@ namespace gdl {
 			// Split
 			SETTING_IMP_BEGIN(Split, CONFIG_KEY_PATH(Split), int)
 			void Default() override {
-				value_ = 16;
+				value_ = 64;
 			}
 			void Put(const QVariant& value) override {
 				value_ = value.toInt();
@@ -226,7 +227,7 @@ namespace gdl {
 			// UserAgent
 			SETTING_IMP_BEGIN(UserAgent, CONFIG_KEY_PATH(UserAgent), QString)
 			void Default() override {
-				value_ = "";
+				value_ = DefaultBrowserUserAgent();
 			}
 			void Put(const QVariant& value) override {
 				value_ = value.toString();

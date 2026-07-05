@@ -53,6 +53,11 @@ GCard {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 32
                 placeholderText: qsTr("User-Agent")
+                Component.onCompleted: {
+                    userAgent.text = SettingsManager.qUserAgent && SettingsManager.qUserAgent.length > 0
+                                     ? SettingsManager.qUserAgent
+                                     : SettingsManager.GetDefaultBrowserUserAgent()
+                }
             }
 
             Text {

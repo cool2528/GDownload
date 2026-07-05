@@ -1,4 +1,5 @@
 #include "aria2c_manager.h"
+#include "default_user_agent.h"
 #include <cpr/cpr.h>
 #include <boost/url.hpp>
 #include <nlohmann/json.hpp>
@@ -200,9 +201,7 @@ namespace gdl {
 			aria2c_settings["split"]					  = config::GetValue(config::Keys::Split).AsString();
 			auto user_agent = config::GetValue(config::Keys::UserAgent).AsString();
 			if (user_agent.empty()) {
-				user_agent =
-					"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) "
-					"Chrome/111.0.0.0 Safari/537.36";
+				user_agent = DefaultBrowserUserAgentString();
 			}
 			aria2c_settings["user-agent"] = quote_path(user_agent);
 			aria2c_settings["check-certificate"] = "true";

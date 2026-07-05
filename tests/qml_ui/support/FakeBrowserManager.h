@@ -44,15 +44,15 @@ class FakeBrowserManager : public QObject {
 	// ===== 任务添加(记录到 history_)=====
 	Q_INVOKABLE bool AddHttpTask(const QVariantList& urls, const QVariantMap& options) {
 		record(QStringLiteral("AddHttpTask"), {QVariant(urls), QVariant(options)});
-		return true;
+		return add_task_result_;
 	}
 	Q_INVOKABLE bool AddTorrentTask(const QString& torrent, const QVariantMap& options) {
 		record(QStringLiteral("AddTorrentTask"), {QVariant(torrent), QVariant(options)});
-		return true;
+		return add_task_result_;
 	}
 	Q_INVOKABLE bool AddMetalinkTask(const QString& metalink, const QVariantMap& options) {
 		record(QStringLiteral("AddMetalinkTask"), {QVariant(metalink), QVariant(options)});
-		return true;
+		return add_task_result_;
 	}
 
 	// ===== 任务暂停/恢复(记录)=====
@@ -119,17 +119,17 @@ class FakeBrowserManager : public QObject {
 	Q_INVOKABLE QObject* GetStopedDownloadModel() { return nullptr; }
 	Q_INVOKABLE QObject* GetWaitingDownloadModel() { return nullptr; }
 	Q_INVOKABLE void OpenFileLocation(const QString& file_path) { Q_UNUSED(file_path); }
-	Q_INVOKABLE bool RemoveStopTask(const QString& gid, bool is_remove_file = true) const {
+	Q_INVOKABLE bool RemoveStopTask(const QString& gid, bool is_remove_file = true) {
 		Q_UNUSED(gid);
 		Q_UNUSED(is_remove_file);
 		return true;
 	}
-	Q_INVOKABLE bool RemoveStopTask(int index, bool is_remove_file = true) const {
+	Q_INVOKABLE bool RemoveStopTask(int index, bool is_remove_file = true) {
 		Q_UNUSED(index);
 		Q_UNUSED(is_remove_file);
 		return true;
 	}
-	Q_INVOKABLE bool RemoveAllStopTask(bool is_remove_file = true) const {
+	Q_INVOKABLE bool RemoveAllStopTask(bool is_remove_file = true) {
 		Q_UNUSED(is_remove_file);
 		return true;
 	}
@@ -168,6 +168,8 @@ class FakeBrowserManager : public QObject {
 	// 调用次数
 	int rpcCallCount() const { return history_.size(); }
 
+	void setAddTaskResult(bool result) { add_task_result_ = result; }
+
 	// 清空历史(测试 init 调用)。仅清调用历史,不影响单例状态
 	void clearHistory() { history_.clear(); }
 
@@ -178,6 +180,7 @@ class FakeBrowserManager : public QObject {
 	}
 
 	QList<FakeRpcCall> history_;
+	bool add_task_result_ = true;
 };
 
 }  // namespace tests

@@ -46,6 +46,7 @@ if(APPLE)
         ${SECURITY_FRAMEWORK}
     )
 elseif(WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Advapi32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE 
         UNICODE 
         _UNICODE
