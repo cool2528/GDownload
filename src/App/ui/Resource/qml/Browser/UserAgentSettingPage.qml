@@ -18,9 +18,14 @@ SettingCard {
 
     // 页面级布局常量(非设计令牌,spec 2.3 约定:按钮宽度)
     readonly property int buttonWidth: 120
+    readonly property string defaultBrowserUserAgent: SettingsManager.GetDefaultBrowserUserAgent()
 
     // User-Agent 预设列表
     property var userAgentPresets: [
+        {
+            name: qsTr("System Browser Default"),
+            value: defaultBrowserUserAgent
+        },
         {
             name: qsTr("Aria2 Default"),
             value: "aria2/1.36.0"
@@ -92,7 +97,9 @@ SettingCard {
 
             Component.onCompleted: {
                 // 初始化:根据当前配置选择对应预设
-                var currentUA = SettingsManager.qUserAgent;
+                var currentUA = SettingsManager.qUserAgent && SettingsManager.qUserAgent.length > 0
+                                ? SettingsManager.qUserAgent
+                                : userAgentSettingPage.defaultBrowserUserAgent;
                 var foundIndex = -1;
 
                 for (var i = 0; i < userAgentPresets.length - 1; i++) {  // 不包括 "Custom"
@@ -180,11 +187,11 @@ SettingCard {
         hasChanges: customUserAgentField.text.trim() !== SettingsManager.qUserAgent
 
         onReset: {
-            // 重置为默认预设 Aria2 Default(仅重置输入,未保存)
-            userAgentPresetComboBox.currentIndex = 0  // Aria2 Default
+            // 重置为系统浏览器默认 UA(仅重置输入,未保存)
+            userAgentPresetComboBox.currentIndex = 0  // System Browser Default
             customUserAgentField.text = userAgentPresets[0].value
 
-            formActions.statusText = qsTr("Reset to Aria2 default User-Agent (not saved yet)")
+            formActions.statusText = qsTr("Reset to system browser User-Agent (not saved yet)")
             formActions.statusColor = GTheme.textSecondary
         }
 

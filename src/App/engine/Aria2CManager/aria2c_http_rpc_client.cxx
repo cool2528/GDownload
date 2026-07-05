@@ -627,8 +627,15 @@ namespace gdl {
             auto reply			   = cpr::Post(cpr::Url(host_ + "/jsonrpc"), cpr::Body(body),
                                                cpr::Header{{"Content-Type", "application/json"}});
 			if (reply.status_code != 200) {
-				LOG_ERR("request aria2c method fail error {}", reply.error.message);
-                result.result = ErrorResult{.err_msg  = reply.error.message,
+				std::string error_message = reply.error.message;
+				if (error_message.empty()) {
+					error_message = "HTTP " + std::to_string(reply.status_code);
+					if (!reply.text.empty()) {
+						error_message += ": " + reply.text;
+					}
+				}
+				LOG_ERR("request aria2c method {} fail error {}", method, error_message);
+                result.result = ErrorResult{.err_msg  = error_message,
                                             .err_code = static_cast<std::int64_t>(reply.status_code)};
 				return result;
 			}

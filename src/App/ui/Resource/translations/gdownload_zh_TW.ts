@@ -29,57 +29,52 @@
         <translation>（1024-65535）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="146"/>
-        <source>RPC settings reset to default. Please restart the application!</source>
-        <translation>RPC 設定已重置為預設值。請重新啟動應用程式！</translation>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="144"/>
+        <source>Reset to default. Click Save to apply.</source>
+        <translation>重設為預設值。點擊儲存以套用。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="150"/>
-        <source>✓ Settings reset to default (Restart required)</source>
-        <translation>✓ 設定已重置為預設值（需要重新啟動）</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="159"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="153"/>
         <source>✗ Invalid port. Please enter a value between 1024 and 65535.</source>
         <translation>✗ 無效埠。請輸入 1024 到 65535 之間的值。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="161"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="155"/>
         <source>Invalid port number!</source>
         <translation>無效的埠號！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="167"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="161"/>
         <source>✗ Secret cannot be empty!</source>
         <translation>✗ 金鑰不能為空！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="169"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="163"/>
         <source>Secret cannot be empty!</source>
         <translation>金鑰不能為空！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="181"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="175"/>
         <source>✓ RPC settings saved successfully! Please restart the application to apply changes.</source>
         <translation>✓ RPC 設定儲存成功！請重新啟動應用程式以使更改生效。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="184"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="178"/>
         <source>✓ Settings saved: Port=%1, Secret updated (Restart required)</source>
         <translation>✓ 設定已儲存：埠=%1，金鑰已更新（需要重新啟動）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="192"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="186"/>
         <source>No changes detected.</source>
         <translation>未檢測到更改。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="193"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="187"/>
         <source>Settings unchanged.</source>
         <translation>設定未更改。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="203"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="197"/>
         <source>• The RPC port is used for communication between the application and Aria2 engine
 • Default port is 16888
 • The RPC secret is used for authentication between the application and Aria2 engine
@@ -352,17 +347,17 @@
         <translation>别再问了，记住我的选择</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="70"/>
+        <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="78"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="75"/>
+        <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="83"/>
         <source>Minimize to Tray</source>
         <translation>最小化到托盘</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="80"/>
+        <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="88"/>
         <source>Quit</source>
         <translation>退出</translation>
     </message>
@@ -412,8 +407,8 @@
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="183"/>
-        <source>Status: Connected (aria2c running)</source>
-        <translation>状态：已连接（aria2c 正在运行）</translation>
+        <source>Requires GDownload running</source>
+        <translation>需要 GDownload 正在執行</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="215"/>
@@ -574,27 +569,27 @@
         <translation>同时删除下载的文件</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="87"/>
+        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="96"/>
         <source>This will only remove the task from the waiting list.</source>
         <translation>这只会将任务从等待列表中删除。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="89"/>
+        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="98"/>
         <source>Warning: The downloaded file will be permanently deleted and cannot be recovered!</source>
         <translation>警告：下载的文件将被永久删除，无法恢复！</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="91"/>
+        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="100"/>
         <source>This will only remove the task record. The downloaded file will be kept.</source>
         <translation>这只会删除任务记录。下载的文件将被保留。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="107"/>
+        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="116"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="112"/>
+        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="121"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
@@ -627,12 +622,12 @@
         <translation>新增下載</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageTitle.qml" line="134"/>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="135"/>
         <source>Delete Confirmation</source>
         <translation>刪除確認</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageTitle.qml" line="138"/>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="139"/>
         <source>Are you sure you want to delete all tasks in this list? This action cannot be undone.</source>
         <translation>確定要刪除此清單中的所有任務嗎?此操作無法復原。</translation>
     </message>
@@ -931,6 +926,14 @@
     </message>
 </context>
 <context>
+    <name>GComBoBox</name>
+    <message>
+        <location filename="../qml/CommonComponents/GComBoBox.qml" line="16"/>
+        <source>Please select</source>
+        <translation>請選擇</translation>
+    </message>
+</context>
+<context>
     <name>GDownloadViewPage</name>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="62"/>
@@ -990,6 +993,26 @@
         <source>Drag a torrent or metalink file here, or click to select.</source>
         <translation>將torrent或metalink檔案拖到此處，或單擊選擇。</translation>
     </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDropArea.qml" line="95"/>
+        <source>Please choose a torrent file</source>
+        <translation>請選擇種子檔案</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDropArea.qml" line="96"/>
+        <source>Torrent files (*.torrent)</source>
+        <translation>種子檔案 (*.torrent)</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDropArea.qml" line="96"/>
+        <source>Metalink Files (*.metalink)</source>
+        <translation>Metalink 檔案 (*.metalink)</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDropArea.qml" line="96"/>
+        <source>Meta4 Files (*.meta4)</source>
+        <translation>Meta4 檔案 (*.meta4)</translation>
+    </message>
 </context>
 <context>
     <name>HelpDialog</name>
@@ -998,6 +1021,11 @@
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="160"/>
         <source>About GDownload</source>
         <translation>关于 GDownload</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="13"/>
+        <source>Version %1</source>
+        <translation>版本 %1</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="36"/>
@@ -1508,12 +1536,12 @@ GDownload 由充满热情的开发人员维护，他们相信
         <translation>時間</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="409"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="408"/>
         <source>Back</source>
         <translation>回上頁</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="426"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="425"/>
         <source>Return parsing</source>
         <translation>回傳解析</translation>
     </message>
@@ -1537,8 +1565,8 @@ GDownload 由充满热情的开发人员维护，他们相信
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="39"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="131"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="218"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="132"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="219"/>
         <source>Do Nothing</source>
         <translation>无所作为</translation>
     </message>
@@ -1554,14 +1582,14 @@ GDownload 由充满热情的开发人员维护，他们相信
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="42"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="132"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="219"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="133"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="220"/>
         <source>Play Sound</source>
         <translation>播放声音</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="43"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="133"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="134"/>
         <source>Run Custom Command</source>
         <translation>运行自定义命令</translation>
     </message>
@@ -1581,58 +1609,58 @@ GDownload 由充满热情的开发人员维护，他们相信
         <translation>重新启动计算机</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="61"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="148"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="62"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="149"/>
         <source>Custom Command</source>
         <translation>自定义命令</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="70"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="71"/>
         <source>e.g., notify-send &quot;Download Complete&quot; &quot;{file}&quot;</source>
         <translation>例如，notify-send &quot;下载完成&quot;&quot;{文件}&quot;</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="82"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="169"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="83"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="170"/>
         <source>Available variables:</source>
         <translation>可用变量</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="89"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="176"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="90"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="177"/>
         <source>  {file} - Downloaded file path</source>
         <translation>{文件｝- 下载文件路径</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="90"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="177"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="91"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="178"/>
         <source>  {dir} - Download directory path</source>
         <translation>{dir}-下载目录路径</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="91"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="178"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="92"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="179"/>
         <source>  {gid} - Download task ID</source>
         <translation>{gid} - 下载任务 ID</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="101"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="188"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="102"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="189"/>
         <source>Example:</source>
         <translation>例如</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="120"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="121"/>
         <source>When Download Fails</source>
         <translation>下载失败时</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="157"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="158"/>
         <source>e.g., logger &quot;Download failed: {gid}&quot;</source>
         <translation>例如，日志程序 &quot;下载失败：{gid}&quot;</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="207"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="208"/>
         <source>When Download Starts</source>
         <translation>下载开始时</translation>
     </message>
@@ -1640,26 +1668,36 @@ GDownload 由充满热情的开发人员维护，他们相信
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="108"/>
+        <location filename="../../Browser/download_task_model.h" line="109"/>
         <source>Unknown</source>
         <translation>未知</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="118"/>
+        <location filename="../../Browser/download_task_model.h" line="119"/>
         <source>h</source>
         <translation>時</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="121"/>
-        <location filename="../../Browser/download_task_model.h" line="125"/>
+        <location filename="../../Browser/download_task_model.h" line="122"/>
+        <location filename="../../Browser/download_task_model.h" line="126"/>
         <source>m</source>
         <translation>分</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="128"/>
-        <location filename="../../Browser/download_task_model.h" line="132"/>
+        <location filename="../../Browser/download_task_model.h" line="129"/>
+        <location filename="../../Browser/download_task_model.h" line="133"/>
         <source>s</source>
         <translation>秒</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/stopped_task_delete_utils.h" line="27"/>
+        <source>Task was removed locally, but aria2 cleanup failed.</source>
+        <translation>任務已從本機移除，但 aria2 清理失敗。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/stopped_task_delete_utils.h" line="28"/>
+        <source>Task was removed locally, but aria2 cleanup failed: %1</source>
+        <translation>任務已從本機移除，但 aria2 清理失敗：%1</translation>
     </message>
 </context>
 <context>
@@ -1736,17 +1774,17 @@ GDownload 由充满热情的开发人员维护，他们相信
         <translation>偏好設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="86"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="85"/>
         <source>Basic</source>
         <translation>基本設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="98"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="97"/>
         <source>Advanced</source>
         <translation>進階設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="110"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="109"/>
         <source>Lab</source>
         <translation>實驗性功能</translation>
     </message>
@@ -1864,12 +1902,52 @@ GDownload 由充满热情的开发人员维护，他们相信
         <translation>高级选项</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="101"/>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="45"/>
+        <source>User-Agent:</source>
+        <translation>User-Agent：</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="55"/>
+        <source>User-Agent</source>
+        <translation>User-Agent</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="64"/>
+        <source>Authorization:</source>
+        <translation>授權：</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="74"/>
+        <source>Authorization</source>
+        <translation>授權</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="78"/>
+        <source>Referer:</source>
+        <translation>Referer：</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="88"/>
+        <source>Referer</source>
+        <translation>Referer</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="92"/>
+        <source>Cookie:</source>
+        <translation>Cookie：</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="102"/>
+        <source>Cookie</source>
+        <translation>Cookie</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="106"/>
         <source>Custom Headers:</source>
         <translation>定制接头：</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="113"/>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="118"/>
         <source>Custom request headers (one per line: KEY:VALUE)</source>
         <translation>自定义请求标头（每行一个：KEY:VALUE）</translation>
     </message>
@@ -1890,37 +1968,37 @@ GDownload 由充满热情的开发人员维护，他们相信
 <context>
     <name>TaskDialogPage</name>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="106"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="107"/>
         <source>URL</source>
         <translation>連結任務</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="108"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="109"/>
         <source>Baidu</source>
         <translation>百度網盘</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="107"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="108"/>
         <source>Torrent</source>
         <translation>下载</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="162"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="166"/>
         <source>Enter download URLs (one per line, supports magnet links)</source>
         <translation>输入下载 URL（每行一个，支持磁铁链接）</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="369"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="373"/>
         <source>Add Task</source>
         <translation>添加任务</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="347"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="351"/>
         <source>Advanced Options</source>
         <translation>進階選項</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="359"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="363"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
@@ -2090,42 +2168,42 @@ GDownload 由充满热情的开发人员维护，他们相信
         <translation>跟踪源</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="104"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="111"/>
         <source>Sync Trackers</source>
         <translation>同步跟踪器</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="119"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="125"/>
         <source>Auto Update:</source>
         <translation>自動更新:</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="120"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="126"/>
         <source>Enable daily tracker source synchronization</source>
         <translation>啟用每日 Tracker 來源同步</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="194"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="200"/>
         <source>Current Tracker List</source>
         <translation>当前跟踪器列表</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="240"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="246"/>
         <source>Updating tracker list...</source>
         <translation>更新跟踪器列表...</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="244"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="250"/>
         <source>Tracker list updated successfully</source>
         <translation>跟踪器列表更新成功</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="245"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="251"/>
         <source>%1 trackers, %2/%3 sources succeeded, took %4ms</source>
         <translation>%1 追踪器，%2/%3 来源成功，耗时 %4ms</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="255"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="261"/>
         <source>Failed to update tracker list</source>
         <translation>更新跟踪器列表失败</translation>
     </message>
@@ -2176,58 +2254,63 @@ GDownload 由充满热情的开发人员维护，他们相信
 <context>
     <name>UserAgentSettingPage</name>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="25"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="30"/>
         <source>Aria2 Default</source>
         <translation>Aria2 默认值</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="29"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="34"/>
         <source>Chrome 120 (Windows)</source>
         <translation>Chrome 120（Windows）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="33"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="38"/>
         <source>Firefox 121 (Windows)</source>
         <translation>火狐 121（Windows）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="37"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="42"/>
         <source>Safari 17 (macOS)</source>
         <translation>Safari 17 (macOS)</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="41"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="46"/>
         <source>Edge 120 (Windows)</source>
         <translation>边缘 120（视窗）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="45"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="50"/>
         <source>Chrome 120 (Android)</source>
         <translation>Chrome 120（安卓）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="49"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="54"/>
         <source>Safari (iPhone)</source>
         <translation>Safari (iPhone)</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="53"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="58"/>
         <source>Wget 1.21</source>
         <translation>Wget 1.21</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="57"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="62"/>
         <source>cURL 8.5</source>
         <translation>cURL 8.5</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="61"/>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="218"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="66"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="223"/>
         <source>Custom</source>
         <translation>定制</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="240"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="194"/>
+        <source>Reset to system browser User-Agent (not saved yet)</source>
+        <translation>已重設為系統瀏覽器 User-Agent（尚未儲存）</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="245"/>
         <source>Tip: Some servers may block downloads from Aria2. Use a browser User-Agent to bypass restrictions.</source>
         <translation>提示:部分伺服器可能會封鎖來自 Aria2 的下載。使用瀏覽器 User-Agent 可繞過限制。</translation>
     </message>
@@ -2242,59 +2325,185 @@ GDownload 由充满热情的开发人员维护，他们相信
         <translation>配置 HTTP/HTTPS 用户代理字符串，以便与不同服务器兼容</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="73"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="26"/>
+        <source>System Browser Default</source>
+        <translation>系統瀏覽器預設值</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="78"/>
         <source>Preset User-Agent</source>
         <translation>预设用户代理</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="142"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="149"/>
         <source>Custom User-Agent</source>
         <translation>自定义用户代理</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="152"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="159"/>
         <source>Enter custom User-Agent string...</source>
         <translation>输入自定义 User-Agent 字符串...</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="189"/>
-        <source>Reset to Aria2 default User-Agent (not saved yet)</source>
-        <translation>重置为 Aria2 默认用户代理（尚未保存）</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="199"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="204"/>
         <source>✗ User-Agent cannot be empty!</source>
         <translation>✗ User-Agent 不能为空！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="201"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="206"/>
         <source>User-Agent cannot be empty!</source>
         <translation>User-Agent 不能为空！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="213"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="218"/>
         <source>✓ User-Agent settings saved and applied successfully!</source>
         <translation>✓ 用户代理设置已保存并成功应用！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="226"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="231"/>
         <source>✓ Settings saved: %1</source>
         <translation>✓ 已保存的设置： %1</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="229"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="234"/>
         <source>No changes detected.</source>
         <translation>未检测到任何变化。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="230"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="235"/>
         <source>Settings unchanged.</source>
         <translation>设置不变。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="179"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="184"/>
         <source>Select a preset or enter custom User-Agent, then click &apos;Save Settings&apos; to apply.</source>
         <translation>选择预设或输入自定义用户代理，然后点击 &quot;保存设置 &quot;应用。</translation>
+    </message>
+</context>
+<context>
+    <name>gdl::ui::browser::BrowserManagerImpl</name>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="272"/>
+        <source>Invalid download link: %1</source>
+        <translation>下載連結無效：%1</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="285"/>
+        <source>Failed to add download task. Please check the link or aria2 connection.</source>
+        <translation>新增下載任務失敗。請檢查連結或 aria2 連線。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="286"/>
+        <source>Failed to add download task: %1</source>
+        <translation>新增下載任務失敗：%1</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="311"/>
+        <source>Torrent file does not exist: %1</source>
+        <translation>種子檔案不存在：%1</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="317"/>
+        <source>Failed to read torrent file: %1</source>
+        <translation>讀取種子檔案失敗：%1</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="331"/>
+        <source>Failed to add torrent task. Please check the file or aria2 connection.</source>
+        <translation>新增種子任務失敗。請檢查檔案或 aria2 連線。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="332"/>
+        <source>Failed to add torrent task: %1</source>
+        <translation>新增種子任務失敗：%1</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="355"/>
+        <source>Metalink file does not exist: %1</source>
+        <translation>Metalink 檔案不存在：%1</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="361"/>
+        <source>Failed to read metalink file: %1</source>
+        <translation>讀取 Metalink 檔案失敗：%1</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="375"/>
+        <source>Failed to add metalink task. Please check the file or aria2 connection.</source>
+        <translation>新增 Metalink 任務失敗。請檢查檔案或 aria2 連線。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="376"/>
+        <source>Failed to add metalink task: %1</source>
+        <translation>新增 Metalink 任務失敗：%1</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="659"/>
+        <source>Failed to delete task: missing task id.</source>
+        <translation>刪除任務失敗：缺少任務 ID。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="663"/>
+        <location filename="../../Browser/browser_manager.cxx" line="720"/>
+        <source>Failed to delete task: stopped task list is not available.</source>
+        <translation>刪除任務失敗：已停止任務清單不可用。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="669"/>
+        <location filename="../../Browser/browser_manager.cxx" line="725"/>
+        <source>Failed to delete task: task was not found.</source>
+        <translation>刪除任務失敗：找不到任務。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="680"/>
+        <source>Failed to delete task from aria2.</source>
+        <translation>從 aria2 刪除任務失敗。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="681"/>
+        <source>Failed to delete task from aria2: %1</source>
+        <translation>從 aria2 刪除任務失敗：%1</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="689"/>
+        <source>Failed to remove task from the stopped list.</source>
+        <translation>從已停止清單移除任務失敗。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="702"/>
+        <source>Task was removed, but the downloaded file could not be deleted.</source>
+        <translation>任務已移除，但無法刪除已下載檔案。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="703"/>
+        <source>Task was removed, but the downloaded file could not be deleted: %1</source>
+        <translation>任務已移除，但無法刪除已下載檔案：%1</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="710"/>
+        <source>Task was removed, but the aria2 control file could not be deleted.</source>
+        <translation>任務已移除，但無法刪除 aria2 控制檔。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="711"/>
+        <source>Task was removed, but the aria2 control file could not be deleted: %1</source>
+        <translation>任務已移除，但無法刪除 aria2 控制檔：%1</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="740"/>
+        <source>Failed to delete tasks: stopped task list is not available.</source>
+        <translation>刪除任務失敗：已停止任務清單不可用。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="1074"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1137"/>
+        <source>Download failed. Please check the link or network connection.</source>
+        <translation>下載失敗。請檢查連結或網路連線。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="1075"/>
+        <source>Download failed: %1</source>
+        <translation>下載失敗：%1</translation>
     </message>
 </context>
 <context>

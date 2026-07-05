@@ -54,9 +54,9 @@ namespace gdl {
 				virtual void OpenFileLocation(const QString& file_path) = 0;
 
 				// 已停止任务的操作
-				virtual bool RemoveStopTask(const QString& gid, bool is_remove_file = true) const = 0;
-				virtual bool RemoveStopTask(int index, bool is_remove_file = true) const = 0;
-				virtual bool RemoveAllStopTask(bool is_remove_file = true) const = 0;
+				virtual bool RemoveStopTask(const QString& gid, bool is_remove_file = true) = 0;
+				virtual bool RemoveStopTask(int index, bool is_remove_file = true) = 0;
+				virtual bool RemoveAllStopTask(bool is_remove_file = true) = 0;
 
 				// 刷新任务列表与获取文件预览模型
 				virtual void RefreshTaskList(int page_index) = 0;

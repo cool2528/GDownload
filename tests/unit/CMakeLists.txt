@@ -12,6 +12,7 @@ add_executable(gdownload_unit_tests
     engine/test_publish_subscribe_system.cpp
     update/test_update_config.cpp
     browser/test_download_url_utils.cpp
+    settings/test_aria2_defaults.cpp
     utils/test_relaunch_function.cpp
     ${CMAKE_SOURCE_DIR}/src/App/ui/utils/utils.cxx
 )
@@ -29,6 +30,10 @@ target_link_libraries(gdownload_unit_tests
     GDLCore
     Boost::asio
 )
+
+if(WIN32)
+    target_link_libraries(gdownload_unit_tests PRIVATE Advapi32)
+endif()
 
 # 包含目录
 target_include_directories(gdownload_unit_tests

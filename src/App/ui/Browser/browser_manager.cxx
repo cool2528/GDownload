@@ -8,6 +8,7 @@
 #include <nlohmann/json.hpp>
 #include "Aria2CManager/engine_def.h"
 #include "Browser/download_url_utils.h"
+#include "Browser/stopped_task_delete_utils.h"
 #include "Definitions/appDef.h"
 #include "Parser/file_parser.h"
 #include "PluginManager/plugin_manager.h"
@@ -31,6 +32,83 @@ namespace gdl {
 				 "gid",	   "bittorrent"};
 
 			namespace {
+				std::string Aria2HttpRpcHost() {
+					const int port_value = settings::Settings::Instance().GetRpcListenPort();
+					const std::string rpc_port =
+						(port_value < 1024 || port_value > 65535) ? kEngineRpcPort : std::to_string(port_value);
+					return std::string("http://127.0.0.1:") + rpc_port;
+				}
+
+				QString ExtractAria2RpcErrorMessage(const std::string& body) {
+					try {
+						const nlohmann::json doc = nlohmann::json::parse(body);
+						if (doc.contains("error") && doc["error"].is_object()) {
+							const auto& error = doc["error"];
+							if (error.contains("message") && error["message"].is_string()) {
+								return QString::fromStdString(error["message"].get<std::string>()).trimmed();
+							}
+						}
+					} catch (const std::exception& e) {
+						LOG_ERR("Failed to parse aria2 RPC response: {}", e.what());
+					}
+					return {};
+				}
+
+				bool IsMissingAria2ResultError(const QString& message) {
+					const QString lower = message.toLower();
+					return lower.contains(QStringLiteral("gid")) && lower.contains(QStringLiteral("not found"));
+				}
+
+				bool RemoveAria2DownloadResultByGid(const QString& gid, QString* error_message) {
+					engine::Aria2cHttpClient client(Aria2HttpRpcHost());
+					auto http_result = client.RemoveDownloadResult(gid.toStdString());
+					if (http_result.HasError()) {
+						if (error_message) {
+							const QString detail = QString::fromUtf8(http_result.GetError().what()).trimmed();
+							*error_message =
+								detail.isEmpty() ? QStringLiteral("aria2 RPC request failed") : detail;
+						}
+						return false;
+					}
+
+					if (auto res = std::get_if<engine::ErrorResult>(&http_result.Value().result)) {
+						if (error_message) {
+							const QString detail = QString::fromStdString(res->err_msg).trimmed();
+							*error_message = detail.isEmpty()
+												 ? QStringLiteral("aria2 RPC returned HTTP %1").arg(res->err_code)
+												 : detail;
+						}
+						return false;
+					}
+
+					if (auto res = std::get_if<engine::SucceedResult>(&http_result.Value().result)) {
+						const QString rpc_error = ExtractAria2RpcErrorMessage(res->body);
+						if (!rpc_error.isEmpty() && !IsMissingAria2ResultError(rpc_error)) {
+							if (error_message) {
+								*error_message = rpc_error;
+							}
+							return false;
+						}
+					}
+					return true;
+				}
+
+				bool RemoveLocalFileIfRequested(const QString& file_path, QString* error_message) {
+					if (file_path.isEmpty() || !QFile::exists(file_path)) {
+						return true;
+					}
+
+					QFile file(file_path);
+					if (file.remove()) {
+						return true;
+					}
+
+					if (error_message) {
+						*error_message = file.errorString();
+					}
+					return false;
+				}
+
 				// 从单个 aria2 任务对象解析出 DownloadTaskInfo,统一 OnHandleAria2Message 与
 				// Aria2QueryByGidTaskInfo 两处重复逻辑。task_id 为空表示对象无有效路径(应跳过)。
 				DownloadTaskInfo ParseAria2TaskObject(const nlohmann::json& object) {
@@ -110,7 +188,11 @@ namespace gdl {
 					}
 
 					if (save_path.isEmpty()) {
-						return task_info;  // 无有效路径,task_id 保持为空,调用方跳过
+						file_name = SuggestDownloadFileNameFromUrl(download_url);
+						if (file_name.isEmpty()) {
+							file_name = QStringLiteral("download-%1").arg(task_id);
+						}
+						save_path = task_dir.isEmpty() ? file_name : QDir(task_dir).filePath(file_name);
 					}
 
 					task_info.set_task_id(task_id);
@@ -190,11 +272,18 @@ namespace gdl {
 							Q_EMIT sigErrorMessage(tr("Invalid download link: %1").arg(url_str));
 							continue;
 						}
-						auto res =
-                            engine::Aria2cDownloadManager::Instance().AddHttpTask({normalized_url->toStdString()}, opt);
+						auto task_options = opt;
+						AddSuggestedOutOptionForUrl(task_options, *normalized_url);
+						auto res = engine::Aria2cDownloadManager::Instance().AddHttpTask(
+							{normalized_url->toStdString()}, task_options);
 						if (res.HasError()) {
 							LOG_ERR("Failed to add HTTP download task Download address {} error {}",
 									url.toString().toStdString(), res.GetError().what());
+							const QString detail = QString::fromUtf8(res.GetError().what()).trimmed();
+							Q_EMIT sigErrorMessage(
+								detail.isEmpty()
+									? tr("Failed to add download task. Please check the link or aria2 connection.")
+									: tr("Failed to add download task: %1").arg(detail));
 							continue;
 						}
 						count++;
@@ -218,10 +307,16 @@ namespace gdl {
 						opt.emplace(key.toStdString(), value.toString().toStdString());
 					}
 				}
-				if (!QFile::exists(tarrent)) return false;
+				if (!QFile::exists(tarrent)) {
+					Q_EMIT sigErrorMessage(tr("Torrent file does not exist: %1").arg(tarrent));
+					return false;
+				}
 				// 读取tarrent文件到base64
 				QFile file(tarrent);
-				if (!file.open(QIODevice::ReadOnly)) return false;
+				if (!file.open(QIODevice::ReadOnly)) {
+					Q_EMIT sigErrorMessage(tr("Failed to read torrent file: %1").arg(tarrent));
+					return false;
+				}
 				QByteArray data = file.readAll();
 				file.close();
 				std::string base64_data = data.toBase64().toStdString();
@@ -230,6 +325,11 @@ namespace gdl {
 				if (res.HasError()) {
 					LOG_ERR("Failed to add Torrent download task Download address {} error {}", tarrent.toStdString(),
 							res.GetError().what());
+					const QString detail = QString::fromUtf8(res.GetError().what()).trimmed();
+					Q_EMIT sigErrorMessage(
+						detail.isEmpty()
+							? tr("Failed to add torrent task. Please check the file or aria2 connection.")
+							: tr("Failed to add torrent task: %1").arg(detail));
 					return false;
 				}
 
@@ -251,10 +351,16 @@ namespace gdl {
 						opt.emplace(key.toStdString(), value.toString().toStdString());
 					}
 				}
-				if (!QFile::exists(metalink)) return false;
+				if (!QFile::exists(metalink)) {
+					Q_EMIT sigErrorMessage(tr("Metalink file does not exist: %1").arg(metalink));
+					return false;
+				}
 				// 读取metalink文件到base64
 				QFile file(metalink);
-				if (!file.open(QIODevice::ReadOnly)) return false;
+				if (!file.open(QIODevice::ReadOnly)) {
+					Q_EMIT sigErrorMessage(tr("Failed to read metalink file: %1").arg(metalink));
+					return false;
+				}
 				QByteArray data = file.readAll();
 				file.close();
 				std::string base64_data = data.toBase64().toStdString();
@@ -263,6 +369,11 @@ namespace gdl {
 				if (res.HasError()) {
 					LOG_ERR("Failed to add metalink download task Download address {} error {}", metalink.toStdString(),
 							res.GetError().what());
+					const QString detail = QString::fromUtf8(res.GetError().what()).trimmed();
+					Q_EMIT sigErrorMessage(
+						detail.isEmpty()
+							? tr("Failed to add metalink task. Please check the file or aria2 connection.")
+							: tr("Failed to add metalink task: %1").arg(detail));
 					return false;
 				}
 
@@ -543,63 +654,90 @@ namespace gdl {
 				QProcess::startDetached(program, args);
 			}
 
-			bool BrowserManagerImpl::RemoveStopTask(const QString& gid, bool is_remove_file) const {
-				if (gid.isEmpty()) return false;
-				if (stopped_model_) {
-					const auto task = stopped_model_->GetTaskById(gid);
-					if (!task) {
-						return false;
-					}
-                    const QString save_path		  = task->task_save_path();
-                    const QString cache_file_path = save_path + ".aria2";
-                    const auto res				  = stopped_model_->RemoveTaskById(gid);
-					gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
-					if (is_remove_file) {
-						if (QFile::exists(save_path)) {
-							QFile::remove(save_path);
-						}
-                        if (QFile::exists(cache_file_path)) {
-                            QFile::remove(cache_file_path);
-                        }
-					}
-					return res;
+			bool BrowserManagerImpl::RemoveStopTask(const QString& gid, bool is_remove_file) {
+				if (gid.isEmpty()) {
+					Q_EMIT sigErrorMessage(tr("Failed to delete task: missing task id."));
+					return false;
 				}
-				return false;
+				if (!stopped_model_) {
+					Q_EMIT sigErrorMessage(tr("Failed to delete task: stopped task list is not available."));
+					return false;
+				}
+
+				const auto task = stopped_model_->GetTaskById(gid);
+				if (!task) {
+					Q_EMIT sigErrorMessage(tr("Failed to delete task: task was not found."));
+					return false;
+				}
+
+				QString aria2_error;
+				const bool aria2_cleanup_succeeded = RemoveAria2DownloadResultByGid(gid, &aria2_error);
+				const auto deletion_decision =
+					DecideStoppedTaskDeletionAfterAria2Cleanup(aria2_cleanup_succeeded, aria2_error);
+				if (!deletion_decision.remove_local_task) {
+					Q_EMIT sigErrorMessage(
+						aria2_error.isEmpty()
+							? tr("Failed to delete task from aria2.")
+							: tr("Failed to delete task from aria2: %1").arg(aria2_error));
+					return false;
+				}
+
+				const QString save_path = task->task_save_path();
+				const QString cache_file_path = save_path + ".aria2";
+				const auto res = stopped_model_->RemoveTaskById(gid);
+				if (!res) {
+					Q_EMIT sigErrorMessage(tr("Failed to remove task from the stopped list."));
+					return false;
+				}
+
+				gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
+				if (deletion_decision.show_cleanup_warning) {
+					Q_EMIT sigErrorMessage(deletion_decision.warning_message);
+				}
+				if (is_remove_file) {
+					QString file_error;
+					if (!RemoveLocalFileIfRequested(save_path, &file_error)) {
+						Q_EMIT sigErrorMessage(
+							file_error.isEmpty()
+								? tr("Task was removed, but the downloaded file could not be deleted.")
+								: tr("Task was removed, but the downloaded file could not be deleted: %1")
+									  .arg(file_error));
+					}
+					QString cache_error;
+					if (!RemoveLocalFileIfRequested(cache_file_path, &cache_error)) {
+						Q_EMIT sigErrorMessage(
+							cache_error.isEmpty()
+								? tr("Task was removed, but the aria2 control file could not be deleted.")
+								: tr("Task was removed, but the aria2 control file could not be deleted: %1")
+									  .arg(cache_error));
+					}
+				}
+				return true;
 			}
 
-			bool BrowserManagerImpl::RemoveStopTask(int index, bool is_remove_file) const {
-				if (stopped_model_) {
-					auto task = stopped_model_->GetTask(index);
-					if (!task) {
-						return false;
-					}
-                    QString gid					  = task->task_id();
-                    const QString save_path		  = task->task_save_path();
-                    const QString cache_file_path = save_path + ".aria2";
-                    const auto res				  = stopped_model_->RemoveTask(index);
-					gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
-					if (is_remove_file) {
-						if (QFile::exists(save_path)) {
-							QFile::remove(save_path);
-						}
-                        if (QFile::exists(cache_file_path)) {
-                            QFile::remove(cache_file_path);
-                        }
-					}
-					return res;
+			bool BrowserManagerImpl::RemoveStopTask(int index, bool is_remove_file) {
+				if (!stopped_model_) {
+					Q_EMIT sigErrorMessage(tr("Failed to delete task: stopped task list is not available."));
+					return false;
 				}
-				return false;
+				auto task = stopped_model_->GetTask(index);
+				if (!task) {
+					Q_EMIT sigErrorMessage(tr("Failed to delete task: task was not found."));
+					return false;
+				}
+				return RemoveStopTask(task->task_id(), is_remove_file);
 			}
 
-			bool BrowserManagerImpl::RemoveAllStopTask(bool is_remove_file) const {
+			bool BrowserManagerImpl::RemoveAllStopTask(bool is_remove_file) {
 				if (stopped_model_) {
 					auto tasks = stopped_model_->GetTaskIds();
-					bool res   = false;
+					bool res   = true;
 					for (const auto& task : tasks) {
-						res = RemoveStopTask(task, is_remove_file);
+						res = RemoveStopTask(task, is_remove_file) && res;
 					}
 					return res;
 				}
+				Q_EMIT sigErrorMessage(tr("Failed to delete tasks: stopped task list is not available."));
 				return false;
 			}
 
@@ -913,13 +1051,28 @@ namespace gdl {
 						LOG_DBG("OnHandleAria2Message  method {}", doc.dump());
 						const auto method	 = doc["method"].get<std::string>();
 						const auto params	 = doc["params"];
-						auto get_params_task = [](const nlohmann::json& param) {
-							DownloadTaskInfo task_info;
+						auto get_param_gids = [](const nlohmann::json& param) {
+							std::vector<std::string> gids;
 							for (const auto& item : param) {
-								std::string gid = item["gid"].get<std::string>();
-								task_info		= Aria2QueryByGidTaskInfo(gid);
+								if (item.contains("gid") && item["gid"].is_string()) {
+									gids.push_back(item["gid"].get<std::string>());
+								}
+							}
+							return gids;
+						};
+						auto get_params_task = [&get_param_gids](const nlohmann::json& param) {
+							DownloadTaskInfo task_info;
+							for (const auto& gid : get_param_gids(param)) {
+								task_info = Aria2QueryByGidTaskInfo(gid);
 							}
 							return task_info;
+						};
+						auto emit_download_error = [this](const std::string& gid) {
+							const QString detail = Aria2QueryByGidErrorMessage(gid);
+							Q_EMIT sigErrorMessage(
+								detail.isEmpty()
+									? tr("Download failed. Please check the link or network connection.")
+									: tr("Download failed: %1").arg(detail));
 						};
 
 						if (method == kAria2OnDownloadStart) {
@@ -975,13 +1128,25 @@ namespace gdl {
 						}
 						else if (method == kAria2OnDownloadError) {
 							// aria2.onDownloadError
+							const auto gids = get_param_gids(params);
 							auto task = get_params_task(params);
 							if (task.task_id().isEmpty()) {
 								LOG_WARN("Failed to get task info by gid");
+								if (gids.empty()) {
+									Q_EMIT sigErrorMessage(
+										tr("Download failed. Please check the link or network connection."));
+								} else {
+									for (const auto& gid : gids) {
+										emit_download_error(gid);
+									}
+								}
 								return;
 							}
 							task.set_task_state(TaskState::kError);
 							Q_EMIT sigUpdateTasksMessage(task);
+							if (!gids.empty()) {
+								emit_download_error(gids.back());
+							}
 
 							// 执行用户配置的错误后操作
 							auto action = settings::Settings::Instance().GetOnErrorAction();
@@ -1076,6 +1241,49 @@ namespace gdl {
 					}
 				}
 				return task_info;
+			}
+
+			QString BrowserManagerImpl::Aria2QueryByGidErrorMessage(const std::string& gid) {
+				// 获取并验证 RPC 端口
+				int port_value = settings::Settings::Instance().GetRpcListenPort();
+				std::string rpc_port;
+				// 验证端口范围，如果无效则使用默认值
+				if (port_value < 1024 || port_value > 65535) {
+					rpc_port = kEngineRpcPort;
+				} else {
+					rpc_port = std::to_string(port_value);
+				}
+				const std::string host = std::string("http://127.0.0.1:") + rpc_port;
+				engine::Aria2cHttpClient client(host);
+				auto http_result = client.TellStatus(gid, keys);
+				if (http_result.HasError()) {
+					LOG_ERR("Failed to query task error by gid:{} error:{}", gid, http_result.GetError().what())
+					return {};
+				}
+				if (auto res = std::get_if<engine::ErrorResult>(&http_result.Value().result)) {
+					LOG_ERR("Failed to query task error by gid:{} error:{}", gid, res->err_msg)
+					return QString::fromStdString(res->err_msg).trimmed();
+				}
+				else if (auto res = std::get_if<engine::SucceedResult>(&http_result.Value().result)) {
+					try {
+						nlohmann::json doc = nlohmann::json::parse(res->body);
+						if (doc.find("result") != doc.end() && doc["result"].is_object()) {
+							const auto& object = doc["result"];
+							if (object.contains("errorMessage") && object["errorMessage"].is_string()) {
+								return QString::fromStdString(object["errorMessage"].get<std::string>()).trimmed();
+							}
+						}
+						else if (doc.find("error") != doc.end() && doc["error"].is_object()) {
+							const auto& error = doc["error"];
+							if (error.contains("message") && error["message"].is_string()) {
+								return QString::fromStdString(error["message"].get<std::string>()).trimmed();
+							}
+						}
+					} catch (std::exception& e) {
+						LOG_ERR("{}", e.what())
+					}
+				}
+				return {};
 			}
 
 			// 执行下载完成后的操作

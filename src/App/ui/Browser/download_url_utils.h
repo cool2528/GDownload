@@ -3,6 +3,8 @@
 #include <QUrl>
 #include <QString>
 #include <optional>
+#include <string>
+#include <unordered_map>
 
 namespace gdl {
 	namespace ui {
@@ -28,6 +30,32 @@ namespace gdl {
 				}
 
 				return parsed.toString();
+			}
+
+			inline QString SuggestDownloadFileNameFromUrl(const QString& raw_url) {
+				const QString trimmed = raw_url.trimmed();
+				if (trimmed.isEmpty() || trimmed.startsWith(QStringLiteral("magnet:"), Qt::CaseInsensitive)) {
+					return {};
+				}
+
+				const QUrl parsed = QUrl::fromUserInput(trimmed);
+				if (!parsed.isValid()) {
+					return {};
+				}
+
+				return parsed.fileName(QUrl::FullyDecoded).trimmed();
+			}
+
+			inline void AddSuggestedOutOptionForUrl(
+				std::unordered_multimap<std::string, std::string>& options, const QString& raw_url) {
+				if (options.find("out") != options.end()) {
+					return;
+				}
+
+				const QString file_name = SuggestDownloadFileNameFromUrl(raw_url);
+				if (!file_name.isEmpty()) {
+					options.emplace("out", file_name.toStdString());
+				}
 			}
 
 		}  // namespace browser

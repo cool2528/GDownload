@@ -180,7 +180,7 @@ SettingCard {
             // 重置为 aria2 默认值(业务值,未保存)
             maxConcurrentDownloadsInput.value = 5
             maxConnectionPerServerInput.value = 16
-            splitInput.value = 16
+            splitInput.value = 64
             minSplitSizeCombo.currentIndex = 3  // 20M
 
             formActions.statusText = qsTr("Input fields reset to default values (not saved yet)")

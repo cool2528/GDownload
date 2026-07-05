@@ -44,6 +44,22 @@ class TstDesignSystemContract : public QObject {
         QVERIFY2(text.contains(QStringLiteral("objectName: \"taskDialogFooter\"")), "Task dialog footer must expose objectName taskDialogFooter");
     }
 
+    void task_dialog_keeps_download_settings_visible_by_default() {
+        const QString path = QStringLiteral("%1/src/App/ui/Resource/qml/CommonComponents/TaskDialogPage.qml").arg(QStringLiteral(SOURCE_ROOT));
+        const QString text = readFile(path);
+        const qsizetype stackIndex = text.indexOf(QStringLiteral("objectName: \"taskDialogStack\""));
+        QVERIFY2(stackIndex >= 0, "Task dialog StackLayout must expose objectName taskDialogStack");
+
+        const qsizetype firstPageIndex = text.indexOf(QStringLiteral("// URL 输入页面"), stackIndex);
+        QVERIFY2(firstPageIndex > stackIndex, "Task dialog StackLayout header should appear before URL page content");
+
+        const QString stackHeader = text.mid(stackIndex, firstPageIndex - stackIndex);
+        QVERIFY2(stackHeader.contains(QStringLiteral("Layout.preferredHeight:")),
+                 "Task dialog StackLayout must use a bounded preferred height");
+        QVERIFY2(!stackHeader.contains(QStringLiteral("Layout.fillHeight: true")),
+                 "Task dialog StackLayout must not fill the scroll area before Download Settings");
+    }
+
     void netdisk_page_exposes_workflow_hooks() {
         const QString path = QStringLiteral("%1/src/App/ui/Resource/qml/CommonComponents/NetDiskPageView.qml").arg(QStringLiteral(SOURCE_ROOT));
         const QString text = readFile(path);
