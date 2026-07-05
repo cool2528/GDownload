@@ -1,10 +1,10 @@
 INIT_SHARE_PROJECT(PluginManager)
-file(GLOB_RECURSE SOURCES_FILES 
+file(GLOB_RECURSE SOURCES_FILES CONFIGURE_DEPENDS
 *.cpp
 *.cxx
 *.c
 )
-file(GLOB_RECURSE HEADERS_FILES 
+file(GLOB_RECURSE HEADERS_FILES CONFIGURE_DEPENDS
 *.h
 *.hpp
 *.hxx
@@ -14,6 +14,7 @@ find_package(boost_system CONFIG REQUIRED)
 find_package(boost_property_tree CONFIG REQUIRED)
 find_package(boost_asio CONFIG REQUIRED)
 find_package(cpr CONFIG REQUIRED)
+find_package(OpenSSL REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(boost_url CONFIG REQUIRED)
 if(APPLE)
@@ -32,6 +33,7 @@ target_link_libraries(${PROJECT_NAME}
         cpr::cpr 
         nlohmann_json::nlohmann_json 
         Boost::url
+        OpenSSL::Crypto
 )
 
 if(APPLE)

@@ -26,7 +26,8 @@ namespace gdl {
 			using DisconnectCallback = std::function<void()>;
 			using ErrorCallback		 = std::function<void(const std::string&)>;
 
-			WebSocketClient(net::io_context& ioc) : resolver_(net::make_strand(ioc)), ws_(net::make_strand(ioc)) {}
+			// resolver_ 与 ws_ 共用同一 strand，避免 onResolve 跨 strand 触碰 ws_（B7）
+			WebSocketClient(net::io_context& ioc) : strand_(net::make_strand(ioc)), resolver_(strand_), ws_(strand_) {}
 
 			// 析构时不能调用 shared_from_this()：此时控制块已失效会抛 bad_weak_ptr，
 			// 改为同步关闭（错误码吞掉），由上层保证 io_context 已停止后再析构。
@@ -107,6 +108,14 @@ namespace gdl {
 				connected_.store(true);
 				retry_count_ = 0;
 
+				// 重连成功后清空断连前残留的陈旧 RPC（id 已过期，重发无意义）。
+				// 断连期间 send() 因 connected_==false 直接返回，队列不会新增；
+				// 正常流程下此时 write_in_flight_ 必为 false，守卫仅为防御在途写缓冲被析构。
+				if (!write_in_flight_) {
+					std::queue<std::string> empty;
+					message_queue_.swap(empty);
+				}
+
 				if (connect_callback_) {
 					connect_callback_();
 				}
@@ -133,14 +142,17 @@ namespace gdl {
 				asyncRead();
 			}
 
+			// onSend/onWrite/asyncWrite 均在 ws strand 上执行（send 通过 post 投递），
+			// message_queue_/write_in_flight_ 为 strand 独占，无需加锁。
 			void onSend(const std::string& message) {
-				std::lock_guard<std::mutex> lock(queue_mutex_);
 				message_queue_.push(message);
 
-				if (message_queue_.size() > 1) {
-					return;	 
+				// 用显式在途标记替代"队列大小即在途"约定，避免写错误后永久死锁（E1）
+				if (write_in_flight_) {
+					return;
 				}
 
+				write_in_flight_ = true;
 				asyncWrite();
 			}
 
@@ -151,17 +163,18 @@ namespace gdl {
 
 			void onWrite(beast::error_code ec, std::size_t) {
 				if (ec) {
+					// 写失败先复位在途标记再报错，否则重连成功后写链永久死锁（E1）
+					write_in_flight_ = false;
 					handleError("Write failed: " + ec.message());
 					return;
 				}
 
-				{
-					std::lock_guard<std::mutex> lock(queue_mutex_);
-					message_queue_.pop();
-				}
+				message_queue_.pop();
 
 				if (!message_queue_.empty()) {
 					asyncWrite();
+				} else {
+					write_in_flight_ = false;
 				}
 			}
 
@@ -181,7 +194,7 @@ namespace gdl {
 				if (error_callback_) {
 					error_callback_(error);
 				}
-				
+
 				if (auto_reconnect_) {
 					if (max_retries_ == -1 || retry_count_ < max_retries_) {
 						retry_count_++;
@@ -195,7 +208,7 @@ namespace gdl {
 						return;
 					}
 				}
-				
+
 				disconnect();
 			}
 
@@ -207,11 +220,12 @@ namespace gdl {
 			}
 
 		   private:
+			net::strand<net::io_context::executor_type> strand_;
 			tcp::resolver resolver_;
 			websocket::stream<beast::tcp_stream> ws_;
 			beast::flat_buffer read_buffer_;
 			std::queue<std::string> message_queue_;
-			std::mutex queue_mutex_;
+			bool write_in_flight_ = false;  // 是否有 async_write 在途（仅 ws strand 访问）
 
 			std::string host_;
 			std::string port_;

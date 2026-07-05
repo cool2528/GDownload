@@ -139,15 +139,9 @@ SettingCard {
             let randomSecret = SettingsManager.GenerateRpcSecret()
             portInput.text = "16888"
             secretInput.text = randomSecret
-            SettingsManager.SetRpcListenPort(16888)
-            SettingsManager.SetRpcSecret(randomSecret)
+            // 遵循本页"暂存-保存"契约:Reset 只重置输入框与未保存标记,不直接落盘(X3)
 
-            ToastManager.ShowWarning(
-                qsTr("RPC settings reset to default. Please restart the application!"),
-                5000
-            )
-
-            formActions.statusText = qsTr("✓ Settings reset to default (Restart required)")
+            formActions.statusText = qsTr("Reset to default. Click Save to apply.")
             formActions.statusColor = GTheme.warningColor
         }
 

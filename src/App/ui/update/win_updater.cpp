@@ -7,6 +7,8 @@
 #include <QThread>
 #include <nlohmann/json.hpp>
 #include "config/config.h"
+#include <QFile>
+#include "logger.h"
 namespace gdl {
     namespace update {
 
@@ -53,6 +55,15 @@ namespace gdl {
 
                 return std::string(kGithubMirrorPrefix) + original_url;
             }
+            // 流式计算文件 SHA-256，返回小写十六进制；失败返回空（S2）
+            QString ComputeFileSha256(const QString& path) {
+                QFile f(path);
+                if (!f.open(QIODevice::ReadOnly)) return {};
+                QCryptographicHash hash(QCryptographicHash::Sha256);
+                if (!hash.addData(&f)) return {};
+                return QString::fromLatin1(hash.result().toHex());
+            }
+
         }  // namespace
 
         namespace VersionTools {
@@ -81,11 +92,12 @@ namespace gdl {
                     if (major_ != other.major_) return major_ < other.major_;
                     if (minor_ != other.minor_) return minor_ < other.minor_;
                     if (patch_ != other.patch_) return patch_ < other.patch_;
-                    return false;
+                    return BuildNumber() < other.BuildNumber();  // 纳入第 4 段 build 号比较（B3）
                 }
 
                 bool operator==(const Version& other) const {
-                    return major_ == other.major_ && minor_ == other.minor_ && patch_ == other.patch_;
+                    return major_ == other.major_ && minor_ == other.minor_ && patch_ == other.patch_ &&
+                           BuildNumber() == other.BuildNumber();
                 }
 
                 bool operator>(const Version& other) const { return other < *this; }
@@ -93,6 +105,15 @@ namespace gdl {
                 bool operator<=(const Version& other) const { return *this < other || *this == other; }
 
                 bool operator>=(const Version& other) const { return *this > other || *this == other; }
+
+                // build 段可能非数字，数值化失败按 0 处理（B3）
+                long long BuildNumber() const {
+                    try {
+                        return build_.empty() ? 0 : std::stoll(build_);
+                    } catch (...) {
+                        return 0;
+                    }
+                }
 
                 bool IsValid() const { return major_ != 0 || minor_ != 0 || patch_ != 0; }
 
@@ -393,6 +414,28 @@ namespace gdl {
                     return;
                 }
 
+                // 校验 SHA-256（latest.json 提供时）；缺失则降级为大小校验并告警（S2）
+                if (!update_info_.sha256.empty()) {
+                    const QString actual_sha = ComputeFileSha256(update_package_path_);
+                    if (actual_sha.isEmpty() ||
+                        actual_sha.compare(QString::fromStdString(update_info_.sha256), Qt::CaseInsensitive) != 0) {
+                        QFile::remove(update_package_path_);
+                        last_error_ = "Update package SHA-256 mismatch";
+                        update_in_progress_ = false;
+                        if (progress_callback_) {
+                            UpdateProgress progress;
+                            progress.stage = UpdateProgress::Stage::kFailed;
+                            progress.percentage = 0;
+                            progress.message = "SHA-256 verification failed";
+                            progress_callback_(progress);
+                        }
+                        reply->deleteLater();
+                        return;
+                    }
+                } else {
+                    LOG_WARN("update package has no sha256 field, fell back to size-only check");
+                }
+
                 // Download complete
                 if (progress_callback_) {
                     UpdateProgress progress;
@@ -443,6 +486,24 @@ namespace gdl {
                 last_error_ = "Update package file does not exist: " + update_package_path_.toStdString();
                 update_in_progress_ = false;
                 return false;
+            }
+
+            // 执行安装包前再次校验 SHA-256（TOCTOU 缓解）（S2）
+            if (!update_info_.sha256.empty()) {
+                const QString actual_sha = ComputeFileSha256(update_package_path_);
+                if (actual_sha.isEmpty() ||
+                    actual_sha.compare(QString::fromStdString(update_info_.sha256), Qt::CaseInsensitive) != 0) {
+                    last_error_ = "Update package SHA-256 mismatch before install";
+                    update_in_progress_ = false;
+                    if (progress_callback_) {
+                        UpdateProgress progress;
+                        progress.stage = UpdateProgress::Stage::kFailed;
+                        progress.percentage = 100;
+                        progress.message = "SHA-256 verification failed";
+                        progress_callback_(progress);
+                    }
+                    return false;
+                }
             }
 
             if (progress_callback_) {
@@ -576,11 +637,13 @@ namespace gdl {
                             }
                             info.download_url = asset["browser_download_url"].get<std::string>();
                             info.package_size = asset["size"].get<int64_t>();
+                            if (asset.contains("sha256")) info.sha256 = asset["sha256"].get<std::string>();
                             break;
                         }
                     }
                     if (!info.download_url.empty()) {
                         // 成功找到可更新的安装包，清空可能残留的上次检查错误信息
+                        if (info.sha256.empty() && doc.contains("sha256")) info.sha256 = doc["sha256"].get<std::string>();
                         last_error_.clear();
                         update_available_ = true;
                         update_info_	  = info;

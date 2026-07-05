@@ -128,6 +128,7 @@ Rectangle {
             // 删除全部任务确认对话框
             Dialog {
                 id: deleteAllConfirmDialog
+                parent: Overlay.overlay  // 以全窗口遮罩为定位父级，避免以按钮簇为父导致弹窗错位(X1)
                 anchors.centerIn: parent
                 modal: true
                 width: 420

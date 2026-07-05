@@ -144,7 +144,7 @@ Popup {
                 easing.type: Easing.OutCubic
             }
             NumberAnimation {
-                property: isTopPlacement() ? "y" : "y"
+                property: "y"  // 两分支同为 y,原三目死逻辑(T5)
                 from: isTopPlacement() ? root.y - 20 : root.y + 20
                 to: root.y
                 duration: 300
@@ -165,7 +165,7 @@ Popup {
                 easing.type: Easing.InCubic
             }
             NumberAnimation {
-                property: isTopPlacement() ? "y" : "y"
+                property: "y"  // 两分支同为 y,原三目死逻辑(T5)
                 from: root.y
                 to: isTopPlacement() ? root.y - 10 : root.y + 10
                 duration: 200
@@ -314,7 +314,7 @@ Popup {
     background: Rectangle {
         color: getBackgroundColor()
         radius: 6
-        border.width: plain ? 1 : 1
+        border.width: 1  // 两分支同为 1(T5)
         border.color: getBorderColor()
         
         // Element Plus 风格阴影

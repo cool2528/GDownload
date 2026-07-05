@@ -42,7 +42,7 @@ GCard {
             rowSpacing: 12
 
             Text {
-                text: "User-Agent:"
+                text: qsTr("User-Agent:")
                 font.pixelSize: 13
                 color: GTheme.textSecondary
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
@@ -52,11 +52,11 @@ GCard {
                 id: userAgent
                 Layout.fillWidth: true
                 Layout.preferredHeight: 32
-                placeholderText: "User-Agent"
+                placeholderText: qsTr("User-Agent")
             }
 
             Text {
-                text: "Authorization:"
+                text: qsTr("Authorization:")
                 font.pixelSize: 13
                 color: GTheme.textSecondary
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
@@ -66,11 +66,11 @@ GCard {
                 id: authorization
                 Layout.fillWidth: true
                 Layout.preferredHeight: 32
-                placeholderText: "Authorization"
+                placeholderText: qsTr("Authorization")
             }
 
             Text {
-                text: "Referer:"
+                text: qsTr("Referer:")
                 font.pixelSize: 13
                 color: GTheme.textSecondary
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
@@ -80,11 +80,11 @@ GCard {
                 id: referrer
                 Layout.fillWidth: true
                 Layout.preferredHeight: 32
-                placeholderText: "Referer"
+                placeholderText: qsTr("Referer")
             }
 
             Text {
-                text: "Cookie:"
+                text: qsTr("Cookie:")
                 font.pixelSize: 13
                 color: GTheme.textSecondary
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
@@ -94,7 +94,7 @@ GCard {
                 id: cookie
                 Layout.fillWidth: true
                 Layout.preferredHeight: 32
-                placeholderText: "Cookie"
+                placeholderText: qsTr("Cookie")
             }
 
             Text {

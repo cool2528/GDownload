@@ -58,7 +58,7 @@ Rectangle {
                         }
                         Component.onCompleted: {
                             let index = languageComBoBox.values.indexOf(LanguageManager.GetCurrentLanguage())
-                            languageComBoBox.currentIndex = index
+                            languageComBoBox.currentIndex = Math.max(0, index)  // indexOf 未命中(-1)时回退第 0 项，杜绝越界(B9)
                         }
                     }
                 }

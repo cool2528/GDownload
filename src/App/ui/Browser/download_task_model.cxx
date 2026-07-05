@@ -123,6 +123,7 @@ namespace gdl {
 				beginInsertRows(QModelIndex(), 0, 0);
 				task_lists_.insert(0, task);
 				endInsertRows();
+				emit countChanged();
 			}
 
 			bool DownloadTaskModel::RemoveTask(int index) {
@@ -130,11 +131,19 @@ namespace gdl {
 				{
 					std::unique_lock lock(mutex_);
                     QString task_id = task_lists_[index].task_id();
-					remove_task_id_.insert(task_id, task_id);
+					if (!remove_task_id_.contains(task_id)) {
+						remove_task_id_.insert(task_id, task_id);
+						remove_order_.push_back(task_id);
+						while (static_cast<int>(remove_order_.size()) > kMaxTombstones) {
+							remove_task_id_.remove(remove_order_.front());
+							remove_order_.pop_front();
+						}
+					}
 				}
 				beginRemoveRows(QModelIndex(), index, index);
 				task_lists_.removeAt(index);
 				endRemoveRows();
+				emit countChanged();
 				return true;
 			}
 
@@ -192,8 +201,10 @@ namespace gdl {
 					{
 						std::lock_guard lock(mutex_);
 						remove_task_id_.clear();
+						remove_order_.clear();
 					}
 					endResetModel();
+					emit countChanged();
 				}
 			}
 

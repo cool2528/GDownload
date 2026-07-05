@@ -1,5 +1,6 @@
 #pragma once
 #include <atomic>
+#include <future>
 #include <boost/asio.hpp>
 #include "Engine_export.h"
 #include "aria2c_websocket_rpc_client.h"
@@ -211,11 +212,10 @@ namespace gdl {
 			String GetDhtPath(IP_VERSION protocol);
 			void UpdateAria2cTasks();
 			void SyncMagnetServerList();
+			void DispatchMagnetServerSync();
 			void SyncGlobalStatInfo();
             std::string SyncActiveTaskInfo();
 			std::string ParseTextUrls(const std::string& input);
-			std::string GetBitTorrentUrl(const std::string& url);
-
 			// Tracker 优化相关方法
 			/// 带降级策略的 URL 获取
 			std::string GetBitTorrentUrlWithFallback(const std::string& url);
@@ -227,8 +227,6 @@ namespace gdl {
 			// ETag 缓存相关方法（使用数据库存储）
 			/// 初始化 ETag 缓存数据库
 			void InitializeETagCache();
-			/// 获取缓存的内容（如果有效）
-			std::optional<std::string> GetCachedContent(const std::string& url, const std::string& etag);
 			/// 更新缓存条目
 			void UpdateCacheEntry(const std::string& url, const std::string& etag, const std::string& content);
 
@@ -238,6 +236,7 @@ namespace gdl {
 			String aria2c_path_;
 			boost::asio::io_context io_context_;
 			std::atomic_bool engine_is_runing_{false};
+			std::atomic_bool uninited_{false};
 			std::atomic_bool daily_task_timer_is_runing{false};
 			boost::asio::executor_work_guard<boost::asio::io_context::executor_type> work_;
 			DailyTaskTimer daily_task_timer_;
@@ -245,15 +244,13 @@ namespace gdl {
 			std::vector<std::thread> worker_threads_;
 			PubSubSystem<std::string> pub_sub_system_;
 			Aria2cWebSocketClient websocket_client_;
-			std::mutex message_mutex_;
-			std::vector<std::string> message_buffer_;
-			std::chrono::steady_clock::time_point last_flush_time_;
-			boost::asio::steady_timer flush_timer_;
-			static constexpr size_t kMaxBufferSize = 100;
-			static constexpr auto kFlushInterval   = std::chrono::milliseconds(100);
 			std::atomic_int64_t active_num_{0};
 			std::atomic_int64_t waiting_num_{0};
 			std::atomic_int64_t stopped_num_{0};
+			// tracker 同步移出 io 线程（E3）：独立线程执行阻塞 HTTP，Uninit 时 wait
+			std::atomic_bool tracker_sync_running_{false};
+			std::future<void> tracker_sync_future_;
+			std::int64_t aria2c_pid_{-1};  // aria2c 子进程 pid，退出时优雅关闭并回收（S3）
 		};
 	}  // namespace engine
 

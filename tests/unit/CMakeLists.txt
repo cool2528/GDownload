@@ -11,6 +11,7 @@ add_executable(gdownload_unit_tests
     core/test_core_functions.cpp
     engine/test_publish_subscribe_system.cpp
     update/test_update_config.cpp
+    browser/test_download_url_utils.cpp
     utils/test_relaunch_function.cpp
     ${CMAKE_SOURCE_DIR}/src/App/ui/utils/utils.cxx
 )

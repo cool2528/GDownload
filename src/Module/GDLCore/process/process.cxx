@@ -6,8 +6,10 @@
 #include <signal.h>
 #include <spawn.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 #elif defined(__linux__)
+#include <csignal>
 #include <spawn.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -23,6 +25,7 @@ extern char** environ;
 #include <filesystem>
 #include <fstream>
 #include <string_view>
+#include <chrono>
 #include <thread>
 #include "logger.h"
 #include "encoding/encoding.h"
@@ -221,6 +224,46 @@ namespace gdl {
 			if (::kill(static_cast<pid_t>(pid), SIGKILL) != 0) {
 				LOG_ERR("Failed to kill process {}: {}", pid, strerror(errno));
 			}
+#endif
+		}
+
+		void ShutdownProcess(int64_t pid, int grace_ms) {
+#ifdef _WIN32
+			HANDLE hProcess = OpenProcess(SYNCHRONIZE | PROCESS_TERMINATE, FALSE, static_cast<DWORD>(pid));
+			if (hProcess == nullptr) {
+				return;  // 进程可能已退出
+			}
+			// 先给 RPC/stop-with-process 优雅退出的宽限，超时再强杀
+			DWORD wait_result = WaitForSingleObject(hProcess, grace_ms < 0 ? INFINITE : static_cast<DWORD>(grace_ms));
+			if (wait_result == WAIT_TIMEOUT) {
+				TerminateProcess(hProcess, 0);
+				WaitForSingleObject(hProcess, 2000);
+			}
+			CloseHandle(hProcess);
+#else
+			pid_t p = static_cast<pid_t>(pid);
+			const int step = 50;
+			int elapsed = 0;
+			// 轮询等待子进程优雅退出并回收，避免 POSIX 僵尸
+			while (elapsed < grace_ms) {
+				pid_t r = ::waitpid(p, nullptr, WNOHANG);
+				if (r == p || (r == -1 && errno == ECHILD)) {
+					return;
+				}
+				std::this_thread::sleep_for(std::chrono::milliseconds(step));
+				elapsed += step;
+			}
+			// 宽限期满仍未退出：SIGTERM 再等，最后 SIGKILL 阻塞回收
+			::kill(p, SIGTERM);
+			for (int i = 0; i < 30; ++i) {
+				pid_t r = ::waitpid(p, nullptr, WNOHANG);
+				if (r == p || (r == -1 && errno == ECHILD)) {
+					return;
+				}
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			}
+			::kill(p, SIGKILL);
+			::waitpid(p, nullptr, 0);
 #endif
 		}
 

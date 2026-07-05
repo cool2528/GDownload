@@ -6,6 +6,7 @@
 #include <pwd.h>
 #include <cstdlib>
 #include <cstdio>
+#include <fstream>
 #include <limits.h>
 #include <linux/limits.h>
 namespace gdl {
@@ -19,34 +20,62 @@ namespace gdl {
 				return String();
 			}
 
-			String GetUserDocumentsDir() {
-				// 首先检查 XDG_CONFIG_HOME/user-dirs.dirs
+			// 解析 ~/.config/user-dirs.dirs 中的 XDG_XXX_DIR，取不到返回空串（C4）
+			String ParseXdgUserDir(const String& key, const String& home) {
 				const char* xdg_config = getenv("XDG_CONFIG_HOME");
-				String config_dir = xdg_config && *xdg_config == '/' ? 
-					String(xdg_config) : GetUserHomeDir() + "/.config";
-				
-				// 如果找不到配置文件，使用默认路径
-				return GetUserHomeDir() + "/Documents";
+				String config_home = (xdg_config && *xdg_config == '/') ? String(xdg_config) : home + "/.config";
+				std::ifstream file(config_home + "/user-dirs.dirs");
+				if (!file) return String();
+				String line;
+				while (std::getline(file, line)) {
+					if (line.empty() || line[0] == '#') continue;
+					size_t eq = line.find('=');
+					if (eq == String::npos || line.compare(0, eq, key) != 0) continue;
+					String value = line.substr(eq + 1);
+					size_t q1 = value.find('"');
+					size_t q2 = value.rfind('"');
+					if (q1 != String::npos && q2 > q1) value = value.substr(q1 + 1, q2 - q1 - 1);
+					const String home_var = "$HOME";
+					if (value.rfind(home_var, 0) == 0) value = home + value.substr(home_var.size());
+					return value;
+				}
+			return String();
+			}
+
+			String GetUserDocumentsDir() {
+				String home = GetUserHomeDir();
+				String xdg = ParseXdgUserDir("XDG_DOCUMENTS_DIR", home);
+				return xdg.empty() ? home + "/Documents" : xdg;
 			}
 
 			String GetUserDownloadsDir() {
-				return GetUserHomeDir() + "/Downloads";
+				String home = GetUserHomeDir();
+				String xdg = ParseXdgUserDir("XDG_DOWNLOAD_DIR", home);
+				return xdg.empty() ? home + "/Downloads" : xdg;
 			}
 
 			String GetUserDesktopDir() {
-				return GetUserHomeDir() + "/Desktop";
+				String home = GetUserHomeDir();
+				String xdg = ParseXdgUserDir("XDG_DESKTOP_DIR", home);
+				return xdg.empty() ? home + "/Desktop" : xdg;
 			}
 
 			String GetUserVideosDir() {
-				return GetUserHomeDir() + "/Videos";
+				String home = GetUserHomeDir();
+				String xdg = ParseXdgUserDir("XDG_VIDEOS_DIR", home);
+				return xdg.empty() ? home + "/Videos" : xdg;
 			}
 
 			String GetUserMusicDir() {
-				return GetUserHomeDir() + "/Music";
+				String home = GetUserHomeDir();
+				String xdg = ParseXdgUserDir("XDG_MUSIC_DIR", home);
+				return xdg.empty() ? home + "/Music" : xdg;
 			}
 
 			String GetUserPicturesDir() {
-				return GetUserHomeDir() + "/Pictures";
+				String home = GetUserHomeDir();
+				String xdg = ParseXdgUserDir("XDG_PICTURES_DIR", home);
+				return xdg.empty() ? home + "/Pictures" : xdg;
 			}
 
 			String GetAppDataDir() {

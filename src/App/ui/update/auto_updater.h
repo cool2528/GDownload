@@ -46,6 +46,7 @@ namespace gdl {
             bool is_mandatory	 = false;			 // Whether the update is mandatory
             int64_t package_size = 0;				 // Package size (bytes)
             std::string signature;					 // Package signature (for verification)
+            std::string sha256;  // SHA-256 校验和（S2，latest.json 提供时启用）
             std::vector<std::string> changed_files;	 // List of changed files
         };
 

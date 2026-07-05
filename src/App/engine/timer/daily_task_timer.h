@@ -12,13 +12,21 @@ namespace gdl {
 		using DailyTaskTimeOutCallback = std::function<void()>;
 		class DailyTaskTimer {
 		   public:
-			explicit DailyTaskTimer(boost::asio::io_context& io) : io_context_(io), timer_(io_context_) {}
+			explicit DailyTaskTimer(boost::asio::io_context& io)
+				: strand_(boost::asio::make_strand(io)), timer_(strand_) {}
 			void Start(const DailyTaskTimeOutCallback& cb) {
-				timeout_callback_ = cb;
-				boost::asio::post(io_context_, [this] { timeout_callback_(); });
-				Next();
+				// 整体投递到 strand，首个回调与 24h 排程都在 strand 上执行（E2）
+				boost::asio::post(strand_, [this, cb] {
+					timeout_callback_ = cb;
+					if (timeout_callback_) {
+						timeout_callback_();
+					}
+					Next();
+				});
 			}
-			void Stop() { timer_.cancel(); }
+			void Stop() {
+				boost::asio::post(strand_, [this] { timer_.cancel(); });
+			}
 
 		   private:
 			void Next() {
@@ -34,7 +42,7 @@ namespace gdl {
 			}
 
 		   private:
-			boost::asio::io_context& io_context_;
+			boost::asio::strand<boost::asio::io_context::executor_type> strand_;
 			DailyTaskTimeOutCallback timeout_callback_{nullptr};
 			boost::asio::steady_timer timer_;
 		};

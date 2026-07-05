@@ -101,14 +101,18 @@ namespace gdl {
 				QMetaObject::invokeMethod(
 					this,
 					[this, info]() {
-						auto data = new UpdateDataInfo(QString::fromStdString(info.version),
-													   QString::fromStdString(info.download_url),
-													   QString::fromStdString(info.release_notes),
-													   QString::fromStdString(info.release_date), this);
+						// 复用单个信息对象，避免重复检查累积 QObject（M1）
+						if (!update_data_) {
+							update_data_ = new UpdateDataInfo(this);
+						}
+						update_data_->Setversion(QString::fromStdString(info.version));
+						update_data_->Seturl(QString::fromStdString(info.download_url));
+						update_data_->Setrelease_note(QString::fromStdString(info.release_notes));
+						update_data_->Setrelease_date(QString::fromStdString(info.release_date));
 
 						// If silent check and not mandatory update, only emit signal
 						if (silent_check_ && !info.is_mandatory && !config_.silent_mode) {
-							Q_EMIT updateAvailable(data);
+							Q_EMIT updateAvailable(update_data_);
 							return;
 						}
 						// If mandatory update or silent mode enabled, start update automatically
@@ -117,7 +121,7 @@ namespace gdl {
 						}
 						else {
 							// Otherwise just emit signal
-							Q_EMIT updateAvailable(data);
+							Q_EMIT updateAvailable(update_data_);
 						}
 					},
 					Qt::QueuedConnection);
@@ -131,8 +135,14 @@ namespace gdl {
 			auto percentage = progress.percentage;
 			// 使用 QMetaObject::invokeMethod 确保在主线程中创建对象
 			QMetaObject::invokeMethod(this, [this, stage, percentage, message]() {
-				auto data = new UpdateProgressData(stage, percentage, message, this);
-				Q_EMIT updateProgress(data);
+				// 复用单个进度对象，避免每次进度回调 new 一个以单例为父的 QObject 泄漏（M1）
+				if (!progress_data_) {
+					progress_data_ = new UpdateProgressData(this);
+				}
+				progress_data_->Setstage(stage);
+				progress_data_->Setpercentage(percentage);
+				progress_data_->Setmessage(message);
+				Q_EMIT updateProgress(progress_data_);
 			}, Qt::QueuedConnection);
 			
 			// 检查更新是否完成

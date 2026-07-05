@@ -1,6 +1,7 @@
 #pragma once
 #include <QAbstractListModel>
 #include <QVector>
+#include <deque>
 #include <mutex>
 #include "cache/cache.h"
 namespace gdl {
@@ -172,6 +173,7 @@ namespace gdl {
 
 			class DownloadTaskModel : public QAbstractListModel {
 				Q_OBJECT
+				Q_PROPERTY(int count READ GetTaskCount NOTIFY countChanged)  // 供 QML 直接绑定计数（P4）
 			   public:
 				enum Roles {
 					kTaskId = Qt::UserRole + 1,
@@ -207,9 +209,14 @@ namespace gdl {
 				int GetTaskCount() const;
 				bool ContainsTask(const QString& task_id) const;
 
+			   Q_SIGNALS:
+				void countChanged();
+
 			   private:
 				QVector<DownloadTaskInfo> task_lists_;
 				QHash<QString, QString> remove_task_id_;
+				std::deque<QString> remove_order_;  // 墓碑插入顺序，配合上限做 FIFO 淘汰（M2）
+				static constexpr int kMaxTombstones = 512;
 				std::mutex mutex_;
 			};
 		}  // namespace browser
