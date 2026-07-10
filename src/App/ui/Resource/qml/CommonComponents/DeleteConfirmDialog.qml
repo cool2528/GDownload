@@ -20,6 +20,9 @@ GMessageBox {
     // 任务文件名
     property string taskFileName: ""
 
+    // 批量模式：复用同一套删除记录/删除文件的显式选择流程
+    property bool batchMode: false
+
     // 内部属性：跟踪是否删除文件
     property bool deleteFileChecked: false
 
@@ -40,7 +43,9 @@ GMessageBox {
 
     title: qsTr("Delete Confirmation")
     messageType: GMessageBox.Warning
-    message: qsTr("Are you sure you want to delete this download task?")
+    message: batchMode
+             ? qsTr("Are you sure you want to delete all tasks in this list?")
+             : qsTr("Are you sure you want to delete this download task?")
 
     // 自定义内容：文件名显示 + 删除选项
     customContent: Component {
@@ -51,6 +56,7 @@ GMessageBox {
             Rectangle {
                 Layout.fillWidth: true
                 height: GTheme.sizeLarge
+                visible: !root.batchMode
                 color: GTheme.fillLight
                 radius: GTheme.radiusBase
                 border.width: 1
@@ -71,7 +77,9 @@ GMessageBox {
             // 删除文件选项（仅对正在下载和已完成的任务显示）
             GCheckBox {
                 id: deleteFileCheckbox
-                text: qsTr("Also delete downloaded file")
+                text: root.batchMode
+                      ? qsTr("Also delete downloaded files")
+                      : qsTr("Also delete downloaded file")
                 checked: root.deleteFileChecked
                 visible: root.pageType === 0 || root.pageType === 2
 
@@ -93,11 +101,17 @@ GMessageBox {
             Label {
                 text: {
                     if (root.pageType === 1) {
-                        return qsTr("This will only remove the task from the waiting list.")
+                        return root.batchMode
+                               ? qsTr("This will only remove all tasks from the waiting list.")
+                               : qsTr("This will only remove the task from the waiting list.")
                     } else if (root.deleteFileChecked && (root.pageType === 0 || root.pageType === 2)) {
-                        return qsTr("Warning: The downloaded file will be permanently deleted and cannot be recovered!")
+                        return root.batchMode
+                               ? qsTr("Warning: Downloaded files will be permanently deleted and cannot be recovered!")
+                               : qsTr("Warning: The downloaded file will be permanently deleted and cannot be recovered!")
                     } else {
-                        return qsTr("This will only remove the task record. The downloaded file will be kept.")
+                        return root.batchMode
+                               ? qsTr("This will only remove task records. Downloaded files will be kept.")
+                               : qsTr("This will only remove the task record. The downloaded file will be kept.")
                     }
                 }
                 font.pixelSize: GTheme.fontCaption

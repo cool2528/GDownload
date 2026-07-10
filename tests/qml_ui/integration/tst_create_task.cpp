@@ -7,6 +7,7 @@
 #include "FakeBrowserManager.h"
 #include "FakeSettingsManager.h"
 #include "IntegrationHelper.h"
+#include "TestStubs.h"
 
 using namespace gdl::tests;
 
@@ -58,7 +59,7 @@ class TstCreateTask : public QObject {
 		qputenv("GDOWNLOAD_TEST", "1");
 		fakeBrowser_ = new FakeBrowserManager(this);
 		fakeSettings_ = new FakeSettingsManager(this);
-		setupIntegrationEngine(&engine_, fakeBrowser_, fakeSettings_);
+		toastManager_ = setupIntegrationEngine(&engine_, fakeBrowser_, fakeSettings_);
 		// 额外上下文属性:TaskDialogPage 引用 brower_view / ClipboardWatcher / mainWindow
 		stubBrowserView_ = new StubBrowserView(this);
 		stubClipboard_ = new StubClipboardWatcher(this);
@@ -72,6 +73,7 @@ class TstCreateTask : public QObject {
 		fakeBrowser_->clearHistory();
 		fakeBrowser_->setAddTaskResult(true);
 		fakeSettings_->clearHistory();
+		toastManager_->clearHistory();
 		stubBrowserView_->setIndex(-1);
 	}
 
@@ -111,6 +113,65 @@ class TstCreateTask : public QObject {
 
 		const auto options = args.at(1).toMap();
 		QCOMPARE(options.value(QStringLiteral("split")).toString(), QStringLiteral("64"));
+		QCOMPARE(toastManager_->lastType(), QStringLiteral("success"));
+		QVERIFY(!toastManager_->lastMessage().isEmpty());
+	}
+
+	void test_blank_lines_are_trimmed_and_filtered() {
+		QQmlComponent comp(&engine_, QUrl("qrc:/qml/CommonComponents/TaskDialogPage.qml"));
+		QVERIFY2(!comp.isError(), qPrintable(comp.errorString()));
+		QScopedPointer<QObject> dialog(comp.create());
+		QVERIFY2(!dialog.isNull(), "TaskDialogPage 实例化失败");
+
+		auto* inputUrl = dialog->findChild<QQuickItem*>("inputUrl");
+		QVERIFY(inputUrl);
+		inputUrl->setProperty("text",
+						  "  https://example.com/one.zip  \n\n\t\r\n https://example.com/two.zip ");
+		auto* btnCreateTask = dialog->findChild<QQuickItem*>("btnCreateTask");
+		QVERIFY(btnCreateTask);
+		QMetaObject::invokeMethod(btnCreateTask, "clicked");
+
+		QTRY_COMPARE(fakeBrowser_->lastRpcMethod(), QStringLiteral("AddHttpTask"));
+		const auto urls = fakeBrowser_->lastRpcCall().args.at(0).toList();
+		QCOMPARE(urls.size(), 2);
+		QCOMPARE(urls.at(0).toString(), QStringLiteral("https://example.com/one.zip"));
+		QCOMPARE(urls.at(1).toString(), QStringLiteral("https://example.com/two.zip"));
+	}
+
+	void test_empty_url_input_shows_local_error() {
+		QQmlComponent comp(&engine_, QUrl("qrc:/qml/CommonComponents/TaskDialogPage.qml"));
+		QVERIFY2(!comp.isError(), qPrintable(comp.errorString()));
+		QScopedPointer<QObject> dialog(comp.create());
+		QVERIFY2(!dialog.isNull(), "TaskDialogPage 实例化失败");
+
+		auto* inputUrl = dialog->findChild<QQuickItem*>("inputUrl");
+		QVERIFY(inputUrl);
+		inputUrl->setProperty("text", " \n\t\r\n ");
+		auto* btnCreateTask = dialog->findChild<QQuickItem*>("btnCreateTask");
+		QVERIFY(btnCreateTask);
+		QMetaObject::invokeMethod(btnCreateTask, "clicked");
+
+		QTest::qWait(50);
+		QCOMPARE(fakeBrowser_->rpcCallCount(), 0);
+		QCOMPARE(toastManager_->lastType(), QStringLiteral("error"));
+		QVERIFY(!toastManager_->lastMessage().isEmpty());
+	}
+
+	void test_missing_torrent_file_shows_local_error() {
+		QQmlComponent comp(&engine_, QUrl("qrc:/qml/CommonComponents/TaskDialogPage.qml"));
+		QVERIFY2(!comp.isError(), qPrintable(comp.errorString()));
+		QScopedPointer<QObject> dialog(comp.create());
+		QVERIFY2(!dialog.isNull(), "TaskDialogPage 实例化失败");
+		dialog->setProperty("initialTab", 1);
+
+		auto* btnCreateTask = dialog->findChild<QQuickItem*>("btnCreateTask");
+		QVERIFY(btnCreateTask);
+		QMetaObject::invokeMethod(btnCreateTask, "clicked");
+
+		QTest::qWait(50);
+		QCOMPARE(fakeBrowser_->rpcCallCount(), 0);
+		QCOMPARE(toastManager_->lastType(), QStringLiteral("error"));
+		QVERIFY(!toastManager_->lastMessage().isEmpty());
 	}
 
 	void test_addUri_failure_stays_on_dialog() {
@@ -142,6 +203,7 @@ class TstCreateTask : public QObject {
 	StubBrowserView* stubBrowserView_ = nullptr;
 	StubClipboardWatcher* stubClipboard_ = nullptr;
 	QObject* stubMainWindow_ = nullptr;
+	TestToastManager* toastManager_ = nullptr;
 };
 
 QTEST_MAIN(TstCreateTask)

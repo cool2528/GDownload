@@ -114,36 +114,39 @@ Rectangle {
 
             // 删除按钮
             GButton {
+                objectName: "btnDeleteAllTasks"
                 buttonType: "danger"
                 iconSource: SegoeFluentIcons.Delete
                 iconSize: GTheme.fontBody
                 Layout.preferredWidth: GTheme.sizeDefault
                 Layout.preferredHeight: GTheme.sizeDefault
                 onClicked: {
-                    // 删除全部任务不可逆（含文件），需确认后执行
+                    // 默认只删除任务记录；删除文件必须由用户显式勾选
                     deleteAllConfirmDialog.open()
                 }
             }
+        }
+    }
 
-            // 删除全部任务确认对话框
-            Dialog {
-                id: deleteAllConfirmDialog
-                parent: Overlay.overlay  // 以全窗口遮罩为定位父级，避免以按钮簇为父导致弹窗错位(X1)
-                anchors.centerIn: parent
-                modal: true
-                width: 420
-                title: qsTr("Delete Confirmation")
-                standardButtons: Dialog.Cancel | Dialog.Ok
+    DeleteConfirmDialog {
+        id: deleteAllConfirmDialog
+        parent: Overlay.overlay
+        batchMode: true
+        pageType: control.type
 
-                contentItem: Text {
-                    text: qsTr("Are you sure you want to delete all tasks in this list? This action cannot be undone.")
-                    wrapMode: Text.WordWrap
-                    color: GTheme.textPrimary
-                }
+        onActionSelected: function(action) {
+            if (action === DeleteConfirmDialog.Cancel) {
+                return
+            }
 
-                onAccepted: {
-                    BrowserManager.RemoveAllTask(control.type, true)
-                }
+            const shouldDeleteFiles = action === DeleteConfirmDialog.DeleteBoth
+            const removed = BrowserManager.RemoveAllTask(control.type, shouldDeleteFiles)
+            if (removed) {
+                ToastManager.ShowSuccess(shouldDeleteFiles
+                                         ? qsTr("All tasks and downloaded files were removed.")
+                                         : qsTr("All task records were removed."))
+            } else {
+                ToastManager.ShowError(qsTr("Failed to remove all tasks."))
             }
         }
     }

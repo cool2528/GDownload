@@ -10,7 +10,9 @@ Control {
     property int pageType: -1 // 0 downloadPage 1 waitingPage  2 completedPage
     readonly property int taskCount: downloadListView.count
     readonly property int taskCardHeight: 104
+    readonly property int failedTaskCardHeight: 120
     readonly property int taskIconSize: GTheme.sizeLarge
+    readonly property int failedTaskState: 4
 
     background: Rectangle {
         color: GTheme.bgPage
@@ -100,8 +102,9 @@ Control {
             model: downloadView.model
 
             delegate: GCard {
+                readonly property bool failedTask: model.taskState === downloadView.failedTaskState
                 width: downloadListView.width - downloadListView.leftMargin - downloadListView.rightMargin
-                height: downloadView.taskCardHeight
+                height: failedTask ? downloadView.failedTaskCardHeight : downloadView.taskCardHeight
                 padding: GTheme.spaceMD
                 outlined: true
                 hoverEnabled: true
@@ -126,9 +129,9 @@ Control {
                             Layout.preferredHeight: downloadView.taskIconSize
                             Layout.alignment: Qt.AlignVCenter
                             radius: GTheme.radiusMedium
-                            color: GTheme.primaryLight(9)
+                            color: failedTask ? GTheme.dangerLight(9) : GTheme.primaryLight(9)
                             border.width: 1
-                            border.color: GTheme.primaryLight(7)
+                            border.color: failedTask ? GTheme.dangerLight(7) : GTheme.primaryLight(7)
 
                             Text {
                                 anchors.centerIn: parent
@@ -139,7 +142,7 @@ Control {
                                 }
                                 font.pixelSize: GTheme.fontCaption
                                 font.weight: GTheme.weightDemiBold
-                                color: GTheme.primaryColor
+                                color: failedTask ? GTheme.dangerColor : GTheme.primaryColor
                             }
                         }
 
@@ -165,6 +168,28 @@ Control {
                                 font.pixelSize: GTheme.fontCaption
                                 color: GTheme.textSecondary
                                 Layout.fillWidth: true
+                                visible: !failedTask
+                            }
+
+                            Text {
+                                objectName: "taskErrorDetails"
+                                text: {
+                                    const code = String(model.errorCode || "").trim()
+                                    const message = String(model.errorMessage || "").trim()
+                                    if (code.length > 0 && message.length > 0) {
+                                        return qsTr("Error %1: %2").arg(code).arg(message)
+                                    }
+                                    if (message.length > 0) {
+                                        return message
+                                    }
+                                    return qsTr("Download failed")
+                                }
+                                font.pixelSize: GTheme.fontCaption
+                                color: GTheme.textDanger
+                                Layout.fillWidth: true
+                                elide: Text.ElideRight
+                                maximumLineCount: 1
+                                visible: failedTask
                             }
                         }
 
@@ -174,7 +199,7 @@ Control {
 
                             // 开始/恢复按钮
                             GButton {
-                                visible: model.taskState !== 1
+                                visible: model.taskState !== 1 && !failedTask
                                 iconSource: downloadView.pageType === 2 ?
                                            SegoeFluentIcons.OpenFile : SegoeFluentIcons.Play
                                 iconSize: GTheme.fontBody
@@ -189,6 +214,20 @@ Control {
                                         BrowserManager.UnpauseTask(1, model.taskId)
                                     }
                                 }
+                            }
+
+                            // 失败任务重试
+                            GButton {
+                                objectName: "btnRetryTask"
+                                visible: downloadView.pageType === 2
+                                         && failedTask
+                                         && String(model.downloadLink || "").trim().length > 0
+                                text: qsTr("Retry")
+                                buttonType: "primary"
+                                iconSource: SegoeFluentIcons.Refresh
+                                iconSize: GTheme.fontBody
+                                Layout.preferredHeight: GTheme.sizeSmall + GTheme.spaceXS
+                                onClicked: BrowserManager.RetryTask(model.taskId)
                             }
 
                             // 暂停按钮

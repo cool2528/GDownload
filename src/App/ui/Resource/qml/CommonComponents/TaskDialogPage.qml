@@ -245,16 +245,25 @@ Popup {
                     function geturls() {
                         if (currentIndex === 0) {
                             taskPageLayout.urlType = 0
-                            return Utils.splitPath(input.text)
+                            let urls = []
+                            const lines = Utils.splitPath(input.text)
+                            for (let i = 0; i < lines.length; ++i) {
+                                const url = String(lines[i]).trim()
+                                if (url.length > 0) {
+                                    urls.push(url)
+                                }
+                            }
+                            return urls
                         } else {
+                            const path = String(dropTorrent.path || "").trim()
                             taskPageLayout.urlType = 1
-                            let ext = dropTorrent.path.split('.').pop()
+                            let ext = path.split('.').pop().toLowerCase()
                             if (ext === "metalink" || ext === "meta4") {
                                 taskPageLayout.urlType = 1
                             } else {
                                 taskPageLayout.urlType = 2
                             }
-                            return dropTorrent.path
+                            return path
                         }
                     }
 
@@ -380,10 +389,22 @@ Popup {
                             let url = taskPageLayout.geturls()
                             let options = taskPageLayout.getOptions()
                             if (taskPageLayout.urlType === 0) {
+                                if (url.length === 0) {
+                                    ToastManager.ShowError(qsTr("Please enter at least one download URL."))
+                                    return
+                                }
                                 taskAdded = BrowserManager.AddHttpTask(url, options)
                             } else if (taskPageLayout.urlType === 1) {
+                                if (url.length === 0) {
+                                    ToastManager.ShowError(qsTr("Please select a Torrent or Metalink file."))
+                                    return
+                                }
                                 taskAdded = BrowserManager.AddMetalinkTask(url, options)
                             } else if (taskPageLayout.urlType === 2) {
+                                if (url.length === 0) {
+                                    ToastManager.ShowError(qsTr("Please select a Torrent or Metalink file."))
+                                    return
+                                }
                                 taskAdded = BrowserManager.AddTorrentTask(url, options)
                             }
                         } else {
@@ -391,6 +412,9 @@ Popup {
                         }
                         if (!taskAdded) {
                             return
+                        }
+                        if (tabNavigation.currentIndex !== 2) {
+                            ToastManager.ShowSuccess(qsTr("Download task added successfully."))
                         }
                         brower_view.index = 0
                         brower_view.switchDownloadPage(0)

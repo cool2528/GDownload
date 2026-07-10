@@ -3,7 +3,9 @@
 #include <QObject>
 #include <QAbstractListModel>
 #include <QColor>
+#include <QList>
 #include <QModelIndex>
+#include <QPair>
 #include <QPoint>
 #include <QSize>
 #include <QString>
@@ -329,6 +331,8 @@ class TestDownloadTaskModel : public QAbstractListModel {
 		kTaskRemainingTime,
 		kTaskConnections,
 		kTaskDownloadLink,
+		kTaskErrorCode,
+		kTaskErrorMessage,
 	};
 
 	explicit TestDownloadTaskModel(QObject* parent = nullptr) : QAbstractListModel(parent) {}
@@ -354,7 +358,9 @@ class TestDownloadTaskModel : public QAbstractListModel {
 			{kTaskProgress, "progress"},
 			{kTaskRemainingTime, "remainingTime"},
 			{kTaskConnections, "connections"},
-			{kTaskDownloadLink, "downloadLink"}};
+			{kTaskDownloadLink, "downloadLink"},
+			{kTaskErrorCode, "errorCode"},
+			{kTaskErrorMessage, "errorMessage"}};
 	}
 
 	void setRows(const QList<QVariantMap>& rows) {
@@ -398,11 +404,18 @@ class TestBrowserManager : public QObject {
 		});
 
 		stopped_model_.setRows({
-			{{"taskId", "stopped-1"}, {"taskState", 2}, {"fileName", "GDownload-Installer.exe"},
+			{{"taskId", "stopped-1"}, {"taskState", 0}, {"fileName", "GDownload-Installer.exe"},
 			 {"savePath", "C:/Downloads/GDownload-Installer.exe"}, {"totalSize", "86 MB"},
 			 {"currentSize", "86 MB"}, {"downloadSpeed", "0 B/s"}, {"progress", 100},
 			 {"remainingTime", "Completed"}, {"connections", 0},
-			 {"downloadLink", "https://example.com/GDownload-Installer.exe"}},
+			 {"downloadLink", "https://example.com/GDownload-Installer.exe"}, {"errorCode", ""},
+			 {"errorMessage", ""}},
+			{{"taskId", "failed-1"}, {"taskState", 4}, {"fileName", "Linux-Image.iso"},
+			 {"savePath", "C:/Downloads/Linux-Image.iso"}, {"totalSize", "2.4 GB"},
+			 {"currentSize", "312 MB"}, {"downloadSpeed", "0 B/s"}, {"progress", 13},
+			 {"remainingTime", "Stopped"}, {"connections", 0},
+			 {"downloadLink", "https://example.com/Linux-Image.iso"}, {"errorCode", "3"},
+			 {"errorMessage", "Resource not found"}},
 		});
 	}
 
@@ -410,6 +423,10 @@ class TestBrowserManager : public QObject {
 	Q_INVOKABLE QObject* GetWaitingDownloadModel() { return &waiting_model_; }
 	Q_INVOKABLE QObject* GetStopedDownloadModel() { return &stopped_model_; }
 	Q_INVOKABLE void SyncTrackersServerlist() {}
+	Q_INVOKABLE bool RetryTask(const QString& gid) {
+		Q_UNUSED(gid);
+		return true;
+	}
 
    Q_SIGNALS:
 	void sigTrackerUpdateStatus(const QString& status);
@@ -613,15 +630,27 @@ class TestSettingsManager : public QObject {
 					   "Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0");
 };
 
-// ToastManager 桩:ShowXxx 空实现,避免 QML 调用时缺少方法
+// ToastManager 桩:记录 ShowXxx 调用,供集成测试验证用户反馈。
 class TestToastManager : public QObject {
 	Q_OBJECT
    public:
 	explicit TestToastManager(QObject* parent = nullptr) : QObject(parent) {}
-	Q_INVOKABLE void ShowError(const QString& msg) { Q_UNUSED(msg); }
-	Q_INVOKABLE void ShowSuccess(const QString& msg) { Q_UNUSED(msg); }
-	Q_INVOKABLE void ShowWarning(const QString& msg) { Q_UNUSED(msg); }
-	Q_INVOKABLE void ShowInfo(const QString& msg) { Q_UNUSED(msg); }
+	Q_INVOKABLE void ShowError(const QString& msg) { record(QStringLiteral("error"), msg); }
+	Q_INVOKABLE void ShowSuccess(const QString& msg) { record(QStringLiteral("success"), msg); }
+	Q_INVOKABLE void ShowWarning(const QString& msg) { record(QStringLiteral("warning"), msg); }
+	Q_INVOKABLE void ShowInfo(const QString& msg) { record(QStringLiteral("info"), msg); }
+
+	int messageCount() const { return messages_.size(); }
+	QString lastType() const { return messages_.isEmpty() ? QString() : messages_.last().first; }
+	QString lastMessage() const { return messages_.isEmpty() ? QString() : messages_.last().second; }
+	void clearHistory() { messages_.clear(); }
+
+   private:
+	void record(const QString& type, const QString& message) {
+		messages_.append(qMakePair(type, message));
+	}
+
+	QList<QPair<QString, QString>> messages_;
 };
 
 // NetWorkDiskManager 桩:ParseShareUrl 空实现

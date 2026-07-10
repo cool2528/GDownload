@@ -68,6 +68,10 @@ class FakeBrowserManager : public QObject {
 		record(QStringLiteral("UnpauseTask"), {page_index, QVariant(gid)});
 		return true;
 	}
+	Q_INVOKABLE bool RetryTask(const QString& gid) {
+		record(QStringLiteral("RetryTask"), {QVariant(gid)});
+		return retry_task_result_;
+	}
 	Q_INVOKABLE bool PauseAllTask(int page_index) {
 		record(QStringLiteral("PauseAllTask"), {page_index});
 		return true;
@@ -86,9 +90,9 @@ class FakeBrowserManager : public QObject {
 		record(QStringLiteral("RemoveTask"), {page_index, QVariant(gid), is_remove_file});
 		return true;
 	}
-	Q_INVOKABLE bool RemoveAllTask(int page_index, bool is_remove_file = true) {
+	Q_INVOKABLE bool RemoveAllTask(int page_index, bool is_remove_file = false) {
 		record(QStringLiteral("RemoveAllTask"), {page_index, is_remove_file});
-		return true;
+		return remove_all_task_result_;
 	}
 	Q_INVOKABLE bool ForceRemoveTask(const QString& gid) {
 		record(QStringLiteral("ForceRemoveTask"), {QVariant(gid)});
@@ -129,7 +133,7 @@ class FakeBrowserManager : public QObject {
 		Q_UNUSED(is_remove_file);
 		return true;
 	}
-	Q_INVOKABLE bool RemoveAllStopTask(bool is_remove_file = true) {
+	Q_INVOKABLE bool RemoveAllStopTask(bool is_remove_file = false) {
 		Q_UNUSED(is_remove_file);
 		return true;
 	}
@@ -169,6 +173,8 @@ class FakeBrowserManager : public QObject {
 	int rpcCallCount() const { return history_.size(); }
 
 	void setAddTaskResult(bool result) { add_task_result_ = result; }
+	void setRetryTaskResult(bool result) { retry_task_result_ = result; }
+	void setRemoveAllTaskResult(bool result) { remove_all_task_result_ = result; }
 
 	// 清空历史(测试 init 调用)。仅清调用历史,不影响单例状态
 	void clearHistory() { history_.clear(); }
@@ -181,6 +187,8 @@ class FakeBrowserManager : public QObject {
 
 	QList<FakeRpcCall> history_;
 	bool add_task_result_ = true;
+	bool retry_task_result_ = true;
+	bool remove_all_task_result_ = true;
 };
 
 }  // namespace tests
