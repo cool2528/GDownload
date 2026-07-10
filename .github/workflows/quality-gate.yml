@@ -1,0 +1,102 @@
+name: Quality Gate
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows-debug-tests:
+    runs-on: windows-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          submodules: recursive
+
+      - name: Setup Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: 6.10.1
+          arch: win64_msvc2022_64
+          modules: qt3d qtimageformats qtwebsockets qt5compat qtshadertools
+
+      - name: Set QTDIR
+        shell: pwsh
+        run: |
+          $qtDir = if ($env:QT_ROOT_DIR) { $env:QT_ROOT_DIR } else { Split-Path (Split-Path $env:Qt6_DIR -Parent) -Parent }
+          if (-not $qtDir) {
+            throw "QTDIR could not be determined after installing Qt."
+          }
+          "QTDIR=$qtDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Cache vcpkg binary cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ github.workspace }}/vcpkg_installed
+            C:\Users\runneradmin\AppData\Local\vcpkg\archives
+          key: vcpkg-x64-windows-debug-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'custom-triplets/**', 'vcpkg-ports/**') }}
+          restore-keys: |
+            vcpkg-x64-windows-debug-
+            vcpkg-x64-windows-
+
+      - name: Setup vcpkg
+        id: vcpkg
+        uses: johnwason/vcpkg-action@v6
+        env:
+          VCPKG_MAX_CONCURRENCY: 4
+        with:
+          manifest-dir: ${{ github.workspace }}
+          triplet: x64-windows
+          extra-args: >-
+            --overlay-triplets=${{ github.workspace }}/custom-triplets
+            --overlay-ports=${{ github.workspace }}/vcpkg-ports
+          token: ${{ github.token }}
+          github-binarycache: true
+          cache-key: vcpkg-x64-windows-debug
+
+      - name: Setup MSVC Developer Command Prompt
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Configure Debug tests
+        shell: cmd
+        run: |
+          where cl
+          set "CC=cl"
+          set "CXX=cl"
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=%QTDIR% -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00" -DBUILD_TESTS=ON -DGDL_UI_GENERATE_TRANSLATIONS=OFF
+
+      - name: Build Debug
+        run: cmake --build build --config Debug --parallel
+
+      - name: Run tests
+        run: ctest --test-dir build -C Debug --output-on-failure
+
+      - name: Upload QML UI artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qml-ui-${{ github.run_id }}
+          path: build/test_artifacts/qml_ui
+          if-no-files-found: warn
+          retention-days: 14

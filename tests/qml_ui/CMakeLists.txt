@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 
 # QML UI 测试设施:视觉用例(quicktest)+ 集成用例(QtTest C++)+ 共享支持库
-# 详见 docs/superpowers/specs/2026-06-20-qml-ui-test-harness-design.md
+# 使用说明与已知限制见 tests/qml_ui/README.md
 find_package(Qt6 REQUIRED COMPONENTS Test QuickTest Qml Quick)
 
 add_subdirectory(support)
@@ -27,8 +27,20 @@ set_tests_properties(qml_ui_finalize_manifest PROPERTIES
     LABELS qml_ui
     ENVIRONMENT "QML_UI_ARTIFACT_DIR=${CMAKE_BINARY_DIR}/test_artifacts/qml_ui")
 
+# 聚合全部 QML UI 测试二进制，保证便利目标在全新构建目录中也可直接使用。
+add_custom_target(qml_ui_test_binaries
+    DEPENDS
+        qml_ui_visual
+        qml_ui_integration_smoke
+        qml_ui_tst_save_settings
+        qml_ui_tst_create_task
+        qml_ui_tst_close_confirm
+        qml_ui_tst_theme_toggle
+        qml_ui_tst_navigation
+        qml_ui_tst_design_system_contract)
+
 # 一键跑全部 qml_ui 测试的便利目标
 add_custom_target(run_qml_ui_tests
-    COMMAND ${CMAKE_CTEST_COMMAND} -L qml_ui --output-on-failure
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMAND ${CMAKE_CTEST_COMMAND} --test-dir ${CMAKE_BINARY_DIR} -C $<CONFIG> -L qml_ui --output-on-failure
+    DEPENDS qml_ui_test_binaries
     COMMENT "Running QML UI tests")

@@ -61,8 +61,32 @@ add_test(NAME UnitTests COMMAND gdownload_unit_tests)
 # 设置测试属性
 set_tests_properties(UnitTests PROPERTIES
     TIMEOUT 300
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Debug/bin/Debug
+    WORKING_DIRECTORY $<TARGET_FILE_DIR:gdownload_unit_tests>
 )
 
 # 注册目标以便清理
 register_target(gdownload_unit_tests)
+
+# 日志测试会关闭全局 spdlog 注册表，使用独立进程避免污染其它单元测试。
+add_executable(gdownload_logger_tests
+    core/test_logger_lifecycle.cpp
+)
+target_link_libraries(gdownload_logger_tests
+    PRIVATE
+    GTest::gtest
+    GTest::gtest_main
+    Qt6::Core
+    GDLCore
+)
+target_include_directories(gdownload_logger_tests
+    PRIVATE
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/Module/GDLCore
+)
+add_test(NAME CoreLoggerTests COMMAND gdownload_logger_tests)
+set_tests_properties(CoreLoggerTests PROPERTIES
+    TIMEOUT 60
+    WORKING_DIRECTORY $<TARGET_FILE_DIR:gdownload_logger_tests>
+)
+register_target(gdownload_logger_tests)
