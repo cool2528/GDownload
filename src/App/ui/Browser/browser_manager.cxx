@@ -7,6 +7,7 @@
 #include <QQmlEngine>
 #include <nlohmann/json.hpp>
 #include "Aria2CManager/engine_def.h"
+#include "Browser/download_task_utils.h"
 #include "Browser/download_url_utils.h"
 #include "Browser/stopped_task_delete_utils.h"
 #include "Definitions/appDef.h"
@@ -112,114 +113,7 @@ namespace gdl {
 				// 从单个 aria2 任务对象解析出 DownloadTaskInfo,统一 OnHandleAria2Message 与
 				// Aria2QueryByGidTaskInfo 两处重复逻辑。task_id 为空表示对象无有效路径(应跳过)。
 				DownloadTaskInfo ParseAria2TaskObject(const nlohmann::json& object) {
-					DownloadTaskInfo task_info;
-					if (!object.is_object() || !object.contains("gid")) {
-						return task_info;
-					}
-					// aria2 数值字段以字符串下发,容错解析为 0
-					auto parse_ll = [&object](const char* key) -> std::int64_t {
-						if (object.contains(key) && object[key].is_string()) {
-							try {
-								return std::stoll(object[key].get<std::string>());
-							} catch (...) {
-							}
-						}
-						return 0;
-					};
-
-					const std::string status = object.value("status", std::string());
-					const QString task_id = QString::fromStdString(object["gid"].get<std::string>());
-					const std::int64_t completed = parse_ll("completedLength");
-					const std::int64_t connections = parse_ll("connections");
-					const std::int64_t speed = parse_ll("downloadSpeed");
-					const std::int64_t total_length = parse_ll("totalLength");
-
-					// 收集文件路径与下载源
-					QString first_path, download_url;
-					int file_count = 0;
-					if (object.contains("files") && object["files"].is_array()) {
-						const auto& files = object["files"];
-						file_count = static_cast<int>(files.size());
-						for (const auto& file : files) {
-							if (first_path.isEmpty() && file.contains("path")) {
-								first_path = QString::fromStdString(file["path"].get<std::string>());
-							}
-							if (download_url.isEmpty() && file.contains("uris") && file["uris"].is_array()) {
-								for (const auto& uri : file["uris"]) {
-									if (uri.contains("uri")) {
-										download_url = QString::fromStdString(uri["uri"].get<std::string>());
-										break;
-									}
-								}
-							}
-						}
-					}
-
-					// 种子名(多文件任务用作显示名与根目录)
-					QString torrent_name;
-					if (object.contains("bittorrent") && object["bittorrent"].is_object()) {
-						const auto& bt = object["bittorrent"];
-						if (bt.contains("info") && bt["info"].is_object() && bt["info"].contains("name")) {
-							torrent_name = QString::fromStdString(bt["info"]["name"].get<std::string>());
-						}
-					}
-					QString task_dir;
-					if (object.contains("dir")) {
-						task_dir = QString::fromStdString(object["dir"].get<std::string>());
-					}
-
-					QString file_name, save_path;
-					if (file_count > 1) {
-						// 多文件 BT:显示种子名,保存路径落到种子根目录(dir/种子名),"打开目录"落到种子根
-						if (!torrent_name.isEmpty() && !task_dir.isEmpty()) {
-							save_path = task_dir + "/" + torrent_name;
-							file_name = torrent_name;
-						} else if (!task_dir.isEmpty()) {
-							save_path = task_dir;
-							file_name = QFileInfo(first_path).fileName();
-						} else {
-							save_path = first_path;
-							file_name = QFileInfo(first_path).fileName();
-						}
-					} else {
-						// 单文件:沿用第一个文件的完整路径
-						save_path = first_path;
-						file_name = QFileInfo(first_path).fileName();
-					}
-
-					if (save_path.isEmpty()) {
-						file_name = SuggestDownloadFileNameFromUrl(download_url);
-						if (file_name.isEmpty()) {
-							file_name = QStringLiteral("download-%1").arg(task_id);
-						}
-						save_path = task_dir.isEmpty() ? file_name : QDir(task_dir).filePath(file_name);
-					}
-
-					task_info.set_task_id(task_id);
-					task_info.set_task_download_speed(speed);
-					task_info.set_task_current_size(completed);
-					task_info.set_task_total_size(total_length);
-					task_info.set_task_connections(connections);
-					task_info.set_task_file_name(file_name);
-					task_info.set_task_save_path(save_path);
-					task_info.set_task_download_link(download_url);
-
-					if (status == "active") {
-						task_info.set_task_state(TaskState::kActive);
-					} else if (status == "waiting") {
-						task_info.set_task_state(TaskState::kWaiting);
-					} else if (status == "complete") {
-						task_info.set_task_state(TaskState::kComplete);
-					} else if (status == "paused") {
-						task_info.set_task_state(TaskState::kPause);
-					} else if (status == "error") {
-						task_info.set_task_state(TaskState::kError);
-					} else if (status == "removed") {
-						task_info.set_task_state(TaskState::kRemoved);
-					} else {
-						LOG_WARN("Unknown state type: {}", status);
-					}
-					return task_info;
+					return DownloadTaskInfoFromAria2Object(object);
 				}
 			}  // namespace
 
@@ -519,24 +413,27 @@ namespace gdl {
 					}
 				}
 
-				// 从模型中移除任务
+				// 调用 aria2 删除任务
+				const bool removed = engine::Aria2cDownloadManager::Instance()
+									 .CallAria2cMethod(engine::Aria2Method::kRemove, gid.toStdString())
+									 .IsOk();
+				if (!removed) {
+					return false;
+				}
+
+				// kRemove 成功后任务已离开 active/waiting 队列，模型必须立即反映这一事实。
 				if (active_model_) {
 					active_model_->RemoveTaskById(gid);
 				}
 				if (waiting_model_) {
 					waiting_model_->RemoveTaskById(gid);
 				}
-
-				// 调用 aria2 删除任务
-				const auto res = engine::Aria2cDownloadManager::Instance()
-									 .CallAria2cMethod(engine::Aria2Method::kRemove, gid.toStdString())
-									 .IsOk();
-				if (res) {
-					engine::Aria2cDownloadManager::Instance().CallAria2cMethod(
-						engine::Aria2Method::kRemoveDownloadResult, gid.toStdString());
-					if (active_model_) {
-						active_model_->RemoveTaskById(gid);
-					}
+				const bool result_removed = engine::Aria2cDownloadManager::Instance()
+										.CallAria2cMethod(engine::Aria2Method::kRemoveDownloadResult,
+														 gid.toStdString())
+										.IsOk();
+				if (!result_removed) {
+					return false;
 				}
 
 				// 如果需要删除文件
@@ -555,18 +452,20 @@ namespace gdl {
 			bool BrowserManagerImpl::RemoveAllTask(int page_index, bool is_remove_file) {
 				if (page_index == 0) {
 					if (active_model_) {
+						bool all_removed = true;
 						for (const auto& task : active_model_->GetTaskIds()) {
-							RemoveTask(page_index, task, is_remove_file);
+							all_removed = RemoveTask(page_index, task, is_remove_file) && all_removed;
 						}
-						return true;
+						return all_removed;
 					}
 				}
 				else if (page_index == 1) {
 					if (waiting_model_) {
+						bool all_removed = true;
 						for (const auto& task : waiting_model_->GetTaskIds()) {
-							RemoveTask(page_index, task, is_remove_file);
+							all_removed = RemoveTask(page_index, task, is_remove_file) && all_removed;
 						}
-						return true;
+						return all_removed;
 					}
 				}
 				else if (page_index == 2) {
@@ -652,6 +551,53 @@ namespace gdl {
 				}
 
 				QProcess::startDetached(program, args);
+			}
+
+			bool BrowserManagerImpl::RetryTask(const QString& gid) {
+				if (gid.isEmpty()) {
+					Q_EMIT sigErrorMessage(tr("Failed to retry task: missing task id."));
+					return false;
+				}
+				if (!stopped_model_) {
+					Q_EMIT sigErrorMessage(tr("Failed to retry task: stopped task list is not available."));
+					return false;
+				}
+
+				const DownloadTaskInfo* task = stopped_model_->GetTaskById(gid);
+				if (!task) {
+					Q_EMIT sigErrorMessage(tr("Failed to retry task: task was not found."));
+					return false;
+				}
+				if (task->task_state() != TaskState::kError) {
+					Q_EMIT sigErrorMessage(tr("Only failed tasks can be retried."));
+					return false;
+				}
+
+				const auto request = BuildRetryTaskRequest(*task);
+				if (!request.has_value()) {
+					Q_EMIT sigErrorMessage(tr("Failed to retry task: original download link is unavailable."));
+					return false;
+				}
+				if (!AddHttpTask(request->urls, request->options)) {
+					return false;
+				}
+				const bool history_removed =
+					gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
+
+				QString aria2_error;
+				if (!RemoveAria2DownloadResultByGid(gid, &aria2_error)) {
+					LOG_WARN("Retry started but failed to remove old aria2 result gid:{} error:{}",
+							 gid.toStdString(), aria2_error.toStdString());
+				}
+				if (!stopped_model_->RemoveTaskById(gid)) {
+					LOG_WARN("Retry started but failed to remove old stopped task gid:{}", gid.toStdString());
+					return true;
+				}
+				if (!history_removed) {
+					Q_EMIT sigErrorMessage(
+						tr("Retry started, but the old failed task could not be removed from history."));
+				}
+				return true;
 			}
 
 			bool BrowserManagerImpl::RemoveStopTask(const QString& gid, bool is_remove_file) {
@@ -856,33 +802,11 @@ namespace gdl {
 			}
 
 			gdl::cache::DownloadRecord BrowserManagerImpl::DownloadTaskInfoToRecord(const DownloadTaskInfo& info) {
-				gdl::cache::DownloadRecord record;
-				record.completed_time  = std::time(nullptr);
-				record.created_time	   = std::time(nullptr);
-				record.connections	   = info.task_connections();
-				record.download_speed  = info.task_download_speed();
-				record.download_url	   = info.task_download_link().toStdString();
-				record.downloaded_size = info.task_current_size();
-				record.task_id		   = info.task_id().toStdString();
-				record.file_name	   = info.task_file_name().toStdString();
-				record.save_path	   = info.task_save_path().toStdString();
-				record.total_size	   = info.task_total_size();
-				record.state		   = static_cast<gdl::cache::DownloadState>(info.task_state());
-				return record;
+				return DownloadRecordFromTaskInfo(info);
 			}
 
 			DownloadTaskInfo BrowserManagerImpl::DownloadRecordToTaskInfo(const gdl::cache::DownloadRecord& record) {
-				DownloadTaskInfo info;
-				info.set_task_id(QString::fromStdString(record.task_id));
-				info.set_task_file_name(QString::fromStdString(record.file_name));
-				info.set_task_save_path(QString::fromStdString(record.save_path));
-				info.set_task_download_link(QString::fromStdString(record.download_url));
-				info.set_task_current_size(record.downloaded_size);
-				info.set_task_total_size(record.total_size);
-				info.set_task_connections(record.connections);
-				info.set_task_download_speed(record.download_speed);
-				info.set_task_state(static_cast<TaskState>(record.state));
-				return info;
+				return DownloadTaskInfoFromRecord(record);
 			}
 
 			BrowserManagerImpl::BrowserManagerImpl(QObject* parent) : QObject(parent) {
@@ -995,7 +919,7 @@ namespace gdl {
 				for (const auto& record : records) {
 					DownloadTaskInfo info = DownloadRecordToTaskInfo(record);
 					if (stopped_model_ && !stopped_model_->ContainsTask(info.task_id())) {
-						if (QFile::exists(info.task_save_path())) {
+						if (ShouldRestoreHistoryTask(info, QFile::exists(info.task_save_path()))) {
 							stopped_model_->AddTask(info);
 						}
 						else {

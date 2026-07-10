@@ -41,7 +41,7 @@ namespace gdl {
 
 				// 删除任务
 				virtual bool RemoveTask(int page_index, const QString& gid, bool is_remove_file = false) = 0;
-				virtual bool RemoveAllTask(int page_index, bool is_remove_file = true) = 0;
+				virtual bool RemoveAllTask(int page_index, bool is_remove_file = false) = 0;
 				virtual bool ForceRemoveTask(const QString& gid) = 0;
 				virtual bool RemoveDownloadResult(const QString& gid) = 0;
 				virtual bool PurgeDownloadResult() = 0;
@@ -54,9 +54,10 @@ namespace gdl {
 				virtual void OpenFileLocation(const QString& file_path) = 0;
 
 				// 已停止任务的操作
+				virtual bool RetryTask(const QString& gid) = 0;
 				virtual bool RemoveStopTask(const QString& gid, bool is_remove_file = true) = 0;
 				virtual bool RemoveStopTask(int index, bool is_remove_file = true) = 0;
-				virtual bool RemoveAllStopTask(bool is_remove_file = true) = 0;
+				virtual bool RemoveAllStopTask(bool is_remove_file = false) = 0;
 
 				// 刷新任务列表与获取文件预览模型
 				virtual void RefreshTaskList(int page_index) = 0;

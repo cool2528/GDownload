@@ -13,8 +13,8 @@
 namespace gdl {
 namespace tests {
 
-void setupIntegrationEngine(QQmlEngine* engine, FakeBrowserManager* fakeBrowser,
-							FakeSettingsManager* fakeSettings) {
+TestToastManager* setupIntegrationEngine(QQmlEngine* engine, FakeBrowserManager* fakeBrowser,
+										 FakeSettingsManager* fakeSettings) {
 	// 桩单例(非记录类)parent 设为 engine,引擎销毁时自动释放
 	auto* g_theme = new TestGTheme(engine);
 	auto* toast_mgr = new TestToastManager(engine);
@@ -61,6 +61,8 @@ void setupIntegrationEngine(QQmlEngine* engine, FakeBrowserManager* fakeBrowser,
 		// 字体加载失败回退:Windows 11 系统自带
 		engine->rootContext()->setContextProperty("FluentIcons", QStringLiteral("Segoe Fluent Icons"));
 	}
+
+	return toast_mgr;
 }
 
 }  // namespace tests

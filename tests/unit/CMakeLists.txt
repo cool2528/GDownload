@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.18)
 # 添加 GTest（包含 GMock）
 find_package(GTest CONFIG REQUIRED)
 find_package(boost_asio CONFIG REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Qml)
 
 # 创建单元测试主程序
 add_executable(gdownload_unit_tests
@@ -12,8 +13,10 @@ add_executable(gdownload_unit_tests
     engine/test_publish_subscribe_system.cpp
     update/test_update_config.cpp
     browser/test_download_url_utils.cpp
+    browser/test_download_task_utils.cpp
     settings/test_aria2_defaults.cpp
     utils/test_relaunch_function.cpp
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Browser/download_task_model.cxx
     ${CMAKE_SOURCE_DIR}/src/App/ui/utils/utils.cxx
 )
 
@@ -26,6 +29,7 @@ target_link_libraries(gdownload_unit_tests
     GTest::gmock_main
     Qt6::Core
     Qt6::Gui
+    Qt6::Qml
     Qt6::Widgets
     GDLCore
     Boost::asio

@@ -46,6 +46,8 @@ set_tests_properties(qml_ui_integration_smoke PROPERTIES
 set(QML_UI_INTEGRATION_TESTS
     save_settings
     create_task
+    bulk_delete
+    download_failure
     close_confirm
     theme_toggle
     navigation

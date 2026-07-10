@@ -38,6 +38,10 @@ namespace gdl {
 						return QVariant::fromValue(task.task_connections());
                     case kTaskDownloadLink:
                         return QVariant::fromValue(task.task_download_link());
+					case kTaskErrorCode:
+						return QVariant::fromValue(task.task_error_code());
+					case kTaskErrorMessage:
+						return QVariant::fromValue(task.task_error_message());
 					default:
 						return QVariant();
 				}
@@ -60,6 +64,8 @@ namespace gdl {
 				roles[kTaskRemainingTime] = "remainingTime";
 				roles[kTaskConnections]	  = "connections";
                 roles[kTaskDownloadLink]  = "downloadLink";
+				roles[kTaskErrorCode]      = "errorCode";
+				roles[kTaskErrorMessage]   = "errorMessage";
 				return roles;
 			}
 
@@ -100,6 +106,18 @@ namespace gdl {
                             changed = true;
                         }
                         break;
+					case kTaskErrorCode:
+						if (value.canConvert<QString>()) {
+							task.set_task_error_code(value.toString());
+							changed = true;
+						}
+						break;
+					case kTaskErrorMessage:
+						if (value.canConvert<QString>()) {
+							task.set_task_error_message(value.toString());
+							changed = true;
+						}
+						break;
 				}
 
 				if (changed) {
