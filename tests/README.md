@@ -43,39 +43,40 @@ cmake --build build --config Debug
 ### 2. 运行所有测试
 
 ```bash
-# 使用 CMake 运行测试
-cd build
-ctest --output-on-failure
+# 使用 CTest 运行全部测试（兼容 Visual Studio 多配置生成器）
+ctest --test-dir build -C Debug --output-on-failure
 
-# 或者直接运行测试可执行文件
-./Debug/bin/Debug/gdownload_unit_tests
-./Debug/bin/Debug/gdownload_integration_tests
+# 或使用会先构建全部测试二进制的便利目标
+cmake --build build --target run_all_tests --config Debug
 ```
 
 ### 3. 运行特定测试
 
 ```bash
 # 运行单元测试
-./Debug/bin/Debug/gdownload_unit_tests --gtest_filter="UtilsManagerTest.*"
+ctest --test-dir build -C Debug -R "^UnitTests$" --output-on-failure
+
+# 运行独立日志测试
+ctest --test-dir build -C Debug -R "^CoreLoggerTests$" --output-on-failure
 
 # 运行集成测试
-./Debug/bin/Debug/gdownload_integration_tests --gtest_filter="RelaunchAfterExitTest.*"
+ctest --test-dir build -C Debug -R "^IntegrationTests$" --output-on-failure
 
 # 列出所有测试（不运行）
-./Debug/bin/Debug/gdownload_unit_tests --gtest_list_tests
+ctest --test-dir build -C Debug -N
 ```
 
 ### 4. 测试输出选项
 
 ```bash
 # 详细输出
-./Debug/bin/Debug/gdownload_unit_tests --gtest_print_time=1
+ctest --test-dir build -C Debug -V
 
-# 输出到 XML 文件
-./Debug/bin/Debug/gdownload_unit_tests --gtest_output=xml:test_results.xml
+# 失败时显示测试输出
+ctest --test-dir build -C Debug --output-on-failure
 
-# 只运行失败的测试
-./Debug/bin/Debug/gdownload_unit_tests --gtest_filter="*FAILED"
+# 重跑上一次失败的测试
+ctest --test-dir build -C Debug --rerun-failed --output-on-failure
 ```
 
 ## 测试内容
@@ -88,10 +89,9 @@ ctest --output-on-failure
    - 自启动功能
    - RelaunchAfterExit 基础功能
 
-2. **CoreFunctionsTest**: 测试核心模块功能
-   - 日志系统
-   - 配置管理
-   - 版本信息
+2. **CoreConfigurationTest / CoreVersionTest**: 测试配置值转换与生成版本一致性
+
+3. **CoreLoggerTests**: 在独立测试进程中验证日志写入与关闭，避免污染其它测试的全局 spdlog 状态
 
 ### 集成测试 (Integration Tests)
 
@@ -107,7 +107,7 @@ ctest --output-on-failure
 
 ```bash
 # 运行所有测试（详细输出）
-cmake --build build --target run_tests
+cmake --build build --target run_all_tests --config Debug
 
 # 清理测试结果
 cmake --build build --target clean_tests
@@ -174,10 +174,9 @@ TEST_F(MyTest, TestBasicFunctionality) {
 # GitHub Actions 示例
 - name: Run Tests
   run: |
-    cmake -B build -S . -DBUILD_TESTS=ON
-    cmake --build build
-    cd build
-    ctest --output-on-failure --timeout 300
+    cmake -B build -S . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
+    cmake --build build --config Debug
+    ctest --test-dir build -C Debug --output-on-failure --timeout 300
 ```
 
 ## 覆盖率报告

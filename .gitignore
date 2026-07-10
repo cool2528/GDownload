@@ -147,7 +147,11 @@ src/version.h
 
 #translations files
 src/App/ui/Resource/translations/*.qm
-/docs/
+/docs/*
+!/docs/CODEBASE_EXPLORATION_REPORT.md
+!/docs/PROJECT_MEMORY.md
+#local design and planning files
+/docs/superpowers/
 #AI files
 /.claude/
 CLAUDE.md

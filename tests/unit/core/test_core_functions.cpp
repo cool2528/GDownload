@@ -1,27 +1,52 @@
+#include <string>
+
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
-// 这里可以添加对核心模块的测试
-// 例如 GDLCore、日志系统、配置管理等
+#include "Module/GDLCore/config/config_ini.h"
+#include "version.h"
 
-// 示例：测试日志功能
-TEST(CoreFunctionsTest, TestLoggingSystem) {
-    // 这里应该测试日志系统是否正常工作
-    // 由于需要访问内部 API，这个测试可能需要链接到 GDLCore 库
+namespace {
 
-    EXPECT_TRUE(true) << "Placeholder for logging system test";
+TEST(CoreConfigurationTest, ConvertsSupportedScalarValues) {
+    using gdl::config::detail::FromString;
+    using gdl::config::detail::ToStringValue;
+
+    EXPECT_EQ(ToStringValue(std::string("download")), "download");
+    EXPECT_EQ(ToStringValue(true), "true");
+    EXPECT_EQ(ToStringValue(false), "false");
+    EXPECT_EQ(ToStringValue(-42), "-42");
+
+    EXPECT_EQ(FromString<std::string>("download"), std::optional<std::string>("download"));
+    EXPECT_EQ(FromString<int>("-42"), std::optional<int>(-42));
+    EXPECT_EQ(FromString<double>("3.5"), std::optional<double>(3.5));
 }
 
-// 示例：测试配置管理
-TEST(CoreFunctionsTest, TestConfigurationManagement) {
-    // 测试配置文件的读取、写入、验证等
+TEST(CoreConfigurationTest, ParsesBooleanAliasesAndRejectsInvalidValues) {
+    using gdl::config::detail::FromString;
 
-    EXPECT_TRUE(true) << "Placeholder for configuration management test";
+    for (const char* value : {"true", "1", "yes", "on", "TRUE", "On"}) {
+        EXPECT_EQ(FromString<bool>(value), std::optional<bool>(true)) << value;
+    }
+    for (const char* value : {"false", "0", "no", "off", "FALSE", "Off"}) {
+        EXPECT_EQ(FromString<bool>(value), std::optional<bool>(false)) << value;
+    }
+
+    EXPECT_EQ(FromString<bool>("enabled"), std::nullopt);
+    EXPECT_EQ(FromString<int>("not-a-number"), std::nullopt);
+    EXPECT_EQ(FromString<double>("not-a-number"), std::nullopt);
 }
 
-// 示例：测试版本信息
-TEST(CoreFunctionsTest, TestVersionInfo) {
-    // 测试版本信息的获取和格式验证
+TEST(CoreVersionTest, GeneratedVersionStringMatchesNumericComponents) {
+    EXPECT_GE(GDownload_VERSION_MAJOR, 0);
+    EXPECT_GE(GDownload_VERSION_MINOR, 0);
+    EXPECT_GE(GDownload_VERSION_BUILD, 0);
+    EXPECT_FALSE(std::string(GDownload_VERSION_COMMIT).empty());
 
-    EXPECT_TRUE(true) << "Placeholder for version info test";
+    const std::string expected = std::to_string(GDownload_VERSION_MAJOR) + "." +
+                                 std::to_string(GDownload_VERSION_MINOR) + "." +
+                                 std::to_string(GDownload_VERSION_BUILD) + "." +
+                                 std::string(GDownload_VERSION_COMMIT);
+    EXPECT_EQ(std::string(GDownload_VERSION_STRING), expected);
 }
+
+}  // namespace

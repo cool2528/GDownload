@@ -1,6 +1,6 @@
 # QML UI 测试设施
 
-GDownload 的 QML UI 测试设施,覆盖视觉验证与集成验证两类用例,统称为 `qml_ui` 测试集。设计文档:`docs/superpowers/specs/2026-06-20-qml-ui-test-harness-design.md`,实施计划:`docs/superpowers/plans/2026-06-20-qml-ui-test-harness.md`。
+GDownload 的 QML UI 测试设施覆盖视觉验证与集成验证两类用例，统称为 `qml_ui` 测试集。本文档是仓库内长期维护的使用说明与限制清单。
 
 - `visual/` — Qt Quick Test(`.qml`)视觉用例,offscreen 平台截图落盘
 - `integration/` — QtTest C++ 集成用例,加载真实 QML 页面 + Fake 后端,模拟用户操作断言后端行为
@@ -172,7 +172,6 @@ class TstMyScenario : public QObject {
 - **像素 diff 基线 / 视觉回归阈值** — manifest.json 已记 md5,可对基线仓库做 `md5 != baseline` 触发回归告警;进一步可接 ImageMagick `compare` 算 SSIM 阈值。
 - **剪贴板自动识别 URL / 拖入种子 / 批量粘贴用例** — 需 ClipboardWatcher 抽象(见下)。
 - **PluginManager / NetDiskManager / ClipboardWatcher 抽象** — 当前只抽象了 BrowserManager + Settings,后续把插件 / 网盘 / 剪贴板也抽接口 + Fake,才能在集成测试里覆盖更多业务路径。
-- **CI 集成(GitHub Actions、上传 artifact)** — `ctest -L qml_ui` 跑通后把 `test_artifacts/qml_ui/` 打 zip 上传,PR review 可下载对比。
 - **主题对比 HTML 报告** — 把 light/dark 同 case 的两张 PNG 并排嵌入 HTML,方便人工 review 主题一致性。
 
 ## 7. 已知限制

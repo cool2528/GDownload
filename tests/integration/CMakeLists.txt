@@ -51,7 +51,7 @@ add_test(NAME IntegrationTests COMMAND gdownload_integration_tests)
 # 设置测试属性（集成测试可能需要更长时间）
 set_tests_properties(IntegrationTests PROPERTIES
     TIMEOUT 600
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Debug/bin/Debug
+    WORKING_DIRECTORY $<TARGET_FILE_DIR:gdownload_integration_tests>
 )
 
 # 注册目标
