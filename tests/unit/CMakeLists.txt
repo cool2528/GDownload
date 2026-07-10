@@ -9,6 +9,7 @@ find_package(Qt6 REQUIRED COMPONENTS Qml)
 # 创建单元测试主程序
 add_executable(gdownload_unit_tests
     main.cpp
+    core/test_atomic_file_replace.cpp
     core/test_core_functions.cpp
     engine/test_publish_subscribe_system.cpp
     update/test_update_config.cpp
