@@ -9,6 +9,44 @@
 #include "websocket_client.h"
 namespace gdl {
 	namespace engine {
+		thread_local Aria2cWebSocketClient::SynchronizedStateCallback* invoking_state_callback = nullptr;
+
+		void Aria2cWebSocketClient::SynchronizedStateCallback::Set(Callback callback) {
+			std::lock_guard lock(mutex_);
+			callback_ = std::move(callback);
+		}
+
+		void Aria2cWebSocketClient::SynchronizedStateCallback::Clear() {
+			std::unique_lock lock(mutex_);
+			callback_ = {};
+			const bool called_from_callback = invoking_state_callback == this;
+			idle_.wait(lock, [&] { return active_callbacks_ <= (called_from_callback ? 1u : 0u); });
+		}
+
+		void Aria2cWebSocketClient::SynchronizedStateCallback::Invoke(const State& state, std::string message) {
+			Callback callback;
+			{
+				std::lock_guard lock(mutex_);
+				callback = callback_;
+				if (!callback) return;
+				++active_callbacks_;
+			}
+			auto* previous = invoking_state_callback;
+			invoking_state_callback = this;
+			try {
+				callback(state, std::move(message));
+			} catch (...) {
+				invoking_state_callback = previous;
+				std::lock_guard lock(mutex_);
+				--active_callbacks_;
+				idle_.notify_all();
+				throw;
+			}
+			invoking_state_callback = previous;
+			std::lock_guard lock(mutex_);
+			--active_callbacks_;
+			idle_.notify_all();
+		}
 		namespace {
 			std::string BuildRpcToken() {
 				auto rpc_secret = config::GetValue(config::Keys::RpcSecret).AsString();
@@ -53,38 +91,25 @@ namespace gdl {
 		Aria2cWebSocketClient::Aria2cWebSocketClient(const std::string& url, boost::asio::io_context& ioc) : url_(url) {
 			websocket_ = std::make_shared<WebSocketClient>(ioc);
 			callback_state_ = std::make_shared<CallbackState>();
+			state_callback_ = std::make_shared<SynchronizedStateCallback>();
 			auto callback_state = callback_state_;
+			auto state_callback = state_callback_;
 			auto websocket = websocket_;
 			// connected
-			websocket_->setConnectCallback([callback_state, websocket] {
-				std::function<void(const State&, std::string)> cb;
-				{
-					std::lock_guard lock(callback_state->mutex);
-					if (!callback_state->alive.load()) return;
-					cb = callback_state->state_chanage_callback;
-				}
-				if (cb) cb(State::kConnected, "");
+			websocket_->setConnectCallback([callback_state, state_callback, websocket] {
+				if (!callback_state->alive.load()) return;
+				state_callback->Invoke(State::kConnected, "");
 				if (callback_state->alive.load()) RequestVersion(websocket);
 			});
 			// closed
-			websocket_->setDisconnectCallback([callback_state] {
-				std::function<void(const State&, std::string)> cb;
-				{
-					std::lock_guard lock(callback_state->mutex);
-					if (!callback_state->alive.load()) return;
-					cb = callback_state->state_chanage_callback;
-				}
-				if (cb) cb(State::kClosed, "");
+			websocket_->setDisconnectCallback([callback_state, state_callback] {
+				if (!callback_state->alive.load()) return;
+				state_callback->Invoke(State::kClosed, "");
 			});
 			// error message
-			websocket_->setErrorCallback([callback_state](const std::string& error) {
-				std::function<void(const State&, std::string)> cb;
-				{
-					std::lock_guard lock(callback_state->mutex);
-					if (!callback_state->alive.load()) return;
-					cb = callback_state->state_chanage_callback;
-				}
-				if (cb) cb(State::kClosed, error);
+			websocket_->setErrorCallback([callback_state, state_callback](const std::string& error) {
+				if (!callback_state->alive.load()) return;
+				state_callback->Invoke(State::kError, error);
 			});
 			// receive message
 			websocket_->setMessageCallback([callback_state](const std::string& msg) {
@@ -102,9 +127,9 @@ namespace gdl {
 			if (callback_state_) {
 				callback_state_->alive.store(false);
 				std::lock_guard lock(callback_state_->mutex);
-				callback_state_->state_chanage_callback = nullptr;
 				callback_state_->text_message_callback = nullptr;
 			}
+			state_callback_->Clear();
 			websocket_->disconnect();
 		}
 
@@ -123,6 +148,10 @@ namespace gdl {
 		void Aria2cWebSocketClient::Disconnect() {
 			websocket_->disconnect();
 		}
+
+		bool Aria2cWebSocketClient::IsConnected() const { return websocket_->isConnected(); }
+
+		void Aria2cWebSocketClient::DisableAutoReconnect() { websocket_->disableAutoReconnect(); }
 
 		Result<bool> Aria2cWebSocketClient::AddUri(const std::vector<std::string>& uris, const Options& options) {
 			// nlohmann::json params = nlohmann::json::array();
@@ -728,9 +757,10 @@ namespace gdl {
 		}
 
 		void Aria2cWebSocketClient::SetStateChanageCallback(const std::function<void(const State&, std::string)>& cb) {
-			std::lock_guard lock(callback_state_->mutex);
-			callback_state_->state_chanage_callback = cb;
+			state_callback_->Set(cb);
 		}
+
+		void Aria2cWebSocketClient::ClearStateChanageCallback() { state_callback_->Clear(); }
 
 		Result<bool> Aria2cWebSocketClient::Send(const std::string_view& method, rapidjson::Value& params) {
 			// 用局部 Document 而非共享成员 doc_，避免多线程并发 RPC 时对同一 rapidjson::Document

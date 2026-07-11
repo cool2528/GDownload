@@ -1,6 +1,7 @@
 #pragma once
 #include <rapidjson/document.h>
 #include <atomic>
+#include <condition_variable>
 #include <mutex>
 #include <unordered_map>
 #include "Engine_export.h"
@@ -13,12 +14,28 @@ namespace gdl {
 		class Engine_API Aria2cWebSocketClient {
 
 		   public:
+			class Engine_API SynchronizedStateCallback {
+			   public:
+				using Callback = std::function<void(const State&, std::string)>;
+				void Set(Callback callback);
+				void Clear();
+				void Invoke(const State& state, std::string message);
+
+			   private:
+				std::mutex mutex_;
+				std::condition_variable idle_;
+				Callback callback_;
+				size_t active_callbacks_{0};
+			};
+
             explicit Aria2cWebSocketClient(const std::string& url, boost::asio::io_context& ioc);
 			~Aria2cWebSocketClient();
 
 		   public:
 			void Open();
 			void Disconnect();
+			bool IsConnected() const;
+			void DisableAutoReconnect();
 			Result<bool> AddUri(const std::vector<std::string>& uris, const Options& options);
 			Result<bool> AddTorrent(const std::string& torrent, const Options& options);
 			Result<bool> AddMetalink(const std::string& metalink, const Options& options);
@@ -73,6 +90,7 @@ namespace gdl {
 		   public:
 			void SetMessageCallback(const std::function<void(const std::string&)>& cb);
 			void SetStateChanageCallback(const std::function<void(const State&, std::string)>&);
+			void ClearStateChanageCallback();
 
 		   private:
 			void onConnected();
@@ -91,10 +109,10 @@ namespace gdl {
 			struct CallbackState {
 				std::mutex mutex;
 				std::atomic<bool> alive{true};
-				std::function<void(const State&, std::string)> state_chanage_callback{nullptr};
 				std::function<void(const std::string&)> text_message_callback{nullptr};
 			};
 			std::shared_ptr<CallbackState> callback_state_;
+			std::shared_ptr<SynchronizedStateCallback> state_callback_;
 		};
 	}  // namespace engine
 }  // namespace gdl
