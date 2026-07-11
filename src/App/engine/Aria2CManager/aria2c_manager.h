@@ -1,6 +1,7 @@
 #pragma once
 #include <atomic>
 #include <future>
+#include "tracker_sync_gate.h"
 #include <boost/asio.hpp>
 #include "Engine_export.h"
 #include "aria2c_websocket_rpc_client.h"
@@ -248,8 +249,7 @@ namespace gdl {
 			std::atomic_int64_t waiting_num_{0};
 			std::atomic_int64_t stopped_num_{0};
 			// tracker 同步移出 io 线程（E3）：独立线程执行阻塞 HTTP，Uninit 时 wait
-			std::atomic_bool tracker_sync_running_{false};
-			std::future<void> tracker_sync_future_;
+			TrackerSyncGate tracker_sync_gate_;
 			std::int64_t aria2c_pid_{-1};  // aria2c 子进程 pid，退出时优雅关闭并回收（S3）
 		};
 	}  // namespace engine
