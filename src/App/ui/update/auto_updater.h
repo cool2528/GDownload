@@ -39,6 +39,10 @@ namespace gdl {
 
         // Update information
         struct UpdateInfo {
+			std::uint64_t release_id = 0;
+			std::string asset_name;
+			std::int64_t published_at = 0;
+			std::int64_t expires_at = 0;
             std::string version;					 // New version number
             std::string download_url;				 // Download URL
             std::string release_notes;				 // Release notes

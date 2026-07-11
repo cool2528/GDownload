@@ -54,6 +54,10 @@ set(VCPKG_OVERLAY_PORTS "${CMAKE_SOURCE_DIR}/vcpkg-ports")
 # 生成版本头文件
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/src)  # 确保输出目录存在（C1）
 configure_file(${CMAKE_SOURCE_DIR}/version.h.in ${CMAKE_BINARY_DIR}/src/version.h)  # 生成到构建目录，避免污染源码树（C1）
+set(GDOWNLOAD_UPDATE_PUBLIC_KEY_BASE64 "" CACHE STRING "Ed25519 public key for signed update manifests")
+set(GDOWNLOAD_UPDATE_SIGNER_SPKI_PIN "" CACHE STRING "SHA-256 SPKI pin for the Windows update signer")
+configure_file(${CMAKE_SOURCE_DIR}/update_trust_config.h.in
+    ${CMAKE_BINARY_DIR}/src/update_trust_config.h @ONLY)
 
 # 设置依赖库的根路径（仅保留 Sparkle 自动更新框架）
 if(APPLE)

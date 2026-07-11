@@ -7,8 +7,13 @@
 #include <nlohmann/json.hpp>
 
 #include "update/update_manifest.h"
+#include "update/update_url_policy.h"
+#include "update/redirect_chain_controller.h"
 #include "update/update_package_verifier.h"
 #include "update/platform_package_verifier.h"
+#include "update/file_update_rollback_store.h"
+#include "update/installation_gate.h"
+#include "update/update_rollback_store.h"
 
 namespace {
 using namespace gdl::update;
@@ -86,6 +91,13 @@ TEST(UpdateManifestTest, VerifiesSignatureAndPolicyAndRejectsTampering) {
 	EXPECT_FALSE(VerifyUpdateManifest(json.dump(), PublicKeyBase64(key.key), policy).ok);
 }
 
+TEST(UpdateManifestTest, EmptyTrustedKeyFailsClosed) {
+	ManifestPolicy policy{"windows-x64", ".exe", {"github.com"}, 0, 1500};
+	const auto result = VerifyUpdateManifest(ManifestJson().dump(), "", policy);
+	EXPECT_FALSE(result.ok);
+	EXPECT_NE(result.error.find("public key"), std::string::npos);
+}
+
 TEST(UpdateManifestTest, RejectsMalformedExpiredRollbackPlatformHostSchemeSuffixAndDigest) {
 	auto key = GenerateKey();
 	auto check = [&](nlohmann::json json, ManifestPolicy policy) {
@@ -101,6 +113,73 @@ TEST(UpdateManifestTest, RejectsMalformedExpiredRollbackPlatformHostSchemeSuffix
 	json = ManifestJson(); json["asset"]["url"] = "https://evil.example/a.exe"; EXPECT_FALSE(check(json, policy));
 	json = ManifestJson(); json["asset"]["name"] = "a.zip"; EXPECT_FALSE(check(json, policy));
 	json = ManifestJson(); json["asset"]["sha256"] = "bad"; EXPECT_FALSE(check(json, policy));
+}
+
+TEST(UpdateManifestTest, RejectsNonDefaultHttpsPort) {
+	auto key = GenerateKey();
+	auto json = ManifestJson();
+	json["asset"]["url"] = "https://github.com:444/cool2528/GDownload/releases/download/v1.2.3/GDownload.exe";
+	json["signature"] = Sign(key.key, CanonicalizeManifest(json.dump()).value());
+	ManifestPolicy policy{"windows-x64", ".exe", {"github.com"}, 41, 1500};
+
+	EXPECT_FALSE(VerifyUpdateManifest(json.dump(), PublicKeyBase64(key.key), policy).ok);
+}
+
+TEST(UpdateUrlPolicyTest, AcceptsOnlyExactAllowedHttpsHosts) {
+	const std::vector<std::string> allowed_hosts{"github.com"};
+
+	EXPECT_TRUE(ValidateDownloadUrl("https://github.com/release.exe", allowed_hosts));
+	EXPECT_TRUE(ValidateDownloadUrl("HTTPS://GITHUB.COM:443/release.exe", allowed_hosts));
+	EXPECT_FALSE(ValidateDownloadUrl("http://github.com/release.exe", allowed_hosts));
+	EXPECT_FALSE(ValidateDownloadUrl("https://github.com.evil.example/release.exe", allowed_hosts));
+	EXPECT_FALSE(ValidateDownloadUrl("https://evil.example/release.exe", allowed_hosts));
+}
+
+TEST(UpdateUrlPolicyTest, RejectsUserinfoAndNonDefaultPorts) {
+	const std::vector<std::string> allowed_hosts{"github.com"};
+
+	EXPECT_FALSE(ValidateDownloadUrl("https://github.com@evil.example/release.exe", allowed_hosts));
+	EXPECT_FALSE(ValidateDownloadUrl("https://evil.example@github.com/release.exe", allowed_hosts));
+	EXPECT_FALSE(ValidateDownloadUrl("https://github.com:444/release.exe", allowed_hosts));
+	EXPECT_TRUE(ValidateDownloadUrl("https://github.com:/release.exe", allowed_hosts));
+}
+
+TEST(UpdateUrlPolicyTest, RedirectDecisionRejectsUntrustedTargets) {
+	const std::vector<std::string> allowed_hosts{"github.com"};
+
+	EXPECT_EQ(DecideDownloadRedirect("https://github.com:443/next.exe", allowed_hosts),
+		RedirectDecision::kFollow);
+	EXPECT_EQ(DecideDownloadRedirect("https://evil.example/payload.exe", allowed_hosts),
+		RedirectDecision::kReject);
+	EXPECT_EQ(DecideDownloadRedirect("https://github.com@evil.example/payload.exe", allowed_hosts),
+		RedirectDecision::kReject);
+}
+
+TEST(RedirectChainControllerTest, ResolvesRelativeRedirectAndValidatesTarget) {
+	RedirectChainController chain("https://github.com/releases/latest/app.exe", {"github.com"});
+	const auto result = chain.Follow("../download/app.exe");
+	ASSERT_EQ(result.decision, RedirectChainDecision::kFollow);
+	EXPECT_EQ(result.url, "https://github.com/releases/download/app.exe");
+}
+
+TEST(RedirectChainControllerTest, RejectsUntrustedAndMalformedRedirects) {
+	RedirectChainController chain("https://github.com/releases/app.exe", {"github.com"});
+	EXPECT_EQ(chain.Follow("https://evil.example/app.exe").decision, RedirectChainDecision::kReject);
+	EXPECT_EQ(chain.Follow("http://github.com/app.exe").decision, RedirectChainDecision::kReject);
+}
+
+TEST(RedirectChainControllerTest, RejectsRedirectLoops) {
+	RedirectChainController chain("https://github.com/a", {"github.com"});
+	ASSERT_EQ(chain.Follow("/b").decision, RedirectChainDecision::kFollow);
+	EXPECT_EQ(chain.Follow("/a").decision, RedirectChainDecision::kLoop);
+}
+
+TEST(RedirectChainControllerTest, AllowsAtMostFiveRedirects) {
+	RedirectChainController chain("https://github.com/0", {"github.com"});
+	for (int index = 1; index <= 5; ++index) {
+		EXPECT_EQ(chain.Follow("/" + std::to_string(index)).decision, RedirectChainDecision::kFollow);
+	}
+	EXPECT_EQ(chain.Follow("/6").decision, RedirectChainDecision::kTooManyRedirects);
 }
 
 TEST(UpdatePackageVerifierTest, ParsesStrictGithubDigest) {
@@ -137,5 +216,194 @@ TEST(PlatformPackageVerifierTest, SignerPinIsStrictAndFailClosed) {
 	EXPECT_FALSE(SignerPinMatches({}, hex));
 	EXPECT_FALSE(SignerPinMatches("sha256:" + std::string(64, 'a'), hex));
 	EXPECT_FALSE(SignerPinMatches(hex, hex));
+}
+
+class FakePlatformPackageVerifier final : public IPlatformPackageVerifier {
+   public:
+	PackageVerificationResult Verify(const std::filesystem::path& package,
+		const std::string& expected_signer_pin) const override {
+		++verify_count;
+		last_package = package;
+		last_signer_pin = expected_signer_pin;
+		return result;
+	}
+
+	mutable int verify_count{0};
+	mutable std::filesystem::path last_package;
+	mutable std::string last_signer_pin;
+	PackageVerificationResult result{true, {}};
+};
+
+class FakeInstallerLauncher final : public IInstallerLauncher {
+   public:
+	InstallationResult LaunchAndWait(const std::filesystem::path& package, std::stop_token) override {
+		++launch_count;
+		last_package = package;
+		if (on_launch) on_launch();
+		return result;
+	}
+
+	int launch_count{0};
+	std::filesystem::path last_package;
+	InstallationResult result{InstallationStatus::kSucceeded, 0, {}};
+	std::function<void()> on_launch;
+};
+
+class FakeUpdateRollbackStore final : public IUpdateRollbackStore {
+   public:
+	RollbackPersistenceResult AcquireInstallationLease() override { return lease_result; }
+	void ReleaseInstallationLease() override { ++release_count; }
+	RollbackReadResult HighestReleaseId() const override {
+		const auto index = read_count++;
+		if (index < read_results.size()) return read_results[index];
+		return {true, highest_release_id, {}};
+	}
+	RollbackPersistenceResult PersistHighestReleaseId(std::uint64_t release_id) override {
+		++persist_count;
+		highest_release_id = release_id;
+		return persist_result;
+	}
+
+	std::uint64_t highest_release_id{0};
+	int persist_count{0};
+	RollbackPersistenceResult persist_result{true, {}};
+	RollbackPersistenceResult lease_result{true, {}};
+	int release_count{0};
+	mutable std::size_t read_count{0};
+	std::vector<RollbackReadResult> read_results;
+};
+
+class InstallationGateTest : public testing::Test {
+   protected:
+	void SetUp() override {
+		directory = std::filesystem::temp_directory_path() / "gdownload-installation-gate";
+		std::filesystem::create_directories(directory);
+		package = directory / "package.exe";
+		{
+			std::ofstream out(package, std::ios::binary);
+			out << "good";
+		}
+		digest = ComputeFileSha256(package).value();
+	}
+
+	void TearDown() override { std::filesystem::remove_all(directory); }
+
+	std::filesystem::path directory;
+	std::filesystem::path package;
+	std::string digest;
+	FakePlatformPackageVerifier platform_verifier;
+	FakeInstallerLauncher launcher;
+	FakeUpdateRollbackStore rollback_store;
+};
+
+TEST_F(InstallationGateTest, SuccessfulInstallationLaunchesOnceAndPersistsReleaseId) {
+	InstallationGate gate(platform_verifier, launcher, rollback_store);
+
+	EXPECT_TRUE(gate.Install(package, 4, digest, "sha256:signer", 42).Succeeded());
+	EXPECT_EQ(platform_verifier.verify_count, 1);
+	EXPECT_EQ(launcher.launch_count, 1);
+	EXPECT_EQ(rollback_store.persist_count, 1);
+	EXPECT_EQ(rollback_store.HighestReleaseId().value, 42);
+}
+
+TEST_F(InstallationGateTest, PlatformVerificationFailureDoesNotLaunchOrPersist) {
+	platform_verifier.result = {false, "untrusted signer"};
+	InstallationGate gate(platform_verifier, launcher, rollback_store);
+
+	EXPECT_FALSE(gate.Install(package, 4, digest, "sha256:signer", 42).Succeeded());
+	EXPECT_EQ(launcher.launch_count, 0);
+	EXPECT_EQ(rollback_store.persist_count, 0);
+}
+
+TEST_F(InstallationGateTest, LauncherFailureDoesNotPersist) {
+	launcher.result = {InstallationStatus::kLaunchFailed, 0, "failed to start"};
+	InstallationGate gate(platform_verifier, launcher, rollback_store);
+
+	EXPECT_FALSE(gate.Install(package, 4, digest, "sha256:signer", 42).Succeeded());
+	EXPECT_EQ(launcher.launch_count, 1);
+	EXPECT_EQ(rollback_store.persist_count, 0);
+}
+
+TEST_F(InstallationGateTest, NonZeroExitAndTimeoutDoNotPersist) {
+	InstallationGate gate(platform_verifier, launcher, rollback_store);
+	launcher.result = {InstallationStatus::kCancelledOrNonZero, 7, "non-zero exit"};
+	EXPECT_FALSE(gate.Install(package, 4, digest, "sha256:signer", 42).Succeeded());
+	EXPECT_EQ(rollback_store.persist_count, 0);
+	launcher.result = {InstallationStatus::kTimedOut, 0, "timed out"};
+	EXPECT_FALSE(gate.Install(package, 4, digest, "sha256:signer", 42).Succeeded());
+	EXPECT_EQ(rollback_store.persist_count, 0);
+}
+
+TEST_F(InstallationGateTest, ConcurrentHigherReleasePreventsLaunch) {
+	rollback_store.highest_release_id = 50;
+	InstallationGate gate(platform_verifier, launcher, rollback_store);
+	const auto result = gate.Install(package, 4, digest, "sha256:signer", 42);
+	EXPECT_EQ(result.status, InstallationStatus::kRollbackRejected);
+	EXPECT_EQ(launcher.launch_count, 0);
+}
+
+TEST_F(InstallationGateTest, HigherReleaseAppearingDuringInstallIsNotLowered) {
+	launcher.on_launch = [&] { rollback_store.highest_release_id = 100; };
+	InstallationGate gate(platform_verifier, launcher, rollback_store);
+	EXPECT_TRUE(gate.Install(package, 4, digest, "sha256:signer", 42).Succeeded());
+	EXPECT_EQ(rollback_store.HighestReleaseId().value, 100);
+}
+
+TEST_F(InstallationGateTest, PersistenceFailureIsVisible) {
+	rollback_store.persist_result = {false, "sync failed"};
+	InstallationGate gate(platform_verifier, launcher, rollback_store);
+	const auto result = gate.Install(package, 4, digest, "sha256:signer", 42);
+	EXPECT_EQ(result.status, InstallationStatus::kPersistenceFailed);
+	EXPECT_FALSE(result.Succeeded());
+}
+
+TEST_F(InstallationGateTest, LeaseAcquisitionFailurePreventsLaunch) {
+	rollback_store.lease_result = {false, "locked"};
+	InstallationGate gate(platform_verifier, launcher, rollback_store);
+	const auto result = gate.Install(package, 4, digest, "sha256:signer", 42);
+	EXPECT_EQ(result.status, InstallationStatus::kPersistenceFailed);
+	EXPECT_EQ(launcher.launch_count, 0);
+}
+
+TEST_F(InstallationGateTest, RollbackPreReadFailurePreventsLaunch) {
+	rollback_store.read_results = {{false, 0, "corrupt rollback state"}};
+	InstallationGate gate(platform_verifier, launcher, rollback_store);
+	const auto result = gate.Install(package, 4, digest, "sha256:signer", 42);
+	EXPECT_EQ(result.status, InstallationStatus::kRollbackStateFailed);
+	EXPECT_EQ(launcher.launch_count, 0);
+	EXPECT_EQ(rollback_store.persist_count, 0);
+}
+
+TEST_F(InstallationGateTest, RollbackPostReadFailureIsVisibleAndDoesNotPersist) {
+	rollback_store.read_results = {{true, 0, {}}, {false, 0, "rollback reread failed"}};
+	InstallationGate gate(platform_verifier, launcher, rollback_store);
+	const auto result = gate.Install(package, 4, digest, "sha256:signer", 42);
+	EXPECT_EQ(result.status, InstallationStatus::kRollbackStateFailed);
+	EXPECT_EQ(launcher.launch_count, 1);
+	EXPECT_EQ(rollback_store.persist_count, 0);
+}
+
+TEST(FileUpdateRollbackStoreTest, StrictlyReadsAndAtomicallyPersistsMonotonicReleaseId) {
+	const auto root = std::filesystem::temp_directory_path() / "gdownload-file-rollback-store";
+	std::filesystem::remove_all(root);
+	const auto path = root / "highest_release_id";
+	FileUpdateRollbackStore store(path);
+	EXPECT_EQ(store.HighestReleaseId().value, 0);
+	ASSERT_TRUE(store.PersistHighestReleaseId(42).ok);
+	EXPECT_EQ(store.HighestReleaseId().value, 42);
+	ASSERT_TRUE(store.PersistHighestReleaseId(7).ok);
+	EXPECT_EQ(store.HighestReleaseId().value, 42);
+	{ std::ofstream output(path, std::ios::trunc); output << "42junk\n"; }
+	EXPECT_FALSE(store.HighestReleaseId().ok);
+	std::filesystem::remove_all(root);
+}
+
+TEST(FileUpdateRollbackStoreTest, DirectoryAtStatePathFailsClosed) {
+	const auto root = std::filesystem::temp_directory_path() / "gdownload-file-rollback-store-dir";
+	std::filesystem::remove_all(root);
+	std::filesystem::create_directories(root / "highest_release_id");
+	FileUpdateRollbackStore store(root / "highest_release_id");
+	EXPECT_FALSE(store.HighestReleaseId().ok);
+	std::filesystem::remove_all(root);
 }
 }  // namespace

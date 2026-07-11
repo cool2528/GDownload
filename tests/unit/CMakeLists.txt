@@ -145,6 +145,7 @@ register_target(gdownload_aria2_lifecycle_tests)
 
 add_executable(gdownload_update_trust_tests
     update/test_update_trust.cpp
+	${CMAKE_SOURCE_DIR}/src/App/ui/update/file_update_rollback_store.cpp
 )
 find_package(OpenSSL REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
@@ -153,9 +154,11 @@ target_link_libraries(gdownload_update_trust_tests PRIVATE
     GTest::gtest_main
     GDLCore
     OpenSSL::Crypto
+	Qt6::Core
     nlohmann_json::nlohmann_json
 )
 target_include_directories(gdownload_update_trust_tests PRIVATE
+	${CMAKE_SOURCE_DIR}/src/App/ui
     ${CMAKE_SOURCE_DIR}/src/Module/GDLCore
 )
 add_test(NAME UpdateTrustTests COMMAND gdownload_update_trust_tests)

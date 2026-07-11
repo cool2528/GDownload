@@ -1,5 +1,7 @@
 #include "update_manifest.h"
 
+#include "update_url_policy.h"
+
 #include <algorithm>
 #include <cctype>
 #include <memory>
@@ -25,17 +27,6 @@ namespace gdl::update {
 			return value.size() == 64 && std::all_of(value.begin(), value.end(), [](unsigned char c) {
 				return std::isxdigit(c) != 0;
 			});
-		}
-
-		std::optional<std::string> HttpsHost(const std::string& url) {
-			constexpr std::string_view prefix = "https://";
-			if (!url.starts_with(prefix)) return std::nullopt;
-			const auto begin = prefix.size();
-			const auto end = url.find_first_of("/:?#", begin);
-			if (end == begin) return std::nullopt;
-			std::string host = url.substr(begin, end == std::string::npos ? end : end - begin);
-			std::transform(host.begin(), host.end(), host.begin(), [](unsigned char c) { return std::tolower(c); });
-			return host;
 		}
 
 		bool VerifyEd25519(const std::string& message, const std::string& signature_base64,
@@ -90,8 +81,7 @@ namespace gdl::update {
 			if (manifest.asset.size <= 0 || !IsSha256(manifest.asset.sha256)) return fail("invalid update asset digest");
 			if (!policy.expected_asset_suffix.empty() && !manifest.asset.name.ends_with(policy.expected_asset_suffix))
 				return fail("wrong update asset type");
-			auto host = HttpsHost(manifest.asset.url);
-			if (!host || std::find(policy.allowed_hosts.begin(), policy.allowed_hosts.end(), *host) == policy.allowed_hosts.end())
+			if (!ValidateDownloadUrl(manifest.asset.url, policy.allowed_hosts))
 				return fail("update asset host is not allowed");
 			return {true, {}, std::move(manifest)};
 		} catch (...) { return fail("malformed update manifest"); }

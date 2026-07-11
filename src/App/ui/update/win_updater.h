@@ -6,7 +6,12 @@
 #include <QProcess>
 #include <atomic>
 #include <memory>
+#include <mutex>
+#include <thread>
 #include "auto_updater.h"
+#include "update/installation_gate.h"
+#include "update/platform_package_verifier.h"
+#include "update/update_rollback_store.h"
 
 namespace gdl {
     namespace update {
@@ -14,6 +19,9 @@ namespace gdl {
         class WinUpdater : public AutoUpdater {
            public:
             WinUpdater();
+			WinUpdater(std::unique_ptr<IPlatformPackageVerifier> verifier,
+				std::unique_ptr<IInstallerLauncher> launcher,
+				std::unique_ptr<IUpdateRollbackStore> rollback_store);
             ~WinUpdater() override;
 
             bool Initialize(const UpdateConfig& config) override;
@@ -40,6 +48,11 @@ namespace gdl {
             std::atomic<bool> update_available_{false};
             std::atomic<bool> update_in_progress_{false};
             std::atomic<bool> download_failed_notified_{false};
+			std::unique_ptr<IPlatformPackageVerifier> platform_verifier_;
+			std::unique_ptr<IInstallerLauncher> installer_launcher_;
+			std::unique_ptr<IUpdateRollbackStore> rollback_store_;
+			std::jthread installation_thread_;
+			mutable std::mutex error_mutex_;
         };
 
     }  // namespace update
