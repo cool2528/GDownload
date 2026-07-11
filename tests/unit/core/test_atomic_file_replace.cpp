@@ -1,13 +1,17 @@
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <iterator>
 #include <ostream>
 #include <stdexcept>
+#include <streambuf>
 #include <string>
 
 #include <gtest/gtest.h>
 #include <QTemporaryDir>
+#include <toml++/toml.h>
 
+#include "Module/GDLCore/config/detail/toml_config_save.h"
 #include "Module/GDLCore/filesystem/atomic_file_replace.h"
 #ifdef _WIN32
 #include "Module/GDLCore/filesystem/detail/atomic_file_replace_windows_detail.h"
@@ -38,6 +42,42 @@ namespace {
 #else
 		return std::filesystem::path(temporaryDirectory.path().toUtf8().toStdString());
 #endif
+	}
+
+	class FailingStreamBuffer final : public std::streambuf {
+	   public:
+		explicit FailingStreamBuffer(std::size_t acceptedBytes) : acceptedBytes_(acceptedBytes) {}
+
+	   protected:
+		std::streamsize xsputn(const char*, std::streamsize count) override {
+			const auto remaining = acceptedBytes_ - writtenBytes_;
+			const auto accepted = static_cast<std::streamsize>(
+				std::min<std::size_t>(remaining, static_cast<std::size_t>(count)));
+			writtenBytes_ += static_cast<std::size_t>(accepted);
+			return accepted;
+		}
+
+		int_type overflow(int_type character) override {
+			if (traits_type::eq_int_type(character, traits_type::eof()) || writtenBytes_ >= acceptedBytes_) {
+				return traits_type::eof();
+			}
+			++writtenBytes_;
+			return character;
+		}
+
+	   private:
+		std::size_t acceptedBytes_{};
+		std::size_t writtenBytes_{};
+	};
+
+	void WriteOldTomlConfig(const std::filesystem::path& path) {
+		std::ofstream output(path, std::ios::binary);
+		output << "[general]\nvalue = \"old-value\"\n";
+	}
+
+	void ExpectOldTomlConfig(const std::filesystem::path& path) {
+		const auto parsed = toml::parse_file(path.string());
+		EXPECT_EQ(parsed["general"]["value"].value<std::string>(), "old-value");
 	}
 
 #ifndef _WIN32
@@ -121,6 +161,30 @@ namespace {
 		EXPECT_EQ(ReadText(target), "old-content");
 	}
 
+	TEST(AtomicFileReplaceTest, TomlWriterFailureKeepsPreviouslyParsableConfig) {
+		QTemporaryDir temporaryDirectory;
+		ASSERT_TRUE(temporaryDirectory.isValid());
+		const auto target = TemporaryRootPath(temporaryDirectory) / "settings.toml";
+		WriteOldTomlConfig(target);
+		const toml::table replacement{{"general", toml::table{{"value", "new-value"}}}};
+
+		const auto result = gdl::config::detail::SaveTomlAtomically(
+			target, replacement,
+			[](const std::filesystem::path& path, const gdl::filesystem::AtomicFileWriter& writer) {
+				return gdl::filesystem::AtomicFileReplace(
+					path, [&writer](std::ostream&) {
+						FailingStreamBuffer buffer(8);
+						std::ostream output(&buffer);
+						return writer(output);
+					});
+			});
+
+		ASSERT_FALSE(result);
+		EXPECT_EQ(result.GetError().Code(),
+				  static_cast<std::int64_t>(gdl::filesystem::AtomicFileReplaceError::kWrite));
+		EXPECT_NO_THROW(ExpectOldTomlConfig(target));
+	}
+
 	TEST(AtomicFileReplaceTest, WriterExceptionPreservesExistingContentAndCleansTemporaryFile) {
 		QTemporaryDir temporaryDirectory;
 		ASSERT_TRUE(temporaryDirectory.isValid());
@@ -171,6 +235,29 @@ namespace {
 		const auto fileCount =
 			std::distance(std::filesystem::directory_iterator(directory), std::filesystem::directory_iterator());
 		EXPECT_EQ(fileCount, 1);
+	}
+
+	TEST(AtomicFileReplaceTest, TomlReplacementFailureKeepsPreviouslyParsableConfig) {
+		QTemporaryDir temporaryDirectory;
+		ASSERT_TRUE(temporaryDirectory.isValid());
+		const auto target = TemporaryRootPath(temporaryDirectory) / "settings.toml";
+		WriteOldTomlConfig(target);
+		const toml::table replacement{{"general", toml::table{{"value", "new-value"}}}};
+
+		const HANDLE lockedTarget = CreateFileW(target.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+											FILE_ATTRIBUTE_NORMAL, nullptr);
+		ASSERT_NE(lockedTarget, INVALID_HANDLE_VALUE);
+		const auto result = gdl::config::detail::SaveTomlAtomically(
+			target, replacement,
+			[](const std::filesystem::path& path, const gdl::filesystem::AtomicFileWriter& writer) {
+				return gdl::filesystem::AtomicFileReplace(path, writer);
+			});
+		CloseHandle(lockedTarget);
+
+		ASSERT_FALSE(result);
+		EXPECT_EQ(result.GetError().Code(),
+				  static_cast<std::int64_t>(gdl::filesystem::AtomicFileReplaceError::kReplace));
+		EXPECT_NO_THROW(ExpectOldTomlConfig(target));
 	}
 #endif
 
