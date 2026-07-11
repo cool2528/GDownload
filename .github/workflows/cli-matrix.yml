@@ -6,6 +6,9 @@ on:
       - '*'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 # 并发控制:按 ref(tag / 手动触发)分组,重复触发同一 ref 时取消旧运行,
 # 避免重复占用 runner。按 ref 分组而非全局,确保不同 tag 的发布互不打断,
 # 不会因新推一个 tag 而掐断另一个正在进行的发布构建(防止半成品 release)。
@@ -14,6 +17,49 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  validate-release-inputs:
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate signing inputs
+        env:
+          UPDATE_MANIFEST_ED25519_PRIVATE_KEY: ${{ secrets.UPDATE_MANIFEST_ED25519_PRIVATE_KEY }}
+          UPDATE_MANIFEST_ED25519_PUBLIC_KEY: ${{ vars.UPDATE_MANIFEST_ED25519_PUBLIC_KEY }}
+          WINDOWS_SIGNING_CERT_PFX_BASE64: ${{ secrets.WINDOWS_SIGNING_CERT_PFX_BASE64 }}
+          WINDOWS_SIGNING_CERT_PASSWORD: ${{ secrets.WINDOWS_SIGNING_CERT_PASSWORD }}
+          UPDATE_WINDOWS_SIGNER_SPKI_SHA256: ${{ secrets.UPDATE_WINDOWS_SIGNER_SPKI_SHA256 }}
+          APPIMAGE_GPG_PRIVATE_KEY: ${{ secrets.APPIMAGE_GPG_PRIVATE_KEY }}
+          APPIMAGE_GPG_FINGERPRINT: ${{ secrets.APPIMAGE_GPG_FINGERPRINT }}
+        run: |
+          required=(
+            UPDATE_MANIFEST_ED25519_PRIVATE_KEY
+            UPDATE_MANIFEST_ED25519_PUBLIC_KEY
+            WINDOWS_SIGNING_CERT_PFX_BASE64
+            WINDOWS_SIGNING_CERT_PASSWORD
+            UPDATE_WINDOWS_SIGNER_SPKI_SHA256
+            APPIMAGE_GPG_PRIVATE_KEY
+            APPIMAGE_GPG_FINGERPRINT
+          )
+          for name in "${required[@]}"; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "Missing required release input: ${name}" >&2
+              exit 1
+            fi
+          done
+          if [[ ! "${UPDATE_WINDOWS_SIGNER_SPKI_SHA256}" =~ ^sha256:[[:xdigit:]]{64}$ ]]; then
+            echo "UPDATE_WINDOWS_SIGNER_SPKI_SHA256 must use sha256:<64 lowercase-or-uppercase-hex>." >&2
+            exit 1
+          fi
+          derived_public_key="$(python3 scripts/update/generate_update_manifest.py public-key \
+            --private-key-env UPDATE_MANIFEST_ED25519_PRIVATE_KEY)"
+          if [[ "${derived_public_key}" != "${UPDATE_MANIFEST_ED25519_PUBLIC_KEY}" ]]; then
+            echo "UPDATE_MANIFEST_ED25519_PUBLIC_KEY does not match the manifest signing key." >&2
+            exit 1
+          fi
+
   # 创建 Release（只运行一次，避免重复创建）
   create-release:
     if: startsWith(github.ref, 'refs/tags/')
@@ -55,10 +101,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build:
-    needs: [create-release]
+    needs: [create-release, validate-release-inputs]
     if: |
       !cancelled() &&
-      (needs.create-release.result == 'success' || needs.create-release.result == 'skipped')
+      (needs.create-release.result == 'success' || needs.create-release.result == 'skipped') &&
+      (needs.validate-release-inputs.result == 'success' || needs.validate-release-inputs.result == 'skipped')
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -224,8 +271,35 @@ jobs:
           sudo ln -sf $(pwd)/linuxdeploy-plugin-qt-x86_64.AppImage /usr/bin/linuxdeploy-plugin-qt
           sudo ln -sf $(pwd)/appimagetool-x86_64.AppImage /usr/bin/appimagetool
 
+      - name: Import AppImage signing key
+        if: matrix.target == 'linux' && startsWith(github.ref, 'refs/tags/')
+        env:
+          APPIMAGE_GPG_PRIVATE_KEY: ${{ secrets.APPIMAGE_GPG_PRIVATE_KEY }}
+          APPIMAGE_GPG_FINGERPRINT: ${{ secrets.APPIMAGE_GPG_FINGERPRINT }}
+        run: |
+          export GNUPGHOME="${RUNNER_TEMP}/gdownload-appimage-gpg"
+          install -d -m 700 "${GNUPGHOME}"
+          key_file="${RUNNER_TEMP}/gdownload-appimage-release.key"
+          if [[ "${APPIMAGE_GPG_PRIVATE_KEY}" == *"BEGIN PGP PRIVATE KEY BLOCK"* ]]; then
+            printf '%s' "${APPIMAGE_GPG_PRIVATE_KEY}" > "${key_file}"
+          else
+            printf '%s' "${APPIMAGE_GPG_PRIVATE_KEY}" | base64 --decode > "${key_file}"
+          fi
+          gpg --batch --import "${key_file}"
+          rm -f "${key_file}"
+          imported_fingerprint="$(gpg --batch --with-colons --list-secret-keys "${APPIMAGE_GPG_FINGERPRINT}" | awk -F: '$1 == "fpr" { print $10; exit }')"
+          if [[ "${imported_fingerprint^^}" != "${APPIMAGE_GPG_FINGERPRINT^^}" ]]; then
+            echo "The imported AppImage signing key does not match APPIMAGE_GPG_FINGERPRINT." >&2
+            exit 1
+          fi
+          echo "GNUPGHOME=${GNUPGHOME}" >> "${GITHUB_ENV}"
+
       - name: Configure & Build (Unix)
         if: matrix.target != 'windows'
+        env:
+          RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') }}
+          UPDATE_MANIFEST_ED25519_PUBLIC_KEY: ${{ vars.UPDATE_MANIFEST_ED25519_PUBLIC_KEY }}
+          UPDATE_WINDOWS_SIGNER_SPKI_SHA256: ${{ secrets.UPDATE_WINDOWS_SIGNER_SPKI_SHA256 }}
         run: |
           if [ -z "${QTDIR:-}" ]; then
             echo "QTDIR is not set."
@@ -234,6 +308,13 @@ jobs:
           EXTRA_CMAKE_ARGS=""
           if [[ "${{ matrix.target }}" == macos-* ]]; then
             EXTRA_CMAKE_ARGS="-DCMAKE_OSX_ARCHITECTURES=${{ matrix.cmake_arch }}"
+          fi
+          TRUST_CMAKE_ARGS=(
+            "-DGDOWNLOAD_UPDATE_PUBLIC_KEY_BASE64=${UPDATE_MANIFEST_ED25519_PUBLIC_KEY}"
+            "-DGDOWNLOAD_UPDATE_SIGNER_SPKI_PIN=${UPDATE_WINDOWS_SIGNER_SPKI_SHA256}"
+          )
+          if [[ "${{ matrix.target }}" == "linux" && "${RELEASE_TAG}" == "true" ]]; then
+            TRUST_CMAKE_ARGS+=("-DGDOWNLOAD_REQUIRE_APPIMAGE_SIGNATURE=ON")
           fi
           cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} \
             -B build \
@@ -244,6 +325,7 @@ jobs:
             -DGDL_UI_GENERATE_TRANSLATIONS=on \
             -GNinja \
             ${{ matrix.cmake_extra }} \
+            "${TRUST_CMAKE_ARGS[@]}" \
             ${EXTRA_CMAKE_ARGS}
           cmake --build build --config Release --parallel
           if [ "${{ matrix.target }}" = "linux" ]; then
@@ -290,6 +372,8 @@ jobs:
           REF_NAME: ${{ github.ref_name }}
           REF: ${{ github.ref }}
           RUN_NUMBER: ${{ github.run_number }}
+          GDOWNLOAD_SIGN_APPIMAGE: ${{ startsWith(github.ref, 'refs/tags/') && '1' || '0' }}
+          GDOWNLOAD_APPIMAGE_GPG_FINGERPRINT: ${{ secrets.APPIMAGE_GPG_FINGERPRINT }}
         run: |
           chmod +x scripts/build_appimage.sh
           RELEASE_DIR="${{ github.workspace }}/release_artifacts/linux"
@@ -303,6 +387,20 @@ jobs:
           scripts/build_appimage.sh "${{ github.workspace }}/${{ matrix.install_prefix }}" "$APPIMAGE_PATH"
           echo "path=$APPIMAGE_PATH" >> "$GITHUB_OUTPUT"
 
+      - name: Create and verify detached AppImage signature
+        if: matrix.target == 'linux' && startsWith(github.ref, 'refs/tags/')
+        env:
+          APPIMAGE_PATH: ${{ steps.build_appimage.outputs.path }}
+          APPIMAGE_GPG_FINGERPRINT: ${{ secrets.APPIMAGE_GPG_FINGERPRINT }}
+        run: |
+          if [[ -z "${APPIMAGE_PATH:-}" || ! -f "${APPIMAGE_PATH}" ]]; then
+            echo "AppImage output is missing." >&2
+            exit 1
+          fi
+          gpg --batch --yes --armor --local-user "${APPIMAGE_GPG_FINGERPRINT}" \
+            --detach-sign --output "${APPIMAGE_PATH}.asc" "${APPIMAGE_PATH}"
+          gpg --batch --verify "${APPIMAGE_PATH}.asc" "${APPIMAGE_PATH}"
+
       - name: Setup MSVC Developer Command Prompt
         if: matrix.target == 'windows'
         uses: ilammy/msvc-dev-cmd@v1
@@ -312,6 +410,9 @@ jobs:
       - name: Configure & Build (Windows)
         if: matrix.target == 'windows'
         shell: cmd
+        env:
+          UPDATE_MANIFEST_ED25519_PUBLIC_KEY: ${{ vars.UPDATE_MANIFEST_ED25519_PUBLIC_KEY }}
+          UPDATE_WINDOWS_SIGNER_SPKI_SHA256: ${{ secrets.UPDATE_WINDOWS_SIGNER_SPKI_SHA256 }}
         run: |
           if "%QTDIR%"=="" (
             echo QTDIR is not set.
@@ -320,7 +421,7 @@ jobs:
           where cl
           set "CC=cl"
           set "CXX=cl"
-          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\${{ matrix.install_prefix }} -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=%QTDIR% -DGDL_UI_GENERATE_TRANSLATIONS=on -GNinja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00"
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\${{ matrix.install_prefix }} -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=%QTDIR% -DGDL_UI_GENERATE_TRANSLATIONS=on -DGDOWNLOAD_UPDATE_PUBLIC_KEY_BASE64=%UPDATE_MANIFEST_ED25519_PUBLIC_KEY% -DGDOWNLOAD_UPDATE_SIGNER_SPKI_PIN=%UPDATE_WINDOWS_SIGNER_SPKI_SHA256% -GNinja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00"
           cmake --build build --config Release --parallel
           mkdir windows_pdb
           copy /Y build\Release\bin\*.pdb windows_pdb
@@ -353,6 +454,42 @@ jobs:
             exit 1
           }
           & $iscc /V5 "$env:GITHUB_WORKSPACE\build\release\windows_installer.iss"
+
+      - name: Sign and verify Windows installer
+        if: matrix.target == 'windows' && startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        env:
+          WINDOWS_SIGNING_CERT_PFX_BASE64: ${{ secrets.WINDOWS_SIGNING_CERT_PFX_BASE64 }}
+          WINDOWS_SIGNING_CERT_PASSWORD: ${{ secrets.WINDOWS_SIGNING_CERT_PASSWORD }}
+          UPDATE_WINDOWS_SIGNER_SPKI_SHA256: ${{ secrets.UPDATE_WINDOWS_SIGNER_SPKI_SHA256 }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $installers = Get-ChildItem "$env:GITHUB_WORKSPACE\build\release\GDownloader_windows_*.exe"
+          if ($installers.Count -ne 1) {
+            throw "Expected exactly one Windows installer, found $($installers.Count)."
+          }
+          $pfxPath = Join-Path $env:RUNNER_TEMP "gdownload-release-signing.pfx"
+          try {
+            [IO.File]::WriteAllBytes($pfxPath, [Convert]::FromBase64String($env:WINDOWS_SIGNING_CERT_PFX_BASE64))
+            $signTool = (Get-Command signtool.exe -ErrorAction Stop).Source
+            & $signTool sign /fd SHA256 /f $pfxPath /p $env:WINDOWS_SIGNING_CERT_PASSWORD /tr http://timestamp.digicert.com /td SHA256 $installers[0].FullName
+            if ($LASTEXITCODE -ne 0) { throw "signtool failed to sign the installer." }
+            & $signTool verify /pa /v $installers[0].FullName
+            if ($LASTEXITCODE -ne 0) { throw "signtool failed to verify the installer." }
+            $signature = Get-AuthenticodeSignature -FilePath $installers[0].FullName
+            if ($signature.Status -ne "Valid" -or -not $signature.SignerCertificate) {
+              throw "Windows did not report a valid Authenticode signature."
+            }
+            $spki = $signature.SignerCertificate.PublicKey.ExportSubjectPublicKeyInfo()
+            $actualPin = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($spki)).ToLowerInvariant()
+            $expectedPin = $env:UPDATE_WINDOWS_SIGNER_SPKI_SHA256 -replace '^sha256:', ''
+            if ($actualPin -cne $expectedPin.ToLowerInvariant()) {
+              throw "The Authenticode signer does not match UPDATE_WINDOWS_SIGNER_SPKI_SHA256."
+            }
+          }
+          finally {
+            Remove-Item -LiteralPath $pfxPath -Force -ErrorAction SilentlyContinue
+          }
 
       - name: Collect Windows Installer
         if: matrix.target == 'windows'
@@ -485,3 +622,92 @@ jobs:
           tag: ${{ github.ref_name }}
           file: GDownload-Universal.dmg
           overwrite: true
+
+  release-update-manifests:
+    needs: [build, merge-macos-universal]
+    if: |
+      !cancelled() &&
+      startsWith(github.ref, 'refs/tags/') &&
+      needs.build.result == 'success' &&
+      needs.merge-macos-universal.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download update assets from the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p release_assets
+          gh release download "${GITHUB_REF_NAME}" --dir release_assets --pattern 'GDownloader_windows_*.exe'
+          gh release download "${GITHUB_REF_NAME}" --dir release_assets --pattern 'gdownload-linux-*.AppImage'
+          gh release view "${GITHUB_REF_NAME}" --json body --jq .body > release_assets/notes.txt
+
+      - name: Generate and verify signed update manifests
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPDATE_MANIFEST_ED25519_PRIVATE_KEY: ${{ secrets.UPDATE_MANIFEST_ED25519_PRIVATE_KEY }}
+          UPDATE_MANIFEST_ED25519_PUBLIC_KEY: ${{ vars.UPDATE_MANIFEST_ED25519_PUBLIC_KEY }}
+        run: |
+          windows_asset="$(find release_assets -maxdepth 1 -type f -name 'GDownloader_windows_*.exe' -printf '%f\n' | head -n 1)"
+          linux_asset="$(find release_assets -maxdepth 1 -type f -name 'gdownload-linux-*.AppImage' -printf '%f\n' | head -n 1)"
+          if [[ -z "${windows_asset}" || -z "${linux_asset}" ]]; then
+            echo "The Windows or Linux update asset is missing from the release." >&2
+            exit 1
+          fi
+          release_id="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${GITHUB_REF_NAME}" --jq .id)"
+          release_version="${GITHUB_REF_NAME#v}"
+          if [[ ! "${release_version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+            echo "Tag ${GITHUB_REF_NAME} is not a supported numeric release version." >&2
+            exit 1
+          fi
+          published_at="$(date +%s)"
+          expires_at="$((published_at + 180 * 24 * 60 * 60))"
+          base_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}"
+          python3 scripts/update/generate_update_manifest.py create \
+            --asset "release_assets/${windows_asset}" \
+            --asset-url "${base_url}/${windows_asset}" \
+            --platform windows-x64 \
+            --version "${release_version}" \
+            --release-id "${release_id}" \
+            --published-at "${published_at}" \
+            --expires-at "${expires_at}" \
+            --notes-file release_assets/notes.txt \
+            --output release_assets/latest-windows-x64.json \
+            --private-key-env UPDATE_MANIFEST_ED25519_PRIVATE_KEY
+          python3 scripts/update/generate_update_manifest.py create \
+            --asset "release_assets/${linux_asset}" \
+            --asset-url "${base_url}/${linux_asset}" \
+            --platform linux-x86_64 \
+            --version "${release_version}" \
+            --release-id "${release_id}" \
+            --published-at "${published_at}" \
+            --expires-at "${expires_at}" \
+            --notes-file release_assets/notes.txt \
+            --output release_assets/latest-linux-x86_64.json \
+            --private-key-env UPDATE_MANIFEST_ED25519_PRIVATE_KEY
+          for manifest in release_assets/latest-*.json; do
+            python3 scripts/update/generate_update_manifest.py verify \
+              --manifest "${manifest}" \
+              --public-key-base64 "${UPDATE_MANIFEST_ED25519_PUBLIC_KEY}"
+          done
+
+      - name: Upload signed update manifests
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+          file: release_assets/latest-*.json
+          file_glob: true
+          overwrite: true
+
+      - name: Validate hosted Sparkle appcast when configured
+        if: vars.SPARKLE_APPCAST_URL != ''
+        env:
+          SPARKLE_APPCAST_URL: ${{ vars.SPARKLE_APPCAST_URL }}
+          SPARKLE_PUBLIC_ED_KEY: fIT0FvUJN7vb6YV2H+Wb+6/Yn4QVPkfclao/LHSR6VE=
+        run: |
+          python3 scripts/update/generate_update_manifest.py verify-sparkle-appcast \
+            --appcast-url "${SPARKLE_APPCAST_URL}" \
+            --public-key-base64 "${SPARKLE_PUBLIC_ED_KEY}"

@@ -125,9 +125,15 @@ namespace gd {
 				gdl::update::UpdateConfig update_config;
 				update_config.current_version	 = GDownload_VERSION_STRING;
 				update_config.enable_auto_check = gdl::ui::settings::Settings::Instance().GetEnableAutoUpdate();
-				update_config.update_url = "https://gdownload.uk/update/latest.json";
+#if defined(_WIN32)
+				update_config.update_url = "https://gdownload.uk/update/latest-windows-x64.json";
 				update_config.fallback_update_url =
-					"https://github.com/cool2528/gdownload/releases/latest/download/latest.json";
+					"https://github.com/cool2528/gdownload/releases/latest/download/latest-windows-x64.json";
+#elif defined(__linux__)
+				update_config.update_url = "https://gdownload.uk/update/latest-linux-x86_64.json";
+				update_config.fallback_update_url =
+					"https://github.com/cool2528/gdownload/releases/latest/download/latest-linux-x86_64.json";
+#endif
 				std::map<std::string, std::string> headers;
 				headers["Content-Type"] = "application/json";
 				headers["User-Agent"]	= "GDownloader-Update-Client";

@@ -2,8 +2,8 @@
 
 ## Current Direction
 
-- Date: 2026-07-10
-- Baseline: `develop` at `280c5c4`
+- Date: 2026-07-11
+- Baseline: `develop` at `f0faafc`
 - Target: v1.0.9 stability iteration
 - Strategy: reliability first, then user-facing failure recovery, then deeper persistence and lifecycle hardening.
 
@@ -22,10 +22,7 @@
    - Improve new-task validation and submission feedback.
 
 3. Persistence and lifecycle hardening
-   - Make configuration replacement safe on Windows.
-   - Add fake aria2 RPC lifecycle tests.
-   - Add SQLite migration, WAL, busy timeout, and error reporting.
-   - Strengthen update signature verification.
+   - Completed: atomic configuration replacement, aria2 lifecycle contracts, SQLite migration/WAL/busy-timeout/error reporting, and signed update verification.
 
 ## Important Commands
 
@@ -33,6 +30,7 @@
 cmake --preset windows-msvc-user
 cmake --build --preset windows-debug-user -j
 ctest --preset windows-debug-test-user
+ctest --preset windows-debug-test-user -R UpdateManifestScriptTests --output-on-failure
 ```
 
 The Windows generator is multi-configuration. Test presets and convenience targets must provide the Debug configuration themselves so callers do not need to remember `-C Debug`.
@@ -44,6 +42,30 @@ The Windows generator is multi-configuration. Test presets and convenience targe
 - After code changes, run `cmake --build --preset windows-debug-user -j`.
 - Keep `docs/superpowers/` local-only. Do not track, commit, or push files from that directory.
 - Do not push implementation changes unless the user explicitly requests it.
+
+## Reliability Closure (2026-07-11)
+
+- Configuration persistence uses atomic file replacement. All migrated config writers surface failures instead of replacing a valid file with a partially written one.
+- Deletion paths return structured record/file outcomes. The QML layer reports partial failure truthfully and does not infer that a local file was deleted just because the download record was removed.
+- SQLite history and tracker caches use `CacheResult`, managed connections, transactional schema migration, WAL, and a busy timeout. The migration contract is covered by isolated CTest targets.
+- aria2 startup, shutdown, and runtime failures are modeled as lifecycle states. Polling drains before shutdown, and UI availability updates are queued onto the Qt UI thread.
+- Update trust is fail-closed. Signed JSON manifests use an Ed25519 public key compiled from CI input. Windows additionally requires SHA-256, Authenticode, and an SPKI pin. Linux stages a private AppImage copy, checks it before handoff, persists the rollback floor under a lease, and restores that floor if launch fails.
+- The vendored AppImage updater owns its worker thread and stops/joins it during destruction. The outer Linux updater also handles cancellation racing the native worker startup.
+
+## Release Trust Operations
+
+Tag releases require these GitHub secrets:
+
+- `UPDATE_MANIFEST_ED25519_PRIVATE_KEY`: PEM or base64-encoded PEM Ed25519 PKCS#8 private key.
+- `WINDOWS_SIGNING_CERT_PFX_BASE64` and `WINDOWS_SIGNING_CERT_PASSWORD`: Authenticode signing certificate.
+- `UPDATE_WINDOWS_SIGNER_SPKI_SHA256`: `sha256:` followed by the signer's 64-character hexadecimal SPKI digest.
+- `APPIMAGE_GPG_PRIVATE_KEY` and `APPIMAGE_GPG_FINGERPRINT`: the AppImage release-signing key and its exact fingerprint.
+
+`UPDATE_MANIFEST_ED25519_PUBLIC_KEY` is a GitHub repository variable, not a source value. The release workflow derives the public key from the private key and refuses the release if the variable does not match.
+
+The workflow generates and verifies `latest-windows-x64.json` and `latest-linux-x86_64.json` after signed artifacts have been uploaded. `gdownload.uk` must mirror those two assets; clients fall back to GitHub Release URLs when the primary host is unavailable.
+
+Sparkle uses the public key embedded in `GDownloadOsxBundleInfo.plist.in`. This repository has no Sparkle signing private key, so it cannot manufacture a valid macOS appcast. Set the optional `SPARKLE_APPCAST_URL` repository variable to make the release workflow download and verify the hosted Sparkle `edSignature` against that public key.
 
 ## Latest Engineering Findings
 
