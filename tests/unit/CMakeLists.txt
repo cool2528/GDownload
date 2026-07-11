@@ -121,3 +121,23 @@ set_tests_properties(CacheTests PROPERTIES
     WORKING_DIRECTORY $<TARGET_FILE_DIR:gdownload_cache_tests>
 )
 register_target(gdownload_cache_tests)
+
+add_executable(gdownload_aria2_lifecycle_tests
+    engine/test_aria2_lifecycle.cpp
+)
+target_link_libraries(gdownload_aria2_lifecycle_tests PRIVATE
+    GTest::gtest
+    GTest::gtest_main
+    Engine
+    GDLCore
+)
+target_include_directories(gdownload_aria2_lifecycle_tests PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/App/engine
+    ${CMAKE_SOURCE_DIR}/src/Module/GDLCore
+)
+add_test(NAME Aria2LifecycleTests COMMAND gdownload_aria2_lifecycle_tests)
+set_tests_properties(Aria2LifecycleTests PROPERTIES
+    TIMEOUT 60
+    WORKING_DIRECTORY $<TARGET_FILE_DIR:gdownload_aria2_lifecycle_tests>
+)
+register_target(gdownload_aria2_lifecycle_tests)
