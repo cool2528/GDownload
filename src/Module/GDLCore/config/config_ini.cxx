@@ -8,6 +8,7 @@
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include "config_key.h"
+#include "detail/toml_config_save.h"
 #include "logger.h"
 #include "os/os.h"
 #include "spdlog/spdlog.h"
@@ -81,25 +82,11 @@ namespace gdl {
 
 		ApplicationConfig::~ApplicationConfig() {
 			// 程序退出阶段 spdlog 可能已析构，且其他线程可能仍持有锁。
-			// 用 try_lock 避免死锁，直接原子写文件，不调用依赖 spdlog 的 Save()。
+			// 用 try_lock 避免死锁，通过无日志 helper 尽力原子保存。
 			try {
 				std::unique_lock lock(mutex_, std::defer_lock);
 				if (lock.try_lock()) {
-					std::string tmp_path = config_file_path_ + ".tmp";
-					{
-						std::ofstream config(tmp_path, std::ios::trunc | std::ios::binary);
-						if (config.is_open()) {
-							config << toml_root_;
-							config.flush();
-						}
-					}
-					std::error_code ec;
-					if (std::filesystem::exists(tmp_path, ec)) {
-						std::filesystem::rename(tmp_path, config_file_path_, ec);
-						if (ec) {
-							std::filesystem::remove(tmp_path, ec);
-						}
-					}
+					(void) detail::SaveTomlAtomically(config_file_path_, toml_root_);
 				}
 			} catch (...) {
 				// 析构中吞掉所有异常
@@ -242,30 +229,10 @@ namespace gdl {
 		bool ApplicationConfig::Save() {
 			try {
 				std::unique_lock lock(mutex_);
-				if (!EnsureConfigFileExists()) {
-					return false;
-				}
-				// 原子写入：先写临时文件再重命名，避免写入过程中崩溃/断电导致
-				// 配置文件被截断而丢失全部用户配置。
-				std::string tmp_path = config_file_path_ + ".tmp";
-				{
-					std::ofstream config(tmp_path, std::ios::trunc | std::ios::binary);
-					if (!config.is_open()) {
-						LOG_ERR("Failed to open config file for writing: {}", tmp_path);
-						return false;
-					}
-					config << toml_root_;
-					config.flush();
-					if (!config.good()) {
-						LOG_ERR("Failed to write config file: {}", tmp_path);
-						return false;
-					}
-				}
-				std::error_code ec;
-				std::filesystem::rename(tmp_path, config_file_path_, ec);
-				if (ec) {
-					LOG_ERR("Failed to rename config file: {}", ec.message());
-					std::filesystem::remove(tmp_path, ec);
+				const auto result = detail::SaveTomlAtomically(config_file_path_, toml_root_);
+				if (!result) {
+					LOG_ERR("Failed to save TOML configuration at atomic replacement stage {}: {}",
+							result.GetError().Code(), result.GetError().what());
 					return false;
 				}
 			} catch (std::exception& e) {
