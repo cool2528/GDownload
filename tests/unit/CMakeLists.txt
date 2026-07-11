@@ -16,6 +16,7 @@ add_executable(gdownload_unit_tests
     browser/test_download_url_utils.cpp
     browser/test_download_task_utils.cpp
     browser/test_local_content_removal.cpp
+    browser/test_task_deletion_result.cpp
     settings/test_aria2_defaults.cpp
     utils/test_relaunch_function.cpp
     ${CMAKE_SOURCE_DIR}/src/App/ui/Browser/download_task_model.cxx

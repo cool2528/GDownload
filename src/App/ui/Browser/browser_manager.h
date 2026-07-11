@@ -7,6 +7,7 @@
 #include "Aria2CManager/aria2c_manager.h"
 #include "Parser/file_preview_model.h"
 #include "download_task_model.h"
+#include "task_deletion_result.h"
 #include "singleton.hpp"
 class QQmlEngine;
 class QJSEngine;
@@ -54,9 +55,9 @@ namespace gdl {
 
                 Q_INVOKABLE bool UnpauseAllTask(int page_index) override;
 
-                Q_INVOKABLE bool RemoveTask(int page_index, const QString& gid, bool is_remove_file = false) override;
+                Q_INVOKABLE QVariantMap RemoveTask(int page_index, const QString& gid, bool is_remove_file = false) override;
 
-                Q_INVOKABLE bool RemoveAllTask(int page_index, bool is_remove_file = false) override;
+                Q_INVOKABLE QVariantMap RemoveAllTask(int page_index, bool is_remove_file = false) override;
 
 				Q_INVOKABLE bool ForceRemoveTask(const QString& gid) override;
 
@@ -72,11 +73,11 @@ namespace gdl {
 
 				Q_INVOKABLE bool RetryTask(const QString& gid) override;
 
-                Q_INVOKABLE bool RemoveStopTask(const QString& gid, bool is_remove_file = true) override;
+                Q_INVOKABLE QVariantMap RemoveStopTask(const QString& gid, bool is_remove_file = true) override;
 
-                Q_INVOKABLE bool RemoveStopTask(int index, bool is_remove_file = true) override;
+                Q_INVOKABLE QVariantMap RemoveStopTask(int index, bool is_remove_file = true) override;
 
-                Q_INVOKABLE bool RemoveAllStopTask(bool is_remove_file = false) override;
+                Q_INVOKABLE QVariantMap RemoveAllStopTask(bool is_remove_file = false) override;
 
                 Q_INVOKABLE void RefreshTaskList(int page_index) override;
                 Q_INVOKABLE parser::FilePreviewModel* GetFilePreviewModel(const QString& file_path) override;
@@ -98,6 +99,8 @@ namespace gdl {
 				// 外部代码仍无法直接构造(protected 对非派生类不可见),单例约束保持不变
 				explicit BrowserManagerImpl(QObject* parent = nullptr);
 			   private:
+				TaskDeletionResult RemoveTaskResult(int page_index, const QString& gid, bool is_remove_file);
+				TaskDeletionResult RemoveStopTaskResult(const QString& gid, bool is_remove_file);
 				void OnHandleAria2Message(const std::string& msg);
                 void OnHandleAria2ActiveProgress(const std::string& msg);
 				void OnHandleTrackerUpdateStatus(const std::string& msg);

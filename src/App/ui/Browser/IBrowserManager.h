@@ -40,8 +40,8 @@ namespace gdl {
 				virtual bool UnpauseAllTask(int page_index) = 0;
 
 				// 删除任务
-				virtual bool RemoveTask(int page_index, const QString& gid, bool is_remove_file = false) = 0;
-				virtual bool RemoveAllTask(int page_index, bool is_remove_file = false) = 0;
+				virtual QVariantMap RemoveTask(int page_index, const QString& gid, bool is_remove_file = false) = 0;
+				virtual QVariantMap RemoveAllTask(int page_index, bool is_remove_file = false) = 0;
 				virtual bool ForceRemoveTask(const QString& gid) = 0;
 				virtual bool RemoveDownloadResult(const QString& gid) = 0;
 				virtual bool PurgeDownloadResult() = 0;
@@ -55,9 +55,9 @@ namespace gdl {
 
 				// 已停止任务的操作
 				virtual bool RetryTask(const QString& gid) = 0;
-				virtual bool RemoveStopTask(const QString& gid, bool is_remove_file = true) = 0;
-				virtual bool RemoveStopTask(int index, bool is_remove_file = true) = 0;
-				virtual bool RemoveAllStopTask(bool is_remove_file = false) = 0;
+				virtual QVariantMap RemoveStopTask(const QString& gid, bool is_remove_file = true) = 0;
+				virtual QVariantMap RemoveStopTask(int index, bool is_remove_file = true) = 0;
+				virtual QVariantMap RemoveAllStopTask(bool is_remove_file = false) = 0;
 
 				// 刷新任务列表与获取文件预览模型
 				virtual void RefreshTaskList(int page_index) = 0;

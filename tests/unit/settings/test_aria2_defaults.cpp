@@ -6,6 +6,7 @@
 #include "config/config_key.h"
 
 using gdl::ui::browser::DecideStoppedTaskDeletionAfterAria2Cleanup;
+using gdl::ui::browser::StoppedTaskAria2CleanupStatus;
 using gdl::ui::settings::DefaultBrowserUserAgent;
 
 TEST(Aria2DefaultsTest, SplitDefaultsTo64) {
@@ -41,18 +42,28 @@ TEST(Aria2DefaultsTest, UserAgentSettingDefaultsToBrowserUserAgent) {
 	EXPECT_EQ(gdl::ui::settings::UserAgentInstance.Get().toStdString(), DefaultBrowserUserAgent().toStdString());
 }
 
-TEST(StoppedTaskDeleteTest, Aria2CleanupFailureDoesNotBlockLocalRemoval) {
-	const auto decision = DecideStoppedTaskDeletionAfterAria2Cleanup(false, QString());
+TEST(StoppedTaskDeleteTest, OrdinaryAria2CleanupFailureBlocksLocalRemoval) {
+	const auto decision = DecideStoppedTaskDeletionAfterAria2Cleanup(
+		StoppedTaskAria2CleanupStatus::kFailed, QStringLiteral("connection refused"));
 
-	EXPECT_TRUE(decision.remove_local_task);
-	EXPECT_TRUE(decision.show_cleanup_warning);
-	EXPECT_FALSE(decision.warning_message.trimmed().isEmpty());
+	EXPECT_FALSE(decision.remove_local_task);
+	EXPECT_FALSE(decision.aria2_cleaned);
 }
 
 TEST(StoppedTaskDeleteTest, Aria2CleanupSuccessRemovesLocalTaskWithoutWarning) {
-	const auto decision = DecideStoppedTaskDeletionAfterAria2Cleanup(true, QString());
+	const auto decision = DecideStoppedTaskDeletionAfterAria2Cleanup(
+		StoppedTaskAria2CleanupStatus::kSucceeded, QString());
 
 	EXPECT_TRUE(decision.remove_local_task);
+	EXPECT_TRUE(decision.aria2_cleaned);
 	EXPECT_FALSE(decision.show_cleanup_warning);
 	EXPECT_TRUE(decision.warning_message.isEmpty());
+}
+
+TEST(StoppedTaskDeleteTest, AlreadyMissingAria2ResultAllowsLocalRemoval) {
+	const auto decision = DecideStoppedTaskDeletionAfterAria2Cleanup(
+		StoppedTaskAria2CleanupStatus::kAlreadyMissing, QStringLiteral("GID not found"));
+
+	EXPECT_TRUE(decision.remove_local_task);
+	EXPECT_TRUE(decision.aria2_cleaned);
 }

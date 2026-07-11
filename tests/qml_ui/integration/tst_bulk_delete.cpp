@@ -29,7 +29,7 @@ class TstBulkDelete : public QObject {
 	}
 
 	void test_default_keeps_downloaded_files() {
-		QVERIFY(fakeBrowser_->RemoveAllTask(2));
+		QCOMPARE(fakeBrowser_->RemoveAllTask(2).value(QStringLiteral("failed")).toInt(), 0);
 		QCOMPARE(fakeBrowser_->lastRpcCall().args.at(1).toBool(), false);
 		fakeBrowser_->clearHistory();
 
