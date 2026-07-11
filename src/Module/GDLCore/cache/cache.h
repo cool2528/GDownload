@@ -4,11 +4,15 @@
 #include <vector>
 #include "download_record.h"
 #include "cache_result.h"
+#include "sqlite_connection.h"
 #include "export.h"
 #include "globalTypes.h"
 #include "singleton.hpp"
 namespace gdl {
 	namespace cache {
+		namespace detail {
+			constexpr SqliteOpenOptions TrackerCacheOpenOptions() { return {.busy_timeout_ms = 3000, .request_wal = true}; }
+		}
 
         class GDLCore_API DownloadHistoryCache : public Singleton<DownloadHistoryCache> {
             SINGLETON_DECLARE(DownloadHistoryCache)
@@ -52,19 +56,19 @@ namespace gdl {
 		class GDLCore_API TrackerETagCache : public Singleton<TrackerETagCache> {
 			SINGLETON_DECLARE(TrackerETagCache)
 		   public:
-			bool Initialize(const String& db_path);
-			void Uninitialize();
+			CacheResult<void> Initialize(const String& db_path);
+			CacheResult<void> Uninitialize();
 			~TrackerETagCache();
 
 			// CRUD 操作
-			bool SetEntry(const TrackerETagEntry& entry);
-			std::optional<TrackerETagEntry> GetEntry(const std::string& url);
-			bool DeleteEntry(const std::string& url);
-			bool ClearAllEntries();
+			CacheResult<void> SetEntry(const TrackerETagEntry& entry);
+			CacheResult<std::optional<TrackerETagEntry>> GetEntry(const std::string& url);
+			CacheResult<void> DeleteEntry(const std::string& url);
+			CacheResult<void> ClearAllEntries();
 
 			// 批量操作
-			std::vector<TrackerETagEntry> GetAllEntries();
-			size_t GetTotalCount();
+			CacheResult<std::vector<TrackerETagEntry>> GetAllEntries();
+			CacheResult<size_t> GetTotalCount();
 
 		   private:
 			TrackerETagCache();

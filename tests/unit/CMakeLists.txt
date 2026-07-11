@@ -13,6 +13,7 @@ add_executable(gdownload_unit_tests
     core/test_atomic_file_replace.cpp
     core/test_core_functions.cpp
     engine/test_publish_subscribe_system.cpp
+    engine/test_tracker_sync_gate.cpp
     update/test_update_config.cpp
     browser/test_download_url_utils.cpp
     browser/test_download_task_utils.cpp

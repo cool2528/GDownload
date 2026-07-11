@@ -386,16 +386,8 @@ namespace gdl {
 		}
 
 		void Aria2cDownloadManager::DispatchMagnetServerSync() {
-			// 上一次同步未结束则跳过，避免并发重复拉取
-			bool expected = false;
-			if (!tracker_sync_running_.compare_exchange_strong(expected, true)) {
-				return;
-			}
-			// 阻塞式 HTTP + 退避 sleep 放到独立线程，避免占死 io worker（E3）
-			tracker_sync_future_ = std::async(std::launch::async, [this] {
-				SyncMagnetServerList();
-				tracker_sync_running_.store(false);
-			});
+			if (uninited_.load()) return;
+			tracker_sync_gate_.Dispatch([this] { SyncMagnetServerList(); });
 		}
 
 		void Aria2cDownloadManager::SyncGlobalStatInfo() {
@@ -506,8 +498,9 @@ namespace gdl {
 
 		void Aria2cDownloadManager::InitializeETagCache() {
 			auto db_path = os::GetAppDataDir() + "/gdownload/tracker_etag_cache.db";
-			if (!cache::TrackerETagCache::Instance().Initialize(db_path)) {
-				LOG_ERR("Failed to initialize TrackerETagCache database");
+			const auto result = cache::TrackerETagCache::Instance().Initialize(db_path);
+			if (result.HasError()) {
+				LOG_ERR("Failed to initialize TrackerETagCache database: {}", result.GetError().Describe());
 			}
 		}
 
@@ -522,10 +515,11 @@ namespace gdl {
 				std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch())
 					.count();
 
-			if (cache::TrackerETagCache::Instance().SetEntry(entry)) {
+			const auto result = cache::TrackerETagCache::Instance().SetEntry(entry);
+			if (result.IsOk()) {
 				LOG_INFO("Updated ETag cache for: {} (ETag: {})", url, etag);
 			} else {
-				LOG_ERR("Failed to update ETag cache for: {}", url);
+				LOG_ERR("Failed to update ETag cache for: {} error:{}", url, result.GetError().Describe());
 			}
 		}
 
@@ -585,7 +579,13 @@ namespace gdl {
 
 				// Check cached ETag from database.
 				std::string cached_etag;
-				auto cached_entry = cache::TrackerETagCache::Instance().GetEntry(try_url);
+				auto cached_result = cache::TrackerETagCache::Instance().GetEntry(try_url);
+				if (cached_result.HasError()) {
+					LOG_WARN("Failed to read ETag cache for: {} error:{}", try_url,
+						cached_result.GetError().Describe());
+				}
+				const std::optional<cache::TrackerETagEntry> cached_entry =
+					cached_result.IsOk() ? cached_result.Value() : std::nullopt;
 				if (cached_entry) {
 					cached_etag = cached_entry->etag;
 					LOG_INFO("Found cached ETag for: {} (ETag: {})", try_url, cached_etag);
@@ -701,12 +701,18 @@ namespace gdl {
 				return;
 			}
 			engine_is_runing_ = false;
-			// 等待可能在途的 tracker 同步线程结束（内部循环见 engine_is_runing_ 会尽快退出）（E3）
-			if (tracker_sync_future_.valid()) {
-				tracker_sync_future_.wait();
-			}
-			update_aria2c_tasks_timer_.Stop();
 			daily_task_timer_.Stop();
+			update_aria2c_tasks_timer_.Stop();
+			auto tracker_future = tracker_sync_gate_.BeginStoppingAndTakeFuture();
+			if (tracker_future.valid()) {
+				try { tracker_future.get(); } catch (const std::exception& error) {
+					LOG_ERR("Tracker synchronization failed during shutdown: {}", error.what());
+				} catch (...) { LOG_ERR("Tracker synchronization failed during shutdown"); }
+			}
+			const auto cache_close_result = cache::TrackerETagCache::Instance().Uninitialize();
+			if (cache_close_result.HasError()) {
+				LOG_WARN("Failed to close TrackerETagCache: {}", cache_close_result.GetError().Describe());
+			}
 			websocket_client_.PurgeDownloadResult();
 			websocket_client_.Shutdown();
 			// 给 RPC/stop-with-process 优雅退出宽限，超时强制终止并回收，避免 POSIX 僵尸（S3）
