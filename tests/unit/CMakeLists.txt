@@ -97,3 +97,20 @@ set_tests_properties(CoreLoggerTests PROPERTIES
     WORKING_DIRECTORY $<TARGET_FILE_DIR:gdownload_logger_tests>
 )
 register_target(gdownload_logger_tests)
+
+add_executable(gdownload_cache_tests
+    cache/test_cache_result.cpp
+    cache/test_sqlite_connection.cpp
+    cache/test_schema_migrator.cpp
+    cache/test_cache.cpp
+)
+target_link_libraries(gdownload_cache_tests PRIVATE GTest::gtest GTest::gtest_main GDLCore)
+target_include_directories(gdownload_cache_tests PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/Module/GDLCore
+)
+add_test(NAME CacheTests COMMAND gdownload_cache_tests)
+set_tests_properties(CacheTests PROPERTIES
+    TIMEOUT 60
+    WORKING_DIRECTORY $<TARGET_FILE_DIR:gdownload_cache_tests>
+)
+register_target(gdownload_cache_tests)

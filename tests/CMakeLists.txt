@@ -15,7 +15,7 @@ add_subdirectory(integration)
 # 添加自定义测试目标
 add_custom_target(run_all_tests
     COMMAND ${CMAKE_CTEST_COMMAND} --test-dir ${CMAKE_BINARY_DIR} -C $<CONFIG> --output-on-failure
-    DEPENDS gdownload_unit_tests gdownload_logger_tests gdownload_integration_tests
+    DEPENDS gdownload_unit_tests gdownload_logger_tests gdownload_cache_tests gdownload_integration_tests
     COMMENT "Running all tests with detailed output"
 )
 
