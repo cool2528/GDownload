@@ -20,6 +20,7 @@ find_package(boost_beast CONFIG REQUIRED)
 find_package(boost_locale CONFIG REQUIRED)
 find_package(unofficial-sqlite3 CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 find_path(TOMLPLUSPLUS_INCLUDE_DIR
     NAMES "toml++/toml.h"
     HINTS ${CMAKE_PREFIX_PATH}
@@ -48,7 +49,10 @@ endif()
 
 register_target(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog PRIVATE Boost::property_tree Boost::beast Boost::locale unofficial::sqlite3::sqlite3 tomlplusplus::tomlplusplus OpenSSL::Crypto)
+target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog PRIVATE Boost::property_tree Boost::beast Boost::locale unofficial::sqlite3::sqlite3 tomlplusplus::tomlplusplus OpenSSL::Crypto nlohmann_json::nlohmann_json)
+if(WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Wintrust Crypt32)
+endif()
 
 if(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE

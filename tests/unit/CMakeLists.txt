@@ -142,3 +142,25 @@ set_tests_properties(Aria2LifecycleTests PROPERTIES
     WORKING_DIRECTORY $<TARGET_FILE_DIR:gdownload_aria2_lifecycle_tests>
 )
 register_target(gdownload_aria2_lifecycle_tests)
+
+add_executable(gdownload_update_trust_tests
+    update/test_update_trust.cpp
+)
+find_package(OpenSSL REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
+target_link_libraries(gdownload_update_trust_tests PRIVATE
+    GTest::gtest
+    GTest::gtest_main
+    GDLCore
+    OpenSSL::Crypto
+    nlohmann_json::nlohmann_json
+)
+target_include_directories(gdownload_update_trust_tests PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/Module/GDLCore
+)
+add_test(NAME UpdateTrustTests COMMAND gdownload_update_trust_tests)
+set_tests_properties(UpdateTrustTests PROPERTIES
+    TIMEOUT 60
+    WORKING_DIRECTORY $<TARGET_FILE_DIR:gdownload_update_trust_tests>
+)
+register_target(gdownload_update_trust_tests)
