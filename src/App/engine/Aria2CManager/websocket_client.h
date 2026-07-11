@@ -74,10 +74,21 @@ namespace gdl {
 			bool isConnected() const { return connected_.load(); }
 
 			void setAutoReconnect(bool enabled, int maxRetries = -1, int retryInterval = 5) {
-				auto_reconnect_ = enabled;
+				auto_reconnect_.store(enabled);
 				max_retries_ = maxRetries;
 				retry_interval_ = retryInterval;
 			}
+
+			void disableAutoReconnect() {
+				auto_reconnect_.store(false);
+				net::post(ws_.get_executor(), [self = shared_from_this()] {
+					if (self->reconnect_timer_) {
+						self->reconnect_timer_->cancel();
+						self->reconnect_timer_.reset();
+					}
+				});
+			}
+			bool isAutoReconnectEnabled() const { return auto_reconnect_.load(); }
 
 		   private:
 			void onResolve(beast::error_code ec, tcp::resolver::results_type results) {
@@ -195,7 +206,7 @@ namespace gdl {
 					error_callback_(error);
 				}
 
-				if (auto_reconnect_) {
+				if (auto_reconnect_.load()) {
 					if (max_retries_ == -1 || retry_count_ < max_retries_) {
 						retry_count_++;
 						reconnect_timer_ = std::make_shared<net::steady_timer>(
@@ -237,7 +248,7 @@ namespace gdl {
 			ErrorCallback error_callback_;
 			std::shared_ptr<net::steady_timer> reconnect_timer_;
 
-			bool auto_reconnect_ = false;
+			std::atomic<bool> auto_reconnect_{false};
 			std::atomic<bool> connected_{false};
 			int max_retries_ = -1;        // -1 表示无限重试
 			int retry_count_ = 0;
