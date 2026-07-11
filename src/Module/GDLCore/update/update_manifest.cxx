@@ -75,7 +75,7 @@ namespace gdl::update {
 			const auto& asset = json.at("asset");
 			manifest.asset = {asset.at("name").get<std::string>(), asset.at("url").get<std::string>(),
 				asset.at("size").get<std::int64_t>(), asset.at("sha256").get<std::string>()};
-			if (manifest.release_id <= policy.highest_release_id) return fail("update manifest rollback rejected");
+			if (manifest.release_id < policy.highest_release_id) return fail("update manifest rollback rejected");
 			if (manifest.platform != policy.expected_platform) return fail("wrong update platform");
 			if (manifest.expires_at < policy.now || manifest.published_at > policy.now) return fail("expired update manifest");
 			if (manifest.asset.size <= 0 || !IsSha256(manifest.asset.sha256)) return fail("invalid update asset digest");

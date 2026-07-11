@@ -16,6 +16,8 @@
 #include <thread>
 #include "update/linux_appimage_gate.h"
 #include "update/update_manifest.h"
+#include "update/prepared_appimage.h"
+#include "update/update_package_verifier.h"
 #include "update_trust_config.h"
 #include "file_update_rollback_store.h"
 #include "os/os.h"
@@ -27,8 +29,18 @@ namespace {
 	class AppImageUpdaterVerifier final : public gdl::update::ILinuxAppImageVerifier {
 	 public:
 		explicit AppImageUpdaterVerifier(appimage::update::Updater& updater) : updater_(updater) {}
-		gdl::update::AppImageSignatureState Verify(const std::filesystem::path&) const override {
+		gdl::update::AppImageSignatureState Verify(const std::filesystem::path& package) const override {
+			std::string downloaded_path;
+			if (!updater_.pathToNewFile(downloaded_path) || downloaded_path.empty())
+				return gdl::update::AppImageSignatureState::kInvalid;
+			const auto staged_digest = gdl::update::ComputeFileSha256(package);
+			const auto source_digest = gdl::update::ComputeFileSha256(downloaded_path);
+			if (!staged_digest || !source_digest || *staged_digest != *source_digest)
+				return gdl::update::AppImageSignatureState::kInvalid;
 			const auto state = updater_.validateSignature();
+			const auto source_digest_after_validation = gdl::update::ComputeFileSha256(downloaded_path);
+			if (!source_digest_after_validation || *source_digest_after_validation != *staged_digest)
+				return gdl::update::AppImageSignatureState::kInvalid;
 			using Updater = appimage::update::Updater;
 			if (state == Updater::VALIDATION_PASSED) return gdl::update::AppImageSignatureState::kPassed;
 			if (state == Updater::VALIDATION_NOT_SIGNED) return gdl::update::AppImageSignatureState::kUnsigned;
@@ -279,6 +291,16 @@ namespace gdl {
 		}
 
 		bool LinuxUpdater::StartUpdate(ProgressCallback progress_callback) {
+			{
+				std::lock_guard lock(update_thread_mutex_);
+				if (update_thread_.joinable()) {
+					if (update_worker_running_.load()) {
+						last_error_ = "Update worker is still running";
+						return false;
+					}
+					update_thread_.join();
+				}
+			}
 			if (!update_available_ || update_in_progress_) {
 				last_error_ = "No available update or update already in progress";
 				qWarning() << "StartUpdate failed:" << QString::fromStdString(last_error_);
@@ -312,11 +334,24 @@ namespace gdl {
 				}
 
 				// Start update thread
+				update_worker_running_.store(true);
 				update_thread_ = std::thread([this, alive = alive_]() {
+					struct RunningGuard { std::atomic<bool>& running; ~RunningGuard() { running.store(false); } } guard{update_worker_running_};
 					try {
-						if (!alive->load()) return;
+						if (!alive->load() || should_stop_thread_) return;
 						// Start update
-						updater_->start();
+						if (!updater_->start()) {
+							if (!should_stop_thread_) {
+								last_error_ = "Failed to start AppImage update worker";
+								update_in_progress_ = false;
+								DispatchProgress({UpdateProgress::Stage::kFailed, 0, last_error_});
+							}
+							return;
+						}
+						if (should_stop_thread_) {
+							updater_->stop();
+							return;
+						}
 
 						// Monitor update progress
 						if (alive->load()) {
@@ -333,7 +368,7 @@ namespace gdl {
 							progress.stage		= UpdateProgress::Stage::kFailed;
 							progress.percentage = 0;
 							progress.message	= "Update failed: " + std::string(e.what());
-							progress_callback_(progress);
+							DispatchProgress(progress);
 						}
 					}
 				});
@@ -369,7 +404,7 @@ namespace gdl {
 							update_progress.message =
 								"Downloading update package: " + std::to_string(update_progress.percentage);
 						}
-						progress_callback_(update_progress);
+						DispatchProgress(update_progress);
 					}
 				}
 
@@ -397,7 +432,7 @@ namespace gdl {
 							qCritical() << "Update failed with no specific error message";
 						}
 
-						progress_callback_(progress);
+						DispatchProgress(progress);
 					}
 				}
 				else {
@@ -407,7 +442,7 @@ namespace gdl {
 						progress.stage		= UpdateProgress::Stage::kVerifying;
 						progress.percentage = 100;
 						progress.message	= "Update completed, preparing to apply update";
-						progress_callback_(progress);
+						DispatchProgress(progress);
 					}
 				}
 			}
@@ -434,11 +469,24 @@ namespace gdl {
 
 			// Mark that the thread should stop
 			should_stop_thread_ = true;
+			const auto stop_updater = [this] {
+				if (!updater_) return;
+				try { updater_->stop(); } catch (const std::exception& error) {
+					qWarning() << "Failed to stop AppImage updater:" << error.what();
+				}
+			};
+			stop_updater();
 
 			// Wait for thread to finish
-			if (update_thread_.joinable()) {
-				update_thread_.join();
+			{
+				std::lock_guard lock(update_thread_mutex_);
+				if (update_thread_.joinable() && update_thread_.get_id() != std::this_thread::get_id()) {
+					update_thread_.join();
+				}
 			}
+			// A cancellation can race with the worker just before it calls Updater::start().
+			// Stop again after joining the outer worker so the native worker cannot escape that window.
+			stop_updater();
 
 			update_in_progress_ = false;
 			qInfo() << "Update cancelled";
@@ -461,21 +509,37 @@ namespace gdl {
 			AppImageUpdaterVerifier verifier(*updater_);
 			AppImageLauncher launcher(restart_app);
 			FileUpdateRollbackStore rollback_store(RollbackStatePath());
+			const auto staging_root = RollbackStatePath().parent_path() / "staged";
+			auto prepared = PrepareAppImage(new_file_path, staging_root);
+			if (!prepared) {
+				last_error_ = "Failed to create private staged AppImage";
+				return false;
+			}
 			LinuxAppImageGate gate(verifier, launcher, rollback_store,
 				GDOWNLOAD_REQUIRE_APPIMAGE_SIGNATURE != 0);
-			const auto result = gate.Apply(new_file_path, update_info_.package_size,
+			const auto result = gate.Apply(prepared->path, update_info_.package_size,
 				update_info_.sha256, update_info_.release_id);
 			if (!result.Succeeded()) {
 				last_error_ = result.detail.empty() ? "Updated AppImage trust handoff failed" : result.detail;
 				if (progress_callback_) {
-					progress_callback_({UpdateProgress::Stage::kFailed, 100, last_error_});
+					DispatchProgress({UpdateProgress::Stage::kFailed, 100, last_error_});
 				}
 				return false;
 			}
 			if (progress_callback_) {
-				progress_callback_({UpdateProgress::Stage::kFinished, 100, "Update completed"});
+				DispatchProgress({UpdateProgress::Stage::kFinished, 100, "Update completed"});
 			}
 			return true;
+		}
+
+		void LinuxUpdater::DispatchProgress(UpdateProgress progress) {
+			auto callback = progress_callback_;
+			auto alive = alive_;
+			if (!callback || !QCoreApplication::instance()) return;
+			QMetaObject::invokeMethod(QCoreApplication::instance(),
+				[alive, callback = std::move(callback), progress = std::move(progress)] {
+					if (alive->load()) callback(progress);
+				}, Qt::QueuedConnection);
 		}
 
 	}  // namespace update

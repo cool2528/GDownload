@@ -10,6 +10,7 @@ namespace gdl::update {
 		void ReleaseInstallationLease() override;
 		RollbackReadResult HighestReleaseId() const override;
 		RollbackPersistenceResult PersistHighestReleaseId(std::uint64_t release_id) override;
+		RollbackPersistenceResult RestoreHighestReleaseId(std::uint64_t release_id) override;
 	 private:
 		std::filesystem::path state_path_;
 		QLockFile lock_;
