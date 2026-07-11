@@ -66,7 +66,7 @@ TEST(SqliteConnectionTest, AppliesConnectionLocalConfiguration) {
 
 	ASSERT_TRUE(opened.IsOk()) << opened.GetError().Describe();
 	auto values = connection.Use<std::pair<int, int>>(CacheOperation::kInspect, "read pragmas",
-		[](sqlite3* db) {
+		[](sqlite3* db, const std::string& database_path) {
 			return CacheResult<std::pair<int, int>>::Success(
 				std::pair{ReadIntPragma(db, "PRAGMA busy_timeout"),
 					ReadIntPragma(db, "PRAGMA synchronous")});
@@ -82,7 +82,7 @@ TEST(SqliteConnectionTest, UsesWalWhenSupported) {
 	ASSERT_TRUE(connection.Open((directory.Path() / "wal.db").string()).IsOk());
 
 	auto journal_mode = connection.Use<std::string>(CacheOperation::kInspect, "journal mode",
-		[](sqlite3* db) { return CacheResult<std::string>::Success(ReadTextPragma(db, "PRAGMA journal_mode")); });
+		[](sqlite3* db, const std::string& database_path) { return CacheResult<std::string>::Success(ReadTextPragma(db, "PRAGMA journal_mode")); });
 
 	ASSERT_TRUE(journal_mode.IsOk());
 	EXPECT_EQ(journal_mode.Value(), "wal");
@@ -140,7 +140,7 @@ TEST(SqliteConnectionTest, CloseWaitsForActiveUse) {
 	std::promise<void> release;
 	auto release_future = release.get_future().share();
 	auto use_future = std::async(std::launch::async, [&] {
-		return connection.Use<void>(CacheOperation::kInspect, "blocking callback", [&](sqlite3*) {
+		return connection.Use<void>(CacheOperation::kInspect, "blocking callback", [&](sqlite3*, const std::string&) {
 			entered.set_value();
 			release_future.wait();
 			return CacheResult<void>::Success();
@@ -166,12 +166,12 @@ TEST(SqliteConnectionTest, RejectsSameConnectionReentryFromUseCallback) {
 	SqliteConnection connection;
 	ASSERT_TRUE(connection.Open((directory.Path() / "reentry.db").string()).IsOk());
 
-	auto result = connection.Use<void>(CacheOperation::kInspect, "reentry", [&](sqlite3*) {
+	auto result = connection.Use<void>(CacheOperation::kInspect, "reentry", [&](sqlite3*, const std::string&) {
 		EXPECT_THROW(static_cast<void>(connection.Path()), std::logic_error);
 		EXPECT_THROW(static_cast<void>(connection.IsOpen()), std::logic_error);
 		EXPECT_THROW(connection.Close(), std::logic_error);
 		EXPECT_THROW(connection.Use<void>(CacheOperation::kInspect, "nested",
-			[](sqlite3*) { return CacheResult<void>::Success(); }), std::logic_error);
+			[](sqlite3*, const std::string&) { return CacheResult<void>::Success(); }), std::logic_error);
 		return CacheResult<void>::Success();
 	});
 
@@ -184,7 +184,7 @@ TEST(SqliteConnectionTest, PreservesCallbackFailure) {
 	const std::string path = (directory.Path() / "failure.db").string();
 	ASSERT_TRUE(connection.Open(path).IsOk());
 
-	auto result = connection.Use<int>(CacheOperation::kStep, "callback failure", [&](sqlite3*) {
+	auto result = connection.Use<int>(CacheOperation::kStep, "callback failure", [&](sqlite3*, const std::string&) {
 		return CacheResult<int>::Failure({.operation = CacheOperation::kStep,
 			.primary_code = SQLITE_CONSTRAINT,
 			.extended_code = SQLITE_CONSTRAINT_UNIQUE,
@@ -202,7 +202,7 @@ TEST(SqliteConnectionTest, CallbackExceptionPropagatesAndReleasesReentryGuard) {
 	ASSERT_TRUE(connection.Open((directory.Path() / "exception.db").string()).IsOk());
 
 	EXPECT_THROW(connection.Use<void>(CacheOperation::kInspect, "throws",
-		[](sqlite3*) -> CacheResult<void> { throw std::runtime_error("callback failed"); }),
+		[](sqlite3*, const std::string&) -> CacheResult<void> { throw std::runtime_error("callback failed"); }),
 		std::runtime_error);
 
 	EXPECT_TRUE(connection.IsOpen());
@@ -225,10 +225,39 @@ TEST(SqliteConnectionTest, OpensUnicodeAndSpaceUtf8Path) {
 
 	ASSERT_TRUE(opened.IsOk()) << opened.GetError().Describe();
 	auto pragma = connection.Use<int>(CacheOperation::kInspect, "unicode path pragma",
-		[](sqlite3* db) { return CacheResult<int>::Success(ReadIntPragma(db, "PRAGMA user_version")); });
+		[](sqlite3* db, const std::string& database_path) { return CacheResult<int>::Success(ReadIntPragma(db, "PRAGMA user_version")); });
 	ASSERT_TRUE(pragma.IsOk());
 	EXPECT_EQ(pragma.Value(), 0);
 	EXPECT_TRUE(std::filesystem::exists(filesystem_path));
 }
 
+TEST(SqliteConnectionTest, UsePathSnapshotIsSerializedWithOpen) {
+	TemporaryDirectory directory;
+	SqliteConnection connection;
+	const std::string old_path = (directory.Path() / "old.db").string();
+	const std::string new_path = (directory.Path() / "new.db").string();
+	ASSERT_TRUE(connection.Open(old_path).IsOk());
+	std::promise<void> entered;
+	std::promise<void> release;
+	auto release_future = release.get_future().share();
+	auto use_future = std::async(std::launch::async, [&] {
+		return connection.Use<std::string>(CacheOperation::kInspect, "path snapshot",
+			[&](sqlite3*, const std::string& database_path) {
+				entered.set_value();
+				release_future.wait();
+				return CacheResult<std::string>::Success(database_path);
+			});
+	});
+	entered.get_future().wait();
+	auto open_future = std::async(std::launch::async, [&] { return connection.Open(new_path); });
+	EXPECT_EQ(open_future.wait_for(std::chrono::milliseconds(50)), std::future_status::timeout);
+	release.set_value();
+	auto used_path = use_future.get();
+	ASSERT_TRUE(used_path.IsOk());
+	EXPECT_EQ(used_path.Value(), old_path);
+	EXPECT_TRUE(open_future.get().IsOk());
+	EXPECT_EQ(connection.Path(), new_path);
+}
+
 }  // namespace
+

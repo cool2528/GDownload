@@ -123,8 +123,8 @@ bool SameColumns(const std::vector<ColumnDefinition>& left, const std::vector<Co
 CacheResult<void> EnsureSchema(SqliteConnection& connection, const SchemaDefinition& definition) {
 	auto valid = ValidateDefinition(definition);
 	if (valid.HasError()) return valid;
-	const std::string path = connection.Path();
-	return connection.Use<void>(CacheOperation::kMigrate, "ensure schema", [&](sqlite3* db) {
+	return connection.Use<void>(CacheOperation::kMigrate, "ensure schema", [&](sqlite3* db, const std::string& database_path) {
+		const std::string& path = database_path;
 		auto begin = ExecuteOne(db, path, "BEGIN IMMEDIATE", CacheOperation::kMigrate, false);
 		// BEGIN is intentionally issued by the migrator, not supplied by a migration step.
 		if (begin.HasError()) {
@@ -210,3 +210,4 @@ CacheResult<void> EnsureSchema(SqliteConnection& connection, const SchemaDefinit
 	});
 }
 }  // namespace gdl::cache
+

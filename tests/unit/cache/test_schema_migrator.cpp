@@ -15,11 +15,11 @@ struct DbFixture {
 	SqliteConnection connection;
 	DbFixture() { std::filesystem::create_directories(dir); EXPECT_TRUE(connection.Open((dir / "db.sqlite").string()).IsOk()); }
 	~DbFixture() { connection.Close(); std::error_code ec; std::filesystem::remove_all(dir, ec); }
-	void Exec(const char* sql) { ASSERT_TRUE(connection.Use<void>(CacheOperation::kStep, sql, [=](sqlite3* db) {
+	void Exec(const char* sql) { ASSERT_TRUE(connection.Use<void>(CacheOperation::kStep, sql, [=](sqlite3* db, const std::string& database_path) {
 		return sqlite3_exec(db, sql, nullptr, nullptr, nullptr) == SQLITE_OK ? CacheResult<void>::Success() :
 			CacheResult<void>::Failure({.operation=CacheOperation::kStep,.primary_code=sqlite3_errcode(db),.extended_code=sqlite3_extended_errcode(db),.context=sqlite3_errmsg(db)});
 	}).IsOk()); }
-	int Int(const char* sql) { auto r=connection.Use<int>(CacheOperation::kInspect, sql,[=](sqlite3* db){sqlite3_stmt* s=nullptr; sqlite3_prepare_v2(db,sql,-1,&s,nullptr); int v=sqlite3_step(s)==SQLITE_ROW?sqlite3_column_int(s,0):-1; sqlite3_finalize(s); return CacheResult<int>::Success(v);}); return r.Value(); }
+	int Int(const char* sql) { auto r=connection.Use<int>(CacheOperation::kInspect, sql,[=](sqlite3* db, const std::string& database_path){sqlite3_stmt* s=nullptr; sqlite3_prepare_v2(db,sql,-1,&s,nullptr); int v=sqlite3_step(s)==SQLITE_ROW?sqlite3_column_int(s,0):-1; sqlite3_finalize(s); return CacheResult<int>::Success(v);}); return r.Value(); }
 };
 
 SchemaDefinition CurrentSchema() {
@@ -45,3 +45,4 @@ TEST(SchemaMigratorTest, RejectsInvalidMigrationDefinitionForCurrentDatabase) { 
 TEST(SchemaMigratorTest, RejectsTransactionControlWithoutPartialCommit) { DbFixture f; auto d=CurrentSchema(); d.migrations[0].sql={"ALTER TABLE items ADD COLUMN name TEXT NOT NULL DEFAULT ''","COMMIT"}; f.Exec("CREATE TABLE items(id INTEGER PRIMARY KEY)"); f.Exec("PRAGMA user_version=1"); f.Exec("INSERT INTO items VALUES(9)"); auto r=EnsureSchema(f.connection,d); EXPECT_TRUE(r.HasError()); EXPECT_EQ(f.Int("PRAGMA user_version"),1); EXPECT_EQ(f.Int("SELECT count(*) FROM pragma_table_info('items') WHERE name='name'"),0); EXPECT_EQ(f.Int("SELECT count(*) FROM items WHERE id=9"),1); }
 TEST(SchemaMigratorTest, RejectsNegativeUserVersionWithoutChangingData) { DbFixture f; f.Exec("CREATE TABLE items(id INTEGER PRIMARY KEY,name TEXT NOT NULL)"); f.Exec("INSERT INTO items VALUES(11,'keep')"); f.Exec("PRAGMA user_version=-1"); auto r=EnsureSchema(f.connection,CurrentSchema()); ASSERT_TRUE(r.HasError()); EXPECT_EQ(r.GetError().operation,CacheOperation::kInspect); EXPECT_EQ(r.GetError().primary_code,SQLITE_SCHEMA); EXPECT_EQ(f.Int("PRAGMA user_version"),-1); EXPECT_EQ(f.Int("SELECT count(*) FROM items WHERE id=11"),1); }
 }
+
