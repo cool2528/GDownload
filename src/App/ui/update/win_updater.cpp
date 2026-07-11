@@ -5,14 +5,63 @@
 #include <QDir>
 #include <QStandardPaths>
 #include <QThread>
+#include <QLockFile>
 #include <nlohmann/json.hpp>
 #include "config/config.h"
 #include <QFile>
 #include "logger.h"
+#include "update/update_manifest.h"
+#include "update/update_package_verifier.h"
+#include "update/update_url_policy.h"
+#include "update/redirect_chain_controller.h"
+#include "update_trust_config.h"
+#include "file_update_rollback_store.h"
+#ifdef _WIN32
+#include <windows.h>
+#endif
 namespace gdl {
     namespace update {
 
         namespace {
+#ifdef _WIN32
+			class LockedUpdatePackage final {
+			 public:
+				explicit LockedUpdatePackage(const std::string& path) {
+					const auto wide = QString::fromStdString(path).toStdWString();
+					handle_ = CreateFileW(wide.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr,
+						OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+				}
+				~LockedUpdatePackage() { if (handle_ != INVALID_HANDLE_VALUE) CloseHandle(handle_); }
+				bool IsValid() const { return handle_ != INVALID_HANDLE_VALUE; }
+			 private:
+				HANDLE handle_{INVALID_HANDLE_VALUE};
+			};
+#endif
+			class QProcessInstallerLauncher final : public IInstallerLauncher {
+			 public:
+				InstallationResult LaunchAndWait(const std::filesystem::path& package, std::stop_token stop_token) override {
+					QProcess process;
+					process.setProgram(QString::fromStdString(package.string()));
+					process.start();
+					if (!process.waitForStarted(10000))
+						return {InstallationStatus::kLaunchFailed, 0, process.errorString().toStdString()};
+					const auto deadline = std::chrono::steady_clock::now() + std::chrono::minutes(30);
+					while (!process.waitForFinished(200)) {
+						if (stop_token.stop_requested()) {
+							process.terminate();
+							if (!process.waitForFinished(2000)) { process.kill(); process.waitForFinished(2000); }
+							return {InstallationStatus::kCancelledOrNonZero, 0, "installer cancelled"};
+						}
+						if (std::chrono::steady_clock::now() >= deadline) {
+							process.kill(); process.waitForFinished(5000);
+							return {InstallationStatus::kTimedOut, 0, "installer timed out"};
+						}
+					}
+					if (process.exitStatus() != QProcess::NormalExit || process.exitCode() != 0)
+						return {InstallationStatus::kCancelledOrNonZero, process.exitCode(), "installer failed"};
+					return {InstallationStatus::kSucceeded, 0, {}};
+				}
+			};
             constexpr const char* kGithubMirrorPrefix = "https://gh-proxy.com/";
 
             std::string NormalizeReleaseNotes(std::string raw) {
@@ -162,11 +211,22 @@ namespace gdl {
                 std::string build_;
             };
         }  // namespace VersionTools
-        WinUpdater::WinUpdater() = default;
+        WinUpdater::WinUpdater()
+			: WinUpdater(CreatePlatformPackageVerifier(), std::make_unique<QProcessInstallerLauncher>(),
+				std::make_unique<FileUpdateRollbackStore>(std::filesystem::path(
+					QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString()) /
+					"update" / "highest_release_id")) {}
+
+		WinUpdater::WinUpdater(std::unique_ptr<IPlatformPackageVerifier> verifier,
+			std::unique_ptr<IInstallerLauncher> launcher,
+			std::unique_ptr<IUpdateRollbackStore> rollback_store)
+			: platform_verifier_(std::move(verifier)), installer_launcher_(std::move(launcher)),
+			  rollback_store_(std::move(rollback_store)) {}
 
         WinUpdater::~WinUpdater() {
             alive_->store(false);
             CancelUpdate();
+			if (installation_thread_.joinable()) installation_thread_.join();
         }
 
         bool WinUpdater::Initialize(const UpdateConfig& config) {
@@ -252,33 +312,19 @@ namespace gdl {
             progress_callback_	= progress_callback;
             update_in_progress_ = true;
 
-            // Create download path
-            update_package_path_ = QString::fromStdString(config_.temp_dir) + "/gdownload_latest_" +
-                                   QString::fromStdString(update_info_.version) + ".exe";
-
-            // Check if the same version package already exists
+            update_package_path_ = QString::fromStdString(CreateUniqueUpdateTempPath(config_.temp_dir, ".exe").string());
             QFileInfo file_info(update_package_path_);
-            if (file_info.exists() && file_info.size() == update_info_.package_size) {
-                // File exists and size matches, skip download
-                if (progress_callback_) {
-                    UpdateProgress progress;
-                    progress.stage		= UpdateProgress::Stage::kInstalling;
-                    progress.percentage = 100;
-                    progress.message	= "Using already downloaded update package";
-                    progress_callback_(progress);
-                }
-                return true;
-            }
 
             // Start download
-            const auto actual_download_url = ApplyGithubMirrorIfNeeded(update_info_.download_url);
+			const std::vector<std::string> allowed_download_hosts{"github.com", "objects.githubusercontent.com", "gdownload.uk"};
+			const auto actual_download_url = update_info_.download_url;
+			if (!ValidateDownloadUrl(actual_download_url, allowed_download_hosts)) {
+				last_error_ = "Update download URL is not allowed";
+				update_in_progress_ = false;
+				return false;
+			}
             QNetworkRequest request(QUrl(QString::fromStdString(actual_download_url)));
 
-            // Support resume download
-            if (file_info.exists() && file_info.size() > 0 && file_info.size() < update_info_.package_size) {
-                QString range_header = QString("bytes=%1-").arg(file_info.size());
-                request.setRawHeader("Range", range_header.toUtf8());
-            }
 
             // Add custom request headers
             for (const auto& header : request_headers_) {
@@ -287,13 +333,10 @@ namespace gdl {
 
             // Set timeout
             request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysNetwork);
-            request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+            request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::UserVerifiedRedirectPolicy);
 
             // Open file for writing
-            QIODevice::OpenMode open_mode = QIODevice::WriteOnly;
-            if (request.hasRawHeader("Range")) {
-                open_mode |= QIODevice::Append;
-            }
+            QIODevice::OpenMode open_mode = QIODevice::WriteOnly | QIODevice::Truncate;
 
             download_file_.setFileName(update_package_path_);
             if (!download_file_.open(open_mode)) {
@@ -303,7 +346,7 @@ namespace gdl {
             }
 
             // Record downloaded bytes (for resume)
-            qint64 downloaded_bytes = request.hasRawHeader("Range") ? file_info.size() : 0;
+            qint64 downloaded_bytes = 0;
 
             // Create and send request
             auto reply = network_manager_.get(request);
@@ -315,6 +358,13 @@ namespace gdl {
             }
             current_download_reply_	   = reply;  // 供 CancelUpdate 中止
             download_failed_notified_ = false;    // 重置失败通知标志
+			auto redirect_chain = std::make_shared<RedirectChainController>(actual_download_url,
+				allowed_download_hosts, 5);
+			QObject::connect(reply, &QNetworkReply::redirected, [reply, redirect_chain](const QUrl& target) {
+				const auto result = redirect_chain->Follow(target.toString().toStdString());
+				if (result.decision == RedirectChainDecision::kFollow) reply->redirectAllowed();
+				else reply->abort();
+			});
 
             // Connect signals
 			QObject::connect(reply, &QNetworkReply::readyRead, [this, reply, alive = alive_]() {
@@ -396,45 +446,31 @@ namespace gdl {
                     return;
                 }
 
-                // Verify file size
-                QFileInfo file_info(update_package_path_);
-                if (file_info.size() != update_info_.package_size) {
-                    last_error_			= "Downloaded file size mismatch";
-                    update_in_progress_ = false;
-
-                    if (progress_callback_) {
-                        UpdateProgress progress;
-                        progress.stage		= UpdateProgress::Stage::kFailed;
-                        progress.percentage = 0;
-                        progress.message	= "File size verification failed";
-                        progress_callback_(progress);
-                    }
-
-                    reply->deleteLater();
-                    return;
-                }
-
-                // 校验 SHA-256（latest.json 提供时）；缺失则降级为大小校验并告警（S2）
-                if (!update_info_.sha256.empty()) {
-                    const QString actual_sha = ComputeFileSha256(update_package_path_);
-                    if (actual_sha.isEmpty() ||
-                        actual_sha.compare(QString::fromStdString(update_info_.sha256), Qt::CaseInsensitive) != 0) {
+                const auto verification = VerifyUpdatePackage(update_package_path_.toStdString(),
+                    update_info_.package_size, update_info_.sha256);
+                if (!verification.ok) {
                         QFile::remove(update_package_path_);
-                        last_error_ = "Update package SHA-256 mismatch";
+                        last_error_ = verification.error;
                         update_in_progress_ = false;
                         if (progress_callback_) {
                             UpdateProgress progress;
                             progress.stage = UpdateProgress::Stage::kFailed;
                             progress.percentage = 0;
-                            progress.message = "SHA-256 verification failed";
+                            progress.message = "Update package verification failed";
                             progress_callback_(progress);
                         }
                         reply->deleteLater();
                         return;
-                    }
-                } else {
-                    LOG_WARN("update package has no sha256 field, fell back to size-only check");
                 }
+				const std::vector<std::string> allowed_download_hosts{"github.com", "objects.githubusercontent.com", "gdownload.uk"};
+				if (!ValidateDownloadUrl(reply->url().toString().toStdString(), allowed_download_hosts)) {
+					last_error_ = "Update download redirect target is not allowed";
+					update_in_progress_ = false;
+					download_file_.close();
+					QFile::remove(update_package_path_);
+					reply->deleteLater();
+					return;
+				}
 
                 // Download complete
                 if (progress_callback_) {
@@ -461,6 +497,7 @@ namespace gdl {
         }
 
         void WinUpdater::CancelUpdate() {
+			if (installation_thread_.joinable()) installation_thread_.request_stop();
             if (current_check_reply_) {
                 current_check_reply_->abort();
                 current_check_reply_ = nullptr;
@@ -487,6 +524,44 @@ namespace gdl {
                 update_in_progress_ = false;
                 return false;
             }
+
+			if (!platform_verifier_ || !installer_launcher_ || !rollback_store_) {
+				last_error_ = "Update trust services are unavailable";
+				update_in_progress_ = false;
+				return false;
+			}
+			if (installation_thread_.joinable()) return false;
+			const auto package = update_package_path_.toStdString();
+			const auto info = update_info_;
+			installation_thread_ = std::jthread([this, package, info](std::stop_token stop_token) {
+#ifdef _WIN32
+				LockedUpdatePackage package_lock(package);
+				if (!package_lock.IsValid()) {
+					std::lock_guard lock(error_mutex_);
+					last_error_ = "Failed to lock update package";
+					update_in_progress_ = false;
+					return;
+				}
+#endif
+				InstallationGate gate(*platform_verifier_, *installer_launcher_, *rollback_store_);
+				const auto result = gate.Install(package, info.package_size, info.sha256,
+					GDOWNLOAD_UPDATE_SIGNER_SPKI_PIN, info.release_id, stop_token);
+				update_in_progress_ = false;
+				if (!result.Succeeded()) {
+					std::lock_guard lock(error_mutex_);
+					last_error_ = result.detail.empty() ? "Update installation failed" : result.detail;
+				}
+				const auto callback = progress_callback_;
+				const auto alive = alive_;
+				const UpdateProgress progress{result.Succeeded() ? UpdateProgress::Stage::kFinished :
+					UpdateProgress::Stage::kFailed, 100, result.Succeeded() ? "Update installed successfully" : result.detail};
+				if (callback && QCoreApplication::instance()) {
+					QMetaObject::invokeMethod(QCoreApplication::instance(), [alive, callback, progress] {
+						if (alive->load()) callback(progress);
+					}, Qt::QueuedConnection);
+				}
+			});
+			return true;
 
             // 执行安装包前再次校验 SHA-256（TOCTOU 缓解）（S2）
             if (!update_info_.sha256.empty()) {
@@ -600,10 +675,21 @@ namespace gdl {
             QByteArray data = reply->readAll();
             try {
 
-                nlohmann::json doc = nlohmann::json::parse(data.toStdString());
-                UpdateInfo info;
-                if (!doc.contains("tag_name")) {
-                    last_error_ = "Invalid update info";
+				const auto rollback_state = rollback_store_ ? rollback_store_->HighestReleaseId() :
+					RollbackReadResult{false, 0, "rollback store unavailable"};
+				if (!rollback_state.ok) {
+					last_error_ = rollback_state.error;
+					if (callback) callback(false, UpdateInfo{});
+					return;
+				}
+                const ManifestPolicy policy{"windows-x64", ".exe",
+                    {"github.com", "objects.githubusercontent.com", "gdownload.uk"},
+					rollback_state.value,
+                    QDateTime::currentSecsSinceEpoch()};
+                const auto verified = VerifyUpdateManifest(data.toStdString(),
+                    GDOWNLOAD_UPDATE_PUBLIC_KEY_BASE64, policy);
+                if (!verified.ok) {
+                    last_error_ = verified.error;
                     if (!is_fallback && !config_.fallback_update_url.empty()) {
                         startCheckRequest(config_.fallback_update_url, true, callback);
                         return;
@@ -613,9 +699,8 @@ namespace gdl {
                     }
                     return;
                 }
-                QString tag_name = QString::fromStdString(doc["tag_name"].get<std::string>());
-                tag_name		 = tag_name.replace("v", "");
-                VersionTools::Version new_version(tag_name.toStdString());
+                const auto& manifest = verified.manifest;
+                VersionTools::Version new_version(manifest.version);
                 VersionTools::Version old_version(config_.current_version);
                 if (new_version <= old_version) {
                     if (callback) {
@@ -623,44 +708,22 @@ namespace gdl {
                     }
                     return;
                 }
-                info.version		 = tag_name.toStdString();
-                QString published_at = QString::fromStdString(doc["published_at"].get<std::string>());
-                info.release_date =
-                    QDateTime::fromString(published_at, Qt::ISODate).toString("yyyy-MM-dd hh:mm:ss").toStdString();
-                info.release_notes = NormalizeReleaseNotes(doc["body"].get<std::string>());
-                if (doc.contains("assets") && doc["assets"].is_array()) {
-                    for (auto asset : doc["assets"]) {
-                        if (asset.contains("browser_download_url") && asset.contains("name")) {
-                            const auto name = asset["name"].get<std::string>();
-                            if (name.find(".exe") == std::string::npos) {
-                                continue;
-                            }
-                            info.download_url = asset["browser_download_url"].get<std::string>();
-                            info.package_size = asset["size"].get<int64_t>();
-                            if (asset.contains("sha256")) info.sha256 = asset["sha256"].get<std::string>();
-                            break;
-                        }
-                    }
-                    if (!info.download_url.empty()) {
-                        // 成功找到可更新的安装包，清空可能残留的上次检查错误信息
-                        if (info.sha256.empty() && doc.contains("sha256")) info.sha256 = doc["sha256"].get<std::string>();
-                        last_error_.clear();
-                        update_available_ = true;
-                        update_info_	  = info;
-                        if (callback) {
-                            callback(true, info);
-                        }
-                        return;
-                    }
-                }
-                if (!is_fallback && !config_.fallback_update_url.empty()) {
-                    last_error_ = "No Windows update package found in primary update info";
-                    startCheckRequest(config_.fallback_update_url, true, callback);
-                    return;
-                }
-                if (callback) {
-                    callback(false, UpdateInfo{});
-                }
+                UpdateInfo info;
+                info.release_id = manifest.release_id;
+                info.version = manifest.version;
+                info.asset_name = manifest.asset.name;
+                info.published_at = manifest.published_at;
+                info.expires_at = manifest.expires_at;
+                info.release_date = QDateTime::fromSecsSinceEpoch(manifest.published_at).toString("yyyy-MM-dd hh:mm:ss").toStdString();
+                info.release_notes = NormalizeReleaseNotes(manifest.notes);
+                info.download_url = manifest.asset.url;
+                info.package_size = manifest.asset.size;
+                info.sha256 = manifest.asset.sha256;
+                last_error_.clear();
+                update_available_ = true;
+                update_info_ = info;
+                if (callback) callback(true, info);
+                return;
 
             } catch (std::exception& e) {
                 last_error_ = e.what();
