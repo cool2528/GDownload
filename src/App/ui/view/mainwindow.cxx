@@ -83,9 +83,10 @@ namespace gd {
 			gdl::ui::theme::RegisterTypes(engine);
 			qmlRegisterUncreatableMetaObject(SegoeFluentIcons::staticMetaObject, GEXPORT_MODULE_URL, 1, 0,
 											 "SegoeFluentIcons", "SegoeFluentIcons enum");
-			if (!gdl::cache::DownloadHistoryCache::Instance().Initialize(gdl::os::GetAppDataDir() +
-																		 "/gdownload/db/gdownload.db")) {
-				LOG_ERR("init download history cache fail")
+			const auto cache_init_result = gdl::cache::DownloadHistoryCache::Instance().Initialize(
+				gdl::os::GetAppDataDir() + "/gdownload/db/gdownload.db");
+			if (cache_init_result.HasError()) {
+				LOG_ERR("init download history cache fail: {}", cache_init_result.GetError().Describe())
 			}
 			gdl::ui::browser::RegisterTypes(engine);
 			gdl::ui::toast::RegisterTypes(engine);
@@ -145,7 +146,10 @@ namespace gd {
 			if (!is_test) {
 				gdl::engine::Aria2cDownloadManager::Instance().UninitAria2cEngine();
 			}
-			gdl::cache::DownloadHistoryCache::Instance().Uninitialize();
+			const auto cache_uninit_result = gdl::cache::DownloadHistoryCache::Instance().Uninitialize();
+			if (cache_uninit_result.HasError()) {
+				LOG_ERR("uninit download history cache fail: {}", cache_uninit_result.GetError().Describe())
+			}
 			gdl::ui::settings::Settings::Instance().UnInit();
 		}
 

@@ -573,8 +573,13 @@ namespace gdl {
 				if (!AddHttpTask(request->urls, request->options)) {
 					return false;
 				}
-				const bool history_removed =
+				const auto history_remove_result =
 					gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
+				const bool history_removed = history_remove_result.IsOk();
+				if (history_remove_result.HasError()) {
+					LOG_ERR("Failed to remove retry task from history cache gid:{} error:{}", gid.toStdString(),
+							history_remove_result.GetError().Describe());
+				}
 
 				QString aria2_error;
 				if (RemoveAria2DownloadResultByGid(gid, &aria2_error) ==
@@ -635,8 +640,13 @@ namespace gdl {
 				}
 				result.task_removed = true;
 
-				result.history_cleaned =
+				const auto history_remove_result =
 					gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
+				result.history_cleaned = history_remove_result.IsOk();
+				if (history_remove_result.HasError()) {
+					LOG_ERR("RemoveStopTask failed to remove history record gid:{} error:{}", gid.toStdString(),
+							history_remove_result.GetError().Describe());
+				}
 				if (deletion_decision.show_cleanup_warning) {
 					LOG_WARN("RemoveStopTask aria2 cleanup warning gid:{} warning:{}", gid.toStdString(),
 							 deletion_decision.warning_message.toStdString());
@@ -860,15 +870,21 @@ namespace gdl {
 									if (stopped_model_->ContainsTask(task_id)) {
 										stopped_model_->UpdateTaskById(task_id, task_info);
 										gdl::cache::DownloadRecord record = DownloadTaskInfoToRecord(task_info);
-										if (!gdl::cache::DownloadHistoryCache::Instance().UpdateRecord(record)) {
-											LOG_ERR("Failed to UPDATE record to history cache {}", record.save_path);
+										const auto update_result =
+											gdl::cache::DownloadHistoryCache::Instance().UpdateRecord(record);
+										if (update_result.HasError()) {
+											LOG_ERR("Failed to UPDATE record to history cache {} error:{}", record.save_path,
+													update_result.GetError().Describe());
 										}
 									}
 									else {
 										stopped_model_->AddTask(task_info);
 										gdl::cache::DownloadRecord record = DownloadTaskInfoToRecord(task_info);
-										if (!gdl::cache::DownloadHistoryCache::Instance().AddRecord(record)) {
-											LOG_ERR("Failed to add record to history cache {}", record.save_path);
+										const auto add_result =
+											gdl::cache::DownloadHistoryCache::Instance().AddRecord(record);
+										if (add_result.HasError()) {
+											LOG_ERR("Failed to add record to history cache {} error:{}", record.save_path,
+													add_result.GetError().Describe());
 										}
 									}
 
@@ -910,15 +926,24 @@ namespace gdl {
 				
 			}
 			void BrowserManagerImpl::InitDownloadHistoryCache() const {
-				const auto records = gdl::cache::DownloadHistoryCache::Instance().GetRecords();
-				for (const auto& record : records) {
+				const auto records_result = gdl::cache::DownloadHistoryCache::Instance().GetRecords();
+				if (records_result.HasError()) {
+					LOG_ERR("Failed to read download history cache: {}", records_result.GetError().Describe());
+					return;
+				}
+				for (const auto& record : records_result.Value()) {
 					DownloadTaskInfo info = DownloadRecordToTaskInfo(record);
 					if (stopped_model_ && !stopped_model_->ContainsTask(info.task_id())) {
 						if (ShouldRestoreHistoryTask(info, QFile::exists(info.task_save_path()))) {
 							stopped_model_->AddTask(info);
 						}
 						else {
-							gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(info.task_id().toStdString());
+							const auto delete_result = gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(
+								info.task_id().toStdString());
+							if (delete_result.HasError()) {
+								LOG_ERR("Failed to remove stale history record gid:{} error:{}",
+										info.task_id().toStdString(), delete_result.GetError().Describe());
+							}
 						}
 					}
 				}

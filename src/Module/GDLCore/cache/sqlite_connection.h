@@ -38,7 +38,7 @@ namespace gdl::cache {
 				return CacheResult<T>::Failure(MakeClosedError(operation, std::move(context)));
 			}
 			UseGuard guard(this);
-			return std::forward<Callback>(callback)(db_);
+			return std::forward<Callback>(callback)(db_, path_);
 		}
 
 	   private:

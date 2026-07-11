@@ -3,6 +3,7 @@
 #include <optional>
 #include <vector>
 #include "download_record.h"
+#include "cache_result.h"
 #include "export.h"
 #include "globalTypes.h"
 #include "singleton.hpp"
@@ -12,31 +13,31 @@ namespace gdl {
         class GDLCore_API DownloadHistoryCache : public Singleton<DownloadHistoryCache> {
             SINGLETON_DECLARE(DownloadHistoryCache)
 		   public:
-			bool Initialize(const String& db_path);
-			void Uninitialize();
+			CacheResult<void> Initialize(const String& db_path);
+			CacheResult<void> Uninitialize();
             ~DownloadHistoryCache();
 			// 基础CRUD操作
-			bool AddRecord(const DownloadRecord& record);
-			bool UpdateRecord(const DownloadRecord& record);
-			bool DeleteRecord(const std::string& task_id);
-			std::optional<DownloadRecord> GetRecord(const std::string& task_id);
-			std::vector<DownloadRecord> GetRecords(int limit = -1, int offset = 0);
+			CacheResult<void> AddRecord(const DownloadRecord& record);
+			CacheResult<void> UpdateRecord(const DownloadRecord& record);
+			CacheResult<void> DeleteRecord(const std::string& task_id);
+			CacheResult<std::optional<DownloadRecord>> GetRecord(const std::string& task_id);
+			CacheResult<std::vector<DownloadRecord>> GetRecords(int limit = -1, int offset = 0);
 
 			// 查询接口
-			std::vector<DownloadRecord> SearchByFileName(const std::string& keyword);
-			std::vector<DownloadRecord> GetRecordsByState(DownloadState state);
-			std::vector<DownloadRecord> GetRecordsByDateRange(time_t start, time_t end);
+			CacheResult<std::vector<DownloadRecord>> SearchByFileName(const std::string& keyword);
+			CacheResult<std::vector<DownloadRecord>> GetRecordsByState(DownloadState state);
+			CacheResult<std::vector<DownloadRecord>> GetRecordsByDateRange(time_t start, time_t end);
 
 			// 统计接口
-			size_t GetTotalCount();
-			size_t GetCountByState(DownloadState state);
-			int64_t GetTotalDownloadSize();
+			CacheResult<size_t> GetTotalCount();
+			CacheResult<size_t> GetCountByState(DownloadState state);
+			CacheResult<int64_t> GetTotalDownloadSize();
 
-			bool ClearRecords();
+			CacheResult<void> ClearRecords();
+			class Impl;
 
 		   private:
 			DownloadHistoryCache();
-			class Impl;
 			std::unique_ptr<Impl> impl_;
 		};
 
