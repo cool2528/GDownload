@@ -5,6 +5,9 @@
 #include <boost/asio.hpp>
 #include "Engine_export.h"
 #include "aria2c_websocket_rpc_client.h"
+#include "aria2c_lifecycle_adapters.h"
+#include "aria2c_lifecycle_controller.h"
+#include "poll_drain_gate.h"
 #include "globalTypes.h"
 #include "publish_subscribe_system.h"
 #include "result/result.h"
@@ -55,6 +58,7 @@ namespace gdl {
 			~Aria2cDownloadManager();
 			bool InitAria2cEngine(const String_View& aria2c_path);
 			void UninitAria2cEngine();
+			void SetEngineAvailabilityCallback(std::function<void(bool)> callback);
 			bool EngineIsRuning() const { return engine_is_runing_; }
             Result<bool> AddHttpTask(const std::vector<String>& url,
 									 const std::unordered_multimap<std::string, std::string>& options);
@@ -245,12 +249,18 @@ namespace gdl {
 			std::vector<std::thread> worker_threads_;
 			PubSubSystem<std::string> pub_sub_system_;
 			Aria2cWebSocketClient websocket_client_;
+			// 析构顺序为 controller -> adapter -> client，保证非 owning 引用有效。
+			Aria2ProcessLifecycleAdapter process_lifecycle_;
+			Aria2RpcLifecycleAdapter rpc_lifecycle_;
+			Aria2LifecycleController lifecycle_controller_;
+			PollDrainGate poll_drain_gate_;
+			std::mutex availability_callback_mutex_;
+			std::function<void(bool)> availability_callback_;
 			std::atomic_int64_t active_num_{0};
 			std::atomic_int64_t waiting_num_{0};
 			std::atomic_int64_t stopped_num_{0};
 			// tracker 同步移出 io 线程（E3）：独立线程执行阻塞 HTTP，Uninit 时 wait
 			TrackerSyncGate tracker_sync_gate_;
-			std::int64_t aria2c_pid_{-1};  // aria2c 子进程 pid，退出时优雅关闭并回收（S3）
 		};
 	}  // namespace engine
 

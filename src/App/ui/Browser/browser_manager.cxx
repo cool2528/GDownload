@@ -114,6 +114,14 @@ namespace gdl {
 
 			BrowserManagerImpl::~BrowserManagerImpl() {}
 
+			void BrowserManagerImpl::SetEngineUnavailable(const QString& message) {
+				if (!engine_available_ && engine_unavailable_message_ == message) return;
+				engine_available_ = false;
+				engine_unavailable_message_ = message;
+				emit engineAvailabilityChanged();
+				emit sigErrorMessage(message);
+			}
+
 			Q_INVOKABLE void BrowserManagerImpl::SyncTrackersServerlist(){
 				engine::Aria2cDownloadManager::Instance().UpdateMagnetServerList();
 			}
@@ -771,19 +779,19 @@ namespace gdl {
 				// subscribe active progress
 				res = engine::Aria2cDownloadManager::Instance().SubscriptionAria2Message(
 					kAria2ActiveProgress, [this](const std::string& msg) { OnHandleAria2ActiveProgress(msg); });
-				if (res.HasError()) return false;
+				if (res.HasError()) { UnInit(); return false; }
 				aria2_active_progress_subcription_ = res.Value();
 				// subscribe sync server list
 				res = engine::Aria2cDownloadManager::Instance().SubscriptionAria2Message(
 					kAria2SyncMagnetServerList, [this](const std::string& msg) { 
 						Q_EMIT sigUpdateSyncServerList(QString::fromStdString(msg));
 					});
-				if (res.HasError()) return false;
+				if (res.HasError()) { UnInit(); return false; }
 				aria2_sync_server_list_subcription_ = res.Value();
 				// subscribe tracker update status
 				res = engine::Aria2cDownloadManager::Instance().SubscriptionAria2Message(
 					kAria2TrackerUpdateStatus, [this](const std::string& msg) { OnHandleTrackerUpdateStatus(msg); });
-				if (res.HasError()) return false;
+				if (res.HasError()) { UnInit(); return false; }
 				aria2_tracker_update_status_subscription_ = res.Value();
 				return true;
 			}
@@ -791,18 +799,22 @@ namespace gdl {
 			void BrowserManagerImpl::UnInit() {
 				if (aria2_responce_subcription_) {
 					engine::Aria2cDownloadManager::Instance().UnSubscribeAria2Message(aria2_responce_subcription_);
+					aria2_responce_subcription_.reset();
 				}
 				if (aria2_active_progress_subcription_) {
 					engine::Aria2cDownloadManager::Instance().UnSubscribeAria2Message(
 						aria2_active_progress_subcription_);
+					aria2_active_progress_subcription_.reset();
 				}
 				if (aria2_sync_server_list_subcription_) {
 					engine::Aria2cDownloadManager::Instance().UnSubscribeAria2Message(
 						aria2_sync_server_list_subcription_);
+					aria2_sync_server_list_subcription_.reset();
 				}
 				if (aria2_tracker_update_status_subscription_) {
 					engine::Aria2cDownloadManager::Instance().UnSubscribeAria2Message(
 						aria2_tracker_update_status_subscription_);
+					aria2_tracker_update_status_subscription_.reset();
 				}
 			}
 

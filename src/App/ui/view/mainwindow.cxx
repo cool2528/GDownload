@@ -1,5 +1,6 @@
 ﻿#include "mainwindow.h"
 #include <QApplication>
+#include "engine_startup_policy.h"
 #include <QFontDatabase>
 #include <QQmlContext>
 #include <QUrl>
@@ -106,8 +107,20 @@ namespace gd {
 #else
 				aria2c_engine_path = app_path + "/engine/aria2c";
 #endif
-				gdl::engine::Aria2cDownloadManager::Instance().InitAria2cEngine(aria2c_engine_path.toStdString());
-				gdl::ui::browser::BrowserManagerImpl::Instance().Init();
+				auto& browser_manager = gdl::ui::browser::BrowserManagerImpl::Instance();
+				gdl::engine::Aria2cDownloadManager::Instance().SetEngineAvailabilityCallback(
+					[manager = &browser_manager](bool available) {
+						if (available) return;
+						QMetaObject::invokeMethod(manager, [manager] {
+							manager->SetEngineUnavailable(QObject::tr("The download engine stopped unexpectedly."));
+						}, Qt::QueuedConnection);
+					});
+				gdl::ui::RunEngineStartupPolicy(
+					[&] { return gdl::engine::Aria2cDownloadManager::Instance().InitAria2cEngine(
+						aria2c_engine_path.toStdString()); },
+					[&] { return browser_manager.Init(); },
+					[&] { gdl::engine::Aria2cDownloadManager::Instance().UninitAria2cEngine(); },
+					[&] { browser_manager.SetEngineUnavailable(QObject::tr("Download engine is unavailable.")); });
 				// 自动更新检查
 				gdl::update::UpdateConfig update_config;
 				update_config.current_version	 = GDownload_VERSION_STRING;
@@ -144,6 +157,7 @@ namespace gd {
 			const bool is_test = gdl::ui::isTestMode();
 			gdl::ui::browser::BrowserManager::Instance().UnInit();
 			if (!is_test) {
+				gdl::engine::Aria2cDownloadManager::Instance().SetEngineAvailabilityCallback({});
 				gdl::engine::Aria2cDownloadManager::Instance().UninitAria2cEngine();
 			}
 			const auto cache_uninit_result = gdl::cache::DownloadHistoryCache::Instance().Uninitialize();

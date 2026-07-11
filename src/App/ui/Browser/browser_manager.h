@@ -21,6 +21,8 @@ namespace gdl {
 			// 保留 Q_INVOKABLE 以确保 moc 注册元对象信息,QML 侧方法调用不受影响
 			class BrowserManagerImpl : public QObject, public IBrowserManager, public Singleton<BrowserManagerImpl> {
 				Q_OBJECT
+				Q_PROPERTY(bool engineAvailable READ engineAvailable NOTIFY engineAvailabilityChanged)
+				Q_PROPERTY(QString engineUnavailableMessage READ engineUnavailableMessage NOTIFY engineAvailabilityChanged)
 				SINGLETON_DECLARE(BrowserManagerImpl)
 				QML_SINGLETON
 			   public:
@@ -84,6 +86,9 @@ namespace gdl {
 
 				bool Init();
 				void UnInit();
+				bool engineAvailable() const { return engine_available_; }
+				QString engineUnavailableMessage() const { return engine_unavailable_message_; }
+				void SetEngineUnavailable(const QString& message);
 
 			   public:
 			   Q_SIGNALS:
@@ -92,6 +97,7 @@ namespace gdl {
                 void sigUpdateActiveProgress(const double& progress) override;
 				void sigUpdateSyncServerList(const QString& list) override;
 				void sigTrackerUpdateStatus(const QString& status) override;
+				void engineAvailabilityChanged();
 
 			   protected:
 				// 构造函数为 protected:允许测试替身 FakeBrowserManager 继承并构造基类子对象
@@ -122,6 +128,8 @@ namespace gdl {
                 engine::Subscription aria2_active_progress_subcription_{nullptr};
 				engine::Subscription aria2_sync_server_list_subcription_{nullptr};
 				engine::Subscription aria2_tracker_update_status_subscription_{nullptr};
+				bool engine_available_{true};
+				QString engine_unavailable_message_;
 			};
 			// 类型别名:保 4 处现有 BrowserManager::Instance() 调用点零改动
 			using BrowserManager = BrowserManagerImpl;
