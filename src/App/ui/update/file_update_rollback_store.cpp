@@ -40,4 +40,12 @@ namespace gdl::update {
 		});
 		return result.HasError() ? RollbackPersistenceResult{false, result.GetError().what()} : RollbackPersistenceResult{true, {}};
 	}
+	RollbackPersistenceResult FileUpdateRollbackStore::RestoreHighestReleaseId(std::uint64_t release_id) {
+		const auto result = gdl::filesystem::AtomicFileReplace(state_path_, [release_id](std::ostream& output) {
+			output << release_id << '\n';
+			return output ? gdl::Result<void>(gdl::Error(0, {})) :
+				gdl::Result<void>(gdl::MakeFail(1, "failed to restore rollback state"));
+		});
+		return result.HasError() ? RollbackPersistenceResult{false, result.GetError().what()} : RollbackPersistenceResult{true, {}};
+	}
 }

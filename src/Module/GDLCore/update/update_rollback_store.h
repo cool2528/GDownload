@@ -15,5 +15,6 @@ namespace gdl::update {
 		virtual void ReleaseInstallationLease() = 0;
 		virtual RollbackReadResult HighestReleaseId() const = 0;
 		virtual RollbackPersistenceResult PersistHighestReleaseId(std::uint64_t release_id) = 0;
+		virtual RollbackPersistenceResult RestoreHighestReleaseId(std::uint64_t release_id) = 0;
 	};
 }  // namespace gdl::update

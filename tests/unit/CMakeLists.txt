@@ -161,6 +161,9 @@ target_include_directories(gdownload_update_trust_tests PRIVATE
 	${CMAKE_SOURCE_DIR}/src/App/ui
     ${CMAKE_SOURCE_DIR}/src/Module/GDLCore
 )
+target_compile_definitions(gdownload_update_trust_tests PRIVATE
+    GDOWNLOAD_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+)
 add_test(NAME UpdateTrustTests COMMAND gdownload_update_trust_tests)
 set_tests_properties(UpdateTrustTests PROPERTIES
     TIMEOUT 60

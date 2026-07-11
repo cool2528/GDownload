@@ -5,6 +5,7 @@
 #include <atomic>
 #include <memory>
 #include <thread>
+#include <mutex>
 #include "auto_updater.h"
 namespace appimage {
     namespace update {
@@ -29,6 +30,7 @@ namespace gdl {
            private:
             void UpdateProgressThread();
             void LogMessages();
+			void DispatchProgress(UpdateProgress progress);
             void startCheckRequest(const std::string& update_url, bool is_fallback, UpdateCheckCallback callback);
             void handleNetworkReply(QNetworkReply* reply, bool is_fallback, UpdateCheckCallback callback);
             UpdateConfig config_;
@@ -46,6 +48,8 @@ namespace gdl {
             std::atomic<bool> update_available_{false};
             std::atomic<bool> update_in_progress_{false};
             std::atomic<bool> should_stop_thread_{false};
+			std::atomic<bool> update_worker_running_{false};
+			std::mutex update_thread_mutex_;
         };
 
     }  // namespace update

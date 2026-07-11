@@ -14,6 +14,7 @@
 #include "update/file_update_rollback_store.h"
 #include "update/installation_gate.h"
 #include "update/linux_appimage_gate.h"
+#include "update/prepared_appimage.h"
 #include "update/update_rollback_store.h"
 
 namespace {
@@ -108,7 +109,8 @@ TEST(UpdateManifestTest, RejectsMalformedExpiredRollbackPlatformHostSchemeSuffix
 	ManifestPolicy policy{"windows-x64", ".exe", {"github.com"}, 41, 1500};
 	EXPECT_FALSE(VerifyUpdateManifest("{", PublicKeyBase64(key.key), policy).ok);
 	auto json = ManifestJson(); json["expires_at"] = 1400; EXPECT_FALSE(check(json, policy));
-	json = ManifestJson(); policy.highest_release_id = 42; EXPECT_FALSE(check(json, policy));
+	json = ManifestJson(); policy.highest_release_id = 43; EXPECT_FALSE(check(json, policy));
+	json = ManifestJson(); policy.highest_release_id = 42; EXPECT_TRUE(check(json, policy));
 	policy.highest_release_id = 41; json["platform"] = "linux-x64"; EXPECT_FALSE(check(json, policy));
 	json = ManifestJson(); json["asset"]["url"] = "http://github.com/a.exe"; EXPECT_FALSE(check(json, policy));
 	json = ManifestJson(); json["asset"]["url"] = "https://evil.example/a.exe"; EXPECT_FALSE(check(json, policy));
@@ -264,6 +266,9 @@ class FakeUpdateRollbackStore final : public IUpdateRollbackStore {
 		highest_release_id = release_id;
 		return persist_result;
 	}
+	RollbackPersistenceResult RestoreHighestReleaseId(std::uint64_t release_id) override {
+		++restore_count; highest_release_id = release_id; return restore_result;
+	}
 
 	std::uint64_t highest_release_id{0};
 	int persist_count{0};
@@ -272,6 +277,8 @@ class FakeUpdateRollbackStore final : public IUpdateRollbackStore {
 	int release_count{0};
 	mutable std::size_t read_count{0};
 	std::vector<RollbackReadResult> read_results;
+	int restore_count{0};
+	RollbackPersistenceResult restore_result{true, {}};
 };
 
 class InstallationGateTest : public testing::Test {
@@ -410,9 +417,12 @@ TEST(FileUpdateRollbackStoreTest, DirectoryAtStatePathFailsClosed) {
 
 class FakeAppImageVerifier final : public ILinuxAppImageVerifier {
    public:
-	AppImageSignatureState Verify(const std::filesystem::path&) const override { ++calls; return state; }
+	AppImageSignatureState Verify(const std::filesystem::path& path) const override {
+		++calls; if (on_verify) on_verify(path); return state;
+	}
 	mutable int calls{0};
 	AppImageSignatureState state{AppImageSignatureState::kPassed};
+	std::function<void(const std::filesystem::path&)> on_verify;
 };
 
 class FakeAppImageLauncher final : public ILinuxAppImageLauncher {
@@ -470,10 +480,81 @@ TEST_F(LinuxAppImageGateTest, RollbackReadFailureAndOldReleaseDoNotLaunch) {
 	EXPECT_EQ(appimage_launcher.calls, 0);
 }
 
-TEST_F(LinuxAppImageGateTest, PersistFailureIsVisibleAfterSuccessfulHandoff) {
+TEST_F(LinuxAppImageGateTest, PersistFailureIsVisibleAndPreventsHandoff) {
 	rollback_store.persist_result = {false, "sync failed"};
 	LinuxAppImageGate gate(appimage_verifier, appimage_launcher, rollback_store, true);
 	EXPECT_EQ(gate.Apply(package, 4, digest, 42).status, InstallationStatus::kPersistenceFailed);
-	EXPECT_EQ(appimage_launcher.calls, 1);
+	EXPECT_EQ(appimage_launcher.calls, 0);
+}
+
+TEST_F(LinuxAppImageGateTest, LaunchFailureRestoresPreviousReleaseExactly) {
+	rollback_store.highest_release_id = 7;
+	appimage_launcher.result = {InstallationStatus::kLaunchFailed, 0, "handoff failed"};
+	LinuxAppImageGate gate(appimage_verifier, appimage_launcher, rollback_store, true);
+	EXPECT_EQ(gate.Apply(package, 4, digest, 42).status, InstallationStatus::kLaunchFailed);
+	EXPECT_EQ(rollback_store.highest_release_id, 7);
+	EXPECT_EQ(rollback_store.restore_count, 1);
+}
+
+TEST_F(LinuxAppImageGateTest, StagedReplacementDuringVerificationPreventsLaunch) {
+	appimage_verifier.on_verify = [](const std::filesystem::path& path) {
+		std::filesystem::remove(path);
+		std::ofstream output(path, std::ios::binary); output << "evil";
+	};
+	LinuxAppImageGate gate(appimage_verifier, appimage_launcher, rollback_store, true);
+	EXPECT_EQ(gate.Apply(package, 4, digest, 42).status, InstallationStatus::kVerificationFailed);
+	EXPECT_EQ(appimage_launcher.calls, 0);
+}
+
+TEST(PreparedAppImageTest, SourceReplacementDoesNotChangePrivateStagedCopy) {
+	const auto root = std::filesystem::temp_directory_path() / "gdownload-prepared-appimage";
+	std::filesystem::remove_all(root); std::filesystem::create_directories(root);
+	const auto source = root / "source.AppImage";
+	{ std::ofstream output(source, std::ios::binary); output << "good"; }
+	const auto good_digest = ComputeFileSha256(source);
+	auto prepared = PrepareAppImage(source, root / "staged");
+	ASSERT_TRUE(prepared.has_value());
+	{ std::ofstream output(source, std::ios::binary | std::ios::trunc); output << "evil"; }
+	EXPECT_EQ(ComputeFileSha256(prepared->path), good_digest);
+	EXPECT_TRUE(PreparedAppImageUnchanged(*prepared));
+	std::filesystem::remove_all(root);
+}
+
+TEST(PreparedAppImageTest, ReplacingStagedFileIsDetected) {
+	const auto root = std::filesystem::temp_directory_path() / "gdownload-prepared-appimage-replace";
+	std::filesystem::remove_all(root); std::filesystem::create_directories(root);
+	const auto source = root / "source.AppImage";
+	{ std::ofstream output(source, std::ios::binary); output << "good"; }
+	auto prepared = PrepareAppImage(source, root / "staged");
+	ASSERT_TRUE(prepared.has_value());
+	std::filesystem::remove(prepared->path);
+	{ std::ofstream output(prepared->path, std::ios::binary); output << "evil"; }
+	EXPECT_FALSE(PreparedAppImageUnchanged(*prepared));
+	std::filesystem::remove_all(root);
+}
+
+TEST(PreparedAppImageTest, SameSizeMutationWithRestoredTimestampIsDetected) {
+	const auto root = std::filesystem::temp_directory_path() / "gdownload-prepared-appimage-mutation";
+	std::filesystem::remove_all(root); std::filesystem::create_directories(root);
+	const auto source = root / "source.AppImage";
+	{ std::ofstream output(source, std::ios::binary); output << "good"; }
+	auto prepared = PrepareAppImage(source, root / "staged");
+	ASSERT_TRUE(prepared.has_value());
+	{ std::ofstream output(prepared->path, std::ios::binary | std::ios::trunc); output << "evil"; }
+	std::filesystem::last_write_time(prepared->path, prepared->modified);
+	EXPECT_FALSE(PreparedAppImageUnchanged(*prepared));
+	std::filesystem::remove_all(root);
+}
+
+TEST(AppImageUpdaterThreadLifecycleTest, VendoredWorkerUsesOwnedThreadAndDestructorStopBarrier) {
+	const auto source = std::filesystem::path(GDOWNLOAD_SOURCE_DIR) /
+		"lib/AppImageUpdate/src/updater/updater.cpp";
+	std::ifstream input(source);
+	ASSERT_TRUE(input);
+	const std::string text((std::istreambuf_iterator<char>(input)), {});
+	EXPECT_NE(text.find("std::unique_ptr<std::thread> thread"), std::string::npos);
+	EXPECT_NE(text.find("Updater::~Updater() noexcept"), std::string::npos);
+	EXPECT_NE(text.find("thread = std::move(d->thread)"), std::string::npos);
+	EXPECT_EQ(text.find("std::thread* thread;"), std::string::npos);
 }
 }  // namespace
