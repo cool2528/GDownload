@@ -14,8 +14,50 @@
 #include <chrono>
 #include <nlohmann/json.hpp>
 #include <thread>
+#include "update/linux_appimage_gate.h"
+#include "update/update_manifest.h"
+#include "update_trust_config.h"
+#include "file_update_rollback_store.h"
+#include "os/os.h"
 
 namespace {
+	std::filesystem::path RollbackStatePath() {
+		return std::filesystem::path(gdl::os::GetAppDataDir()) / "gdownload" / "update" / "highest_release_id";
+	}
+	class AppImageUpdaterVerifier final : public gdl::update::ILinuxAppImageVerifier {
+	 public:
+		explicit AppImageUpdaterVerifier(appimage::update::Updater& updater) : updater_(updater) {}
+		gdl::update::AppImageSignatureState Verify(const std::filesystem::path&) const override {
+			const auto state = updater_.validateSignature();
+			using Updater = appimage::update::Updater;
+			if (state == Updater::VALIDATION_PASSED) return gdl::update::AppImageSignatureState::kPassed;
+			if (state == Updater::VALIDATION_NOT_SIGNED) return gdl::update::AppImageSignatureState::kUnsigned;
+			if (state == Updater::VALIDATION_KEY_CHANGED || state == Updater::VALIDATION_NO_LONGER_SIGNED)
+				return gdl::update::AppImageSignatureState::kKeyChanged;
+			return gdl::update::AppImageSignatureState::kInvalid;
+		}
+	 private:
+		appimage::update::Updater& updater_;
+	};
+
+	class AppImageLauncher final : public gdl::update::ILinuxAppImageLauncher {
+	 public:
+		explicit AppImageLauncher(bool restart) : restart_(restart) {}
+		gdl::update::InstallationResult Launch(const std::filesystem::path& package) override {
+			QFile file(QString::fromStdString(package.string()));
+			if (!file.setPermissions(file.permissions() | QFile::ExeOwner | QFile::ExeUser |
+				QFile::ExeGroup | QFile::ExeOther))
+				return {gdl::update::InstallationStatus::kLaunchFailed, 0, "failed to set AppImage permissions"};
+			if (!restart_) return {gdl::update::InstallationStatus::kSucceeded, 0, {}};
+			if (!QProcess::startDetached(QString::fromStdString(package.string()), QStringList()))
+				return {gdl::update::InstallationStatus::kLaunchFailed, 0, "failed to start updated AppImage"};
+			QCoreApplication::quit();
+			return {gdl::update::InstallationStatus::kSucceeded, 0, {}};
+		}
+	 private:
+		bool restart_{false};
+	};
+
 	std::string NormalizeReleaseNotes(std::string raw) {
 		auto replace_all = [](std::string& s, const std::string& from, const std::string& to) {
 			size_t pos = 0;
@@ -115,51 +157,39 @@ namespace gdl {
 			QByteArray data = reply->readAll();
 			try {
 
-				nlohmann::json doc = nlohmann::json::parse(data.toStdString());
+				FileUpdateRollbackStore rollback_store(RollbackStatePath());
+				const auto rollback = rollback_store.HighestReleaseId();
+				if (!rollback.ok) {
+					last_error_ = rollback.error;
+					if (callback) callback(false, UpdateInfo{});
+					return;
+				}
+				const ManifestPolicy policy{"linux-x86_64", ".AppImage",
+					{"github.com", "objects.githubusercontent.com", "gdownload.uk"},
+					rollback.value,
+					QDateTime::currentSecsSinceEpoch()};
+				const auto verified = VerifyUpdateManifest(data.toStdString(),
+					GDOWNLOAD_UPDATE_PUBLIC_KEY_BASE64, policy);
+				if (!verified.ok) {
+					last_error_ = verified.error;
+					if (!is_fallback && !config_.fallback_update_url.empty()) {
+						startCheckRequest(config_.fallback_update_url, true, callback);
+						return;
+					}
+					if (callback) {
+						callback(false, UpdateInfo{});
+					}
+					return;
+				}
+				const auto& manifest = verified.manifest;
 				UpdateInfo info;
-				if (!doc.contains("tag_name")) {
-					last_error_ = "Invalid update info";
-					if (!is_fallback && !config_.fallback_update_url.empty()) {
-						startCheckRequest(config_.fallback_update_url, true, callback);
-						return;
-					}
-					if (callback) {
-						callback(false, UpdateInfo{});
-					}
-					return;
-				}
-				QString tag_name	 = QString::fromStdString(doc["tag_name"].get<std::string>());
-				tag_name			 = tag_name.replace("v", "");
-				info.version		 = tag_name.toStdString();
-				QString published_at = QString::fromStdString(doc["published_at"].get<std::string>());
-				info.release_date =
-					QDateTime::fromString(published_at, Qt::ISODate).toString("yyyy-MM-dd hh:mm:ss").toStdString();
-				info.release_notes = NormalizeReleaseNotes(doc["body"].get<std::string>());
-				if (doc.contains("assets") && doc["assets"].is_array()) {
-					for (auto asset : doc["assets"]) {
-						if (asset.contains("browser_download_url") && asset.contains("name")) {
-							const auto name = asset["name"].get<std::string>();
-							if (name.find(".AppImage") == std::string::npos) {
-								continue;
-							}
-							info.download_url = asset["browser_download_url"].get<std::string>();
-							info.package_size = asset["size"].get<int64_t>();
-							break;
-						}
-					}
-					update_info_ = info;
-				}
-				if (info.download_url.empty()) {
-					last_error_ = "No Linux update package found in update info";
-					if (!is_fallback && !config_.fallback_update_url.empty()) {
-						startCheckRequest(config_.fallback_update_url, true, callback);
-						return;
-					}
-					if (callback) {
-						callback(false, UpdateInfo{});
-					}
-					return;
-				}
+				info.release_id = manifest.release_id; info.version = manifest.version;
+				info.asset_name = manifest.asset.name; info.published_at = manifest.published_at;
+				info.expires_at = manifest.expires_at; info.release_notes = NormalizeReleaseNotes(manifest.notes);
+				info.release_date = QDateTime::fromSecsSinceEpoch(manifest.published_at)
+					.toString("yyyy-MM-dd hh:mm:ss").toStdString();
+				info.download_url = manifest.asset.url; info.package_size = manifest.asset.size;
+				info.sha256 = manifest.asset.sha256; update_info_ = info;
 				bool update_available = false;
 				if (!updater_->checkForChanges(update_available)) {
 					// AppImage updater 本地检查失败（如读取 AppImage 更新信息、校验等），
@@ -374,7 +404,7 @@ namespace gdl {
 					qInfo() << "Update completed successfully";
 					if (progress_callback_) {
 						UpdateProgress progress;
-						progress.stage		= UpdateProgress::Stage::kInstalling;
+						progress.stage		= UpdateProgress::Stage::kVerifying;
 						progress.percentage = 100;
 						progress.message	= "Update completed, preparing to apply update";
 						progress_callback_(progress);
@@ -428,50 +458,23 @@ namespace gdl {
 				qCritical() << "ApplyUpdate failed:" << QString::fromStdString(last_error_);
 				return false;
 			}
-
-			if (progress_callback_) {
-				UpdateProgress progress;
-				progress.stage		= UpdateProgress::Stage::kInstalling;
-				progress.percentage = 100;
-				progress.message	= "Preparing to apply update...";
-				progress_callback_(progress);
-			}
-
-			// Ensure new file exists
-			if (!QFile::exists(QString::fromStdString(new_file_path))) {
-				last_error_ = "Updated AppImage file does not exist";
-				qCritical() << "ApplyUpdate failed:" << QString::fromStdString(last_error_);
+			AppImageUpdaterVerifier verifier(*updater_);
+			AppImageLauncher launcher(restart_app);
+			FileUpdateRollbackStore rollback_store(RollbackStatePath());
+			LinuxAppImageGate gate(verifier, launcher, rollback_store,
+				GDOWNLOAD_REQUIRE_APPIMAGE_SIGNATURE != 0);
+			const auto result = gate.Apply(new_file_path, update_info_.package_size,
+				update_info_.sha256, update_info_.release_id);
+			if (!result.Succeeded()) {
+				last_error_ = result.detail.empty() ? "Updated AppImage trust handoff failed" : result.detail;
+				if (progress_callback_) {
+					progress_callback_({UpdateProgress::Stage::kFailed, 100, last_error_});
+				}
 				return false;
 			}
-
-			// Set executable permissions
-			QFile file(QString::fromStdString(new_file_path));
-			if (!file.setPermissions(file.permissions() | QFile::ExeOwner | QFile::ExeUser | QFile::ExeGroup |
-									 QFile::ExeOther)) {
-				last_error_ = "Failed to set executable permissions on updated AppImage";
-				qCritical() << "ApplyUpdate failed:" << QString::fromStdString(last_error_);
-				return false;
-			}
-
-			qInfo() << "Update applied successfully, new file path:" << QString::fromStdString(new_file_path);
-
-			if (restart_app) {
-				// Start new version
-				qInfo() << "Starting new version and quitting current application";
-				QProcess::startDetached(QString::fromStdString(new_file_path), QStringList());
-
-				// Quit current application
-				QCoreApplication::quit();
-			}
-
 			if (progress_callback_) {
-				UpdateProgress progress;
-				progress.stage		= UpdateProgress::Stage::kFinished;
-				progress.percentage = 100;
-				progress.message	= "Update completed";
-				progress_callback_(progress);
+				progress_callback_({UpdateProgress::Stage::kFinished, 100, "Update completed"});
 			}
-
 			return true;
 		}
 

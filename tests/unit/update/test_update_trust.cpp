@@ -13,6 +13,7 @@
 #include "update/platform_package_verifier.h"
 #include "update/file_update_rollback_store.h"
 #include "update/installation_gate.h"
+#include "update/linux_appimage_gate.h"
 #include "update/update_rollback_store.h"
 
 namespace {
@@ -405,5 +406,74 @@ TEST(FileUpdateRollbackStoreTest, DirectoryAtStatePathFailsClosed) {
 	FileUpdateRollbackStore store(root / "highest_release_id");
 	EXPECT_FALSE(store.HighestReleaseId().ok);
 	std::filesystem::remove_all(root);
+}
+
+class FakeAppImageVerifier final : public ILinuxAppImageVerifier {
+   public:
+	AppImageSignatureState Verify(const std::filesystem::path&) const override { ++calls; return state; }
+	mutable int calls{0};
+	AppImageSignatureState state{AppImageSignatureState::kPassed};
+};
+
+class FakeAppImageLauncher final : public ILinuxAppImageLauncher {
+   public:
+	InstallationResult Launch(const std::filesystem::path&) override { ++calls; return result; }
+	int calls{0};
+	InstallationResult result{InstallationStatus::kSucceeded, 0, {}};
+};
+
+class LinuxAppImageGateTest : public InstallationGateTest {
+   protected:
+	FakeAppImageVerifier appimage_verifier;
+	FakeAppImageLauncher appimage_launcher;
+};
+
+TEST_F(LinuxAppImageGateTest, HashFailureDoesNotVerifyOrLaunch) {
+	LinuxAppImageGate gate(appimage_verifier, appimage_launcher, rollback_store, false);
+	EXPECT_FALSE(gate.Apply(package, 4, std::string(64, '0'), 42).Succeeded());
+	EXPECT_EQ(appimage_verifier.calls, 0); EXPECT_EQ(appimage_launcher.calls, 0);
+}
+
+TEST_F(LinuxAppImageGateTest, InvalidAndKeyChangedNeverLaunch) {
+	LinuxAppImageGate gate(appimage_verifier, appimage_launcher, rollback_store, false);
+	appimage_verifier.state = AppImageSignatureState::kInvalid;
+	EXPECT_FALSE(gate.Apply(package, 4, digest, 42).Succeeded());
+	appimage_verifier.state = AppImageSignatureState::kKeyChanged;
+	EXPECT_FALSE(gate.Apply(package, 4, digest, 42).Succeeded());
+	EXPECT_EQ(appimage_launcher.calls, 0);
+}
+
+TEST_F(LinuxAppImageGateTest, UnsignedAllowedOnlyDuringMigration) {
+	appimage_verifier.state = AppImageSignatureState::kUnsigned;
+	LinuxAppImageGate migration_gate(appimage_verifier, appimage_launcher, rollback_store, false);
+	EXPECT_TRUE(migration_gate.Apply(package, 4, digest, 42).Succeeded());
+	appimage_launcher.calls = 0;
+	rollback_store.highest_release_id = 0;
+	LinuxAppImageGate strict_gate(appimage_verifier, appimage_launcher, rollback_store, true);
+	EXPECT_FALSE(strict_gate.Apply(package, 4, digest, 42).Succeeded());
+	EXPECT_EQ(appimage_launcher.calls, 0);
+}
+
+TEST_F(LinuxAppImageGateTest, PassedSignatureLaunches) {
+	LinuxAppImageGate gate(appimage_verifier, appimage_launcher, rollback_store, true);
+	EXPECT_TRUE(gate.Apply(package, 4, digest, 42).Succeeded());
+	EXPECT_EQ(appimage_launcher.calls, 1);
+}
+
+TEST_F(LinuxAppImageGateTest, RollbackReadFailureAndOldReleaseDoNotLaunch) {
+	rollback_store.read_results = {{false, 0, "corrupt"}};
+	LinuxAppImageGate gate(appimage_verifier, appimage_launcher, rollback_store, true);
+	EXPECT_EQ(gate.Apply(package, 4, digest, 42).status, InstallationStatus::kRollbackStateFailed);
+	EXPECT_EQ(appimage_launcher.calls, 0);
+	rollback_store.read_results.clear(); rollback_store.read_count = 0; rollback_store.highest_release_id = 42;
+	EXPECT_EQ(gate.Apply(package, 4, digest, 42).status, InstallationStatus::kRollbackRejected);
+	EXPECT_EQ(appimage_launcher.calls, 0);
+}
+
+TEST_F(LinuxAppImageGateTest, PersistFailureIsVisibleAfterSuccessfulHandoff) {
+	rollback_store.persist_result = {false, "sync failed"};
+	LinuxAppImageGate gate(appimage_verifier, appimage_launcher, rollback_store, true);
+	EXPECT_EQ(gate.Apply(package, 4, digest, 42).status, InstallationStatus::kPersistenceFailed);
+	EXPECT_EQ(appimage_launcher.calls, 1);
 }
 }  // namespace
