@@ -598,20 +598,20 @@ namespace gdl {
 			}
 
 			TaskDeletionResult BrowserManagerImpl::RemoveStopTaskResult(const QString& gid,
-																 bool is_remove_file) {
+															 bool is_remove_file) {
 				TaskDeletionResult result{.content_requested = is_remove_file};
 				if (gid.isEmpty()) {
-					Q_EMIT sigErrorMessage(tr("Failed to delete task: missing task id."));
+					LOG_ERR("RemoveStopTask failed: missing task id");
 					return result;
 				}
 				if (!stopped_model_) {
-					Q_EMIT sigErrorMessage(tr("Failed to delete task: stopped task list is not available."));
+					LOG_ERR("RemoveStopTask failed: stopped task list is not available");
 					return result;
 				}
 
 				const auto task = stopped_model_->GetTaskById(gid);
 				if (!task) {
-					Q_EMIT sigErrorMessage(tr("Failed to delete task: task was not found."));
+					LOG_ERR("RemoveStopTask failed: task was not found gid:{}", gid.toStdString());
 					return result;
 				}
 
@@ -620,10 +620,8 @@ namespace gdl {
 				const auto deletion_decision =
 					DecideStoppedTaskDeletionAfterAria2Cleanup(aria2_cleanup_status, aria2_error);
 				if (!deletion_decision.remove_local_task) {
-					Q_EMIT sigErrorMessage(
-						aria2_error.isEmpty()
-							? tr("Failed to delete task from aria2.")
-							: tr("Failed to delete task from aria2: %1").arg(aria2_error));
+					LOG_WARN("RemoveStopTask failed during aria2 cleanup gid:{} error:{}", gid.toStdString(),
+							 aria2_error.toStdString());
 					return result;
 				}
 				result.aria2_cleaned = deletion_decision.aria2_cleaned;
@@ -632,7 +630,7 @@ namespace gdl {
 				const QString cache_file_path = save_path + ".aria2";
 				const auto res = stopped_model_->RemoveTaskById(gid);
 				if (!res) {
-					Q_EMIT sigErrorMessage(tr("Failed to remove task from the stopped list."));
+					LOG_ERR("RemoveStopTask failed to remove stopped model entry gid:{}", gid.toStdString());
 					return result;
 				}
 				result.task_removed = true;
@@ -640,24 +638,19 @@ namespace gdl {
 				result.history_cleaned =
 					gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
 				if (deletion_decision.show_cleanup_warning) {
-					Q_EMIT sigErrorMessage(deletion_decision.warning_message);
+					LOG_WARN("RemoveStopTask aria2 cleanup warning gid:{} warning:{}", gid.toStdString(),
+							 deletion_decision.warning_message.toStdString());
 				}
 				if (is_remove_file) {
 					result.content = RemoveLocalContent(save_path);
 					if (result.content.status == LocalRemovalStatus::kFailed) {
-						Q_EMIT sigErrorMessage(
-							result.content.error.isEmpty()
-								? tr("Task was removed, but the downloaded file could not be deleted.")
-								: tr("Task was removed, but the downloaded file could not be deleted: %1")
-								  .arg(result.content.error));
+						LOG_WARN("RemoveStopTask failed to remove downloaded content gid:{} error:{}",
+								 gid.toStdString(), result.content.error.toStdString());
 					}
 					result.control_file = RemoveLocalContent(cache_file_path);
 					if (result.control_file.status == LocalRemovalStatus::kFailed) {
-						Q_EMIT sigErrorMessage(
-							result.control_file.error.isEmpty()
-								? tr("Task was removed, but the aria2 control file could not be deleted.")
-								: tr("Task was removed, but the aria2 control file could not be deleted: %1")
-								  .arg(result.control_file.error));
+						LOG_WARN("RemoveStopTask failed to remove aria2 control file gid:{} error:{}",
+								 gid.toStdString(), result.control_file.error.toStdString());
 					}
 				}
 				return result;
@@ -665,12 +658,12 @@ namespace gdl {
 
 			QVariantMap BrowserManagerImpl::RemoveStopTask(int index, bool is_remove_file) {
 				if (!stopped_model_) {
-					Q_EMIT sigErrorMessage(tr("Failed to delete task: stopped task list is not available."));
+					LOG_ERR("RemoveStopTask failed: stopped task list is not available");
 					return TaskDeletionResult{.content_requested = is_remove_file}.ToVariantMap();
 				}
 				auto task = stopped_model_->GetTask(index);
 				if (!task) {
-					Q_EMIT sigErrorMessage(tr("Failed to delete task: task was not found."));
+					LOG_ERR("RemoveStopTask failed: task was not found at index:{}", index);
 					return TaskDeletionResult{.content_requested = is_remove_file}.ToVariantMap();
 				}
 				return RemoveStopTask(task->task_id(), is_remove_file);
@@ -685,7 +678,7 @@ namespace gdl {
 					}
 					return bulk.ToVariantMap();
 				}
-				Q_EMIT sigErrorMessage(tr("Failed to delete tasks: stopped task list is not available."));
+				LOG_ERR("RemoveAllStopTask failed: stopped task list is not available");
 				return bulk.ToVariantMap();
 			}
 

@@ -385,15 +385,42 @@ Control {
             const shouldDeleteFile = (action === DeleteConfirmDialog.DeleteBoth)
 
             // 根据页面类型调用相应的删除方法
+            let result
             if (downloadView.pageType === 0) {
                 // 正在下载页面
-                BrowserManager.RemoveTask(0, currentTaskId, shouldDeleteFile)
+                result = BrowserManager.RemoveTask(0, currentTaskId, shouldDeleteFile)
             } else if (downloadView.pageType === 1) {
                 // 等待中页面（通常没有文件，但保持一致性）
-                BrowserManager.RemoveTask(1, currentTaskId, shouldDeleteFile)
+                result = BrowserManager.RemoveTask(1, currentTaskId, shouldDeleteFile)
             } else if (downloadView.pageType === 2) {
                 // 已完成页面
-                BrowserManager.RemoveStopTask(currentTaskId, shouldDeleteFile)
+                result = BrowserManager.RemoveStopTask(currentTaskId, shouldDeleteFile)
+            } else {
+                return
+            }
+
+            const hasExpectedFields = result !== null
+                    && typeof result === "object"
+                    && typeof result.completeSuccess === "boolean"
+                    && typeof result.partialSuccess === "boolean"
+                    && !(result.completeSuccess && result.partialSuccess)
+            if (!hasExpectedFields) {
+                ToastManager.ShowError(qsTr("The task could not be removed."))
+                return
+            }
+
+            if (result.completeSuccess === true) {
+                ToastManager.ShowSuccess(shouldDeleteFile
+                                         ? qsTr("Task and downloaded content were removed.")
+                                         : qsTr("Task record was removed."))
+            } else if (result.partialSuccess === true) {
+                ToastManager.ShowWarning(shouldDeleteFile
+                                         ? qsTr("The task was removed, but some downloaded content could not be deleted.")
+                                         : qsTr("The task was removed, but cleanup could not be completed."))
+            } else {
+                ToastManager.ShowError(shouldDeleteFile
+                                       ? qsTr("Failed to remove the task and downloaded content.")
+                                       : qsTr("Failed to remove the task."))
             }
         }
     }
