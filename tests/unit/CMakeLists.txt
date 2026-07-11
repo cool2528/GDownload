@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.18)
 find_package(GTest CONFIG REQUIRED)
 find_package(boost_asio CONFIG REQUIRED)
 find_package(Qt6 REQUIRED COMPONENTS Qml)
+find_package(unofficial-sqlite3 CONFIG REQUIRED)
 
 # 创建单元测试主程序
 add_executable(gdownload_unit_tests
@@ -104,7 +105,12 @@ add_executable(gdownload_cache_tests
     cache/test_schema_migrator.cpp
     cache/test_cache.cpp
 )
-target_link_libraries(gdownload_cache_tests PRIVATE GTest::gtest GTest::gtest_main GDLCore)
+target_link_libraries(gdownload_cache_tests PRIVATE
+    GTest::gtest
+    GTest::gtest_main
+    GDLCore
+    unofficial::sqlite3::sqlite3
+)
 target_include_directories(gdownload_cache_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/src/Module/GDLCore
 )
