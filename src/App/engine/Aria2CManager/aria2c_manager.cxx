@@ -87,7 +87,9 @@ namespace gdl {
 			  websocket_client_([]() {
 			auto rpc_port = detail::GetValidRpcPort();
 			return std::string("ws://127.0.0.1:") + rpc_port + "/jsonrpc";
-			  }(), io_context_) {
+			  }(), io_context_),
+			  rpc_lifecycle_(websocket_client_),
+			  lifecycle_controller_(process_lifecycle_, rpc_lifecycle_) {
 
 			websocket_client_.SetMessageCallback([this](const std::string& msg) {
 				// Forward direct messages to clients through pub/sub.
@@ -246,8 +248,22 @@ namespace gdl {
 		}
 
 		void Aria2cDownloadManager::UpdateAria2cTasks() {
+			auto poll_entry = poll_drain_gate_.TryEnter();
+			if (!poll_entry) return;
 			// Skip updates during shutdown to avoid racing with Shutdown/Purge calls.
 			if (!engine_is_runing_) return;
+			if (!lifecycle_controller_.CheckLiveness()) {
+				engine_is_runing_ = false;
+				update_aria2c_tasks_timer_.Stop();
+				LOG_ERR("aria2c process exited while the application was running");
+				std::function<void(bool)> callback;
+				{
+					std::lock_guard lock(availability_callback_mutex_);
+					callback = availability_callback_;
+				}
+				if (callback) callback(false);
+				return;
+			}
 			// Refresh aria2 task state lists.
 			static const std::vector<std::string> keys = {
 				"status", "totalLength", "completedLength", "downloadSpeed", "infoHash", "numSeeders",
@@ -671,24 +687,20 @@ namespace gdl {
 		}
 
 		bool Aria2cDownloadManager::InitAria2cEngine(const String_View& aria2c_path) {
-			// TODO: initialize aria2c.
 			aria2c_path_			 = String(aria2c_path);
 			std::vector<String> args = InitAria2cSettingsArgs();
-			auto pid				 = process::Execute(aria2c_path, args);
-			if (pid <= 0) {
-				LOG_ERR("Failed to initialise aria2c Failed to start the process");
+			const auto startup = lifecycle_controller_.Start(aria2c_path, args);
+			if (startup.state != Aria2LifecycleState::kReady) {
+				LOG_ERR("Failed to initialise aria2c, startup error: {}", static_cast<int>(startup.error));
 				return false;
 			}
-			aria2c_pid_ = pid;  // 登记 pid，退出时优雅关闭并回收（S3）
 
 			// Initialize ETag cache database.
 			InitializeETagCache();
 
 			// Start task polling. Tracker auto-update must not affect task list refresh.
 			update_aria2c_tasks_timer_.Start(std::bind(&Aria2cDownloadManager::UpdateAria2cTasks, this),
-											 std::chrono::milliseconds(300), true);
-			// Connect aria2c websocket.
-			websocket_client_.Open();
+				lifecycle_controller_.Timing().liveness_check_interval, true);
 			engine_is_runing_ = true;
 
 			return true;
@@ -703,6 +715,7 @@ namespace gdl {
 			engine_is_runing_ = false;
 			daily_task_timer_.Stop();
 			update_aria2c_tasks_timer_.Stop();
+			poll_drain_gate_.StopAndDrain();
 			auto tracker_future = tracker_sync_gate_.BeginStoppingAndTakeFuture();
 			if (tracker_future.valid()) {
 				try { tracker_future.get(); } catch (const std::exception& error) {
@@ -714,14 +727,7 @@ namespace gdl {
 				LOG_WARN("Failed to close TrackerETagCache: {}", cache_close_result.GetError().Describe());
 			}
 			websocket_client_.PurgeDownloadResult();
-			websocket_client_.Shutdown();
-			// 给 RPC/stop-with-process 优雅退出宽限，超时强制终止并回收，避免 POSIX 僵尸（S3）
-			if (aria2c_pid_ > 0) {
-				process::ShutdownProcess(aria2c_pid_, 2000);
-			} else {
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			}
-			websocket_client_.Disconnect();
+			lifecycle_controller_.Stop();
 			work_.reset();
 			io_context_.stop();
 			for (auto& t : worker_threads_) {
@@ -729,6 +735,11 @@ namespace gdl {
 					t.join();
 				}
 			}
+		}
+
+		void Aria2cDownloadManager::SetEngineAvailabilityCallback(std::function<void(bool)> callback) {
+			std::lock_guard lock(availability_callback_mutex_);
+			availability_callback_ = std::move(callback);
 		}
 
 		Result<bool> Aria2cDownloadManager::AddHttpTask(

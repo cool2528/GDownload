@@ -133,6 +133,7 @@ target_link_libraries(gdownload_aria2_lifecycle_tests PRIVATE
 )
 target_include_directories(gdownload_aria2_lifecycle_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/src/App/engine
+	${CMAKE_SOURCE_DIR}/src/App/ui
     ${CMAKE_SOURCE_DIR}/src/Module/GDLCore
 )
 add_test(NAME Aria2LifecycleTests COMMAND gdownload_aria2_lifecycle_tests)

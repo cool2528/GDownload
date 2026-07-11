@@ -35,6 +35,8 @@ namespace gdl::engine {
 
 	class Engine_API Aria2RpcLifecycleAdapter final : public IAria2RpcLifecycle {
 	   public:
+		// 非 owning：调用方必须保证 client 的生命周期覆盖 adapter。
+		explicit Aria2RpcLifecycleAdapter(Aria2cWebSocketClient& client);
 		explicit Aria2RpcLifecycleAdapter(std::shared_ptr<Aria2cWebSocketClient> client);
 		explicit Aria2RpcLifecycleAdapter(std::shared_ptr<detail::IAria2RpcClientBackend> client);
 		~Aria2RpcLifecycleAdapter() override;

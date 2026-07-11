@@ -40,6 +40,10 @@ namespace gdl::engine {
 	Aria2RpcLifecycleAdapter::Aria2RpcLifecycleAdapter(std::shared_ptr<Aria2cWebSocketClient> client)
 		: Aria2RpcLifecycleAdapter(client ? std::make_shared<Aria2RpcClientBackend>(std::move(client)) : nullptr) {}
 
+	Aria2RpcLifecycleAdapter::Aria2RpcLifecycleAdapter(Aria2cWebSocketClient& client)
+		: Aria2RpcLifecycleAdapter(std::shared_ptr<Aria2cWebSocketClient>(&client,
+			[](Aria2cWebSocketClient*) {})) {}
+
 	Aria2RpcLifecycleAdapter::Aria2RpcLifecycleAdapter(
 		std::shared_ptr<detail::IAria2RpcClientBackend> client)
 		: client_(std::move(client)) {
