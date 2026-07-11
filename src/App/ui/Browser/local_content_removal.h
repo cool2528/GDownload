@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QString>
+#include <QVariantMap>
 
 #include <cstdint>
 #include <filesystem>
@@ -25,6 +26,20 @@ namespace gdl {
 				int error_code{0};
 				bool partial_possible{false};
 			};
+
+			inline QVariantMap LocalRemovalResultToVariantMap(const LocalRemovalResult& result) {
+				QString status = QStringLiteral("notFound");
+				if (result.status == LocalRemovalStatus::kRemoved) status = QStringLiteral("removed");
+				if (result.status == LocalRemovalStatus::kFailed) status = QStringLiteral("failed");
+				return {{QStringLiteral("status"), status},
+						{QStringLiteral("path"), result.path},
+						{QStringLiteral("error"), result.error},
+						{QStringLiteral("errorCode"), result.error_code},
+						{QStringLiteral("removedCount"),
+						 result.removed_count.has_value() ? QVariant::fromValue<qulonglong>(*result.removed_count)
+													  : QVariant()},
+						{QStringLiteral("partialPossible"), result.partial_possible}};
+			}
 
 			inline std::filesystem::path LocalRemovalFilesystemPath(const QString& path) {
 #ifdef Q_OS_WIN

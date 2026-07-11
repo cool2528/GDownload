@@ -2,6 +2,7 @@
 
 #include <QList>
 #include <QObject>
+#include "Browser/task_deletion_result.h"
 #include <QString>
 #include <QVariant>
 #include <QVariantList>
@@ -86,13 +87,16 @@ class FakeBrowserManager : public QObject {
 	}
 
 	// ===== 任务删除(记录)=====
-	Q_INVOKABLE bool RemoveTask(int page_index, const QString& gid, bool is_remove_file = false) {
+	Q_INVOKABLE QVariantMap RemoveTask(int page_index, const QString& gid, bool is_remove_file = false) {
 		record(QStringLiteral("RemoveTask"), {page_index, QVariant(gid), is_remove_file});
-		return true;
+		return deletionResult(true, is_remove_file);
 	}
-	Q_INVOKABLE bool RemoveAllTask(int page_index, bool is_remove_file = false) {
+	Q_INVOKABLE QVariantMap RemoveAllTask(int page_index, bool is_remove_file = false) {
 		record(QStringLiteral("RemoveAllTask"), {page_index, is_remove_file});
-		return remove_all_task_result_;
+		return {{QStringLiteral("total"), 1},
+				{QStringLiteral("complete"), remove_all_task_result_ ? 1 : 0},
+				{QStringLiteral("partial"), 0},
+				{QStringLiteral("failed"), remove_all_task_result_ ? 0 : 1}};
 	}
 	Q_INVOKABLE bool ForceRemoveTask(const QString& gid) {
 		record(QStringLiteral("ForceRemoveTask"), {QVariant(gid)});
@@ -123,19 +127,20 @@ class FakeBrowserManager : public QObject {
 	Q_INVOKABLE QObject* GetStopedDownloadModel() { return nullptr; }
 	Q_INVOKABLE QObject* GetWaitingDownloadModel() { return nullptr; }
 	Q_INVOKABLE void OpenFileLocation(const QString& file_path) { Q_UNUSED(file_path); }
-	Q_INVOKABLE bool RemoveStopTask(const QString& gid, bool is_remove_file = true) {
+	Q_INVOKABLE QVariantMap RemoveStopTask(const QString& gid, bool is_remove_file = true) {
 		Q_UNUSED(gid);
 		Q_UNUSED(is_remove_file);
-		return true;
+		return deletionResult(true, is_remove_file);
 	}
-	Q_INVOKABLE bool RemoveStopTask(int index, bool is_remove_file = true) {
+	Q_INVOKABLE QVariantMap RemoveStopTask(int index, bool is_remove_file = true) {
 		Q_UNUSED(index);
 		Q_UNUSED(is_remove_file);
-		return true;
+		return deletionResult(true, is_remove_file);
 	}
-	Q_INVOKABLE bool RemoveAllStopTask(bool is_remove_file = false) {
+	Q_INVOKABLE QVariantMap RemoveAllStopTask(bool is_remove_file = false) {
 		Q_UNUSED(is_remove_file);
-		return true;
+		return {{QStringLiteral("total"), 0}, {QStringLiteral("complete"), 0},
+				{QStringLiteral("partial"), 0}, {QStringLiteral("failed"), 0}};
 	}
 	Q_INVOKABLE void RefreshTaskList(int page_index) { Q_UNUSED(page_index); }
 	Q_INVOKABLE QObject* GetFilePreviewModel(const QString& file_path) {
@@ -180,6 +185,12 @@ class FakeBrowserManager : public QObject {
 	void clearHistory() { history_.clear(); }
 
    private:
+	static QVariantMap deletionResult(bool success, bool content_requested) {
+		return gdl::ui::browser::TaskDeletionResult{.task_removed = success,
+													.aria2_cleaned = success,
+													.content_requested = content_requested}
+			.ToVariantMap();
+	}
 	// 记录一次调用
 	void record(const QString& method, const QVariantList& args) {
 		history_.append({method, args});

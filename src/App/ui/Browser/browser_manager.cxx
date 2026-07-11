@@ -9,6 +9,7 @@
 #include "Aria2CManager/engine_def.h"
 #include "Browser/download_task_utils.h"
 #include "Browser/download_url_utils.h"
+#include "Browser/local_content_removal.h"
 #include "Browser/stopped_task_delete_utils.h"
 #include "Definitions/appDef.h"
 #include "Parser/file_parser.h"
@@ -60,7 +61,8 @@ namespace gdl {
 					return lower.contains(QStringLiteral("gid")) && lower.contains(QStringLiteral("not found"));
 				}
 
-				bool RemoveAria2DownloadResultByGid(const QString& gid, QString* error_message) {
+				StoppedTaskAria2CleanupStatus RemoveAria2DownloadResultByGid(
+					const QString& gid, QString* error_message) {
 					engine::Aria2cHttpClient client(Aria2HttpRpcHost());
 					auto http_result = client.RemoveDownloadResult(gid.toStdString());
 					if (http_result.HasError()) {
@@ -69,7 +71,7 @@ namespace gdl {
 							*error_message =
 								detail.isEmpty() ? QStringLiteral("aria2 RPC request failed") : detail;
 						}
-						return false;
+						return StoppedTaskAria2CleanupStatus::kFailed;
 					}
 
 					if (auto res = std::get_if<engine::ErrorResult>(&http_result.Value().result)) {
@@ -79,35 +81,22 @@ namespace gdl {
 												 ? QStringLiteral("aria2 RPC returned HTTP %1").arg(res->err_code)
 												 : detail;
 						}
-						return false;
+						return StoppedTaskAria2CleanupStatus::kFailed;
 					}
 
 					if (auto res = std::get_if<engine::SucceedResult>(&http_result.Value().result)) {
 						const QString rpc_error = ExtractAria2RpcErrorMessage(res->body);
-						if (!rpc_error.isEmpty() && !IsMissingAria2ResultError(rpc_error)) {
+						if (IsMissingAria2ResultError(rpc_error)) {
+							return StoppedTaskAria2CleanupStatus::kAlreadyMissing;
+						}
+						if (!rpc_error.isEmpty()) {
 							if (error_message) {
 								*error_message = rpc_error;
 							}
-							return false;
+							return StoppedTaskAria2CleanupStatus::kFailed;
 						}
 					}
-					return true;
-				}
-
-				bool RemoveLocalFileIfRequested(const QString& file_path, QString* error_message) {
-					if (file_path.isEmpty() || !QFile::exists(file_path)) {
-						return true;
-					}
-
-					QFile file(file_path);
-					if (file.remove()) {
-						return true;
-					}
-
-					if (error_message) {
-						*error_message = file.errorString();
-					}
-					return false;
+					return StoppedTaskAria2CleanupStatus::kSucceeded;
 				}
 
 				// 从单个 aria2 任务对象解析出 DownloadTaskInfo,统一 OnHandleAria2Message 与
@@ -390,10 +379,16 @@ namespace gdl {
 				return false;
 			}
 
-			bool BrowserManagerImpl::RemoveTask(int page_index, const QString& gid, bool is_remove_file) {
-				if (gid.isEmpty()) return false;
+			QVariantMap BrowserManagerImpl::RemoveTask(int page_index, const QString& gid, bool is_remove_file) {
+				return RemoveTaskResult(page_index, gid, is_remove_file).ToVariantMap();
+			}
+
+			TaskDeletionResult BrowserManagerImpl::RemoveTaskResult(int page_index, const QString& gid,
+															 bool is_remove_file) {
+				TaskDeletionResult result{.content_requested = is_remove_file};
+				if (gid.isEmpty()) return result;
                 if (page_index != 0 && page_index != 1) {
-					return false;
+					return result;
 				}
 
 				// 获取任务信息以获取文件路径（在删除任务之前）
@@ -418,7 +413,7 @@ namespace gdl {
 									 .CallAria2cMethod(engine::Aria2Method::kRemove, gid.toStdString())
 									 .IsOk();
 				if (!removed) {
-					return false;
+					return result;
 				}
 
 				// kRemove 成功后任务已离开 active/waiting 队列，模型必须立即反映这一事实。
@@ -428,44 +423,41 @@ namespace gdl {
 				if (waiting_model_) {
 					waiting_model_->RemoveTaskById(gid);
 				}
+				result.task_removed = true;
 				const bool result_removed = engine::Aria2cDownloadManager::Instance()
 										.CallAria2cMethod(engine::Aria2Method::kRemoveDownloadResult,
 														 gid.toStdString())
 										.IsOk();
 				if (!result_removed) {
-					return false;
+					return result;
 				}
+				result.aria2_cleaned = true;
 
 				// 如果需要删除文件
 				if (is_remove_file && !save_path.isEmpty()) {
-					if (QFile::exists(save_path)) {
-						QFile::remove(save_path);
-					}
-					if (QFile::exists(cache_file_path)) {
-						QFile::remove(cache_file_path);
-					}
+					result.content = RemoveLocalContent(save_path);
+					result.control_file = RemoveLocalContent(cache_file_path);
 				}
 
-				return true;
+				return result;
 			}
 
-			bool BrowserManagerImpl::RemoveAllTask(int page_index, bool is_remove_file) {
+			QVariantMap BrowserManagerImpl::RemoveAllTask(int page_index, bool is_remove_file) {
+				BulkDeletionResult bulk;
 				if (page_index == 0) {
 					if (active_model_) {
-						bool all_removed = true;
 						for (const auto& task : active_model_->GetTaskIds()) {
-							all_removed = RemoveTask(page_index, task, is_remove_file) && all_removed;
+							bulk.Add(RemoveTaskResult(page_index, task, is_remove_file));
 						}
-						return all_removed;
+						return bulk.ToVariantMap();
 					}
 				}
 				else if (page_index == 1) {
 					if (waiting_model_) {
-						bool all_removed = true;
 						for (const auto& task : waiting_model_->GetTaskIds()) {
-							all_removed = RemoveTask(page_index, task, is_remove_file) && all_removed;
+							bulk.Add(RemoveTaskResult(page_index, task, is_remove_file));
 						}
-						return all_removed;
+						return bulk.ToVariantMap();
 					}
 				}
 				else if (page_index == 2) {
@@ -474,7 +466,7 @@ namespace gdl {
 				else {
 					LOG_ERR("RemoveAllTask error: page_index is invalid");
 				}
-				return false;
+				return bulk.ToVariantMap();
 			}
 
 			bool BrowserManagerImpl::ForceRemoveTask(const QString& gid) {
@@ -585,7 +577,8 @@ namespace gdl {
 					gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
 
 				QString aria2_error;
-				if (!RemoveAria2DownloadResultByGid(gid, &aria2_error)) {
+				if (RemoveAria2DownloadResultByGid(gid, &aria2_error) ==
+					StoppedTaskAria2CleanupStatus::kFailed) {
 					LOG_WARN("Retry started but failed to remove old aria2 result gid:{} error:{}",
 							 gid.toStdString(), aria2_error.toStdString());
 				}
@@ -600,91 +593,100 @@ namespace gdl {
 				return true;
 			}
 
-			bool BrowserManagerImpl::RemoveStopTask(const QString& gid, bool is_remove_file) {
+			QVariantMap BrowserManagerImpl::RemoveStopTask(const QString& gid, bool is_remove_file) {
+				return RemoveStopTaskResult(gid, is_remove_file).ToVariantMap();
+			}
+
+			TaskDeletionResult BrowserManagerImpl::RemoveStopTaskResult(const QString& gid,
+																 bool is_remove_file) {
+				TaskDeletionResult result{.content_requested = is_remove_file};
 				if (gid.isEmpty()) {
 					Q_EMIT sigErrorMessage(tr("Failed to delete task: missing task id."));
-					return false;
+					return result;
 				}
 				if (!stopped_model_) {
 					Q_EMIT sigErrorMessage(tr("Failed to delete task: stopped task list is not available."));
-					return false;
+					return result;
 				}
 
 				const auto task = stopped_model_->GetTaskById(gid);
 				if (!task) {
 					Q_EMIT sigErrorMessage(tr("Failed to delete task: task was not found."));
-					return false;
+					return result;
 				}
 
 				QString aria2_error;
-				const bool aria2_cleanup_succeeded = RemoveAria2DownloadResultByGid(gid, &aria2_error);
+				const auto aria2_cleanup_status = RemoveAria2DownloadResultByGid(gid, &aria2_error);
 				const auto deletion_decision =
-					DecideStoppedTaskDeletionAfterAria2Cleanup(aria2_cleanup_succeeded, aria2_error);
+					DecideStoppedTaskDeletionAfterAria2Cleanup(aria2_cleanup_status, aria2_error);
 				if (!deletion_decision.remove_local_task) {
 					Q_EMIT sigErrorMessage(
 						aria2_error.isEmpty()
 							? tr("Failed to delete task from aria2.")
 							: tr("Failed to delete task from aria2: %1").arg(aria2_error));
-					return false;
+					return result;
 				}
+				result.aria2_cleaned = deletion_decision.aria2_cleaned;
 
 				const QString save_path = task->task_save_path();
 				const QString cache_file_path = save_path + ".aria2";
 				const auto res = stopped_model_->RemoveTaskById(gid);
 				if (!res) {
 					Q_EMIT sigErrorMessage(tr("Failed to remove task from the stopped list."));
-					return false;
+					return result;
 				}
+				result.task_removed = true;
 
-				gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
+				result.history_cleaned =
+					gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
 				if (deletion_decision.show_cleanup_warning) {
 					Q_EMIT sigErrorMessage(deletion_decision.warning_message);
 				}
 				if (is_remove_file) {
-					QString file_error;
-					if (!RemoveLocalFileIfRequested(save_path, &file_error)) {
+					result.content = RemoveLocalContent(save_path);
+					if (result.content.status == LocalRemovalStatus::kFailed) {
 						Q_EMIT sigErrorMessage(
-							file_error.isEmpty()
+							result.content.error.isEmpty()
 								? tr("Task was removed, but the downloaded file could not be deleted.")
 								: tr("Task was removed, but the downloaded file could not be deleted: %1")
-									  .arg(file_error));
+								  .arg(result.content.error));
 					}
-					QString cache_error;
-					if (!RemoveLocalFileIfRequested(cache_file_path, &cache_error)) {
+					result.control_file = RemoveLocalContent(cache_file_path);
+					if (result.control_file.status == LocalRemovalStatus::kFailed) {
 						Q_EMIT sigErrorMessage(
-							cache_error.isEmpty()
+							result.control_file.error.isEmpty()
 								? tr("Task was removed, but the aria2 control file could not be deleted.")
 								: tr("Task was removed, but the aria2 control file could not be deleted: %1")
-									  .arg(cache_error));
+								  .arg(result.control_file.error));
 					}
 				}
-				return true;
+				return result;
 			}
 
-			bool BrowserManagerImpl::RemoveStopTask(int index, bool is_remove_file) {
+			QVariantMap BrowserManagerImpl::RemoveStopTask(int index, bool is_remove_file) {
 				if (!stopped_model_) {
 					Q_EMIT sigErrorMessage(tr("Failed to delete task: stopped task list is not available."));
-					return false;
+					return TaskDeletionResult{.content_requested = is_remove_file}.ToVariantMap();
 				}
 				auto task = stopped_model_->GetTask(index);
 				if (!task) {
 					Q_EMIT sigErrorMessage(tr("Failed to delete task: task was not found."));
-					return false;
+					return TaskDeletionResult{.content_requested = is_remove_file}.ToVariantMap();
 				}
 				return RemoveStopTask(task->task_id(), is_remove_file);
 			}
 
-			bool BrowserManagerImpl::RemoveAllStopTask(bool is_remove_file) {
+			QVariantMap BrowserManagerImpl::RemoveAllStopTask(bool is_remove_file) {
+				BulkDeletionResult bulk;
 				if (stopped_model_) {
 					auto tasks = stopped_model_->GetTaskIds();
-					bool res   = true;
 					for (const auto& task : tasks) {
-						res = RemoveStopTask(task, is_remove_file) && res;
+						bulk.Add(RemoveStopTaskResult(task, is_remove_file));
 					}
-					return res;
+					return bulk.ToVariantMap();
 				}
 				Q_EMIT sigErrorMessage(tr("Failed to delete tasks: stopped task list is not available."));
-				return false;
+				return bulk.ToVariantMap();
 			}
 
 			void BrowserManagerImpl::RefreshTaskList(int page_index) {
