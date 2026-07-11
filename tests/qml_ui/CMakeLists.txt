@@ -35,6 +35,7 @@ add_custom_target(qml_ui_test_binaries
         qml_ui_tst_save_settings
         qml_ui_tst_create_task
         qml_ui_tst_bulk_delete
+        qml_ui_tst_single_delete
         qml_ui_tst_download_failure
         qml_ui_tst_close_confirm
         qml_ui_tst_theme_toggle

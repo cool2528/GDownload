@@ -18,6 +18,12 @@ struct FakeRpcCall {
 	QVariantList args;
 };
 
+enum class FakeDeletionOutcome {
+	kComplete,
+	kPartial,
+	kFailed,
+};
+
 // 测试期 BrowserManager 替身(独立 QObject 版)
 //
 // 设计变更说明(原 Task 9 版本继承 BrowserManagerImpl,现改为独立 QObject):
@@ -87,16 +93,14 @@ class FakeBrowserManager : public QObject {
 	}
 
 	// ===== 任务删除(记录)=====
-	Q_INVOKABLE QVariantMap RemoveTask(int page_index, const QString& gid, bool is_remove_file = false) {
+	Q_INVOKABLE QVariant RemoveTask(int page_index, const QString& gid, bool is_remove_file = false) {
 		record(QStringLiteral("RemoveTask"), {page_index, QVariant(gid), is_remove_file});
-		return deletionResult(true, is_remove_file);
+		if (has_task_deletion_result_override_) return task_deletion_result_override_;
+		return deletionResult(task_deletion_outcome_, is_remove_file);
 	}
 	Q_INVOKABLE QVariantMap RemoveAllTask(int page_index, bool is_remove_file = false) {
 		record(QStringLiteral("RemoveAllTask"), {page_index, is_remove_file});
-		return {{QStringLiteral("total"), 1},
-				{QStringLiteral("complete"), remove_all_task_result_ ? 1 : 0},
-				{QStringLiteral("partial"), 0},
-				{QStringLiteral("failed"), remove_all_task_result_ ? 0 : 1}};
+		return bulk_deletion_result_;
 	}
 	Q_INVOKABLE bool ForceRemoveTask(const QString& gid) {
 		record(QStringLiteral("ForceRemoveTask"), {QVariant(gid)});
@@ -127,15 +131,15 @@ class FakeBrowserManager : public QObject {
 	Q_INVOKABLE QObject* GetStopedDownloadModel() { return nullptr; }
 	Q_INVOKABLE QObject* GetWaitingDownloadModel() { return nullptr; }
 	Q_INVOKABLE void OpenFileLocation(const QString& file_path) { Q_UNUSED(file_path); }
-	Q_INVOKABLE QVariantMap RemoveStopTask(const QString& gid, bool is_remove_file = true) {
-		Q_UNUSED(gid);
-		Q_UNUSED(is_remove_file);
-		return deletionResult(true, is_remove_file);
+	Q_INVOKABLE QVariant RemoveStopTask(const QString& gid, bool is_remove_file = true) {
+		record(QStringLiteral("RemoveStopTask"), {QVariant(gid), is_remove_file});
+		if (has_task_deletion_result_override_) return task_deletion_result_override_;
+		return deletionResult(task_deletion_outcome_, is_remove_file);
 	}
-	Q_INVOKABLE QVariantMap RemoveStopTask(int index, bool is_remove_file = true) {
-		Q_UNUSED(index);
-		Q_UNUSED(is_remove_file);
-		return deletionResult(true, is_remove_file);
+	Q_INVOKABLE QVariant RemoveStopTask(int index, bool is_remove_file = true) {
+		record(QStringLiteral("RemoveStopTask"), {index, is_remove_file});
+		if (has_task_deletion_result_override_) return task_deletion_result_override_;
+		return deletionResult(task_deletion_outcome_, is_remove_file);
 	}
 	Q_INVOKABLE QVariantMap RemoveAllStopTask(bool is_remove_file = false) {
 		Q_UNUSED(is_remove_file);
@@ -179,17 +183,44 @@ class FakeBrowserManager : public QObject {
 
 	void setAddTaskResult(bool result) { add_task_result_ = result; }
 	void setRetryTaskResult(bool result) { retry_task_result_ = result; }
-	void setRemoveAllTaskResult(bool result) { remove_all_task_result_ = result; }
+	void setTaskDeletionOutcome(FakeDeletionOutcome outcome) {
+		task_deletion_outcome_ = outcome;
+		has_task_deletion_result_override_ = false;
+	}
+	void setTaskDeletionResult(const QVariant& result) {
+		task_deletion_result_override_ = result;
+		has_task_deletion_result_override_ = true;
+	}
+	void setBulkDeletionResult(int total, int complete, int partial, int failed) {
+		bulk_deletion_result_ = {{QStringLiteral("total"), total},
+							 {QStringLiteral("complete"), complete},
+							 {QStringLiteral("partial"), partial},
+							 {QStringLiteral("failed"), failed}};
+	}
+	void setBulkDeletionResultMap(const QVariantMap& result) { bulk_deletion_result_ = result; }
+	void setRemoveAllTaskResult(bool result) {
+		setBulkDeletionResult(1, result ? 1 : 0, 0, result ? 0 : 1);
+	}
 
 	// 清空历史(测试 init 调用)。仅清调用历史,不影响单例状态
 	void clearHistory() { history_.clear(); }
 
    private:
-	static QVariantMap deletionResult(bool success, bool content_requested) {
-		return gdl::ui::browser::TaskDeletionResult{.task_removed = success,
-													.aria2_cleaned = success,
-													.content_requested = content_requested}
-			.ToVariantMap();
+	static QVariantMap deletionResult(FakeDeletionOutcome outcome, bool content_requested) {
+		gdl::ui::browser::TaskDeletionResult result{.content_requested = content_requested};
+		if (outcome == FakeDeletionOutcome::kComplete) {
+			result.task_removed = true;
+			result.aria2_cleaned = true;
+		} else if (outcome == FakeDeletionOutcome::kPartial) {
+			result.task_removed = true;
+			result.aria2_cleaned = true;
+			if (content_requested) {
+				result.content.status = gdl::ui::browser::LocalRemovalStatus::kFailed;
+			} else {
+				result.history_cleaned = false;
+			}
+		}
+		return result.ToVariantMap();
 	}
 	// 记录一次调用
 	void record(const QString& method, const QVariantList& args) {
@@ -199,7 +230,13 @@ class FakeBrowserManager : public QObject {
 	QList<FakeRpcCall> history_;
 	bool add_task_result_ = true;
 	bool retry_task_result_ = true;
-	bool remove_all_task_result_ = true;
+	FakeDeletionOutcome task_deletion_outcome_{FakeDeletionOutcome::kComplete};
+	QVariant task_deletion_result_override_;
+	bool has_task_deletion_result_override_{false};
+	QVariantMap bulk_deletion_result_{{QStringLiteral("total"), 1},
+								 {QStringLiteral("complete"), 1},
+								 {QStringLiteral("partial"), 0},
+								 {QStringLiteral("failed"), 0}};
 };
 
 }  // namespace tests

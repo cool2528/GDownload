@@ -140,11 +140,43 @@ Rectangle {
             }
 
             const shouldDeleteFiles = action === DeleteConfirmDialog.DeleteBoth
-            const removed = BrowserManager.RemoveAllTask(control.type, shouldDeleteFiles)
-            if (removed) {
+            const result = BrowserManager.RemoveAllTask(control.type, shouldDeleteFiles)
+            const hasExpectedFields = result
+                    && typeof result.total === "number"
+                    && typeof result.complete === "number"
+                    && typeof result.partial === "number"
+                    && typeof result.failed === "number"
+            const hasValidCounts = hasExpectedFields
+                    && Number.isFinite(result.total)
+                    && Number.isFinite(result.complete)
+                    && Number.isFinite(result.partial)
+                    && Number.isFinite(result.failed)
+                    && Number.isInteger(result.total)
+                    && Number.isInteger(result.complete)
+                    && Number.isInteger(result.partial)
+                    && Number.isInteger(result.failed)
+                    && result.total > 0
+                    && result.complete >= 0
+                    && result.partial >= 0
+                    && result.failed >= 0
+                    && result.complete + result.partial + result.failed === result.total
+            const total = hasValidCounts ? result.total : 0
+            const complete = hasValidCounts ? result.complete : 0
+            const partial = hasValidCounts ? result.partial : 0
+            const failed = hasValidCounts ? result.failed : 0
+
+            if (!hasValidCounts) {
+                ToastManager.ShowError(qsTr("Failed to remove all tasks."))
+            } else if (complete === total && partial === 0 && failed === 0) {
                 ToastManager.ShowSuccess(shouldDeleteFiles
-                                         ? qsTr("All tasks and downloaded files were removed.")
+                                         ? qsTr("All tasks and downloaded content were removed.")
                                          : qsTr("All task records were removed."))
+            } else if (failed > 0 && complete + partial > 0) {
+                ToastManager.ShowWarning(qsTr("Some tasks were removed, but some tasks could not be removed."))
+            } else if (partial > 0) {
+                ToastManager.ShowWarning(shouldDeleteFiles
+                                         ? qsTr("Some tasks were removed, but some downloaded content could not be deleted.")
+                                         : qsTr("Some task records were removed, but some cleanup operations could not be completed."))
             } else {
                 ToastManager.ShowError(qsTr("Failed to remove all tasks."))
             }

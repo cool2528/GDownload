@@ -47,6 +47,7 @@ set(QML_UI_INTEGRATION_TESTS
     save_settings
     create_task
     bulk_delete
+    single_delete
     download_failure
     close_confirm
     theme_toggle
