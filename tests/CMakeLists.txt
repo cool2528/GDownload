@@ -12,6 +12,17 @@ enable_testing()
 add_subdirectory(unit)
 add_subdirectory(integration)
 
+find_package(Python3 COMPONENTS Interpreter QUIET)
+if(Python3_Interpreter_FOUND)
+    add_test(NAME UpdateManifestScriptTests
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/scripts/test_generate_update_manifest.py
+    )
+    set_tests_properties(UpdateManifestScriptTests PROPERTIES
+        TIMEOUT 60
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
+endif()
+
 # 添加自定义测试目标
 add_custom_target(run_all_tests
     COMMAND ${CMAKE_CTEST_COMMAND} --test-dir ${CMAKE_BINARY_DIR} -C $<CONFIG> --output-on-failure

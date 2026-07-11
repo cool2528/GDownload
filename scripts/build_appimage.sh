@@ -22,6 +22,12 @@ if [[ -z "$LINUXDEPLOY_BIN" ]]; then
     exit 1
 fi
 
+APPIMAGETOOL_BIN="$(command -v appimagetool || true)"
+if [[ -z "$APPIMAGETOOL_BIN" ]]; then
+    echo "找不到 appimagetool，可执行文件未安装到 PATH"
+    exit 1
+fi
+
 if [[ -f /usr/lib/x86_64-linux-gnu/libtiff.so.6 && ! -f /usr/lib/x86_64-linux-gnu/libtiff.so.5 ]]; then
     sudo ln -sf /usr/lib/x86_64-linux-gnu/libtiff.so.6 /usr/lib/x86_64-linux-gnu/libtiff.so.5
 fi
@@ -47,22 +53,22 @@ if [[ -n "${QTDIR:-}" ]]; then
     export QMAKE="$QTDIR/bin/qmake"
 fi
 
-pushd "$TMPDIR" >/dev/null
 "$LINUXDEPLOY_BIN" \
     --appdir "$APPDIR" \
     --executable "$APPDIR/usr/bin/gdownload" \
     --desktop-file "$APPDIR/usr/share/applications/gdownload.desktop" \
     --icon-file "$APPDIR/usr/share/icons/hicolor/256x256/apps/gdownload.svg" \
-    --plugin qt \
-    --output appimage
+    --plugin qt
 
-GENERATED_APPIMAGE="$(ls -1 *.AppImage 2>/dev/null | tail -n 1 || true)"
-if [[ -z "$GENERATED_APPIMAGE" ]]; then
-    echo "linuxdeploy 未生成 AppImage"
-    exit 1
+if [[ "${GDOWNLOAD_SIGN_APPIMAGE:-0}" == "1" ]]; then
+    if [[ -z "${GDOWNLOAD_APPIMAGE_GPG_FINGERPRINT:-}" ]]; then
+        echo "缺少 GDOWNLOAD_APPIMAGE_GPG_FINGERPRINT，无法签名 AppImage"
+        exit 1
+    fi
+    export GPG_DEFAULT_KEY="$GDOWNLOAD_APPIMAGE_GPG_FINGERPRINT"
+    "$APPIMAGETOOL_BIN" --sign "$APPDIR" "$OUTPUT_PATH"
+else
+    "$APPIMAGETOOL_BIN" "$APPDIR" "$OUTPUT_PATH"
 fi
-
-mv "$GENERATED_APPIMAGE" "$OUTPUT_PATH"
-popd >/dev/null
 
 echo "AppImage 已生成: $OUTPUT_PATH"
