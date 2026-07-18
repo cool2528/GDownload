@@ -2,7 +2,7 @@
     "manifest_version": 1,
     "name": "baidu-netdisk",
     "display_name": "Baidu NetDisk",
-    "version": "2.0.2",
+    "version": "2.1.0",
     "author": "GDownload Official",
     "description": "Parse Baidu netdisk share links (JS rewrite of the native Baidu plugin)",
     "homepage": "https://github.com/cool2528/GDownload",
@@ -23,6 +23,22 @@
         "storage": true,
         "verification_ui": true
     },
+    "settings": [
+        {
+            "key": "cookie",
+            "type": "textarea",
+            "required": true,
+            "role": "token",
+            "label": "Baidu Netdisk Cookie",
+            "hint": "Paste the Cookie of a logged-in pan.baidu.com session",
+            "locales": {
+                "zh_CN": { "label": "百度网盘 Cookie", "hint": "粘贴登录 pan.baidu.com 后的 Cookie" },
+                "zh_TW": { "label": "百度網盤 Cookie", "hint": "貼上登入 pan.baidu.com 後的 Cookie" },
+                "ja_JP": { "label": "Baidu ネットディスク Cookie", "hint": "pan.baidu.com にログイン後の Cookie を貼り付け" },
+                "ko_KR": { "label": "바이두 넷디스크 Cookie", "hint": "pan.baidu.com 로그인 후 Cookie를 붙여넣기" }
+            }
+        }
+    ],
     "min_app_version": "0.0.0",
     "locales": {
         "zh_CN": {
