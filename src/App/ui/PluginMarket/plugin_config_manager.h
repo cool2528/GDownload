@@ -28,7 +28,8 @@ namespace gdl {
 				Q_INVOKABLE QVariantList schema(const QString& name) const;
 				// 当前配置值（含 schema default 回填）
 				Q_INVOKABLE QVariantMap values(const QString& name) const;
-				Q_INVOKABLE void save(const QString& name, const QVariantMap& values);
+				// 保存配置到磁盘；返回是否落盘成功(仅成功时才发出 configChanged)
+				Q_INVOKABLE bool save(const QString& name, const QVariantMap& values);
 				Q_INVOKABLE void clear(const QString& name);
 				// required 字段是否全部有值
 				Q_INVOKABLE bool configured(const QString& name) const;

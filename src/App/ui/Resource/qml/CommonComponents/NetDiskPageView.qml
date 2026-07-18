@@ -58,7 +58,7 @@ Rectangle {
         matchedPlugins = url.length > 0 ? NetWorkDiskManager.MatchPlugins(url) : []
         if (selectedPluginIndex >= matchedPlugins.length)
             selectedPluginIndex = 0
-        if (matchedPlugins.length > 0)
+        if (matchedPlugins.length > 0 || url.length === 0)
             noPluginMatched = false
     }
 

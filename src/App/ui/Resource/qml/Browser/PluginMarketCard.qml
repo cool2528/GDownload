@@ -72,6 +72,7 @@ Rectangle {
                     spacing: GTheme.spaceSM
                     Text {
                         text: card.displayName
+                        textFormat: Text.PlainText
                         font.pixelSize: GTheme.fontSubtitle
                         font.weight: GTheme.weightDemiBold
                         color: GTheme.textPrimary
@@ -157,6 +158,7 @@ Rectangle {
         Text {
             Layout.fillWidth: true
             text: card.description
+            textFormat: Text.PlainText
             font.pixelSize: GTheme.fontBody
             color: GTheme.textRegular
             wrapMode: Text.WordWrap

@@ -157,6 +157,7 @@ Popup {
 
                     Text {
                         text: shell.title
+                        textFormat: Text.PlainText
                         font.pixelSize: GTheme.fontTitle
                         font.weight: GTheme.weightDemiBold
                         color: GTheme.textPrimary
@@ -165,6 +166,7 @@ Popup {
                     }
                     Text {
                         text: shell.subtitle
+                        textFormat: Text.PlainText
                         font.pixelSize: GTheme.fontBody
                         color: GTheme.textSecondary
                         visible: shell.subtitle.length > 0

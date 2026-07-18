@@ -154,6 +154,7 @@ Control {
                 Layout.fillWidth: true
                 Layout.minimumWidth: 0
                 text: root.resolvedDescription
+                textFormat: Text.PlainText
                 color: root.title.length > 0 ? GTheme.textRegular : root.alertText
                 font.pixelSize: GTheme.fontCaption
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere

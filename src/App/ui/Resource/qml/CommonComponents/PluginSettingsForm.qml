@@ -82,6 +82,7 @@ ColumnLayout {
                     text: fieldRow.modelData.required === true
                           ? fieldRow.modelData.label + " *"
                           : fieldRow.modelData.label
+                    textFormat: Text.PlainText
                     color: GTheme.textPrimary
                     font.pixelSize: GTheme.fontBody
                     font.weight: GTheme.weightMedium
@@ -150,6 +151,7 @@ ColumnLayout {
                     }
                     Text {
                         text: fieldRow.modelData.label
+                        textFormat: Text.PlainText
                         color: GTheme.textPrimary
                         font.pixelSize: GTheme.fontBody
                         Layout.fillWidth: true
