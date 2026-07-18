@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QQmlEngine>
 #include <QThread>
+#include <QVariantList>
 #include <QWaitCondition>
 #include <queue>
 #include "GDLCore/singleton.hpp"
@@ -19,6 +20,8 @@ namespace gdl {
             class NetDiskTask {
                public:
                 NetDiskTaskType type;
+                // 执行本任务的插件名：解析时由 UI 传入，目录浏览/取下载信息沿用会话绑定
+                std::string plugin_name;
                 explicit NetDiskTask(NetDiskTaskType t) : type(t) {}
                 virtual ~NetDiskTask() = default;
             };
@@ -59,9 +62,12 @@ namespace gdl {
             class ParseShareUrlResult : public TaskResult {
                public:
                 std::vector<INetDiskDownloadPlugin::FileInfo> files;
+                // 成功后 manager 据此做会话绑定
+                QString pluginName;
 
-                ParseShareUrlResult(bool s, const QString& msg, const std::vector<INetDiskDownloadPlugin::FileInfo>& f)
-                    : TaskResult(s, msg, NetDiskTaskType::ParseShareUrl), files(f) {}
+                ParseShareUrlResult(bool s, const QString& msg, const std::vector<INetDiskDownloadPlugin::FileInfo>& f,
+                                    const QString& plugin = QString())
+                    : TaskResult(s, msg, NetDiskTaskType::ParseShareUrl), files(f), pluginName(plugin) {}
             };
 
             class EnterDirectoryResult : public TaskResult {
@@ -112,8 +118,10 @@ namespace gdl {
                public:
                 ~NetWorkDiskManager() override;
                 Q_INVOKABLE NetWorkDiskModel* GetNetWorkDiskModel();
-                // 解析分享链接
-                Q_INVOKABLE void ParseShareUrl(const QString& url);
+                // 返回能处理该 URL 的插件列表：[{name, displayName, needsConfig, configured}]
+                Q_INVOKABLE QVariantList MatchPlugins(const QString& url);
+                // 用指定插件解析分享链接（pluginName 来自 MatchPlugins 的选择）
+                Q_INVOKABLE void ParseShareUrl(const QString& url, const QString& pluginName);
 
                 // 切换目录
                 Q_INVOKABLE void ChangeDir(const QString& path, const QString& id);
@@ -139,6 +147,8 @@ namespace gdl {
                private:
                 std::unique_ptr<NetWorkDiskModel> model_{nullptr};
                 AsyncTaskWorker worker_;
+                // 当前会话绑定的插件名（解析成功后设置）
+                QString current_plugin_name_;
             };
             void RegisterTypes(QQmlEngine* engine);
         }  // namespace netdisk

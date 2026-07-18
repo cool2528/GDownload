@@ -3,25 +3,60 @@
 #include "Definitions/appDef.h"
 #include "GDLCore/logger.h"
 #include "PluginManager/plugin_manager.h"
+#include "PluginMarket/plugin_config_manager.h"
 #include "Settings/settings_manager.h"
 #include "toast/toast_manager.h"
 namespace gdl {
     namespace ui {
         namespace netdisk {
+            namespace {
+                // 按任务类型构造失败结果（统一错误出口）
+                std::shared_ptr<TaskResult> MakeFailureResult(NetDiskTaskType type, const QString& msg) {
+                    switch (type) {
+                        case NetDiskTaskType::ParseShareUrl:
+                            return std::make_shared<ParseShareUrlResult>(false, msg,
+                                                                         std::vector<INetDiskDownloadPlugin::FileInfo>{});
+                        case NetDiskTaskType::EnterDirectory:
+                            return std::make_shared<EnterDirectoryResult>(
+                                false, msg, std::vector<INetDiskDownloadPlugin::FileInfo>{}, "");
+                        case NetDiskTaskType::GetDownloadInfo:
+                            return std::make_shared<GetDownloadInfoResult>(
+                                false, msg, std::vector<INetDiskDownloadPlugin::ParseResult>{});
+                    }
+                    return nullptr;
+                }
+            }  // namespace
+
             NetWorkDiskManager::~NetWorkDiskManager() {}
 
             NetWorkDiskModel* NetWorkDiskManager::GetNetWorkDiskModel() {
                 return model_.get();
             }
 
-            void NetWorkDiskManager::ParseShareUrl(const QString& url) {
-                const auto baidu_cokies = settings::Settings::Instance().GetBaiduPanCookies();
-                auto task				= std::make_shared<ParseShareUrlTask>(url, baidu_cokies);
+            QVariantList NetWorkDiskManager::MatchPlugins(const QString& url) {
+                QVariantList result;
+                auto plugins = plugin::DownloadPluginManager::Instance().GetPluginsForUrl(url.toStdString());
+                for (const auto& plugin : plugins) {
+                    if (!plugin) {
+                        continue;
+                    }
+                    const auto name = QString::fromStdString(plugin->GetPluginMetadata().name);
+                    result.push_back(market::PluginConfigManager::Instance().pluginInfo(name));
+                }
+                return result;
+            }
+
+            void NetWorkDiskManager::ParseShareUrl(const QString& url, const QString& pluginName) {
+                // userToken 取该插件 role=token 配置字段的当前值（声明式 Schema）
+                const auto token = market::PluginConfigManager::Instance().TokenFor(pluginName);
+                auto task		 = std::make_shared<ParseShareUrlTask>(url, token);
+                task->plugin_name = pluginName.toStdString();
                 worker_.AddTask(task);
             }
 
             void NetWorkDiskManager::ChangeDir(const QString& path, const QString& id) {
                 auto task = std::make_shared<EnterDirectoryTask>(id, path);
+                task->plugin_name = current_plugin_name_.toStdString();
                 worker_.AddTask(task);
             }
 
@@ -68,6 +103,7 @@ namespace gdl {
                     file_infos.push_back(info);
                 }
                 auto task = std::make_shared<GetDownloadInfoTask>(file_infos);
+                task->plugin_name = current_plugin_name_.toStdString();
                 worker_.AddTask(task);
             }
 
@@ -88,6 +124,7 @@ namespace gdl {
                         }
                         if (parse_result->success) {
                             model_->Init(parse_result->files);
+                            current_plugin_name_ = parse_result->pluginName;
                         }
                         Q_EMIT taskFinished(parse_result->message, parse_result->success,
                                             static_cast<int>(NetDiskTaskType::ParseShareUrl));
@@ -212,13 +249,12 @@ namespace gdl {
             }
 
             std::shared_ptr<TaskResult> AsyncTaskWorker::ExecuteTask(std::shared_ptr<NetDiskTask> task) {
-                auto plugin_vec = plugin::DownloadPluginManager::Instance().GetPluginsForUrl("https://pan.baidu.com");
-                if (plugin_vec.empty()) {
-                    return nullptr;
-                }
-                auto plugin = plugin_vec.front();
+                // 按名取插件（解析时 UI 传入，浏览/下载沿用会话绑定的插件名）
+                auto plugin = plugin::DownloadPluginManager::Instance().GetPluginByName(task->plugin_name);
                 if (!plugin) {
-                    return nullptr;
+                    LOG_ERR("netdisk plugin not found: {}", task->plugin_name);
+                    return MakeFailureResult(task->type,
+                                             tr("The plugin is no longer available. Check the Plugin Market."));
                 }
                 try {
                     switch (task->type) {
@@ -230,7 +266,8 @@ namespace gdl {
                             auto result =
                                 plugin->ParseUrl(parse_task->url.toStdString(), parse_task->userToken.toStdString());
                             if (!result.has_value()) return nullptr;
-                            return std::make_shared<ParseShareUrlResult>(true, "succeed", result.value());
+                            return std::make_shared<ParseShareUrlResult>(true, "succeed", result.value(),
+                                                                         QString::fromStdString(task->plugin_name));
                         }
                         case NetDiskTaskType::GetDownloadInfo: {
                             auto get_download_info_task = std::static_pointer_cast<GetDownloadInfoTask>(task);
