@@ -79,16 +79,12 @@ ColumnLayout {
                 spacing: GTheme.spaceXS
                 visible: fieldRow.fieldType !== "bool"
                 Text {
-                    text: fieldRow.modelData.label
+                    text: fieldRow.modelData.required === true
+                          ? fieldRow.modelData.label + " *"
+                          : fieldRow.modelData.label
                     color: GTheme.textPrimary
                     font.pixelSize: GTheme.fontBody
                     font.weight: GTheme.weightMedium
-                }
-                Text {
-                    visible: fieldRow.modelData.required === true
-                    text: "*"
-                    color: GTheme.dangerColor
-                    font.pixelSize: GTheme.fontBody
                 }
                 Item { Layout.fillWidth: true }
             }
