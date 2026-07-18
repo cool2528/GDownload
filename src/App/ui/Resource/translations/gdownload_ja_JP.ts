@@ -2,6 +2,19 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ja_JP">
 <context>
+    <name>AlertTip</name>
+    <message>
+        <location filename="../qml/CommonComponents/AlertTip.qml" line="202"/>
+        <source>Dismiss alert</source>
+        <translation>アラートを閉じる</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/AlertTip.qml" line="204"/>
+        <source>Dismiss</source>
+        <translation>閉じる</translation>
+    </message>
+</context>
+<context>
     <name>Aria2RpcSettingPage</name>
     <message>
         <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="13"/>
@@ -24,57 +37,104 @@
         <translation>ポート：</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="51"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="44"/>
+        <source>RPC listen port</source>
+        <translation>RPC リスニングポート</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="52"/>
         <source>(1024-65535)</source>
         <translation>（1024-65535）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="144"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="97"/>
+        <source>RPC secret</source>
+        <translation>RPC シークレット</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="109"/>
+        <source>Show RPC secret</source>
+        <translation>RPC シークレットを表示</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="147"/>
         <source>Reset to default. Click Save to apply.</source>
         <translation>既定値にリセットしました。保存をクリックして適用してください。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="153"/>
-        <source>✗ Invalid port. Please enter a value between 1024 and 65535.</source>
-        <translation>✗ 無効なポート。1024 から 65535 の間の値を入力してください。</translation>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="156"/>
+        <source>Invalid port. Please enter a value between 1024 and 65535.</source>
+        <translation>無効なポートです。1024 から 65535 の間の値を入力してください。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="155"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="178"/>
+        <source>RPC settings saved successfully! Please restart the application to apply changes.</source>
+        <translation>RPC 設定が正常に保存されました。変更を適用するにはアプリケーションを再起動してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="181"/>
+        <source>Settings saved: Port=%1, Secret updated (restart required)</source>
+        <translation>設定を保存しました: ポート=%1、シークレット更新済み（再起動が必要）</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="200"/>
+        <source>• The RPC port is used for communication between the application and Aria2 engine
+• Default port is 16888
+• The RPC secret is used for authentication between the application and Aria2 engine
+• The RPC secret is generated automatically on first launch
+• It&apos;s recommended to use a strong random secret for security
+• Make sure the port is not used by other applications
+• Important: You must restart the application after changing the port or secret.
+• Choose a port number between 1024 and 65535
+• Changes are saved immediately but only take effect after restart</source>
+        <translation>• RPCポートはアプリケーションとAria2エンジン間の通信に使用されます
+• デフォルトポートは16888です
+• RPCシークレットはアプリケーションとAria2エンジン間の認証に使用されます
+• RPCシークレットは初回起動時に自動生成されます
+• セキュリティのため、強力なランダムシークレットの使用を推奨します
+• ポートが他のアプリケーションに使用されていないことを確認してください
+• 重要：ポートまたはシークレットを変更した後、アプリケーションを再起動する必要があります
+• 1024から65535の間のポート番号を選択してください
+• 変更は即座に保存されますが、再起動後にのみ有効になります</translation>
+    </message>
+    <message>
+        <source>✗ Invalid port. Please enter a value between 1024 and 65535.</source>
+        <translation type="vanished">✗ 無効なポート。1024 から 65535 の間の値を入力してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="158"/>
         <source>Invalid port number!</source>
         <translation>無効なポート番号！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="161"/>
         <source>✗ Secret cannot be empty!</source>
-        <translation>✗ シークレットは空にできません！</translation>
+        <translation type="vanished">✗ シークレットは空にできません！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="163"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="164"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="166"/>
         <source>Secret cannot be empty!</source>
         <translation>シークレットは空にできません！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="175"/>
         <source>✓ RPC settings saved successfully! Please restart the application to apply changes.</source>
-        <translation>✓ RPC 設定が正常に保存されました！変更を適用するにはアプリケーションを再起動してください。</translation>
+        <translation type="vanished">✓ RPC 設定が正常に保存されました！変更を適用するにはアプリケーションを再起動してください。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="178"/>
         <source>✓ Settings saved: Port=%1, Secret updated (Restart required)</source>
-        <translation>✓ 設定が保存されました：ポート=%1、シークレットが更新されました（再起動が必要）</translation>
+        <translation type="vanished">✓ 設定が保存されました：ポート=%1、シークレットが更新されました（再起動が必要）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="186"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="189"/>
         <source>No changes detected.</source>
         <translation>変更が検出されませんでした。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="187"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="190"/>
         <source>Settings unchanged.</source>
         <translation>設定は変更されていません。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="197"/>
         <source>• The RPC port is used for communication between the application and Aria2 engine
 • Default port is 16888
 • The RPC secret is used for authentication between the application and Aria2 engine
@@ -84,7 +144,7 @@
 • ⚠️ You MUST restart the application after changing the port or secret!
 • Choose a port number between 1024 and 65535
 • Changes are saved immediately but only take effect after restart</source>
-        <translation>• RPC ポートはアプリケーションと Aria2 エンジン間の通信に使用されます
+        <translation type="vanished">• RPC ポートはアプリケーションと Aria2 エンジン間の通信に使用されます
 • 既定のポートは 16888 です
 • RPC シークレットはアプリケーションと Aria2 エンジン間の認証に使用されます
 • RPC シークレットは初回起動時に自動生成されます
@@ -95,27 +155,27 @@
 • 変更は即座に保存されますが、再起動後にのみ有効になります</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="67"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="68"/>
         <source>RPC Secret</source>
         <translation>RPC シークレット</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="80"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="81"/>
         <source>Secret:</source>
         <translation>シークレット：</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="94"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="95"/>
         <source>Generated automatically on first launch</source>
         <translation>初回起動時に自動生成</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="110"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="113"/>
         <source>Show</source>
         <translation>表示</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="118"/>
+        <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="121"/>
         <source>Generate Random</source>
         <translation>ランダム生成</translation>
     </message>
@@ -148,12 +208,17 @@
         <translation>Baidu Netdisk cookieをここに貼り付けます。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="59"/>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="54"/>
+        <source>Baidu Netdisk cookie</source>
+        <translation>Baidu Netdisk Cookie</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="60"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="66"/>
+        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="67"/>
         <source>Baidu cookie saved successfully</source>
         <translation>百度のクッキーが正常に保存されました</translation>
     </message>
@@ -166,77 +231,117 @@
         <translation>外見と言葉</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="47"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="33"/>
+        <source>Personalize the app appearance and display language</source>
+        <translation>アプリの外観と表示言語をカスタマイズ</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="48"/>
         <source>Language</source>
         <translation>言語</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="69"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="53"/>
+        <source>Display language</source>
+        <translation>表示言語</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="56"/>
+        <source>English</source>
+        <translation>英語</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="57"/>
+        <source>Simplified Chinese</source>
+        <translation>簡体字中国語</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="58"/>
+        <source>Traditional Chinese</source>
+        <translation>繁体字中国語</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="59"/>
+        <source>Japanese</source>
+        <translation>日本語</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="60"/>
+        <source>Korean</source>
+        <translation>韓国語</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="77"/>
         <source>Application Behavior</source>
         <translation>アプリケーションの動作</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="79"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="87"/>
         <source>Auto Update</source>
         <translation>自動更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="93"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="101"/>
         <source>Open at Login</source>
         <translation>起動時自動開始</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="108"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="116"/>
         <source>Remember Window Position</source>
         <translation>ウィンドウ位置を記憶</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="122"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="130"/>
         <source>Auto Resume Unfinished Download</source>
         <translation>未完了のダウンロードを自動再開</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="136"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="144"/>
         <source>Show Close Confirmation</source>
         <translation>閉じる確認を表示する</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="146"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="154"/>
         <source>Download Path</source>
         <translation>ダウンロードパス</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="147"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="155"/>
         <source>Global download folder</source>
         <translation>グローバルダウンロードフォルダ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="166"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="174"/>
         <source>Network Proxy</source>
         <translation>ネットワーク・プロキシ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="176"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="184"/>
         <source>Enable Global Proxy</source>
         <translation>グローバルプロキシを有効にする</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="211"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="210"/>
+        <source>Global proxy address</source>
+        <translation>グローバルプロキシアドレス</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="220"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="222"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="231"/>
         <source>Clipboard Monitor</source>
         <translation>クリップボードモニター</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="223"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="232"/>
         <source>Automatically detect download links from clipboard</source>
         <translation>クリップボードからダウンロードリンクを自動検出</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="232"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="241"/>
         <source>Auto Listen Clipboard Link</source>
         <translation>クリップボードリンクを自動でリッスン</translation>
     </message>
@@ -254,74 +359,121 @@
         <translation>BitTorrentダウンロード用のDHT、ピア接続、暗号化の設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="38"/>
+        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="30"/>
+        <source>Enable DHT</source>
+        <translation>DHT を有効にする</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="39"/>
         <source>Enable DHT (Distributed Hash Table)</source>
         <translation>DHT（分散ハッシュテーブル）を有効にする</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="46"/>
+        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="47"/>
         <source>Helps find more peers for torrent downloads. Also enables UDP tracker support.</source>
         <translation>トレントダウンロードのためのより多くのピアを見つけるのに役立ちます。また、UDPトラッカーのサポートも可能にします。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="67"/>
+        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="68"/>
         <source>Max Peers Per Torrent</source>
         <translation>トレントあたりの最大ピア数</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="75"/>
+        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="76"/>
         <source>Peers:</source>
         <translation>ピア:</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="153"/>
+        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="84"/>
+        <source>Maximum peers per torrent</source>
+        <translation>トレントあたりの最大ピア数</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="105"/>
+        <source>Require encrypted connections</source>
+        <translation>暗号化された接続を要求する</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="156"/>
         <source>DHT</source>
         <translation>DHT</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="156"/>
+        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="159"/>
         <source>MaxPeers</source>
         <translation>最大ピア数</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="159"/>
+        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="162"/>
         <source>RequireCrypto</source>
         <translation>暗号化を要求</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="169"/>
+        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="163"/>
+        <source>BitTorrent advanced settings saved and applied successfully!</source>
+        <translation>BitTorrent の詳細設定が保存され、正常に適用されました。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="172"/>
         <source>Requiring encryption may reduce the number of available peers</source>
         <translation>暗号化を要求すると利用可能なピア数が減る場合があります</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="176"/>
+        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="179"/>
         <source>For private torrents, DHT is automatically disabled regardless of this setting</source>
         <translation>プライベートトレントでは、この設定に関わらず DHT は自動的に無効になります</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="84"/>
+        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="86"/>
         <source>Maximum number of peers to connect per torrent (0 = unlimited)</source>
         <translation>トレントごとに接続できるピアの最大数 (0 = 制限なし)</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="111"/>
+        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="114"/>
         <source>Require Encrypted Connections</source>
         <translation>暗号化された接続を要求する</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="119"/>
+        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="122"/>
         <source>Only accept encrypted BitTorrent handshake. Rejects legacy unencrypted connections.</source>
         <translation>暗号化された BitTorrent ハンドシェイクのみを受け付けます。暗号化されていないレガシー接続は拒否されます。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="144"/>
+        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="147"/>
         <source>Input fields reset to default values (not saved yet)</source>
         <translation>入力フィールドがデフォルト値にリセットされる（まだ保存されていない）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="160"/>
         <source>✓ BitTorrent advanced settings saved and applied successfully!</source>
-        <translation>BitTorrent の詳細設定が保存され、正常に適用されました！</translation>
+        <translation type="vanished">BitTorrent の詳細設定が保存され、正常に適用されました！</translation>
+    </message>
+</context>
+<context>
+    <name>BrowserView</name>
+    <message>
+        <location filename="../qml/Browser/BrowserView.qml" line="13"/>
+        <source>Preferences</source>
+        <translation>プリファレンス</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserView.qml" line="15"/>
+        <source>Home</source>
+        <translation>ホーム</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserView.qml" line="17"/>
+        <source>Waiting</source>
+        <translation>待機中</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserView.qml" line="19"/>
+        <source>Stopped</source>
+        <translation>停止しました</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserView.qml" line="20"/>
+        <source>Downloads</source>
+        <translation>ダウンロード</translation>
     </message>
 </context>
 <context>
@@ -337,27 +489,35 @@
         <translation>アプリケーションを終了しますか、それともシステムトレイに最小化しますか？</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="49"/>
         <source>Tip: When minimized to tray, the application will continue running in the background. You can restore the window from the system tray.</source>
-        <translation>ヒント：トレイに最小化しても、アプリケーションはバックグラウンドで実行され続けます。システムトレイからウィンドウを復元することができます。</translation>
+        <translation type="vanished">ヒント：トレイに最小化しても、アプリケーションはバックグラウンドで実行され続けます。システムトレイからウィンドウを復元することができます。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="59"/>
         <source>Don&apos;t ask again, remember my choice</source>
-        <translation>二度と聞かないでくれ。</translation>
+        <translation type="vanished">二度と聞かないでくれ。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="78"/>
+        <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="70"/>
+        <source>When minimized to tray, GDownload keeps running in the background. Restore it from the system tray at any time.</source>
+        <translation>トレイに最小化しても、GDownload はバックグラウンドで動作し続けます。いつでもシステムトレイから復元できます。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="84"/>
+        <source>Remember my choice</source>
+        <translation>この選択を記憶する</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="104"/>
         <source>Cancel</source>
         <translation>キャンセル</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="83"/>
+        <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="109"/>
         <source>Minimize to Tray</source>
         <translation>トレイに最小化</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="88"/>
+        <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="114"/>
         <source>Quit</source>
         <translation>やめる</translation>
     </message>
@@ -365,95 +525,173 @@
 <context>
     <name>ConfigHelperCard</name>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="55"/>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="68"/>
         <source>Configuration Helper</source>
         <translation>コンフィギュレーション・ヘルパー</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="63"/>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="78"/>
+        <source>Copy the local connection values into the browser extension options page.</source>
+        <translation>ローカル接続の値をブラウザ拡張機能の設定ページにコピーしてください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="90"/>
+        <source>Local endpoint ready</source>
+        <translation>ローカルエンドポイント準備完了</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="91"/>
+        <source>Keep GDownload running while the extension is connected.</source>
+        <translation>拡張機能の接続中は GDownload を起動したままにしてください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="101"/>
+        <source>Current GDownload Settings</source>
+        <translation>現在の GDownload 設定</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="108"/>
+        <source>WebSocket URL</source>
+        <translation>WebSocket URL</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="113"/>
+        <source>WebSocket URL copied.</source>
+        <translation>WebSocket URL をコピーしました。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="117"/>
+        <source>RPC Secret</source>
+        <translation>RPC シークレット</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="122"/>
+        <source>RPC Secret copied.</source>
+        <translation>RPC シークレットをコピーしました。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="150"/>
+        <source>Connect the extension</source>
+        <translation>拡張機能を接続する</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="157"/>
+        <source>Copy the endpoint and secret shown above.</source>
+        <translation>上に表示されているエンドポイントとシークレットをコピーします。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="158"/>
+        <source>Open the browser extension options page.</source>
+        <translation>ブラウザ拡張機能の設定ページを開きます。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="159"/>
+        <source>Paste both values into the matching connection fields.</source>
+        <translation>両方の値を対応する接続フィールドに貼り付けます。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="160"/>
+        <source>Run Test Connection before saving the extension settings.</source>
+        <translation>拡張機能の設定を保存する前に、接続テストを実行してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="174"/>
+        <source>Copy All Settings</source>
+        <translation>すべての設定をコピー</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="182"/>
+        <source>All connection settings copied.</source>
+        <translation>すべての接続設定をコピーしました。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="190"/>
+        <source>Need help? Open the FAQ below for connection troubleshooting.</source>
+        <translation>お困りですか？接続のトラブルシューティングについては、以下の FAQ をご覧ください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="202"/>
+        <source>GDownload must remain open</source>
+        <translation>GDownload を開いたままにしてください</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="203"/>
+        <source>The extension connects directly to the local aria2c service and cannot submit tasks after GDownload exits.</source>
+        <translation>拡張機能はローカルの aria2c サービスに直接接続しており、GDownload の終了後はタスクを送信できません。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="250"/>
+        <source>Copy %1</source>
+        <translation>%1 をコピー</translation>
+    </message>
+    <message>
         <source>Copy these settings to your browser extension</source>
-        <translation>これらの設定をブラウザの拡張機能にコピーする</translation>
+        <translation type="vanished">これらの設定をブラウザの拡張機能にコピーする</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="75"/>
         <source>Current GDownload Settings:</source>
-        <translation>現在のGDownloadの設定：</translation>
+        <translation type="vanished">現在のGDownloadの設定：</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="87"/>
         <source>WebSocket URL:</source>
-        <translation>WebSocketのURL：</translation>
+        <translation type="vanished">WebSocketのURL：</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="106"/>
-        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="142"/>
+        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="247"/>
         <source>Copy</source>
         <translation>コピー</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="111"/>
         <source>✓ WebSocket URL copied!</source>
-        <translation>WebSocket URLをコピー！</translation>
+        <translation type="vanished">WebSocket URLをコピー！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="123"/>
         <source>RPC Secret:</source>
-        <translation>RPCの秘密：</translation>
+        <translation type="vanished">RPCの秘密：</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="147"/>
         <source>✓ RPC Secret copied!</source>
-        <translation>RPCシークレットをコピー！</translation>
+        <translation type="vanished">RPCシークレットをコピー！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="183"/>
         <source>Requires GDownload running</source>
-        <translation>GDownload の起動が必要です</translation>
+        <translation type="vanished">GDownload の起動が必要です</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="215"/>
         <source>How to use:</source>
-        <translation>使用方法</translation>
+        <translation type="vanished">使用方法</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="223"/>
         <source>1. Copy the settings above using the Copy buttons</source>
-        <translation>1.コピーボタンを使用して、上記の設定をコピーします。</translation>
+        <translation type="vanished">1.コピーボタンを使用して、上記の設定をコピーします。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="230"/>
         <source>2. Open your browser extension options page</source>
-        <translation>2.ブラウザの拡張機能オプションページを開く</translation>
+        <translation type="vanished">2.ブラウザの拡張機能オプションページを開く</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="237"/>
         <source>3. Paste the values into the corresponding fields</source>
-        <translation>3.対応するフィールドに値を貼り付ける。</translation>
+        <translation type="vanished">3.対応するフィールドに値を貼り付ける。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="244"/>
         <source>4. Click &apos;Test Connection&apos; to verify</source>
-        <translation>4.Test Connection（接続テスト）」をクリックし、以下を確認する。</translation>
+        <translation type="vanished">4.Test Connection（接続テスト）」をクリックし、以下を確認する。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="258"/>
         <source>📋 Copy All Settings</source>
-        <translation>📋 すべての設定をコピーする</translation>
+        <translation type="vanished">📋 すべての設定をコピーする</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="265"/>
         <source>✓ All settings copied!</source>
-        <translation>すべての設定がコピーされます！</translation>
+        <translation type="vanished">すべての設定がコピーされます！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="272"/>
         <source>Need help? Check the FAQ below</source>
-        <translation>ヘルプが必要ですか？以下のFAQをご覧ください。</translation>
+        <translation type="vanished">ヘルプが必要ですか？以下のFAQをご覧ください。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="303"/>
         <source>Important: Keep GDownload running for the browser extension to work. The extension connects directly to aria2c via these settings.</source>
-        <translation>重要: ブラウザの拡張機能を動作させるためにGDownloadを起動しておいてください。拡張機能はこれらの設定を介してaria2cに直接接続します。</translation>
+        <translation type="vanished">重要: ブラウザの拡張機能を動作させるためにGDownloadを起動しておいてください。拡張機能はこれらの設定を介してaria2cに直接接続します。</translation>
     </message>
 </context>
 <context>
@@ -475,8 +713,8 @@
     </message>
     <message>
         <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="41"/>
-        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="79"/>
-        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="114"/>
+        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="80"/>
+        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="116"/>
         <source>Count:</source>
         <translation>カウントする：</translation>
     </message>
@@ -486,110 +724,168 @@
         <translation>同時に実行されているダウンロード数</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="71"/>
+        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="53"/>
+        <source>Maximum concurrent downloads</source>
+        <translation>最大同時ダウンロード数</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="72"/>
         <source>Max Connections Per Server</source>
         <translation>サーバーあたりの最大接続数</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="80"/>
+        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="81"/>
         <source>More connections = faster speed, but may be blocked by servers</source>
         <translation>接続数が多いほどスピードは速くなるが、サーバーによってブロックされる可能性がある。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="106"/>
+        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="89"/>
+        <source>Maximum connections per server</source>
+        <translation>サーバーあたりの最大接続数</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="108"/>
         <source>File Segments (Split)</source>
         <translation>ファイルセグメント（分割）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="115"/>
+        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="117"/>
         <source>Number of segments to split the file for downloading</source>
         <translation>ダウンロード用にファイルを分割するセグメント数</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="141"/>
+        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="125"/>
+        <source>Download splits</source>
+        <translation>ダウンロード分割数</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="144"/>
         <source>Min Split Size</source>
         <translation>最小分割サイズ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="149"/>
+        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="152"/>
         <source>Size:</source>
         <translation>サイズ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="150"/>
+        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="153"/>
         <source>Don&apos;t split files smaller than this size</source>
         <translation>このサイズより小さいファイルは分割しない</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="201"/>
+        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="159"/>
+        <source>Minimum split size</source>
+        <translation>最小分割サイズ</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="205"/>
         <source>Concurrent</source>
         <translation>同時実行数</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="204"/>
+        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="208"/>
         <source>Connection</source>
         <translation>接続数</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="207"/>
+        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="211"/>
         <source>Split</source>
         <translation>分割数</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="210"/>
+        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="214"/>
         <source>MinSize</source>
         <translation>最小分割サイズ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="186"/>
+        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="215"/>
+        <source>Connection and performance settings saved and applied successfully!</source>
+        <translation>接続とパフォーマンスの設定が保存され、正常に適用されました。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="190"/>
         <source>Input fields reset to default values (not saved yet)</source>
         <translation>入力フィールドがデフォルト値にリセットされる（まだ保存されていない）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="211"/>
         <source>✓ Connection &amp; Performance settings saved and applied successfully!</source>
-        <translation>接続とパフォーマンスの設定が保存され、正常に適用されました！</translation>
+        <translation type="vanished">接続とパフォーマンスの設定が保存され、正常に適用されました！</translation>
     </message>
 </context>
 <context>
     <name>DeleteConfirmDialog</name>
     <message>
-        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="41"/>
+        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="43"/>
         <source>Delete Confirmation</source>
         <translation>削除確認</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="43"/>
+        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="48"/>
+        <source>Are you sure you want to delete all tasks in this list?</source>
+        <translation>このリストのすべてのタスクを削除してもよろしいですか？</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="49"/>
         <source>Are you sure you want to delete this download task?</source>
         <translation>本当にこのダウンロードタスクを削除しますか？</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="74"/>
+        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="76"/>
+        <source>Download task: %1</source>
+        <translation>ダウンロードタスク: %1</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="84"/>
+        <source>Also delete downloaded files</source>
+        <translation>ダウンロード済みファイルも削除する</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="85"/>
         <source>Also delete downloaded file</source>
         <translation>ダウンロードしたファイルも削除する</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="96"/>
+        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="137"/>
+        <source>This will only remove all tasks from the waiting list.</source>
+        <translation>これは待機リストからすべてのタスクを削除するだけです。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="138"/>
         <source>This will only remove the task from the waiting list.</source>
         <translation>これは待機リストからタスクを削除するだけである。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="98"/>
-        <source>Warning: The downloaded file will be permanently deleted and cannot be recovered!</source>
-        <translation>警告ダウンロードしたファイルは永久に削除され、復元することはできません！</translation>
+        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="142"/>
+        <source>Downloaded files will be permanently deleted and cannot be recovered.</source>
+        <translation>ダウンロード済みファイルは完全に削除され、復元できません。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="100"/>
+        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="143"/>
+        <source>The downloaded file will be permanently deleted and cannot be recovered.</source>
+        <translation>ダウンロード済みファイルは完全に削除され、復元できません。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="146"/>
+        <source>This will only remove task records. Downloaded files will be kept.</source>
+        <translation>タスクの記録のみ削除されます。ダウンロード済みファイルは保持されます。</translation>
+    </message>
+    <message>
+        <source>Warning: The downloaded file will be permanently deleted and cannot be recovered!</source>
+        <translation type="vanished">警告ダウンロードしたファイルは永久に削除され、復元することはできません！</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="147"/>
         <source>This will only remove the task record. The downloaded file will be kept.</source>
         <translation>これはタスクレコードを削除するだけである。ダウンロードされたファイルは保持されます。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="116"/>
+        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="166"/>
         <source>Cancel</source>
         <translation>キャンセル</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="121"/>
+        <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="171"/>
         <source>Delete</source>
         <translation>削除</translation>
     </message>
@@ -597,42 +893,79 @@
 <context>
     <name>DownloadPageTitle</name>
     <message>
-        <location filename="../qml/Browser/DownloadPageTitle.qml" line="36"/>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="44"/>
         <source>Downloads</source>
         <translation>ダウンロード</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageTitle.qml" line="45"/>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="53"/>
         <source>Everything is running smoothly · active downloads</source>
         <translation>すべて正常に動作中 · ダウンロード中</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageTitle.qml" line="46"/>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="54"/>
+        <source>Queued tasks show position and expected size</source>
+        <translation>キュー内のタスクは順番と予想サイズを表示します</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="55"/>
+        <source>Review completed downloads and retry failures</source>
+        <translation>完了したダウンロードの確認と失敗の再試行</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="170"/>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="182"/>
+        <source>Failed to remove all tasks.</source>
+        <translation>すべてのタスクの削除に失敗しました。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="173"/>
+        <source>All tasks and downloaded content were removed.</source>
+        <translation>すべてのタスクとダウンロード済みコンテンツが削除されました。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="174"/>
+        <source>All task records were removed.</source>
+        <translation>すべてのタスク記録が削除されました。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="176"/>
+        <source>Some tasks were removed, but some tasks could not be removed.</source>
+        <translation>一部のタスクは削除されましたが、削除できなかったタスクがあります。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="179"/>
+        <source>Some tasks were removed, but some downloaded content could not be deleted.</source>
+        <translation>一部のタスクは削除されましたが、ダウンロード済みコンテンツを削除できなかったものがあります。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="180"/>
+        <source>Some task records were removed, but some cleanup operations could not be completed.</source>
+        <translation>一部のタスク記録は削除されましたが、クリーンアップ操作を完了できなかったものがあります。</translation>
+    </message>
+    <message>
         <source>Queued tasks are ready to start</source>
-        <translation>キュー内のタスクは開始準備ができています</translation>
+        <translation type="vanished">キュー内のタスクは開始準備ができています</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageTitle.qml" line="47"/>
         <source>Completed and stopped tasks</source>
-        <translation>完了および停止したタスク</translation>
+        <translation type="vanished">完了および停止したタスク</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageTitle.qml" line="65"/>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="79"/>
         <source>Add Download</source>
         <translation>ダウンロードを追加</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageTitle.qml" line="135"/>
         <source>Delete Confirmation</source>
-        <translation>削除の確認</translation>
+        <translation type="vanished">削除の確認</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageTitle.qml" line="139"/>
         <source>Are you sure you want to delete all tasks in this list? This action cannot be undone.</source>
-        <translation>このリストのすべてのタスクを削除してもよろしいですか?この操作は元に戻せません。</translation>
+        <translation type="vanished">このリストのすべてのタスクを削除してもよろしいですか?この操作は元に戻せません。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageTitle.qml" line="48"/>
+        <location filename="../qml/Browser/DownloadPageTitle.qml" line="56"/>
         <source>Manage your downloads</source>
         <translation>ダウンロードの管理</translation>
     </message>
@@ -640,34 +973,34 @@
 <context>
     <name>DownloadPageView</name>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="62"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="82"/>
         <source>Active</source>
         <translation>実行中</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="64"/>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="73"/>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="82"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="84"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="93"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="102"/>
         <source>tasks</source>
         <translation>タスク</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="71"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="91"/>
         <source>Waiting</source>
         <translation>待機中</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="80"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="100"/>
         <source>Stopped</source>
         <translation>停止しました</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="89"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="109"/>
         <source>Density</source>
         <translation>密度</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/DownloadPageView.qml" line="90"/>
+        <location filename="../qml/Browser/DownloadPageView.qml" line="110"/>
         <source>Comfort</source>
         <translation>快適</translation>
     </message>
@@ -675,313 +1008,657 @@
 <context>
     <name>FAQCard</name>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="40"/>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="66"/>
         <source>Frequently Asked Questions</source>
         <translation>よくある質問</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="48"/>
         <source>Find answers to common questions</source>
-        <translation>よくある質問への回答を探す</translation>
+        <translation type="vanished">よくある質問への回答を探す</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="62"/>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="91"/>
         <source>Why do I need the browser extension?</source>
         <translation>なぜブラウザの拡張機能が必要なのですか？</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="63"/>
         <source>The extension allows you to capture download links directly from web pages and send them to GDownload with a single click. It seamlessly integrates with your browsing experience.</source>
-        <translation>この拡張機能を使用すると、Webページから直接ダウンロードリンクをキャプチャし、ワンクリックでGDownloadに送信することができます。あなたのブラウジング体験にシームレスに統合します。</translation>
+        <translation type="vanished">この拡張機能を使用すると、Webページから直接ダウンロードリンクをキャプチャし、ワンクリックでGDownloadに送信することができます。あなたのブラウジング体験にシームレスに統合します。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="69"/>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="97"/>
         <source>Is my data safe?</source>
         <translation>私のデータは安全ですか？</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="70"/>
         <source>Yes! The extension connects locally to aria2c via WebSocket. All communication stays on your computer - no data is sent to external servers. Your privacy is fully protected.</source>
-        <translation>はい！拡張機能は WebSocket を介してローカルに aria2c に接続します。すべての通信はあなたのコンピュータにとどまります - 外部サーバにデータが送信されることはありません。あなたのプライバシーは完全に保護されます。</translation>
+        <translation type="vanished">はい！拡張機能は WebSocket を介してローカルに aria2c に接続します。すべての通信はあなたのコンピュータにとどまります - 外部サーバにデータが送信されることはありません。あなたのプライバシーは完全に保護されます。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="76"/>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="103"/>
         <source>Connection failed. What should I do?</source>
         <translation>接続に失敗しました。どうすればいいですか？</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="77"/>
         <source>1. Ensure GDownload is running
 2. Check that aria2c is enabled in GDownload settings
 3. Verify the WebSocket URL and RPC Secret match the values shown above
 4. Try restarting both GDownload and your browser</source>
-        <translation>1.GDownloadが実行されていることを確認する。
+        <translation type="vanished">1.GDownloadが実行されていることを確認する。
 2.GDownloadの設定でaria2cが有効になっていることを確認する。
 3.WebSocket URLとRPC Secretが上記の値と一致していることを確認する。
 4.GDownloadとブラウザの両方を再起動してみてください。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="83"/>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="109"/>
         <source>Which browsers are supported?</source>
         <translation>どのブラウザに対応していますか？</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="84"/>
         <source>The extension supports Chrome 110+, Firefox 115+, and Edge 110+. It uses the standard Web Extensions API (Manifest V3) for maximum compatibility.</source>
-        <translation>この拡張機能はChrome 110+、Firefox 115+、Edge 110+をサポートしています。最大の互換性のために標準のWeb Extensions API (Manifest V3)を使用しています。</translation>
+        <translation type="vanished">この拡張機能はChrome 110+、Firefox 115+、Edge 110+をサポートしています。最大の互換性のために標準のWeb Extensions API (Manifest V3)を使用しています。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="90"/>
         <source>Can I customize what links are captured?</source>
-        <translation>どのリンクをキャプチャするかをカスタマイズできますか？</translation>
+        <translation type="vanished">どのリンクをキャプチャするかをカスタマイズできますか？</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="91"/>
         <source>Yes! The extension has powerful filtering options:
 • Set minimum file size
 • Filter by file type (video, audio, archive, etc.)
 • Add URL blacklist patterns
 • Configure domain whitelist</source>
-        <translation>はい！この拡張機能には強力なフィルタリングオプションがあります：
+        <translation type="vanished">はい！この拡張機能には強力なフィルタリングオプションがあります：
 - 最小ファイルサイズの設定
 - ファイルタイプによるフィルタリング（ビデオ、オーディオ、アーカイブなど）
 - URLブラックリストパターンの追加
 - ドメインホワイトリストの設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="97"/>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="121"/>
         <source>Does it work with password-protected sites?</source>
         <translation>パスワードで保護されたサイトでも使えますか？</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="98"/>
         <source>Yes. The extension can optionally send cookies and authorization headers (disabled by default for security). Enable these in the extension&apos;s Privacy &amp; Security settings for sites that require login.</source>
-        <translation>拡張機能では、オプションでCookieと認証ヘッダーを送信できます（デフォルトではセキュリティのために無効になっています）。ログインが必要なサイトでは、拡張機能のプライバシーとセキュリティ設定でこれらを有効にしてください。</translation>
+        <translation type="vanished">拡張機能では、オプションでCookieと認証ヘッダーを送信できます（デフォルトではセキュリティのために無効になっています）。ログインが必要なサイトでは、拡張機能のプライバシーとセキュリティ設定でこれらを有効にしてください。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="115"/>
         <source>📖 Need more help?</source>
-        <translation>📖 もっと助けが必要ですか？</translation>
+        <translation type="vanished">📖 もっと助けが必要ですか？</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="128"/>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="167"/>
         <source>GitHub Issues</source>
         <translation>ギットハブの課題</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="129"/>
         <source>Report bugs</source>
-        <translation>バグを報告する</translation>
+        <translation type="vanished">バグを報告する</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="132"/>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="171"/>
         <source>Opening GitHub Issues...</source>
         <translation>GitHub Issuesを開く...</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="139"/>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="177"/>
         <source>Documentation</source>
         <translation>ドキュメンテーション</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="140"/>
         <source>Full user guide</source>
-        <translation>ユーザーガイド</translation>
+        <translation type="vanished">ユーザーガイド</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="143"/>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="76"/>
+        <source>Connection, privacy, compatibility, and capture behavior.</source>
+        <translation>接続、プライバシー、互換性、キャプチャ動作について。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="92"/>
+        <source>The extension captures download links directly from web pages and sends them to GDownload with one action, so you do not need to copy each URL manually.</source>
+        <translation>拡張機能はウェブページからダウンロードリンクを直接キャプチャし、ワンアクションで GDownload に送信するため、各 URL を手動でコピーする必要がありません。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="98"/>
+        <source>Yes. The extension connects locally to aria2c through WebSocket. The connection values remain on your computer and are not sent to an external service.</source>
+        <translation>はい。拡張機能は WebSocket を介してローカルで aria2c に接続します。接続情報はお使いのコンピュータに留まり、外部サービスには送信されません。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="104"/>
+        <source>Keep GDownload running. Confirm that aria2c is enabled, verify that the WebSocket URL and RPC Secret match the configuration helper, and then restart GDownload and the browser before testing again.</source>
+        <translation>GDownload を起動したままにしてください。aria2c が有効であることを確認し、WebSocket URL と RPC シークレットが設定ヘルパーと一致していることを確認してから、GDownload とブラウザを再起動して再テストしてください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="110"/>
+        <source>The extension supports Chrome 110+, Firefox 115+, and Edge 110+ through the standard Web Extensions API and Manifest V3 where available.</source>
+        <translation>この拡張機能は、標準の Web Extensions API と Manifest V3 を通じて Chrome 110 以降、Firefox 115 以降、Edge 110 以降に対応しています。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="115"/>
+        <source>Can I customize which links are captured?</source>
+        <translation>キャプチャするリンクをカスタマイズできますか？</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="116"/>
+        <source>Yes. Configure minimum file size, allowed file types, URL blacklist patterns, and a domain whitelist in the extension options.</source>
+        <translation>はい。拡張機能の設定で最小ファイルサイズ、許可するファイルタイプ、URL ブラックリストパターン、ドメインホワイトリストを設定できます。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="122"/>
+        <source>The extension can optionally send cookies and authorization headers. These options are disabled by default; enable them only for trusted sites that require an authenticated request.</source>
+        <translation>拡張機能は Cookie と認証ヘッダーをオプションで送信できます。これらのオプションはデフォルトで無効になっています。認証が必要な信頼できるサイトに対してのみ有効にしてください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="150"/>
+        <source>Need more help?</source>
+        <translation>さらにヘルプが必要ですか？</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="168"/>
+        <source>Report a bug</source>
+        <translation>バグを報告する</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="178"/>
+        <source>Read the user guide</source>
+        <translation>ユーザーガイドを読む</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="181"/>
         <source>Opening documentation...</source>
         <translation>オープニング・ドキュメント...</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="150"/>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="187"/>
         <source>Official Website</source>
         <translation>公式ウェブサイト</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="151"/>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="188"/>
         <source>Visit gdownload.uk</source>
         <translation>gdownload.ukをご覧ください。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="154"/>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="191"/>
+        <source>Opening the website...</source>
+        <translation>ウェブサイトを開いています...</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="232"/>
+        <source>Join the GDownload community</source>
+        <translation>GDownload コミュニティに参加する</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="243"/>
+        <source>Share feedback, compare capture rules, and follow new extension releases on GitHub.</source>
+        <translation>フィードバックの共有、キャプチャルールの比較、GitHub での新しい拡張機能リリースのフォローができます。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="255"/>
+        <source>Star on GitHub</source>
+        <translation>GitHub でスターを付ける</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="262"/>
+        <source>Thank you for supporting GDownload.</source>
+        <translation>GDownload をご支援いただきありがとうございます。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="289"/>
+        <source>Collapsed</source>
+        <translation>折りたたみ済み</translation>
+    </message>
+    <message>
         <source>Opening website...</source>
-        <translation>ウェブサイトを開設...</translation>
+        <translation type="vanished">ウェブサイトを開設...</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="186"/>
         <source>Join Our Community</source>
-        <translation>コミュニティに参加する</translation>
+        <translation type="vanished">コミュニティに参加する</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="194"/>
         <source>Get help from other users, share tips, and stay updated with the latest features. Star us on GitHub to show your support!</source>
-        <translation>他のユーザーからヘルプを得たり、ヒントを共有したり、最新機能を常にアップデートしましょう。GitHubでスターを付けて応援してください！</translation>
+        <translation type="vanished">他のユーザーからヘルプを得たり、ヒントを共有したり、最新機能を常にアップデートしましょう。GitHubでスターを付けて応援してください！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="203"/>
         <source>⭐ Star on GitHub</source>
-        <translation>GitHubのスター</translation>
+        <translation type="vanished">GitHubのスター</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="210"/>
         <source>Thank you for your support!</source>
-        <translation>ご声援ありがとうございました！</translation>
+        <translation type="vanished">ご声援ありがとうございました！</translation>
     </message>
 </context>
 <context>
     <name>FeatureHighlightCard</name>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="37"/>
+        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="38"/>
         <source>Feature Highlights</source>
         <translation>特集ハイライト</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="44"/>
-        <source>Discover what makes our browser extension special</source>
-        <translation>当社のブラウザ拡張機能の特徴をご覧ください</translation>
+        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="48"/>
+        <source>Capture, filter, and hand off browser downloads without leaving your current page.</source>
+        <translation>現在のページを離れずに、ブラウザのダウンロードをキャプチャ、フィルタリング、転送できます。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="61"/>
+        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="67"/>
+        <source>Capture downloadable links from the page you are viewing.</source>
+        <translation>閲覧中のページからダウンロード可能なリンクをキャプチャします。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="74"/>
+        <source>Select multiple links and send the complete group at once.</source>
+        <translation>複数のリンクを選択して一括送信できます。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="80"/>
+        <source>Unified Experience</source>
+        <translation>統一されたエクスペリエンス</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="81"/>
+        <source>Use the same Aurora visual language as the desktop application.</source>
+        <translation>デスクトップアプリケーションと同じ Aurora ビジュアルデザインを使用します。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="87"/>
+        <source>Local Connection</source>
+        <translation>ローカル接続</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="88"/>
+        <source>Connect directly to the local aria2c JSON-RPC endpoint.</source>
+        <translation>ローカルの aria2c JSON-RPC エンドポイントに直接接続します。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="95"/>
+        <source>Use the extension with Chrome, Firefox, and Edge.</source>
+        <translation>Chrome、Firefox、Edge で拡張機能を使用できます。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="102"/>
+        <source>Filter links by size, type, domain, and custom rules.</source>
+        <translation>サイズ、タイプ、ドメイン、カスタムルールでリンクをフィルタリングします。</translation>
+    </message>
+    <message>
+        <source>Discover what makes our browser extension special</source>
+        <translation type="vanished">当社のブラウザ拡張機能の特徴をご覧ください</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="66"/>
         <source>One-Click Capture</source>
         <translation>ワンクリック・キャプチャー</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="62"/>
         <source>Quickly capture download links from web pages</source>
-        <translation>ウェブページからダウンロードリンクを素早くキャプチャ</translation>
+        <translation type="vanished">ウェブページからダウンロードリンクを素早くキャプチャ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="70"/>
+        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="73"/>
         <source>Batch Download</source>
         <translation>一括ダウンロード</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="71"/>
         <source>Select multiple links and send them all at once</source>
-        <translation>複数のリンクを選択して一度に送信</translation>
+        <translation type="vanished">複数のリンクを選択して一度に送信</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="79"/>
         <source>Unified UI</source>
-        <translation>統一されたUI</translation>
+        <translation type="vanished">統一されたUI</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="80"/>
         <source>Perfectly matches GDownload&apos;s Element Plus design</source>
-        <translation>GDownloadのエレメント・プラスのデザインに完璧にマッチ</translation>
+        <translation type="vanished">GDownloadのエレメント・プラスのデザインに完璧にマッチ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="88"/>
         <source>Secure Connection</source>
-        <translation>安全な接続</translation>
+        <translation type="vanished">安全な接続</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="89"/>
         <source>Direct WebSocket connection to aria2c via JSON-RPC</source>
-        <translation>JSON-RPCによるaria2cへの直接WebSocket接続</translation>
+        <translation type="vanished">JSON-RPCによるaria2cへの直接WebSocket接続</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="97"/>
+        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="94"/>
         <source>Cross-Browser</source>
         <translation>クロスブラウザ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="98"/>
         <source>Compatible with Chrome, Firefox, and Edge</source>
-        <translation>Chrome、Firefox、Edgeに対応</translation>
+        <translation type="vanished">Chrome、Firefox、Edgeに対応</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="106"/>
+        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="101"/>
         <source>Smart Filtering</source>
         <translation>スマート・フィルタリング</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="107"/>
         <source>Filter links by file size, type, and custom rules</source>
-        <translation>ファイルサイズ、タイプ、カスタムルールによるリンクのフィルタリング</translation>
+        <translation type="vanished">ファイルサイズ、タイプ、カスタムルールによるリンクのフィルタリング</translation>
     </message>
 </context>
 <context>
     <name>FilePreviewList</name>
     <message>
-        <location filename="../qml/CommonComponents/FilePreviewList.qml" line="40"/>
+        <location filename="../qml/CommonComponents/FilePreviewList.qml" line="53"/>
+        <source>Select all files</source>
+        <translation>すべてのファイルを選択</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/FilePreviewList.qml" line="78"/>
         <source>File Name</source>
         <translation>ファイル名</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/FilePreviewList.qml" line="48"/>
+        <location filename="../qml/CommonComponents/FilePreviewList.qml" line="88"/>
         <source>Extension</source>
         <translation>拡張子</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/FilePreviewList.qml" line="56"/>
+        <location filename="../qml/CommonComponents/FilePreviewList.qml" line="99"/>
         <source>Size</source>
         <translation>サイズ</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/FilePreviewList.qml" line="175"/>
+        <location filename="../qml/CommonComponents/FilePreviewList.qml" line="118"/>
+        <location filename="../qml/CommonComponents/FilePreviewList.qml" line="120"/>
+        <source>Clear torrent file</source>
+        <translation>トレントファイルをクリア</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/FilePreviewList.qml" line="182"/>
+        <source>Select %1</source>
+        <translation>%1 を選択</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/FilePreviewList.qml" line="300"/>
         <source>Selected: %1 files, Total %2</source>
         <translation>選択済み: %1 ファイル, 合計 %2</translation>
     </message>
 </context>
 <context>
+    <name>FolderSelector</name>
+    <message>
+        <location filename="../qml/CommonComponents/FolderSelector.qml" line="46"/>
+        <location filename="../qml/CommonComponents/FolderSelector.qml" line="48"/>
+        <source>Folder history</source>
+        <translation>フォルダ履歴</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/FolderSelector.qml" line="73"/>
+        <source>Download folder</source>
+        <translation>ダウンロードフォルダ</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/FolderSelector.qml" line="126"/>
+        <source>Browse</source>
+        <translation>参照</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/FolderSelector.qml" line="132"/>
+        <location filename="../qml/CommonComponents/FolderSelector.qml" line="134"/>
+        <source>Browse folders</source>
+        <translation>フォルダを参照</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/FolderSelector.qml" line="201"/>
+        <location filename="../qml/CommonComponents/FolderSelector.qml" line="203"/>
+        <source>Remove from history</source>
+        <translation>履歴から削除</translation>
+    </message>
+</context>
+<context>
     <name>GComBoBox</name>
     <message>
-        <location filename="../qml/CommonComponents/GComBoBox.qml" line="16"/>
+        <location filename="../qml/CommonComponents/GComBoBox.qml" line="13"/>
         <source>Please select</source>
         <translation>選択してください</translation>
     </message>
 </context>
 <context>
+    <name>GDialogShell</name>
+    <message>
+        <location filename="../qml/CommonComponents/GDialogShell.qml" line="185"/>
+        <source>Close dialog</source>
+        <translation>ダイアログを閉じる</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDialogShell.qml" line="187"/>
+        <source>Close</source>
+        <translation>閉じる</translation>
+    </message>
+</context>
+<context>
     <name>GDownloadViewPage</name>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="62"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="117"/>
         <source>No active downloads</source>
         <translation>アクティブダウンロードなし</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="63"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="118"/>
         <source>No waiting downloads</source>
         <translation>ダウンロード待ちなし</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="64"/>
-        <source>No completed downloads</source>
-        <translation>ダウンロードが完了していない</translation>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="119"/>
+        <source>No stopped downloads</source>
+        <translation>停止済みダウンロードなし</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="65"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="124"/>
+        <source>Completed and failed downloads will appear here.</source>
+        <translation>完了および失敗したダウンロードがここに表示されます。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="125"/>
+        <source>Add a download to begin building your queue.</source>
+        <translation>ダウンロードを追加してキューの構築を開始しましょう。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="182"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="330"/>
+        <source>Failed</source>
+        <translation>失敗</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="182"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="331"/>
+        <source>Completed</source>
+        <translation>完了</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="306"/>
+        <source>The transfer stopped before completion.</source>
+        <translation>転送が完了前に停止しました。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="309"/>
+        <source>Downloading now</source>
+        <translation>ダウンロード中</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="309"/>
+        <source>Paused — resume when ready</source>
+        <translation>一時停止中 — 準備ができたら再開</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="327"/>
+        <source>Downloading</source>
+        <translation>ダウンロード中</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="328"/>
+        <source>Paused</source>
+        <translation>一時停止</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="329"/>
+        <source>Queued</source>
+        <translation>キュー待ち</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="358"/>
+        <source>Remove</source>
+        <translation>削除</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="393"/>
+        <source>Open</source>
+        <translation>開く</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="405"/>
+        <source>Retry</source>
+        <translation>再試行</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="417"/>
+        <source>Start</source>
+        <translation>開始</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="429"/>
+        <source>Resume</source>
+        <translation>再開</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="441"/>
+        <source>Pause</source>
+        <translation>一時停止</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="474"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="534"/>
+        <source>Transferred</source>
+        <translation>転送済み</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="475"/>
+        <source>%1 of %2</source>
+        <translation>%1 / %2</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="482"/>
+        <source>Speed</source>
+        <translation>速度</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="492"/>
+        <source>ETA</source>
+        <translation>残り時間</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="499"/>
+        <source>Connections</source>
+        <translation>接続数</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="507"/>
+        <source>Queue</source>
+        <translation>キュー</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="508"/>
+        <source>Position %1</source>
+        <translation>位置 %1</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="517"/>
+        <source>Expected size</source>
+        <translation>予想サイズ</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="525"/>
+        <source>Completed size</source>
+        <translation>完了サイズ</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="549"/>
+        <source>Error %1: %2</source>
+        <translation>エラー %1: %2</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="552"/>
+        <source>Download failed</source>
+        <translation>ダウンロード失敗</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="594"/>
+        <source>The task could not be removed.</source>
+        <translation>タスクを削除できませんでした。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="600"/>
+        <source>Task and downloaded content were removed.</source>
+        <translation>タスクとダウンロード済みコンテンツが削除されました。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="601"/>
+        <source>Task record was removed.</source>
+        <translation>タスクの記録が削除されました。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="604"/>
+        <source>The task was removed, but some downloaded content could not be deleted.</source>
+        <translation>タスクは削除されましたが、一部のダウンロード済みコンテンツを削除できませんでした。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="605"/>
+        <source>The task was removed, but cleanup could not be completed.</source>
+        <translation>タスクは削除されましたが、クリーンアップを完了できませんでした。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="608"/>
+        <source>Failed to remove the task and downloaded content.</source>
+        <translation>タスクとダウンロード済みコンテンツの削除に失敗しました。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="609"/>
+        <source>Failed to remove the task.</source>
+        <translation>タスクの削除に失敗しました。</translation>
+    </message>
+    <message>
+        <source>No completed downloads</source>
+        <translation type="vanished">ダウンロードが完了していない</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="120"/>
         <source>No downloads</source>
         <translation>ダウンロードなし</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="75"/>
         <source>Add some download links to get started</source>
-        <translation>ダウンロードリンクの追加</translation>
+        <translation type="vanished">ダウンロードリンクの追加</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="137"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="263"/>
         <source>FILE</source>
         <translation>ファイル</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="163"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="300"/>
+        <source>Ready to start when a download slot is available.</source>
+        <translation>ダウンロードスロットが空き次第、開始します。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="303"/>
         <source>Saved to %1</source>
         <translation>%1 に保存しました</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="164"/>
         <source>%1 of %2 • %3% • %4 left</source>
-        <translation>%1 / %2 • %3% • 残り %4</translation>
+        <translation type="vanished">%1 / %2 • %3% • 残り %4</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="302"/>
         <source>Remaining </source>
-        <translation>残り</translation>
+        <translation type="vanished">残り</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="237"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="376"/>
         <source>Link copied to clipboard</source>
         <translation>クリップボードにコピーされたリンク</translation>
     </message>
@@ -989,81 +1666,210 @@
 <context>
     <name>GDropArea</name>
     <message>
-        <location filename="../qml/CommonComponents/GDropArea.qml" line="53"/>
+        <location filename="../qml/CommonComponents/GDropArea.qml" line="50"/>
+        <location filename="../qml/CommonComponents/GDropArea.qml" line="132"/>
+        <source>Release to import torrent</source>
+        <translation>リリースしてトレントをインポート</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDropArea.qml" line="51"/>
+        <source>Choose a torrent or metalink file</source>
+        <translation>トレントまたは Metalink ファイルを選択</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDropArea.qml" line="52"/>
+        <source>Supports Torrent, Metalink, and Meta4 files</source>
+        <translation>Torrent、Metalink、Meta4 ファイルに対応</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDropArea.qml" line="133"/>
         <source>Drag a torrent or metalink file here, or click to select.</source>
         <translation>トレントまたはメタリンクファイルをここにドラッグするか、クリックして選択します。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDropArea.qml" line="95"/>
+        <location filename="../qml/CommonComponents/GDropArea.qml" line="150"/>
+        <source>Supports .torrent, .metalink, and .meta4 files</source>
+        <translation>.torrent、.metalink、.meta4 ファイルに対応</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDropArea.qml" line="216"/>
         <source>Please choose a torrent file</source>
         <translation>Torrent ファイルを選択してください</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDropArea.qml" line="96"/>
+        <location filename="../qml/CommonComponents/GDropArea.qml" line="218"/>
         <source>Torrent files (*.torrent)</source>
         <translation>Torrent ファイル (*.torrent)</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDropArea.qml" line="96"/>
+        <location filename="../qml/CommonComponents/GDropArea.qml" line="219"/>
         <source>Metalink Files (*.metalink)</source>
         <translation>Metalink ファイル (*.metalink)</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDropArea.qml" line="96"/>
+        <location filename="../qml/CommonComponents/GDropArea.qml" line="220"/>
         <source>Meta4 Files (*.meta4)</source>
         <translation>Meta4 ファイル (*.meta4)</translation>
     </message>
 </context>
 <context>
+    <name>GMessage</name>
+    <message>
+        <location filename="../qml/CommonComponents/GMessage.qml" line="276"/>
+        <source>Dismiss notification</source>
+        <translation>通知を閉じる</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GMessage.qml" line="278"/>
+        <source>Dismiss</source>
+        <translation>閉じる</translation>
+    </message>
+</context>
+<context>
     <name>HelpDialog</name>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="12"/>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="160"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="18"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="222"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="235"/>
         <source>About GDownload</source>
         <translation>GDownloadについて</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="13"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="19"/>
         <source>Version %1</source>
         <translation>バージョン %1</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="36"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="41"/>
         <source>Sponsorship</source>
         <translation>スポンサーシップ</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="37"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="42"/>
         <source>License</source>
         <translation>ライセンス</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="38"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="43"/>
         <source>About</source>
         <translation>アバウト</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="89"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="58"/>
+        <source>Selected tab</source>
+        <translation>選択中のタブ</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="58"/>
+        <source>Open tab</source>
+        <translation>タブを開く</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="110"/>
         <source>Support GDownload Development</source>
         <translation>Gダウンロード開発支援</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="97"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="120"/>
+        <source>If GDownload is useful to you, sponsorship helps fund maintenance, testing, and new releases.</source>
+        <translation>GDownload が役に立っている場合、スポンサーシップはメンテナンス、テスト、新しいリリースの資金となります。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="146"/>
+        <source>GDownload sponsorship payment codes</source>
+        <translation>GDownload スポンサーシップ支払いコード</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="151"/>
+        <source>Thank you for supporting open source development.</source>
+        <translation>オープンソース開発をご支援いただきありがとうございます。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="197"/>
+        <source>Open source license notices</source>
+        <translation>オープンソースライセンス通知</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="236"/>
+        <source># GDownload
+
+**A modern cross-platform download manager**
+
+## Core Features
+
+- Multi-platform support for Windows, macOS, and Linux
+- High-performance downloads powered by aria2c
+- HTTP, HTTPS, FTP, BitTorrent, and Metalink support
+- Multi-threaded downloads with resume capability
+- A native Qt Quick desktop experience
+
+## Technology
+
+- **Frontend**: Qt Quick (QML)
+- **Backend**: Qt and modern C++20
+- **Download engine**: aria2c
+- **Network**: Boost.Asio with SSL
+- **BitTorrent**: libtorrent
+- **Build system**: CMake and vcpkg
+
+## Get Involved
+
+- [GitHub](https://github.com/cool2528/GDownload)
+- [Report an issue](https://github.com/cool2528/GDownload/issues)
+- Pull requests are welcome
+
+## License
+
+Copyright © 2024 GDownload Team
+
+Licensed under the Apache License 2.0.</source>
+        <translation># GDownload
+
+**最新のクロスプラットフォームダウンロードマネージャー**
+
+## 主な機能
+
+- Windows、macOS、Linux のマルチプラットフォーム対応
+- aria2c による高速ダウンロード
+- HTTP、HTTPS、FTP、BitTorrent、Metalink に対応
+- マルチスレッドダウンロードとレジューム機能
+- Qt Quick によるネイティブデスクトップ体験
+
+## 技術スタック
+
+- **フロントエンド**: Qt Quick (QML)
+- **バックエンド**: Qt と最新の C++20
+- **ダウンロードエンジン**: aria2c
+- **ネットワーク**: Boost.Asio（SSL 対応）
+- **BitTorrent**: libtorrent
+- **ビルドシステム**: CMake と vcpkg
+
+## 参加する
+
+- [GitHub](https://github.com/cool2528/GDownload)
+- [問題を報告する](https://github.com/cool2528/GDownload/issues)
+- プルリクエスト歓迎
+
+## ライセンス
+
+Copyright © 2024 GDownload Team
+
+Apache License 2.0 に基づきライセンスされています。</translation>
+    </message>
+    <message>
         <source>If you like GDownload, you can support us through the following platforms:</source>
-        <translation>GDownloadを気に入っていただけたなら、以下のプラットフォームからご支援いただけます：</translation>
+        <translation type="vanished">GDownloadを気に入っていただけたなら、以下のプラットフォームからご支援いただけます：</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="117"/>
         <source>Thank you for your support! ❤️</source>
-        <translation>ご支援ありがとうございました！❤️</translation>
+        <translation type="vanished">ご支援ありがとうございました！❤️</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="135"/>
+        <location filename="../qml/CommonComponents/HelpDialog.qml" line="184"/>
         <source>Open Source Licenses</source>
         <translation>オープンソースライセンス</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/HelpDialog.qml" line="171"/>
         <source># GDownload
 
 **A modern cross-platform download manager**
@@ -1107,7 +1913,7 @@ Licensed under the Apache License 2.0
 ---
 
 *Thank you to all contributors and users who make GDownload better!* 🚀</source>
-        <translation># Gダウンロード
+        <translation type="vanished"># Gダウンロード
 
 **最新のクロスプラットフォームダウンロードマネージャ**。
 
@@ -1155,94 +1961,132 @@ Apache License 2.0 に基づいてライセンスされています。
 <context>
     <name>HomePage</name>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="63"/>
+        <location filename="../qml/Browser/HomePage.qml" line="75"/>
         <source>Welcome back</source>
         <translation>おかえりなさい</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="71"/>
         <source>Manage your downloads and start new tasks here.</source>
-        <translation>ここでダウンロードを管理し、新しいタスクを開始します。</translation>
+        <translation type="vanished">ここでダウンロードを管理し、新しいタスクを開始します。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/HomePage.qml" line="83"/>
+        <source>Monitor transfers, start a task, or reopen a completed file.</source>
+        <translation>転送の監視、タスクの開始、完了したファイルの再オープンができます。</translation>
     </message>
     <message>
         <location filename="../qml/Browser/HomePage.qml" line="94"/>
+        <source>Add Download</source>
+        <translation>ダウンロードを追加</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/HomePage.qml" line="115"/>
         <source>Active</source>
         <translation>実行中</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="96"/>
-        <location filename="../qml/Browser/HomePage.qml" line="104"/>
-        <location filename="../qml/Browser/HomePage.qml" line="112"/>
+        <location filename="../qml/Browser/HomePage.qml" line="117"/>
+        <location filename="../qml/Browser/HomePage.qml" line="129"/>
+        <location filename="../qml/Browser/HomePage.qml" line="141"/>
         <source>tasks</source>
         <translation>タスク</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="102"/>
+        <location filename="../qml/Browser/HomePage.qml" line="118"/>
+        <source>Transfers currently running</source>
+        <translation>現在実行中の転送</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/HomePage.qml" line="127"/>
         <source>Waiting</source>
         <translation>待機中</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="110"/>
+        <location filename="../qml/Browser/HomePage.qml" line="130"/>
+        <source>Queued for the next slot</source>
+        <translation>次のスロットを待機中</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/HomePage.qml" line="139"/>
         <source>Completed</source>
         <translation>完了</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="122"/>
+        <location filename="../qml/Browser/HomePage.qml" line="142"/>
+        <source>Ready to open again</source>
+        <translation>再度開く準備完了</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/HomePage.qml" line="151"/>
         <source>Quick start</source>
         <translation>クイックスタート</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="123"/>
+        <location filename="../qml/Browser/HomePage.qml" line="152"/>
         <source>Add a new download from a link, torrent, or Baidu cloud share.</source>
         <translation>リンク、トレント、または Baidu の共有から新しいダウンロードを追加します。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="131"/>
+        <location filename="../qml/Browser/HomePage.qml" line="163"/>
         <source>Add URL</source>
         <translation>URL を追加</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="132"/>
+        <location filename="../qml/Browser/HomePage.qml" line="164"/>
         <source>Paste download links</source>
         <translation>ダウンロードリンクを貼り付け</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="139"/>
+        <location filename="../qml/Browser/HomePage.qml" line="172"/>
         <source>Torrent</source>
         <translation>トレント</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="140"/>
+        <location filename="../qml/Browser/HomePage.qml" line="173"/>
         <source>Drop torrent files</source>
         <translation>トレントファイルをドロップ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="147"/>
+        <location filename="../qml/Browser/HomePage.qml" line="181"/>
         <source>Baidu</source>
         <translation>Baidu</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="148"/>
+        <location filename="../qml/Browser/HomePage.qml" line="182"/>
         <source>Parse cloud links</source>
         <translation>クラウドリンクを解析</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="159"/>
+        <location filename="../qml/Browser/HomePage.qml" line="193"/>
         <source>Recent activity</source>
         <translation>最近のアクティビティ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="160"/>
+        <location filename="../qml/Browser/HomePage.qml" line="194"/>
         <source>Your most recently completed downloads.</source>
         <translation>最近完了したダウンロードです。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="166"/>
-        <source>No completed downloads yet.</source>
-        <translation>完了したダウンロードはまだありません。</translation>
+        <location filename="../qml/Browser/HomePage.qml" line="202"/>
+        <source>No completed downloads yet</source>
+        <translation>完了したダウンロードはまだありません</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="217"/>
+        <location filename="../qml/Browser/HomePage.qml" line="203"/>
+        <source>Completed files will appear here for quick access.</source>
+        <translation>完了したファイルはここに表示され、すぐにアクセスできます。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/HomePage.qml" line="204"/>
+        <source>Add download</source>
+        <translation>ダウンロードを追加</translation>
+    </message>
+    <message>
+        <source>No completed downloads yet.</source>
+        <translation type="vanished">完了したダウンロードはまだありません。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/HomePage.qml" line="254"/>
         <source>Open</source>
         <translation>開く</translation>
     </message>
@@ -1250,182 +2094,309 @@ Apache License 2.0 に基づいてライセンスされています。
 <context>
     <name>InstallationGuideCard</name>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="41"/>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="45"/>
         <source>Installation Guide</source>
         <translation>インストレーション・ガイド</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="48"/>
-        <source>Follow these simple steps to get started</source>
-        <translation>以下の簡単なステップに従ってください。</translation>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="55"/>
+        <source>Download, install, and connect the extension in three short steps.</source>
+        <translation>3つの簡単なステップで拡張機能をダウンロード、インストール、接続します。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="58"/>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="65"/>
+        <source>Choose the browser package you want to install.</source>
+        <translation>インストールするブラウザパッケージを選択してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="79"/>
+        <source>Chrome</source>
+        <translation>Chrome</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="83"/>
+        <source>Opening the Chrome download page...</source>
+        <translation>Chrome のダウンロードページを開いています...</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="88"/>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="154"/>
+        <source>Firefox</source>
+        <translation>Firefox</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="92"/>
+        <source>Opening the Firefox download page...</source>
+        <translation>Firefox のダウンロードページを開いています...</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="97"/>
+        <source>Edge</source>
+        <translation>Edge</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="101"/>
+        <source>Opening the Edge download page...</source>
+        <translation>Edge のダウンロードページを開いています...</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="115"/>
+        <source>GitHub Repository</source>
+        <translation>GitHub リポジトリ</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="116"/>
+        <source>Releases and source code</source>
+        <translation>リリースとソースコード</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="125"/>
+        <source>Official Website</source>
+        <translation>公式ウェブサイト</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="129"/>
+        <source>Opening the official website...</source>
+        <translation>公式ウェブサイトを開いています...</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="138"/>
+        <source>Load the downloaded package in your browser.</source>
+        <translation>ダウンロードしたパッケージをブラウザに読み込みます。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="144"/>
+        <source>Chrome and Edge</source>
+        <translation>Chrome と Edge</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="146"/>
+        <source>Open chrome://extensions/ or edge://extensions/.</source>
+        <translation>chrome://extensions/ または edge://extensions/ を開きます。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="147"/>
+        <source>Enable Developer mode.</source>
+        <translation>デベロッパーモードを有効にします。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="148"/>
+        <source>Select Load unpacked.</source>
+        <translation>「パッケージ化されていない拡張機能を読み込む」を選択します。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="149"/>
+        <source>Choose the dist folder from the extracted release.</source>
+        <translation>展開したリリースから dist フォルダを選択します。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="156"/>
+        <source>Open about:debugging#/runtime/this-firefox.</source>
+        <translation>about:debugging#/runtime/this-firefox を開きます。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="157"/>
+        <source>Select Load Temporary Add-on.</source>
+        <translation>「一時的なアドオンを読み込む」を選択します。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="158"/>
+        <source>Choose manifest.json from the dist folder.</source>
+        <translation>dist フォルダから manifest.json を選択します。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="159"/>
+        <source>Keep the debugging page available while testing the temporary add-on.</source>
+        <translation>一時アドオンのテスト中はデバッグページを開いたままにしてください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="167"/>
+        <source>Web-store installation is planned</source>
+        <translation>ウェブストアからのインストールは計画中です</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="168"/>
+        <source>For now, install the release package manually using the steps above.</source>
+        <translation>現時点では、上記の手順でリリースパッケージを手動でインストールしてください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="176"/>
+        <source>Pair the extension with the local GDownload service.</source>
+        <translation>拡張機能をローカルの GDownload サービスとペアリングします。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="184"/>
+        <source>The extension sends captured links to GDownload through the local aria2c JSON-RPC endpoint.</source>
+        <translation>拡張機能はキャプチャしたリンクをローカルの aria2c JSON-RPC エンドポイント経由で GDownload に送信します。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="190"/>
+        <source>Default connection values are already available in GDownload.</source>
+        <translation>既定の接続設定は GDownload で既に利用可能です。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="191"/>
+        <source>The configuration helper below provides the exact endpoint and secret.</source>
+        <translation>以下の設定ヘルパーで正確なエンドポイントとシークレットを確認できます。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="198"/>
+        <source>View Configuration</source>
+        <translation>設定を表示</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="202"/>
+        <source>See Configuration Helper below.</source>
+        <translation>以下の設定ヘルパーをご覧ください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="307"/>
+        <source>Download for %1</source>
+        <translation>%1 用ダウンロード</translation>
+    </message>
+    <message>
+        <source>Follow these simple steps to get started</source>
+        <translation type="vanished">以下の簡単なステップに従ってください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="64"/>
         <source>Download Extension</source>
         <translation>ダウンロード</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="59"/>
         <source>Choose your browser and download the extension</source>
-        <translation>ブラウザを選択し、拡張機能をダウンロードする</translation>
+        <translation type="vanished">ブラウザを選択し、拡張機能をダウンロードする</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="65"/>
         <source>Select your browser:</source>
-        <translation>ブラウザを選択してください：</translation>
+        <translation type="vanished">ブラウザを選択してください：</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="81"/>
         <source>Opening Chrome download page...</source>
-        <translation>Chromeのダウンロードページを開く...</translation>
+        <translation type="vanished">Chromeのダウンロードページを開く...</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="91"/>
         <source>Opening Firefox download page...</source>
-        <translation>Firefoxのダウンロードページを開く...</translation>
+        <translation type="vanished">Firefoxのダウンロードページを開く...</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="101"/>
         <source>Opening Edge download page...</source>
-        <translation>Edgeのダウンロードページを開く...</translation>
+        <translation type="vanished">Edgeのダウンロードページを開く...</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="132"/>
         <source>GitHub Release:</source>
-        <translation>GitHubリリース：</translation>
+        <translation type="vanished">GitHubリリース：</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="138"/>
         <source>Visit Repository</source>
-        <translation>リポジトリへ</translation>
+        <translation type="vanished">リポジトリへ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="150"/>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="119"/>
         <source>Opening GitHub...</source>
         <translation>GitHubを開く...</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="167"/>
         <source>Official Site:</source>
-        <translation>公式サイト</translation>
+        <translation type="vanished">公式サイト</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="173"/>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="126"/>
         <source>Download from gdownload.uk</source>
         <translation>gdownload.ukからダウンロード</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="185"/>
         <source>Opening official website...</source>
-        <translation>オフィシャルサイト開設</translation>
+        <translation type="vanished">オフィシャルサイト開設</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="198"/>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="137"/>
         <source>Install Extension</source>
         <translation>エクステンションのインストール</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="199"/>
         <source>Load the extension in your browser</source>
-        <translation>ブラウザで拡張機能を読み込む</translation>
+        <translation type="vanished">ブラウザで拡張機能を読み込む</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="208"/>
         <source>For Chrome/Edge:</source>
-        <translation>クロム/エッジ用：</translation>
+        <translation type="vanished">クロム/エッジ用：</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="210"/>
         <source>1. Open chrome://extensions/ (or edge://extensions/)</source>
-        <translation>1.chrome://extensions/ (または edge://extensions/) を開く。</translation>
+        <translation type="vanished">1.chrome://extensions/ (または edge://extensions/) を開く。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="211"/>
         <source>2. Enable &quot;Developer mode&quot; toggle</source>
-        <translation>2.開発者モード」を有効にする</translation>
+        <translation type="vanished">2.開発者モード」を有効にする</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="212"/>
         <source>3. Click &quot;Load unpacked&quot;</source>
-        <translation>3.Load unpacked &quot;をクリックする。</translation>
+        <translation type="vanished">3.Load unpacked &quot;をクリックする。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="213"/>
         <source>4. Select the dist folder from extracted files</source>
-        <translation>4.解凍したファイルからdistフォルダを選択</translation>
+        <translation type="vanished">4.解凍したファイルからdistフォルダを選択</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="221"/>
         <source>For Firefox:</source>
-        <translation>Firefoxの場合：</translation>
+        <translation type="vanished">Firefoxの場合：</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="223"/>
         <source>1. Open about:debugging#/runtime/this-firefox</source>
-        <translation>1.about:debugging#/runtime/this-firefoxを開く。</translation>
+        <translation type="vanished">1.about:debugging#/runtime/this-firefoxを開く。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="224"/>
         <source>2. Click &quot;Load Temporary Add-on&quot;</source>
-        <translation>2.一時アドオンのロード」をクリックします。</translation>
+        <translation type="vanished">2.一時アドオンのロード」をクリックします。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="225"/>
         <source>3. Select manifest.json from the dist folder</source>
-        <translation>3.distフォルダからmanifest.jsonを選択します。</translation>
+        <translation type="vanished">3.distフォルダからmanifest.jsonを選択します。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="226"/>
         <source>4. Extension will be loaded temporarily</source>
-        <translation>4.エクステンションは一時的にロードされます。</translation>
+        <translation type="vanished">4.エクステンションは一時的にロードされます。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="234"/>
         <source>Coming Soon: Direct installation from browser web stores!</source>
-        <translation>近日公開：ブラウザのウェブストアから直接インストール！</translation>
+        <translation type="vanished">近日公開：ブラウザのウェブストアから直接インストール！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="243"/>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="175"/>
         <source>Configure Connection</source>
         <translation>接続の設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="244"/>
         <source>Set up the connection to GDownload</source>
-        <translation>GDownloadへの接続設定</translation>
+        <translation type="vanished">GDownloadへの接続設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="250"/>
         <source>The extension needs to connect to GDownload&apos;s aria2c:</source>
-        <translation>拡張機能はGDownloadのaria2cに接続する必要がある：</translation>
+        <translation type="vanished">拡張機能はGDownloadのaria2cに接続する必要がある：</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="269"/>
         <source>Default settings are pre-configured</source>
-        <translation>デフォルト設定はあらかじめ設定されている</translation>
+        <translation type="vanished">デフォルト設定はあらかじめ設定されている</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="282"/>
         <source>Works out-of-the-box with GDownload</source>
-        <translation>GDownloadですぐに使える</translation>
+        <translation type="vanished">GDownloadですぐに使える</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="290"/>
         <source>Configuration values (see below for details):</source>
-        <translation>設定値（詳細は下記参照）：</translation>
+        <translation type="vanished">設定値（詳細は下記参照）：</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="301"/>
         <source>📖 View Configuration</source>
-        <translation>設定を見る</translation>
+        <translation type="vanished">設定を見る</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="307"/>
         <source>See Configuration Helper below</source>
-        <translation>下記のコンフィギュレーション・ヘルパーを参照</translation>
+        <translation type="vanished">下記のコンフィギュレーション・ヘルパーを参照</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="447"/>
+        <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="337"/>
         <source>Download</source>
         <translation>ダウンロード</translation>
     </message>
@@ -1433,302 +2404,525 @@ Apache License 2.0 に基づいてライセンスされています。
 <context>
     <name>LabSettingPage</name>
     <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="50"/>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="89"/>
         <source>Browser Extension</source>
         <translation>ブラウザ拡張機能</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/LabSettingPage.qml" line="58"/>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="99"/>
+        <source>Capture links from any webpage and send them directly to GDownload through a local connection.</source>
+        <translation>任意のウェブページからリンクをキャプチャし、ローカル接続で GDownload に直接送信します。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="112"/>
+        <source>Experimental integration</source>
+        <translation>実験的な統合</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/LabSettingPage.qml" line="113"/>
+        <source>Review the connection values and browser permissions before enabling capture for authenticated websites.</source>
+        <translation>認証が必要なウェブサイトでキャプチャを有効にする前に、接続設定とブラウザの権限を確認してください。</translation>
+    </message>
+    <message>
         <source>Enhance your download experience with our browser extension. Capture links from any webpage and send them directly to GDownload.</source>
-        <translation>GDownloadのブラウザ拡張機能を使って、ダウンロード体験を向上させましょう。あらゆるウェブページからリンクをキャプチャし、直接GDownloadに送信します。</translation>
+        <translation type="vanished">GDownloadのブラウザ拡張機能を使って、ダウンロード体験を向上させましょう。あらゆるウェブページからリンクをキャプチャし、直接GDownloadに送信します。</translation>
+    </message>
+</context>
+<context>
+    <name>NavigatorView</name>
+    <message>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="50"/>
+        <source>Open GDownload repository</source>
+        <translation>GDownload リポジトリを開く</translation>
+    </message>
+    <message>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="51"/>
+        <source>Opens in the default browser</source>
+        <translation>既定のブラウザで開きます</translation>
+    </message>
+    <message>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="96"/>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="98"/>
+        <source>Home</source>
+        <translation>ホーム</translation>
+    </message>
+    <message>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="114"/>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="116"/>
+        <source>Active downloads</source>
+        <translation>ダウンロード中</translation>
+    </message>
+    <message>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="134"/>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="136"/>
+        <source>Waiting downloads</source>
+        <translation>待機中のダウンロード</translation>
+    </message>
+    <message>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="154"/>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="156"/>
+        <source>Stopped downloads</source>
+        <translation>停止済みのダウンロード</translation>
+    </message>
+    <message>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="174"/>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="176"/>
+        <source>Add download</source>
+        <translation>ダウンロードを追加</translation>
+    </message>
+    <message>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="206"/>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="208"/>
+        <source>Preferences</source>
+        <translation>プリファレンス</translation>
+    </message>
+    <message>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="224"/>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="226"/>
+        <source>Help and about</source>
+        <translation>ヘルプと情報</translation>
     </message>
 </context>
 <context>
     <name>NetDiskPageView</name>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="44"/>
         <source>Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</source>
-        <translation>百度ネットディスク共有リンクフォーマット (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</translation>
+        <translation type="vanished">百度ネットディスク共有リンクフォーマット (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="66"/>
         <source>Parse</source>
-        <translation>パース</translation>
+        <translation type="vanished">パース</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="69"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="48"/>
         <source>Invalid Baidu Netdisk URL, please check.</source>
         <translation>百度ネットディスクのURLが無効です</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="73"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="53"/>
         <source>Please set Baidu Netdisk cookies first.</source>
         <translation>最初にBaidu Netdisk Cookieを設定してください</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="119"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="105"/>
         <source>Cloud link parser</source>
         <translation>クラウドリンク解析</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="127"/>
         <source>Paste a Baidu share link, preview files, then add selected items to the queue.</source>
-        <translation>Baidu の共有リンクを貼り付け、ファイルをプレビューし、選択した項目をキューに追加します。</translation>
+        <translation type="vanished">Baidu の共有リンクを貼り付け、ファイルをプレビューし、選択した項目をキューに追加します。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="140"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="213"/>
         <source>Paste link</source>
         <translation>リンクを貼り付け</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="140"/>
         <source>Validate share URL and cookie.</source>
-        <translation>共有 URL と Cookie を検証します。</translation>
+        <translation type="vanished">共有 URL と Cookie を検証します。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="141"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="214"/>
         <source>Preview files</source>
         <translation>ファイルをプレビュー</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="141"/>
         <source>Select files before downloading.</source>
-        <translation>ダウンロード前にファイルを選択します。</translation>
+        <translation type="vanished">ダウンロード前にファイルを選択します。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="142"/>
         <source>Add queue</source>
-        <translation>キューに追加</translation>
+        <translation type="vanished">キューに追加</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="142"/>
         <source>Send selected files to aria2.</source>
-        <translation>選択したファイルを aria2 に送信します。</translation>
+        <translation type="vanished">選択したファイルを aria2 に送信します。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="208"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="269"/>
         <source>Cookie required. Set Baidu Netdisk cookies in Preferences before parsing share links.</source>
         <translation>Cookie が必要です。共有リンクを解析する前に、設定で Baidu Netdisk の Cookie を設定してください。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="209"/>
         <source>Ready to parse. The parser will preview files before adding them to the download queue.</source>
-        <translation>解析の準備ができました。パーサーはファイルをダウンロードキューに追加する前にプレビューします。</translation>
+        <translation type="vanished">解析の準備ができました。パーサーはファイルをダウンロードキューに追加する前にプレビューします。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="40"/>
+        <source>The cloud request timed out. Please check your network and try again.</source>
+        <translation>クラウドリクエストがタイムアウトしました。ネットワークを確認して再試行してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="47"/>
+        <source>Enter a valid Baidu Netdisk share link before parsing.</source>
+        <translation>解析する前に、有効な Baidu Netdisk 共有リンクを入力してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="52"/>
+        <source>Baidu Netdisk cookies are required. Add them in Preferences and try again.</source>
+        <translation>Baidu Netdisk の Cookie が必要です。設定で追加してから再試行してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="114"/>
+        <source>Preview a Baidu share safely before adding selected files to the queue.</source>
+        <translation>選択したファイルをキューに追加する前に、Baidu 共有を安全にプレビューします。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="140"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="156"/>
+        <source>Baidu share link</source>
+        <translation>Baidu 共有リンク</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="155"/>
+        <source>Paste https://pan.baidu.com/s/... here</source>
+        <translation>https://pan.baidu.com/s/... をここに貼り付け</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="174"/>
+        <source>Share links may include an extraction code in the URL.</source>
+        <translation>共有リンクの URL には抽出コードが含まれている場合があります。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="185"/>
+        <source>Parsing...</source>
+        <translation>解析中...</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="185"/>
+        <source>Parse link</source>
+        <translation>リンクを解析</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="213"/>
+        <source>Validate the share URL and cookie.</source>
+        <translation>共有 URL と Cookie を検証します。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="214"/>
+        <source>Browse folders and select files.</source>
+        <translation>フォルダを閲覧してファイルを選択します。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="215"/>
+        <source>Add to queue</source>
+        <translation>キューに追加</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="215"/>
+        <source>Send the selection to aria2.</source>
+        <translation>選択した項目を aria2 に送信します。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="270"/>
+        <source>Baidu Netdisk is ready. Parsed files remain local until you add them to the queue.</source>
+        <translation>Baidu Netdisk は準備完了です。解析されたファイルはキューに追加するまでローカルに保持されます。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="275"/>
         <source>Open Baidu cookie settings</source>
         <translation>Baidu Cookie 設定を開く</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="292"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="304"/>
+        <source>Shared files</source>
+        <translation>共有ファイル</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="304"/>
+        <source>Folder contents</source>
+        <translation>フォルダの内容</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="311"/>
+        <source>Root folder</source>
+        <translation>ルートフォルダ</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="319"/>
+        <source>New link</source>
+        <translation>新しいリンク</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="363"/>
         <source>File Name</source>
         <translation>ファイル名</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="299"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="369"/>
         <source>Size</source>
         <translation>サイズ</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="306"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="376"/>
         <source>Date</source>
         <translation>日付</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="408"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="406"/>
+        <source>Open folder</source>
+        <translation>フォルダを開く</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="407"/>
+        <source>Cloud file</source>
+        <translation>クラウドファイル</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="427"/>
+        <source>Select %1</source>
+        <translation>%1 を選択</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="496"/>
+        <source>This folder is empty</source>
+        <translation>このフォルダは空です</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="497"/>
+        <source>Go back to another folder or parse a different share link.</source>
+        <translation>別のフォルダに戻るか、別の共有リンクを解析してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="507"/>
+        <source>All visible files selected</source>
+        <translation>表示中のすべてのファイルを選択済み</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="507"/>
+        <source>Select files to add them to the download queue</source>
+        <translation>ファイルを選択してダウンロードキューに追加</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="515"/>
         <source>Back</source>
         <translation>バック</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="425"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="550"/>
+        <source>Parsing share link...</source>
+        <translation>共有リンクを解析中...</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="550"/>
+        <source>Loading folder...</source>
+        <translation>フォルダを読み込み中...</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="559"/>
+        <source>This may take a moment for large shares.</source>
+        <translation>大きな共有の場合は少し時間がかかることがあります。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="577"/>
+        <source>The cloud request failed. Please try again.</source>
+        <translation>クラウドリクエストに失敗しました。再試行してください。</translation>
+    </message>
+    <message>
         <source>Return parsing</source>
-        <translation>リターン・パース</translation>
+        <translation type="vanished">リターン・パース</translation>
     </message>
 </context>
 <context>
     <name>PostDownloadActionsSettingPage</name>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="14"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="16"/>
         <source>Post-Download Actions</source>
         <translation>ダウンロード後のアクション</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="15"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="17"/>
         <source>Configure automated actions after download completes, fails, or starts</source>
         <translation>ダウンロード完了、失敗、開始後の自動アクションの設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="28"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="32"/>
         <source>When Download Completes</source>
         <translation>ダウンロードが完了したら</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="39"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="132"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="219"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="44"/>
+        <source>Action when download completes</source>
+        <translation>ダウンロード完了時のアクション</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="46"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="158"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="264"/>
         <source>Do Nothing</source>
         <translation>何もしない</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="40"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="47"/>
         <source>Open File</source>
         <translation>ファイルを開く</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="41"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="48"/>
         <source>Open Directory</source>
         <translation>オープンディレクトリ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="42"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="133"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="220"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="49"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="159"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="265"/>
         <source>Play Sound</source>
         <translation>サウンドを再生する</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="43"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="134"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="50"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="160"/>
         <source>Run Custom Command</source>
         <translation>カスタムコマンドの実行</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="44"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="51"/>
         <source>Shutdown Computer</source>
         <translation>コンピュータのシャットダウン</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="45"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="52"/>
         <source>Sleep Computer</source>
         <translation>スリープコンピュータ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="46"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="53"/>
         <source>Restart Computer</source>
         <translation>コンピュータの再起動</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="62"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="149"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="74"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="180"/>
         <source>Custom Command</source>
         <translation>カスタムコマンド</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="71"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="85"/>
+        <source>Command to run when download completes</source>
+        <translation>ダウンロード完了時に実行するコマンド</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="86"/>
         <source>e.g., notify-send &quot;Download Complete&quot; &quot;{file}&quot;</source>
         <translation>例）notify-send &quot;ダウンロード完了&quot; &quot;{ファイル}&quot;</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="83"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="170"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="101"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="207"/>
         <source>Available variables:</source>
         <translation>利用可能な変数：</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="90"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="177"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="110"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="216"/>
         <source>  {file} - Downloaded file path</source>
         <translation>{ファイル｝- ダウンロードしたファイルのパス</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="91"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="178"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="111"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="217"/>
         <source>  {dir} - Download directory path</source>
         <translation>{dir} - ダウンロードディレクトリのパス</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="92"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="179"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="112"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="218"/>
         <source>  {gid} - Download task ID</source>
         <translation>{gid} - ダウンロードタスクID</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="102"/>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="189"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="123"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="229"/>
         <source>Example:</source>
         <translation>例</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="121"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="144"/>
         <source>When Download Fails</source>
         <translation>ダウンロードに失敗した場合</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="158"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="156"/>
+        <source>Action when download fails</source>
+        <translation>ダウンロード失敗時のアクション</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="191"/>
+        <source>Command to run when download fails</source>
+        <translation>ダウンロード失敗時に実行するコマンド</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="192"/>
         <source>e.g., logger &quot;Download failed: {gid}&quot;</source>
         <translation>例えば、ロガー &quot;Download failed：{gid}&quot;</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="208"/>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="250"/>
         <source>When Download Starts</source>
         <translation>ダウンロード開始時期</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="262"/>
+        <source>Action when download starts</source>
+        <translation>ダウンロード開始時のアクション</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="109"/>
         <source>Unknown</source>
-        <translation>不明</translation>
+        <translation type="vanished">不明</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="119"/>
         <source>h</source>
-        <translation>h</translation>
+        <translation type="vanished">h</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="122"/>
-        <location filename="../../Browser/download_task_model.h" line="126"/>
         <source>m</source>
-        <translation>m</translation>
+        <translation type="vanished">m</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="129"/>
-        <location filename="../../Browser/download_task_model.h" line="133"/>
         <source>s</source>
-        <translation>s</translation>
+        <translation type="vanished">s</translation>
     </message>
     <message>
-        <location filename="../../Browser/stopped_task_delete_utils.h" line="27"/>
         <source>Task was removed locally, but aria2 cleanup failed.</source>
-        <translation>タスクはローカルから削除されましたが、aria2 のクリーンアップに失敗しました。</translation>
+        <translation type="vanished">タスクはローカルから削除されましたが、aria2 のクリーンアップに失敗しました。</translation>
     </message>
     <message>
-        <location filename="../../Browser/stopped_task_delete_utils.h" line="28"/>
         <source>Task was removed locally, but aria2 cleanup failed: %1</source>
-        <translation>タスクはローカルから削除されましたが、aria2 のクリーンアップに失敗しました: %1</translation>
+        <translation type="vanished">タスクはローカルから削除されましたが、aria2 のクリーンアップに失敗しました: %1</translation>
     </message>
 </context>
 <context>
     <name>SettingFormActions</name>
     <message>
-        <location filename="../qml/CommonComponents/SettingFormActions.qml" line="23"/>
+        <location filename="../qml/CommonComponents/SettingFormActions.qml" line="12"/>
         <source>Modify the values above and click &apos;Save Settings&apos; to apply.</source>
         <translation>上記の値を変更し、「設定を保存」をクリックして適用します。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/SettingFormActions.qml" line="49"/>
+        <location filename="../qml/CommonComponents/SettingFormActions.qml" line="22"/>
         <source>Settings saved</source>
         <translation>設定を保存しました</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/SettingFormActions.qml" line="65"/>
+        <location filename="../qml/CommonComponents/SettingFormActions.qml" line="38"/>
         <source>No changes detected.</source>
         <translation>変更は検出されませんでした。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/SettingFormActions.qml" line="66"/>
+        <location filename="../qml/CommonComponents/SettingFormActions.qml" line="39"/>
         <source>Settings unchanged.</source>
         <translation>設定は変更されていません。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/SettingFormActions.qml" line="90"/>
+        <location filename="../qml/CommonComponents/SettingFormActions.qml" line="69"/>
         <source>Reset</source>
         <translation>リセット</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/SettingFormActions.qml" line="99"/>
+        <location filename="../qml/CommonComponents/SettingFormActions.qml" line="81"/>
         <source>Save Settings</source>
         <translation>設定を保存</translation>
     </message>
@@ -1769,22 +2963,22 @@ Apache License 2.0 に基づいてライセンスされています。
 <context>
     <name>SettingsPageView</name>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="46"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="60"/>
         <source>Preferences</source>
         <translation>プリファレンス</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="85"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="100"/>
         <source>Basic</source>
         <translation>基本設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="97"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="116"/>
         <source>Advanced</source>
         <translation>詳細設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingsPageView.qml" line="109"/>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="132"/>
         <source>Lab</source>
         <translation>ラボ機能</translation>
     </message>
@@ -1808,8 +3002,8 @@ Apache License 2.0 に基づいてライセンスされています。
     </message>
     <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="36"/>
-        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="76"/>
-        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="116"/>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="77"/>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="118"/>
         <source>Speed:</source>
         <translation>スピードだ：</translation>
     </message>
@@ -1819,137 +3013,324 @@ Apache License 2.0 に基づいてライセンスされています。
         <translation>KB/s (0 = 無制限)</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="68"/>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="44"/>
+        <source>Global download speed limit</source>
+        <translation>グローバルダウンロード速度制限</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="69"/>
         <source>Global Upload Limit</source>
         <translation>グローバルアップロード制限</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="77"/>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="78"/>
         <source>KB/s (0 = unlimited, for BitTorrent seeding)</source>
         <translation>KB/s (0 = 無制限、BitTorrent シード用)</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="108"/>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="85"/>
+        <source>Global upload speed limit</source>
+        <translation>グローバルアップロード速度制限</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="110"/>
         <source>Lowest Speed Limit</source>
         <translation>最低制限速度</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="117"/>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="119"/>
         <source>KB/s (0 = disabled, disconnect if speed is lower for 60s)</source>
         <translation>KB/s（0＝無効、60秒間速度が低ければ切断）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="148"/>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="126"/>
+        <source>Lowest download speed limit</source>
+        <translation>最低ダウンロード速度制限</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="151"/>
         <source>Input fields reset to default values (not saved yet)</source>
         <translation>入力フィールドがデフォルト値にリセットされる（まだ保存されていない）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="160"/>
-        <source>✗ Download limit must be between 0 and 102400 KB/s</source>
-        <translation>ダウンロードの上限は0～102400KB/sの間でなければならない。</translation>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="163"/>
+        <source>Download limit must be between 0 and 102400 KB/s</source>
+        <translation>ダウンロード制限は 0 から 102400 KB/s の間にしてください</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="162"/>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="169"/>
+        <source>Upload limit must be between 0 and 10240 KB/s</source>
+        <translation>アップロード制限は 0 から 10240 KB/s の間にしてください</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="175"/>
+        <source>Lowest speed must be between 0 and 1024 KB/s</source>
+        <translation>最低速度は 0 から 1024 KB/s の間にしてください</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="192"/>
+        <source>Speed control settings saved and applied successfully!</source>
+        <translation>速度制御の設定が保存され、正常に適用されました。</translation>
+    </message>
+    <message>
+        <source>✗ Download limit must be between 0 and 102400 KB/s</source>
+        <translation type="vanished">ダウンロードの上限は0～102400KB/sの間でなければならない。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="165"/>
         <source>Invalid download limit!</source>
         <translation>ダウンロード制限が無効です！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="166"/>
         <source>✗ Upload limit must be between 0 and 10240 KB/s</source>
-        <translation>アップロードの上限は、0～10240KB/秒の間でなければなりません。</translation>
+        <translation type="vanished">アップロードの上限は、0～10240KB/秒の間でなければなりません。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="168"/>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="171"/>
         <source>Invalid upload limit!</source>
         <translation>アップロード制限が無効です！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="172"/>
         <source>✗ Lowest speed must be between 0 and 1024 KB/s</source>
-        <translation>最低速度は0～1024KB/sでなければならない。</translation>
+        <translation type="vanished">最低速度は0～1024KB/sでなければならない。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="174"/>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="177"/>
         <source>Invalid lowest speed!</source>
         <translation>最低速度が無効！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="182"/>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="185"/>
         <source>Download</source>
         <translation>ダウンロード</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="185"/>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="188"/>
         <source>Upload</source>
         <translation>アップロード</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="188"/>
+        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="191"/>
         <source>LowestSpeed</source>
         <translation>最低速度</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="189"/>
         <source>✓ Speed control settings saved and applied successfully!</source>
-        <translation>スピードコントロールの設定が保存され、正常に適用されました！</translation>
+        <translation type="vanished">スピードコントロールの設定が保存され、正常に適用されました！</translation>
+    </message>
+</context>
+<context>
+    <name>SummaryMetricCard</name>
+    <message>
+        <location filename="../qml/CommonComponents/SummaryMetricCard.qml" line="32"/>
+        <source>%1: %2 %3</source>
+        <translation>%1: %2 %3</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/SummaryMetricCard.qml" line="33"/>
+        <source>%1: %2</source>
+        <translation>%1: %2</translation>
     </message>
 </context>
 <context>
     <name>TaskAdvancedOptionsCard</name>
     <message>
-        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="32"/>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="60"/>
+        <source>Tracker URLs must start with http://, https://, or udp://.</source>
+        <translation>トラッカー URL は http://、https://、または udp:// で始まる必要があります。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="63"/>
+        <source>Stop ratio must be a number between 0 and 100.</source>
+        <translation>停止比率は 0 から 100 の間の数値にしてください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="101"/>
         <source>Advanced Options</source>
         <translation>高度なオプション</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="45"/>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="101"/>
+        <source>Torrent Options</source>
+        <translation>トレントオプション</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="111"/>
+        <source>Tune peer discovery, encryption, seeding, and tracker behavior for this task.</source>
+        <translation>このタスクのピア検出、暗号化、シード、トラッカー動作を調整します。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="126"/>
         <source>User-Agent:</source>
         <translation>User-Agent:</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="55"/>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="139"/>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="140"/>
         <source>User-Agent</source>
         <translation>User-Agent</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="64"/>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="149"/>
         <source>Authorization:</source>
         <translation>認証:</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="74"/>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="162"/>
         <source>Authorization</source>
         <translation>認証</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="78"/>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="163"/>
+        <source>Authorization header</source>
+        <translation>Authorization ヘッダー</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="167"/>
         <source>Referer:</source>
         <translation>Referer:</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="88"/>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="180"/>
         <source>Referer</source>
         <translation>Referer</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="92"/>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="181"/>
+        <source>Referrer URL</source>
+        <translation>リファラー URL</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="185"/>
         <source>Cookie:</source>
         <translation>Cookie:</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="102"/>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="198"/>
         <source>Cookie</source>
         <translation>Cookie</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="106"/>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="199"/>
+        <source>Cookie header</source>
+        <translation>Cookie ヘッダー</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="203"/>
         <source>Custom Headers:</source>
         <translation>カスタムヘッダー</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="118"/>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="218"/>
         <source>Custom request headers (one per line: KEY:VALUE)</source>
         <translation>カスタムリクエストヘッダ（1行に1つ：KEY:VALUE）</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="225"/>
+        <source>Custom request headers</source>
+        <translation>カスタムリクエストヘッダー</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="274"/>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="293"/>
+        <source>Tracker URLs</source>
+        <translation>トラッカー URL</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="286"/>
+        <source>Tracker URLs (one per line)</source>
+        <translation>トラッカー URL（1行に1つ）</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="294"/>
+        <source>Enter one HTTP, HTTPS, or UDP tracker URL per line</source>
+        <translation>HTTP、HTTPS、または UDP のトラッカー URL を1行に1つ入力</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="324"/>
+        <source>Peer discovery</source>
+        <translation>ピア検出</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="335"/>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="337"/>
+        <source>Enable DHT peer discovery</source>
+        <translation>DHT ピア検出を有効にする</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="349"/>
+        <source>Peer limit</source>
+        <translation>ピア制限</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="363"/>
+        <source>Maximum peers for this torrent</source>
+        <translation>このトレントの最大ピア数</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="364"/>
+        <source>Use zero for no peer limit</source>
+        <translation>制限なしにするには 0 を使用</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="384"/>
+        <source>Encryption</source>
+        <translation>暗号化</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="396"/>
+        <source>Prefer encrypted</source>
+        <translation>暗号化を優先</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="397"/>
+        <source>Require encrypted</source>
+        <translation>暗号化を要求</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="398"/>
+        <source>Force full encryption</source>
+        <translation>完全暗号化を強制</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="401"/>
+        <source>BitTorrent encryption mode</source>
+        <translation>BitTorrent 暗号化モード</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="413"/>
+        <source>Stop ratio</source>
+        <translation>停止比率</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="424"/>
+        <source>1.0</source>
+        <translation>1.0</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="433"/>
+        <source>Stop seeding ratio</source>
+        <translation>シード停止比率</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="445"/>
+        <source>Seed time</source>
+        <translation>シード時間</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="464"/>
+        <source>Torrent seed time in minutes</source>
+        <translation>トレントのシード時間（分）</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="468"/>
+        <source>min</source>
+        <translation>分</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="479"/>
+        <source>These values apply only to this torrent task and do not change Preferences.</source>
+        <translation>これらの値はこのトレントタスクにのみ適用され、設定は変更されません。</translation>
     </message>
 </context>
 <context>
@@ -1964,41 +3345,77 @@ Apache License 2.0 に基づいてライセンスされています。
         <source>Add downloads from URLs, torrents, or cloud storage</source>
         <translation>URL、トレント、クラウドストレージからのダウンロードを追加する</translation>
     </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogHeader.qml" line="71"/>
+        <source>Close dialog</source>
+        <translation>ダイアログを閉じる</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogHeader.qml" line="73"/>
+        <source>Close</source>
+        <translation>閉じる</translation>
+    </message>
 </context>
 <context>
     <name>TaskDialogPage</name>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="107"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="114"/>
         <source>URL</source>
         <translation>タスクのリンク</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="109"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="116"/>
         <source>Baidu</source>
         <translation>百度ネットディスク</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="108"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="115"/>
         <source>Torrent</source>
         <translation>激流</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="166"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="177"/>
         <source>Enter download URLs (one per line, supports magnet links)</source>
         <translation>ダウンロードURLを入力（1行に1つ、マグネットリンクに対応）</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="373"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="183"/>
+        <source>Download URLs</source>
+        <translation>ダウンロード URL</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="351"/>
+        <source>Check the task details</source>
+        <translation>タスクの詳細を確認</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="435"/>
         <source>Add Task</source>
         <translation>タスクの追加</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="351"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="456"/>
+        <source>Please enter at least one download URL.</source>
+        <translation>少なくとも1つのダウンロード URL を入力してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="463"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="470"/>
+        <source>Please select a Torrent or Metalink file.</source>
+        <translation>Torrent または Metalink ファイルを選択してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="483"/>
+        <source>Download task added successfully.</source>
+        <translation>ダウンロードタスクが正常に追加されました。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="408"/>
         <source>Advanced Options</source>
         <translation>高度なオプション</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="363"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="424"/>
         <source>Cancel</source>
         <translation>キャンセル</translation>
     </message>
@@ -2006,27 +3423,37 @@ Apache License 2.0 に基づいてライセンスされています。
 <context>
     <name>TaskGeneralOptionsCard</name>
     <message>
-        <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="23"/>
+        <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="25"/>
         <source>Download Settings</source>
         <translation>設定のダウンロード</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="39"/>
+        <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="42"/>
         <source>Rename:</source>
         <translation>改名する：</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="49"/>
+        <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="53"/>
         <source>Optional filename</source>
         <translation>オプションのファイル名</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="53"/>
+        <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="54"/>
+        <source>Filename</source>
+        <translation>ファイル名</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="58"/>
         <source>Splits:</source>
         <translation>スプリッツ</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="69"/>
+        <source>Connection splits</source>
+        <translation>接続分割数</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="76"/>
         <source>Save to:</source>
         <translation>に保存する：</translation>
     </message>
@@ -2034,24 +3461,48 @@ Apache License 2.0 に基づいてライセンスされています。
 <context>
     <name>ThemeSwitch</name>
     <message>
-        <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="13"/>
         <source>Theme Mode:</source>
-        <translation>テーマモード：</translation>
+        <translation type="vanished">テーマモード：</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="32"/>
+        <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="42"/>
+        <source>Theme mode</source>
+        <translation>テーマモード</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="53"/>
+        <source>Choose the appearance that fits your workspace.</source>
+        <translation>作業環境に合った外観を選択してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="76"/>
         <source>System</source>
         <translation>システム</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="47"/>
+        <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="77"/>
+        <source>Follow Windows</source>
+        <translation>Windows に合わせる</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="93"/>
         <source>Light</source>
         <translation>薄い色</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="59"/>
+        <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="94"/>
+        <source>Bright surfaces</source>
+        <translation>明るい画面</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="110"/>
         <source>Dark</source>
         <translation>暗い</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="111"/>
+        <source>Low-light surfaces</source>
+        <translation>暗い画面</translation>
     </message>
 </context>
 <context>
@@ -2068,14 +3519,14 @@ Apache License 2.0 に基づいてライセンスされています。
     </message>
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="28"/>
-        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="120"/>
+        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="124"/>
         <source>Timeout</source>
         <translation>タイムアウト</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="29"/>
-        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="45"/>
-        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="84"/>
+        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="46"/>
+        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="87"/>
         <source>seconds</source>
         <translation>おかわり</translation>
     </message>
@@ -2085,69 +3536,143 @@ Apache License 2.0 に基づいてライセンスされています。
         <translation>HTTP/FTP接続確立後のタイムアウト</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="44"/>
-        <source>Connect Timeout</source>
+        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="37"/>
+        <source>Connection timeout</source>
         <translation>接続タイムアウト</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="45"/>
+        <source>Connect Timeout</source>
+        <translation>接続タイムアウト</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="46"/>
         <source>Timeout for establishing initial connection</source>
         <translation>初期接続確立のタイムアウト</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="67"/>
+        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="54"/>
+        <source>Initial connection timeout</source>
+        <translation>初期接続タイムアウト</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="69"/>
         <source>Max Retry Attempts</source>
         <translation>最大リトライ回数</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="68"/>
+        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="70"/>
         <source>times</source>
         <translation>回</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="68"/>
+        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="70"/>
         <source>Number of retry attempts (0 = unlimited)</source>
         <translation>再試行回数（0 = 無制限）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="83"/>
+        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="78"/>
+        <source>Maximum retry attempts</source>
+        <translation>最大再試行回数</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="86"/>
         <source>Retry Wait Time</source>
         <translation>リトライ待ち時間</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="84"/>
+        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="87"/>
         <source>Wait time between retries (0 = disabled, only retry on HTTP 503)</source>
         <translation>再試行までの待ち時間 (0 = 無効、HTTP 503 でのみ再試行)</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="123"/>
+        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="95"/>
+        <source>Retry wait time</source>
+        <translation>再試行待機時間</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="127"/>
         <source>ConnectTimeout</source>
         <translation>接続タイムアウト</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="126"/>
+        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="130"/>
         <source>MaxTries</source>
         <translation>最大試行回数</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="129"/>
+        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="133"/>
         <source>RetryWait</source>
         <translation>再試行待機時間</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="138"/>
+        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="134"/>
+        <source>Timeout and retry settings saved and applied successfully!</source>
+        <translation>タイムアウトと再試行の設定が保存され、正常に適用されました。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="142"/>
         <source>Tip: Increase timeout and retry values for unstable network connections</source>
         <translation>ヒント:不安定なネットワーク接続では、タイムアウトと再試行の値を大きくしてください</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="111"/>
+        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="115"/>
         <source>Input fields reset to default values (not saved yet)</source>
         <translation>入力フィールドがデフォルト値にリセットされる（まだ保存されていない）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="130"/>
         <source>✓ Timeout and retry settings saved and applied successfully!</source>
-        <translation>タイムアウトとリトライの設定が保存され、正常に適用された！</translation>
+        <translation type="vanished">タイムアウトとリトライの設定が保存され、正常に適用された！</translation>
+    </message>
+</context>
+<context>
+    <name>TitleBar</name>
+    <message>
+        <location filename="../qml/titlebar/TitleBar.qml" line="10"/>
+        <source>Home</source>
+        <translation>ホーム</translation>
+    </message>
+    <message>
+        <location filename="../qml/titlebar/TitleBar.qml" line="127"/>
+        <source>Close window</source>
+        <translation>ウィンドウを閉じる</translation>
+    </message>
+    <message>
+        <location filename="../qml/titlebar/TitleBar.qml" line="135"/>
+        <location filename="../qml/titlebar/TitleBar.qml" line="230"/>
+        <source>Close</source>
+        <translation>閉じる</translation>
+    </message>
+    <message>
+        <location filename="../qml/titlebar/TitleBar.qml" line="143"/>
+        <source>Minimize window</source>
+        <translation>ウィンドウを最小化</translation>
+    </message>
+    <message>
+        <location filename="../qml/titlebar/TitleBar.qml" line="151"/>
+        <location filename="../qml/titlebar/TitleBar.qml" line="184"/>
+        <source>Minimize</source>
+        <translation>最小化</translation>
+    </message>
+    <message>
+        <location filename="../qml/titlebar/TitleBar.qml" line="159"/>
+        <source>Enter full screen</source>
+        <translation>全画面表示にする</translation>
+    </message>
+    <message>
+        <location filename="../qml/titlebar/TitleBar.qml" line="167"/>
+        <source>Full screen</source>
+        <translation>全画面表示</translation>
+    </message>
+    <message>
+        <location filename="../qml/titlebar/TitleBar.qml" line="198"/>
+        <source>Maximize</source>
+        <translation>最大化</translation>
+    </message>
+    <message>
+        <location filename="../qml/titlebar/TitleBar.qml" line="215"/>
+        <source>Restore</source>
+        <translation>元に戻す</translation>
     </message>
 </context>
 <context>
@@ -2183,27 +3708,37 @@ Apache License 2.0 に基づいてライセンスされています。
         <translation>毎日のトラッカーソース同期を有効にする</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="200"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="133"/>
+        <source>Automatically update tracker sources</source>
+        <translation>トラッカーソースを自動更新</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="201"/>
         <source>Current Tracker List</source>
         <translation>現在のトラッカーリスト</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="246"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="221"/>
+        <source>Tracker server update result</source>
+        <translation>トラッカーサーバー更新結果</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="248"/>
         <source>Updating tracker list...</source>
         <translation>トラッカーリストの更新...</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="250"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="252"/>
         <source>Tracker list updated successfully</source>
         <translation>トラッカーリストの更新に成功</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="251"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="253"/>
         <source>%1 trackers, %2/%3 sources succeeded, took %4ms</source>
         <translation>1 個のトラッカー、%2/%3 個のソースが成功しました。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="261"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="263"/>
         <source>Failed to update tracker list</source>
         <translation>トラッカーリストの更新に失敗</translation>
     </message>
@@ -2211,42 +3746,126 @@ Apache License 2.0 に基づいてライセンスされています。
 <context>
     <name>UpdateDialog</name>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="12"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="16"/>
+        <source>No release notes were provided for this version.</source>
+        <translation>このバージョンのリリースノートはありません。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="21"/>
         <source>New Version Available</source>
         <translation>新バージョン</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="34"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="31"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="57"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="101"/>
+        <source>Review the release notes, then install when you are ready.</source>
+        <translation>リリースノートを確認してから、準備ができたらインストールしてください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="41"/>
+        <source>Update in progress</source>
+        <translation>更新中</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="44"/>
+        <source>Update failed</source>
+        <translation>更新に失敗しました</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="46"/>
+        <source>Ready to update</source>
+        <translation>更新の準備完了</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="52"/>
+        <source>The update could not be completed. Check your connection and try again.</source>
+        <translation>更新を完了できませんでした。接続を確認して再試行してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="55"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="86"/>
+        <source>Preparing the update package...</source>
+        <translation>アップデートパッケージを準備中...</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="91"/>
+        <source>The update could not be started. Please try again.</source>
+        <translation>更新を開始できませんでした。再試行してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="112"/>
+        <source>Working on the update...</source>
+        <translation>更新を処理中...</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="140"/>
+        <source>The update could not be completed. Please try again.</source>
+        <translation>更新を完了できませんでした。再試行してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="217"/>
         <source>Release Notes</source>
         <translation>リリースノート</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="74"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="232"/>
+        <source>Release notes</source>
+        <translation>リリースノート</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="250"/>
         <source>Enable GitHub Accelerated Download</source>
         <translation>GitHub Accelerated Downloadを有効にする</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="80"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="257"/>
         <source>Use a GitHub mirror (ghproxy) when fetching update packages.</source>
         <translation>アップデートパッケージの取得には、GitHub ミラー (ghproxy) を使用します。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="96"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="274"/>
+        <source>Progress</source>
+        <translation>進捗</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="298"/>
+        <source>Update progress</source>
+        <translation>更新の進捗</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="319"/>
+        <source>Download Page</source>
+        <translation>ダウンロードページ</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="340"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="390"/>
+        <source>Try Again</source>
+        <translation>再試行</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="368"/>
+        <source>Open Download Page</source>
+        <translation>ダウンロードページを開く</translation>
+    </message>
+    <message>
         <source>Updating...</source>
-        <translation>更新中...</translation>
+        <translation type="vanished">更新中...</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="139"/>
         <source>Go to Download Page</source>
-        <translation>ダウンロードページへ</translation>
+        <translation type="vanished">ダウンロードページへ</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="153"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="329"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="379"/>
         <source>Cancel</source>
         <translation>キャンセル</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="163"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="340"/>
+        <location filename="../qml/CommonComponents/UpdateDialog.qml" line="390"/>
         <source>Update Now</source>
         <translation>今すぐ更新</translation>
     </message>
@@ -2254,128 +3873,146 @@ Apache License 2.0 に基づいてライセンスされています。
 <context>
     <name>UserAgentSettingPage</name>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="30"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="32"/>
         <source>Aria2 Default</source>
         <translation>アリア2 デフォルト</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="34"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="36"/>
         <source>Chrome 120 (Windows)</source>
         <translation>クローム120（Windows）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="38"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="40"/>
         <source>Firefox 121 (Windows)</source>
         <translation>Firefox 121 (Windows)</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="42"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="44"/>
         <source>Safari 17 (macOS)</source>
         <translation>サファリ17（macOS）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="46"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="48"/>
         <source>Edge 120 (Windows)</source>
         <translation>エッジ120（Windows）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="50"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="52"/>
         <source>Chrome 120 (Android)</source>
         <translation>クローム120（アンドロイド）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="54"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="56"/>
         <source>Safari (iPhone)</source>
         <translation>サファリ（iPhone）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="58"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="60"/>
         <source>Wget 1.21</source>
         <translation>Wget 1.21</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="62"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="64"/>
         <source>cURL 8.5</source>
         <translation>cURL 8.5</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="66"/>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="223"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="68"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="233"/>
         <source>Custom</source>
         <translation>カスタム</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="194"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="93"/>
+        <source>User-Agent preset</source>
+        <translation>User-Agent プリセット</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="204"/>
         <source>Reset to system browser User-Agent (not saved yet)</source>
         <translation>システムブラウザーの User-Agent にリセットしました（まだ保存されていません）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="245"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="214"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="216"/>
+        <source>User-Agent cannot be empty.</source>
+        <translation>User-Agent を空にすることはできません。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="228"/>
+        <source>User-Agent settings saved and applied successfully.</source>
+        <translation>User-Agent の設定が保存され、正常に適用されました。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="241"/>
+        <source>Settings saved: %1</source>
+        <translation>設定を保存しました: %1</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="255"/>
         <source>Tip: Some servers may block downloads from Aria2. Use a browser User-Agent to bypass restrictions.</source>
         <translation>ヒント:一部のサーバーは Aria2 からのダウンロードをブロックする場合があります。ブラウザの User-Agent を使用すると制限を回避できます。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="16"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="18"/>
         <source>User-Agent</source>
         <translation>ユーザーエージェント</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="17"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="19"/>
         <source>Configure HTTP/HTTPS User-Agent string for compatibility with different servers</source>
         <translation>異なるサーバーとの互換性のためにHTTP/HTTPSのUser-Agent文字列を設定する</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="26"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="28"/>
         <source>System Browser Default</source>
         <translation>システムブラウザーの既定値</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="78"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="81"/>
         <source>Preset User-Agent</source>
         <translation>プリセット・ユーザー・エージェント</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="149"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="156"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="168"/>
         <source>Custom User-Agent</source>
         <translation>カスタム・ユーザーエージェント</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="159"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="169"/>
         <source>Enter custom User-Agent string...</source>
         <translation>カスタムUser-Agent文字列を入力...</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="204"/>
         <source>✗ User-Agent cannot be empty!</source>
-        <translation>✗ User-Agentを空にすることはできません！</translation>
+        <translation type="vanished">✗ User-Agentを空にすることはできません！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="206"/>
         <source>User-Agent cannot be empty!</source>
-        <translation>User-Agentを空にすることはできません！</translation>
+        <translation type="vanished">User-Agentを空にすることはできません！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="218"/>
         <source>✓ User-Agent settings saved and applied successfully!</source>
-        <translation>ユーザーエージェント設定が保存され、正常に適用されました！</translation>
+        <translation type="vanished">ユーザーエージェント設定が保存され、正常に適用されました！</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="231"/>
         <source>✓ Settings saved: %1</source>
-        <translation>保存された設定: %1</translation>
+        <translation type="vanished">保存された設定: %1</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="234"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="244"/>
         <source>No changes detected.</source>
         <translation>変更は検出されなかった。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="235"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="245"/>
         <source>Settings unchanged.</source>
         <translation>設定は変更なし。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="184"/>
+        <location filename="../qml/Browser/UserAgentSettingPage.qml" line="194"/>
         <source>Select a preset or enter custom User-Agent, then click &apos;Save Settings&apos; to apply.</source>
         <translation>プリセットを選択するか、カスタムのUser-Agentを入力し、「Save Settings」をクリックして適用します。</translation>
     </message>
@@ -2383,161 +4020,131 @@ Apache License 2.0 に基づいてライセンスされています。
 <context>
     <name>gdl::ui::browser::BrowserManagerImpl</name>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="272"/>
         <source>Invalid download link: %1</source>
-        <translation>ダウンロードリンクが無効です: %1</translation>
+        <translation type="vanished">ダウンロードリンクが無効です: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="285"/>
         <source>Failed to add download task. Please check the link or aria2 connection.</source>
-        <translation>ダウンロードタスクの追加に失敗しました。リンクまたは aria2 接続を確認してください。</translation>
+        <translation type="vanished">ダウンロードタスクの追加に失敗しました。リンクまたは aria2 接続を確認してください。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="286"/>
         <source>Failed to add download task: %1</source>
-        <translation>ダウンロードタスクの追加に失敗しました: %1</translation>
+        <translation type="vanished">ダウンロードタスクの追加に失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="311"/>
         <source>Torrent file does not exist: %1</source>
-        <translation>Torrent ファイルが存在しません: %1</translation>
+        <translation type="vanished">Torrent ファイルが存在しません: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="317"/>
         <source>Failed to read torrent file: %1</source>
-        <translation>Torrent ファイルの読み取りに失敗しました: %1</translation>
+        <translation type="vanished">Torrent ファイルの読み取りに失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="331"/>
         <source>Failed to add torrent task. Please check the file or aria2 connection.</source>
-        <translation>Torrent タスクの追加に失敗しました。ファイルまたは aria2 接続を確認してください。</translation>
+        <translation type="vanished">Torrent タスクの追加に失敗しました。ファイルまたは aria2 接続を確認してください。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="332"/>
         <source>Failed to add torrent task: %1</source>
-        <translation>Torrent タスクの追加に失敗しました: %1</translation>
+        <translation type="vanished">Torrent タスクの追加に失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="355"/>
         <source>Metalink file does not exist: %1</source>
-        <translation>Metalink ファイルが存在しません: %1</translation>
+        <translation type="vanished">Metalink ファイルが存在しません: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="361"/>
         <source>Failed to read metalink file: %1</source>
-        <translation>Metalink ファイルの読み取りに失敗しました: %1</translation>
+        <translation type="vanished">Metalink ファイルの読み取りに失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="375"/>
         <source>Failed to add metalink task. Please check the file or aria2 connection.</source>
-        <translation>Metalink タスクの追加に失敗しました。ファイルまたは aria2 接続を確認してください。</translation>
+        <translation type="vanished">Metalink タスクの追加に失敗しました。ファイルまたは aria2 接続を確認してください。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="376"/>
         <source>Failed to add metalink task: %1</source>
-        <translation>Metalink タスクの追加に失敗しました: %1</translation>
+        <translation type="vanished">Metalink タスクの追加に失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="659"/>
         <source>Failed to delete task: missing task id.</source>
-        <translation>タスクの削除に失敗しました: タスク ID がありません。</translation>
+        <translation type="vanished">タスクの削除に失敗しました: タスク ID がありません。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="663"/>
-        <location filename="../../Browser/browser_manager.cxx" line="720"/>
         <source>Failed to delete task: stopped task list is not available.</source>
-        <translation>タスクの削除に失敗しました: 停止済みタスクリストを使用できません。</translation>
+        <translation type="vanished">タスクの削除に失敗しました: 停止済みタスクリストを使用できません。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="669"/>
-        <location filename="../../Browser/browser_manager.cxx" line="725"/>
         <source>Failed to delete task: task was not found.</source>
-        <translation>タスクの削除に失敗しました: タスクが見つかりません。</translation>
+        <translation type="vanished">タスクの削除に失敗しました: タスクが見つかりません。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="680"/>
         <source>Failed to delete task from aria2.</source>
-        <translation>aria2 からタスクを削除できませんでした。</translation>
+        <translation type="vanished">aria2 からタスクを削除できませんでした。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="681"/>
         <source>Failed to delete task from aria2: %1</source>
-        <translation>aria2 からタスクを削除できませんでした: %1</translation>
+        <translation type="vanished">aria2 からタスクを削除できませんでした: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="689"/>
         <source>Failed to remove task from the stopped list.</source>
-        <translation>停止済みリストからタスクを削除できませんでした。</translation>
+        <translation type="vanished">停止済みリストからタスクを削除できませんでした。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="702"/>
         <source>Task was removed, but the downloaded file could not be deleted.</source>
-        <translation>タスクは削除されましたが、ダウンロード済みファイルを削除できませんでした。</translation>
+        <translation type="vanished">タスクは削除されましたが、ダウンロード済みファイルを削除できませんでした。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="703"/>
         <source>Task was removed, but the downloaded file could not be deleted: %1</source>
-        <translation>タスクは削除されましたが、ダウンロード済みファイルを削除できませんでした: %1</translation>
+        <translation type="vanished">タスクは削除されましたが、ダウンロード済みファイルを削除できませんでした: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="710"/>
         <source>Task was removed, but the aria2 control file could not be deleted.</source>
-        <translation>タスクは削除されましたが、aria2 制御ファイルを削除できませんでした。</translation>
+        <translation type="vanished">タスクは削除されましたが、aria2 制御ファイルを削除できませんでした。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="711"/>
         <source>Task was removed, but the aria2 control file could not be deleted: %1</source>
-        <translation>タスクは削除されましたが、aria2 制御ファイルを削除できませんでした: %1</translation>
+        <translation type="vanished">タスクは削除されましたが、aria2 制御ファイルを削除できませんでした: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="740"/>
         <source>Failed to delete tasks: stopped task list is not available.</source>
-        <translation>タスクの削除に失敗しました: 停止済みタスクリストを使用できません。</translation>
+        <translation type="vanished">タスクの削除に失敗しました: 停止済みタスクリストを使用できません。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1074"/>
-        <location filename="../../Browser/browser_manager.cxx" line="1137"/>
         <source>Download failed. Please check the link or network connection.</source>
-        <translation>ダウンロードに失敗しました。リンクまたはネットワーク接続を確認してください。</translation>
+        <translation type="vanished">ダウンロードに失敗しました。リンクまたはネットワーク接続を確認してください。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1075"/>
         <source>Download failed: %1</source>
-        <translation>ダウンロードに失敗しました: %1</translation>
+        <translation type="vanished">ダウンロードに失敗しました: %1</translation>
     </message>
 </context>
 <context>
     <name>gdl::ui::netdisk::AsyncTaskWorker</name>
     <message>
-        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="189"/>
         <source>Failed to parse the share link.</source>
-        <translation>共有リンクの解析に失敗しました</translation>
+        <translation type="vanished">共有リンクの解析に失敗しました</translation>
     </message>
     <message>
-        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="195"/>
         <source>Failed to retrieve download link information.</source>
-        <translation>ダウンロードリンク情報の取得に失敗しました</translation>
+        <translation type="vanished">ダウンロードリンク情報の取得に失敗しました</translation>
     </message>
     <message>
-        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="201"/>
         <source>Failed to switch directory.</source>
-        <translation>ディレクトリの切り替えに失敗</translation>
+        <translation type="vanished">ディレクトリの切り替えに失敗</translation>
     </message>
 </context>
 <context>
     <name>mainWindow</name>
     <message>
-        <location filename="../qml/mainWindow.qml" line="157"/>
+        <location filename="../qml/mainWindow.qml" line="163"/>
         <source>Show main interface</source>
         <translation>メイン・インターフェースを表示</translation>
     </message>
     <message>
-        <location filename="../qml/mainWindow.qml" line="170"/>
+        <location filename="../qml/mainWindow.qml" line="176"/>
         <source>Hide main interface</source>
         <translation>メイン・インターフェースを隠す</translation>
     </message>
     <message>
-        <location filename="../qml/mainWindow.qml" line="177"/>
+        <location filename="../qml/mainWindow.qml" line="183"/>
         <source>Exit</source>
         <translation>出口</translation>
     </message>
