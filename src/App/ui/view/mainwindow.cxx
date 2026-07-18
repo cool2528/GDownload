@@ -16,6 +16,7 @@
 #include "Models/folder_history_model.h"
 #include "NetDisk/NetWork_Disk_magager.h"
 #include "PluginManager/plugin_manager.h"
+#include "PluginMarket/plugin_market_manager.h"
 #include "Settings/settings_manager.h"
 #include "Settings/settings_manager_factory.h"
 #include "language/language_manager.h"
@@ -99,6 +100,10 @@ namespace gd {
 			gdl::ui::toast::RegisterTypes(engine);
 			gdl::update::RegisterTypes(engine);
 			gdl::ui::netdisk::RegisterTypes(engine);
+			gdl::ui::market::RegisterTypes(engine);
+			qmlRegisterSingletonInstance<gdl::ui::market::PluginMarketManager>(
+				GEXPORT_MODULE_URL, 1, 0, "PluginMarketManager",
+				&gdl::ui::market::PluginMarketManager::Instance());
 			// 启动期副作用:测试模式下跳过 aria2c 子进程、自动更新 HTTP
 			if (!is_test) {
 				// aria2c 引擎初始化(原 browser_manager.cxx RegisterTypes 内的逻辑)
@@ -181,6 +186,9 @@ namespace gd {
             if (!js_res) {
                 LOG_INFO("no js plugins loaded from {}", js_plugins_dir)
             }
+            // 插件市场：注入插件目录与数据目录
+            gdl::ui::market::PluginMarketManager::Instance().Initialize(
+                QString::fromStdString(js_plugins_dir), QString::fromStdString(data_dir));
         }
 
 		void MainWindow::InitQtMessageHandler() const {

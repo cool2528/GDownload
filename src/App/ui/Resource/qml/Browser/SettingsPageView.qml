@@ -75,7 +75,7 @@ Item {
                     rowSpacing: GTheme.spaceXS
 
                     property int currentIndex: 0
-                    property var buttonsArr: [basic, advanced, lab]
+                    property var buttonsArr: [basic, advanced, lab, market]
 
                     ButtonGroup {
                         id: titleGroup
@@ -130,6 +130,22 @@ Item {
                         ButtonGroup.group: titleGroup
                         iconName: "lightbulb"
                         text: qsTr("Lab")
+                        activeFocusOnTab: true
+                        Accessible.name: text
+                        onClicked: checked = true
+                    }
+
+                    GButton {
+                        id: market
+                        objectName: "settingsMarketNav"
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 0
+                        Layout.preferredHeight: GTheme.navItemHeight
+                        variant: "nav"
+                        checkable: true
+                        ButtonGroup.group: titleGroup
+                        iconName: "repository"
+                        text: qsTr("Plugin Market")
                         activeFocusOnTab: true
                         Accessible.name: text
                         onClicked: checked = true
@@ -189,6 +205,10 @@ Item {
 
                 LabSettingPage {
                     id: labSetting
+                }
+
+                PluginMarketPage {
+                    id: marketPage
                 }
             }
         }
