@@ -26,3 +26,13 @@ target_include_directories(market_smoke PRIVATE
 set_target_properties(market_smoke PROPERTIES FOLDER "Tests")
 register_target(market_smoke)
 
+# 插件配置系统单元测试（manifest settings / config store / gdl.config）
+add_executable(plugin_config_test plugin_config_test.cxx)
+target_link_libraries(plugin_config_test PRIVATE PluginManager GDLCore)
+target_include_directories(plugin_config_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/Module/plugin/PluginManager
+    ${CMAKE_SOURCE_DIR}/src/Module/GDLCore
+)
+set_target_properties(plugin_config_test PROPERTIES FOLDER "Tests")
+register_target(plugin_config_test)
+
