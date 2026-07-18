@@ -14,6 +14,7 @@ the outside world only through the host-injected `gdl.*` SDK.
 - [How plugins work](#how-plugins-work)
 - [Directory layout](#directory-layout)
 - [manifest.json specification](#manifestjson-specification)
+- [settings — declarative configuration panel](#settings--declarative-configuration-panel-optional)
 - [Entry script contract](#entry-script-contract)
 - [Data structures](#data-structures)
 - [gdl.* SDK reference](#gdl-sdk-reference)
@@ -118,6 +119,46 @@ bare host.
 - `"*"` (match-all) is **forbidden** (load rejected)
 - Requests to non-whitelisted domains make `gdl.http` throw; `Set-Cookie` from non-whitelisted
   domains is silently dropped
+
+---
+
+### settings — declarative configuration panel (optional)
+
+Plugins don't write any UI code; instead you declare configuration fields in the manifest, and the
+host renders a config form for it uniformly (entry points: the "Settings" button on the plugin
+market card / the "Configure plugin" button on the netdisk-parsing page).
+
+```json
+"settings": [
+    { "key": "cookie", "type": "textarea", "required": true, "role": "token",
+      "label": "Cookie", "hint": "Paste your login cookie",
+      "locales": { "zh_CN": { "label": "登录 Cookie", "hint": "粘贴登录后的 Cookie" } } },
+    { "key": "use_cdn", "type": "bool", "default": true, "label": "Prefer CDN" },
+    { "key": "quality", "type": "select", "default": "high", "options": ["high", "low"], "label": "Quality" }
+]
+```
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `key` | ✅ | `[a-z0-9_]+`, unique within the plugin |
+| `type` | ✅ | `text` / `password` / `textarea` / `bool` / `select` / `number` |
+| `label` | ✅ | default (English) label |
+| `hint` | — | input hint |
+| `required` | — | the field counts as "configured" only once all `required` fields have a value (default false) |
+| `default` | — | default value |
+| `role` | — | only `"token"`: this field's value is passed as `parseUrl`'s `userToken`; at most one, and it must be a text-type field |
+| `options` | required for select | array of enum values |
+| `locales` | — | per-language override of `label`/`hint` |
+
+The JS side reads user config through the read-only `gdl.config.get(key)` (user value > default >
+null):
+
+```javascript
+const useCdn = gdl.config.get("use_cdn");
+```
+
+Configuration is persisted by the host (`plugin_configs.json`); plugins cannot write it — once the
+user saves, the next method call sees the new value.
 
 ---
 
@@ -312,6 +353,15 @@ gdl.storage.remove("cookie");
 ```
 
 Isolated per plugin, 1MB quota, persisted to `plugin_storage/<name>.json`.
+
+### gdl.config — read-only user configuration (backs manifest `settings`)
+
+```javascript
+const useCdn = gdl.config.get("use_cdn");  // user value > default > null
+```
+
+Fields come from the manifest's [`settings`](#settings--declarative-configuration-panel-optional)
+declaration; the host renders the form, persists it, and validates it — plugins can only read it.
 
 ### gdl.ui / gdl.notify — interaction and notifications
 

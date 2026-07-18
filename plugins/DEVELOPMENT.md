@@ -13,6 +13,7 @@
 - [插件的工作原理](#插件的工作原理)
 - [目录结构](#目录结构)
 - [manifest.json 规范](#manifestjson-规范)
+- [settings —— 声明式配置面板](#settings--声明式配置面板可选)
 - [入口脚本约定](#入口脚本约定)
 - [数据结构](#数据结构)
 - [gdl.* SDK 参考](#gdl-sdk-参考)
@@ -112,6 +113,43 @@ my-plugin/
 - 子域通配：`"*.quark.cn"` 匹配 `a.quark.cn`、`a.b.quark.cn`，**不**匹配 `quark.cn` 本身
 - **禁止** `"*"` 全通配（会被拒绝加载）
 - 白名单外的请求域名会让 `gdl.http` 抛异常；白名单外域名的 `Set-Cookie` 被静默丢弃
+
+---
+
+### settings —— 声明式配置面板（可选）
+
+插件不写任何 UI 代码；在 manifest 里声明配置字段，宿主统一渲染配置表单
+（入口：插件市场卡片"Settings"按钮 / 网盘解析页"Configure plugin"按钮）。
+
+```json
+"settings": [
+    { "key": "cookie", "type": "textarea", "required": true, "role": "token",
+      "label": "Cookie", "hint": "Paste your login cookie",
+      "locales": { "zh_CN": { "label": "登录 Cookie", "hint": "粘贴登录后的 Cookie" } } },
+    { "key": "use_cdn", "type": "bool", "default": true, "label": "Prefer CDN" },
+    { "key": "quality", "type": "select", "default": "high", "options": ["high", "low"], "label": "Quality" }
+]
+```
+
+| 属性 | 必填 | 说明 |
+| --- | --- | --- |
+| `key` | ✅ | `[a-z0-9_]+`，插件内唯一 |
+| `type` | ✅ | `text` / `password` / `textarea` / `bool` / `select` / `number` |
+| `label` | ✅ | 默认（英文）标签 |
+| `hint` | — | 输入提示 |
+| `required` | — | required 字段全部有值才算"已配置"（缺省 false） |
+| `default` | — | 缺省值 |
+| `role` | — | 仅 `"token"`：该字段值作为 `parseUrl` 的 `userToken` 传入；至多一个，且须为文本类字段 |
+| `options` | select 必填 | 枚举值数组 |
+| `locales` | — | 按语言覆盖 `label`/`hint` |
+
+JS 侧用只读 `gdl.config.get(key)` 读取用户配置（用户值 > default > null）：
+
+```javascript
+const useCdn = gdl.config.get("use_cdn");
+```
+
+配置由宿主落盘（`plugin_configs.json`），插件不可写；用户保存后下次方法调用即读到新值。
 
 ---
 
@@ -299,6 +337,15 @@ gdl.storage.remove("cookie");
 ```
 
 按插件名隔离，单插件限额 1MB，落盘到 `plugin_storage/<name>.json`。
+
+### gdl.config —— 只读用户配置（对应 manifest `settings`）
+
+```javascript
+const useCdn = gdl.config.get("use_cdn");  // 用户值 > default > null
+```
+
+字段来自 manifest 的 [`settings`](#settings--声明式配置面板可选) 声明；宿主负责渲染表单、落盘与校验，
+插件只读、不可写。
 
 ### gdl.ui / gdl.notify —— 交互与通知
 
