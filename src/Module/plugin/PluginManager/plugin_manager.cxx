@@ -118,6 +118,17 @@ namespace gdl {
 			return nullptr;
 		}
 
+		std::optional<js::PluginManifest> DownloadPluginManager::GetManifestByName(std::string_view name) {
+			std::lock_guard<std::mutex> lock(mutex_);
+			for (const auto& js_plugin : js_plugins_) {
+				auto host = std::dynamic_pointer_cast<js::JsPluginHost>(js_plugin);
+				if (host && host->manifest().name == name) {
+					return host->manifest();
+				}
+			}
+			return std::nullopt;
+		}
+
 		DownloadPluginManager::DownloadPluginManager() {}
 
 	}  // namespace plugin

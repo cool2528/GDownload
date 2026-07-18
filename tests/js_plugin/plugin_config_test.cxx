@@ -218,6 +218,15 @@ static void TestGdlConfig(const fs::path& dir) {
 	if (files2 && !files2->empty()) {
 		CHECK(files2->front().name == "low|null|tok");
 	}
+
+	// 3. GetManifestByName：取到完整 manifest（含 settings）
+	auto manifest = manager.GetManifestByName("config-probe");
+	CHECK(manifest.has_value());
+	if (manifest) {
+		CHECK(manifest->settings.size() == 2);
+		CHECK(manifest->TokenField() != nullptr && manifest->TokenField()->key == "cookie");
+	}
+	CHECK(!manager.GetManifestByName("no-such-plugin").has_value());
 }
 
 int main() {
