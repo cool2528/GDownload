@@ -2200,108 +2200,123 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
 <context>
     <name>PluginMarketCard</name>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="106"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="111"/>
         <source>Verified</source>
-        <translation type="unfinished"></translation>
+        <translation>검증됨</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="107"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="112"/>
         <source>Third-party</source>
-        <translation type="unfinished"></translation>
+        <translation>서드파티</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="131"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="138"/>
         <source>Installed</source>
-        <translation type="unfinished"></translation>
+        <translation>설치됨</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="132"/>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="220"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="139"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="253"/>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="133"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="140"/>
         <source>Working</source>
-        <translation type="unfinished"></translation>
+        <translation>작업 중</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="134"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="141"/>
         <source>Available</source>
-        <translation type="unfinished"></translation>
+        <translation>설치 가능</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="211"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="202"/>
+        <source>Working…</source>
+        <translation>작업 중…</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="245"/>
         <source>Install</source>
-        <translation type="unfinished"></translation>
+        <translation>설치</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="230"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="237"/>
         <source>Remove</source>
-        <translation type="unfinished">제거</translation>
+        <translation>제거</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="240"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="223"/>
         <source>Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>사용</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="240"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="223"/>
         <source>Disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>사용 안 함</translation>
     </message>
 </context>
 <context>
     <name>PluginMarketPage</name>
     <message>
         <location filename="../qml/Browser/PluginMarketPage.qml" line="27"/>
-        <source>Failed to load plugin market: %1</source>
-        <translation type="unfinished"></translation>
+        <source>Plugin list refreshed</source>
+        <translation>플러그인 목록을 새로고침했습니다</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="31"/>
-        <source>%1 succeeded</source>
-        <translation type="unfinished"></translation>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="29"/>
+        <source>Failed to load plugin market: %1</source>
+        <translation>플러그인 마켓을 불러오지 못했습니다: %1</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PluginMarketPage.qml" line="33"/>
+        <source>%1 succeeded</source>
+        <translation>%1 성공</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="35"/>
         <source>%1 failed: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 실패: %2</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="50"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="52"/>
         <source>All</source>
-        <translation type="unfinished">전체</translation>
+        <translation>전체</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="50"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="52"/>
         <source>Installed</source>
-        <translation type="unfinished"></translation>
+        <translation>설치됨</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="50"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="52"/>
         <source>Updates</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="66"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="68"/>
         <source>Search plugins…</source>
-        <translation type="unfinished"></translation>
+        <translation>플러그인 검색…</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="73"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="78"/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>새로고침</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="145"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="80"/>
+        <source>Refresh plugin list</source>
+        <translation>플러그인 목록 새로고침</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="162"/>
         <source>No plugins available</source>
-        <translation type="unfinished"></translation>
+        <translation>사용 가능한 플러그인이 없습니다</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="151"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="168"/>
         <source>Check your network connection and refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>네트워크 연결을 확인하고 새로고침하세요</translation>
     </message>
 </context>
 <context>
@@ -2519,44 +2534,44 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
 <context>
     <name>SettingPageTitle</name>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="21"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="22"/>
         <source>Basic Settings</source>
         <translation>기본 설정</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="23"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="24"/>
         <source>Advanced Settings</source>
         <translation>고급 설정</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="25"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="26"/>
         <source>Lab Settings</source>
         <translation>실험실 설정</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="27"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="28"/>
         <source>Plugin Market</source>
-        <translation type="unfinished"></translation>
+        <translation>플러그인 마켓</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="43"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="44"/>
         <source>Configure basic download preferences</source>
         <translation>기본 다운로드 환경 설정 구성</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="45"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="46"/>
         <source>Advanced configuration options</source>
         <translation>고급 구성 옵션</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="47"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="48"/>
         <source>Experimental features and settings</source>
         <translation>실험적 기능 및 설정</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="49"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="50"/>
         <source>Browse, install and update netdisk parser plugins</source>
-        <translation type="unfinished"></translation>
+        <translation>넷디스크 파서 플러그인 찾아보기, 설치 및 업데이트</translation>
     </message>
 </context>
 <context>
@@ -2584,7 +2599,7 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
     <message>
         <location filename="../qml/Browser/SettingsPageView.qml" line="148"/>
         <source>Plugin Market</source>
-        <translation type="unfinished"></translation>
+        <translation>플러그인 마켓</translation>
     </message>
 </context>
 <context>

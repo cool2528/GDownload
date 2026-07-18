@@ -2200,108 +2200,123 @@ Copyright © 2024 GDownload Team
 <context>
     <name>PluginMarketCard</name>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="106"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="111"/>
         <source>Verified</source>
-        <translation type="unfinished"></translation>
+        <translation>已验证</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="107"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="112"/>
         <source>Third-party</source>
-        <translation type="unfinished"></translation>
+        <translation>第三方</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="131"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="138"/>
         <source>Installed</source>
-        <translation type="unfinished"></translation>
+        <translation>已安装</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="132"/>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="220"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="139"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="253"/>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation>更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="133"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="140"/>
         <source>Working</source>
-        <translation type="unfinished"></translation>
+        <translation>处理中</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="134"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="141"/>
         <source>Available</source>
-        <translation type="unfinished"></translation>
+        <translation>可安装</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="211"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="202"/>
+        <source>Working…</source>
+        <translation>处理中…</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="245"/>
         <source>Install</source>
-        <translation type="unfinished"></translation>
+        <translation>安装</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="230"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="237"/>
         <source>Remove</source>
-        <translation type="unfinished">移除</translation>
+        <translation>移除</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="240"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="223"/>
         <source>Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>已启用</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="240"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="223"/>
         <source>Disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>已禁用</translation>
     </message>
 </context>
 <context>
     <name>PluginMarketPage</name>
     <message>
         <location filename="../qml/Browser/PluginMarketPage.qml" line="27"/>
-        <source>Failed to load plugin market: %1</source>
-        <translation type="unfinished"></translation>
+        <source>Plugin list refreshed</source>
+        <translation>插件列表已刷新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="31"/>
-        <source>%1 succeeded</source>
-        <translation type="unfinished"></translation>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="29"/>
+        <source>Failed to load plugin market: %1</source>
+        <translation>加载插件市场失败：%1</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PluginMarketPage.qml" line="33"/>
+        <source>%1 succeeded</source>
+        <translation>%1 成功</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="35"/>
         <source>%1 failed: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 失败：%2</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="50"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="52"/>
         <source>All</source>
-        <translation type="unfinished">全部</translation>
+        <translation>全部</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="50"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="52"/>
         <source>Installed</source>
-        <translation type="unfinished"></translation>
+        <translation>已安装</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="50"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="52"/>
         <source>Updates</source>
-        <translation type="unfinished"></translation>
+        <translation>可更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="66"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="68"/>
         <source>Search plugins…</source>
-        <translation type="unfinished"></translation>
+        <translation>搜索插件…</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="73"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="78"/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>刷新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="145"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="80"/>
+        <source>Refresh plugin list</source>
+        <translation>刷新插件列表</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="162"/>
         <source>No plugins available</source>
-        <translation type="unfinished"></translation>
+        <translation>暂无可用插件</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="151"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="168"/>
         <source>Check your network connection and refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>请检查网络连接后刷新</translation>
     </message>
 </context>
 <context>
@@ -2519,44 +2534,44 @@ Copyright © 2024 GDownload Team
 <context>
     <name>SettingPageTitle</name>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="21"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="22"/>
         <source>Basic Settings</source>
         <translation>基本设置</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="23"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="24"/>
         <source>Advanced Settings</source>
         <translation>高级设置</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="25"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="26"/>
         <source>Lab Settings</source>
         <translation>实验室设置</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="27"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="28"/>
         <source>Plugin Market</source>
-        <translation type="unfinished"></translation>
+        <translation>插件市场</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="43"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="44"/>
         <source>Configure basic download preferences</source>
         <translation>配置基本下载偏好</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="45"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="46"/>
         <source>Advanced configuration options</source>
         <translation>高级配置选项</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="47"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="48"/>
         <source>Experimental features and settings</source>
         <translation>实验性功能和设置</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="49"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="50"/>
         <source>Browse, install and update netdisk parser plugins</source>
-        <translation type="unfinished"></translation>
+        <translation>浏览、安装和更新网盘解析插件</translation>
     </message>
 </context>
 <context>
@@ -2584,7 +2599,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/SettingsPageView.qml" line="148"/>
         <source>Plugin Market</source>
-        <translation type="unfinished"></translation>
+        <translation>插件市场</translation>
     </message>
 </context>
 <context>

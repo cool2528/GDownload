@@ -2200,108 +2200,123 @@ Apache License 2.0 に基づきライセンスされています。</translation
 <context>
     <name>PluginMarketCard</name>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="106"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="111"/>
         <source>Verified</source>
-        <translation type="unfinished"></translation>
+        <translation>検証済み</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="107"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="112"/>
         <source>Third-party</source>
-        <translation type="unfinished"></translation>
+        <translation>サードパーティ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="131"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="138"/>
         <source>Installed</source>
-        <translation type="unfinished"></translation>
+        <translation>インストール済み</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="132"/>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="220"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="139"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="253"/>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation>更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="133"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="140"/>
         <source>Working</source>
-        <translation type="unfinished"></translation>
+        <translation>処理中</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="134"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="141"/>
         <source>Available</source>
-        <translation type="unfinished"></translation>
+        <translation>利用可能</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="211"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="202"/>
+        <source>Working…</source>
+        <translation>処理中…</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="245"/>
         <source>Install</source>
-        <translation type="unfinished"></translation>
+        <translation>インストール</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="230"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="237"/>
         <source>Remove</source>
-        <translation type="unfinished">削除</translation>
+        <translation>削除</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="240"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="223"/>
         <source>Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>有効</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="240"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="223"/>
         <source>Disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>無効</translation>
     </message>
 </context>
 <context>
     <name>PluginMarketPage</name>
     <message>
         <location filename="../qml/Browser/PluginMarketPage.qml" line="27"/>
-        <source>Failed to load plugin market: %1</source>
-        <translation type="unfinished"></translation>
+        <source>Plugin list refreshed</source>
+        <translation>プラグイン一覧を更新しました</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="31"/>
-        <source>%1 succeeded</source>
-        <translation type="unfinished"></translation>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="29"/>
+        <source>Failed to load plugin market: %1</source>
+        <translation>プラグインマーケットの読み込みに失敗しました：%1</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PluginMarketPage.qml" line="33"/>
+        <source>%1 succeeded</source>
+        <translation>%1 が成功しました</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="35"/>
         <source>%1 failed: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 が失敗しました：%2</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="50"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="52"/>
         <source>All</source>
-        <translation type="unfinished">すべて</translation>
+        <translation>すべて</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="50"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="52"/>
         <source>Installed</source>
-        <translation type="unfinished"></translation>
+        <translation>インストール済み</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="50"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="52"/>
         <source>Updates</source>
-        <translation type="unfinished"></translation>
+        <translation>更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="66"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="68"/>
         <source>Search plugins…</source>
-        <translation type="unfinished"></translation>
+        <translation>プラグインを検索…</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="73"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="78"/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="145"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="80"/>
+        <source>Refresh plugin list</source>
+        <translation>プラグイン一覧を更新</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="162"/>
         <source>No plugins available</source>
-        <translation type="unfinished"></translation>
+        <translation>利用可能なプラグインがありません</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="151"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="168"/>
         <source>Check your network connection and refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>ネットワーク接続を確認して更新してください</translation>
     </message>
 </context>
 <context>
@@ -2519,44 +2534,44 @@ Apache License 2.0 に基づきライセンスされています。</translation
 <context>
     <name>SettingPageTitle</name>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="21"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="22"/>
         <source>Basic Settings</source>
         <translation>基本設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="23"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="24"/>
         <source>Advanced Settings</source>
         <translation>詳細設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="25"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="26"/>
         <source>Lab Settings</source>
         <translation>ラボの設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="27"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="28"/>
         <source>Plugin Market</source>
-        <translation type="unfinished"></translation>
+        <translation>プラグインマーケット</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="43"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="44"/>
         <source>Configure basic download preferences</source>
         <translation>ダウンロードの基本設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="45"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="46"/>
         <source>Advanced configuration options</source>
         <translation>高度な設定オプション</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="47"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="48"/>
         <source>Experimental features and settings</source>
         <translation>実験の特徴と設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="49"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="50"/>
         <source>Browse, install and update netdisk parser plugins</source>
-        <translation type="unfinished"></translation>
+        <translation>ネットディスク解析プラグインの閲覧・インストール・更新</translation>
     </message>
 </context>
 <context>
@@ -2584,7 +2599,7 @@ Apache License 2.0 に基づきライセンスされています。</translation
     <message>
         <location filename="../qml/Browser/SettingsPageView.qml" line="148"/>
         <source>Plugin Market</source>
-        <translation type="unfinished"></translation>
+        <translation>プラグインマーケット</translation>
     </message>
 </context>
 <context>
