@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <variant>
+#include <vector>
 #include "config_key.h"
 #include "export.h"
 namespace gdl {
@@ -64,6 +65,9 @@ namespace gdl {
 		};
 		GDLCore_API void SetValue(const std::string& key, const ConfigValue& value);
 		GDLCore_API ConfigValue GetValue(const std::string& key, const ConfigValue& defaultValue = std::string(""));
-		GDLCore_API std::string GetTrackersServerUrl(const std::string& key);
+		// 按逻辑源名获取有序镜像 URL 列表（主源在前，回退镜像在后）
+		GDLCore_API std::vector<std::string> GetTrackersServerUrls(const std::string& key);
+		// 将旧版配置名归一化为逻辑源名，未知名称原样返回
+		GDLCore_API std::string NormalizeTrackerSourceName(const std::string& name);
 	}  // namespace config
 }  // namespace gdl

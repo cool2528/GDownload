@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 #include <algorithm>
 #include <cstdint>
+#include <map>
 #include <unordered_map>
 #include <unordered_set>
 #include <sstream>
@@ -54,29 +55,13 @@ namespace gdl {
 			}
 
 			nlohmann::json DefaultTrackerSourceNames() {
-				return nlohmann::json::array({"ngosang-best-link",
-											  "ngosang-best-mirror",
-											  "ngosang-best-cdn",
-											  "ngosang-all-link",
-											  "ngosang-all-mirror",
-											  "ngosang-all-cdn",
-											  "ngosang-all_udp-link",
-											  "ngosang-all_udp-mirror",
-											  "ngosang-all_udp-cdn",
-											  "ngosang-all_http-link",
-											  "ngosang-all_http-mirror",
-											  "ngosang-all_http-cdn",
-											  "ngosang-all_https-link",
-											  "ngosang-all_https-mirror",
-											  "ngosang-all_https-cdn",
-											  "XIU2-best-link",
-											  "XIU2-best-cdn",
-											  "XIU2-all-link",
-											  "XIU2-all-cdn",
-											  "XIU2-http-link",
-											  "XIU2-http-cdn",
-											  "XIU2-nohttp-link",
-											  "XIU2-nohttp-cdn"});
+				// 默认只选两家的精选列表：镜像通道由引擎自动回退，全量列表由用户按需勾选
+				return nlohmann::json::array({"ngosang-best", "XIU2-best"});
+			}
+
+			// 判断配置的源名是否为用户自定义的直连 URL 源
+			bool IsCustomTrackerSourceUrl(const std::string& name) {
+				return name.rfind("http://", 0) == 0 || name.rfind("https://", 0) == 0;
 			}
 		}  // namespace detail
 		Aria2cDownloadManager::Aria2cDownloadManager()
@@ -303,10 +288,13 @@ namespace gdl {
 			                        R"({"status":"started","message":"Updating tracker list..."})");
 
 			try {
-				// 1. Download blacklist.
-				const std::string trackers_black_url(
-					"https://bitbucket.org/xiu2/trackerslistcollection/raw/master/blacklist.txt");
-				auto bt_exclude_tracker = GetBitTorrentUrlWithFallback(trackers_black_url);
+				// 1. Download blacklist. 多镜像按序回退，避免单一主机被墙导致黑名单拉取失败
+				const std::vector<std::string> trackers_black_urls = {
+					"https://raw.githubusercontent.com/XIU2/TrackersListCollection/master/blacklist.txt",
+					"https://jsd.onmicrosoft.cn/gh/XIU2/TrackersListCollection/blacklist.txt",
+					"https://bitbucket.org/xiu2/trackerslistcollection/raw/master/blacklist.txt",
+				};
+				auto bt_exclude_tracker = GetBitTorrentUrlWithFallback(trackers_black_urls);
 				if (!engine_is_runing_) return;
 
 				if (!bt_exclude_tracker.empty()) {
@@ -323,19 +311,37 @@ namespace gdl {
 					tracker_source_names = detail::DefaultTrackerSourceNames();
 				}
 
+				// 2.1 归一化源名：旧版「源×通道」名称（-link/-mirror/-cdn）合并为逻辑源，去重后拉取
+				std::vector<std::string> normalized_sources;
+				std::unordered_set<std::string> seen_sources;
+				for (const auto& key : tracker_source_names) {
+					if (!key.is_string()) continue;
+					auto name = detail::IsCustomTrackerSourceUrl(key.get<std::string>())
+									? key.get<std::string>()
+									: config::NormalizeTrackerSourceName(key.get<std::string>());
+					if (seen_sources.insert(name).second) {
+						normalized_sources.push_back(std::move(name));
+					}
+				}
+
 				// 3. Deduplicate trackers.
 				std::unordered_set<std::string> unique_trackers;
 				int successful_sources = 0;
 				int failed_sources = 0;
 
-				for (const auto& key : tracker_source_names) {
-					if (!key.is_string() || !engine_is_runing_) break;
+				for (const auto& name : normalized_sources) {
+					if (!engine_is_runing_) break;
 
-					std::string name = key.get<std::string>();
-					auto source_url = config::GetTrackersServerUrl(name);
+					// 自定义源为用户直接填写的 URL；内置源查表取有序镜像列表
+					std::vector<std::string> source_urls;
+					if (detail::IsCustomTrackerSourceUrl(name)) {
+						source_urls.push_back(name);
+					} else {
+						source_urls = config::GetTrackersServerUrls(name);
+					}
 
 					LOG_INFO("Fetching trackers from source: {}", name);
-					auto bt_tracker_urls = GetBitTorrentUrlWithFallback(source_url);
+					auto bt_tracker_urls = GetBitTorrentUrlWithFallback(source_urls);
 
 					if (!bt_tracker_urls.empty()) {
 						// Split and insert into the set for deduplication.
@@ -570,16 +576,26 @@ namespace gdl {
 			return cdn_url;
 		}
 
-		std::string Aria2cDownloadManager::GetBitTorrentUrlWithFallback(const std::string& url) {
-			if (url.empty() || !engine_is_runing_) return "";
+		std::string Aria2cDownloadManager::GetBitTorrentUrlWithFallback(const std::vector<std::string>& urls) {
+			if (urls.empty() || !engine_is_runing_) return "";
 
-			// Build fallback URL list.
-			std::vector<std::string> fallback_urls = {url};
-
-			// Add CDN mirrors for GitHub raw URLs.
-			if (url.find("raw.githubusercontent.com") != std::string::npos) {
-				fallback_urls.push_back(ConvertToJsDelivrCDN(url));
+			// Build fallback URL list. 保序去重；GitHub Raw 追加 jsDelivr CDN 兜底（若未显式提供）
+			std::vector<std::string> fallback_urls;
+			std::unordered_set<std::string> seen_urls;
+			auto append_url = [&](const std::string& u) {
+				if (!u.empty() && seen_urls.insert(u).second) {
+					fallback_urls.push_back(u);
+				}
+			};
+			for (const auto& u : urls) {
+				append_url(u);
 			}
+			for (const auto& u : urls) {
+				if (u.find("raw.githubusercontent.com") != std::string::npos) {
+					append_url(ConvertToJsDelivrCDN(u));
+				}
+			}
+			if (fallback_urls.empty()) return "";
 
 			// Get system proxy.
 			auto system_proxy = os::GetSystemHTTPProxy();
@@ -677,7 +693,7 @@ namespace gdl {
 				}
 			}
 
-			LOG_ERR("All fallback URLs failed for: {}", url);
+			LOG_ERR("All fallback URLs failed for: {}", fallback_urls.front());
 			return "";
 		}
 

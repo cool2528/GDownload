@@ -91,7 +91,11 @@ namespace gdl {
 				return detail::FromString<Type>(*optional_val);
 			}
 
-			std::string GetTrackerServerUrlByName(const std::string& name);
+			// 按逻辑源名获取有序镜像 URL 列表（第一个为主源，后续为回退镜像）
+			std::vector<std::string> GetTrackerServerUrlsByName(const std::string& name) const;
+			// 将旧版配置名（如 "ngosang-best-link"）归一化为逻辑源名（如 "ngosang-best"）；
+			// 未知名称原样返回
+			std::string NormalizeTrackerSourceName(const std::string& name) const;
 		   private:
 			explicit ApplicationConfig();
 			bool Load();
@@ -113,7 +117,8 @@ namespace gdl {
 			String config_file_path_;
 			String legacy_config_file_path_;
 			std::shared_mutex mutex_;
-			std::map<std::string,std::string> tracker_source_server_;
+			// 逻辑源名 -> 有序镜像 URL 列表（主源在前，回退镜像在后）
+			std::map<std::string, std::vector<std::string>> tracker_source_server_;
 		};
 	}  // namespace config
 }  // namespace gdl

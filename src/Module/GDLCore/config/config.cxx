@@ -16,8 +16,12 @@ namespace gdl {
 			return *opt;
 		}
 
-		 std::string GetTrackersServerUrl(const std::string& key) {
-			return ApplicationConfig::Instance().GetTrackerServerUrlByName(key);
+		std::vector<std::string> GetTrackersServerUrls(const std::string& key) {
+			return ApplicationConfig::Instance().GetTrackerServerUrlsByName(key);
+		}
+
+		std::string NormalizeTrackerSourceName(const std::string& name) {
+			return ApplicationConfig::Instance().NormalizeTrackerSourceName(name);
 		}
 
 	}  // namespace config

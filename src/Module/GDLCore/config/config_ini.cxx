@@ -49,10 +49,24 @@ namespace gdl {
 				return false;
 			}
 
-			inline std::string BuildTrackerJson(const std::map<std::string, std::string>& source, bool use_name) {
+			inline std::string BuildTrackerJson(const std::map<std::string, std::vector<std::string>>& source,
+												bool use_name) {
 				nlohmann::json json_data = nlohmann::json::array();
-				for (const auto& item : source) json_data.push_back(use_name ? item.first : item.second);
+				for (const auto& item : source) {
+					if (use_name) {
+						json_data.push_back(item.first);
+					} else {
+						// 展开该逻辑源的全部镜像 URL
+						for (const auto& url : item.second) json_data.push_back(url);
+					}
+				}
 				return json_data.dump();
+			}
+
+			// TrackerSourceNames 的默认值：只选两家的精选列表（与引擎侧 DefaultTrackerSourceNames 保持一致），
+			// 全量/分协议列表由用户按需勾选
+			inline std::string DefaultTrackerSourceNamesJson() {
+				return nlohmann::json::array({"ngosang-best", "XIU2-best"}).dump();
 			}
 
 			inline std::string EnsureSessionPath() {
@@ -93,71 +107,68 @@ namespace gdl {
 			}
 		}
 
-		std::string ApplicationConfig::GetTrackerServerUrlByName(const std::string& name) {
-			if (tracker_source_server_.find(name) != tracker_source_server_.end()) {
-				return tracker_source_server_[name];
+		std::vector<std::string> ApplicationConfig::GetTrackerServerUrlsByName(const std::string& name) const {
+			auto it = tracker_source_server_.find(NormalizeTrackerSourceName(name));
+			if (it != tracker_source_server_.end()) {
+				return it->second;
 			}
-			return "";
+			return {};
+		}
+
+		std::string ApplicationConfig::NormalizeTrackerSourceName(const std::string& name) const {
+			// 已是逻辑源名则直接返回
+			if (tracker_source_server_.find(name) != tracker_source_server_.end()) {
+				return name;
+			}
+			// 旧版按「源×通道」拆分的名称形如 "ngosang-best-link/-mirror/-cdn"，
+			// 去掉通道后缀后若命中逻辑源名则归一化
+			static const std::vector<std::string> legacy_suffixes = {"-link", "-mirror", "-cdn"};
+			for (const auto& suffix : legacy_suffixes) {
+				if (name.size() > suffix.size() &&
+					name.compare(name.size() - suffix.size(), suffix.size(), suffix) == 0) {
+					auto stripped = name.substr(0, name.size() - suffix.size());
+					if (tracker_source_server_.find(stripped) != tracker_source_server_.end()) {
+						return stripped;
+					}
+				}
+			}
+			return name;
 		}
 
 		ApplicationConfig::ApplicationConfig() {
 			config_file_path_ = os::GetAppDataDir() + "/gdownload/gd.toml";
 			legacy_config_file_path_ = os::GetAppDataDir() + "/gdownload/gd.ini";
-			/*
-			 * ["ngosang-best-link","ngosang-best-mirror","ngosang-best-cdn","ngosang-all-link","ngosang-all-mirror","ngosang-all-cdn",
-						"ngosang-all_udp-link","ngosang-all_udp-mirror","ngosang-all_udp-cdn",
-						"ngosang-all_http-link","ngosang-all_http-mirror","ngosang-all_http-cdn",
-						"ngosang-all_https-link","ngosang-all_https-mirror","ngosang-all_https-cdn",
-						"XIU2-best-link","XIU2-best-cdn","XIU2-all-link","XIU2-all-cdn","XIU2-http-link","XIU2-http-cdn","XIU2-nohttp-link","XIU2-nohttp-cdn"]
-			 */
-			tracker_source_server_.insert(
-				std::make_pair("ngosang-best-link",
-							   "https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best.txt"));
-			tracker_source_server_.insert(
-				std::make_pair("ngosang-best-mirror", "https://ngosang.github.io/trackerslist/trackers_best.txt"));
-			tracker_source_server_.insert(
-				std::make_pair("ngosang-best-cdn", "https://cdn.jsdelivr.net/gh/ngosang/trackerslist@master/trackers_best.txt"));
-			tracker_source_server_.insert(
-				std::make_pair("ngosang-all-link", "https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_all.txt"));
-			tracker_source_server_.insert(
-				std::make_pair("ngosang-all-mirror", "https://ngosang.github.io/trackerslist/trackers_all.txt"));
-			tracker_source_server_.insert(
-				std::make_pair("ngosang-all-cdn", "https://cdn.jsdelivr.net/gh/ngosang/trackerslist@master/trackers_all.txt"));
-			tracker_source_server_.insert(
-				std::make_pair("ngosang-all_udp-link",
-							   "https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_all_udp.txt"));
-			tracker_source_server_.insert(
-				std::make_pair("ngosang-all_udp-mirror", "https://ngosang.github.io/trackerslist/trackers_all_udp.txt"));
-			tracker_source_server_.insert(
-				std::make_pair("ngosang-all_udp-cdn", "https://cdn.jsdelivr.net/gh/ngosang/trackerslist@master/trackers_all_udp.txt"));
-			tracker_source_server_.insert(
-				std::make_pair("ngosang-all_http-link",
-							   "https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_all_http.txt"));
-			tracker_source_server_.insert(
-				std::make_pair("ngosang-all_http-mirror", "https://ngosang.github.io/trackerslist/trackers_all_http.txt"));
-			tracker_source_server_.insert(
-				std::make_pair("ngosang-all_http-cdn",
-							   "https://cdn.jsdelivr.net/gh/ngosang/trackerslist@master/trackers_all_http.txt"));
-			tracker_source_server_.insert(
-				std::make_pair("ngosang-all_https-link",
-							   "https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_all_https.txt"));
-			tracker_source_server_.insert(
-				std::make_pair("ngosang-all_https-mirror", "https://ngosang.github.io/trackerslist/trackers_all_https.txt"));
-			tracker_source_server_.insert(
-				std::make_pair("ngosang-all_https-cdn",
-							   "https://cdn.jsdelivr.net/gh/ngosang/trackerslist@master/trackers_all_https.txt"));
-			tracker_source_server_.insert(std::make_pair("XIU2-best-link", "https://cf.trackerslist.com/best.txt"));
-			tracker_source_server_.insert(
-				std::make_pair("XIU2-best-cdn", "https://jsd.onmicrosoft.cn/gh/XIU2/TrackersListCollection/best.txt"));
-			tracker_source_server_.insert(std::make_pair("XIU2-all-link", "https://cf.trackerslist.com/all.txt"));
-			tracker_source_server_.insert(
-				std::make_pair("XIU2-all-cdn", "https://jsd.onmicrosoft.cn/gh/XIU2/TrackersListCollection/all.txt"));
-			tracker_source_server_.insert(std::make_pair("XIU2-http-link", "https://cf.trackerslist.com/http.txt"));
-			tracker_source_server_.insert(
-				std::make_pair("XIU2-http-cdn", "https://jsd.onmicrosoft.cn/gh/XIU2/TrackersListCollection/http.txt"));
-			tracker_source_server_.insert(std::make_pair("XIU2-nohttp-link", "https://cf.trackerslist.com/nohttp.txt"));
-			tracker_source_server_.insert(
-				std::make_pair("XIU2-nohttp-cdn", "https://jsd.onmicrosoft.cn/gh/XIU2/TrackersListCollection/nohttp.txt"));
+			// 逻辑源 -> 有序镜像列表：主源在前，回退镜像在后。
+			// 镜像通道（raw/github.io/jsDelivr 等）由引擎按序自动回退，不再作为独立源暴露给用户。
+			// ngosang/trackerslist：每日更新的公共 tracker 精选列表
+			auto ngosang_mirrors = [](const char* file) {
+				return std::vector<std::string>{
+					std::string("https://raw.githubusercontent.com/ngosang/trackerslist/master/") + file,
+					std::string("https://ngosang.github.io/trackerslist/") + file,
+					std::string("https://cdn.jsdelivr.net/gh/ngosang/trackerslist@master/") + file,
+				};
+			};
+			tracker_source_server_["ngosang-best"]		= ngosang_mirrors("trackers_best.txt");
+			tracker_source_server_["ngosang-best-ip"]	= ngosang_mirrors("trackers_best_ip.txt");
+			tracker_source_server_["ngosang-all"]		= ngosang_mirrors("trackers_all.txt");
+			tracker_source_server_["ngosang-all_udp"]	= ngosang_mirrors("trackers_all_udp.txt");
+			tracker_source_server_["ngosang-all_http"]	= ngosang_mirrors("trackers_all_http.txt");
+			tracker_source_server_["ngosang-all_https"] = ngosang_mirrors("trackers_all_https.txt");
+			// XIU2/TrackersListCollection：每日更新，自带国内可达镜像
+			auto xiu2_mirrors = [](const char* file) {
+				return std::vector<std::string>{
+					std::string("https://cf.trackerslist.com/") + file,
+					std::string("https://raw.githubusercontent.com/XIU2/TrackersListCollection/master/") + file,
+					std::string("https://jsd.onmicrosoft.cn/gh/XIU2/TrackersListCollection/") + file,
+					std::string("https://cdn.jsdelivr.net/gh/XIU2/TrackersListCollection@master/") + file,
+				};
+			};
+			tracker_source_server_["XIU2-best"]	  = xiu2_mirrors("best.txt");
+			tracker_source_server_["XIU2-all"]	  = xiu2_mirrors("all.txt");
+			tracker_source_server_["XIU2-http"]	  = xiu2_mirrors("http.txt");
+			tracker_source_server_["XIU2-nohttp"] = xiu2_mirrors("nohttp.txt");
+			// newTrackon：持续监测公共 tracker 可用率，stable 为可用率 >= 95% 的列表
+			tracker_source_server_["newtrackon-stable"] = {"https://newtrackon.com/api/stable"};
 
 			EnsureConfigFileExists();
 			Load();
@@ -406,7 +417,7 @@ namespace gdl {
 				return GenerateRpcSecret();
 			}
 			if (key_path == config::Keys::TrackerSourceNames.get()) {
-				return BuildTrackerJson(tracker_source_server_, /*use_name*/ true);
+				return DefaultTrackerSourceNamesJson();
 			}
 			return def;
 		}
@@ -446,7 +457,7 @@ namespace gdl {
 				return GenerateRpcSecret();
 			}
 			if (key_path == config::Keys::TrackerSourceNames.get() && cur.empty()) {
-				return BuildTrackerJson(tracker_source_server_, /*use_name*/ true);
+				return DefaultTrackerSourceNamesJson();
 			}
 
 			auto ldef = ToLower(def);
