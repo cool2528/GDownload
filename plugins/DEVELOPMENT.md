@@ -1,5 +1,7 @@
 # GDownload 插件开发指南
 
+**简体中文** · [English](./DEVELOPMENT.en.md)
+
 本指南教你从零写一个 GDownload 网盘解析插件。插件用 **JavaScript（ES2023）** 编写，运行在
 内嵌的 **QuickJS 沙箱**中，只能通过宿主注入的 `gdl.*` SDK 与外界交互。
 

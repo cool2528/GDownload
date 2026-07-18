@@ -1,5 +1,7 @@
 # GDownload 插件
 
+**简体中文** · [English](./README.en.md)
+
 本目录存放 GDownload 的**内置 JS 插件**。GDownload 的插件用 JavaScript 编写，在内嵌的
 QuickJS 沙箱中运行——一份脚本全平台通用、可热更新、只能调用宿主暴露的 `gdl.*` SDK。
 
