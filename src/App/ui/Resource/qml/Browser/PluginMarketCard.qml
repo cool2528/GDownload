@@ -20,11 +20,13 @@ Rectangle {
     property int progress: -1
     property string stage: ""
     property var tags: []
+    property bool hasSettings: false
 
     signal install()
     signal updatePlugin()
     signal uninstall()
     signal toggleEnabled(bool on)
+    signal openSettings()
 
     readonly property int stAvailable: 0
     readonly property int stInstalled: 1
@@ -228,7 +230,16 @@ Rectangle {
 
             Item { Layout.fillWidth: true }
 
-            // 右侧操作：移除（次要）在前，安装/更新（主操作）在最右
+            // 右侧操作：设置/移除（次要）在前，安装/更新（主操作）在最右
+            GButton {
+                visible: (card.state === card.stInstalled || card.state === card.stUpdate) && card.hasSettings
+                type: 3
+                iconName: "settings"
+                text: qsTr("Settings")
+                Accessible.name: qsTr("Plugin settings")
+                onClicked: card.openSettings()
+            }
+
             GButton {
                 visible: card.state === card.stInstalled || card.state === card.stUpdate
                 type: 3

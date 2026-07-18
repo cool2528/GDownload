@@ -12,6 +12,9 @@ Item {
     // 当前筛选：0=全部 1=已安装 2=可更新
     property int filterIndex: 0
 
+    // 配置修订号：保存/清除插件配置后自增，强制重算依赖 hasSchema 的绑定
+    property int configRevision: 0
+
     // 状态枚举（与 C++ InstallState / Busy 对齐）
     readonly property int stAvailable: 0
     readonly property int stInstalled: 1
@@ -33,6 +36,14 @@ Item {
                 ToastManager.ShowSuccess(qsTr("%1 succeeded").arg(name))
             else if (message.length > 0)
                 ToastManager.ShowError(qsTr("%1 failed: %2").arg(name).arg(message))
+        }
+    }
+
+    Connections {
+        target: PluginConfigManager
+        // 保存/清除配置后强制重算 hasSettings/configured 绑定
+        function onConfigChanged(name) {
+            root.configRevision++
         }
     }
 
@@ -136,11 +147,13 @@ Item {
                     progress: model.progress
                     stage: model.stage
                     tags: model.tags
+                    hasSettings: (root.configRevision, PluginConfigManager.hasSchema(model.name))
 
                     onInstall: PluginMarketManager.install(model.name)
                     onUpdatePlugin: PluginMarketManager.install(model.name)
                     onUninstall: PluginMarketManager.uninstall(model.name)
                     onToggleEnabled: PluginMarketManager.setEnabled(model.name, on)
+                    onOpenSettings: marketSettingsDialog.openFor(model.name)
                 }
             }
         }
@@ -176,5 +189,10 @@ Item {
         anchors.centerIn: parent
         running: PluginMarketManager.busy && grid.count === 0
         visible: running
+    }
+
+    PluginSettingsDialog {
+        id: marketSettingsDialog
+        parent: Overlay.overlay
     }
 }
