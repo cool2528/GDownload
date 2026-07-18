@@ -147,44 +147,36 @@
 <context>
     <name>BaiduCookieSettingPage</name>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="17"/>
         <source>Baidu Netdisk Integration</source>
-        <translation>바이두 넷디스크 통합</translation>
+        <translation type="vanished">바이두 넷디스크 통합</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="18"/>
         <source>Configure Baidu Netdisk cookie for link parsing</source>
-        <translation>링크 구문 분석을 위한 바이두 넷디스크 쿠키 구성</translation>
+        <translation type="vanished">링크 구문 분석을 위한 바이두 넷디스크 쿠키 구성</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="35"/>
         <source>Cookie</source>
-        <translation>쿠키</translation>
+        <translation type="vanished">쿠키</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="42"/>
         <source>BDUSS value</source>
-        <translation>BDUSS 값</translation>
+        <translation type="vanished">BDUSS 값</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="53"/>
         <source>Paste your Baidu Netdisk cookie here</source>
-        <translation>여기에 바이두 넷디스크 쿠키 붙여넣기</translation>
+        <translation type="vanished">여기에 바이두 넷디스크 쿠키 붙여넣기</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="54"/>
         <source>Baidu Netdisk cookie</source>
-        <translation>바이두 넷디스크 Cookie</translation>
+        <translation type="vanished">바이두 넷디스크 Cookie</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="60"/>
         <source>Save</source>
-        <translation>저장</translation>
+        <translation type="vanished">저장</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="67"/>
         <source>Baidu cookie saved successfully</source>
-        <translation>바이두 쿠키가 성공적으로 저장되었습니다.</translation>
+        <translation type="vanished">바이두 쿠키가 성공적으로 저장되었습니다.</translation>
     </message>
 </context>
 <context>
@@ -1657,8 +1649,17 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
     </message>
     <message>
         <location filename="../qml/Browser/HomePage.qml" line="152"/>
+        <source>Add a new download from a link, torrent, or cloud drive share.</source>
+        <translation>링크, 토렌트 또는 클라우드 드라이브 공유를 통해 새 다운로드를 추가합니다.</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/HomePage.qml" line="181"/>
+        <source>Cloud Drive</source>
+        <translation>클라우드 드라이브</translation>
+    </message>
+    <message>
         <source>Add a new download from a link, torrent, or Baidu cloud share.</source>
-        <translation>링크, 토렌트 또는 Baidu 공유에서 새 다운로드를 추가합니다.</translation>
+        <translation type="vanished">링크, 토렌트 또는 Baidu 공유에서 새 다운로드를 추가합니다.</translation>
     </message>
     <message>
         <location filename="../qml/Browser/HomePage.qml" line="163"/>
@@ -1681,9 +1682,8 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
         <translation>토렌트 파일 끌어다 놓기</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="181"/>
         <source>Baidu</source>
-        <translation>Baidu</translation>
+        <translation type="vanished">Baidu</translation>
     </message>
     <message>
         <location filename="../qml/Browser/HomePage.qml" line="182"/>
@@ -1996,203 +1996,252 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
 <context>
     <name>NetDiskPageView</name>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="48"/>
         <source>Invalid Baidu Netdisk URL, please check.</source>
-        <translation>잘못된 바이두 넷디스크 URL을 확인하세요.</translation>
+        <translation type="vanished">잘못된 바이두 넷디스크 URL을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="53"/>
         <source>Please set Baidu Netdisk cookies first.</source>
-        <translation>먼저 바이두 넷디스크 쿠키를 설정하세요.</translation>
+        <translation type="vanished">먼저 바이두 넷디스크 쿠키를 설정하세요.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="105"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="128"/>
         <source>Cloud link parser</source>
         <translation>클라우드 링크 분석</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="213"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="263"/>
         <source>Paste link</source>
         <translation>링크 붙여넣기</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="214"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="264"/>
         <source>Preview files</source>
         <translation>파일 미리보기</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="269"/>
         <source>Cookie required. Set Baidu Netdisk cookies in Preferences before parsing share links.</source>
-        <translation>쿠키가 필요합니다. 공유 링크를 분석하기 전에 환경설정에서 Baidu Netdisk 쿠키를 설정하세요.</translation>
+        <translation type="vanished">쿠키가 필요합니다. 공유 링크를 분석하기 전에 환경설정에서 Baidu Netdisk 쿠키를 설정하세요.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="40"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="51"/>
         <source>The cloud request timed out. Please check your network and try again.</source>
         <translation>클라우드 요청이 시간 초과되었습니다. 네트워크를 확인하고 다시 시도하세요.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="47"/>
         <source>Enter a valid Baidu Netdisk share link before parsing.</source>
-        <translation>구문 분석 전에 유효한 바이두 넷디스크 공유 링크를 입력하세요.</translation>
+        <translation type="vanished">구문 분석 전에 유효한 바이두 넷디스크 공유 링크를 입력하세요.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="52"/>
         <source>Baidu Netdisk cookies are required. Add them in Preferences and try again.</source>
-        <translation>바이두 넷디스크 Cookie가 필요합니다. 기본 설정에서 추가한 후 다시 시도하세요.</translation>
+        <translation type="vanished">바이두 넷디스크 Cookie가 필요합니다. 기본 설정에서 추가한 후 다시 시도하세요.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="114"/>
         <source>Preview a Baidu share safely before adding selected files to the queue.</source>
-        <translation>선택한 파일을 대기열에 추가하기 전에 바이두 공유를 안전하게 미리 보세요.</translation>
+        <translation type="vanished">선택한 파일을 대기열에 추가하기 전에 바이두 공유를 안전하게 미리 보세요.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="140"/>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="156"/>
         <source>Baidu share link</source>
-        <translation>바이두 공유 링크</translation>
+        <translation type="vanished">바이두 공유 링크</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="155"/>
         <source>Paste https://pan.baidu.com/s/... here</source>
-        <translation>https://pan.baidu.com/s/... 링크를 여기에 붙여넣으세요</translation>
+        <translation type="vanished">https://pan.baidu.com/s/... 링크를 여기에 붙여넣으세요</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="174"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="224"/>
         <source>Share links may include an extraction code in the URL.</source>
         <translation>공유 링크에 URL 내 추출 코드가 포함될 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="185"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="235"/>
         <source>Parsing...</source>
         <translation>분석 중...</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="185"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="235"/>
         <source>Parse link</source>
         <translation>링크 분석</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="213"/>
         <source>Validate the share URL and cookie.</source>
-        <translation>공유 URL과 Cookie를 확인합니다.</translation>
+        <translation type="vanished">공유 URL과 Cookie를 확인합니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="214"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="264"/>
         <source>Browse folders and select files.</source>
         <translation>폴더를 찾아보고 파일을 선택합니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="215"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="265"/>
         <source>Add to queue</source>
         <translation>대기열에 추가</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="215"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="265"/>
         <source>Send the selection to aria2.</source>
         <translation>선택한 항목을 aria2로 전송합니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="270"/>
         <source>Baidu Netdisk is ready. Parsed files remain local until you add them to the queue.</source>
-        <translation>바이두 넷디스크가 준비되었습니다. 분석된 파일은 대기열에 추가할 때까지 로컬에 유지됩니다.</translation>
+        <translation type="vanished">바이두 넷디스크가 준비되었습니다. 분석된 파일은 대기열에 추가할 때까지 로컬에 유지됩니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="275"/>
         <source>Open Baidu cookie settings</source>
-        <translation>Baidu 쿠키 설정 열기</translation>
+        <translation type="vanished">Baidu 쿠키 설정 열기</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="304"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="69"/>
+        <source>Enter a share link before parsing.</source>
+        <translation>분석하기 전에 공유 링크를 입력하세요.</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="75"/>
+        <source>No installed plugin can handle this link. Install one from the Plugin Market.</source>
+        <translation>이 링크를 처리할 수 있는 설치된 플러그인이 없습니다. 플러그인 마켓에서 설치하세요.</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="137"/>
+        <source>Preview a cloud share before adding selected files to the queue.</source>
+        <translation>선택한 파일을 대기열에 추가하기 전에 클라우드 공유를 미리 봅니다.</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="163"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="179"/>
+        <source>Cloud share link</source>
+        <translation>클라우드 공유 링크</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="178"/>
+        <source>Paste a share link from a supported cloud drive here</source>
+        <translation>지원되는 클라우드 드라이브의 공유 링크를 여기에 붙여넣으세요</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="202"/>
+        <source>Parse with</source>
+        <translation>분석 플러그인</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="213"/>
+        <source>Plugin used for parsing</source>
+        <translation>분석에 사용되는 플러그인</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="263"/>
+        <source>Auto-match an installed plugin for the link.</source>
+        <translation>링크에 맞는 설치된 플러그인을 자동으로 매칭합니다.</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="321"/>
+        <source>%1 needs to be configured before parsing.</source>
+        <translation>분석하려면 먼저 %1 설정을 완료해야 합니다.</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="322"/>
+        <source>%1 is ready. Parsed files remain local until you add them to the queue.</source>
+        <translation>%1이(가) 준비되었습니다. 분석된 파일은 대기열에 추가할 때까지 로컬에 유지됩니다.</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="333"/>
+        <source>Open Plugin Market</source>
+        <translation>플러그인 마켓 열기</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="344"/>
+        <source>Configure plugin</source>
+        <translation>플러그인 설정</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="370"/>
         <source>Shared files</source>
         <translation>공유 파일</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="304"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="370"/>
         <source>Folder contents</source>
         <translation>폴더 내용</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="311"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="377"/>
         <source>Root folder</source>
         <translation>루트 폴더</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="319"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="385"/>
         <source>New link</source>
         <translation>새 링크</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="363"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="429"/>
         <source>File Name</source>
         <translation>파일 이름</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="369"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="435"/>
         <source>Size</source>
         <translation>크기</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="376"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="442"/>
         <source>Date</source>
         <translation>날짜</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="406"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="472"/>
         <source>Open folder</source>
         <translation>폴더 열기</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="407"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="473"/>
         <source>Cloud file</source>
         <translation>클라우드 파일</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="427"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="493"/>
         <source>Select %1</source>
         <translation>%1 선택</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="496"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="562"/>
         <source>This folder is empty</source>
         <translation>이 폴더가 비어 있습니다</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="497"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="563"/>
         <source>Go back to another folder or parse a different share link.</source>
         <translation>다른 폴더로 돌아가거나 다른 공유 링크를 분석하세요.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="507"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="573"/>
         <source>All visible files selected</source>
         <translation>표시된 모든 파일이 선택됨</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="507"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="573"/>
         <source>Select files to add them to the download queue</source>
         <translation>다운로드 대기열에 추가할 파일을 선택하세요</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="515"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="581"/>
         <source>Back</source>
         <translation>뒤로</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="550"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="616"/>
         <source>Parsing share link...</source>
         <translation>공유 링크 분석 중...</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="550"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="616"/>
         <source>Loading folder...</source>
         <translation>폴더 로드 중...</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="559"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="625"/>
         <source>This may take a moment for large shares.</source>
         <translation>대용량 공유의 경우 잠시 시간이 걸릴 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="577"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="643"/>
         <source>The cloud request failed. Please try again.</source>
         <translation>클라우드 요청이 실패했습니다. 다시 시도하세요.</translation>
     </message>
@@ -2200,58 +2249,68 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
 <context>
     <name>PluginMarketCard</name>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="111"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="113"/>
         <source>Verified</source>
         <translation>검증됨</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="112"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="114"/>
         <source>Third-party</source>
         <translation>서드파티</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="138"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="140"/>
         <source>Installed</source>
         <translation>설치됨</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="139"/>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="253"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="141"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="264"/>
         <source>Update</source>
         <translation>업데이트</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="140"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="142"/>
         <source>Working</source>
         <translation>작업 중</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="141"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="143"/>
         <source>Available</source>
         <translation>설치 가능</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="202"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="204"/>
         <source>Working…</source>
         <translation>작업 중…</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="245"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="238"/>
+        <source>Settings</source>
+        <translation>설정</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="239"/>
+        <source>Plugin settings</source>
+        <translation>플러그인 설정</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="256"/>
         <source>Install</source>
         <translation>설치</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="237"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="248"/>
         <source>Remove</source>
         <translation>제거</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="223"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="225"/>
         <source>Enabled</source>
         <translation>사용</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="223"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="225"/>
         <source>Disabled</source>
         <translation>사용 안 함</translation>
     </message>
@@ -2259,64 +2318,102 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
 <context>
     <name>PluginMarketPage</name>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="27"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="30"/>
         <source>Plugin list refreshed</source>
         <translation>플러그인 목록을 새로고침했습니다</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="29"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="32"/>
         <source>Failed to load plugin market: %1</source>
         <translation>플러그인 마켓을 불러오지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="33"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="36"/>
         <source>%1 succeeded</source>
         <translation>%1 성공</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="35"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="38"/>
         <source>%1 failed: %2</source>
         <translation>%1 실패: %2</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="52"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="63"/>
         <source>All</source>
         <translation>전체</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="52"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="63"/>
         <source>Installed</source>
         <translation>설치됨</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="52"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="63"/>
         <source>Updates</source>
         <translation>업데이트</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="68"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="79"/>
         <source>Search plugins…</source>
         <translation>플러그인 검색…</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="78"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="89"/>
         <source>Refresh</source>
         <translation>새로고침</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="80"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="91"/>
         <source>Refresh plugin list</source>
         <translation>플러그인 목록 새로고침</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="162"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="175"/>
         <source>No plugins available</source>
         <translation>사용 가능한 플러그인이 없습니다</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="168"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="181"/>
         <source>Check your network connection and refresh</source>
         <translation>네트워크 연결을 확인하고 새로고침하세요</translation>
+    </message>
+</context>
+<context>
+    <name>PluginSettingsDialog</name>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="17"/>
+        <source>Plugin settings</source>
+        <translation>플러그인 설정</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="50"/>
+        <source>Please fill in all required fields.</source>
+        <translation>모든 필수 항목을 입력하세요.</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="71"/>
+        <source>Clear</source>
+        <translation>지우기</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="72"/>
+        <source>Clear plugin settings</source>
+        <translation>플러그인 설정 지우기</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="82"/>
+        <source>Cancel</source>
+        <translation>취소</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="88"/>
+        <source>Save</source>
+        <translation>저장</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="94"/>
+        <source>Plugin settings saved.</source>
+        <translation>플러그인 설정이 저장되었습니다.</translation>
     </message>
 </context>
 <context>
@@ -2488,12 +2585,12 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
         <translation>s</translation>
     </message>
     <message>
-        <location filename="../../view/mainwindow.cxx" line="126"/>
+        <location filename="../../view/mainwindow.cxx" line="130"/>
         <source>The download engine stopped unexpectedly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/mainwindow.cxx" line="134"/>
+        <location filename="../../view/mainwindow.cxx" line="138"/>
         <source>Download engine is unavailable.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2967,14 +3064,18 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
         <translation>작업 연결</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="116"/>
         <source>Baidu</source>
-        <translation>바이두</translation>
+        <translation type="vanished">바이두</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="115"/>
         <source>Torrent</source>
         <translation>토렌트</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="116"/>
+        <source>Cloud Drive</source>
+        <translation>클라우드 드라이브</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="177"/>
@@ -3872,19 +3973,24 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
 <context>
     <name>gdl::ui::netdisk::AsyncTaskWorker</name>
     <message>
-        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="189"/>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="226"/>
         <source>Failed to parse the share link.</source>
         <translation>공유 링크를 구문 분석하지 못했습니다.</translation>
     </message>
     <message>
-        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="195"/>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="232"/>
         <source>Failed to retrieve download link information.</source>
         <translation>다운로드 링크 정보를 검색하지 못했습니다.</translation>
     </message>
     <message>
-        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="201"/>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="238"/>
         <source>Failed to switch directory.</source>
         <translation>디렉터리 전환에 실패했습니다.</translation>
+    </message>
+    <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="257"/>
+        <source>The plugin is no longer available. Check the Plugin Market.</source>
+        <translation>플러그인을 더 이상 사용할 수 없습니다. 플러그인 마켓을 확인하세요.</translation>
     </message>
 </context>
 <context>

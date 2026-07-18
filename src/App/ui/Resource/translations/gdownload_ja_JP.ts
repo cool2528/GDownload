@@ -147,44 +147,36 @@
 <context>
     <name>BaiduCookieSettingPage</name>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="17"/>
         <source>Baidu Netdisk Integration</source>
-        <translation>百度ネットディスクの統合</translation>
+        <translation type="vanished">百度ネットディスクの統合</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="18"/>
         <source>Configure Baidu Netdisk cookie for link parsing</source>
-        <translation>リンク解析用にBaidu Netdisk cookieを設定する</translation>
+        <translation type="vanished">リンク解析用にBaidu Netdisk cookieを設定する</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="35"/>
         <source>Cookie</source>
-        <translation>クッキー</translation>
+        <translation type="vanished">クッキー</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="42"/>
         <source>BDUSS value</source>
-        <translation>BDUSS値</translation>
+        <translation type="vanished">BDUSS値</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="53"/>
         <source>Paste your Baidu Netdisk cookie here</source>
-        <translation>Baidu Netdisk cookieをここに貼り付けます。</translation>
+        <translation type="vanished">Baidu Netdisk cookieをここに貼り付けます。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="54"/>
         <source>Baidu Netdisk cookie</source>
-        <translation>Baidu Netdisk Cookie</translation>
+        <translation type="vanished">Baidu Netdisk Cookie</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="60"/>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation type="vanished">保存</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="67"/>
         <source>Baidu cookie saved successfully</source>
-        <translation>百度のクッキーが正常に保存されました</translation>
+        <translation type="vanished">百度のクッキーが正常に保存されました</translation>
     </message>
 </context>
 <context>
@@ -1657,8 +1649,17 @@ Apache License 2.0 に基づきライセンスされています。</translation
     </message>
     <message>
         <location filename="../qml/Browser/HomePage.qml" line="152"/>
+        <source>Add a new download from a link, torrent, or cloud drive share.</source>
+        <translation>リンク、トレント、クラウドドライブの共有から新しいダウンロードを追加します。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/HomePage.qml" line="181"/>
+        <source>Cloud Drive</source>
+        <translation>クラウドドライブ</translation>
+    </message>
+    <message>
         <source>Add a new download from a link, torrent, or Baidu cloud share.</source>
-        <translation>リンク、トレント、または Baidu の共有から新しいダウンロードを追加します。</translation>
+        <translation type="vanished">リンク、トレント、または Baidu の共有から新しいダウンロードを追加します。</translation>
     </message>
     <message>
         <location filename="../qml/Browser/HomePage.qml" line="163"/>
@@ -1681,9 +1682,8 @@ Apache License 2.0 に基づきライセンスされています。</translation
         <translation>トレントファイルをドロップ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="181"/>
         <source>Baidu</source>
-        <translation>Baidu</translation>
+        <translation type="vanished">Baidu</translation>
     </message>
     <message>
         <location filename="../qml/Browser/HomePage.qml" line="182"/>
@@ -1996,203 +1996,252 @@ Apache License 2.0 に基づきライセンスされています。</translation
 <context>
     <name>NetDiskPageView</name>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="48"/>
         <source>Invalid Baidu Netdisk URL, please check.</source>
-        <translation>百度ネットディスクのURLが無効です</translation>
+        <translation type="vanished">百度ネットディスクのURLが無効です</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="53"/>
         <source>Please set Baidu Netdisk cookies first.</source>
-        <translation>最初にBaidu Netdisk Cookieを設定してください</translation>
+        <translation type="vanished">最初にBaidu Netdisk Cookieを設定してください</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="105"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="128"/>
         <source>Cloud link parser</source>
         <translation>クラウドリンク解析</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="213"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="263"/>
         <source>Paste link</source>
         <translation>リンクを貼り付け</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="214"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="264"/>
         <source>Preview files</source>
         <translation>ファイルをプレビュー</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="269"/>
         <source>Cookie required. Set Baidu Netdisk cookies in Preferences before parsing share links.</source>
-        <translation>Cookie が必要です。共有リンクを解析する前に、設定で Baidu Netdisk の Cookie を設定してください。</translation>
+        <translation type="vanished">Cookie が必要です。共有リンクを解析する前に、設定で Baidu Netdisk の Cookie を設定してください。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="40"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="51"/>
         <source>The cloud request timed out. Please check your network and try again.</source>
         <translation>クラウドリクエストがタイムアウトしました。ネットワークを確認して再試行してください。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="47"/>
         <source>Enter a valid Baidu Netdisk share link before parsing.</source>
-        <translation>解析する前に、有効な Baidu Netdisk 共有リンクを入力してください。</translation>
+        <translation type="vanished">解析する前に、有効な Baidu Netdisk 共有リンクを入力してください。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="52"/>
         <source>Baidu Netdisk cookies are required. Add them in Preferences and try again.</source>
-        <translation>Baidu Netdisk の Cookie が必要です。設定で追加してから再試行してください。</translation>
+        <translation type="vanished">Baidu Netdisk の Cookie が必要です。設定で追加してから再試行してください。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="114"/>
         <source>Preview a Baidu share safely before adding selected files to the queue.</source>
-        <translation>選択したファイルをキューに追加する前に、Baidu 共有を安全にプレビューします。</translation>
+        <translation type="vanished">選択したファイルをキューに追加する前に、Baidu 共有を安全にプレビューします。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="140"/>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="156"/>
         <source>Baidu share link</source>
-        <translation>Baidu 共有リンク</translation>
+        <translation type="vanished">Baidu 共有リンク</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="155"/>
         <source>Paste https://pan.baidu.com/s/... here</source>
-        <translation>https://pan.baidu.com/s/... をここに貼り付け</translation>
+        <translation type="vanished">https://pan.baidu.com/s/... をここに貼り付け</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="174"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="224"/>
         <source>Share links may include an extraction code in the URL.</source>
         <translation>共有リンクの URL には抽出コードが含まれている場合があります。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="185"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="235"/>
         <source>Parsing...</source>
         <translation>解析中...</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="185"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="235"/>
         <source>Parse link</source>
         <translation>リンクを解析</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="213"/>
         <source>Validate the share URL and cookie.</source>
-        <translation>共有 URL と Cookie を検証します。</translation>
+        <translation type="vanished">共有 URL と Cookie を検証します。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="214"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="264"/>
         <source>Browse folders and select files.</source>
         <translation>フォルダを閲覧してファイルを選択します。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="215"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="265"/>
         <source>Add to queue</source>
         <translation>キューに追加</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="215"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="265"/>
         <source>Send the selection to aria2.</source>
         <translation>選択した項目を aria2 に送信します。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="270"/>
         <source>Baidu Netdisk is ready. Parsed files remain local until you add them to the queue.</source>
-        <translation>Baidu Netdisk は準備完了です。解析されたファイルはキューに追加するまでローカルに保持されます。</translation>
+        <translation type="vanished">Baidu Netdisk は準備完了です。解析されたファイルはキューに追加するまでローカルに保持されます。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="275"/>
         <source>Open Baidu cookie settings</source>
-        <translation>Baidu Cookie 設定を開く</translation>
+        <translation type="vanished">Baidu Cookie 設定を開く</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="304"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="69"/>
+        <source>Enter a share link before parsing.</source>
+        <translation>解析する前に共有リンクを入力してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="75"/>
+        <source>No installed plugin can handle this link. Install one from the Plugin Market.</source>
+        <translation>このリンクを処理できるプラグインがインストールされていません。プラグインマーケットからインストールしてください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="137"/>
+        <source>Preview a cloud share before adding selected files to the queue.</source>
+        <translation>選択したファイルをキューに追加する前に、クラウド共有をプレビューします。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="163"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="179"/>
+        <source>Cloud share link</source>
+        <translation>クラウド共有リンク</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="178"/>
+        <source>Paste a share link from a supported cloud drive here</source>
+        <translation>サポートされているクラウドドライブの共有リンクをここに貼り付けてください</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="202"/>
+        <source>Parse with</source>
+        <translation>解析プラグイン</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="213"/>
+        <source>Plugin used for parsing</source>
+        <translation>解析に使用するプラグイン</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="263"/>
+        <source>Auto-match an installed plugin for the link.</source>
+        <translation>リンクに応じてインストール済みのプラグインを自動的に選択します。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="321"/>
+        <source>%1 needs to be configured before parsing.</source>
+        <translation>解析する前に %1 の設定が必要です。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="322"/>
+        <source>%1 is ready. Parsed files remain local until you add them to the queue.</source>
+        <translation>%1 の準備ができました。解析されたファイルはキューに追加するまでローカルに保持されます。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="333"/>
+        <source>Open Plugin Market</source>
+        <translation>プラグインマーケットを開く</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="344"/>
+        <source>Configure plugin</source>
+        <translation>プラグインを設定</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="370"/>
         <source>Shared files</source>
         <translation>共有ファイル</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="304"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="370"/>
         <source>Folder contents</source>
         <translation>フォルダの内容</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="311"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="377"/>
         <source>Root folder</source>
         <translation>ルートフォルダ</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="319"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="385"/>
         <source>New link</source>
         <translation>新しいリンク</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="363"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="429"/>
         <source>File Name</source>
         <translation>ファイル名</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="369"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="435"/>
         <source>Size</source>
         <translation>サイズ</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="376"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="442"/>
         <source>Date</source>
         <translation>日付</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="406"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="472"/>
         <source>Open folder</source>
         <translation>フォルダを開く</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="407"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="473"/>
         <source>Cloud file</source>
         <translation>クラウドファイル</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="427"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="493"/>
         <source>Select %1</source>
         <translation>%1 を選択</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="496"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="562"/>
         <source>This folder is empty</source>
         <translation>このフォルダは空です</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="497"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="563"/>
         <source>Go back to another folder or parse a different share link.</source>
         <translation>別のフォルダに戻るか、別の共有リンクを解析してください。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="507"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="573"/>
         <source>All visible files selected</source>
         <translation>表示中のすべてのファイルを選択済み</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="507"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="573"/>
         <source>Select files to add them to the download queue</source>
         <translation>ファイルを選択してダウンロードキューに追加</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="515"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="581"/>
         <source>Back</source>
         <translation>バック</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="550"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="616"/>
         <source>Parsing share link...</source>
         <translation>共有リンクを解析中...</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="550"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="616"/>
         <source>Loading folder...</source>
         <translation>フォルダを読み込み中...</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="559"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="625"/>
         <source>This may take a moment for large shares.</source>
         <translation>大きな共有の場合は少し時間がかかることがあります。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="577"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="643"/>
         <source>The cloud request failed. Please try again.</source>
         <translation>クラウドリクエストに失敗しました。再試行してください。</translation>
     </message>
@@ -2200,58 +2249,68 @@ Apache License 2.0 に基づきライセンスされています。</translation
 <context>
     <name>PluginMarketCard</name>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="111"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="113"/>
         <source>Verified</source>
         <translation>検証済み</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="112"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="114"/>
         <source>Third-party</source>
         <translation>サードパーティ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="138"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="140"/>
         <source>Installed</source>
         <translation>インストール済み</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="139"/>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="253"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="141"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="264"/>
         <source>Update</source>
         <translation>更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="140"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="142"/>
         <source>Working</source>
         <translation>処理中</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="141"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="143"/>
         <source>Available</source>
         <translation>利用可能</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="202"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="204"/>
         <source>Working…</source>
         <translation>処理中…</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="245"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="238"/>
+        <source>Settings</source>
+        <translation>設定</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="239"/>
+        <source>Plugin settings</source>
+        <translation>プラグイン設定</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="256"/>
         <source>Install</source>
         <translation>インストール</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="237"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="248"/>
         <source>Remove</source>
         <translation>削除</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="223"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="225"/>
         <source>Enabled</source>
         <translation>有効</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="223"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="225"/>
         <source>Disabled</source>
         <translation>無効</translation>
     </message>
@@ -2259,64 +2318,102 @@ Apache License 2.0 に基づきライセンスされています。</translation
 <context>
     <name>PluginMarketPage</name>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="27"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="30"/>
         <source>Plugin list refreshed</source>
         <translation>プラグイン一覧を更新しました</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="29"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="32"/>
         <source>Failed to load plugin market: %1</source>
         <translation>プラグインマーケットの読み込みに失敗しました：%1</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="33"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="36"/>
         <source>%1 succeeded</source>
         <translation>%1 が成功しました</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="35"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="38"/>
         <source>%1 failed: %2</source>
         <translation>%1 が失敗しました：%2</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="52"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="63"/>
         <source>All</source>
         <translation>すべて</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="52"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="63"/>
         <source>Installed</source>
         <translation>インストール済み</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="52"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="63"/>
         <source>Updates</source>
         <translation>更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="68"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="79"/>
         <source>Search plugins…</source>
         <translation>プラグインを検索…</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="78"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="89"/>
         <source>Refresh</source>
         <translation>更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="80"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="91"/>
         <source>Refresh plugin list</source>
         <translation>プラグイン一覧を更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="162"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="175"/>
         <source>No plugins available</source>
         <translation>利用可能なプラグインがありません</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="168"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="181"/>
         <source>Check your network connection and refresh</source>
         <translation>ネットワーク接続を確認して更新してください</translation>
+    </message>
+</context>
+<context>
+    <name>PluginSettingsDialog</name>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="17"/>
+        <source>Plugin settings</source>
+        <translation>プラグイン設定</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="50"/>
+        <source>Please fill in all required fields.</source>
+        <translation>すべての必須項目を入力してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="71"/>
+        <source>Clear</source>
+        <translation>クリア</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="72"/>
+        <source>Clear plugin settings</source>
+        <translation>プラグイン設定をクリア</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="82"/>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="88"/>
+        <source>Save</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="94"/>
+        <source>Plugin settings saved.</source>
+        <translation>プラグイン設定を保存しました。</translation>
     </message>
 </context>
 <context>
@@ -2488,12 +2585,12 @@ Apache License 2.0 に基づきライセンスされています。</translation
         <translation>s</translation>
     </message>
     <message>
-        <location filename="../../view/mainwindow.cxx" line="126"/>
+        <location filename="../../view/mainwindow.cxx" line="130"/>
         <source>The download engine stopped unexpectedly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/mainwindow.cxx" line="134"/>
+        <location filename="../../view/mainwindow.cxx" line="138"/>
         <source>Download engine is unavailable.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2967,14 +3064,18 @@ Apache License 2.0 に基づきライセンスされています。</translation
         <translation>タスクのリンク</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="116"/>
         <source>Baidu</source>
-        <translation>百度ネットディスク</translation>
+        <translation type="vanished">百度ネットディスク</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="115"/>
         <source>Torrent</source>
         <translation>激流</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="116"/>
+        <source>Cloud Drive</source>
+        <translation>クラウドドライブ</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="177"/>
@@ -3872,19 +3973,24 @@ Apache License 2.0 に基づきライセンスされています。</translation
 <context>
     <name>gdl::ui::netdisk::AsyncTaskWorker</name>
     <message>
-        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="189"/>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="226"/>
         <source>Failed to parse the share link.</source>
         <translation>共有リンクの解析に失敗しました</translation>
     </message>
     <message>
-        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="195"/>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="232"/>
         <source>Failed to retrieve download link information.</source>
         <translation>ダウンロードリンク情報の取得に失敗しました</translation>
     </message>
     <message>
-        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="201"/>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="238"/>
         <source>Failed to switch directory.</source>
         <translation>ディレクトリの切り替えに失敗</translation>
+    </message>
+    <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="257"/>
+        <source>The plugin is no longer available. Check the Plugin Market.</source>
+        <translation>このプラグインは利用できなくなりました。プラグインマーケットを確認してください。</translation>
     </message>
 </context>
 <context>

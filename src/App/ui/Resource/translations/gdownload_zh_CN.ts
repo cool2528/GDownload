@@ -147,44 +147,36 @@
 <context>
     <name>BaiduCookieSettingPage</name>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="17"/>
         <source>Baidu Netdisk Integration</source>
-        <translation>百度网盘集成</translation>
+        <translation type="vanished">百度网盘集成</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="18"/>
         <source>Configure Baidu Netdisk cookie for link parsing</source>
-        <translation>为链接解析配置百度网盘 cookie</translation>
+        <translation type="vanished">为链接解析配置百度网盘 cookie</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="35"/>
         <source>Cookie</source>
-        <translation>Cookie</translation>
+        <translation type="vanished">Cookie</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="42"/>
         <source>BDUSS value</source>
-        <translation>BDUSS 值</translation>
+        <translation type="vanished">BDUSS 值</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="53"/>
         <source>Paste your Baidu Netdisk cookie here</source>
-        <translation>在此处粘贴您的百度网盘 cookie</translation>
+        <translation type="vanished">在此处粘贴您的百度网盘 cookie</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="54"/>
         <source>Baidu Netdisk cookie</source>
-        <translation>百度网盘 Cookie</translation>
+        <translation type="vanished">百度网盘 Cookie</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="60"/>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation type="vanished">保存</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BaiduCookieSettingPage.qml" line="67"/>
         <source>Baidu cookie saved successfully</source>
-        <translation>成功保存百度 cookie</translation>
+        <translation type="vanished">成功保存百度 cookie</translation>
     </message>
 </context>
 <context>
@@ -1657,8 +1649,17 @@ Copyright © 2024 GDownload Team
     </message>
     <message>
         <location filename="../qml/Browser/HomePage.qml" line="152"/>
+        <source>Add a new download from a link, torrent, or cloud drive share.</source>
+        <translation>通过链接、种子或网盘分享添加新下载。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/HomePage.qml" line="181"/>
+        <source>Cloud Drive</source>
+        <translation>网盘</translation>
+    </message>
+    <message>
         <source>Add a new download from a link, torrent, or Baidu cloud share.</source>
-        <translation>通过链接、种子或百度网盘分享添加新下载。</translation>
+        <translation type="vanished">通过链接、种子或百度网盘分享添加新下载。</translation>
     </message>
     <message>
         <location filename="../qml/Browser/HomePage.qml" line="163"/>
@@ -1681,9 +1682,8 @@ Copyright © 2024 GDownload Team
         <translation>拖入种子文件</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="181"/>
         <source>Baidu</source>
-        <translation>百度网盘</translation>
+        <translation type="vanished">百度网盘</translation>
     </message>
     <message>
         <location filename="../qml/Browser/HomePage.qml" line="182"/>
@@ -1996,203 +1996,252 @@ Copyright © 2024 GDownload Team
 <context>
     <name>NetDiskPageView</name>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="48"/>
         <source>Invalid Baidu Netdisk URL, please check.</source>
-        <translation>百度网盘 URL 无效，请检查。</translation>
+        <translation type="vanished">百度网盘 URL 无效，请检查。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="53"/>
         <source>Please set Baidu Netdisk cookies first.</source>
-        <translation>请先设置百度网盘 cookie</translation>
+        <translation type="vanished">请先设置百度网盘 cookie</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="105"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="128"/>
         <source>Cloud link parser</source>
         <translation>网盘链接解析</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="213"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="263"/>
         <source>Paste link</source>
         <translation>粘贴链接</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="214"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="264"/>
         <source>Preview files</source>
         <translation>预览文件</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="269"/>
         <source>Cookie required. Set Baidu Netdisk cookies in Preferences before parsing share links.</source>
-        <translation>需要 Cookie。解析分享链接前,请在首选项中设置百度网盘 Cookie。</translation>
+        <translation type="vanished">需要 Cookie。解析分享链接前,请在首选项中设置百度网盘 Cookie。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="40"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="51"/>
         <source>The cloud request timed out. Please check your network and try again.</source>
         <translation>云端请求超时，请检查网络后重试。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="47"/>
         <source>Enter a valid Baidu Netdisk share link before parsing.</source>
-        <translation>请输入有效的百度网盘分享链接后再解析。</translation>
+        <translation type="vanished">请输入有效的百度网盘分享链接后再解析。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="52"/>
         <source>Baidu Netdisk cookies are required. Add them in Preferences and try again.</source>
-        <translation>需要百度网盘 Cookie，请在偏好设置中添加后重试。</translation>
+        <translation type="vanished">需要百度网盘 Cookie，请在偏好设置中添加后重试。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="114"/>
         <source>Preview a Baidu share safely before adding selected files to the queue.</source>
-        <translation>安全预览百度分享内容，然后将选中的文件添加到队列。</translation>
+        <translation type="vanished">安全预览百度分享内容，然后将选中的文件添加到队列。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="140"/>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="156"/>
         <source>Baidu share link</source>
-        <translation>百度分享链接</translation>
+        <translation type="vanished">百度分享链接</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="155"/>
         <source>Paste https://pan.baidu.com/s/... here</source>
-        <translation>在此粘贴 https://pan.baidu.com/s/... 链接</translation>
+        <translation type="vanished">在此粘贴 https://pan.baidu.com/s/... 链接</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="174"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="224"/>
         <source>Share links may include an extraction code in the URL.</source>
         <translation>分享链接中可能包含提取码。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="185"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="235"/>
         <source>Parsing...</source>
         <translation>解析中...</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="185"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="235"/>
         <source>Parse link</source>
         <translation>解析链接</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="213"/>
         <source>Validate the share URL and cookie.</source>
-        <translation>验证分享链接和 Cookie。</translation>
+        <translation type="vanished">验证分享链接和 Cookie。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="214"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="264"/>
         <source>Browse folders and select files.</source>
         <translation>浏览文件夹并选择文件。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="215"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="265"/>
         <source>Add to queue</source>
         <translation>添加到队列</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="215"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="265"/>
         <source>Send the selection to aria2.</source>
         <translation>将选择发送到 aria2。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="270"/>
         <source>Baidu Netdisk is ready. Parsed files remain local until you add them to the queue.</source>
-        <translation>百度网盘已就绪。解析的文件保留在本地，直到你将其添加到队列。</translation>
+        <translation type="vanished">百度网盘已就绪。解析的文件保留在本地，直到你将其添加到队列。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="275"/>
         <source>Open Baidu cookie settings</source>
-        <translation>打开百度 Cookie 设置</translation>
+        <translation type="vanished">打开百度 Cookie 设置</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="304"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="69"/>
+        <source>Enter a share link before parsing.</source>
+        <translation>请先输入分享链接再解析。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="75"/>
+        <source>No installed plugin can handle this link. Install one from the Plugin Market.</source>
+        <translation>没有已安装的插件能处理该链接，请到插件市场安装。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="137"/>
+        <source>Preview a cloud share before adding selected files to the queue.</source>
+        <translation>将所选文件加入队列前，可预览网盘分享内容。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="163"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="179"/>
+        <source>Cloud share link</source>
+        <translation>网盘分享链接</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="178"/>
+        <source>Paste a share link from a supported cloud drive here</source>
+        <translation>在此粘贴受支持网盘的分享链接</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="202"/>
+        <source>Parse with</source>
+        <translation>解析插件</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="213"/>
+        <source>Plugin used for parsing</source>
+        <translation>用于解析的插件</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="263"/>
+        <source>Auto-match an installed plugin for the link.</source>
+        <translation>根据链接自动匹配已安装的插件。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="321"/>
+        <source>%1 needs to be configured before parsing.</source>
+        <translation>%1 需要先完成配置才能解析。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="322"/>
+        <source>%1 is ready. Parsed files remain local until you add them to the queue.</source>
+        <translation>%1 已就绪。解析的文件保留在本地，直到你将其添加到队列。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="333"/>
+        <source>Open Plugin Market</source>
+        <translation>打开插件市场</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="344"/>
+        <source>Configure plugin</source>
+        <translation>配置插件</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="370"/>
         <source>Shared files</source>
         <translation>共享文件</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="304"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="370"/>
         <source>Folder contents</source>
         <translation>文件夹内容</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="311"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="377"/>
         <source>Root folder</source>
         <translation>根目录</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="319"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="385"/>
         <source>New link</source>
         <translation>新链接</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="363"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="429"/>
         <source>File Name</source>
         <translation>文件名</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="369"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="435"/>
         <source>Size</source>
         <translation>大小</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="376"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="442"/>
         <source>Date</source>
         <translation>日期</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="406"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="472"/>
         <source>Open folder</source>
         <translation>打开文件夹</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="407"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="473"/>
         <source>Cloud file</source>
         <translation>云端文件</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="427"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="493"/>
         <source>Select %1</source>
         <translation>选择 %1</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="496"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="562"/>
         <source>This folder is empty</source>
         <translation>此文件夹为空</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="497"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="563"/>
         <source>Go back to another folder or parse a different share link.</source>
         <translation>返回其他文件夹或解析不同的分享链接。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="507"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="573"/>
         <source>All visible files selected</source>
         <translation>所有可见文件已选中</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="507"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="573"/>
         <source>Select files to add them to the download queue</source>
         <translation>选择文件以添加到下载队列</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="515"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="581"/>
         <source>Back</source>
         <translation>返回上级</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="550"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="616"/>
         <source>Parsing share link...</source>
         <translation>正在解析分享链接...</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="550"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="616"/>
         <source>Loading folder...</source>
         <translation>正在加载文件夹...</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="559"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="625"/>
         <source>This may take a moment for large shares.</source>
         <translation>大型分享可能需要一些时间。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="577"/>
+        <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="643"/>
         <source>The cloud request failed. Please try again.</source>
         <translation>云端请求失败，请重试。</translation>
     </message>
@@ -2200,58 +2249,68 @@ Copyright © 2024 GDownload Team
 <context>
     <name>PluginMarketCard</name>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="111"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="113"/>
         <source>Verified</source>
         <translation>已验证</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="112"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="114"/>
         <source>Third-party</source>
         <translation>第三方</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="138"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="140"/>
         <source>Installed</source>
         <translation>已安装</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="139"/>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="253"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="141"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="264"/>
         <source>Update</source>
         <translation>更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="140"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="142"/>
         <source>Working</source>
         <translation>处理中</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="141"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="143"/>
         <source>Available</source>
         <translation>可安装</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="202"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="204"/>
         <source>Working…</source>
         <translation>处理中…</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="245"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="238"/>
+        <source>Settings</source>
+        <translation>设置</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="239"/>
+        <source>Plugin settings</source>
+        <translation>插件设置</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="256"/>
         <source>Install</source>
         <translation>安装</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="237"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="248"/>
         <source>Remove</source>
         <translation>移除</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="223"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="225"/>
         <source>Enabled</source>
         <translation>已启用</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="223"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="225"/>
         <source>Disabled</source>
         <translation>已禁用</translation>
     </message>
@@ -2259,64 +2318,102 @@ Copyright © 2024 GDownload Team
 <context>
     <name>PluginMarketPage</name>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="27"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="30"/>
         <source>Plugin list refreshed</source>
         <translation>插件列表已刷新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="29"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="32"/>
         <source>Failed to load plugin market: %1</source>
         <translation>加载插件市场失败：%1</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="33"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="36"/>
         <source>%1 succeeded</source>
         <translation>%1 成功</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="35"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="38"/>
         <source>%1 failed: %2</source>
         <translation>%1 失败：%2</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="52"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="63"/>
         <source>All</source>
         <translation>全部</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="52"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="63"/>
         <source>Installed</source>
         <translation>已安装</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="52"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="63"/>
         <source>Updates</source>
         <translation>可更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="68"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="79"/>
         <source>Search plugins…</source>
         <translation>搜索插件…</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="78"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="89"/>
         <source>Refresh</source>
         <translation>刷新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="80"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="91"/>
         <source>Refresh plugin list</source>
         <translation>刷新插件列表</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="162"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="175"/>
         <source>No plugins available</source>
         <translation>暂无可用插件</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="168"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="181"/>
         <source>Check your network connection and refresh</source>
         <translation>请检查网络连接后刷新</translation>
+    </message>
+</context>
+<context>
+    <name>PluginSettingsDialog</name>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="17"/>
+        <source>Plugin settings</source>
+        <translation>插件设置</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="50"/>
+        <source>Please fill in all required fields.</source>
+        <translation>请填写所有必填项。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="71"/>
+        <source>Clear</source>
+        <translation>清空</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="72"/>
+        <source>Clear plugin settings</source>
+        <translation>清空插件设置</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="82"/>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="88"/>
+        <source>Save</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="94"/>
+        <source>Plugin settings saved.</source>
+        <translation>插件设置已保存。</translation>
     </message>
 </context>
 <context>
@@ -2488,12 +2585,12 @@ Copyright © 2024 GDownload Team
         <translation>秒</translation>
     </message>
     <message>
-        <location filename="../../view/mainwindow.cxx" line="126"/>
+        <location filename="../../view/mainwindow.cxx" line="130"/>
         <source>The download engine stopped unexpectedly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/mainwindow.cxx" line="134"/>
+        <location filename="../../view/mainwindow.cxx" line="138"/>
         <source>Download engine is unavailable.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2967,14 +3064,18 @@ Copyright © 2024 GDownload Team
         <translation>链接任务</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="116"/>
         <source>Baidu</source>
-        <translation>百度网盘</translation>
+        <translation type="vanished">百度网盘</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="115"/>
         <source>Torrent</source>
         <translation>下载</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="116"/>
+        <source>Cloud Drive</source>
+        <translation>网盘</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="177"/>
@@ -3872,19 +3973,24 @@ Copyright © 2024 GDownload Team
 <context>
     <name>gdl::ui::netdisk::AsyncTaskWorker</name>
     <message>
-        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="189"/>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="226"/>
         <source>Failed to parse the share link.</source>
         <translation>解析分享链接失败</translation>
     </message>
     <message>
-        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="195"/>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="232"/>
         <source>Failed to retrieve download link information.</source>
         <translation>获取下载链接信息失败</translation>
     </message>
     <message>
-        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="201"/>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="238"/>
         <source>Failed to switch directory.</source>
         <translation>切换目录失败</translation>
+    </message>
+    <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="257"/>
+        <source>The plugin is no longer available. Check the Plugin Market.</source>
+        <translation>插件已不可用，请到插件市场检查。</translation>
     </message>
 </context>
 <context>
