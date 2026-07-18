@@ -91,6 +91,19 @@ namespace gdl {
 				manifest.homepage		 = json.value("homepage", "");
 				manifest.min_app_version = json.value("min_app_version", "");
 
+				// 可选本地化文案 locales: { "zh_CN": {display_name, description}, ... }
+				if (json.contains("locales") && json["locales"].is_object()) {
+					for (auto it = json["locales"].begin(); it != json["locales"].end(); ++it) {
+						if (!it.value().is_object()) {
+							continue;
+						}
+						LocaleStrings ls;
+						ls.display_name			 = it.value().value("display_name", "");
+						ls.description			 = it.value().value("description", "");
+						manifest.locales[it.key()] = std::move(ls);
+					}
+				}
+
 				// manifest_version 支持范围
 				if (manifest.manifest_version != kSupportedManifestVersion) {
 					error_out = "unsupported manifest_version: " + std::to_string(manifest.manifest_version);

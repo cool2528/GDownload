@@ -1,6 +1,8 @@
 #include "plugin_manager.h"
 #include <algorithm>
 #include <filesystem>
+#include <fstream>
+#include <nlohmann/json.hpp>
 #include "JsPluginRuntime/js_plugin_host.h"
 #include "JsPluginRuntime/plugin_manifest.h"
 #include "logger.h"
@@ -11,6 +13,34 @@ namespace gdl {
 			js_plugins_.clear();
 		}
 
+		namespace {
+			// 读取 data_dir/plugin_state.json 中被禁用的插件名（市场"禁用"开关写入）
+			std::vector<std::string> ReadDisabledPlugins(const std::string& data_dir) {
+				std::vector<std::string> disabled;
+				std::ifstream f(std::filesystem::path(data_dir) / "plugin_state.json");
+				if (!f.is_open()) {
+					return disabled;
+				}
+				try {
+					nlohmann::json json;
+					f >> json;
+					if (json.contains("disabled") && json["disabled"].is_array()) {
+						disabled = json["disabled"].get<std::vector<std::string>>();
+					}
+				} catch (const nlohmann::json::exception&) {
+				}
+				return disabled;
+			}
+		}  // namespace
+
+		bool DownloadPluginManager::ReloadJsPlugins(const std::string& plugins_dir, const std::string& data_dir) {
+			{
+				std::lock_guard<std::mutex> lock(mutex_);
+				js_plugins_.clear();
+			}
+			return LoadJsPlugins(plugins_dir, data_dir);
+		}
+
 		bool DownloadPluginManager::LoadJsPlugins(const std::string& plugins_dir, const std::string& data_dir) {
 			std::lock_guard<std::mutex> lock(mutex_);
 			std::error_code ec;
@@ -18,6 +48,10 @@ namespace gdl {
 				LOG_INFO("js plugins dir not found: {}", plugins_dir);
 				return false;
 			}
+			auto disabled		= ReadDisabledPlugins(data_dir);
+			auto is_disabled	= [&](const std::string& name) {
+				return std::find(disabled.begin(), disabled.end(), name) != disabled.end();
+			};
 			bool any_loaded = false;
 			try {
 				for (const auto& entry : std::filesystem::directory_iterator(plugins_dir)) {
@@ -31,6 +65,11 @@ namespace gdl {
 						if (error != "manifest.json not found") {
 							LOG_WARN("js plugin rejected: {} ({})", entry.path().string(), error);
 						}
+						continue;
+					}
+					// 被市场禁用的插件不加载
+					if (is_disabled(manifest->name)) {
+						LOG_INFO("js plugin disabled, skipped: {}", manifest->name);
 						continue;
 					}
 					// 同名插件去重（先加载者优先）
