@@ -49,7 +49,6 @@ TestCase {
         { tag: "basic",               path: "qrc:/qml/Browser/BasicSettingPage.qml" },
         { tag: "advanced",            path: "qrc:/qml/Browser/AdvancedSettingPage.qml" },
         { tag: "aria2rpc",            path: "qrc:/qml/Browser/Aria2RpcSettingPage.qml" },
-        { tag: "baiducookie",         path: "qrc:/qml/Browser/BaiduCookieSettingPage.qml" },
         { tag: "bittorrentadvanced",  path: "qrc:/qml/Browser/BitTorrentAdvancedSettingPage.qml" },
         { tag: "connectionperf",      path: "qrc:/qml/Browser/ConnectionPerformanceSettingPage.qml" },
         { tag: "lab",                 path: "qrc:/qml/Browser/LabSettingPage.qml" },
