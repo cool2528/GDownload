@@ -4,13 +4,15 @@ import QtQuick.Controls
 import "../CommonComponents"
 import gdl.sdk 1.0
 
-// V5 下载中心标题区:主标题 + 状态说明 + 添加任务 + 批量操作
+// Aurora 下载中心标题区：窄宽下操作区自动换到第二行，避免按钮挤出页面。
 Rectangle {
     id: control
     property int type: 0
     signal addTaskRequested()
-    implicitHeight: GTheme.titleBarHeight + GTheme.spaceLG
-    color: GTheme.bgPage  // 与下载中心背景一致
+    readonly property bool compactLayout: width < 720
+    readonly property bool narrowLayout: width < 560
+    implicitHeight: compactLayout ? 116 : 88
+    color: GTheme.bgPage
 
     // 底部分隔线
     Rectangle {
@@ -21,20 +23,26 @@ Rectangle {
         color: GTheme.borderLight
     }
 
-    RowLayout {
+    GridLayout {
+        id: titleLayout
         anchors.fill: parent
-        anchors.leftMargin: GTheme.space2XL  // 与左侧导航对齐
-        anchors.rightMargin: GTheme.space2XL
-        spacing: GTheme.spaceLG
+        anchors.leftMargin: compactLayout ? GTheme.spaceSM : GTheme.space2XL
+        anchors.rightMargin: compactLayout ? GTheme.spaceSM : GTheme.space2XL
+        anchors.topMargin: GTheme.spaceSM
+        anchors.bottomMargin: GTheme.spaceSM
+        columns: compactLayout ? 1 : 2
+        columnSpacing: GTheme.spaceLG
+        rowSpacing: GTheme.spaceSM
 
         // 标题区域
         ColumnLayout {
             Layout.fillWidth: true
+            Layout.minimumWidth: 0
             spacing: GTheme.spaceXS
 
             Text {
                 text: qsTr("Downloads")
-                font.pixelSize: GTheme.fontTitle
+                font.pixelSize: GTheme.fontH1
                 font.weight: GTheme.weightDemiBold
                 color: GTheme.textPrimary
             }
@@ -43,70 +51,66 @@ Rectangle {
                 text: {
                     switch(control.type) {
                         case 0: return qsTr("Everything is running smoothly · active downloads")
-                        case 1: return qsTr("Queued tasks are ready to start")
-                        case 2: return qsTr("Completed and stopped tasks")
+                        case 1: return qsTr("Queued tasks show position and expected size")
+                        case 2: return qsTr("Review completed downloads and retry failures")
                         default: return qsTr("Manage your downloads")
                     }
                 }
                 font.pixelSize: GTheme.fontCaption
                 color: GTheme.textSecondary
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                elide: Text.ElideRight
+                maximumLineCount: 1
                 visible: text.length > 0
             }
         }
 
-        // 操作按钮区域 - 全部靠右
+        // 操作按钮区域。紧凑布局下独占第二行，主标题始终保留完整宽度。
         RowLayout {
-            Layout.alignment: Qt.AlignRight
+            objectName: "downloadPageActions"
+            Layout.fillWidth: compactLayout
+            Layout.alignment: compactLayout ? Qt.AlignLeft : Qt.AlignRight
             spacing: GTheme.spaceSM
 
-            // 添加任务主按钮
             GButton {
+                objectName: "btnAddDownload"
                 type: 1
-                text: qsTr("Add Download")
-                iconSource: SegoeFluentIcons.Add
-                iconSize: GTheme.fontBody
-                Layout.preferredHeight: GTheme.sizeDefault
+                text: narrowLayout ? "" : qsTr("Add Download")
+                iconName: "add"
+                size: "default"
                 onClicked: control.addTaskRequested()
             }
 
-            // 恢复/开始所有按钮
             GButton {
+                objectName: "btnStartAllTasks"
                 visible: control.type !== 2
-                iconSource: SegoeFluentIcons.PlayBadge12
-                iconSize: GTheme.fontBody
-                Layout.preferredWidth: GTheme.sizeDefault
-                Layout.preferredHeight: GTheme.sizeDefault
+                iconName: "play"
                 onClicked: {
                     BrowserManager.UnpauseAllTask(control.type)
                 }
             }
 
-            // 暂停所有按钮
             GButton {
+                objectName: "btnPauseAllTasks"
                 visible: control.type !== 2
-                iconSource: SegoeFluentIcons.PauseBadge12
-                iconSize: GTheme.fontBody
-                Layout.preferredWidth: GTheme.sizeDefault
-                Layout.preferredHeight: GTheme.sizeDefault
+                iconName: "pause"
                 onClicked: {
                     BrowserManager.PauseAllTask(control.type)
                 }
             }
 
-            // 分隔线
             Rectangle {
+                visible: !compactLayout
                 Layout.preferredWidth: 1
                 Layout.preferredHeight: GTheme.spaceXL
                 color: GTheme.borderLight
                 Layout.alignment: Qt.AlignVCenter
             }
 
-            // 刷新按钮
             GButton {
-                iconSource: SegoeFluentIcons.Refresh
-                iconSize: GTheme.fontBody
-                Layout.preferredWidth: GTheme.sizeDefault
-                Layout.preferredHeight: GTheme.sizeDefault
+                objectName: "btnRefreshTasks"
+                iconName: "refresh"
                 onClicked: {
                     BrowserManager.RefreshTaskList(control.type)
                 }
@@ -116,10 +120,7 @@ Rectangle {
             GButton {
                 objectName: "btnDeleteAllTasks"
                 buttonType: "danger"
-                iconSource: SegoeFluentIcons.Delete
-                iconSize: GTheme.fontBody
-                Layout.preferredWidth: GTheme.sizeDefault
-                Layout.preferredHeight: GTheme.sizeDefault
+                iconName: "delete"
                 onClicked: {
                     // 默认只删除任务记录；删除文件必须由用户显式勾选
                     deleteAllConfirmDialog.open()
@@ -135,11 +136,11 @@ Rectangle {
         pageType: control.type
 
         onActionSelected: function(action) {
-            if (action === DeleteConfirmDialog.Cancel) {
+            if (action === DeleteConfirmDialog.CancelAction) {
                 return
             }
 
-            const shouldDeleteFiles = action === DeleteConfirmDialog.DeleteBoth
+            const shouldDeleteFiles = action === DeleteConfirmDialog.DeleteBothAction
             const result = BrowserManager.RemoveAllTask(control.type, shouldDeleteFiles)
             const hasExpectedFields = result
                     && typeof result.total === "number"

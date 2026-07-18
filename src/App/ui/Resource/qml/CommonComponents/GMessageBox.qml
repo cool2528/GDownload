@@ -1,28 +1,21 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Qt5Compat.GraphicalEffects
+import QtQuick.Effects
 import gdl.sdk
 
 /**
- * GMessageBox - 通用消息框组件
- * 基于 Element Plus MessageBox 规范
+ * Aurora responsive message box.
  *
- * 功能特性：
- * - 支持多种类型（info, warning, error, success, question）
- * - 可配置 1-3 个自定义按钮
- * - 支持自定义内容组件
- * - 集成 GTheme 主题系统
+ * The public message/buttons/result contract remains compatible with the
+ * original component. Preferred geometry is bounded by the popup parent, and
+ * long copy scrolls instead of escaping the dialog surface.
  */
 Dialog {
     id: root
 
-    // ========== 公开属性 ==========
-
-    // 消息内容
     property string message: ""
 
-    // 消息类型枚举
     enum MessageType {
         Info,
         Warning,
@@ -33,70 +26,82 @@ Dialog {
 
     property int messageType: GMessageBox.Info
 
-    // 自定义图标（优先级高于类型默认图标）
+    // Legacy glyph override plus the preferred Aurora semantic override.
     property int customIcon: -1
-
-    // 自定义内容组件（在 message 之后显示）
+    property string customIconName: ""
     property Component customContent: null
-
-    // 按钮配置（按钮数组，每个按钮包含 text, buttonType, action）
     property var buttons: []
-
-    // 默认按钮索引（用于高亮显示）
     property int defaultButtonIndex: -1
 
-    // 对话框宽度
-    property int dialogWidth: 420
-    property int standardHeight: 300
-
-
-    // ========== 内部属性 ==========
+    // Preferred geometry. Actual geometry is bounded by the current parent.
+    property int dialogWidth: 440
+    property int standardHeight: 280
 
     readonly property int standardPadding: GTheme.spaceXL
     readonly property int standardSpacing: GTheme.spaceLG
+    readonly property real outerMargin: GTheme.spaceLG
+    readonly property real availableDialogWidth: parent
+                                                  ? Math.max(0, parent.width - outerMargin * 2)
+                                                  : dialogWidth
+    readonly property real availableDialogHeight: parent
+                                                   ? Math.max(0, parent.height - outerMargin * 2)
+                                                   : standardHeight
+    readonly property real preferredButtonsWidth: {
+        var total = 0
+        for (var i = 0; i < buttons.length; ++i) {
+            total += buttons[i].width || 90
+        }
+        return total + Math.max(0, buttons.length - 1) * GTheme.spaceSM
+    }
+    readonly property bool stackButtons: width < 400
+                                         || preferredButtonsWidth > width - standardPadding * 2
+    readonly property real desiredHeight: messageHeader.implicitHeight
+                                          + bodyColumn.implicitHeight
+                                          + standardPadding * 2
+                                          + (buttons.length > 0
+                                             ? buttonGrid.implicitHeight + standardPadding * 2 + 1
+                                             : 0)
 
-    // ========== 信号 ==========
-
-    // 按钮点击信号（返回按钮索引）
     signal buttonClicked(int index, var buttonData)
 
-    // ========== Dialog 配置 ==========
-
     modal: true
-    x: parent ? Math.round((parent.width - width) / 2) : 0
-    y: parent ? Math.round((parent.height - height) / 2) : 0
-    width: dialogWidth
-    height: standardHeight
+    padding: 0
+    closePolicy: Popup.CloseOnEscape
+    x: parent ? Math.max(0, Math.round((parent.width - width) / 2)) : 0
+    y: parent ? Math.max(0, Math.round((parent.height - height) / 2)) : 0
+    width: Math.min(dialogWidth,
+                    availableDialogWidth > 0 ? availableDialogWidth : dialogWidth)
+    height: Math.min(availableDialogHeight > 0 ? availableDialogHeight : standardHeight,
+                     Math.max(Math.min(standardHeight,
+                                       availableDialogHeight > 0
+                                       ? availableDialogHeight : standardHeight),
+                              desiredHeight))
 
-    // ========== 辅助函数 ==========
+    Overlay.modal: Rectangle {
+        color: GTheme.overlayScrim
+    }
 
-    // 获取类型对应的图标
-    function getTypeIcon() {
-        if (customIcon !== -1) {
-            return customIcon
+    function getTypeIconName() {
+        if (customIconName.length > 0) {
+            return customIconName
         }
 
         switch(messageType) {
-            case GMessageBox.Info:
-                return SegoeFluentIcons.Info
             case GMessageBox.Warning:
-                return SegoeFluentIcons.Warning
+                return "warning"
             case GMessageBox.Error:
-                return SegoeFluentIcons.ErrorBadge
+                return "error-badge"
             case GMessageBox.Success:
-                return SegoeFluentIcons.CheckmarkCircle
+                return "completed"
             case GMessageBox.Question:
-                return SegoeFluentIcons.Help
+                return "help"
             default:
-                return SegoeFluentIcons.Info
+                return "info"
         }
     }
 
-    // 获取类型对应的颜色
     function getTypeColor() {
         switch(messageType) {
-            case GMessageBox.Info:
-                return GTheme.infoColor
             case GMessageBox.Warning:
                 return GTheme.warningColor
             case GMessageBox.Error:
@@ -110,29 +115,66 @@ Dialog {
         }
     }
 
-    // ========== 背景样式 ==========
-
-    background: Rectangle {
-        color: GTheme.bgWhite
-        radius: GTheme.radiusBase * 2
-        border.width: 1
-        border.color: GTheme.borderLight
-
-        layer.enabled: true
-        layer.effect: DropShadow {
-            radius: GTheme.elevation4.blur
-            samples: GTheme.elevation4.blur * 2 + 1
-            color: GTheme.elevation4.color
-            horizontalOffset: GTheme.elevation4.offsetX
-            verticalOffset: GTheme.elevation4.offsetY
+    function getTypeBackground() {
+        switch(messageType) {
+            case GMessageBox.Warning:
+                return GTheme.bgWarning
+            case GMessageBox.Error:
+                return GTheme.bgDanger
+            case GMessageBox.Success:
+                return GTheme.bgSuccess
+            default:
+                return GTheme.bgInfo
         }
     }
 
-    // ========== 标题栏样式 ==========
+    function activateButton(index) {
+        if (index < 0 || index >= buttons.length) {
+            return
+        }
+        const buttonData = buttons[index]
+        root.buttonClicked(index, buttonData)
+        root.close()
+    }
 
-    header: Rectangle {
-        height: GTheme.titleBarHeight + GTheme.spaceSM
-        color: "transparent"
+    function activateDefaultButton() {
+        if (defaultButtonIndex >= 0 && defaultButtonIndex < buttons.length) {
+            activateButton(defaultButtonIndex)
+        }
+    }
+
+    function focusDefaultButton() {
+        const focusIndex = defaultButtonIndex >= 0
+                           && defaultButtonIndex < buttons.length
+                           ? defaultButtonIndex : (buttons.length > 0 ? 0 : -1)
+        const target = focusIndex >= 0 ? buttonRepeater.itemAt(focusIndex) : null
+        if (target) {
+            target.forceActiveFocus()
+        } else {
+            contentRoot.forceActiveFocus()
+        }
+    }
+
+    background: Rectangle {
+        color: GTheme.surfaceElevated
+        radius: GTheme.radiusLarge
+        border.width: 1
+        border.color: GTheme.borderBase
+
+        layer.enabled: true
+        layer.effect: MultiEffect {
+            shadowEnabled: true
+            shadowColor: GTheme.elevation4.color
+            shadowBlur: Math.min(1.0, GTheme.elevation4.blur / 32)
+            shadowHorizontalOffset: GTheme.elevation4.offsetX
+            shadowVerticalOffset: GTheme.elevation4.offsetY
+            autoPaddingEnabled: true
+        }
+    }
+
+    header: Item {
+        id: messageHeader
+        implicitHeight: GTheme.titleBarHeight + GTheme.space2XL
 
         RowLayout {
             anchors.fill: parent
@@ -140,110 +182,157 @@ Dialog {
             anchors.rightMargin: root.standardPadding
             spacing: GTheme.spaceMD
 
-            // 图标
-            FontIcon {
-                iconSource: getTypeIcon()
-                iconSize: GTheme.fontTitle
-                color: getTypeColor()
+            Rectangle {
+                Layout.preferredWidth: GTheme.sizeLarge
+                Layout.preferredHeight: GTheme.sizeLarge
                 Layout.alignment: Qt.AlignVCenter
+                radius: GTheme.radiusLarge
+                color: root.getTypeBackground()
+
+                AuroraIcon {
+                    anchors.centerIn: parent
+                    visible: root.customIconName.length > 0 || root.customIcon < 0
+                    name: root.getTypeIconName()
+                    iconSize: GTheme.fontTitle
+                    color: root.getTypeColor()
+                }
+
+                FontIcon {
+                    anchors.centerIn: parent
+                    visible: root.customIconName.length === 0 && root.customIcon >= 0
+                    iconSource: root.customIcon >= 0 ? root.customIcon : 0
+                    iconSize: GTheme.fontTitle
+                    color: root.getTypeColor()
+                }
             }
 
-            // 标题文本
             Label {
                 text: root.title
                 font.pixelSize: GTheme.fontSubtitle
                 font.weight: GTheme.weightDemiBold
                 color: GTheme.textPrimary
+                wrapMode: Text.WordWrap
+                maximumLineCount: 2
+                elide: Text.ElideRight
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignVCenter
             }
         }
 
-        // 底部分隔线
-        Rectangle {
+        Divider {
             anchors.bottom: parent.bottom
             width: parent.width
-            height: 1
-            color: GTheme.borderLighter
         }
     }
 
-    // ========== 内容区域 ==========
+    contentItem: ColumnLayout {
+        id: contentRoot
+        focus: true
+        spacing: 0
+        Accessible.role: Accessible.Dialog
+        Accessible.name: root.title
+        Accessible.description: root.message
 
-    contentItem: Item {
-        implicitWidth: contentColumn.implicitWidth + root.standardPadding * 2
-        implicitHeight: contentColumn.implicitHeight + GTheme.spaceXL
+        Keys.priority: Keys.AfterItem
+        Keys.onReturnPressed: event => {
+            root.activateDefaultButton()
+            event.accepted = root.defaultButtonIndex >= 0
+        }
+        Keys.onEnterPressed: event => {
+            root.activateDefaultButton()
+            event.accepted = root.defaultButtonIndex >= 0
+        }
 
-        ColumnLayout {
-            id: contentColumn
-            anchors.fill: parent
-            anchors.leftMargin: root.standardPadding
-            anchors.rightMargin: root.standardPadding
-            anchors.topMargin: GTheme.spaceSM
-            anchors.bottomMargin: GTheme.spaceSM
-            spacing: root.standardSpacing
+        ScrollView {
+            id: bodyScroll
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            padding: root.standardPadding
+            clip: true
+            contentWidth: availableWidth
+            contentHeight: bodyColumn.implicitHeight
+            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
 
-            // 消息文本
-            Label {
-                text: root.message
-                font.pixelSize: GTheme.fontBody
-                color: GTheme.textRegular
-                wrapMode: Text.WordWrap
-                Layout.fillWidth: true
-                visible: root.message !== ""
-            }
+            ColumnLayout {
+                id: bodyColumn
+                width: bodyScroll.availableWidth
+                spacing: root.standardSpacing
 
-            // 自定义内容区域
-            Loader {
-                id: customContentLoader
-                sourceComponent: root.customContent
-                Layout.fillWidth: true
-                visible: root.customContent !== null
-            }
-
-            // 按钮区域
-            RowLayout {
-                spacing: GTheme.spaceSM
-                Layout.fillWidth: true
-                Layout.topMargin: GTheme.spaceXS
-                visible: root.buttons.length > 0
-
-                Item {
+                Label {
+                    id: messageLabel
+                    objectName: "messageText"
+                    text: root.message
+                    font.pixelSize: GTheme.fontBody
+                    lineHeight: 1.35
+                    color: GTheme.textRegular
+                    wrapMode: Text.WordWrap
                     Layout.fillWidth: true
+                    visible: root.message !== ""
+                    Accessible.role: Accessible.StaticText
+                    Accessible.name: text
                 }
 
-                // 动态创建按钮
+                Loader {
+                    id: customContentLoader
+                    sourceComponent: root.customContent
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: item ? item.implicitHeight : 0
+                    visible: root.customContent !== null
+                }
+            }
+        }
+
+        Divider {
+            Layout.fillWidth: true
+            visible: root.buttons.length > 0
+        }
+
+        Item {
+            Layout.fillWidth: true
+            Layout.preferredHeight: root.buttons.length > 0
+                                    ? buttonGrid.implicitHeight + root.standardPadding * 2 : 0
+            visible: root.buttons.length > 0
+
+            GridLayout {
+                id: buttonGrid
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.leftMargin: root.standardPadding
+                anchors.rightMargin: root.standardPadding
+                columns: root.stackButtons ? 1 : Math.max(1, root.buttons.length)
+                rowSpacing: GTheme.spaceSM
+                columnSpacing: GTheme.spaceSM
+
                 Repeater {
+                    id: buttonRepeater
                     model: root.buttons
 
                     GButton {
                         required property int index
                         required property var modelData
 
-                        // 调用方可在 buttons 数组项中传 objectName 字段,
-                        // 供集成测试 findChild 定位特定按钮(如 CloseConfirmDialog 的退出按钮)
                         objectName: modelData.objectName || ""
                         text: modelData.text || ""
-                        implicitWidth: modelData.width || 90
-                        implicitHeight: GTheme.sizeDefault
+                        Layout.fillWidth: root.stackButtons
+                        Layout.preferredWidth: modelData.width || 90
+                        Layout.preferredHeight: GTheme.sizeDefault
+                        Accessible.name: text
 
-                        // 使用 GButton 的 buttonType 属性
                         buttonType: {
                             const type = modelData.type || "default"
-                            // 映射类型
                             if (type === "default" && index === root.defaultButtonIndex) {
                                 return "primary"
                             }
                             return type
                         }
 
-                        onClicked: {
-                            root.buttonClicked(index, modelData)
-                            root.close()
-                        }
+                        onClicked: root.activateButton(index)
                     }
                 }
             }
         }
     }
+
+    onOpened: Qt.callLater(focusDefaultButton)
 }

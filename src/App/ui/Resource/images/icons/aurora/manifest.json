@@ -1,0 +1,522 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "tools/figma-aurora-generator/scripts/export-qml-icons.js",
+  "canonical": [
+    {
+      "name": "home",
+      "category": "navigation",
+      "resourceUrl": "qrc:/images/icons/aurora/home.svg",
+      "aliases": [
+        "homesolid"
+      ]
+    },
+    {
+      "name": "download",
+      "category": "navigation",
+      "resourceUrl": "qrc:/images/icons/aurora/download.svg",
+      "aliases": []
+    },
+    {
+      "name": "queue",
+      "category": "navigation",
+      "resourceUrl": "qrc:/images/icons/aurora/queue.svg",
+      "aliases": [
+        "list"
+      ]
+    },
+    {
+      "name": "completed",
+      "category": "status",
+      "resourceUrl": "qrc:/images/icons/aurora/completed.svg",
+      "aliases": [
+        "check-circle",
+        "checkmarkcircle"
+      ]
+    },
+    {
+      "name": "add",
+      "category": "action",
+      "resourceUrl": "qrc:/images/icons/aurora/add.svg",
+      "aliases": [
+        "plus"
+      ]
+    },
+    {
+      "name": "settings",
+      "category": "navigation",
+      "resourceUrl": "qrc:/images/icons/aurora/settings.svg",
+      "aliases": [
+        "gear",
+        "settingssolid"
+      ]
+    },
+    {
+      "name": "info",
+      "category": "status",
+      "resourceUrl": "qrc:/images/icons/aurora/info.svg",
+      "aliases": []
+    },
+    {
+      "name": "help",
+      "category": "status",
+      "resourceUrl": "qrc:/images/icons/aurora/help.svg",
+      "aliases": []
+    },
+    {
+      "name": "play",
+      "category": "action",
+      "resourceUrl": "qrc:/images/icons/aurora/play.svg",
+      "aliases": [
+        "playbadge12"
+      ]
+    },
+    {
+      "name": "pause",
+      "category": "action",
+      "resourceUrl": "qrc:/images/icons/aurora/pause.svg",
+      "aliases": [
+        "pausebadge12"
+      ]
+    },
+    {
+      "name": "stop",
+      "category": "action",
+      "resourceUrl": "qrc:/images/icons/aurora/stop.svg",
+      "aliases": []
+    },
+    {
+      "name": "refresh",
+      "category": "action",
+      "resourceUrl": "qrc:/images/icons/aurora/refresh.svg",
+      "aliases": [
+        "retry"
+      ]
+    },
+    {
+      "name": "folder",
+      "category": "content",
+      "resourceUrl": "qrc:/images/icons/aurora/folder.svg",
+      "aliases": []
+    },
+    {
+      "name": "link",
+      "category": "action",
+      "resourceUrl": "qrc:/images/icons/aurora/link.svg",
+      "aliases": []
+    },
+    {
+      "name": "delete",
+      "category": "action",
+      "resourceUrl": "qrc:/images/icons/aurora/delete.svg",
+      "aliases": [
+        "trash"
+      ]
+    },
+    {
+      "name": "close",
+      "category": "action",
+      "resourceUrl": "qrc:/images/icons/aurora/close.svg",
+      "aliases": [
+        "x",
+        "chromeclose"
+      ]
+    },
+    {
+      "name": "cloud",
+      "category": "content",
+      "resourceUrl": "qrc:/images/icons/aurora/cloud.svg",
+      "aliases": []
+    },
+    {
+      "name": "cloud-download",
+      "category": "content",
+      "resourceUrl": "qrc:/images/icons/aurora/cloud-download.svg",
+      "aliases": [
+        "clouddownload"
+      ]
+    },
+    {
+      "name": "file",
+      "category": "content",
+      "resourceUrl": "qrc:/images/icons/aurora/file.svg",
+      "aliases": [
+        "document"
+      ]
+    },
+    {
+      "name": "warning",
+      "category": "status",
+      "resourceUrl": "qrc:/images/icons/aurora/warning.svg",
+      "aliases": []
+    },
+    {
+      "name": "error",
+      "category": "status",
+      "resourceUrl": "qrc:/images/icons/aurora/error.svg",
+      "aliases": []
+    },
+    {
+      "name": "error-badge",
+      "category": "status",
+      "resourceUrl": "qrc:/images/icons/aurora/error-badge.svg",
+      "aliases": [
+        "errorbadge"
+      ]
+    },
+    {
+      "name": "code",
+      "category": "content",
+      "resourceUrl": "qrc:/images/icons/aurora/code.svg",
+      "aliases": []
+    },
+    {
+      "name": "connected",
+      "category": "status",
+      "resourceUrl": "qrc:/images/icons/aurora/connected.svg",
+      "aliases": []
+    },
+    {
+      "name": "shield",
+      "category": "settings",
+      "resourceUrl": "qrc:/images/icons/aurora/shield.svg",
+      "aliases": [
+        "exploitprotectionsettings"
+      ]
+    },
+    {
+      "name": "keyboard",
+      "category": "settings",
+      "resourceUrl": "qrc:/images/icons/aurora/keyboard.svg",
+      "aliases": [
+        "keyboardsettings"
+      ]
+    },
+    {
+      "name": "player-settings",
+      "category": "settings",
+      "resourceUrl": "qrc:/images/icons/aurora/player-settings.svg",
+      "aliases": [
+        "playersettings"
+      ]
+    },
+    {
+      "name": "globe",
+      "category": "content",
+      "resourceUrl": "qrc:/images/icons/aurora/globe.svg",
+      "aliases": []
+    },
+    {
+      "name": "heart",
+      "category": "content",
+      "resourceUrl": "qrc:/images/icons/aurora/heart.svg",
+      "aliases": []
+    },
+    {
+      "name": "history",
+      "category": "navigation",
+      "resourceUrl": "qrc:/images/icons/aurora/history.svg",
+      "aliases": []
+    },
+    {
+      "name": "open-file",
+      "category": "action",
+      "resourceUrl": "qrc:/images/icons/aurora/open-file.svg",
+      "aliases": [
+        "openfile"
+      ]
+    },
+    {
+      "name": "view",
+      "category": "action",
+      "resourceUrl": "qrc:/images/icons/aurora/view.svg",
+      "aliases": []
+    },
+    {
+      "name": "extension",
+      "category": "content",
+      "resourceUrl": "qrc:/images/icons/aurora/extension.svg",
+      "aliases": [
+        "puzzle"
+      ]
+    },
+    {
+      "name": "lightning",
+      "category": "action",
+      "resourceUrl": "qrc:/images/icons/aurora/lightning.svg",
+      "aliases": []
+    },
+    {
+      "name": "palette",
+      "category": "settings",
+      "resourceUrl": "qrc:/images/icons/aurora/palette.svg",
+      "aliases": [
+        "theme"
+      ]
+    },
+    {
+      "name": "lock",
+      "category": "settings",
+      "resourceUrl": "qrc:/images/icons/aurora/lock.svg",
+      "aliases": []
+    },
+    {
+      "name": "filter",
+      "category": "action",
+      "resourceUrl": "qrc:/images/icons/aurora/filter.svg",
+      "aliases": []
+    },
+    {
+      "name": "repository",
+      "category": "brand",
+      "resourceUrl": "qrc:/images/icons/aurora/repository.svg",
+      "aliases": [
+        "github"
+      ]
+    },
+    {
+      "name": "book",
+      "category": "content",
+      "resourceUrl": "qrc:/images/icons/aurora/book.svg",
+      "aliases": [
+        "docs",
+        "documentation"
+      ]
+    },
+    {
+      "name": "people",
+      "category": "content",
+      "resourceUrl": "qrc:/images/icons/aurora/people.svg",
+      "aliases": [
+        "community"
+      ]
+    },
+    {
+      "name": "chevron-down",
+      "category": "navigation",
+      "resourceUrl": "qrc:/images/icons/aurora/chevron-down.svg",
+      "aliases": [
+        "chevrondown"
+      ]
+    },
+    {
+      "name": "chevron-right",
+      "category": "navigation",
+      "resourceUrl": "qrc:/images/icons/aurora/chevron-right.svg",
+      "aliases": [
+        "chevronright"
+      ]
+    },
+    {
+      "name": "lightbulb",
+      "category": "status",
+      "resourceUrl": "qrc:/images/icons/aurora/lightbulb.svg",
+      "aliases": [
+        "bulb"
+      ]
+    },
+    {
+      "name": "copy",
+      "category": "action",
+      "resourceUrl": "qrc:/images/icons/aurora/copy.svg",
+      "aliases": [
+        "clipboard"
+      ]
+    },
+    {
+      "name": "more",
+      "category": "action",
+      "resourceUrl": "qrc:/images/icons/aurora/more.svg",
+      "aliases": [
+        "dot"
+      ]
+    }
+  ],
+  "legacyEnums": {
+    "Completed": "completed",
+    "ErrorBadge": "error-badge",
+    "Help": "help",
+    "Info": "info",
+    "Warning": "warning"
+  },
+  "legacyGlyphs": [
+    {
+      "value": "U+23F1",
+      "semantic": "history",
+      "locations": [
+        "CommonComponents/FolderSelector.qml"
+      ]
+    },
+    {
+      "value": "0xE711",
+      "semantic": "close",
+      "locations": [
+        "CommonComponents/FolderSelector.qml"
+      ]
+    },
+    {
+      "value": "U+00D7",
+      "semantic": "close",
+      "locations": [
+        "CommonComponents/FilePreviewList.qml"
+      ]
+    },
+    {
+      "value": "U+EA86",
+      "semantic": "extension",
+      "locations": [
+        "Browser/LabSettingPage.qml"
+      ]
+    },
+    {
+      "value": "U+E713",
+      "semantic": "settings",
+      "locations": [
+        "Browser/BrowserExtension/ConfigHelperCard.qml"
+      ]
+    },
+    {
+      "value": "U+EA80",
+      "semantic": "lightbulb",
+      "locations": [
+        "Browser/BrowserExtension/ConfigHelperCard.qml"
+      ]
+    },
+    {
+      "value": "U+E7BA",
+      "semantic": "warning",
+      "locations": [
+        "Browser/BrowserExtension/ConfigHelperCard.qml"
+      ]
+    },
+    {
+      "value": "U+E897",
+      "semantic": "help",
+      "locations": [
+        "Browser/BrowserExtension/FAQCard.qml"
+      ]
+    },
+    {
+      "value": "U+EBEF",
+      "semantic": "repository",
+      "locations": [
+        "Browser/BrowserExtension/FAQCard.qml"
+      ]
+    },
+    {
+      "value": "U+E85D",
+      "semantic": "book",
+      "locations": [
+        "Browser/BrowserExtension/FAQCard.qml"
+      ]
+    },
+    {
+      "value": "U+E86F",
+      "semantic": "globe",
+      "locations": [
+        "Browser/BrowserExtension/FAQCard.qml"
+      ]
+    },
+    {
+      "value": "U+E716",
+      "semantic": "people",
+      "locations": [
+        "Browser/BrowserExtension/FAQCard.qml"
+      ]
+    },
+    {
+      "value": "U+E70D",
+      "semantic": "chevron-down",
+      "locations": [
+        "Browser/BrowserExtension/FAQCard.qml"
+      ]
+    },
+    {
+      "value": "U+E76C",
+      "semantic": "chevron-right",
+      "locations": [
+        "Browser/BrowserExtension/FAQCard.qml"
+      ]
+    },
+    {
+      "value": "U+E71B",
+      "semantic": "link",
+      "locations": [
+        "Browser/BrowserExtension/FeatureHighlightCard.qml"
+      ]
+    },
+    {
+      "value": "U+E945",
+      "semantic": "lightning",
+      "locations": [
+        "Browser/BrowserExtension/FeatureHighlightCard.qml"
+      ]
+    },
+    {
+      "value": "U+E790",
+      "semantic": "palette",
+      "locations": [
+        "Browser/BrowserExtension/FeatureHighlightCard.qml"
+      ]
+    },
+    {
+      "value": "U+E72E",
+      "semantic": "lock",
+      "locations": [
+        "Browser/BrowserExtension/FeatureHighlightCard.qml"
+      ]
+    },
+    {
+      "value": "U+E774",
+      "semantic": "globe",
+      "locations": [
+        "Browser/BrowserExtension/FeatureHighlightCard.qml",
+        "Browser/BrowserExtension/InstallationGuideCard.qml"
+      ]
+    },
+    {
+      "value": "U+E71C",
+      "semantic": "filter",
+      "locations": [
+        "Browser/BrowserExtension/FeatureHighlightCard.qml"
+      ]
+    },
+    {
+      "value": "U+E943",
+      "semantic": "repository",
+      "locations": [
+        "Browser/BrowserExtension/InstallationGuideCard.qml"
+      ]
+    },
+    {
+      "value": "U+1F4CB",
+      "semantic": "copy",
+      "locations": [
+        "Browser/BrowserExtension/ConfigHelperCard.qml"
+      ]
+    }
+  ],
+  "separateFamilies": {
+    "applicationBrand": [
+      "images/logo/*",
+      "images/titlebar/icon.svg"
+    ],
+    "browserBrands": [
+      "images/browser-extension/chrome.svg",
+      "images/browser-extension/firefox.svg",
+      "images/browser-extension/edge.svg"
+    ],
+    "nativeWindowControls": [
+      "images/titlebar/windows-*.svg",
+      "images/titlebar/macos-*.svg"
+    ],
+    "contentImages": [
+      "payee/sponsor.jpg",
+      "images/theme/*"
+    ]
+  },
+  "lookupPolicy": {
+    "empty": "error",
+    "unknown": "error",
+    "explicitMoreOnly": true
+  }
+}

@@ -26,6 +26,7 @@
 //   - TestNetWorkDiskManager-> "NetWorkDiskManager"(ParseShareUrl 空实现)
 //   - TestUpdateManager     -> "UpdateManager"    (空对象)
 //   - TestUtilsToolsManager -> "UtilsToolsManager"(HideMacOsxWindowStandardButtons 等)
+//   - TestClipboardWatcher  -> "ClipboardWatcher" (空剪贴板读取与 clipboardChanged 信号)
 //   - TestLanguageManager   -> "LanguageManager"  (空对象)
 //
 // 枚举 GThemeType / SegoeFluentIcons 通过 Q_NAMESPACE + Q_ENUM_NS + QML_NAMED_ELEMENT
@@ -54,6 +55,7 @@ class TestSetup : public QObject {
 		auto* netdisk_mgr = new gdl::tests::TestNetWorkDiskManager(engine);
 		auto* update_mgr = new gdl::tests::TestUpdateManager(engine);
 		auto* utils_mgr = new gdl::tests::TestUtilsToolsManager(engine);
+		auto* clipboard_watcher = new gdl::tests::TestClipboardWatcher(engine);
 		auto* lang_mgr = new gdl::tests::TestLanguageManager(engine);
 
 		qmlRegisterSingletonInstance<gdl::tests::TestGTheme>("gdl.sdk", 1, 0, "GTheme", g_theme);
@@ -67,9 +69,10 @@ class TestSetup : public QObject {
 		qmlRegisterSingletonInstance<gdl::tests::TestUpdateManager>("gdl.sdk", 1, 0, "UpdateManager",
 																	update_mgr);
 		qmlRegisterSingletonInstance<gdl::tests::TestUtilsToolsManager>("gdl.sdk", 1, 0, "UtilsToolsManager",
-																		utils_mgr);
+																						 utils_mgr);
 		qmlRegisterSingletonInstance<gdl::tests::TestLanguageManager>("gdl.sdk", 1, 0, "LanguageManager",
-																	  lang_mgr);
+																						  lang_mgr);
+		engine->rootContext()->setContextProperty("ClipboardWatcher", clipboard_watcher);
 
 		// 枚举注册:复刻 mainwindow.cxx InitQmlEngine 末尾的 qmlRegisterUncreatableMetaObject
 		// 显式注册。GThemeType / SegoeFluentIcons 虽经 QML_NAMED_ELEMENT 声明,但静态库
@@ -97,25 +100,6 @@ class TestSetup : public QObject {
 		// "mainWindow 依赖 FramelessHelper QML 模块;若测试环境未注册,Loader 失败,
 		//  截图为空白 harness,不影响其他用例产出"。Task 9 重构主项目为库后,可在真实
 		// 窗口环境中补充 mainWindow 视觉用例。
-
-		// FluentIcons 字体加载 + 上下文属性:
-		// 生产代码 mainwindow.cxx InitFont() 从 "://font/SegoeFluentIcons.ttf" 加载
-		// 字体到 QFontDatabase,取字体族名设为 FluentIcons 上下文属性。
-		// 视觉用例 qml_ui_visual 已通过 resource_icons.qrc 打包同字体,这里复刻:
-		//   - addApplicationFont 注册字体到 QFontDatabase
-		//   - 设置 FluentIcons 上下文属性为字体族名
-		// FontIcon.qml 直接用 font.family: "Segoe Fluent Icons" 引用,故即使不设
-		// 上下文属性也能渲染;但保持与生产一致以防其他组件通过 FluentIcons 引用。
-		const int font_id = QFontDatabase::addApplicationFont(QStringLiteral("://font/SegoeFluentIcons.ttf"));
-		if (font_id != -1) {
-			const auto families = QFontDatabase::applicationFontFamilies(font_id);
-			if (!families.isEmpty()) {
-				engine->rootContext()->setContextProperty("FluentIcons", families.first());
-			}
-		} else {
-			// 字体加载失败回退:Windows 11 系统自带 "Segoe Fluent Icons",族名直接设
-			engine->rootContext()->setContextProperty("FluentIcons", QStringLiteral("Segoe Fluent Icons"));
-		}
 
 		// 中文字体回退:`-platform offscreen` 在 Windows 上不读系统字体目录,
 		// 所有非 ASCII 字符(包括汉字与中文标点)缺少字形回退到 .notdef → 方框。

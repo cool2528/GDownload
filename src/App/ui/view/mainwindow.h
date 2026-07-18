@@ -14,14 +14,12 @@ namespace gd {
 		   private:
 			void InitQmlEngine(QQmlEngine* engine);
 			void InitTranslation(QGuiApplication* app);
-			void InitFont(QQmlEngine* engine);
 			void InitIcon(QGuiApplication* app);
 			void UnInitEngine();
             void InitNetDiskPlugins();
 			void InitQtMessageHandler() const;
 
 		   private:
-			int fluent_icons_font_id_{-1};
 		};
 	}  // namespace ui
 }  // namespace gd

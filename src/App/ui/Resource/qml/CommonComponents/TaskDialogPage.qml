@@ -8,11 +8,11 @@ import "../Utils/utils.js" as Utils
 Popup {
     id: taskPage
     objectName: "taskDialogPage"
-    width: dialogWidth
+    width: Math.min(dialogWidth, parent ? Math.max(320, parent.width - dialogViewportMargin * 2) : dialogWidth)
     implicitHeight: contentLayout.implicitHeight
     height: Math.min(parent ? parent.height - dialogViewportMargin * 2 : implicitHeight, implicitHeight)
-    x: (parent.width - width) / 2
-    y: (parent.height - height) / 2
+    x: parent ? Math.max(0, Math.round((parent.width - width) / 2)) : 0
+    y: parent ? Math.max(0, Math.round((parent.height - height) / 2)) : 0
     modal: true
     closePolicy: Popup.CloseOnEscape
     focus: true
@@ -20,6 +20,7 @@ Popup {
     // 打开时预选的标签页:0=URL,1=Torrent,2=Baidu。
     // 供下载页空状态快捷入口(Add URL / Torrent / Baidu)按入口类型直达对应标签。
     property int initialTab: 0
+    property string validationMessage: ""
 
     // 页面级布局常量:对话框宽度和内容高度只服务本弹窗,不是通用设计令牌
     readonly property int dialogWidth: 720
@@ -28,20 +29,23 @@ Popup {
     readonly property int urlPanelHeight: 120
     readonly property int torrentPanelHeight: 150
     readonly property int netDiskPanelHeight: 300
-    readonly property int generalPanelHeight: 150
-    readonly property int footerHeight: GTheme.titleBarHeight + GTheme.space2XL
+    readonly property bool compactDialog: width < 560
+    readonly property int generalPanelHeight: compactDialog ? 330 : 150
+    readonly property int footerHeight: compactDialog
+                                        ? GTheme.sizeDefault * 2 + GTheme.spaceLG * 3
+                                        : GTheme.titleBarHeight + GTheme.space2XL
     readonly property int actionButtonWidth: 100
     readonly property int cancelButtonWidth: 80
 
     // 视觉令牌别名:减少本文件重复,仍全部来自 GTheme
-    readonly property int contentPadding: GTheme.space2XL
+    readonly property int contentPadding: compactDialog ? GTheme.spaceLG : GTheme.space2XL
     readonly property int contentSpacing: GTheme.spaceSM
-    readonly property int cardPadding: GTheme.spaceSM
+    readonly property int cardPadding: GTheme.spaceMD
 
     // Element Plus 风格背景
     background: Rectangle {
-        color: GTheme.bgWhite
-        radius: GTheme.radiusBase
+        color: GTheme.surfaceElevated
+        radius: GTheme.radiusLarge
         border.width: 1
         border.color: GTheme.borderLight
 
@@ -70,6 +74,7 @@ Popup {
         // 主要内容区域
         ScrollView {
             id: scrollArea
+            objectName: "taskDialogScroll"
             Layout.fillWidth: true
             Layout.fillHeight: true
             // 最小高度取小值:窗口较矮时本区可收缩、内部滚动,
@@ -99,18 +104,21 @@ Popup {
 
                     RowLayout {
                         anchors.fill: parent
+                        anchors.leftMargin: GTheme.spaceSM
+                        anchors.rightMargin: GTheme.spaceSM
                         spacing: 0
 
                         Repeater {
                             id: tabRepeater
                             model: [
-                                { name: qsTr("URL"), icon: SegoeFluentIcons.Link },
-                                { name: qsTr("Torrent"), icon: SegoeFluentIcons.CloudDownload },
-                                { name: qsTr("Baidu"), icon: SegoeFluentIcons.Cloud }
+                                { name: qsTr("URL"), iconName: "link" },
+                                { name: qsTr("Torrent"), iconName: "cloud-download" },
+                                { name: qsTr("Baidu"), iconName: "cloud" }
                             ]
 
                             GButton {
                                 variant: "nav"
+                                objectName: "taskSourceTab" + index
                                 required property int index
                                 required property var modelData
 
@@ -118,11 +126,13 @@ Popup {
                                 Layout.preferredHeight: GTheme.navItemHeight
                                 checkable: true
                                 checked: index === tabNavigation.currentIndex
-                                iconSource: modelData.icon
+                                iconName: modelData.iconName
                                 text: modelData.name
+                                Accessible.name: modelData.name
                                 ButtonGroup.group: tabGroup
                                 onClicked: {
                                     tabNavigation.currentIndex = index
+                                    taskPage.validationMessage = ""
                                 }
                             }
                         }
@@ -146,13 +156,14 @@ Popup {
                     property int urlType: 0
 
                     // URL 输入页面
-                    GCard {
-                        outlined: true
-                        padding: taskPage.cardPadding
-                        Layout.preferredHeight: taskPage.urlPanelHeight
-                        ColumnLayout {
-                            anchors.fill: parent
-                            spacing: 0
+                        GCard {
+                            outlined: true
+                            padding: taskPage.cardPadding
+                            Layout.preferredHeight: taskPage.urlPanelHeight
+                            ColumnLayout {
+                                anchors.fill: parent
+                                anchors.margins: taskPage.cardPadding
+                                spacing: 0
                             ScrollView{
                                 id:view_input
                                 Layout.fillWidth: true
@@ -168,6 +179,12 @@ Popup {
                                     placeholderTextColor: GTheme.textPlaceholder
                                     selectByMouse: true
                                     wrapMode: TextArea.Wrap
+                                    activeFocusOnTab: enabled && visible
+                                    Accessible.name: qsTr("Download URLs")
+                                    onTextChanged: {
+                                        if (text.trim().length > 0)
+                                            taskPage.validationMessage = ""
+                                    }
 
                                     background: Rectangle {
                                         color: GTheme.fillLighter
@@ -199,27 +216,32 @@ Popup {
                     }
 
                     // Torrent 文件页面
-                    GCard {
-                        outlined: true
-                        padding: taskPage.cardPadding
-                        Layout.preferredHeight: taskPage.torrentPanelHeight
-                        GDropArea {
-                            id: dropTorrent
-                            anchors.fill: parent
-                            visible: true
+                        GCard {
+                            outlined: true
+                            padding: taskPage.cardPadding
+                            Layout.preferredHeight: taskPage.torrentPanelHeight
+                            GDropArea {
+                                id: dropTorrent
+                                objectName: "taskTorrentDropArea"
+                                anchors.fill: parent
+                                anchors.margins: taskPage.cardPadding
+                                visible: true
                             onAccepted: {
                                 let model = BrowserManager.GetFilePreviewModel(dropTorrent.path)
                                 if (model) {
                                     dropTorrent.visible = false
                                     filePreview.previewModel = model
+                                    taskPage.validationMessage = ""
                                 }
                             }
                         }
 
-                        FilePreviewList {
-                            id: filePreview
-                            anchors.fill: parent
-                            visible: !dropTorrent.visible
+                            FilePreviewList {
+                                id: filePreview
+                                objectName: "taskTorrentFilePreview"
+                                anchors.fill: parent
+                                anchors.margins: taskPage.cardPadding
+                                visible: !dropTorrent.visible
                             onClearRequested: {
                                 filePreview.previewModel.clear()
                                 filePreview.previewModel = null
@@ -229,14 +251,15 @@ Popup {
                     }
 
                     // 百度网盘页面
-                    GCard {
-                        outlined: true
-                        padding: taskPage.cardPadding
-                        Layout.fillHeight: true
-                        Layout.preferredHeight: taskPage.netDiskPanelHeight
-                        NetDiskPageView {
-                            id: netDiskPageView
+                        GCard {
+                            outlined: true
+                            padding: taskPage.cardPadding
+                            Layout.fillHeight: true
+                            Layout.preferredHeight: taskPage.netDiskPanelHeight
+                            NetDiskPageView {
+                                id: netDiskPageView
                             anchors.fill: parent
+                            anchors.margins: taskPage.cardPadding
                             // NetDiskPageView 根为 Rectangle，默认无隐式高度，提供一个合理的缺省高度
                         }
                     }
@@ -279,18 +302,27 @@ Popup {
                         if (generalConfig.saveDirectory.length > 0) {
                             options["dir"] = generalConfig.saveDirectory
                         }
-                        if (additionalConfig.userAgentText.length > 0) {
-                            options["user-agent"] = additionalConfig.userAgentText
-                        }
-                        if (additionalConfig.authorizationText.length > 0) {
-                            options["http-auth-challenge"] = "true"
-                            headers.push(String("Authorization: %1").arg(additionalConfig.authorizationText))
-                        }
-                        if (additionalConfig.cookieText.length > 0) {
-                            headers.push(String("Cookie: %1").arg(additionalConfig.cookieText))
-                        }
-                        if (additionalConfig.referrerText.length > 0) {
-                            options["referer"] = additionalConfig.referrerText
+                        if (currentIndex === 0) {
+                            if (additionalConfig.userAgentText.length > 0) {
+                                options["user-agent"] = additionalConfig.userAgentText
+                            }
+                            if (additionalConfig.authorizationText.length > 0) {
+                                options["http-auth-challenge"] = "true"
+                                headers.push(String("Authorization: %1").arg(additionalConfig.authorizationText))
+                            }
+                            if (additionalConfig.cookieText.length > 0) {
+                                headers.push(String("Cookie: %1").arg(additionalConfig.cookieText))
+                            }
+                            if (additionalConfig.referrerText.length > 0) {
+                                options["referer"] = additionalConfig.referrerText
+                            }
+                            const customHeaders = additionalConfig.collectRequestHeaders()
+                            if (customHeaders.length > 0) {
+                                headers = headers.concat(customHeaders)
+                            }
+                            if (headers.length > 0) {
+                                options["header"] = headers
+                            }
                         }
                         if (currentIndex === 1) {
                             // previewModel 初始为 null（未拖入 torrent 时），直接访问会空指针崩溃
@@ -300,16 +332,26 @@ Popup {
                                     options["select-file"] = select_files.join()
                                 }
                             }
-                        }
-                        let customHeaders = additionalConfig.collectRequestHeaders()
-                        if (customHeaders.length > 0) {
-                            headers = headers.concat(customHeaders)
-                        }
-                        if (headers.length > 0) {
-                            options["header"] = headers
+                            // Metalink 与 Torrent 共用导入标签，但 BT 任务选项只传给 addTorrent。
+                            if (taskPageLayout.urlType === 2 && advanced.checked) {
+                                const torrentOptions = additionalConfig.collectTorrentOptions()
+                                for (const key in torrentOptions)
+                                    options[key] = torrentOptions[key]
+                            }
                         }
                         return options
                     }
+                }
+
+                AlertTip {
+                    objectName: "taskDialogValidationAlert"
+                    Layout.fillWidth: true
+                    visible: taskPage.validationMessage.length > 0
+                    severity: "danger"
+                    title: qsTr("Check the task details")
+                    description: taskPage.validationMessage
+                    showClose: true
+                    onCloseRequested: taskPage.validationMessage = ""
                 }
 
                 // 基础配置区域
@@ -324,6 +366,7 @@ Popup {
                 // 高级配置区域
                 TaskAdvancedOptionsCard {
                     id: additionalConfig
+                    optionMode: tabNavigation.currentIndex === 1 ? "torrent" : "http"
                     standardSpacing: taskPage.contentSpacing
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -346,31 +389,41 @@ Popup {
             objectName: "taskDialogFooter"
             Layout.fillWidth: true
             Layout.preferredHeight: taskPage.footerHeight
-            color: GTheme.bgWhite
+            color: GTheme.surfaceElevated
 
-            RowLayout {
+            GridLayout {
                 anchors.fill: parent
                 anchors.leftMargin: taskPage.contentPadding
                 anchors.rightMargin: taskPage.contentPadding
-                spacing: taskPage.contentSpacing
+                anchors.topMargin: taskPage.compactDialog ? GTheme.spaceLG : 0
+                anchors.bottomMargin: taskPage.compactDialog ? GTheme.spaceLG : 0
+                columns: taskPage.compactDialog ? 2 : 4
+                rowSpacing: GTheme.spaceSM
+                columnSpacing: taskPage.contentSpacing
 
                 // 高级选项开关
                 GCheckBox {
                     id: advanced
+                    objectName: "taskAdvancedOptionsToggle"
                     text: qsTr("Advanced Options")
                     visible: tabNavigation.currentIndex !== 2
                     Layout.alignment: Qt.AlignVCenter
+                    Layout.columnSpan: taskPage.compactDialog ? 2 : 1
 
                 }
 
                 Item {
                     Layout.fillWidth: true
+                    visible: !taskPage.compactDialog
+                    Layout.columnSpan: advanced.visible ? 1 : 2
                 }
 
                 // 取消按钮
                 GButton {
+                    objectName: "btnCancelTask"
                     text: qsTr("Cancel")
-                    Layout.preferredWidth: taskPage.cancelButtonWidth
+                    Layout.fillWidth: taskPage.compactDialog
+                    Layout.preferredWidth: taskPage.compactDialog ? -1 : taskPage.cancelButtonWidth
                     Layout.preferredHeight: GTheme.sizeDefault
                     onClicked: taskPage.close()
                 }
@@ -380,29 +433,42 @@ Popup {
                     type: 1  // Primary
                     objectName: "btnCreateTask"
                     text: qsTr("Add Task")
-                    Layout.preferredWidth: taskPage.actionButtonWidth
+                    Layout.fillWidth: taskPage.compactDialog
+                    Layout.preferredWidth: taskPage.compactDialog ? -1 : taskPage.actionButtonWidth
                     Layout.preferredHeight: GTheme.sizeDefault
                     onClicked: {
                         let taskAdded = true
                         if (tabNavigation.currentIndex !== 2) {
                             taskAdded = false
                             let url = taskPageLayout.geturls()
+                            if (tabNavigation.currentIndex === 1 &&
+                                    taskPageLayout.urlType === 2 && advanced.checked) {
+                                const optionError = additionalConfig.torrentValidationMessage()
+                                if (optionError.length > 0) {
+                                    taskPage.validationMessage = optionError
+                                    ToastManager.ShowError(taskPage.validationMessage)
+                                    return
+                                }
+                            }
                             let options = taskPageLayout.getOptions()
                             if (taskPageLayout.urlType === 0) {
                                 if (url.length === 0) {
-                                    ToastManager.ShowError(qsTr("Please enter at least one download URL."))
+                                    taskPage.validationMessage = qsTr("Please enter at least one download URL.")
+                                    ToastManager.ShowError(taskPage.validationMessage)
                                     return
                                 }
                                 taskAdded = BrowserManager.AddHttpTask(url, options)
                             } else if (taskPageLayout.urlType === 1) {
                                 if (url.length === 0) {
-                                    ToastManager.ShowError(qsTr("Please select a Torrent or Metalink file."))
+                                    taskPage.validationMessage = qsTr("Please select a Torrent or Metalink file.")
+                                    ToastManager.ShowError(taskPage.validationMessage)
                                     return
                                 }
                                 taskAdded = BrowserManager.AddMetalinkTask(url, options)
                             } else if (taskPageLayout.urlType === 2) {
                                 if (url.length === 0) {
-                                    ToastManager.ShowError(qsTr("Please select a Torrent or Metalink file."))
+                                    taskPage.validationMessage = qsTr("Please select a Torrent or Metalink file.")
+                                    ToastManager.ShowError(taskPage.validationMessage)
                                     return
                                 }
                                 taskAdded = BrowserManager.AddTorrentTask(url, options)

@@ -4,187 +4,201 @@ import QtQuick.Layouts
 import "../../CommonComponents"
 import gdl.sdk
 
-// 功能亮点卡片 - 展示浏览器插件核心功能
-// 颜色/尺寸/间距/字号/圆角/动效一律取自 GTheme 令牌,零魔法数字
-// 装饰色(紫/青/粉)按 spec Section 7 保留为局部常量:EP 令牌体系无对应语义色
+// Aurora browser-extension capability overview. The grid collapses from
+// three columns to two/one without changing the feature content.
 GCard {
     id: featureCard
-    Layout.fillWidth: true
-    // 单层边距补偿(上下各 spaceLG):消除原 GCard padding:16 + 内层 margins:16 的双重边距
-    Layout.preferredHeight: contentLayout.implicitHeight + 2 * GTheme.spaceLG
-    outlined: true
-    padding: GTheme.spaceLG
+    objectName: "extensionFeatureCard"
 
-    // ========== 装饰色(spec Section 7)==========
-    // EP 令牌体系无紫/青/粉语义对应,保留为局部常量;仅用于功能图标着色,不随深浅色切换
-    readonly property color decorationPurple: "#722ED1"
-    readonly property color decorationCyan: "#13C2C2"
-    readonly property color decorationMagenta: "#EB2F96"
+    Layout.fillWidth: true
+    implicitHeight: contentLayout.implicitHeight + padding * 2
+    outlined: true
+    hoverEnabled: false
+    interactive: false
+    variant: "elevated"
+    padding: GTheme.spaceLG
+    radius: GTheme.radiusLarge
+
+    readonly property int gridColumns: width >= 760 ? 3 : (width >= 460 ? 2 : 1)
 
     ColumnLayout {
         id: contentLayout
         anchors.fill: parent
-        // 内层边距收为 0:GCard 已通过 padding=spaceLG 提供单层内边距,避免双重边距
-        anchors.margins: 0
+        anchors.margins: featureCard.padding
         spacing: GTheme.spaceLG
 
-        // 卡片标题
         ColumnLayout {
             Layout.fillWidth: true
+            Layout.minimumWidth: 0
             spacing: GTheme.spaceXS
 
             Text {
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 text: qsTr("Feature Highlights")
                 font.pixelSize: GTheme.fontSubtitle
-                font.weight: GTheme.weightMedium
+                font.weight: GTheme.weightDemiBold
                 color: GTheme.textPrimary
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             }
 
             Text {
-                text: qsTr("Discover what makes our browser extension special")
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                text: qsTr("Capture, filter, and hand off browser downloads without leaving your current page.")
                 font.pixelSize: GTheme.fontCaption
                 color: GTheme.textSecondary
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             }
         }
 
-        // 功能网格 - 2行3列
         GridLayout {
+            id: featureGrid
+            objectName: "extensionFeatureGrid"
             Layout.fillWidth: true
-            columns: 3
-            rowSpacing: GTheme.spaceLG
-            columnSpacing: GTheme.spaceLG
+            Layout.minimumWidth: 0
+            columns: featureCard.gridColumns
+            columnSpacing: GTheme.spaceMD
+            rowSpacing: GTheme.spaceMD
 
-            // 功能 1: One-Click Capture
             FeatureItem {
-                Layout.fillWidth: true
-                icon: "\uE71B"  // link icon
+                iconName: "link"
                 title: qsTr("One-Click Capture")
-                description: qsTr("Quickly capture download links from web pages")
-                iconColor: GTheme.primaryColor
+                description: qsTr("Capture downloadable links from the page you are viewing.")
+                accent: "primary"
             }
 
-            // 功能 2: Batch Download
             FeatureItem {
-                Layout.fillWidth: true
-                icon: "\uE945"  // flash icon
+                iconName: "lightning"
                 title: qsTr("Batch Download")
-                description: qsTr("Select multiple links and send them all at once")
-                iconColor: GTheme.warningColor  // 橙:映射到 warning 语义色
+                description: qsTr("Select multiple links and send the complete group at once.")
+                accent: "warning"
             }
 
-            // 功能 3: Unified UI
             FeatureItem {
-                Layout.fillWidth: true
-                icon: "\uE790"  // palette icon
-                title: qsTr("Unified UI")
-                description: qsTr("Perfectly matches GDownload's Element Plus design")
-                iconColor: featureCard.decorationPurple  // 紫:装饰色(无 EP 语义对应)
+                iconName: "palette"
+                title: qsTr("Unified Experience")
+                description: qsTr("Use the same Aurora visual language as the desktop application.")
+                accent: "info"
             }
 
-            // 功能 4: Secure Connection
             FeatureItem {
-                Layout.fillWidth: true
-                icon: "\uE72E"  // lock icon
-                title: qsTr("Secure Connection")
-                description: qsTr("Direct WebSocket connection to aria2c via JSON-RPC")
-                iconColor: GTheme.successColor  // 绿:映射到 success 语义色
+                iconName: "lock"
+                title: qsTr("Local Connection")
+                description: qsTr("Connect directly to the local aria2c JSON-RPC endpoint.")
+                accent: "success"
             }
 
-            // 功能 5: Cross-Browser
             FeatureItem {
-                Layout.fillWidth: true
-                icon: "\uE774"  // globe icon
+                iconName: "globe"
                 title: qsTr("Cross-Browser")
-                description: qsTr("Compatible with Chrome, Firefox, and Edge")
-                iconColor: featureCard.decorationCyan  // 青:装饰色(无 EP 语义对应)
+                description: qsTr("Use the extension with Chrome, Firefox, and Edge.")
+                accent: "primary"
             }
 
-            // 功能 6: Smart Filtering
             FeatureItem {
-                Layout.fillWidth: true
-                icon: "\uE71C"  // filter icon
+                iconName: "filter"
                 title: qsTr("Smart Filtering")
-                description: qsTr("Filter links by file size, type, and custom rules")
-                iconColor: featureCard.decorationMagenta  // 粉:装饰色(无 EP 语义对应)
+                description: qsTr("Filter links by size, type, domain, and custom rules.")
+                accent: "info"
             }
         }
     }
 
-    // 功能项组件
     component FeatureItem: Rectangle {
-        property string icon: ""
+        property string iconName: "info"
         property string title: ""
         property string description: ""
-        property color iconColor: GTheme.primaryColor
+        property string accent: "primary"
 
-        // 上下内边距各 spaceMD,补偿 itemLayout 的 anchors.margins
-        implicitHeight: itemLayout.implicitHeight + 2 * GTheme.spaceMD
-        color: "transparent"
-        radius: GTheme.radiusBase
+        readonly property color accentColor: {
+            switch (accent) {
+            case "success": return GTheme.successColor
+            case "warning": return GTheme.warningColor
+            case "info": return GTheme.infoColor
+            default: return GTheme.primaryColor
+            }
+        }
+        readonly property color accentBackground: {
+            switch (accent) {
+            case "success": return GTheme.bgSuccess
+            case "warning": return GTheme.bgWarning
+            case "info": return GTheme.bgInfo
+            default: return GTheme.dark ? GTheme.fillLight : GTheme.primaryLight(9)
+            }
+        }
 
-        // 悬停效果
+        Layout.fillWidth: true
+        Layout.minimumWidth: 0
+        Layout.preferredHeight: Math.max(GTheme.sizeLarge * 2,
+                                         itemLayout.implicitHeight + GTheme.spaceMD * 2)
+        radius: GTheme.radiusMedium
+        color: hoverHandler.hovered ? GTheme.fillLight : GTheme.surfaceBase
+        border.width: 1
+        border.color: hoverHandler.hovered ? accentColor : GTheme.borderLighter
+
+        Behavior on color {
+            ColorAnimation { duration: GTheme.durationFast }
+        }
+        Behavior on border.color {
+            ColorAnimation { duration: GTheme.durationFast }
+        }
+
         HoverHandler {
             id: hoverHandler
         }
 
-        // 背景色变化
-        Rectangle {
-            anchors.fill: parent
-            radius: GTheme.radiusBase
-            color: hoverHandler.hovered ? GTheme.fillLighter : "transparent"
-            opacity: 0.5
-
-            Behavior on color {
-                ColorAnimation {
-                    duration: GTheme.durationBase
-                }
-            }
-        }
-
-        ColumnLayout {
+        RowLayout {
             id: itemLayout
             anchors.fill: parent
             anchors.margins: GTheme.spaceMD
-            spacing: GTheme.spaceSM
+            spacing: GTheme.spaceMD
 
-            // 图标
-            Text {
-                text: icon
-                font.family: "Segoe Fluent Icons"
-                font.pixelSize: 32  // 图标尺寸,保留(非设计令牌)
-                color: iconColor
-                Layout.alignment: Qt.AlignHCenter
+            Rectangle {
+                Layout.preferredWidth: GTheme.sizeLarge
+                Layout.preferredHeight: GTheme.sizeLarge
+                Layout.minimumWidth: GTheme.sizeLarge
+                Layout.minimumHeight: GTheme.sizeLarge
+                Layout.alignment: Qt.AlignTop
+                radius: GTheme.radiusMedium
+                color: accentBackground
 
-                // 悬停时的脉冲动画
-                scale: hoverHandler.hovered ? 1.1 : 1.0
-                Behavior on scale {
-                    NumberAnimation {
-                        duration: GTheme.durationBase
-                        easing.type: GTheme.easingStandard
-                    }
+                AuroraIcon {
+                    anchors.centerIn: parent
+                    name: iconName
+                    iconSize: GTheme.fontSubtitle
+                    color: accentColor
                 }
             }
 
-            // 标题
-            Text {
-                text: title
-                font.pixelSize: GTheme.fontBody
-                font.weight: GTheme.weightMedium
-                color: GTheme.textPrimary
-                horizontalAlignment: Text.AlignHCenter
+            ColumnLayout {
                 Layout.fillWidth: true
-                wrapMode: Text.WordWrap
-            }
+                Layout.minimumWidth: 0
+                Layout.alignment: Qt.AlignTop
+                spacing: GTheme.spaceXS
 
-            // 描述
-            Text {
-                text: description
-                font.pixelSize: GTheme.fontCaption
-                color: GTheme.textSecondary
-                horizontalAlignment: Text.AlignHCenter
-                Layout.fillWidth: true
-                wrapMode: Text.WordWrap
-                lineHeight: 1.4
+                Text {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
+                    text: title
+                    font.pixelSize: GTheme.fontBody
+                    font.weight: GTheme.weightDemiBold
+                    color: GTheme.textPrimary
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    maximumLineCount: 2
+                    elide: Text.ElideRight
+                }
+
+                Text {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
+                    text: description
+                    font.pixelSize: GTheme.fontCaption
+                    color: GTheme.textSecondary
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    maximumLineCount: 3
+                    elide: Text.ElideRight
+                }
             }
         }
     }

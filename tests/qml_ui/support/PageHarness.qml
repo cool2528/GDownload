@@ -8,14 +8,16 @@ import gdl.sdk 1.0
 // 桩单例随后 emit darkChanged() 触发页面所有 GTheme.X 绑定刷新。
 // 必须显式 `import gdl.sdk 1.0` 才能引用 GTheme 单例与 GThemeType 枚举,
 // 否则 QML 引擎报 ReferenceError: GTheme is not defined。
-Item {
+Rectangle {
     id: harness
+    color: GTheme.bgPage
     property string themeMode: "light"
     property alias source: loader.source
     // 已加载项引用(Loader.item):供视觉用例对 Popup/Dialog 类组件调用 open()
     // 等方法。Loader 未加载时为 null。
     property alias loadedItem: loader.item
     function load(url) { loader.source = url }
+    function loadWithProperties(url, properties) { loader.setSource(url, properties) }
 
     // 主题切换:GThemeType 枚举值 kSystem=0 kLight=1 kDark=2
     // 枚举名沿用 C++ enum class 原名(带 k 前缀),与 ThemeSwitch.qml 调用一致。
@@ -42,6 +44,7 @@ Item {
     Loader {
         id: loader
         anchors.fill: parent
+        asynchronous: false
         // 被加载页面根 Item 多数未声明 anchors.fill: parent(如 DownloadPageView
         // 根是 Item,仅内部 RowLayout anchors.fill: parent),默认尺寸 0x0 导致
         // grabToImage 截图为空白。这里在 onLoaded 把加载项尺寸绑定到 Loader,

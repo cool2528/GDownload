@@ -8,6 +8,9 @@ import gdl.sdk
 Button {
     id: control
 
+    activeFocusOnTab: enabled && visible
+    Accessible.name: control.text
+
     // ===== 向后兼容 API(勿删,59 处调用依赖)=====
     // 0=default,1=primary
     property int type: 0
@@ -28,6 +31,8 @@ Button {
     property int iconSize: GTheme.fontBody
     // 哨兵 transparent:为空则自动跟随文字色/类型色,调用方一般无需设置
     property color iconColor: "transparent"
+    // Aurora 语义 SVG 图标名；优先于 iconSource/imageSource。
+    property string iconName: ""
     // 图片图标(与 FontIcon 二选一,用于 SVG 等非字体图标)
     property url imageSource: ""
     property url hoverImage: ""
@@ -37,11 +42,12 @@ Button {
     // ===== 派生状态 =====
     readonly property bool isNav: variant === "nav"
     readonly property bool isChip: variant === "chip"
+    readonly property bool hasSemanticIcon: iconName.length > 0
     readonly property bool hasIcon: iconSource > 0
-    readonly property bool hasImage: String(imageSource).length > 0
+    readonly property bool hasImage: imageSource.toString().length > 0
     readonly property bool hasText: control.text !== ""
     // 纯图标态:有图标/图片但无文字,且非导航
-    readonly property bool iconOnly: (hasIcon || hasImage) && !hasText && !isNav
+    readonly property bool iconOnly: (hasSemanticIcon || hasIcon || hasImage) && !hasText && !isNav
 
     readonly property string resolvedType: (function () {
         if (buttonType && buttonType.length > 0)
@@ -52,7 +58,7 @@ Button {
     // 导航选中指示条宽度(Element Plus 设计常量)
     readonly property int navIndicatorWidth: 3
     // 彩色按钮上的文字色恒为白(不随主题),不走 ElementPlusColors 直调
-    readonly property color onAccentText: "#FFFFFF"
+    readonly property color onAccentText: GTheme.textInverse
 
     // 尺寸规格(令牌)
     readonly property int implicitH: isNav ? GTheme.navItemHeight : (isChip ? GTheme.sizeSmall : (size === "large" ? GTheme.sizeLarge : (size === "small" ? GTheme.sizeSmall : GTheme.sizeDefault)))
@@ -93,8 +99,8 @@ Button {
             },
             "primary": {
                 bg: GTheme.primaryColor,
-                bgHover: GTheme.primaryLight(3),
-                bgChecked: GTheme.primaryLight(5),
+                bgHover: GTheme.brandHover,
+                bgChecked: GTheme.brandPressed,
                 text: control.onAccentText,
                 textHover: control.onAccentText,
                 textChecked: control.onAccentText,
@@ -162,8 +168,8 @@ Button {
             },
             "primary": {
                 bg: GTheme.primaryColor,
-                bgHover: GTheme.primaryLight(3),
-                bgChecked: GTheme.primaryLight(5),
+                bgHover: GTheme.brandHover,
+                bgChecked: GTheme.brandPressed,
                 text: control.onAccentText,
                 textHover: control.onAccentText,
                 textChecked: control.onAccentText,
@@ -335,15 +341,30 @@ Button {
         }
 
         // ===== 导航内容:左对齐 图标 + 文本 =====
-        FontIcon {
+        Item {
             id: navIcon
             visible: control.isNav
-            iconSize: control.iconSize
-            iconSource: control.iconSource
+            width: control.iconSize
+            height: control.iconSize
             anchors.left: parent.left
             anchors.leftMargin: GTheme.spaceLG
             anchors.verticalCenter: parent.verticalCenter
-            color: control.effIconColor
+
+            AuroraIcon {
+                anchors.centerIn: parent
+                visible: control.hasSemanticIcon
+                name: control.hasSemanticIcon ? control.iconName : "info"
+                iconSize: control.iconSize
+                color: control.effIconColor
+            }
+
+            FontIcon {
+                anchors.centerIn: parent
+                visible: !control.hasSemanticIcon && control.hasIcon
+                iconSize: control.iconSize
+                iconSource: control.iconSource
+                color: control.effIconColor
+            }
         }
         Text {
             id: navText
@@ -366,19 +387,27 @@ Button {
             id: stdRow
             visible: !control.isNav
             anchors.centerIn: parent
-            spacing: (control.hasText && (control.hasIcon || control.hasImage)) ? GTheme.spaceSM : 0
+            spacing: (control.hasText && (control.hasSemanticIcon || control.hasIcon || control.hasImage)) ? GTheme.spaceSM : 0
+
+            AuroraIcon {
+                visible: control.hasSemanticIcon
+                anchors.verticalCenter: parent.verticalCenter
+                name: control.hasSemanticIcon ? control.iconName : "info"
+                iconSize: control.iconSize
+                color: control.effIconColor
+            }
 
             FontIcon {
-                visible: control.hasIcon && !control.hasImage
+                visible: control.hasIcon && !control.hasSemanticIcon && !control.hasImage
                 anchors.verticalCenter: parent.verticalCenter
                 iconSize: control.iconSize
                 iconSource: control.iconSource
                 color: control.effIconColor
             }
             Image {
-                visible: control.hasImage
+                visible: control.hasImage && !control.hasSemanticIcon
                 anchors.verticalCenter: parent.verticalCenter
-                source: (String(control.hoverImage).length > 0 && control.hovered) ? control.hoverImage : control.imageSource
+                source: (control.hoverImage.toString().length > 0 && control.hovered) ? control.hoverImage : control.imageSource
                 width: control.imageSize.width
                 height: control.imageSize.height
                 mipmap: true
@@ -404,6 +433,18 @@ Button {
                 }
             }
         }
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        anchors.margins: -2
+        radius: (control.variant === "round" || control.variant === "circle")
+                ? GTheme.radiusRound : control.radius + 2
+        color: "transparent"
+        border.width: 2
+        border.color: GTheme.focusRing
+        visible: control.activeFocus
+        z: 2
     }
 
     // 鼠标指针形状

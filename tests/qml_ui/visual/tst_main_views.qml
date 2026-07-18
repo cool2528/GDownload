@@ -2,7 +2,7 @@ import QtQuick
 import QtTest
 import "qrc:/tests/qml_ui/support"
 
-// 视觉用例:4 主页面 × 2 主题 + 2 全窗 = 10 张截图
+// 视觉用例:主页面、全窗与下载页窄宽回归。
 //
 // 覆盖范围:
 //   - DownloadPageView  下载页主视图(左侧导航 + 列表堆栈)
@@ -53,12 +53,54 @@ TestCase {
         verify(ok, "Screenshot.capture failed for " + tag)
     }
 
+    function loadDownloadStateAndCapture(index, tag, theme) {
+        harness.themeMode = theme
+        harness.loadWithProperties("qrc:/qml/Browser/DownloadPageView.qml", {
+            "currentIndex": index
+        })
+        wait(250)
+        verify(harness.loadedItem !== null, "DownloadPageView failed to load")
+        compare(harness.loadedItem.currentIndex, index)
+        wait(400)
+        var pageNames = ["downloadPage", "waitingPage", "completedPage"]
+        var lifecyclePage = findChild(harness.loadedItem, pageNames[index])
+        verify(lifecyclePage !== null, "Missing lifecycle page for " + tag)
+        lifecyclePage.refreshLayout()
+        wait(200)
+        verify(findChild(lifecyclePage, "downloadTaskCard") !== null,
+               "Lifecycle screenshot has no task card for " + tag)
+        var ok = Screenshot.capture(harness, tag, harness.themeMode)
+        verify(ok, "Screenshot.capture failed for " + tag)
+    }
+
     // ---- DownloadPageView ----
     function test_download_light() {
         loadAndCapture("qrc:/qml/Browser/DownloadPageView.qml", "download_light", "light")
     }
     function test_download_dark() {
         loadAndCapture("qrc:/qml/Browser/DownloadPageView.qml", "download_dark", "dark")
+    }
+
+    function test_download_narrow_light() {
+        testCase.width = 640
+        testCase.height = 720
+        wait(120)
+        loadAndCapture("qrc:/qml/Browser/DownloadPageView.qml", "download_narrow_light", "light")
+    }
+
+    function test_download_narrow_dark() {
+        testCase.width = 640
+        testCase.height = 720
+        wait(120)
+        loadAndCapture("qrc:/qml/Browser/DownloadPageView.qml", "download_narrow_dark", "dark")
+    }
+
+    function test_download_waiting_light() {
+        loadDownloadStateAndCapture(1, "download_waiting_light", "light")
+    }
+
+    function test_download_stopped_light() {
+        loadDownloadStateAndCapture(2, "download_stopped_light", "light")
     }
 
     // ---- HomePage (Browser/HomePage.qml) ----
@@ -68,6 +110,34 @@ TestCase {
     function test_home_dark() {
         loadAndCapture("qrc:/qml/Browser/HomePage.qml", "home_dark", "dark")
     }
+
+    function captureHomeNarrow(theme) {
+        testCase.width = 520
+        testCase.height = 900
+        wait(120)
+        harness.themeMode = theme
+        harness.load("qrc:/qml/Browser/HomePage.qml")
+        wait(300)
+        verify(harness.loadedItem !== null, "HomePage failed to load")
+
+        var names = ["homeAddDownloadButton", "homeActiveMetric",
+                     "homeWaitingMetric", "homeCompletedMetric",
+                     "homeAddUrlAction", "homeAddTorrentAction", "homeAddBaiduAction"]
+        for (var i = 0; i < names.length; ++i) {
+            var item = findChild(harness.loadedItem, names[i])
+            verify(item !== null, "Missing Home item: " + names[i])
+            var left = item.mapToItem(harness.loadedItem, 0, 0)
+            var right = item.mapToItem(harness.loadedItem, item.width, 0)
+            verify(left.x >= -1, names[i] + " exceeds HomePage left edge")
+            verify(right.x <= harness.loadedItem.width + 1,
+                   names[i] + " exceeds HomePage right edge")
+        }
+
+        verify(Screenshot.capture(harness, "home_narrow_" + theme, theme))
+    }
+
+    function test_home_narrow_light() { captureHomeNarrow("light") }
+    function test_home_narrow_dark() { captureHomeNarrow("dark") }
 
     // ---- NetDiskPageView (CommonComponents/NetDiskPageView.qml) ----
     function test_netdisk_light() {
@@ -79,19 +149,20 @@ TestCase {
 
     // ---- NavigatorView (Navigator/NavigatorView.qml) ----
     function test_navigator_light() {
-        loadAndCapture("qrc:/qml/Navigator/NavigatorView.qml", "navigator_light", "light")
+        loadAndCapture("qrc:/tests/qml_ui/support/NavigatorPreview.qml", "navigator_light", "light")
     }
     function test_navigator_dark() {
-        loadAndCapture("qrc:/qml/Navigator/NavigatorView.qml", "navigator_dark", "dark")
+        loadAndCapture("qrc:/tests/qml_ui/support/NavigatorPreview.qml", "navigator_dark", "dark")
     }
 
-    // ---- mainWindow (顶层主窗口) ----
-    // 依赖 FramelessHelper QML 模块;若未注册,Loader.item 为 null,截图仍会产出
+    // ---- Application Shell Preview ----
+    // 使用真实 TitleBar/Navigator/Browser 组合，避开 offscreen 下 FramelessHelper
+    // 原生窗口钩子限制，确保截图能覆盖 Aurora 壳层而不是空白 harness。
     function test_mainwindow_light() {
-        loadAndCapture("qrc:/qml/mainWindow.qml", "mainwindow_light", "light")
+        loadAndCapture("qrc:/tests/qml_ui/support/ApplicationShellPreview.qml", "mainwindow_light", "light")
     }
     function test_mainwindow_dark() {
-        loadAndCapture("qrc:/qml/mainWindow.qml", "mainwindow_dark", "dark")
+        loadAndCapture("qrc:/tests/qml_ui/support/ApplicationShellPreview.qml", "mainwindow_dark", "dark")
     }
 
     // ---- full window (1920x1080 DownloadPageView) ----
@@ -107,4 +178,5 @@ TestCase {
         wait(120)
         loadAndCapture("qrc:/qml/Browser/DownloadPageView.qml", "full_window_dark", "dark")
     }
+
 }

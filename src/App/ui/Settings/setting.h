@@ -99,7 +99,7 @@ namespace gdl {
 			// Language
 			SETTING_IMP_BEGIN(Language, CONFIG_KEY_PATH(Language), QString)
 			void Default() override {
-				value_ = "zh-cn";
+				value_ = "zh_CN";
 			}
 			void Put(const QVariant& value) override {
 				value_ = value.toString();

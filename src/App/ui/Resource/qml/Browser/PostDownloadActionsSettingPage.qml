@@ -9,7 +9,9 @@ import gdl.sdk
 // 颜色/尺寸/间距/字号/动效一律取自 GTheme 令牌,零魔法数字
 SettingCard {
     id: postDownloadActionsSettingPage
+    objectName: "postDownloadActionsSettingsCard"
     Layout.fillWidth: true
+    Layout.minimumWidth: 0
 
     title: qsTr("Post-Download Actions")
     description: qsTr("Configure automated actions after download completes, fails, or starts")
@@ -25,6 +27,8 @@ SettingCard {
             spacing: GTheme.spaceMD
 
             Text {
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 text: qsTr("When Download Completes")
                 font.pixelSize: GTheme.fontBody
                 font.weight: GTheme.weightMedium
@@ -33,8 +37,11 @@ SettingCard {
 
             GComBoBox {
                 id: completeActionComboBox
+                objectName: "completeActionComboBox"
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 Layout.preferredHeight: GTheme.sizeDefault
+                Accessible.name: qsTr("Action when download completes")
                 model: [
                     qsTr("Do Nothing"),
                     qsTr("Open File"),
@@ -54,11 +61,16 @@ SettingCard {
 
             // 自定义完成命令(仅在选择"自定义命令"时显示)
             ColumnLayout {
+                id: completeCommandSection
+                objectName: "completeCommandSection"
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 spacing: GTheme.spaceSM
                 visible: completeActionComboBox.currentIndex === 4
 
                 Text {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
                     text: qsTr("Custom Command")
                     font.pixelSize: GTheme.fontBody
                     color: GTheme.textPrimary
@@ -66,8 +78,11 @@ SettingCard {
 
                 GTextField {
                     id: customCompleteCommandField
+                    objectName: "customCompleteCommandField"
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 0
                     Layout.preferredHeight: GTheme.sizeDefault
+                    Accessible.name: qsTr("Command to run when download completes")
                     placeholderText: qsTr("e.g., notify-send \"Download Complete\" \"{file}\"")
                     text: SettingsManager.qCustomCompleteCommand
                     onTextChanged: {
@@ -77,9 +92,12 @@ SettingCard {
 
                 ColumnLayout {
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 0
                     spacing: GTheme.spaceXS
 
                     Text {
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 0
                         text: qsTr("Available variables:")
                         font.pixelSize: GTheme.fontCaption
                         color: GTheme.textSecondary
@@ -87,12 +105,15 @@ SettingCard {
                     }
 
                     Text {
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 0
                         text: qsTr("  {file} - Downloaded file path") + "\n" +
                               qsTr("  {dir} - Download directory path") + "\n" +
                               qsTr("  {gid} - Download task ID")
                         font.pixelSize: GTheme.fontCaption
                         color: GTheme.textSecondary
                         lineHeight: 1.5
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     }
 
                     // 示例框:原裸 Text 的 info 文字色幽灵令牌 → AlertTip(info)
@@ -118,6 +139,8 @@ SettingCard {
             spacing: GTheme.spaceMD
 
             Text {
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 text: qsTr("When Download Fails")
                 font.pixelSize: GTheme.fontBody
                 font.weight: GTheme.weightMedium
@@ -126,8 +149,11 @@ SettingCard {
 
             GComBoBox {
                 id: errorActionComboBox
+                objectName: "errorActionComboBox"
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 Layout.preferredHeight: GTheme.sizeDefault
+                Accessible.name: qsTr("Action when download fails")
                 model: [
                     qsTr("Do Nothing"),
                     qsTr("Play Sound"),
@@ -141,11 +167,16 @@ SettingCard {
 
             // 自定义错误命令(仅在选择"自定义命令"时显示)
             ColumnLayout {
+                id: errorCommandSection
+                objectName: "errorCommandSection"
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 spacing: GTheme.spaceSM
                 visible: errorActionComboBox.currentIndex === 2
 
                 Text {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
                     text: qsTr("Custom Command")
                     font.pixelSize: GTheme.fontBody
                     color: GTheme.textPrimary
@@ -153,8 +184,11 @@ SettingCard {
 
                 GTextField {
                     id: customErrorCommandField
+                    objectName: "customErrorCommandField"
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 0
                     Layout.preferredHeight: GTheme.sizeDefault
+                    Accessible.name: qsTr("Command to run when download fails")
                     placeholderText: qsTr("e.g., logger \"Download failed: {gid}\"")
                     text: SettingsManager.qCustomErrorCommand
                     onTextChanged: {
@@ -164,9 +198,12 @@ SettingCard {
 
                 ColumnLayout {
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 0
                     spacing: GTheme.spaceXS
 
                     Text {
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 0
                         text: qsTr("Available variables:")
                         font.pixelSize: GTheme.fontCaption
                         color: GTheme.textSecondary
@@ -174,12 +211,15 @@ SettingCard {
                     }
 
                     Text {
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 0
                         text: qsTr("  {file} - Downloaded file path") + "\n" +
                               qsTr("  {dir} - Download directory path") + "\n" +
                               qsTr("  {gid} - Download task ID")
                         font.pixelSize: GTheme.fontCaption
                         color: GTheme.textSecondary
                         lineHeight: 1.5
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     }
 
                     // 示例框:原裸 Text 的 info 文字色幽灵令牌 → AlertTip(info)
@@ -205,6 +245,8 @@ SettingCard {
             spacing: GTheme.spaceMD
 
             Text {
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 text: qsTr("When Download Starts")
                 font.pixelSize: GTheme.fontBody
                 font.weight: GTheme.weightMedium
@@ -213,8 +255,11 @@ SettingCard {
 
             GComBoBox {
                 id: startActionComboBox
+                objectName: "startActionComboBox"
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 Layout.preferredHeight: GTheme.sizeDefault
+                Accessible.name: qsTr("Action when download starts")
                 model: [
                     qsTr("Do Nothing"),
                     qsTr("Play Sound")

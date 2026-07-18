@@ -1,5 +1,6 @@
 import QtQuick
 import QtTest
+import gdl.sdk
 import "qrc:/tests/qml_ui/support"
 
 // 视觉用例:5 个对话框 × 2 主题 = 10 张截图(Task 8)
@@ -40,6 +41,21 @@ TestCase {
         objectName: "harness"
     }
 
+    SignalSpy {
+        id: messageBoxSpy
+        signalName: "buttonClicked"
+    }
+
+    SignalSpy {
+        id: closeActionSpy
+        signalName: "actionSelected"
+    }
+
+    SignalSpy {
+        id: deleteActionSpy
+        signalName: "actionSelected"
+    }
+
     // 4 个单对话框(各含 qrc 路径 + 窗口尺寸 + tag 后缀 + 是否为 Dialog 类)
     property var dialogs: [
         { tag: "closeconfirm",  path: "qrc:/qml/CommonComponents/CloseConfirmDialog.qml",  w: 480, h: 440, isDialog: true },
@@ -51,6 +67,38 @@ TestCase {
 
     // 当前打开的对话框引用(cleanup 时关闭销毁,避免泄漏)
     property var currentDialog: null
+    property var currentCaptureHost: null
+
+    Component {
+        id: dialogCaptureHostComponent
+
+        Rectangle {
+            id: captureHost
+            property alias surface: dialogSurface
+            property int surfaceWidth: 460
+            property int surfaceHeight: 330
+
+            width: 1024
+            height: 768
+            color: GTheme.bgPage
+
+            Rectangle {
+                anchors.fill: parent
+                color: GTheme.overlayScrim
+            }
+
+            Rectangle {
+                id: dialogSurface
+                width: captureHost.surfaceWidth
+                height: captureHost.surfaceHeight
+                anchors.centerIn: parent
+                color: GTheme.surfaceElevated
+                radius: GTheme.radiusLarge
+                border.width: 1
+                border.color: GTheme.borderBase
+            }
+        }
+    }
 
     function init() {
         harness.themeMode = "light"
@@ -71,12 +119,44 @@ TestCase {
             try { testCase.currentDialog.destroy() } catch (e) {}
             testCase.currentDialog = null
         }
+        if (testCase.currentCaptureHost !== null) {
+            try { testCase.currentCaptureHost.destroy() } catch (e) {}
+            testCase.currentCaptureHost = null
+        }
+    }
+
+    function capturePopupContent(popup, tag, theme, separateHeader) {
+        var host = dialogCaptureHostComponent.createObject(harness, {
+            surfaceWidth: popup.width,
+            surfaceHeight: popup.height
+        })
+        verify(host !== null)
+        testCase.currentCaptureHost = host
+        host.x = Math.round((harness.width - host.width) / 2)
+        host.y = Math.round((harness.height - host.height) / 2)
+
+        var headerHeight = 0
+        if (separateHeader && popup.header !== null) {
+            headerHeight = popup.header.height > 0 ? popup.header.height : popup.header.implicitHeight
+            popup.header.parent = host.surface
+            popup.header.x = 0
+            popup.header.y = 0
+            popup.header.width = host.surface.width
+            popup.header.height = headerHeight
+        }
+        popup.contentItem.parent = host.surface
+        popup.contentItem.x = 0
+        popup.contentItem.y = headerHeight
+        popup.contentItem.width = host.surface.width
+        popup.contentItem.height = host.surface.height - headerHeight
+        wait(150)
+        verify(Screenshot.capture(host, tag, theme), "Screenshot capture failed for " + tag)
     }
 
     // 通用:createComponent + createObject → open() → capture
     // Dialog 类:reparent contentItem 到 harness 后直接抓(绕过 Overlay 限制)
     // Popup 类:captureWindow 抓窗口 contentItem(含 Overlay)
-    function createOpenAndCapture(url, tag, theme, winW, winH, isDialog) {
+    function createOpenAndCapture(url, tag, theme, winW, winH, isDialog, properties) {
         harness.themeMode = theme
         testCase.width = winW
         testCase.height = winH
@@ -91,6 +171,11 @@ TestCase {
         verify(dlg !== null, "Failed to create dialog object from " + url)
         testCase.currentDialog = dlg
         dlg.parent = harness
+        if (properties !== undefined && properties !== null) {
+            for (var propertyName in properties) {
+                dlg[propertyName] = properties[propertyName]
+            }
+        }
         // 关闭 modal:dim 层可能干扰 grabToImage 对 contentItem 的捕获
         try { dlg.modal = false } catch (e) {}
 
@@ -99,6 +184,13 @@ TestCase {
             // enter 动画 durationBase=150ms,留余量到 300ms
             wait(300)
         }
+
+        verify(dlg.x >= -0.5, tag + " has a negative x coordinate")
+        verify(dlg.y >= -0.5, tag + " has a negative y coordinate")
+        verify(dlg.x + dlg.width <= winW + 0.5,
+               tag + " extends beyond the right edge")
+        verify(dlg.y + dlg.height <= winH + 0.5,
+               tag + " extends beyond the bottom edge")
 
         var ok
         if (isDialog) {
@@ -128,6 +220,242 @@ TestCase {
                 createOpenAndCapture(dialogs[i].path, tag, themes[t], dialogs[i].w, dialogs[i].h, dialogs[i].isDialog)
             }
         }
+    }
+
+    function test_narrow_dialogs_light_dark() {
+        var narrowDialogs = [
+            {
+                tag: "closeconfirm_narrow",
+                path: "qrc:/qml/CommonComponents/CloseConfirmDialog.qml",
+                isDialog: true,
+                properties: null
+            },
+            {
+                tag: "deleteconfirm_narrow",
+                path: "qrc:/qml/CommonComponents/DeleteConfirmDialog.qml",
+                isDialog: true,
+                properties: {
+                    pageType: 2,
+                    taskFileName: "A very long multilingual-ready download task name that must remain inside the confirmation surface.zip"
+                }
+            },
+            {
+                tag: "update_narrow",
+                path: "qrc:/qml/CommonComponents/UpdateDialog.qml",
+                isDialog: false,
+                properties: {
+                    versionNumber: "v9.99.0-preview",
+                    releaseNotes: "## Highlights\n\n- A deliberately long release note validates wrapping and scrolling in a narrow window.\n- Download recovery and update verification are improved."
+                }
+            },
+            {
+                tag: "help_narrow",
+                path: "qrc:/qml/CommonComponents/HelpDialog.qml",
+                isDialog: false,
+                properties: null
+            }
+        ]
+
+        for (var i = 0; i < narrowDialogs.length; ++i) {
+            for (var t = 0; t < themes.length; ++t) {
+                var config = narrowDialogs[i]
+                createOpenAndCapture(config.path,
+                                     config.tag + "_" + themes[t],
+                                     themes[t], 360, 520,
+                                     config.isDialog, config.properties)
+            }
+        }
+    }
+
+    function captureUpdateState(theme, state, tag) {
+        harness.themeMode = theme
+        testCase.width = 620
+        testCase.height = 660
+        wait(150)
+
+        var comp = Qt.createComponent("qrc:/qml/CommonComponents/UpdateDialog.qml")
+        verify(comp.status === Component.Ready, comp.errorString())
+        var dlg = comp.createObject(harness, {
+            versionNumber: "v3.2.1",
+            releaseNotes: "## Aurora update\n\nThis release improves task recovery, accessibility, and visual consistency."
+        })
+        verify(dlg !== null, "Failed to create UpdateDialog")
+        testCase.currentDialog = dlg
+        dlg.parent = harness
+        dlg.modal = false
+        dlg.open()
+        wait(300)
+
+        if (state === "progress") {
+            dlg.handleUpdateProgress({ stage: 1, percentage: 58,
+                                       message: "Downloading update package..." })
+        } else if (state === "failed") {
+            dlg.updateState = "failed"
+            dlg.updating = false
+            dlg.failureMessage = "The package could not be verified. Check your connection and try again."
+        }
+        wait(150)
+
+        compare(dlg.updateState, state)
+        verify(dlg.x >= 0 && dlg.y >= 0)
+        verify(dlg.x + dlg.width <= testCase.width + 0.5)
+        verify(dlg.y + dlg.height <= testCase.height + 0.5)
+        capturePopupContent(dlg, tag, harness.themeMode, false)
+        cleanupDialog()
+    }
+
+    function test_update_progress_dark() {
+        captureUpdateState("dark", "progress", "update_progress_dark")
+    }
+
+    function test_update_failed_light() {
+        captureUpdateState("light", "failed", "update_failed_light")
+    }
+
+    function test_delete_full_window_light() {
+        testCase.width = 1024
+        testCase.height = 768
+        harness.themeMode = "light"
+        wait(120)
+
+        var comp = Qt.createComponent("qrc:/qml/CommonComponents/DeleteConfirmDialog.qml")
+        verify(comp.status === Component.Ready, comp.errorString())
+        var dlg = comp.createObject(harness, {
+            pageType: 2,
+            taskFileName: "creative-assets-2026.zip"
+        })
+        verify(dlg !== null)
+        testCase.currentDialog = dlg
+        dlg.parent = harness
+        dlg.open()
+        wait(350)
+        capturePopupContent(dlg, "deleteconfirm_full_light", "light", true)
+        cleanupDialog()
+    }
+
+    function test_update_primary_focus_enter_and_escape() {
+        testCase.width = 620
+        testCase.height = 660
+        wait(100)
+
+        var comp = Qt.createComponent("qrc:/qml/CommonComponents/UpdateDialog.qml")
+        verify(comp.status === Component.Ready, comp.errorString())
+        var dlg = comp.createObject(harness, {
+            versionNumber: "v3.2.1",
+            releaseNotes: "Keyboard behavior regression coverage."
+        })
+        verify(dlg !== null)
+        testCase.currentDialog = dlg
+        dlg.parent = harness
+        dlg.modal = false
+        dlg.open()
+        wait(250)
+
+        verify(dlg.primaryActionButton !== null, "Update primary action is unavailable")
+        verify(dlg.primaryActionButton.activeFocus,
+               "Update primary action should receive initial focus")
+        keyClick(Qt.Key_Return)
+        tryCompare(dlg, "updateState", "failed")
+        verify(dlg.visible, "A failed update start should keep the dialog open")
+
+        keyClick(Qt.Key_Escape)
+        tryVerify(function() { return !dlg.visible })
+        cleanupDialog()
+    }
+
+    function test_messagebox_keyboard_and_narrow_geometry() {
+        testCase.width = 340
+        testCase.height = 440
+        wait(100)
+
+        var comp = Qt.createComponent("qrc:/qml/CommonComponents/GMessageBox.qml")
+        verify(comp.status === Component.Ready, comp.errorString())
+        var box = comp.createObject(harness, {
+            title: "A confirmation title that must stay bounded",
+            message: "This deliberately long message validates word wrapping, scrolling, and keyboard activation without allowing text or actions to escape the narrow dialog surface.",
+            defaultButtonIndex: 1,
+            buttons: [
+                { text: "Cancel", type: "default", width: 96 },
+                { text: "Continue", type: "primary", width: 112 },
+                { text: "More Options", type: "default", width: 120 }
+            ]
+        })
+        verify(box !== null, "Failed to create narrow GMessageBox")
+        testCase.currentDialog = box
+        box.parent = harness
+        box.modal = false
+        messageBoxSpy.target = box
+        messageBoxSpy.clear()
+        box.open()
+        wait(250)
+
+        verify(box.stackButtons, "Narrow message box actions should stack")
+        verify(box.x >= 0 && box.y >= 0)
+        verify(box.x + box.width <= testCase.width + 0.5)
+        verify(box.y + box.height <= testCase.height + 0.5)
+        keyClick(Qt.Key_Return)
+        tryCompare(messageBoxSpy, "count", 1)
+        compare(messageBoxSpy.signalArguments[0][0], 1)
+        tryVerify(function() { return !box.visible })
+
+        box.open()
+        wait(200)
+        keyClick(Qt.Key_Escape)
+        tryVerify(function() { return !box.visible })
+        messageBoxSpy.target = null
+        cleanupDialog()
+    }
+
+    function test_delete_and_close_default_keyboard_actions() {
+        testCase.width = 620
+        testCase.height = 520
+        wait(100)
+
+        var closeComponent = Qt.createComponent("qrc:/qml/CommonComponents/CloseConfirmDialog.qml")
+        verify(closeComponent.status === Component.Ready, closeComponent.errorString())
+        var closeDialog = closeComponent.createObject(harness)
+        verify(closeDialog !== null)
+        testCase.currentDialog = closeDialog
+        closeDialog.parent = harness
+        closeDialog.modal = false
+        closeActionSpy.target = closeDialog
+        closeActionSpy.clear()
+        closeDialog.open()
+        wait(250)
+        keyClick(Qt.Key_Return)
+        tryCompare(closeActionSpy, "count", 1)
+        compare(closeActionSpy.signalArguments[0][0], 2) // MinimizeToTray
+        tryVerify(function() { return !closeDialog.visible })
+        closeActionSpy.target = null
+        cleanupDialog()
+
+        var deleteComponent = Qt.createComponent("qrc:/qml/CommonComponents/DeleteConfirmDialog.qml")
+        verify(deleteComponent.status === Component.Ready, deleteComponent.errorString())
+        var deleteDialog = deleteComponent.createObject(harness, {
+            pageType: 2,
+            taskFileName: "keyboard-delete.zip"
+        })
+        verify(deleteDialog !== null)
+        testCase.currentDialog = deleteDialog
+        deleteDialog.parent = harness
+        deleteDialog.modal = false
+        deleteActionSpy.target = deleteDialog
+        deleteActionSpy.clear()
+        deleteDialog.open()
+        wait(250)
+        keyClick(Qt.Key_Return)
+        tryCompare(deleteActionSpy, "count", 1)
+        compare(deleteActionSpy.signalArguments[0][0], 0) // Cancel
+        tryVerify(function() { return !deleteDialog.visible })
+
+        deleteDialog.open()
+        wait(200)
+        deleteActionSpy.clear()
+        keyClick(Qt.Key_Escape)
+        tryVerify(function() { return !deleteDialog.visible })
+        compare(deleteActionSpy.count, 0)
+        deleteActionSpy.target = null
+        cleanupDialog()
     }
 
     // GMessageBox 多类型:4 种 messageType 横向并排,每主题 1 张截图
@@ -171,6 +499,8 @@ TestCase {
             box.dialogWidth = boxWidth
             box.standardHeight = boxHeight
             box.messageType = configs[i].type
+            verify(box.getTypeIconName().length > 0,
+                   "GMessageBox semantic icon is undefined for messageType " + configs[i].type)
             box.title = configs[i].title
             box.message = configs[i].msg
             box.buttons = [{ text: "OK", type: "primary", width: 90 }]
@@ -214,4 +544,5 @@ TestCase {
             try { boxes[k].destroy() } catch (e) {}
         }
     }
+
 }

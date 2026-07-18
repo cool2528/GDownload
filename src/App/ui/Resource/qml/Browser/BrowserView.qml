@@ -1,12 +1,26 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import gdl.sdk
 
 Rectangle {
     id: control
     property alias index: browsesStack.currentIndex
     // 当前下载子页索引(0=Downloading 1=Waiting 2=Completed),供导航栏高亮当前页
     property alias downloadIndex: downloadPage.currentIndex
+    readonly property string currentSectionTitle: {
+        if (index === 1)
+            return qsTr("Preferences")
+        if (index === 2)
+            return qsTr("Home")
+        if (downloadIndex === 1)
+            return qsTr("Waiting")
+        if (downloadIndex === 2)
+            return qsTr("Stopped")
+        return qsTr("Downloads")
+    }
+
+    color: GTheme.bgPage
 
     StackLayout {
         id: browsesStack
@@ -16,15 +30,18 @@ Rectangle {
 
         DownloadPageView {
             id: downloadPage
+            objectName: "downloadWorkspace"
         }
 
         SettingsPageView {
             id: settingPage
+            objectName: "settingsWorkspace"
         }
 
         // 主页/概览仪表盘(导航 home 按钮 → index 2)
         HomePage {
             id: homePage
+            objectName: "homeWorkspace"
         }
     }
 

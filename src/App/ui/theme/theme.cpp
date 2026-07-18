@@ -144,23 +144,31 @@ namespace gdl {
 
 			// Element Plus 颜色方法实现
 			QColor GTheme::primaryColor() const {
-				return QColor(ElementPlusColors::Primary::kPrimary);
+				return dark() ? QColor("#5AA9FF") : QColor(ElementPlusColors::Primary::kPrimary);
+			}
+
+			QColor GTheme::brandHover() const {
+				return dark() ? QColor("#73B7FF") : QColor("#2F8EEA");
+			}
+
+			QColor GTheme::brandPressed() const {
+				return dark() ? QColor("#3F95EC") : QColor("#237FD6");
 			}
 
 			QColor GTheme::successColor() const {
-				return QColor(ElementPlusColors::Status::kSuccess);
+				return dark() ? QColor("#4ADE80") : QColor("#34C759");
 			}
 
 			QColor GTheme::warningColor() const {
-				return QColor(ElementPlusColors::Status::kWarning);
+				return dark() ? QColor("#FBBF24") : QColor("#F5A524");
 			}
 
 			QColor GTheme::dangerColor() const {
-				return QColor(ElementPlusColors::Status::kDanger);
+				return dark() ? QColor("#FB7185") : QColor("#F05252");
 			}
 
 			QColor GTheme::infoColor() const {
-				return QColor(ElementPlusColors::Status::kInfo);
+				return dark() ? QColor("#94A3B8") : QColor(ElementPlusColors::Status::kInfo);
 			}
 
 			QColor GTheme::textPrimary() const {
@@ -235,7 +243,16 @@ namespace gdl {
 
 			QColor GTheme::bgElevated() const {
 				return dark() ? QColor(ElementPlusColors::VSCodeDark::kBgElevated)
-							  : QColor(ElementPlusColors::AntDesignLight::kBgWhite);
+							  : QColor("#F8FAFE");
+			}
+
+			QColor GTheme::bgOverlay() const {
+				return dark() ? QColor(ElementPlusColors::VSCodeDark::kBgOverlay)
+							  : QColor(ElementPlusColors::AntDesignLight::kBgOverlay);
+			}
+
+			QColor GTheme::overlayScrim() const {
+				return dark() ? QColor(0, 0, 0, 153) : QColor(8, 13, 24, 82);
 			}
 
 			// 主色色阶:严格对齐 Element Plus light3/5/7/8/9 + dark2
@@ -296,18 +313,17 @@ namespace gdl {
 
 			// 告警语义令牌实现:浅色复用 Status::* 色阶常量,暗色按 spec Section 1.2 表
 			QColor GTheme::bgInfo() const {
-				return dark() ? QColor("#1D1D1D")
+				return dark() ? QColor("#1D2533")
 							  : QColor(ElementPlusColors::Status::kInfoLight9);
 			}
 
 			QColor GTheme::borderInfo() const {
-				return dark() ? QColor("#313134")
+				return dark() ? QColor("#313E55")
 							  : QColor(ElementPlusColors::Status::kInfoLight7);
 			}
 
 			QColor GTheme::textInfo() const {
-				return dark() ? QColor(ElementPlusColors::VSCodeDark::kTextSecondary)
-							  : QColor(ElementPlusColors::Status::kInfo);
+				return dark() ? QColor("#94A3B8") : QColor("#73767A");
 			}
 
 			QColor GTheme::bgSuccess() const {
@@ -321,8 +337,7 @@ namespace gdl {
 			}
 
 			QColor GTheme::textSuccess() const {
-				// 浅暗色均为 Element Plus success 主色
-				return QColor(ElementPlusColors::Status::kSuccess);
+				return dark() ? QColor("#4ADE80") : QColor("#34A853");
 			}
 
 			QColor GTheme::bgWarning() const {
@@ -336,8 +351,7 @@ namespace gdl {
 			}
 
 			QColor GTheme::textWarning() const {
-				// 浅暗色均为 Element Plus warning 主色
-				return QColor(ElementPlusColors::Status::kWarning);
+				return dark() ? QColor("#FBBF24") : QColor("#C77D12");
 			}
 
 			QColor GTheme::bgDanger() const {
@@ -351,8 +365,7 @@ namespace gdl {
 			}
 
 			QColor GTheme::textDanger() const {
-				// 浅暗色均为 Element Plus danger 主色
-				return QColor(ElementPlusColors::Status::kDanger);
+				return dark() ? QColor("#FB7185") : QColor("#D83B3B");
 			}
 
 			// 阴影层级:对应 Element Plus box-shadow 四档,深浅色取色不同

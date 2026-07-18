@@ -44,6 +44,47 @@ class TstDesignSystemContract : public QObject {
         QVERIFY2(text.contains(QStringLiteral("objectName: \"taskDialogFooter\"")), "Task dialog footer must expose objectName taskDialogFooter");
     }
 
+    void aurora_theme_exposes_semantic_tokens() {
+        const QString path = QStringLiteral("%1/src/App/ui/theme/theme.h").arg(QStringLiteral(SOURCE_ROOT));
+        const QString text = readFile(path);
+        const QStringList tokens = {
+            QStringLiteral("brandHover"),
+            QStringLiteral("brandPressed"),
+            QStringLiteral("textInverse"),
+            QStringLiteral("bgOverlay"),
+            QStringLiteral("surfaceBase"),
+            QStringLiteral("surfaceElevated"),
+            QStringLiteral("focusRing"),
+            QStringLiteral("overlayScrim")
+        };
+        for (const QString& token : tokens) {
+            QVERIFY2(text.contains(QStringLiteral("Q_PROPERTY(QColor %1").arg(token)),
+                     qPrintable(QStringLiteral("GTheme must expose Aurora token %1").arg(token)));
+        }
+    }
+
+    void application_shell_uses_aurora_contract() {
+        const QString root = QStringLiteral("%1/src/App/ui/Resource/qml").arg(QStringLiteral(SOURCE_ROOT));
+        const QString mainWindow = readFile(root + QStringLiteral("/mainWindow.qml"));
+        const QString titleBar = readFile(root + QStringLiteral("/titlebar/TitleBar.qml"));
+        const QString navigator = readFile(root + QStringLiteral("/Navigator/NavigatorView.qml"));
+
+        QVERIFY2(mainWindow.contains(QStringLiteral("minimumWidth: 900")), "mainWindow must preserve the 900 px Aurora minimum width");
+        QVERIFY2(mainWindow.contains(QStringLiteral("minimumHeight: 640")), "mainWindow must preserve the 640 px Aurora minimum height");
+        QVERIFY2(mainWindow.contains(QStringLiteral("sectionTitle: brower_view.currentSectionTitle")), "mainWindow must bind the title bar to the active product area");
+
+        QVERIFY2(titleBar.contains(QStringLiteral("GTheme.titleBarHeight")), "TitleBar must use the central height token");
+        QVERIFY2(titleBar.contains(QStringLiteral("AuroraBrand")), "TitleBar must use the Aurora brand asset");
+        QVERIFY2(titleBar.contains(QStringLiteral("property string sectionTitle")), "TitleBar must expose sectionTitle");
+        QVERIFY2(titleBar.contains(QStringLiteral("import QtQuick.Controls")),
+                 "TitleBar must import QtQuick.Controls for ToolTip attached properties");
+
+        QVERIFY2(navigator.contains(QStringLiteral("iconName: \"home\"")), "Navigator must use semantic Aurora SVG icons");
+        QVERIFY2(navigator.contains(QStringLiteral("AuroraBrand")), "Navigator must use the Aurora brand asset");
+        QVERIFY2(!navigator.contains(QStringLiteral("SegoeFluentIcons")), "Navigator must not use legacy Segoe Fluent glyphs");
+        QVERIFY2(!navigator.contains(QStringLiteral("text: \"G\"")), "Navigator must not use the placeholder G logo");
+    }
+
     void task_dialog_keeps_download_settings_visible_by_default() {
         const QString path = QStringLiteral("%1/src/App/ui/Resource/qml/CommonComponents/TaskDialogPage.qml").arg(QStringLiteral(SOURCE_ROOT));
         const QString text = readFile(path);
@@ -68,7 +109,48 @@ class TstDesignSystemContract : public QObject {
         QVERIFY2(text.contains(QStringLiteral("objectName: \"netDiskFileList\"")), "NetDisk file list must expose objectName netDiskFileList");
         QVERIFY2(text.contains(QStringLiteral("Paste link")), "NetDisk workflow must expose Paste link copy");
         QVERIFY2(text.contains(QStringLiteral("Preview files")), "NetDisk workflow must expose Preview files copy");
-        QVERIFY2(text.contains(QStringLiteral("Add queue")), "NetDisk workflow must expose Add queue copy");
+        QVERIFY2(text.contains(QStringLiteral("Add to queue")), "NetDisk workflow must expose Add to queue copy");
+    }
+
+    void download_flows_do_not_bind_layout_height_to_children_rect() {
+        const QString path = QStringLiteral("%1/src/App/ui/Resource/qml/CommonComponents/GDownloadViewPage.qml").arg(QStringLiteral(SOURCE_ROOT));
+        const QString text = readFile(path);
+        QVERIFY2(!text.contains(QStringLiteral("Layout.preferredHeight: childrenRect.height")),
+                 "Flow height must not feed childrenRect back into its parent QQuickLayout");
+        QVERIFY2(!text.contains(QStringLiteral("implicitHeight: childrenRect.height")),
+                 "Flow implicitHeight is read-only and must be provided by the positioner itself");
+        QVERIFY2(!text.contains(QStringLiteral("implicitHeight: visible ? childrenRect.height : 0")),
+                 "Hidden Flow items must collapse through visibility instead of assigning read-only implicitHeight");
+    }
+
+    void language_locale_defaults_and_legacy_values_are_canonicalized() {
+        const QString languageManager = readFile(
+            QStringLiteral("%1/src/App/ui/language/language_manager.cpp").arg(QStringLiteral(SOURCE_ROOT)));
+        const QString setting = readFile(
+            QStringLiteral("%1/src/App/ui/Settings/setting.h").arg(QStringLiteral(SOURCE_ROOT)));
+        const QString configKeys = readFile(
+            QStringLiteral("%1/src/Module/GDLCore/config/config_key.h").arg(QStringLiteral(SOURCE_ROOT)));
+
+        QVERIFY2(languageManager.contains(QStringLiteral("locale.replace('-', '_')")),
+                 "LanguageManager must accept legacy hyphenated locale values");
+        QVERIFY2(languageManager.contains(QStringLiteral("if (lowered == \"zh_cn\") return \"zh_CN\";")),
+                 "LanguageManager must map legacy zh-cn settings to the deployed zh_CN catalog");
+        QVERIFY2(setting.contains(QStringLiteral("value_ = \"zh_CN\";")),
+                 "Settings language default must use a supported canonical locale");
+        QVERIFY2(configKeys.contains(QStringLiteral("CONFIG_PATH(Language, \"general.language\", \"zh_CN\")")),
+                 "Config language default must match the deployed translation filename");
+    }
+
+    void application_shutdown_destroys_qml_before_managers() {
+        const QString mainWindow = readFile(
+            QStringLiteral("%1/src/App/ui/view/mainwindow.cxx").arg(QStringLiteral(SOURCE_ROOT)));
+        const qsizetype rootCleanup = mainWindow.indexOf(QStringLiteral("delete root_object;"));
+        const qsizetype managerCleanup = mainWindow.indexOf(QStringLiteral("UnInitEngine();"), rootCleanup);
+        QVERIFY2(rootCleanup >= 0, "Application shutdown must explicitly destroy QML root objects");
+        QVERIFY2(managerCleanup > rootCleanup,
+                 "QML roots must be destroyed before managers are uninitialized");
+        QVERIFY2(mainWindow.indexOf(QStringLiteral("engine.collectGarbage();"), rootCleanup) < managerCleanup,
+                 "QML garbage collection must run before manager teardown");
     }
 
    private:

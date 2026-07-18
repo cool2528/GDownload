@@ -130,6 +130,7 @@ SettingCard {
                 text: ""
                 Layout.preferredHeight: GTheme.sizeDefault
                 font.pixelSize: GTheme.fontBody
+                Accessible.name: qsTr("Automatically update tracker sources")
                 onClicked: {
                     SettingsManager.SetEnableTrackerSourceAutoUpdate(checked)
                 }
@@ -217,6 +218,7 @@ SettingCard {
                 selectByMouse: true
                 readOnly: true
                 wrapMode: TextArea.Wrap
+                Accessible.name: qsTr("Tracker server update result")
                 background: Rectangle {
                     color: GTheme.fillLighter
                     border.color: GTheme.borderLight

@@ -68,11 +68,13 @@ target_compile_features(qml_ui_support PUBLIC cxx_std_20)
 # 均含 Q_OBJECT,需 moc 生成元对象实现(metaObject / qt_metacast / qt_metacall)
 set_target_properties(qml_ui_support PROPERTIES AUTOMOC ON)
 
-# PageHarness.qml / GMessageBoxMulti.qml 注册到 qrc,供视觉用例 Loader 加载
+# PageHarness.qml / 预览外壳 / GMessageBoxMulti.qml 注册到 qrc,供视觉用例 Loader 加载
 # - PageHarness.qml:单页加载外壳(主题切换 + Loader)
 # - GMessageBoxMulti.qml:GMessageBox 4-type 横向并排包装器(tst_dialogs 用)
 qt_add_resources(qml_ui_support "qml_ui_support_qml"
     PREFIX "/tests/qml_ui/support"
     FILES PageHarness.qml
+          ApplicationShellPreview.qml
+          NavigatorPreview.qml
           GMessageBoxMulti.qml
 )

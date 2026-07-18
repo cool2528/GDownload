@@ -4,362 +4,440 @@ import QtQuick.Layouts
 import "../../CommonComponents"
 import gdl.sdk
 
-// 常见问题卡片 - FAQ 和支持信息
-// 颜色/尺寸/间距/字号/动效一律取自 GTheme 令牌,零魔法数字
-// 图标字形尺寸/链接项尺寸/Toast 时长为本地业务常量,非设计令牌(已注释标注)
+// Aurora FAQ and support surface. Questions keep their full answer text and
+// support actions collapse to one column on narrow settings pages.
 GCard {
     id: faqCard
+    objectName: "extensionFaqCard"
+
     Layout.fillWidth: true
-    // 高度 = 内容隐式高度 + 上下内边距(单层 spaceLG,消除原双重 16 边距)
-    Layout.preferredHeight: contentLayout.implicitHeight + GTheme.spaceLG * 2
+    implicitHeight: contentLayout.implicitHeight + padding * 2
     outlined: true
+    hoverEnabled: false
+    interactive: false
+    variant: "elevated"
     padding: GTheme.spaceLG
+    radius: GTheme.radiusLarge
+
+    readonly property bool compactLayout: width < 520
+    readonly property int supportColumns: width >= 700 ? 3 : (width >= 480 ? 2 : 1)
+
+    function openExternal(url, message) {
+        Qt.openUrlExternally(url)
+        ToastManager.ShowInfo(message, 2000)
+    }
 
     ColumnLayout {
         id: contentLayout
         anchors.fill: parent
-        anchors.margins: 0
+        anchors.margins: faqCard.padding
         spacing: GTheme.spaceXL
 
-        // 卡片标题
-        ColumnLayout {
+        RowLayout {
             Layout.fillWidth: true
-            spacing: GTheme.spaceXS
+            Layout.minimumWidth: 0
+            spacing: GTheme.spaceMD
 
-            RowLayout {
-                spacing: GTheme.spaceSM
+            Rectangle {
+                Layout.preferredWidth: GTheme.sizeLarge
+                Layout.preferredHeight: GTheme.sizeLarge
+                Layout.minimumWidth: GTheme.sizeLarge
+                Layout.minimumHeight: GTheme.sizeLarge
+                Layout.alignment: Qt.AlignTop
+                radius: GTheme.radiusMedium
+                color: GTheme.bgInfo
+
+                AuroraIcon {
+                    anchors.centerIn: parent
+                    name: "help"
+                    iconSize: GTheme.fontSubtitle
+                    color: GTheme.infoColor
+                }
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                spacing: GTheme.spaceXS
 
                 Text {
-                    text: "\uE897"  // help-circle icon
-                    font.family: "Segoe Fluent Icons"
-                    font.pixelSize: 18  // 图标尺寸,保留(非设计令牌)
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
+                    text: qsTr("Frequently Asked Questions")
+                    font.pixelSize: GTheme.fontSubtitle
+                    font.weight: GTheme.weightDemiBold
+                    color: GTheme.textPrimary
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                }
+
+                Text {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
+                    text: qsTr("Connection, privacy, compatibility, and capture behavior.")
+                    font.pixelSize: GTheme.fontCaption
+                    color: GTheme.textSecondary
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                }
+            }
+        }
+
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.minimumWidth: 0
+            spacing: GTheme.spaceSM
+
+            FAQItem {
+                objectName: "extensionFaqWhy"
+                question: qsTr("Why do I need the browser extension?")
+                answer: qsTr("The extension captures download links directly from web pages and sends them to GDownload with one action, so you do not need to copy each URL manually.")
+            }
+
+            FAQItem {
+                objectName: "extensionFaqPrivacy"
+                question: qsTr("Is my data safe?")
+                answer: qsTr("Yes. The extension connects locally to aria2c through WebSocket. The connection values remain on your computer and are not sent to an external service.")
+            }
+
+            FAQItem {
+                objectName: "extensionFaqConnection"
+                question: qsTr("Connection failed. What should I do?")
+                answer: qsTr("Keep GDownload running. Confirm that aria2c is enabled, verify that the WebSocket URL and RPC Secret match the configuration helper, and then restart GDownload and the browser before testing again.")
+            }
+
+            FAQItem {
+                objectName: "extensionFaqBrowsers"
+                question: qsTr("Which browsers are supported?")
+                answer: qsTr("The extension supports Chrome 110+, Firefox 115+, and Edge 110+ through the standard Web Extensions API and Manifest V3 where available.")
+            }
+
+            FAQItem {
+                objectName: "extensionFaqFiltering"
+                question: qsTr("Can I customize which links are captured?")
+                answer: qsTr("Yes. Configure minimum file size, allowed file types, URL blacklist patterns, and a domain whitelist in the extension options.")
+            }
+
+            FAQItem {
+                objectName: "extensionFaqProtectedSites"
+                question: qsTr("Does it work with password-protected sites?")
+                answer: qsTr("The extension can optionally send cookies and authorization headers. These options are disabled by default; enable them only for trusted sites that require an authenticated request.")
+            }
+        }
+
+        Divider {
+            Layout.fillWidth: true
+            color: GTheme.borderLight
+        }
+
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.minimumWidth: 0
+            spacing: GTheme.spaceMD
+
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                spacing: GTheme.spaceSM
+
+                AuroraIcon {
+                    name: "book"
+                    iconSize: GTheme.fontSubtitle
                     color: GTheme.primaryColor
                 }
 
                 Text {
-                    text: qsTr("Frequently Asked Questions")
-                    font.pixelSize: GTheme.fontSubtitle
-                    font.weight: GTheme.weightMedium
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
+                    text: qsTr("Need more help?")
+                    font.pixelSize: GTheme.fontBody
+                    font.weight: GTheme.weightDemiBold
                     color: GTheme.textPrimary
                 }
             }
 
-            Text {
-                text: qsTr("Find answers to common questions")
-                font.pixelSize: GTheme.fontCaption
-                color: GTheme.textSecondary
-            }
-        }
-
-        // FAQ 列表
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: GTheme.spaceMD
-
-            // FAQ 1
-            FAQItem {
+            GridLayout {
                 Layout.fillWidth: true
-                question: qsTr("Why do I need the browser extension?")
-                answer: qsTr("The extension allows you to capture download links directly from web pages and send them to GDownload with a single click. It seamlessly integrates with your browsing experience.")
-            }
+                Layout.minimumWidth: 0
+                columns: faqCard.supportColumns
+                columnSpacing: GTheme.spaceMD
+                rowSpacing: GTheme.spaceMD
 
-            // FAQ 2
-            FAQItem {
-                Layout.fillWidth: true
-                question: qsTr("Is my data safe?")
-                answer: qsTr("Yes! The extension connects locally to aria2c via WebSocket. All communication stays on your computer - no data is sent to external servers. Your privacy is fully protected.")
-            }
-
-            // FAQ 3
-            FAQItem {
-                Layout.fillWidth: true
-                question: qsTr("Connection failed. What should I do?")
-                answer: qsTr("1. Ensure GDownload is running\n2. Check that aria2c is enabled in GDownload settings\n3. Verify the WebSocket URL and RPC Secret match the values shown above\n4. Try restarting both GDownload and your browser")
-            }
-
-            // FAQ 4
-            FAQItem {
-                Layout.fillWidth: true
-                question: qsTr("Which browsers are supported?")
-                answer: qsTr("The extension supports Chrome 110+, Firefox 115+, and Edge 110+. It uses the standard Web Extensions API (Manifest V3) for maximum compatibility.")
-            }
-
-            // FAQ 5
-            FAQItem {
-                Layout.fillWidth: true
-                question: qsTr("Can I customize what links are captured?")
-                answer: qsTr("Yes! The extension has powerful filtering options:\n• Set minimum file size\n• Filter by file type (video, audio, archive, etc.)\n• Add URL blacklist patterns\n• Configure domain whitelist")
-            }
-
-            // FAQ 6
-            FAQItem {
-                Layout.fillWidth: true
-                question: qsTr("Does it work with password-protected sites?")
-                answer: qsTr("Yes. The extension can optionally send cookies and authorization headers (disabled by default for security). Enable these in the extension's Privacy & Security settings for sites that require login.")
-            }
-        }
-
-        // 分隔线(色 borderLight)
-        Divider {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 1
-            color: GTheme.borderLight
-        }
-
-        // 需要更多帮助
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: GTheme.spaceMD
-
-            Text {
-                text: qsTr("📖 Need more help?")
-                font.pixelSize: GTheme.fontBody
-                font.weight: GTheme.weightMedium
-                color: GTheme.textPrimary
-            }
-
-            RowLayout {
-                spacing: GTheme.spaceXL
-                Layout.fillWidth: true
-
-                // GitHub 问题
                 HelpLinkItem {
-                    icon: "\uEBEF"  // github icon
+                    objectName: "extensionIssuesButton"
+                    iconName: "repository"
                     label: qsTr("GitHub Issues")
-                    description: qsTr("Report bugs")
-                    onClicked: {
-                        Qt.openUrlExternally("https://github.com/cool2528/gd-browser-extension/issues")
-                        ToastManager.ShowInfo(qsTr("Opening GitHub Issues..."), 2000)
-                    }
+                    description: qsTr("Report a bug")
+                    onClicked: faqCard.openExternal(
+                                   "https://github.com/cool2528/gd-browser-extension/issues",
+                                   qsTr("Opening GitHub Issues..."))
                 }
 
-                // 官方文档
                 HelpLinkItem {
-                    icon: "\uE85D"  // book icon
+                    objectName: "extensionDocsButton"
+                    iconName: "book"
                     label: qsTr("Documentation")
-                    description: qsTr("Full user guide")
-                    onClicked: {
-                        Qt.openUrlExternally("https://github.com/cool2528/gd-browser-extension/blob/main/README.md")
-                        ToastManager.ShowInfo(qsTr("Opening documentation..."), 2000)
-                    }
+                    description: qsTr("Read the user guide")
+                    onClicked: faqCard.openExternal(
+                                   "https://github.com/cool2528/gd-browser-extension/blob/main/README.md",
+                                   qsTr("Opening documentation..."))
                 }
 
-                // 官网
                 HelpLinkItem {
-                    icon: "\uE86F"  // globe icon
+                    objectName: "extensionWebsiteButton"
+                    iconName: "globe"
                     label: qsTr("Official Website")
                     description: qsTr("Visit gdownload.uk")
-                    onClicked: {
-                        Qt.openUrlExternally("https://gdownload.uk/")
-                        ToastManager.ShowInfo(qsTr("Opening website..."), 2000)
-                    }
+                    onClicked: faqCard.openExternal(
+                                   "https://gdownload.uk/",
+                                   qsTr("Opening the website..."))
                 }
             }
         }
 
-        // 社区支持
         Rectangle {
             Layout.fillWidth: true
-            // 高度 = 内容隐式高度 + 上下内边距(单层 spaceLG)
+            Layout.minimumWidth: 0
             Layout.preferredHeight: communityLayout.implicitHeight + GTheme.spaceLG * 2
-            // 主色淡底:浅色用 primaryLight(9),深色回退 fillLight(替代原 Qt.rgba 透明叠加)
+            radius: GTheme.radiusLarge
             color: GTheme.dark ? GTheme.fillLight : GTheme.primaryLight(9)
-            radius: GTheme.radiusBase
+            border.width: 1
+            border.color: GTheme.dark ? GTheme.borderBase : GTheme.primaryLight(7)
 
-            ColumnLayout {
+            GridLayout {
                 id: communityLayout
                 anchors.fill: parent
                 anchors.margins: GTheme.spaceLG
-                spacing: GTheme.spaceSM
+                columns: faqCard.compactLayout ? 1 : 2
+                columnSpacing: GTheme.spaceLG
+                rowSpacing: GTheme.spaceSM
 
-                RowLayout {
-                    spacing: GTheme.spaceSM
-
-                    Text {
-                        text: "\uE716"  // people icon
-                        font.family: "Segoe Fluent Icons"
-                        font.pixelSize: 18  // 图标尺寸,保留(非设计令牌)
-                        color: GTheme.primaryColor
-                    }
-
-                    Text {
-                        text: qsTr("Join Our Community")
-                        font.pixelSize: GTheme.fontBody
-                        font.weight: GTheme.weightMedium
-                        color: GTheme.textPrimary
-                    }
-                }
-
-                Text {
-                    text: qsTr("Get help from other users, share tips, and stay updated with the latest features. Star us on GitHub to show your support!")
-                    font.pixelSize: GTheme.fontCaption
-                    color: GTheme.textRegular
+                ColumnLayout {
                     Layout.fillWidth: true
-                    wrapMode: Text.WordWrap
-                    lineHeight: 1.4
+                    Layout.minimumWidth: 0
+                    spacing: GTheme.spaceXS
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 0
+                        spacing: GTheme.spaceSM
+
+                        AuroraIcon {
+                            name: "people"
+                            iconSize: GTheme.fontSubtitle
+                            color: GTheme.primaryColor
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            Layout.minimumWidth: 0
+                            text: qsTr("Join the GDownload community")
+                            font.pixelSize: GTheme.fontBody
+                            font.weight: GTheme.weightDemiBold
+                            color: GTheme.textPrimary
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        }
+                    }
+
+                    Text {
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 0
+                        text: qsTr("Share feedback, compare capture rules, and follow new extension releases on GitHub.")
+                        font.pixelSize: GTheme.fontCaption
+                        color: GTheme.textRegular
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    }
                 }
 
                 GButton {
-                    text: qsTr("⭐ Star on GitHub")
+                    objectName: "extensionStarButton"
+                    Layout.fillWidth: faqCard.compactLayout
+                    Layout.maximumWidth: faqCard.compactLayout ? 100000 : 180
+                    Layout.alignment: faqCard.compactLayout ? Qt.AlignLeft : Qt.AlignVCenter | Qt.AlignRight
+                    text: qsTr("Star on GitHub")
+                    iconName: "repository"
                     type: 1
-                    Layout.preferredWidth: 140  // 按钮宽度(本地布局常量,非设计令牌)
-                    Layout.preferredHeight: GTheme.sizeDefault
-                    Layout.topMargin: GTheme.spaceXS
+                    activeFocusOnTab: true
+                    Accessible.name: text
                     onClicked: {
                         Qt.openUrlExternally("https://github.com/cool2528/GDownload")
-                        ToastManager.ShowSuccess(qsTr("Thank you for your support!"), 2000)
+                        ToastManager.ShowSuccess(qsTr("Thank you for supporting GDownload."), 2000)
                     }
                 }
             }
         }
     }
 
-    // FAQ 问答项组件
     component FAQItem: Rectangle {
+        id: faqItem
+
         property string question: ""
         property string answer: ""
         property bool expanded: false
-        // 折叠态固定高度(本地布局常量,非设计令牌)
-        readonly property int collapsedHeight: 56
 
-        implicitHeight: expanded ? (itemLayout.implicitHeight + GTheme.spaceMD * 2) : collapsedHeight
-        color: hoverHandler.hovered ? GTheme.fillLighter : GTheme.bgBase
-        radius: GTheme.radiusBase
-
-        Behavior on implicitHeight {
-            NumberAnimation { duration: GTheme.durationBase; easing.type: GTheme.easingStandard }
-        }
+        Layout.fillWidth: true
+        Layout.minimumWidth: 0
+        Layout.preferredHeight: questionRow.implicitHeight + GTheme.spaceMD * 2 +
+                                (faqItem.expanded
+                                 ? GTheme.spaceSM + answerText.implicitHeight
+                                 : 0)
+        radius: GTheme.radiusMedium
+        color: hoverHandler.hovered ? GTheme.fillLight : GTheme.fillLighter
+        border.width: activeFocus ? 2 : 1
+        border.color: activeFocus ? GTheme.focusRing : GTheme.borderLighter
+        activeFocusOnTab: true
+        Accessible.role: Accessible.Button
+        Accessible.name: faqItem.question
+        Accessible.description: faqItem.expanded ? faqItem.answer : qsTr("Collapsed")
 
         Behavior on color {
-            ColorAnimation { duration: GTheme.durationBase }
-        }
-
-        HoverHandler {
-            id: hoverHandler
+            ColorAnimation { duration: GTheme.durationFast }
         }
 
         ColumnLayout {
-            id: itemLayout
+            id: faqLayout
             anchors.fill: parent
             anchors.margins: GTheme.spaceMD
             spacing: GTheme.spaceSM
 
-            // 问题行
             RowLayout {
-                spacing: GTheme.spaceMD
+                id: questionRow
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                spacing: GTheme.spaceSM
 
-                // 展开/收起图标
-                Text {
-                    text: expanded ? "\uE70D" : "\uE76C"  // chevron-down / chevron-right
-                    font.family: "Segoe Fluent Icons"
-                    font.pixelSize: 20  // 图标尺寸,保留(非设计令牌)
+                AuroraIcon {
+                    Layout.alignment: Qt.AlignTop
+                    name: faqItem.expanded ? "chevron-down" : "chevron-right"
+                    iconSize: GTheme.fontSubtitle
                     color: GTheme.primaryColor
-
-                    Behavior on rotation {
-                        NumberAnimation { duration: GTheme.durationBase }
-                    }
                 }
 
-                // 问题文本
                 Text {
-                    text: question
-                    font.pixelSize: GTheme.fontBody
-                    font.weight: GTheme.weightMedium
-                    color: GTheme.textPrimary
                     Layout.fillWidth: true
-                    wrapMode: Text.WordWrap
+                    Layout.minimumWidth: 0
+                    text: faqItem.question
+                    font.pixelSize: GTheme.fontBody
+                    font.weight: GTheme.weightDemiBold
+                    color: GTheme.textPrimary
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 }
             }
 
-            // 答案（可展开）
             Text {
-                text: answer
+                id: answerText
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                Layout.leftMargin: GTheme.fontSubtitle + GTheme.spaceSM
+                visible: faqItem.expanded
+                text: faqItem.answer
                 font.pixelSize: GTheme.fontCaption
                 color: GTheme.textRegular
-                Layout.fillWidth: true
-                Layout.leftMargin: GTheme.space3XL
-                wrapMode: Text.WordWrap
-                lineHeight: 1.5
-                visible: expanded
-                opacity: expanded ? 1.0 : 0.0
-
-                Behavior on opacity {
-                    NumberAnimation { duration: GTheme.durationBase }
-                }
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                lineHeight: 1.35
             }
         }
-
-        MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.PointingHandCursor
-            onClicked: {
-                expanded = !expanded
-            }
-        }
-    }
-
-    // 帮助链接项组件
-    component HelpLinkItem: Rectangle {
-        property string icon: ""
-        property string label: ""
-        property string description: ""
-        signal clicked()
-
-        implicitWidth: 140  // 链接项宽度(本地布局常量,非设计令牌)
-        implicitHeight: 80  // 链接项高度(本地布局常量,非设计令牌)
-        radius: GTheme.radiusBase
-        color: hovered ? GTheme.fillLight : "transparent"
-        border.width: 1
-        border.color: GTheme.borderBase
-
-        property bool hovered: hoverHandler.hovered
 
         HoverHandler {
             id: hoverHandler
         }
-
-        Behavior on color {
-            ColorAnimation { duration: GTheme.durationBase }
-        }
-
-        ColumnLayout {
-            anchors.centerIn: parent
-            spacing: GTheme.spaceSM
-
-            Text {
-                text: icon
-                font.family: "Segoe Fluent Icons"
-                font.pixelSize: 24  // 图标尺寸,保留(非设计令牌)
-                color: GTheme.primaryColor
-                Layout.alignment: Qt.AlignHCenter
-
-                scale: hovered ? 1.15 : 1.0
-                Behavior on scale {
-                    NumberAnimation { duration: GTheme.durationBase; easing.type: GTheme.easingStandard }
-                }
-            }
-
-            Text {
-                text: label
-                font.pixelSize: GTheme.fontCaption
-                font.weight: GTheme.weightMedium
-                color: GTheme.textPrimary
-                Layout.alignment: Qt.AlignHCenter
-            }
-
-            Text {
-                text: description
-                font.pixelSize: GTheme.fontCaption
-                color: GTheme.textSecondary
-                Layout.alignment: Qt.AlignHCenter
-            }
-        }
-
         MouseArea {
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
+            onPressed: faqItem.forceActiveFocus()
+            onClicked: faqItem.expanded = !faqItem.expanded
+        }
+        Keys.onReturnPressed: event => {
+            faqItem.expanded = !faqItem.expanded
+            event.accepted = true
+        }
+        Keys.onSpacePressed: event => {
+            faqItem.expanded = !faqItem.expanded
+            event.accepted = true
+        }
+    }
+
+    component HelpLinkItem: Rectangle {
+        property string iconName: "help"
+        property string label: ""
+        property string description: ""
+        signal clicked()
+
+        Layout.fillWidth: true
+        Layout.minimumWidth: 0
+        Layout.preferredHeight: Math.max(GTheme.sizeLarge + GTheme.sizeDefault,
+                                         helpLayout.implicitHeight + GTheme.spaceMD * 2)
+        radius: GTheme.radiusMedium
+        color: helpHover.hovered ? GTheme.fillLight : GTheme.surfaceBase
+        border.width: activeFocus ? 2 : 1
+        border.color: activeFocus ? GTheme.focusRing : GTheme.borderLight
+        activeFocusOnTab: true
+        Accessible.role: Accessible.Link
+        Accessible.name: label
+        Accessible.description: description
+
+        RowLayout {
+            id: helpLayout
+            anchors.fill: parent
+            anchors.margins: GTheme.spaceMD
+            spacing: GTheme.spaceSM
+
+            Rectangle {
+                Layout.preferredWidth: GTheme.sizeLarge
+                Layout.preferredHeight: GTheme.sizeLarge
+                Layout.minimumWidth: GTheme.sizeLarge
+                Layout.minimumHeight: GTheme.sizeLarge
+                radius: GTheme.radiusMedium
+                color: GTheme.dark ? GTheme.fillLight : GTheme.primaryLight(9)
+
+                AuroraIcon {
+                    anchors.centerIn: parent
+                    name: iconName
+                    iconSize: GTheme.fontSubtitle
+                    color: GTheme.primaryColor
+                }
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                spacing: 0
+
+                Text {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
+                    text: label
+                    font.pixelSize: GTheme.fontCaption
+                    font.weight: GTheme.weightDemiBold
+                    color: GTheme.textPrimary
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                }
+
+                Text {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
+                    text: description
+                    font.pixelSize: GTheme.fontCaption
+                    color: GTheme.textSecondary
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                }
+            }
+        }
+
+        HoverHandler {
+            id: helpHover
+        }
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            onPressed: parent.forceActiveFocus()
             onClicked: parent.clicked()
+        }
+        Keys.onReturnPressed: event => {
+            clicked()
+            event.accepted = true
+        }
+        Keys.onSpacePressed: event => {
+            clicked()
+            event.accepted = true
         }
     }
 }

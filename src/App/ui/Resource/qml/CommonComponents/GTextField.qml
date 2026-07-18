@@ -4,76 +4,80 @@ import gdl.sdk
 
 TextField {
     id: control
-    // 规格化：尺寸 large/default/small
+
+    // Public compatibility API: large | default | small.
     property string size: "default"
-    readonly property int implicitH: (size === "large" ? 40 : (size === "small" ? 24 : 32))
-    readonly property int radiusPx: 4
-    readonly property int fontPx: (size === "large" ? 16 : (size === "small" ? 12 : 14))
-    
-    // 内部属性用于颜色管理（基于 GTheme/ElementPlusColors 收敛）
-    readonly property var colors: {
-        const darkTheme = {
-            background: GTheme.fillBase,
-            border: GTheme.borderBase,
-            borderFocus: GTheme.primaryColor,
-            text: GTheme.textPrimary,
-            placeholder: GTheme.textPlaceholder,
-            selection: GTheme.fillLight,
-            selectedText: GTheme.textPrimary
-        }
+    // normal | success | warning | danger | error.
+    property string status: "normal"
 
-        const lightTheme = {
-            background: GTheme.bgWhite,
-            border: GTheme.borderBase,
-            borderFocus: GTheme.primaryColor,
-            text: GTheme.textPrimary,
-            placeholder: GTheme.textPlaceholder,
-            selection: GTheme.primaryLight(5),
-            selectedText: GTheme.textPrimary
-        }
-
-        return GTheme.dark ? darkTheme : lightTheme
+    readonly property int implicitH: size === "large" ? 40 : (size === "small" ? 24 : 32)
+    readonly property int radiusPx: GTheme.radiusBase
+    readonly property int fontPx: size === "large" ? GTheme.fontSubtitle
+                                                    : (size === "small" ? GTheme.fontCaption : GTheme.fontBody)
+    readonly property bool hasError: status === "danger" || status === "error"
+    readonly property bool hasSuccess: status === "success"
+    readonly property color semanticBorderColor: {
+        if (hasError)
+            return GTheme.borderDanger
+        if (hasSuccess)
+            return GTheme.borderSuccess
+        if (status === "warning")
+            return GTheme.borderWarning
+        return GTheme.borderBase
     }
 
-    // 基础属性设置
+    implicitWidth: 220
+    implicitHeight: Math.max(GTheme.sizeLarge, implicitH)
+    leftPadding: GTheme.spaceMD
+    rightPadding: GTheme.spaceMD
     font.pixelSize: fontPx
+    color: enabled ? GTheme.textRegular : GTheme.textDisabled
+    placeholderTextColor: enabled ? GTheme.textPlaceholder : GTheme.textDisabled
+    selectedTextColor: GTheme.textInverse
+    selectionColor: GTheme.primaryColor
     selectByMouse: true
-    selectedTextColor: colors.selectedText
-    selectionColor: colors.selection
-    color: colors.text
-    placeholderTextColor: colors.placeholder
+    hoverEnabled: true
+    focusPolicy: Qt.StrongFocus
 
-    // 背景设置
     background: Rectangle {
-        implicitHeight: control.implicitH
-        implicitWidth: 200
-        color: colors.background
-        border.color: control.activeFocus ? colors.borderFocus : colors.border
-        border.width: control.activeFocus ? 2 : 1
-        radius: control.radiusPx
+        id: fieldSurface
 
-        // 添加边框颜色过渡动画
-        Behavior on border.color {
-            ColorAnimation { duration: 150 }
+        implicitWidth: 220
+        implicitHeight: Math.max(GTheme.sizeLarge, control.implicitH)
+        radius: control.radiusPx
+        color: !control.enabled || control.readOnly ? GTheme.fillLighter : GTheme.surfaceBase
+        border.width: control.hasError || control.hasSuccess || control.status === "warning" ? 2 : 1
+        border.color: {
+            if (!control.enabled)
+                return GTheme.borderLight
+            if (control.hasError || control.hasSuccess || control.status === "warning")
+                return control.semanticBorderColor
+            if (control.hovered)
+                return GTheme.brandHover
+            return control.readOnly ? GTheme.borderLight : GTheme.borderBase
         }
-        
-        Behavior on border.width {
-            NumberAnimation { duration: 150 }
+
+        Rectangle {
+            anchors.fill: parent
+            anchors.margins: -3
+            radius: parent.radius + 3
+            color: "transparent"
+            border.width: 2
+            border.color: GTheme.focusRing
+            visible: control.enabled && control.activeFocus
+        }
+
+        Behavior on color {
+            ColorAnimation { duration: GTheme.durationBase; easing.type: GTheme.easingStandard }
+        }
+
+        Behavior on border.color {
+            ColorAnimation { duration: GTheme.durationBase; easing.type: GTheme.easingStandard }
         }
     }
 
-    // 使用 HoverHandler 设置鼠标形状
     HoverHandler {
         acceptedDevices: PointerDevice.Mouse
-        cursorShape: Qt.IBeamCursor
-    }
-    
-    // 添加获得焦点时的缩放动画
-    scale: activeFocus ? 1.02 : 1.0
-    Behavior on scale {
-        NumberAnimation {
-            duration: 150
-            easing.type: Easing.OutCubic
-        }
+        cursorShape: control.enabled ? Qt.IBeamCursor : Qt.ArrowCursor
     }
 }

@@ -12,11 +12,13 @@ GCard {
     property alias splitsValue: spinbox.value
     property alias pathSelector: savePath
     property alias saveDirectory: savePath.path
+    readonly property bool compactLayout: width < 520
     outlined: true
     padding: standardSpacing
 
     ColumnLayout {
         anchors.fill: parent
+        anchors.margins: generalCard.padding
         spacing: standardSpacing
 
         Text {
@@ -31,7 +33,8 @@ GCard {
         GridLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            columns: 4
+            Layout.minimumWidth: 0
+            columns: generalCard.compactLayout ? 1 : 4
             columnSpacing: standardSpacing
             rowSpacing: 12
 
@@ -45,8 +48,10 @@ GCard {
             GTextField {
                 id: renameEdit
                 Layout.fillWidth: true
-                Layout.preferredHeight: 32
+                Layout.minimumWidth: 0
+                Layout.preferredHeight: GTheme.sizeLarge
                 placeholderText: qsTr("Optional filename")
+                Accessible.name: qsTr("Filename")
             }
 
             Text {
@@ -58,8 +63,10 @@ GCard {
 
             GSpinBox {
                 id: spinbox
-                Layout.preferredWidth: 100
-                Layout.preferredHeight: 32
+                Layout.fillWidth: generalCard.compactLayout
+                Layout.preferredWidth: generalCard.compactLayout ? -1 : 100
+                Layout.preferredHeight: GTheme.sizeLarge
+                Accessible.name: qsTr("Connection splits")
                 from: 1
                 to: 64
                 value: 64
@@ -75,8 +82,9 @@ GCard {
             FolderSelector {
                 id: savePath
                 Layout.fillWidth: true
-                Layout.preferredHeight: 32
-                Layout.columnSpan: 3
+                Layout.minimumWidth: 0
+                Layout.preferredHeight: GTheme.sizeLarge
+                Layout.columnSpan: generalCard.compactLayout ? 1 : 3
                 path: SettingsManager.qDir
             }
         }

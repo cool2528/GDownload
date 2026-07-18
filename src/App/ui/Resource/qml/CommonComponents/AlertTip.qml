@@ -3,46 +3,35 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import gdl.sdk 1.0
 
-/**
- * AlertTip - 通用告警/提示条
- * 替换设置页内裸 Rectangle 告警框,统一告警语义配色:背景/边框/文字取 GTheme 告警令牌
- * (bgXxx/borderXxx/textXxx),修复阶段①前的幽灵令牌 bug。风格参照 GMessage:前导图标 + 文本。
- * 颜色/尺寸/间距/字号/动效一律取自 GTheme 令牌,零魔法数字。
- *
- * 用法:
- *   AlertTip {
- *       severity: "info"  // info | success | warning | danger
- *       text: qsTr("...")
- *   }
- */
+// Aurora inline feedback. The historical severity/text/iconSource API remains
+// available while title, description, semantic icons, and one recovery action
+// provide the richer production alert anatomy.
 Control {
     id: root
 
-    // ========== 公开属性 ==========
-
-    // 告警级别:info | success | warning | danger(未知值容错回退为 info)
     property string severity: "info"
-
-    // 提示文本(调用方用 qsTr 包裹英文)
     property string text: ""
-
-    // 是否显示前导图标(默认按 severity 自动选取)
+    property string title: ""
+    property string description: ""
+    property string actionText: ""
+    property string actionLabel: ""
     property bool showIcon: true
-
-    // 自定义图标字形(>0 优先于 severity 默认图标,与 GButton 的 iconSource 约定一致)
+    property bool showClose: false
     property int iconSource: 0
+    property string iconName: ""
 
-    // ========== 派生:按级别解析令牌 ==========
+    signal actionTriggered()
+    signal closeRequested()
 
-    // 归一化级别(小写化 + 容错回退)
     readonly property string resolvedSeverity: {
-        const s = severity.toLowerCase()
-        if (s === "success" || s === "warning" || s === "danger")
-            return s
+        const value = String(severity || "").toLowerCase()
+        if (value === "success" || value === "warning" || value === "danger")
+            return value
         return "info"
     }
-
-    // 背景色(取 Section 1 告警令牌)
+    readonly property string resolvedDescription: description.length > 0 ? description : text
+    readonly property string resolvedActionText: actionLabel.length > 0 ? actionLabel : actionText
+    readonly property bool compactActionLayout: resolvedActionText.length > 0 && width < 520
     readonly property color alertBg: {
         switch (resolvedSeverity) {
         case "success": return GTheme.bgSuccess
@@ -51,8 +40,6 @@ Control {
         default: return GTheme.bgInfo
         }
     }
-
-    // 边框色(取 Section 1 告警令牌)
     readonly property color alertBorder: {
         switch (resolvedSeverity) {
         case "success": return GTheme.borderSuccess
@@ -61,8 +48,6 @@ Control {
         default: return GTheme.borderInfo
         }
     }
-
-    // 文字色(取 Section 1 告警令牌,贴合原裸 Rectangle 告警框的 textInfo/textWarning 配色)
     readonly property color alertText: {
         switch (resolvedSeverity) {
         case "success": return GTheme.textSuccess
@@ -71,8 +56,6 @@ Control {
         default: return GTheme.textInfo
         }
     }
-
-    // 图标色(取主状态色,更鲜亮,参照 GMessage 的图标配色)
     readonly property color iconTint: {
         switch (resolvedSeverity) {
         case "success": return GTheme.successColor
@@ -81,21 +64,24 @@ Control {
         default: return GTheme.infoColor
         }
     }
-
-    // 默认图标字形(按 severity 自动选取)
-    readonly property int defaultIcon: {
+    readonly property string defaultIconName: {
         switch (resolvedSeverity) {
-        case "success": return SegoeFluentIcons.Completed
-        case "warning": return SegoeFluentIcons.Warning
-        case "danger": return SegoeFluentIcons.Error
-        default: return SegoeFluentIcons.Info
+        case "success": return "completed"
+        case "warning": return "warning"
+        case "danger": return "error"
+        default: return "info"
         }
     }
+    readonly property string resolvedIconName: iconName.length > 0 ? iconName : defaultIconName
+    readonly property bool hasSemanticIcon: iconName.length > 0 || iconSource <= 0
 
-    // ========== 外观 ==========
-
-    // 内边距取令牌(spec Section 2.4 约定 spaceMD)
+    implicitWidth: 360
+    implicitHeight: Math.max(GTheme.sizeLarge + padding * 2,
+                             contentLayout.implicitHeight + padding * 2)
     padding: GTheme.spaceMD
+    Accessible.role: Accessible.AlertMessage
+    Accessible.name: title.length > 0 ? title : resolvedDescription
+    Accessible.description: title.length > 0 ? resolvedDescription : ""
 
     background: Rectangle {
         radius: GTheme.radiusLarge
@@ -103,43 +89,120 @@ Control {
         border.width: 1
         border.color: root.alertBorder
 
-        // 主题切换 / 级别变更时背景、边框平滑过渡
         Behavior on color {
-            ColorAnimation {
-                duration: GTheme.durationBase
-            }
+            ColorAnimation { duration: GTheme.durationBase }
         }
         Behavior on border.color {
-            ColorAnimation {
-                duration: GTheme.durationBase
-            }
+            ColorAnimation { duration: GTheme.durationBase }
         }
     }
 
     contentItem: RowLayout {
+        id: contentLayout
+
         spacing: GTheme.spaceSM
 
-        FontIcon {
+        Item {
             visible: root.showIcon
-            iconSource: root.iconSource > 0 ? root.iconSource : root.defaultIcon
-            iconSize: GTheme.fontBody
-            color: root.iconTint
+            Layout.preferredWidth: GTheme.sizeDefault
+            Layout.preferredHeight: GTheme.sizeDefault
             Layout.alignment: Qt.AlignTop
+
+            Rectangle {
+                anchors.fill: parent
+                radius: GTheme.radiusMedium
+                color: root.alertBg
+                border.width: 1
+                border.color: root.alertBorder
+            }
+
+            AuroraIcon {
+                anchors.centerIn: parent
+                visible: root.hasSemanticIcon
+                name: root.resolvedIconName
+                iconSize: GTheme.fontBody
+                color: root.iconTint
+            }
+
+            FontIcon {
+                anchors.centerIn: parent
+                visible: !root.hasSemanticIcon && root.iconSource > 0
+                iconSource: root.iconSource
+                iconSize: GTheme.fontBody
+                color: root.iconTint
+            }
         }
 
-        Text {
-            text: root.text
-            color: root.alertText
-            font.pixelSize: GTheme.fontCaption
-            wrapMode: Text.WordWrap
+        ColumnLayout {
             Layout.fillWidth: true
-            verticalAlignment: Text.AlignVCenter
+            Layout.minimumWidth: 0
+            spacing: GTheme.spaceXS
 
-            Behavior on color {
-                ColorAnimation {
-                    duration: GTheme.durationBase
+            Text {
+                visible: root.title.length > 0
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                text: root.title
+                color: root.alertText
+                font.pixelSize: GTheme.fontBody
+                font.weight: GTheme.weightDemiBold
+                elide: Text.ElideRight
+                maximumLineCount: 1
+            }
+
+            Text {
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                text: root.resolvedDescription
+                color: root.title.length > 0 ? GTheme.textRegular : root.alertText
+                font.pixelSize: GTheme.fontCaption
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                maximumLineCount: 5
+                elide: Text.ElideRight
+
+                Behavior on color {
+                    ColorAnimation { duration: GTheme.durationBase }
                 }
             }
+
+            GButton {
+                visible: root.compactActionLayout
+                text: root.resolvedActionText
+                buttonType: "default"
+                size: "small"
+                Layout.alignment: Qt.AlignLeft
+                activeFocusOnTab: visible
+                Accessible.name: text
+                onClicked: root.actionTriggered()
+            }
+        }
+
+        GButton {
+            visible: root.resolvedActionText.length > 0 && !root.compactActionLayout
+            text: root.resolvedActionText
+            buttonType: "default"
+            size: "small"
+            Layout.alignment: Qt.AlignTop
+            Layout.maximumWidth: 160
+            activeFocusOnTab: visible
+            Accessible.name: text
+            onClicked: root.actionTriggered()
+        }
+
+        GButton {
+            visible: root.showClose
+            iconName: "close"
+            iconSize: GTheme.fontBody
+            imageSize: Qt.size(iconSize, iconSize)
+            variant: "plain"
+            Layout.preferredWidth: GTheme.sizeDefault
+            Layout.preferredHeight: GTheme.sizeDefault
+            Layout.alignment: Qt.AlignTop
+            activeFocusOnTab: visible
+            Accessible.name: qsTr("Dismiss alert")
+            ToolTip.visible: hovered
+            ToolTip.text: qsTr("Dismiss")
+            onClicked: root.closeRequested()
         }
     }
 }

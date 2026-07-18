@@ -1,60 +1,99 @@
 import QtQuick
 import QtQuick.Controls
 import gdl.sdk
+
 Switch {
     id: control
-    // 规格化尺寸：large/default/small
-    property string size: "default"
-    readonly property int trackH: (size === "large" ? 28 : (size === "small" ? 18 : 22))
-    readonly property int trackW: Math.round(trackH * 1.8)
-    readonly property int knob: trackH - 2
-    property color checkedBkColor: GTheme.primaryColor
-    property color normalBkColor: GTheme.borderBase
-    property color checkedFkColor: GTheme.bgWhite
-    property color normalFkColor: GTheme.bgWhite
-    property color textColor: GTheme.textPrimary
-    implicitHeight: trackH
-    font.pixelSize: 14
-    indicator: Rectangle {
-        implicitWidth: control.trackW
-        implicitHeight: control.trackH
-        x: control.width - width - control.rightPadding
-        y: parent.height / 2 - height / 2
-        radius: height / 2
-        color: control.checked ? checkedBkColor : normalBkColor
-        border.color: control.checked ? checkedBkColor : normalBkColor
 
-        // 添加背景颜色过渡动画
-        Behavior on color {
-            ColorAnimation { duration: 200 }
+    property string size: "default"
+    readonly property int trackH: size === "large" ? 32 : (size === "small" ? 24 : 28)
+    readonly property int trackW: size === "large" ? 52 : (size === "small" ? 40 : 44)
+    readonly property int knob: trackH - 8
+
+    property color checkedBkColor: GTheme.primaryColor
+    property color normalBkColor: GTheme.fillBase
+    property color checkedFkColor: GTheme.surfaceBase
+    property color normalFkColor: GTheme.surfaceBase
+    property color textColor: GTheme.textPrimary
+
+    readonly property bool usesDefaultCheckedColor: Qt.colorEqual(checkedBkColor, GTheme.primaryColor)
+    readonly property color effectiveTrackColor: {
+        if (!control.enabled)
+            return GTheme.fillLighter
+        if (control.checked) {
+            if (control.down)
+                return usesDefaultCheckedColor ? GTheme.brandPressed : Qt.darker(checkedBkColor, 1.14)
+            if (control.hovered)
+                return usesDefaultCheckedColor ? GTheme.brandHover : Qt.darker(checkedBkColor, 1.07)
+            return checkedBkColor
         }
-        Behavior on border.color {
-            ColorAnimation { duration: 200 }
-        }
+        if (control.down)
+            return GTheme.fillBase
+        if (control.hovered)
+            return GTheme.fillLight
+        return normalBkColor
+    }
+
+    implicitHeight: GTheme.sizeLarge
+    spacing: GTheme.spaceSM
+    font.pixelSize: GTheme.fontBody
+    hoverEnabled: true
+    focusPolicy: Qt.StrongFocus
+    opacity: enabled ? 1.0 : 0.56
+
+    indicator: Item {
+        implicitWidth: control.trackW
+        implicitHeight: GTheme.sizeLarge
+        x: control.width - width - control.rightPadding
+        y: (control.height - height) / 2
 
         Rectangle {
-            id: toggleButton
-            x: control.checked ? parent.width - width - 1 : 1
-            y: parent.height / 2 - height / 2
-            width: control.knob
-            height: control.knob
-            radius: height / 2
-            color: control.checked ? checkedFkColor : normalFkColor
-            border.color: control.checked ? checkedFkColor : normalFkColor
+            id: track
 
-            // 添加滑块移动动画
-            Behavior on x {
-                NumberAnimation {
-                    duration: 200
-                    easing.type: Easing.InOutQuad
+            width: control.trackW
+            height: control.trackH
+            anchors.centerIn: parent
+            radius: height / 2
+            color: control.effectiveTrackColor
+            border.width: 1
+            border.color: control.checked ? control.effectiveTrackColor : GTheme.borderBase
+
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: -3
+                radius: parent.radius + 3
+                color: "transparent"
+                border.width: 2
+                border.color: GTheme.focusRing
+                visible: control.enabled && control.activeFocus
+            }
+
+            Rectangle {
+                id: toggleButton
+
+                x: control.checked ? parent.width - width - 4 : 4
+                anchors.verticalCenter: parent.verticalCenter
+                width: control.knob
+                height: control.knob
+                radius: height / 2
+                color: control.checked ? control.checkedFkColor : control.normalFkColor
+                scale: control.down ? 0.9 : 1.0
+
+                Behavior on x {
+                    NumberAnimation { duration: GTheme.durationBase; easing.type: GTheme.easingStandard }
+                }
+
+                Behavior on scale {
+                    NumberAnimation { duration: GTheme.durationFast; easing.type: GTheme.easingStandard }
                 }
             }
-            // 添加滑块颜色过渡动画
+
             Behavior on color {
-                ColorAnimation { duration: 200 }
+                ColorAnimation { duration: GTheme.durationBase; easing.type: GTheme.easingStandard }
             }
+
             Behavior on border.color {
-                ColorAnimation { duration: 200 }
+                ColorAnimation { duration: GTheme.durationBase; easing.type: GTheme.easingStandard }
             }
         }
     }
@@ -62,12 +101,17 @@ Switch {
     contentItem: Text {
         text: control.text
         font: control.font
-        color: textColor
+        color: control.enabled ? control.textColor : GTheme.textDisabled
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignLeft
         rightPadding: control.indicator.width + control.spacing
         wrapMode: Text.WordWrap
         elide: Text.ElideRight
         maximumLineCount: 2
+    }
+
+    HoverHandler {
+        acceptedDevices: PointerDevice.Mouse
+        cursorShape: control.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
     }
 }

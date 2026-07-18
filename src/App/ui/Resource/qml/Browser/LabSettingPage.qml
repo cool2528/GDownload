@@ -5,100 +5,132 @@ import "./BrowserExtension"
 import "../CommonComponents"
 import gdl.sdk
 
-// 实验功能页面 - 浏览器插件引导(A 类整页容器)
-// 颜色/尺寸/间距/字号/动效一律取自 GTheme 令牌,零魔法数字
-// 4 个 BrowserExtension 子卡片为独立组件,本页仅做布局编排,不重复卡片骨架
+// Aurora Lab page. The current experimental surface is the browser-extension
+// workflow; behavior remains in the child cards while this page owns scrolling
+// and responsive spacing.
 Rectangle {
     id: labSetting
+    objectName: "labSettingsPage"
+
     color: GTheme.bgPage
     clip: true
 
+    readonly property bool compactLayout: width < 560
+    readonly property int pagePadding: compactLayout ? GTheme.spaceMD : GTheme.spaceLG
+
     ScrollView {
         id: scrollView
+        objectName: "labSettingsScrollView"
         anchors.fill: parent
-        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
         clip: true
+        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+        ScrollBar.vertical.policy: ScrollBar.AsNeeded
         contentWidth: availableWidth
-        // 底部留白:2 倍大间距 + 小间距,保证内容可完整滚动
-        contentHeight: columnLayout.implicitHeight + GTheme.spaceLG * 2 + GTheme.spaceSM
+        contentHeight: pageColumn.implicitHeight + labSetting.pagePadding * 2
 
         ColumnLayout {
-            id: columnLayout
-            width: scrollView.availableWidth
+            id: pageColumn
+            objectName: "labSettingsContent"
+            x: labSetting.pagePadding
+            y: labSetting.pagePadding
+            width: Math.max(0, scrollView.availableWidth - labSetting.pagePadding * 2)
             spacing: GTheme.spaceMD
-            anchors.margins: 0
-            anchors.topMargin: GTheme.spaceLG
 
-            // 页面标题和描述
-            ColumnLayout {
+            GCard {
+                id: headerCard
                 Layout.fillWidth: true
-                Layout.leftMargin: GTheme.spaceLG
-                Layout.rightMargin: GTheme.spaceLG
-                spacing: GTheme.spaceSM
+                Layout.minimumWidth: 0
+                implicitHeight: headerLayout.implicitHeight + padding * 2
+                outlined: true
+                hoverEnabled: false
+                interactive: false
+                variant: "accentPrimary"
+                padding: labSetting.compactLayout ? GTheme.spaceMD : GTheme.spaceLG
+                radius: GTheme.radiusLarge
+
+                background: Rectangle {
+                    radius: headerCard.radius
+                    color: GTheme.dark ? GTheme.fillLight : GTheme.primaryLight(9)
+                    border.width: 1
+                    border.color: GTheme.dark ? GTheme.borderBase : GTheme.primaryLight(7)
+                }
 
                 RowLayout {
+                    id: headerLayout
+                    anchors.fill: parent
+                    anchors.margins: headerCard.padding
                     spacing: GTheme.spaceMD
 
-                    Text {
-                        text: ""  // extension/puzzle icon
-                        font.family: "Segoe Fluent Icons"
-                        font.pixelSize: 28  // 图标尺寸,保留(非设计令牌)
+                    Rectangle {
+                        Layout.preferredWidth: GTheme.sizeLarge
+                        Layout.preferredHeight: GTheme.sizeLarge
+                        Layout.minimumWidth: GTheme.sizeLarge
+                        Layout.minimumHeight: GTheme.sizeLarge
+                        Layout.alignment: Qt.AlignTop
+                        radius: GTheme.radiusMedium
                         color: GTheme.primaryColor
+
+                        AuroraIcon {
+                            anchors.centerIn: parent
+                            name: "extension"
+                            iconSize: GTheme.fontSubtitle
+                            color: GTheme.textInverse
+                        }
                     }
 
-                    Text {
-                        text: qsTr("Browser Extension")
-                        font.pixelSize: GTheme.fontTitle
-                        font.weight: GTheme.weightDemiBold
-                        color: GTheme.textPrimary
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 0
+                        spacing: GTheme.spaceXS
+
+                        Text {
+                            Layout.fillWidth: true
+                            Layout.minimumWidth: 0
+                            text: qsTr("Browser Extension")
+                            font.pixelSize: GTheme.fontTitle
+                            font.weight: GTheme.weightDemiBold
+                            color: GTheme.textPrimary
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            Layout.minimumWidth: 0
+                            text: qsTr("Capture links from any webpage and send them directly to GDownload through a local connection.")
+                            font.pixelSize: GTheme.fontBody
+                            color: GTheme.textRegular
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        }
                     }
-                }
-
-                Text {
-                    text: qsTr("Enhance your download experience with our browser extension. Capture links from any webpage and send them directly to GDownload.")
-                    font.pixelSize: GTheme.fontBody
-                    color: GTheme.textSecondary
-                    Layout.fillWidth: true
-                    wrapMode: Text.WordWrap
-                    lineHeight: 1.5
-                }
-
-                // 分隔线(色 borderLight)
-                Divider {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 1
-                    Layout.topMargin: GTheme.spaceSM
-                    color: GTheme.borderLight
                 }
             }
 
-            // 功能亮点卡片
+            AlertTip {
+                Layout.fillWidth: true
+                severity: "warning"
+                iconName: "lightbulb"
+                title: qsTr("Experimental integration")
+                description: qsTr("Review the connection values and browser permissions before enabling capture for authenticated websites.")
+            }
+
             FeatureHighlightCard {
                 Layout.fillWidth: true
-                Layout.leftMargin: GTheme.spaceLG
-                Layout.rightMargin: GTheme.spaceLG
+                Layout.minimumWidth: 0
             }
 
-            // 安装指南卡片
             InstallationGuideCard {
                 Layout.fillWidth: true
-                Layout.leftMargin: GTheme.spaceLG
-                Layout.rightMargin: GTheme.spaceLG
+                Layout.minimumWidth: 0
             }
 
-            // 配置助手卡片
             ConfigHelperCard {
                 Layout.fillWidth: true
-                Layout.leftMargin: GTheme.spaceLG
-                Layout.rightMargin: GTheme.spaceLG
+                Layout.minimumWidth: 0
             }
 
-            // FAQ 卡片
             FAQCard {
                 Layout.fillWidth: true
-                Layout.leftMargin: GTheme.spaceLG
-                Layout.rightMargin: GTheme.spaceLG
-                Layout.bottomMargin: GTheme.spaceLG
+                Layout.minimumWidth: 0
             }
         }
     }

@@ -21,16 +21,19 @@ namespace gdl {
 
 				// Element Plus 颜色属性
 				Q_PROPERTY(QColor primaryColor READ primaryColor NOTIFY darkChanged)
-				Q_PROPERTY(QColor successColor READ successColor CONSTANT)
-				Q_PROPERTY(QColor warningColor READ warningColor CONSTANT)
-				Q_PROPERTY(QColor dangerColor READ dangerColor CONSTANT)
-				Q_PROPERTY(QColor infoColor READ infoColor CONSTANT)
+				Q_PROPERTY(QColor brandHover READ brandHover NOTIFY darkChanged)
+				Q_PROPERTY(QColor brandPressed READ brandPressed NOTIFY darkChanged)
+				Q_PROPERTY(QColor successColor READ successColor NOTIFY darkChanged)
+				Q_PROPERTY(QColor warningColor READ warningColor NOTIFY darkChanged)
+				Q_PROPERTY(QColor dangerColor READ dangerColor NOTIFY darkChanged)
+				Q_PROPERTY(QColor infoColor READ infoColor NOTIFY darkChanged)
 
 				Q_PROPERTY(QColor textPrimary READ textPrimary NOTIFY darkChanged)
 				Q_PROPERTY(QColor textRegular READ textRegular NOTIFY darkChanged)
 				Q_PROPERTY(QColor textSecondary READ textSecondary NOTIFY darkChanged)
 				Q_PROPERTY(QColor textPlaceholder READ textPlaceholder NOTIFY darkChanged)
 				Q_PROPERTY(QColor textDisabled READ textDisabled NOTIFY darkChanged)
+				Q_PROPERTY(QColor textInverse READ textInverse CONSTANT)
 
 				Q_PROPERTY(QColor borderBase READ borderBase NOTIFY darkChanged)
 				Q_PROPERTY(QColor borderLight READ borderLight NOTIFY darkChanged)
@@ -44,6 +47,11 @@ namespace gdl {
 				Q_PROPERTY(QColor bgPage READ bgPage NOTIFY darkChanged)
 				Q_PROPERTY(QColor bgBase READ bgBase NOTIFY darkChanged)
 				Q_PROPERTY(QColor bgElevated READ bgElevated NOTIFY darkChanged)
+				Q_PROPERTY(QColor bgOverlay READ bgOverlay NOTIFY darkChanged)
+				Q_PROPERTY(QColor surfaceBase READ surfaceBase NOTIFY darkChanged)
+				Q_PROPERTY(QColor surfaceElevated READ surfaceElevated NOTIFY darkChanged)
+				Q_PROPERTY(QColor focusRing READ focusRing NOTIFY darkChanged)
+				Q_PROPERTY(QColor overlayScrim READ overlayScrim NOTIFY darkChanged)
 
 				// 告警语义令牌(背景/边框/文字,info/success/warning/danger),浅暗色随主题切换
 				Q_PROPERTY(QColor bgInfo READ bgInfo NOTIFY darkChanged)
@@ -129,6 +137,8 @@ namespace gdl {
 
 				// Element Plus 颜色方法
 				QColor primaryColor() const;
+				QColor brandHover() const;
+				QColor brandPressed() const;
 				QColor successColor() const;
 				QColor warningColor() const;
 				QColor dangerColor() const;
@@ -139,6 +149,7 @@ namespace gdl {
 				QColor textSecondary() const;
 				QColor textPlaceholder() const;
 				QColor textDisabled() const;
+				QColor textInverse() const { return QColor("#FFFFFF"); }
 
 				QColor borderBase() const;
 				QColor borderLight() const;
@@ -152,6 +163,11 @@ namespace gdl {
 				QColor bgPage() const;
 				QColor bgBase() const;
 				QColor bgElevated() const;
+				QColor bgOverlay() const;
+				QColor surfaceBase() const { return bgBase(); }
+				QColor surfaceElevated() const { return bgElevated(); }
+				QColor focusRing() const { return primaryColor(); }
+				QColor overlayScrim() const;
 
 				// 告警语义令牌方法(背景/边框/文字 × info/success/warning/danger)
 				QColor bgInfo() const;

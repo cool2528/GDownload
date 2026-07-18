@@ -4,509 +4,533 @@ import QtQuick.Layouts
 import "../../CommonComponents"
 import gdl.sdk
 
-// 安装指南卡片 - 分步骤引导用户安装浏览器插件
-// 颜色/尺寸/间距/字号/圆角/动效一律取自 GTheme 令牌,零魔法数字
-// contentContainer 的 bindChildWidths 宽度绑定逻辑为既有坍缩修复,原样保留不动
+// Aurora installation flow for the browser extension. Browser brands remain
+// image assets; all product/action symbols use the semantic Aurora icon set.
 GCard {
     id: installCard
-    Layout.fillWidth: true
-    // 单层边距补偿(上下各 spaceLG):消除原 GCard padding:16 + 内层 margins:16 的双重边距
-    Layout.preferredHeight: contentLayout.implicitHeight + 2 * GTheme.spaceLG
-    outlined: true
-    padding: GTheme.spaceLG
+    objectName: "extensionInstallationCard"
 
-    // ========== 页面级布局常量(EP 令牌无对应值)==========
-    // 彩色背景上的白字(不随主题切换,参照 GButton onAccentText 约定)
-    readonly property color onAccentText: "#FFFFFF"
-    // 浏览器按钮尺寸(正方形,EP 尺寸令牌无对应,页面级布局常量)
-    readonly property int browserButtonSize: 100
-    // 浏览器图标尺寸(EP 令牌无对应,页面级布局常量)
-    readonly property int browserIconSize: 48
-    // 配置按钮宽度(EP 令牌无对应,页面级布局常量)
-    readonly property int configButtonWidth: 160
+    Layout.fillWidth: true
+    implicitHeight: contentLayout.implicitHeight + padding * 2
+    outlined: true
+    hoverEnabled: false
+    interactive: false
+    variant: "elevated"
+    padding: GTheme.spaceLG
+    radius: GTheme.radiusLarge
+
+    readonly property bool compactLayout: width < 520
+    readonly property int browserColumns: width >= 620 ? 3 : 1
+    readonly property int linkColumns: width >= 620 ? 2 : 1
+
+    function openExternal(url, message) {
+        Qt.openUrlExternally(url)
+        ToastManager.ShowInfo(message, 2000)
+    }
 
     ColumnLayout {
         id: contentLayout
         anchors.fill: parent
-        // 内层边距收为 0:GCard 已通过 padding=spaceLG 提供单层内边距,避免双重边距
-        anchors.margins: 0
+        anchors.margins: installCard.padding
         spacing: GTheme.spaceXL
 
-        // 卡片标题
         ColumnLayout {
             Layout.fillWidth: true
+            Layout.minimumWidth: 0
             spacing: GTheme.spaceXS
 
             Text {
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 text: qsTr("Installation Guide")
                 font.pixelSize: GTheme.fontSubtitle
-                font.weight: GTheme.weightMedium
+                font.weight: GTheme.weightDemiBold
                 color: GTheme.textPrimary
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             }
 
             Text {
-                text: qsTr("Follow these simple steps to get started")
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                text: qsTr("Download, install, and connect the extension in three short steps.")
                 font.pixelSize: GTheme.fontCaption
                 color: GTheme.textSecondary
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             }
         }
 
-        // Step 1: Download Extension
         StepSection {
-            Layout.fillWidth: true
             stepNumber: 1
             stepTitle: qsTr("Download Extension")
-            stepDescription: qsTr("Choose your browser and download the extension")
+            stepDescription: qsTr("Choose the browser package you want to install.")
 
             stepContent: ColumnLayout {
                 spacing: GTheme.spaceMD
 
-                Text {
-                    text: qsTr("Select your browser:")
-                    font.pixelSize: GTheme.fontCaption
-                    color: GTheme.textRegular
-                }
-
-                // 浏览器按钮行
-                RowLayout {
-                    spacing: GTheme.spaceLG
+                GridLayout {
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 0
+                    columns: installCard.browserColumns
+                    columnSpacing: GTheme.spaceMD
+                    rowSpacing: GTheme.spaceMD
 
-                    // Chrome 按钮
                     BrowserButton {
-                        browserName: "Chrome"
+                        objectName: "extensionChromeButton"
+                        browserName: qsTr("Chrome")
                         iconSource: "qrc:/images/browser-extension/chrome.svg"
-                        onClicked: {
-                            Qt.openUrlExternally("https://github.com/cool2528/gd-browser-extension/releases")
-                            ToastManager.ShowInfo(qsTr("Opening Chrome download page..."), 2000)
-                        }
+                        onClicked: installCard.openExternal(
+                                       "https://github.com/cool2528/gd-browser-extension/releases",
+                                       qsTr("Opening the Chrome download page..."))
                     }
 
-                    // Firefox 按钮
                     BrowserButton {
-                        browserName: "Firefox"
+                        objectName: "extensionFirefoxButton"
+                        browserName: qsTr("Firefox")
                         iconSource: "qrc:/images/browser-extension/firefox.svg"
-                        onClicked: {
-                            Qt.openUrlExternally("https://github.com/cool2528/gd-browser-extension/releases")
-                            ToastManager.ShowInfo(qsTr("Opening Firefox download page..."), 2000)
-                        }
+                        onClicked: installCard.openExternal(
+                                       "https://github.com/cool2528/gd-browser-extension/releases",
+                                       qsTr("Opening the Firefox download page..."))
                     }
 
-                    // Edge 按钮
                     BrowserButton {
-                        browserName: "Edge"
+                        objectName: "extensionEdgeButton"
+                        browserName: qsTr("Edge")
                         iconSource: "qrc:/images/browser-extension/edge.svg"
-                        onClicked: {
-                            Qt.openUrlExternally("https://github.com/cool2528/gd-browser-extension/releases")
-                            ToastManager.ShowInfo(qsTr("Opening Edge download page..."), 2000)
-                        }
+                        onClicked: installCard.openExternal(
+                                       "https://github.com/cool2528/gd-browser-extension/releases",
+                                       qsTr("Opening the Edge download page..."))
                     }
-
-                    Item { Layout.fillWidth: true }
                 }
 
-                // 分隔线(色 borderLight)
-                Divider {
+                GridLayout {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 1
-                    Layout.topMargin: GTheme.spaceXS
-                    color: GTheme.borderLight
-                }
+                    Layout.minimumWidth: 0
+                    columns: installCard.linkColumns
+                    columnSpacing: GTheme.spaceMD
+                    rowSpacing: GTheme.spaceSM
 
-                // 其他下载方式
-                RowLayout {
-                    spacing: GTheme.spaceXL
-                    Layout.fillWidth: true
-
-                    RowLayout {
-                        spacing: GTheme.spaceSM
-
-                        Text {
-                            text: "\uE943"  // code/github icon
-                            font.family: "Segoe Fluent Icons"
-                            font.pixelSize: GTheme.fontSubtitle
-                            color: GTheme.textSecondary
-                        }
-
-                        Text {
-                            text: qsTr("GitHub Release:")
-                            font.pixelSize: GTheme.fontCaption
-                            color: GTheme.textRegular
-                        }
-
-                        Text {
-                            text: qsTr("Visit Repository")
-                            font.pixelSize: GTheme.fontCaption
-                            color: GTheme.primaryColor
-                            font.underline: linkHover1.hovered
-
-                            HoverHandler { id: linkHover1 }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    Qt.openUrlExternally("https://github.com/cool2528/gd-browser-extension")
-                                    ToastManager.ShowInfo(qsTr("Opening GitHub..."), 2000)
-                                }
-                            }
-                        }
+                    ResourceLink {
+                        objectName: "extensionRepositoryLink"
+                        iconName: "repository"
+                        title: qsTr("GitHub Repository")
+                        description: qsTr("Releases and source code")
+                        onClicked: installCard.openExternal(
+                                       "https://github.com/cool2528/gd-browser-extension",
+                                       qsTr("Opening GitHub..."))
                     }
 
-                    RowLayout {
-                        spacing: GTheme.spaceSM
-
-                        Text {
-                            text: "\uE774"  // globe icon
-                            font.family: "Segoe Fluent Icons"
-                            font.pixelSize: GTheme.fontSubtitle
-                            color: GTheme.textSecondary
-                        }
-
-                        Text {
-                            text: qsTr("Official Site:")
-                            font.pixelSize: GTheme.fontCaption
-                            color: GTheme.textRegular
-                        }
-
-                        Text {
-                            text: qsTr("Download from gdownload.uk")
-                            font.pixelSize: GTheme.fontCaption
-                            color: GTheme.primaryColor
-                            font.underline: linkHover2.hovered
-
-                            HoverHandler { id: linkHover2 }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    Qt.openUrlExternally("https://gdownload.uk/")
-                                    ToastManager.ShowInfo(qsTr("Opening official website..."), 2000)
-                                }
-                            }
-                        }
+                    ResourceLink {
+                        objectName: "extensionWebsiteLink"
+                        iconName: "globe"
+                        title: qsTr("Official Website")
+                        description: qsTr("Download from gdownload.uk")
+                        onClicked: installCard.openExternal(
+                                       "https://gdownload.uk/",
+                                       qsTr("Opening the official website..."))
                     }
                 }
             }
         }
 
-        // Step 2: Install Extension
         StepSection {
-            Layout.fillWidth: true
             stepNumber: 2
             stepTitle: qsTr("Install Extension")
-            stepDescription: qsTr("Load the extension in your browser")
+            stepDescription: qsTr("Load the downloaded package in your browser.")
 
             stepContent: ColumnLayout {
                 spacing: GTheme.spaceMD
 
-                // Chrome/Edge 安装说明
                 InstallInstructionItem {
-                    Layout.fillWidth: true
-                    browserIcon: "\uE774"  // browser/globe icon
-                    browserName: qsTr("For Chrome/Edge:")
+                    browserName: qsTr("Chrome and Edge")
                     instructions: [
-                        qsTr("1. Open chrome://extensions/ (or edge://extensions/)"),
-                        qsTr("2. Enable \"Developer mode\" toggle"),
-                        qsTr("3. Click \"Load unpacked\""),
-                        qsTr("4. Select the dist folder from extracted files")
+                        qsTr("Open chrome://extensions/ or edge://extensions/."),
+                        qsTr("Enable Developer mode."),
+                        qsTr("Select Load unpacked."),
+                        qsTr("Choose the dist folder from the extracted release.")
                     ]
                 }
 
-                // Firefox 安装说明
                 InstallInstructionItem {
-                    Layout.fillWidth: true
-                    browserIcon: "\uE774"  // browser/globe icon
-                    browserName: qsTr("For Firefox:")
+                    browserName: qsTr("Firefox")
                     instructions: [
-                        qsTr("1. Open about:debugging#/runtime/this-firefox"),
-                        qsTr("2. Click \"Load Temporary Add-on\""),
-                        qsTr("3. Select manifest.json from the dist folder"),
-                        qsTr("4. Extension will be loaded temporarily")
+                        qsTr("Open about:debugging#/runtime/this-firefox."),
+                        qsTr("Select Load Temporary Add-on."),
+                        qsTr("Choose manifest.json from the dist folder."),
+                        qsTr("Keep the debugging page available while testing the temporary add-on.")
                     ]
                 }
 
-                // 提示信息(裸 Rectangle 告警框→AlertTip,info 语义)
                 AlertTip {
                     Layout.fillWidth: true
                     severity: "info"
-                    text: qsTr("Coming Soon: Direct installation from browser web stores!")
+                    iconName: "info"
+                    title: qsTr("Web-store installation is planned")
+                    description: qsTr("For now, install the release package manually using the steps above.")
                 }
             }
         }
 
-        // Step 3: Configure Connection
         StepSection {
-            Layout.fillWidth: true
             stepNumber: 3
             stepTitle: qsTr("Configure Connection")
-            stepDescription: qsTr("Set up the connection to GDownload")
+            stepDescription: qsTr("Pair the extension with the local GDownload service.")
 
             stepContent: ColumnLayout {
-                spacing: GTheme.spaceMD
+                spacing: GTheme.spaceSM
 
                 Text {
-                    text: qsTr("The extension needs to connect to GDownload's aria2c:")
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
+                    text: qsTr("The extension sends captured links to GDownload through the local aria2c JSON-RPC endpoint.")
                     font.pixelSize: GTheme.fontCaption
                     color: GTheme.textRegular
-                    Layout.fillWidth: true
-                    wrapMode: Text.WordWrap
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 }
 
-                // 配置说明列表
-                ColumnLayout {
-                    spacing: GTheme.spaceSM
-                    Layout.fillWidth: true
+                CheckRow { text: qsTr("Default connection values are already available in GDownload.") }
+                CheckRow { text: qsTr("The configuration helper below provides the exact endpoint and secret.") }
 
-                    Row {
-                        spacing: GTheme.spaceSM
-                        Text {
-                            text: "✅"
-                            font.pixelSize: GTheme.fontBody
-                        }
-                        Text {
-                            text: qsTr("Default settings are pre-configured")
-                            font.pixelSize: GTheme.fontCaption
-                            color: GTheme.textRegular
-                        }
-                    }
-
-                    Row {
-                        spacing: GTheme.spaceSM
-                        Text {
-                            text: "✅"
-                            font.pixelSize: GTheme.fontBody
-                        }
-                        Text {
-                            text: qsTr("Works out-of-the-box with GDownload")
-                            font.pixelSize: GTheme.fontCaption
-                            color: GTheme.textRegular
-                        }
-                    }
-                }
-
-                Text {
-                    text: qsTr("Configuration values (see below for details):")
-                    font.pixelSize: GTheme.fontCaption
-                    color: GTheme.textSecondary
-                    Layout.topMargin: GTheme.spaceXS
-                }
-
-                RowLayout {
-                    spacing: GTheme.spaceMD
-                    Layout.fillWidth: true
-
-                    GButton {
-                        text: qsTr("📖 View Configuration")
-                        type: 2
-                        Layout.preferredWidth: installCard.configButtonWidth
-                        Layout.preferredHeight: GTheme.sizeDefault
-                        onClicked: {
-                            // 滚动到配置助手卡片（在主页面中实现）
-                            ToastManager.ShowInfo(qsTr("See Configuration Helper below"), 2000)
-                        }
-                    }
+                GButton {
+                    objectName: "extensionViewConfigurationButton"
+                    Layout.fillWidth: installCard.compactLayout
+                    Layout.maximumWidth: installCard.compactLayout ? 100000 : 220
+                    Layout.topMargin: GTheme.spaceSM
+                    text: qsTr("View Configuration")
+                    iconName: "settings"
+                    activeFocusOnTab: true
+                    Accessible.name: text
+                    onClicked: ToastManager.ShowInfo(qsTr("See Configuration Helper below."), 2000)
                 }
             }
         }
     }
 
-    // 步骤区域组件
     component StepSection: ColumnLayout {
         property int stepNumber: 1
         property string stepTitle: ""
         property string stepDescription: ""
         property alias stepContent: contentContainer.data
 
+        Layout.fillWidth: true
+        Layout.minimumWidth: 0
         spacing: GTheme.spaceMD
 
         RowLayout {
-            spacing: GTheme.spaceMD
             Layout.fillWidth: true
+            Layout.minimumWidth: 0
+            spacing: GTheme.spaceMD
 
-            // 步骤编号圆圈
             Rectangle {
                 Layout.preferredWidth: GTheme.sizeDefault
                 Layout.preferredHeight: GTheme.sizeDefault
+                Layout.minimumWidth: GTheme.sizeDefault
+                Layout.minimumHeight: GTheme.sizeDefault
                 Layout.alignment: Qt.AlignTop
-                radius: GTheme.sizeDefault / 2
+                radius: GTheme.radiusCircle
                 color: GTheme.primaryColor
 
                 Text {
                     anchors.centerIn: parent
                     text: stepNumber
-                    font.pixelSize: GTheme.fontSubtitle
+                    font.pixelSize: GTheme.fontBody
                     font.weight: GTheme.weightDemiBold
-                    color: installCard.onAccentText
+                    color: GTheme.textInverse
                 }
             }
 
-            // 步骤内容
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: GTheme.spaceSM
+                Layout.minimumWidth: 0
+                spacing: GTheme.spaceXS
 
                 Text {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
                     text: stepTitle
                     font.pixelSize: GTheme.fontBody
-                    font.weight: GTheme.weightMedium
+                    font.weight: GTheme.weightDemiBold
                     color: GTheme.textPrimary
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 }
 
                 Text {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
                     text: stepDescription
                     font.pixelSize: GTheme.fontCaption
                     color: GTheme.textSecondary
-                }
-
-                Item {
-                    id: contentContainer
-                    Layout.fillWidth: true
-                    Layout.topMargin: GTheme.spaceXS
-                    implicitHeight: childrenRect.height
-
-                    // 让放入的 stepContent 铺满容器宽度:contentContainer 是普通 Item,
-                    // 其子布局不会自动继承宽度;若不绑定,内部 Layout.fillWidth 的子项会因
-                    // 容器宽度未定义而坍缩到 ~0,导致文字相互重叠。
-                    // (既有宽度坍缩修复,原样保留,勿动)
-                    onChildrenChanged: bindChildWidths()
-                    Component.onCompleted: bindChildWidths()
-                    function bindChildWidths() {
-                        for (var i = 0; i < children.length; i++) {
-                            children[i].width = Qt.binding(function () { return contentContainer.width })
-                        }
-                    }
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 }
             }
         }
 
-        // 步骤之间的分隔线(色 borderLight)
+        Item {
+            id: contentContainer
+            Layout.fillWidth: true
+            Layout.minimumWidth: 0
+            Layout.leftMargin: installCard.compactLayout ? 0 : GTheme.sizeDefault + GTheme.spaceMD
+            implicitHeight: childrenRect.height
+
+            onChildrenChanged: bindChildWidths()
+            Component.onCompleted: bindChildWidths()
+
+            function bindChildWidths() {
+                for (let index = 0; index < children.length; ++index) {
+                    children[index].width = Qt.binding(function() {
+                        return contentContainer.width
+                    })
+                }
+            }
+        }
+
         Divider {
             Layout.fillWidth: true
-            Layout.preferredHeight: 1
             Layout.topMargin: GTheme.spaceSM
-            color: GTheme.borderLight
+            color: GTheme.borderLighter
         }
     }
 
-    // 浏览器按钮组件
     component BrowserButton: Rectangle {
         property string browserName: ""
-        property string iconSource: ""
+        property url iconSource: ""
         signal clicked()
 
-        implicitWidth: installCard.browserButtonSize
-        implicitHeight: installCard.browserButtonSize
-        radius: GTheme.radiusBase
-        color: hovered ? GTheme.fillLighter : "transparent"
+        Layout.fillWidth: true
+        Layout.minimumWidth: 0
+        Layout.preferredHeight: GTheme.sizeLarge * 2 + GTheme.spaceSM
+        radius: GTheme.radiusMedium
+        color: hoverHandler.hovered ? GTheme.fillLight : GTheme.surfaceBase
         border.width: 1
-        border.color: GTheme.borderBase
-
-        property bool hovered: hoverHandler.hovered
+        border.color: hoverHandler.hovered ? GTheme.primaryColor : GTheme.borderLight
+        activeFocusOnTab: true
+        Accessible.role: Accessible.Button
+        Accessible.name: qsTr("Download for %1").arg(browserName)
 
         HoverHandler {
             id: hoverHandler
         }
 
-        Behavior on color {
-            ColorAnimation {
-                duration: GTheme.durationBase
-            }
-        }
-
         ColumnLayout {
             anchors.centerIn: parent
-            spacing: GTheme.spaceSM
+            spacing: GTheme.spaceXS
 
             Image {
-                source: iconSource
-                Layout.preferredWidth: installCard.browserIconSize
-                Layout.preferredHeight: installCard.browserIconSize
+                Layout.preferredWidth: GTheme.sizeLarge
+                Layout.preferredHeight: GTheme.sizeLarge
                 Layout.alignment: Qt.AlignHCenter
+                source: iconSource
                 fillMode: Image.PreserveAspectFit
-
-                scale: hovered ? 1.1 : 1.0
-                Behavior on scale {
-                    NumberAnimation {
-                        duration: GTheme.durationBase
-                        easing.type: GTheme.easingStandard
-                    }
-                }
+                smooth: true
+                mipmap: true
             }
 
             Text {
+                Layout.alignment: Qt.AlignHCenter
                 text: browserName
                 font.pixelSize: GTheme.fontCaption
-                font.weight: GTheme.weightMedium
+                font.weight: GTheme.weightDemiBold
                 color: GTheme.textPrimary
-                Layout.alignment: Qt.AlignHCenter
             }
 
             Text {
+                Layout.alignment: Qt.AlignHCenter
                 text: qsTr("Download")
                 font.pixelSize: GTheme.fontCaption
                 color: GTheme.primaryColor
-                Layout.alignment: Qt.AlignHCenter
             }
         }
 
         MouseArea {
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
+            onPressed: parent.forceActiveFocus()
             onClicked: parent.clicked()
+        }
+
+        Keys.onReturnPressed: event => {
+            clicked()
+            event.accepted = true
+        }
+        Keys.onSpacePressed: event => {
+            clicked()
+            event.accepted = true
         }
     }
 
-    // 安装说明条目组件
-    component InstallInstructionItem: Rectangle {
-        property string browserIcon: ""
-        property string browserName: ""
-        property var instructions: []
+    component ResourceLink: Rectangle {
+        property string iconName: "link"
+        property string title: ""
+        property string description: ""
+        signal clicked()
 
         Layout.fillWidth: true
-        implicitHeight: instrLayout.implicitHeight + 2 * GTheme.spaceMD
-        color: GTheme.bgBase
-        radius: GTheme.radiusBase
+        Layout.minimumWidth: 0
+        Layout.preferredHeight: Math.max(GTheme.sizeLarge + GTheme.spaceMD * 2,
+                                         linkLayout.implicitHeight + GTheme.spaceMD * 2)
+        radius: GTheme.radiusMedium
+        color: linkHover.hovered ? GTheme.fillLight : GTheme.fillLighter
+        border.width: 1
+        border.color: GTheme.borderLighter
+        activeFocusOnTab: true
+        Accessible.role: Accessible.Link
+        Accessible.name: title
+        Accessible.description: description
 
-        ColumnLayout {
-            id: instrLayout
+        RowLayout {
+            id: linkLayout
             anchors.fill: parent
             anchors.margins: GTheme.spaceMD
             spacing: GTheme.spaceSM
 
-            // 浏览器名称
-            RowLayout {
-                spacing: GTheme.spaceSM
+            AuroraIcon {
+                Layout.alignment: Qt.AlignTop
+                name: iconName
+                iconSize: GTheme.fontSubtitle
+                color: GTheme.primaryColor
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                spacing: 0
 
                 Text {
-                    text: browserIcon
-                    font.family: "Segoe Fluent Icons"
-                    font.pixelSize: GTheme.fontSubtitle
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
+                    text: title
+                    font.pixelSize: GTheme.fontCaption
+                    font.weight: GTheme.weightDemiBold
+                    color: GTheme.textPrimary
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                }
+
+                Text {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
+                    text: description
+                    font.pixelSize: GTheme.fontCaption
+                    color: GTheme.textSecondary
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                }
+            }
+
+            AuroraIcon {
+                name: "chevron-right"
+                iconSize: GTheme.fontBody
+                color: GTheme.textSecondary
+            }
+        }
+
+        HoverHandler {
+            id: linkHover
+        }
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            onPressed: parent.forceActiveFocus()
+            onClicked: parent.clicked()
+        }
+        Keys.onReturnPressed: event => {
+            clicked()
+            event.accepted = true
+        }
+        Keys.onSpacePressed: event => {
+            clicked()
+            event.accepted = true
+        }
+    }
+
+    component InstallInstructionItem: Rectangle {
+        property string browserName: ""
+        property var instructions: []
+
+        Layout.fillWidth: true
+        Layout.minimumWidth: 0
+        Layout.preferredHeight: instructionLayout.implicitHeight + GTheme.spaceMD * 2
+        radius: GTheme.radiusMedium
+        color: GTheme.fillLighter
+        border.width: 1
+        border.color: GTheme.borderLighter
+
+        ColumnLayout {
+            id: instructionLayout
+            anchors.fill: parent
+            anchors.margins: GTheme.spaceMD
+            spacing: GTheme.spaceSM
+
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                spacing: GTheme.spaceSM
+
+                AuroraIcon {
+                    name: "globe"
+                    iconSize: GTheme.fontSubtitle
                     color: GTheme.primaryColor
                 }
 
                 Text {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
                     text: browserName
                     font.pixelSize: GTheme.fontCaption
-                    font.weight: GTheme.weightMedium
+                    font.weight: GTheme.weightDemiBold
                     color: GTheme.textPrimary
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 }
             }
 
-            // 指令列表
             Repeater {
                 model: instructions
 
-                Text {
-                    text: modelData
-                    font.pixelSize: GTheme.fontCaption
-                    color: GTheme.textRegular
+                RowLayout {
                     Layout.fillWidth: true
-                    wrapMode: Text.WordWrap
-                    leftPadding: GTheme.spaceXL
+                    Layout.minimumWidth: 0
+                    spacing: GTheme.spaceSM
+
+                    Rectangle {
+                        Layout.preferredWidth: GTheme.spaceXS
+                        Layout.preferredHeight: GTheme.spaceXS
+                        Layout.alignment: Qt.AlignTop
+                        Layout.topMargin: GTheme.spaceSM
+                        radius: GTheme.radiusCircle
+                        color: GTheme.primaryColor
+                    }
+
+                    Text {
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 0
+                        text: modelData
+                        font.pixelSize: GTheme.fontCaption
+                        color: GTheme.textRegular
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    }
                 }
             }
+        }
+    }
+
+    component CheckRow: RowLayout {
+        property alias text: checkText.text
+
+        Layout.fillWidth: true
+        Layout.minimumWidth: 0
+        spacing: GTheme.spaceSM
+
+        AuroraIcon {
+            Layout.alignment: Qt.AlignTop
+            name: "completed"
+            iconSize: GTheme.fontBody
+            color: GTheme.successColor
+        }
+
+        Text {
+            id: checkText
+            Layout.fillWidth: true
+            Layout.minimumWidth: 0
+            font.pixelSize: GTheme.fontCaption
+            color: GTheme.textRegular
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         }
     }
 }

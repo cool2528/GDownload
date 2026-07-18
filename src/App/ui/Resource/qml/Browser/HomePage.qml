@@ -17,6 +17,8 @@ Item {
     // 页面级布局常量
     readonly property int contentMaxWidth: 1080
     readonly property int recentRowHeight: GTheme.sizeLarge + GTheme.spaceSM
+    readonly property bool compactLayout: width < 760
+    readonly property int pageInset: compactLayout ? GTheme.spaceLG : GTheme.space2XL
 
     // 快捷入口复用 TaskDialogPage,不新增第二套任务创建 UI
     Component { id: taskDialogComponent; TaskDialogPage {} }
@@ -43,76 +45,103 @@ Item {
         color: GTheme.bgPage
 
         ScrollView {
+            id: homeScroll
             anchors.fill: parent
             contentWidth: availableWidth
             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
             clip: true
 
             ColumnLayout {
-                width: Math.min(control.contentMaxWidth, parent.width - GTheme.space2XL * 2)
-                x: Math.max(GTheme.space2XL, (parent.width - width) / 2)
-                y: GTheme.space2XL
+                width: Math.min(control.contentMaxWidth,
+                                Math.max(0, homeScroll.availableWidth - control.pageInset * 2))
+                x: Math.max(control.pageInset, (homeScroll.availableWidth - width) / 2)
+                y: control.pageInset
                 spacing: GTheme.spaceLG
 
                 // ===== 欢迎区 =====
-                ColumnLayout {
+                GridLayout {
                     Layout.fillWidth: true
-                    spacing: GTheme.spaceXS
+                    columns: control.compactLayout ? 1 : 2
+                    columnSpacing: GTheme.spaceLG
+                    rowSpacing: GTheme.spaceMD
 
-                    Text {
-                        text: qsTr("Welcome back")
-                        font.pixelSize: GTheme.fontH1
-                        font.weight: GTheme.weightDemiBold
-                        color: GTheme.textPrimary
+                    ColumnLayout {
                         Layout.fillWidth: true
+                        Layout.minimumWidth: 0
+                        spacing: GTheme.spaceXS
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: qsTr("Welcome back")
+                            font.pixelSize: GTheme.fontH1
+                            font.weight: GTheme.weightDemiBold
+                            color: GTheme.textPrimary
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: qsTr("Monitor transfers, start a task, or reopen a completed file.")
+                            font.pixelSize: GTheme.fontBody
+                            color: GTheme.textSecondary
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        }
                     }
 
-                    Text {
-                        text: qsTr("Manage your downloads and start new tasks here.")
-                        font.pixelSize: GTheme.fontBody
-                        color: GTheme.textSecondary
-                        Layout.fillWidth: true
+                    GButton {
+                        objectName: "homeAddDownloadButton"
+                        Layout.fillWidth: control.compactLayout
+                        Layout.alignment: control.compactLayout ? Qt.AlignLeft : Qt.AlignRight
+                        text: qsTr("Add Download")
+                        iconName: "add"
+                        size: "large"
+                        buttonType: "primary"
+                        onClicked: control.openTaskDialog(0)
                     }
                 }
 
                 // ===== 状态概览 =====
-                GCard {
+                GridLayout {
+                    id: summaryGrid
                     Layout.fillWidth: true
-                    Layout.preferredHeight: GTheme.sizeLarge + GTheme.spaceSM * 4
-                    padding: GTheme.spaceSM
-                    outlined: true
-                    hoverEnabled: false
-                    variant: "elevated"
-                    shadow: true
+                    columns: control.compactLayout ? 1 : 3
+                    columnSpacing: GTheme.spaceMD
+                    rowSpacing: GTheme.spaceMD
 
-                    RowLayout {
-                        anchors.fill: parent
-                        spacing: GTheme.spaceSM
-
-                        SummaryMetricCard {
-                            Layout.fillWidth: true
-                            title: qsTr("Active")
-                            value: String(control.activeCount)
-                            unit: qsTr("tasks")
-                            iconSource: SegoeFluentIcons.Download
-                            accent: "primary"
-                        }
-                        SummaryMetricCard {
-                            Layout.fillWidth: true
-                            title: qsTr("Waiting")
-                            value: String(control.waitingCount)
-                            unit: qsTr("tasks")
-                            iconSource: SegoeFluentIcons.History
-                            accent: "warning"
-                        }
-                        SummaryMetricCard {
-                            Layout.fillWidth: true
-                            title: qsTr("Completed")
-                            value: String(control.completedCount)
-                            unit: qsTr("tasks")
-                            iconSource: SegoeFluentIcons.Completed
-                            accent: "success"
-                        }
+                    SummaryMetricCard {
+                        objectName: "homeActiveMetric"
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: implicitHeight
+                        expanded: true
+                        title: qsTr("Active")
+                        value: String(control.activeCount)
+                        unit: qsTr("tasks")
+                        detail: qsTr("Transfers currently running")
+                        iconName: "download"
+                        accent: "primary"
+                    }
+                    SummaryMetricCard {
+                        objectName: "homeWaitingMetric"
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: implicitHeight
+                        expanded: true
+                        title: qsTr("Waiting")
+                        value: String(control.waitingCount)
+                        unit: qsTr("tasks")
+                        detail: qsTr("Queued for the next slot")
+                        iconName: "history"
+                        accent: "warning"
+                    }
+                    SummaryMetricCard {
+                        objectName: "homeCompletedMetric"
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: implicitHeight
+                        expanded: true
+                        title: qsTr("Completed")
+                        value: String(control.completedCount)
+                        unit: qsTr("tasks")
+                        detail: qsTr("Ready to open again")
+                        iconName: "completed"
+                        accent: "success"
                     }
                 }
 
@@ -122,31 +151,36 @@ Item {
                     title: qsTr("Quick start")
                     description: qsTr("Add a new download from a link, torrent, or Baidu cloud share.")
 
-                    RowLayout {
+                    GridLayout {
                         Layout.fillWidth: true
-                        spacing: GTheme.spaceMD
+                        columns: control.compactLayout ? 1 : 3
+                        columnSpacing: GTheme.spaceMD
+                        rowSpacing: GTheme.spaceMD
 
                         QuickActionCard {
+                            objectName: "homeAddUrlAction"
                             Layout.fillWidth: true
                             title: qsTr("Add URL")
                             description: qsTr("Paste download links")
-                            iconSource: SegoeFluentIcons.Globe
+                            iconName: "globe"
                             accent: "primary"
                             onClicked: control.openTaskDialog(0)
                         }
                         QuickActionCard {
+                            objectName: "homeAddTorrentAction"
                             Layout.fillWidth: true
                             title: qsTr("Torrent")
                             description: qsTr("Drop torrent files")
-                            iconSource: SegoeFluentIcons.CloudDownload
+                            iconName: "cloud-download"
                             accent: "success"
                             onClicked: control.openTaskDialog(1)
                         }
                         QuickActionCard {
+                            objectName: "homeAddBaiduAction"
                             Layout.fillWidth: true
                             title: qsTr("Baidu")
                             description: qsTr("Parse cloud links")
-                            iconSource: SegoeFluentIcons.Cloud
+                            iconName: "cloud"
                             accent: "warning"
                             onClicked: control.openTaskDialog(2)
                         }
@@ -160,12 +194,15 @@ Item {
                     description: qsTr("Your most recently completed downloads.")
 
                     // 空状态
-                    Text {
+                    EmptyState {
                         Layout.fillWidth: true
                         visible: control.completedCount === 0
-                        text: qsTr("No completed downloads yet.")
-                        font.pixelSize: GTheme.fontBody
-                        color: GTheme.textPlaceholder
+                        compact: true
+                        iconName: "completed"
+                        title: qsTr("No completed downloads yet")
+                        description: qsTr("Completed files will appear here for quick access.")
+                        actionText: qsTr("Add download")
+                        onActionTriggered: control.openTaskDialog(0)
                     }
 
                     // 最近完成列表(最多 5 条)
@@ -195,9 +232,9 @@ Item {
                                     radius: GTheme.radiusMedium
                                     color: GTheme.bgSuccess
 
-                                    FontIcon {
+                                    AuroraIcon {
                                         anchors.centerIn: parent
-                                        iconSource: SegoeFluentIcons.Completed
+                                        name: "completed"
                                         iconSize: GTheme.fontBody
                                         color: GTheme.successColor
                                     }

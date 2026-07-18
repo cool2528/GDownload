@@ -61,18 +61,18 @@ namespace Status {
 // 命名空间沿用历史名 AntDesignLight,实际值为 Element Plus 浅色色板,勿再增删 Ant Design 色值
 namespace AntDesignLight {
     // 文字色 - Element Plus 浅色(次级/占位色微调冷调,贴合设计稿)
-    constexpr const char* kTextPrimary = "#303133";
-    constexpr const char* kTextRegular = "#606266";
-    constexpr const char* kTextSecondary = "#7B8798";
-    constexpr const char* kTextPlaceholder = "#97A3B6";
-    constexpr const char* kTextDisabled = "#C0C4CC";
+    constexpr const char* kTextPrimary = "#1F2937";
+    constexpr const char* kTextRegular = "#414C5E";
+    constexpr const char* kTextSecondary = "#596579";
+    constexpr const char* kTextPlaceholder = "#7B879B";
+    constexpr const char* kTextDisabled = "#A8B1C0";
 
     // 边框色 - 冷调蓝灰(对齐设计稿 #E8EEF7 卡片边框系)
     constexpr const char* kBorderDarker = "#B4C0D4";
     constexpr const char* kBorderDark = "#CAD8EC";
-    constexpr const char* kBorderBase = "#D5DEEA";
-    constexpr const char* kBorderLight = "#E8EEF7";
-    constexpr const char* kBorderLighter = "#EEF3FA";
+    constexpr const char* kBorderBase = "#CBD6E5";
+    constexpr const char* kBorderLight = "#DCE5F0";
+    constexpr const char* kBorderLighter = "#E7EDF5";
     constexpr const char* kBorderExtraLight = "#F4F8FD";
 
     // 填充色 - 冷调蓝灰(输入框/内嵌区)
@@ -85,8 +85,8 @@ namespace AntDesignLight {
 
     // 背景色 - 冷调蓝灰页面底 + 纯白卡片(设计稿 App Shell)
     constexpr const char* kBgWhite = "#FFFFFF";
-    constexpr const char* kBgPage = "#EEF2F7";
-    constexpr const char* kBgBase = "#F7FAFE";
+    constexpr const char* kBgPage = "#F3F6FB";
+    constexpr const char* kBgBase = "#FFFFFF";
     constexpr const char* kBgOverlay = "#FFFFFF";
 }
 
@@ -94,34 +94,34 @@ namespace AntDesignLight {
 // 命名空间沿用历史名 VSCodeDark,实际值为 Element Plus 暗色色板,勿再增删 VS Code 色值
 namespace VSCodeDark {
     // 文字色 - 暗色(次级/占位色冷调,贴合设计稿)
-    constexpr const char* kTextPrimary = "#E5EAF3";
-    constexpr const char* kTextRegular = "#CFD3DC";
-    constexpr const char* kTextSecondary = "#8896AE";
-    constexpr const char* kTextPlaceholder = "#6E7C99";
-    constexpr const char* kTextDisabled = "#4C4D4F";
+    constexpr const char* kTextPrimary = "#F3F7FF";
+    constexpr const char* kTextRegular = "#D7E0EF";
+    constexpr const char* kTextSecondary = "#A8B4C7";
+    constexpr const char* kTextPlaceholder = "#8090AA";
+    constexpr const char* kTextDisabled = "#62708A";
 
     // 边框色 - 深蓝调(对齐设计稿 #263146 暗卡边框系)
     constexpr const char* kBorderDarker = "#3C4C68";
     constexpr const char* kBorderDark = "#2E3C58";
-    constexpr const char* kBorderBase = "#2C3A55";
-    constexpr const char* kBorderLight = "#263146";
-    constexpr const char* kBorderLighter = "#222E44";
+    constexpr const char* kBorderBase = "#34435E";
+    constexpr const char* kBorderLight = "#2B3951";
+    constexpr const char* kBorderLighter = "#233149";
     constexpr const char* kBorderExtraLight = "#1A2438";
 
     // 填充色 - 深蓝调(输入框/内嵌区)
     constexpr const char* kFillDarker = "#2C3A55";
     constexpr const char* kFillDark = "#222E44";
     constexpr const char* kFillBase = "#243049";
-    constexpr const char* kFillLight = "#1B2335";
+    constexpr const char* kFillLight = "#1B263A";
     constexpr const char* kFillLighter = "#131C2E";
     constexpr const char* kFillBlank = "#161E2E";
 
     // 背景色 - 深蓝黑(非中性灰黑):页面底 < 普通面 < 高层卡片
-    constexpr const char* kBgWhite = "#161E2E";
-    constexpr const char* kBgPage = "#0E1524";
-    constexpr const char* kBgBase = "#161E2E";
-    constexpr const char* kBgElevated = "#1A2438";
-    constexpr const char* kBgOverlay = "#1A2438";
+    constexpr const char* kBgWhite = "#101827";
+    constexpr const char* kBgPage = "#080D18";
+    constexpr const char* kBgBase = "#101827";
+    constexpr const char* kBgElevated = "#151F31";
+    constexpr const char* kBgOverlay = "#151F31";
 }
 
 // Element Plus 尺寸与设计令牌规范

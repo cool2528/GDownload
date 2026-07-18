@@ -8,6 +8,8 @@ import gdl.sdk 1.0
 Item {
     id: control
     property int currentIndex: 0
+    readonly property bool compactLayout: width < 760
+    readonly property int pagePadding: compactLayout ? GTheme.spaceSM : GTheme.space2XL
 
     // 快捷入口复用现有 TaskDialogPage,不新增第二套任务创建 UI
     Component { id: taskDialogComponent; TaskDialogPage {} }
@@ -22,6 +24,19 @@ Item {
         task.closed.connect(function(){ task.destroy() })
         task.open()
     }
+
+    function refreshCurrentDownloadPage() {
+        if (control.currentIndex === 0) {
+            downloadPage.refreshLayout()
+        } else if (control.currentIndex === 1) {
+            waitingPage.refreshLayout()
+        } else if (control.currentIndex === 2) {
+            completedPage.refreshLayout()
+        }
+    }
+
+    onCurrentIndexChanged: Qt.callLater(control.refreshCurrentDownloadPage)
+    Component.onCompleted: Qt.callLater(control.refreshCurrentDownloadPage)
 
     Rectangle {
         id: mainContent
@@ -40,12 +55,13 @@ Item {
                 onAddTaskRequested: control.openTaskDialog()
             }
 
-            // 下载中心摘要条:紧凑展示当前分类计数与密度模式
+            // 下载中心摘要条：窄宽改为两列，避免四张指标卡互相遮挡。
             GCard {
+                objectName: "downloadSummaryCard"
                 Layout.fillWidth: true
-                Layout.preferredHeight: GTheme.sizeLarge + GTheme.spaceSM * 4
-                Layout.leftMargin: GTheme.space2XL
-                Layout.rightMargin: GTheme.space2XL
+                Layout.preferredHeight: summaryGrid.implicitHeight + padding * 2
+                Layout.leftMargin: control.pagePadding
+                Layout.rightMargin: control.pagePadding
                 Layout.topMargin: GTheme.spaceMD
                 Layout.bottomMargin: GTheme.spaceSM
                 padding: GTheme.spaceSM
@@ -53,16 +69,20 @@ Item {
                 hoverEnabled: false
                 variant: "elevated"
 
-                RowLayout {
+                GridLayout {
+                    id: summaryGrid
+                    objectName: "downloadSummaryGrid"
                     anchors.fill: parent
-                    spacing: GTheme.spaceSM
+                    columns: control.compactLayout ? 2 : 4
+                    columnSpacing: GTheme.spaceSM
+                    rowSpacing: GTheme.spaceSM
 
                     SummaryMetricCard {
                         Layout.fillWidth: true
                         title: qsTr("Active")
                         value: String(downloadPage.taskCount)
                         unit: qsTr("tasks")
-                        iconSource: SegoeFluentIcons.Download
+                        iconName: "download"
                         accent: "primary"
                     }
 
@@ -71,7 +91,7 @@ Item {
                         title: qsTr("Waiting")
                         value: String(waitingPage.taskCount)
                         unit: qsTr("tasks")
-                        iconSource: SegoeFluentIcons.History
+                        iconName: "queue"
                         accent: "warning"
                     }
 
@@ -80,7 +100,7 @@ Item {
                         title: qsTr("Stopped")
                         value: String(completedPage.taskCount)
                         unit: qsTr("tasks")
-                        iconSource: SegoeFluentIcons.Completed
+                        iconName: "completed"
                         accent: "success"
                     }
 
@@ -89,7 +109,7 @@ Item {
                         title: qsTr("Density")
                         value: qsTr("Comfort")
                         unit: ""
-                        iconSource: SegoeFluentIcons.View
+                        iconName: "view"
                         accent: "info"
                     }
                 }
@@ -97,15 +117,18 @@ Item {
 
 
             // 下载列表堆栈视图
-            StackLayout {
+            Item {
                 id: downloadStack
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                currentIndex: control.currentIndex
 
                 // 下载中页面
                 GDownloadViewPage {
                     id: downloadPage
+                    anchors.fill: parent
+                    visible: control.currentIndex === 0
+                    enabled: control.currentIndex === 0
+                    z: control.currentIndex === 0 ? 1 : 0
                     pageType: 0
                     objectName: "downloadPage"
                     model: BrowserManager.GetActiveDownloadModel()
@@ -114,6 +137,10 @@ Item {
                 // 等待中页面
                 GDownloadViewPage {
                     id: waitingPage
+                    anchors.fill: parent
+                    visible: control.currentIndex === 1
+                    enabled: control.currentIndex === 1
+                    z: control.currentIndex === 1 ? 1 : 0
                     pageType: 1
                     objectName: "waitingPage"
                     model: BrowserManager.GetWaitingDownloadModel()
@@ -122,6 +149,10 @@ Item {
                 // 已停止页面
                 GDownloadViewPage {
                     id: completedPage
+                    anchors.fill: parent
+                    visible: control.currentIndex === 2
+                    enabled: control.currentIndex === 2
+                    z: control.currentIndex === 2 ? 1 : 0
                     pageType: 2
                     objectName: "completedPage"
                     model: BrowserManager.GetStopedDownloadModel()

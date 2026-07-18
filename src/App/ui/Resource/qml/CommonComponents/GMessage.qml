@@ -1,66 +1,33 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Effects
 import QtQuick.Layouts
-import Qt5Compat.GraphicalEffects
 import gdl.sdk
 
-/**
- * GMessage - 增强版消息提示组件
- * 基于 Element Plus Message 组件规范
- * 
- * 主要增强：
- * - 支持 Primary 消息类型
- * - 可选的关闭按钮
- * - 6 种位置选项
- * - 可配置偏移量
- * - Plain 纯色样式
- * - 自定义图标
- * - 关闭回调
- */
-Popup {
+// Aurora transient message. It remains dynamically created by ToastContainer
+// and preserves the historical show/close/timer/type API without using Popup
+// coordinates for stack layout.
+Control {
     id: root
 
-    // ========== 公开属性 ==========
-    
-    // 消息内容
     property string message: ""
-    
-    // 显示持续时间（毫秒），0 表示不自动关闭
+    property string title: ""
     property int duration: 3000
-    
-    // 消息 ID（用于手动关闭）
     property int messageId: -1
-    
-    // ========== 样式属性 ==========
-    
-    // 最大宽度
-    property int maxWidth: 500
-    
-    // 最小宽度
-    property int minWidth: 300
-    
-    // 最大文本行数
+    property int maxWidth: 420
+    property int minWidth: 320
     property int maxTextLines: 3
-    
-    // 是否显示关闭按钮
     property bool showClose: false
-    
-    // 纯色背景样式
     property bool plain: false
-    
-    // 自定义图标（优先级高于类型默认图标）
     property int customIcon: -1
-    
-    // 与视口边缘的偏移量
-    property int offset: 16
-    
-    // ========== Element Plus 设计标准 ==========
-    
-    readonly property int standardPadding: 16
-    readonly property int iconSize: 16
-    readonly property int closeButtonSize: 20
-    
-    // ========== 消息类型枚举 ==========    
+    property string iconName: ""
+    property int offset: GTheme.spaceLG
+    property bool closing: false
+
+    readonly property int standardPadding: GTheme.spaceMD
+    readonly property int iconSize: GTheme.fontBody
+    readonly property int closeButtonSize: GTheme.sizeLarge
+
     enum MessageType {
         Primary,
         Success,
@@ -68,11 +35,8 @@ Popup {
         Info,
         Error
     }
-    
     property int messageType: GMessage.Info
-    
-    // ========== 位置枚举 ==========
-    
+
     enum Placement {
         Top,
         TopLeft,
@@ -81,326 +45,292 @@ Popup {
         BottomLeft,
         BottomRight
     }
-    
     property int placement: GMessage.Top
-    
-    // ========== 信号 ==========
-    
-    // 关闭回调
+
     signal messageClosed(int messageId)
-    
-    // ========== Popup 配置 ==========
-    
-    modal: false
-    dim: false
-    closePolicy: Popup.NoAutoClose
+
+    visible: false
+    opacity: 0
     padding: standardPadding
-    
-    // ========== 位置计算 ==========
-    
-    // 动态计算宽度（考虑关闭按钮）
-    width: {
-        let contentWidth = messageLayout.implicitWidth + 2 * padding
-        if (showClose) {
-            contentWidth += closeButtonSize + messageLayout.spacing
-        }
-        return Math.max(Math.min(contentWidth, maxWidth), minWidth)
-    }
-    
-    // 根据 placement 计算 x 坐标
-    x: {
-        if (!parent) return 0
-        
-        switch(placement) {
-            case GMessage.Top:
-            case GMessage.Bottom:
-                return Math.round((parent.width - width) / 2)
-                
-            case GMessage.TopLeft:
-            case GMessage.BottomLeft:
-                return offset
-                
-            case GMessage.TopRight:
-            case GMessage.BottomRight:
-                return parent.width - width - offset
-                
-            default:
-                return Math.round((parent.width - width) / 2)
-        }
-    }
-    
-    // y 坐标由容器管理，这里只设置初始值
-    y: offset
-    
-    // ========== 进入动画 ==========
-    
-    enter: Transition {
-        ParallelAnimation {
-            NumberAnimation {
-                property: "opacity"
-                from: 0.0
-                to: 1.0
-                duration: 300
-                easing.type: Easing.OutCubic
-            }
-            NumberAnimation {
-                property: "y"  // 两分支同为 y,原三目死逻辑(T5)
-                from: isTopPlacement() ? root.y - 20 : root.y + 20
-                to: root.y
-                duration: 300
-                easing.type: Easing.OutCubic
-            }
-        }
-    }
-    
-    // ========== 退出动画 ==========
-    
-    exit: Transition {
-        ParallelAnimation {
-            NumberAnimation {
-                property: "opacity"
-                from: 1.0
-                to: 0.0
-                duration: 200
-                easing.type: Easing.InCubic
-            }
-            NumberAnimation {
-                property: "y"  // 两分支同为 y,原三目死逻辑(T5)
-                from: root.y
-                to: isTopPlacement() ? root.y - 10 : root.y + 10
-                duration: 200
-                easing.type: Easing.InCubic
-            }
-        }
-    }
-    
-    // ========== 辅助函数 ==========
-    
-    // 判断是否为顶部位置
+    width: parent ? Math.min(maxWidth, parent.width) : implicitWidth
+    implicitWidth: Math.max(minWidth, Math.min(maxWidth, 360))
+    implicitHeight: Math.max(GTheme.sizeLarge + padding * 2,
+                             messageLayout.implicitHeight + padding * 2)
+    height: implicitHeight
+    Accessible.role: Accessible.AlertMessage
+    Accessible.name: title.length > 0 ? title : message
+    Accessible.description: title.length > 0 ? message : ""
+
     function isTopPlacement() {
-        return placement === GMessage.Top || 
-               placement === GMessage.TopLeft || 
-               placement === GMessage.TopRight
+        return placement === GMessage.Top
+               || placement === GMessage.TopLeft
+               || placement === GMessage.TopRight
     }
-    
-    // 获取背景颜色
+
     function getBackgroundColor() {
-        if (plain) {
-            return "transparent"
-        }
-        
-        switch(messageType) {
-            case GMessage.Primary:
-                return GTheme.primaryLight(8)
-            case GMessage.Success:
-                return GTheme.bgSuccess
-            case GMessage.Warning:
-                return GTheme.bgWarning
-            case GMessage.Info:
-                return GTheme.bgInfo
-            case GMessage.Error:
-                return GTheme.bgDanger
-            default:
-                return GTheme.bgWhite
+        if (plain)
+            return GTheme.surfaceElevated
+        switch (messageType) {
+        case GMessage.Primary: return GTheme.primaryLight(9)
+        case GMessage.Success: return GTheme.bgSuccess
+        case GMessage.Warning: return GTheme.bgWarning
+        case GMessage.Info: return GTheme.bgInfo
+        case GMessage.Error: return GTheme.bgDanger
+        default: return GTheme.surfaceElevated
         }
     }
-    
-    // 获取边框颜色
+
     function getBorderColor() {
-        switch(messageType) {
-            case GMessage.Primary:
-                return GTheme.primaryColor
-            case GMessage.Success:
-                return GTheme.successColor
-            case GMessage.Warning:
-                return GTheme.warningColor
-            case GMessage.Info:
-                return GTheme.infoColor
-            case GMessage.Error:
-                return GTheme.dangerColor
-            default:
-                return GTheme.borderLight
+        switch (messageType) {
+        case GMessage.Primary: return GTheme.primaryColor
+        case GMessage.Success: return GTheme.borderSuccess
+        case GMessage.Warning: return GTheme.borderWarning
+        case GMessage.Info: return GTheme.borderInfo
+        case GMessage.Error: return GTheme.borderDanger
+        default: return GTheme.borderLight
         }
     }
-    
-    // 获取图标（优先使用自定义图标）
-    function getIcon() {
-        if (customIcon !== -1) {
-            return customIcon
-        }
-        
-        switch(messageType) {
-            case GMessage.Primary:
-                return SegoeFluentIcons.CheckmarkCircle
-            case GMessage.Success:
-                return SegoeFluentIcons.CheckmarkCircle
-            case GMessage.Warning:
-                return SegoeFluentIcons.Warning
-            case GMessage.Info:
-                return SegoeFluentIcons.Info
-            case GMessage.Error:
-                return SegoeFluentIcons.ErrorBadge
-            default:
-                return SegoeFluentIcons.Info
+
+    function getIconName() {
+        if (iconName.length > 0)
+            return iconName
+        switch (messageType) {
+        case GMessage.Primary: return "completed"
+        case GMessage.Success: return "completed"
+        case GMessage.Warning: return "warning"
+        case GMessage.Info: return "info"
+        case GMessage.Error: return "error"
+        default: return "info"
         }
     }
-    
-    // 获取图标颜色
+
     function getIconColor() {
-        switch(messageType) {
-            case GMessage.Primary:
-                return GTheme.primaryColor
-            case GMessage.Success:
-                return GTheme.successColor
-            case GMessage.Warning:
-                return GTheme.warningColor
-            case GMessage.Info:
-                return GTheme.infoColor
-            case GMessage.Error:
-                return GTheme.dangerColor
-            default:
-                return GTheme.textSecondary
+        switch (messageType) {
+        case GMessage.Primary: return GTheme.primaryColor
+        case GMessage.Success: return GTheme.successColor
+        case GMessage.Warning: return GTheme.warningColor
+        case GMessage.Info: return GTheme.infoColor
+        case GMessage.Error: return GTheme.dangerColor
+        default: return GTheme.textSecondary
         }
     }
-    
-    // 获取文本颜色（plain 模式使用类型颜色）
+
     function getTextColor() {
-        if (plain) {
-            return getIconColor()
-        }
-        return GTheme.textPrimary
+        return plain ? getIconColor() : GTheme.textPrimary
     }
-    
-    // ========== 公共方法 ==========
-    
-    /**
-     * 显示消息
-     * @param msg 消息内容
-     * @param type 消息类型
-     * @param time 显示时长（可选）
-     */
+
     function show(msg, type, time) {
         message = msg
         messageType = type
-        
-        if (time !== undefined) {
+        closing = false
+        if (time !== undefined)
             duration = time
-        }
-        
-        // 根据消息长度动态调整显示时间
-        if (duration > 0 && msg.length > 50) {
-            duration = Math.min(duration * 1.5, 8000) // 最长8秒
-        }
-        
-        open()
-        
-        // 启动自动关闭定时器（如果 duration > 0）
-        if (duration > 0) {
+        if (duration > 0 && String(msg).length > 50)
+            duration = Math.min(duration * 1.5, 8000)
+
+        exitAnimation.stop()
+        visible = true
+        opacity = 0
+        slideOffset.y = isTopPlacement() ? -GTheme.spaceMD : GTheme.spaceMD
+        enterAnimation.restart()
+        if (duration > 0)
             closeTimer.restart()
-        }
     }
-    
-    /**
-     * 关闭消息
-     */
+
     function closeMessage() {
+        if (closing)
+            return
+        closing = true
         closeTimer.stop()
         messageClosed(messageId)
-        close()
+        exitAnimation.restart()
     }
-    
-    // ========== 背景样式 ==========
-    
+
+    function open() {
+        show(message, messageType, duration)
+    }
+
+    function close() {
+        closeMessage()
+    }
+
+    transform: Translate {
+        id: slideOffset
+    }
+
     background: Rectangle {
-        color: getBackgroundColor()
-        radius: 6
-        border.width: 1  // 两分支同为 1(T5)
-        border.color: getBorderColor()
-        
-        // Element Plus 风格阴影
+        color: root.plain ? "transparent" : GTheme.surfaceElevated
+        radius: GTheme.radiusLarge
+        border.width: 1
+        border.color: root.getBorderColor()
+
+        Rectangle {
+            anchors.fill: parent
+            radius: parent.radius
+            color: root.getBackgroundColor()
+            opacity: root.plain ? 0 : 0.42
+        }
+
+        Behavior on color {
+            ColorAnimation { duration: GTheme.durationBase }
+        }
+        Behavior on border.color {
+            ColorAnimation { duration: GTheme.durationBase }
+        }
+
         layer.enabled: true
-        layer.effect: DropShadow {
-            radius: 12
-            samples: 25
-            color: Qt.rgba(0, 0, 0, 0.12)
-            horizontalOffset: 0
-            verticalOffset: 2
+        layer.effect: MultiEffect {
+            shadowEnabled: true
+            shadowColor: GTheme.elevation2.color
+            shadowBlur: Math.min(1.0, GTheme.elevation2.blur / 32)
+            shadowHorizontalOffset: GTheme.elevation2.offsetX
+            shadowVerticalOffset: GTheme.elevation2.offsetY
+            autoPaddingEnabled: true
         }
     }
-    
-    // ========== 内容布局 ==========
-    
+
     contentItem: RowLayout {
         id: messageLayout
-        spacing: 12
-        
-        // 消息图标
-        FontIcon {
-            id: icon
-            iconSource: getIcon()
-            iconSize: root.iconSize
-            color: getIconColor()
+
+        spacing: GTheme.spaceSM
+
+        Item {
+            Layout.preferredWidth: GTheme.sizeDefault
+            Layout.preferredHeight: GTheme.sizeDefault
             Layout.alignment: Qt.AlignTop
-            Layout.topMargin: 2
-        }
-        
-        // 消息文本
-        Label {
-            id: messageLabel
-            text: message
-            color: getTextColor()
-            font.pixelSize: 14
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignVCenter
-            
-            // 文本换行设置
-            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-            maximumLineCount: root.maxTextLines
-            elide: Text.ElideRight
-            
-            // 工具提示（当文本被截断时）
-            MouseArea {
+
+            Rectangle {
                 anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: messageLabel.truncated ? Qt.PointingHandCursor : Qt.ArrowCursor
-                
-                ToolTip.visible: messageLabel.truncated && containsMouse
-                ToolTip.text: message
-                ToolTip.delay: 500
+                radius: GTheme.radiusMedium
+                color: root.getBackgroundColor()
+                border.width: 1
+                border.color: root.getBorderColor()
+            }
+
+            AuroraIcon {
+                anchors.centerIn: parent
+                visible: root.customIcon < 0 || root.iconName.length > 0
+                name: root.getIconName()
+                iconSize: root.iconSize
+                color: root.getIconColor()
+            }
+
+            FontIcon {
+                anchors.centerIn: parent
+                visible: root.iconName.length === 0 && root.customIcon >= 0
+                iconSource: root.customIcon >= 0 ? root.customIcon : 0
+                iconSize: root.iconSize
+                color: root.getIconColor()
             }
         }
-        
-        // 关闭按钮(GButton icon-only,自带悬停底)
-        GButton {
-            id: closeButton
-            visible: root.showClose
-            iconSource: SegoeFluentIcons.ChromeClose
-            iconSize: GTheme.fontBody
 
-            Layout.alignment: Qt.AlignTop
-            Layout.topMargin: 2
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.minimumWidth: 0
+            spacing: GTheme.spaceXS
+
+            Text {
+                visible: root.title.length > 0
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                text: root.title
+                color: root.getTextColor()
+                font.pixelSize: GTheme.fontBody
+                font.weight: GTheme.weightDemiBold
+                elide: Text.ElideRight
+                maximumLineCount: 1
+            }
+
+            Label {
+                id: messageLabel
+
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                text: root.message
+                color: root.getTextColor()
+                font.pixelSize: GTheme.fontCaption
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                maximumLineCount: root.maxTextLines
+                elide: Text.ElideRight
+                ToolTip.visible: messageHover.hovered && truncated
+                ToolTip.text: root.message
+                ToolTip.delay: 500
+
+                HoverHandler {
+                    id: messageHover
+                    acceptedDevices: PointerDevice.Mouse
+                }
+            }
+        }
+
+        GButton {
+            visible: root.showClose
+            iconName: "close"
+            iconSize: GTheme.fontBody
+            imageSize: Qt.size(iconSize, iconSize)
+            variant: "plain"
             Layout.preferredWidth: root.closeButtonSize
             Layout.preferredHeight: root.closeButtonSize
-
-            onClicked: {
-                root.closeMessage()
-            }
+            Layout.alignment: Qt.AlignTop
+            activeFocusOnTab: visible
+            Accessible.name: qsTr("Dismiss notification")
+            ToolTip.visible: hovered
+            ToolTip.text: qsTr("Dismiss")
+            onClicked: root.closeMessage()
         }
     }
-    
-    // ========== 自动关闭定时器 ==========
-    
+
     Timer {
         id: closeTimer
-        interval: duration
+        interval: root.duration
         repeat: false
         onTriggered: root.closeMessage()
     }
-    
-    // ========== 销毁处理 ==========
-    
-    onClosed: {
-        // 延迟销毁，等待退出动画完成
-        root.destroy(300)
+
+    ParallelAnimation {
+        id: enterAnimation
+
+        NumberAnimation {
+            target: root
+            property: "opacity"
+            from: 0
+            to: 1
+            duration: GTheme.durationSlow
+            easing.type: GTheme.easingStandard
+        }
+        NumberAnimation {
+            target: slideOffset
+            property: "y"
+            to: 0
+            duration: GTheme.durationSlow
+            easing.type: GTheme.easingStandard
+        }
+    }
+
+    SequentialAnimation {
+        id: exitAnimation
+
+        ParallelAnimation {
+            NumberAnimation {
+                target: root
+                property: "opacity"
+                to: 0
+                duration: GTheme.durationBase
+                easing.type: GTheme.easingStandard
+            }
+            NumberAnimation {
+                target: slideOffset
+                property: "y"
+                to: root.isTopPlacement() ? -GTheme.spaceSM : GTheme.spaceSM
+                duration: GTheme.durationBase
+                easing.type: GTheme.easingStandard
+            }
+        }
+        ScriptAction {
+            script: {
+                root.visible = false
+                root.destroy()
+            }
+        }
     }
 }

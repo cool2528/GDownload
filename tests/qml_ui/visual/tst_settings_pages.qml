@@ -86,4 +86,221 @@ TestCase {
             }
         }
     }
+
+    // Theme options previously used fixed 60 px image buttons beside a label,
+    // which overflowed the usable settings width. Keep both responsive modes
+    // covered so future visual changes cannot reintroduce horizontal overlap.
+    function test_theme_picker_geometry() {
+        var widths = [416, 320]
+        var optionNames = ["systemThemeButton", "lightThemeButton", "darkThemeButton"]
+
+        for (var w = 0; w < widths.length; ++w) {
+            testCase.width = widths[w]
+            harness.load("qrc:/qml/CommonComponents/ThemeSwitch.qml")
+            wait(100)
+
+            var picker = harness.loadedItem
+            verify(picker !== null)
+
+            for (var i = 0; i < optionNames.length; ++i) {
+                var option = findChild(picker, optionNames[i])
+                verify(option !== null, "Missing " + optionNames[i])
+                var topLeft = option.mapToItem(picker, 0, 0)
+                verify(topLeft.x >= -0.5, optionNames[i] + " starts outside the picker")
+                verify(topLeft.x + option.width <= picker.width + 0.5,
+                       optionNames[i] + " extends outside the picker at " + widths[w] + " px")
+                verify(topLeft.y >= -0.5, optionNames[i] + " starts above the picker")
+                verify(topLeft.y + option.height <= picker.implicitHeight + 0.5,
+                       optionNames[i] + " extends below implicitHeight at " + widths[w] + " px")
+            }
+        }
+    }
+
+    function verifyHorizontallyContained(item, root, label) {
+        verify(item !== null, "Missing " + label)
+        var topLeft = item.mapToItem(root, 0, 0)
+        verify(topLeft.x >= -0.5,
+               label + " starts outside its page at x=" + topLeft.x)
+        verify(topLeft.x + item.width <= root.width + 0.5,
+               label + " extends outside its page: right=" +
+               (topLeft.x + item.width) + ", page=" + root.width)
+    }
+
+    // Browser Extension previously used fixed 100/140/160 px action rows and
+    // Segoe glyphs. Capture the actual narrow page in both themes and assert
+    // that every primary action remains inside the scroll content width.
+    function test_lab_narrow_light_dark() {
+        var narrowThemes = ["light", "dark"]
+        var actionNames = [
+            "extensionChromeButton",
+            "extensionFirefoxButton",
+            "extensionEdgeButton",
+            "extensionViewConfigurationButton",
+            "extensionCopyUrlButton",
+            "extensionCopySecretButton",
+            "extensionCopyAllButton",
+            "extensionIssuesButton",
+            "extensionDocsButton",
+            "extensionWebsiteButton",
+            "extensionStarButton"
+        ]
+
+        testCase.width = 420
+        testCase.height = 720
+
+        for (var t = 0; t < narrowThemes.length; ++t) {
+            harness.themeMode = narrowThemes[t]
+            harness.load("qrc:/qml/Browser/LabSettingPage.qml")
+            wait(250)
+
+            var page = harness.loadedItem
+            verify(page !== null)
+            for (var i = 0; i < actionNames.length; ++i)
+                verifyHorizontallyContained(findChild(page, actionNames[i]), page, actionNames[i])
+
+            var tag = "lab_narrow_" + narrowThemes[t]
+            verify(Screenshot.capture(harness, tag, harness.themeMode),
+                   "Screenshot.capture failed for " + tag)
+        }
+    }
+
+    // The preferences shell switches from a fixed sidebar to a horizontal
+    // navigation rail. Keep the three semantic-icon buttons bounded at the
+    // narrow breakpoint in Light and Dark themes.
+    function test_settings_shell_narrow_light_dark() {
+        var narrowThemes = ["light", "dark"]
+        var navNames = ["settingsBasicNav", "settingsAdvancedNav", "settingsLabNav"]
+
+        testCase.width = 560
+        testCase.height = 720
+
+        for (var t = 0; t < narrowThemes.length; ++t) {
+            harness.themeMode = narrowThemes[t]
+            harness.load("qrc:/qml/Browser/SettingsPageView.qml")
+            wait(250)
+
+            var shell = harness.loadedItem
+            verify(shell !== null)
+            for (var i = 0; i < navNames.length; ++i)
+                verifyHorizontallyContained(findChild(shell, navNames[i]), shell, navNames[i])
+
+            var tag = "settings_index_narrow_" + narrowThemes[t]
+            verify(Screenshot.capture(harness, tag, harness.themeMode),
+                   "Screenshot.capture failed for " + tag)
+        }
+    }
+
+    // Long User-Agent values must remain inside the card at the same narrow
+    // width used by the compact Preferences shell.
+    function test_advanced_long_values_narrow_light_dark() {
+        var narrowThemes = ["light", "dark"]
+        var cases = [
+            {
+                tag: "useragent_long_narrow",
+                path: "qrc:/qml/Browser/UserAgentSettingPage.qml",
+                prepare: function(page) {
+                    var field = findChild(page, "customUserAgentField")
+                    verify(field !== null)
+                    field.text = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+                                 "(KHTML, like Gecko) Chrome/999.0.0.0 Safari/537.36 " +
+                                 "AuroraCompatibilityValidation/2026.07"
+                    verifyHorizontallyContained(field, page, "custom User-Agent field")
+                }
+            }
+        ]
+
+        testCase.width = 420
+        for (var c = 0; c < cases.length; ++c) {
+            for (var t = 0; t < narrowThemes.length; ++t) {
+                testCase.height = 900
+                harness.themeMode = narrowThemes[t]
+                harness.load(cases[c].path)
+                wait(200)
+
+                var page = harness.loadedItem
+                verify(page !== null)
+                cases[c].prepare(page)
+                wait(100)
+
+                testCase.height = Math.ceil(page.implicitHeight)
+                wait(50)
+                var tag = cases[c].tag + "_" + narrowThemes[t]
+                verify(Screenshot.capture(harness, tag, harness.themeMode),
+                       "Screenshot.capture failed for " + tag)
+            }
+        }
+    }
+
+    // Capture the cards below the Lab viewport as standalone narrow surfaces,
+    // so installation, long connection values, FAQ wrapping, and support
+    // actions receive direct Light/Dark review coverage.
+    function test_extension_cards_narrow_light_dark() {
+        var cards = [
+            {
+                tag: "extension_installation_narrow",
+                path: "qrc:/qml/Browser/BrowserExtension/InstallationGuideCard.qml"
+            },
+            {
+                tag: "extension_configuration_narrow",
+                path: "qrc:/qml/Browser/BrowserExtension/ConfigHelperCard.qml"
+            },
+            {
+                tag: "extension_faq_narrow",
+                path: "qrc:/qml/Browser/BrowserExtension/FAQCard.qml"
+            }
+        ]
+        var narrowThemes = ["light", "dark"]
+
+        testCase.width = 420
+        for (var c = 0; c < cards.length; ++c) {
+            testCase.height = 720
+            for (var t = 0; t < narrowThemes.length; ++t) {
+                harness.themeMode = narrowThemes[t]
+                harness.load(cards[c].path)
+                wait(250)
+
+                var card = harness.loadedItem
+                verify(card !== null)
+                testCase.height = Math.ceil(card.implicitHeight)
+                wait(100)
+                compare(Math.ceil(card.height), testCase.height)
+
+                var tag = cards[c].tag + "_" + narrowThemes[t]
+                verify(Screenshot.capture(harness, tag, harness.themeMode),
+                       "Screenshot.capture failed for " + tag)
+            }
+        }
+    }
+
+    function test_extension_faq_expanded_narrow_light_dark() {
+        var narrowThemes = ["light", "dark"]
+        testCase.width = 420
+
+        for (var t = 0; t < narrowThemes.length; ++t) {
+            testCase.height = 720
+            harness.themeMode = narrowThemes[t]
+            harness.load("qrc:/qml/Browser/BrowserExtension/FAQCard.qml")
+            wait(200)
+
+            var card = harness.loadedItem
+            verify(card !== null)
+            var connectionQuestion = findChild(card, "extensionFaqConnection")
+            var protectedQuestion = findChild(card, "extensionFaqProtectedSites")
+            verify(connectionQuestion !== null)
+            verify(protectedQuestion !== null)
+            connectionQuestion.expanded = true
+            protectedQuestion.expanded = true
+            wait(100)
+
+            testCase.height = Math.ceil(card.implicitHeight)
+            wait(100)
+            verifyHorizontallyContained(connectionQuestion, card, "expanded connection FAQ")
+            verifyHorizontallyContained(protectedQuestion, card, "expanded protected-site FAQ")
+
+            var tag = "extension_faq_expanded_narrow_" + narrowThemes[t]
+            verify(Screenshot.capture(harness, tag, harness.themeMode),
+                   "Screenshot.capture failed for " + tag)
+        }
+    }
+
 }

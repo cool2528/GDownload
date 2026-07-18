@@ -1,7 +1,6 @@
 ﻿#include "mainwindow.h"
 #include <QApplication>
 #include "engine_startup_policy.h"
-#include <QFontDatabase>
 #include <QQmlContext>
 #include <QUrl>
 #include <filesystem>
@@ -50,7 +49,6 @@ namespace gd {
 				InitNetDiskPlugins();
 			}
 			InitQmlEngine(&engine);
-			InitFont(&engine);
 			QObject::connect(
 				&engine, &QQmlApplicationEngine::objectCreationFailed, &app, []() { QApplication::exit(-1); },
 				Qt::QueuedConnection);
@@ -58,6 +56,13 @@ namespace gd {
 			engine.addImportPath(QStringLiteral("qrc:/qml"));
 			engine.load(url);
 			const auto code = app.exec();
+			// 事件循环结束后先销毁 QML 根对象，取消 ListView 等仍在孵化的委托。
+			// Managers 必须保持到 QML 对象析构完成，避免析构期绑定访问已反初始化的单例。
+			const auto root_objects = engine.rootObjects();
+			for (auto* root_object : root_objects) {
+				delete root_object;
+			}
+			engine.collectGarbage();
 			UnInitEngine();
 			return code;
 		}
@@ -143,16 +148,6 @@ namespace gd {
 			}
 		}
 		void MainWindow::InitTranslation(QGuiApplication* app) {}
-		void MainWindow::InitFont(QQmlEngine* engine) {
-			fluent_icons_font_id_ = QFontDatabase::addApplicationFont("://font/SegoeFluentIcons.ttf");
-			if (fluent_icons_font_id_ == -1) {
-				LOG_ERR("init fluenticons font fail");
-				return;
-			}
-			const auto font_family_name = QFontDatabase::applicationFontFamilies(fluent_icons_font_id_).at(0);
-			engine->rootContext()->setContextProperty("FluentIcons", font_family_name);
-		}
-
 		void MainWindow::InitIcon(QGuiApplication* app) {
 #if defined(_WIN32) || defined(_WIN64)
 			app->setWindowIcon(QIcon(":/images/logo/icon.ico"));

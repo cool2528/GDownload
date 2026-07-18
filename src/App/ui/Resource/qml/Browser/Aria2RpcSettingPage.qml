@@ -41,6 +41,7 @@ SettingCard {
                 Layout.preferredWidth: aria2RpcSettingPage.inputWidth
                 text: SettingsManager.qRpcListenPort.toString()
                 placeholderText: "16888"
+                Accessible.name: qsTr("RPC listen port")
 
                 // 只允许输入数字(业务值:端口上下界)
                 validator: IntValidator {
@@ -93,6 +94,7 @@ SettingCard {
                 text: SettingsManager.qRpcSecret
                 placeholderText: qsTr("Generated automatically on first launch")
                 echoMode: showSecretCheckbox.checked ? TextInput.Normal : TextInput.Password
+                Accessible.name: qsTr("RPC secret")
             }
 
             // 显示/隐藏密码
@@ -104,6 +106,7 @@ SettingCard {
                     id: showSecretCheckbox
                     checked: false
                     anchors.verticalCenter: parent.verticalCenter
+                    Accessible.name: qsTr("Show RPC secret")
                 }
 
                 Text {
@@ -150,7 +153,7 @@ SettingCard {
             let portValue = parseInt(portInput.text)
             // 空输入时 parseInt 返回 NaN,NaN 的所有比较均为 false 会绕过校验,必须显式判断
             if (isNaN(portValue) || portValue < 1024 || portValue > 65535) {
-                formActions.statusText = qsTr("✗ Invalid port. Please enter a value between 1024 and 65535.")
+                formActions.statusText = qsTr("Invalid port. Please enter a value between 1024 and 65535.")
                 formActions.statusColor = GTheme.dangerColor
                 ToastManager.ShowError(qsTr("Invalid port number!"), 3000)
                 return
@@ -158,7 +161,7 @@ SettingCard {
 
             // 验证密钥
             if (secretInput.text.trim() === "") {
-                formActions.statusText = qsTr("✗ Secret cannot be empty!")
+                formActions.statusText = qsTr("Secret cannot be empty!")
                 formActions.statusColor = GTheme.dangerColor
                 ToastManager.ShowError(qsTr("Secret cannot be empty!"), 3000)
                 return
@@ -172,10 +175,10 @@ SettingCard {
             // 显示 Toast 通知
             if (hasChanges) {
                 ToastManager.ShowSuccess(
-                    qsTr("✓ RPC settings saved successfully! Please restart the application to apply changes."),
+                    qsTr("RPC settings saved successfully! Please restart the application to apply changes."),
                     5000
                 )
-                formActions.statusText = qsTr("✓ Settings saved: Port=%1, Secret updated (Restart required)").arg(portValue)
+                formActions.statusText = qsTr("Settings saved: Port=%1, Secret updated (restart required)").arg(portValue)
                 formActions.statusColor = GTheme.successColor
                 // 保存设置
                 SettingsManager.SetRpcListenPort(portValue)
@@ -200,7 +203,7 @@ SettingCard {
                    "• The RPC secret is generated automatically on first launch\n" +
                    "• It's recommended to use a strong random secret for security\n" +
                    "• Make sure the port is not used by other applications\n" +
-                   "• ⚠️ You MUST restart the application after changing the port or secret!\n" +
+                   "• Important: You must restart the application after changing the port or secret.\n" +
                    "• Choose a port number between 1024 and 65535\n" +
                    "• Changes are saved immediately but only take effect after restart")
     }

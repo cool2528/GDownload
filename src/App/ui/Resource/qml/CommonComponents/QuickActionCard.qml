@@ -2,35 +2,54 @@ import QtQuick
 import QtQuick.Layouts
 import gdl.sdk
 
-// 下载中心快捷入口卡:URL / Torrent / Baidu,点击后复用现有添加任务入口
+// Aurora 快捷操作卡：整卡为单一点击目标，支持键盘、焦点、按下和禁用状态。
 GCard {
     id: root
 
     property string title: ""
     property string description: ""
+    // iconSource 保留兼容；新调用应优先使用 Aurora 语义 iconName。
     property int iconSource: 0
+    property string iconName: ""
     property string accent: "primary" // primary | success | warning | info
     signal clicked()
 
-    compact: true
-    interactive: true
+    activeFocusOnTab: enabled
+    compact: false
+    interactive: enabled
     outlined: true
-    hoverEnabled: true
-    shadow: true
-    // hover 时复用 GCard selected 视觉反馈(加粗主色边框),弥补 accent 变体下
-    // GCard 自身 hover 背景无变化的缺失,给可点击卡片以明确 hover 反馈
-    selected: actionArea.containsMouse
-    variant: {
-        switch (accent) {
-        case "success": return "accentSuccess"
-        case "warning": return "accentWarning"
-        case "info": return "accentInfo"
-        default: return "accentPrimary"
+    hoverEnabled: enabled
+    shadow: false
+    clip: false
+    disabled: !enabled
+    selected: enabled && (actionArea.containsMouse || activeFocus)
+    variant: "elevated"
+    padding: GTheme.spaceMD
+    radius: GTheme.radiusLarge
+    implicitWidth: 220
+    implicitHeight: GTheme.sizeLarge * 3
+    Layout.minimumHeight: implicitHeight
+    Accessible.role: Accessible.Button
+    Accessible.name: title
+    Accessible.description: description
+
+    background: Rectangle {
+        radius: root.radius
+        color: {
+            if (!root.enabled)
+                return GTheme.fillLighter
+            return actionArea.containsMouse ? GTheme.fillLight : GTheme.surfaceElevated
+        }
+        border.width: root.selected ? 2 : 1
+        border.color: root.selected ? root.accentColor : GTheme.borderLight
+
+        Behavior on color {
+            ColorAnimation { duration: GTheme.durationBase }
+        }
+        Behavior on border.color {
+            ColorAnimation { duration: GTheme.durationBase }
         }
     }
-    padding: GTheme.spaceSM
-    radius: GTheme.radiusRound
-    implicitHeight: GTheme.sizeLarge + GTheme.spaceSM * 2
 
     readonly property color accentColor: {
         switch (accent) {
@@ -41,7 +60,6 @@ GCard {
         }
     }
 
-    // 图标气泡底色:取 accent 低饱和底(V5 彩色气泡)
     readonly property color accentBubble: {
         switch (accent) {
         case "success": return GTheme.bgSuccess
@@ -51,55 +69,102 @@ GCard {
         }
     }
 
-    RowLayout {
+    ColumnLayout {
         anchors.fill: parent
-        spacing: GTheme.spaceSM
+        anchors.margins: root.padding
+        spacing: GTheme.spaceXS
 
         Rectangle {
-            Layout.preferredWidth: GTheme.sizeDefault
-            Layout.preferredHeight: GTheme.sizeDefault
-            Layout.minimumWidth: GTheme.sizeDefault
-            Layout.minimumHeight: GTheme.sizeDefault
-            Layout.alignment: Qt.AlignVCenter
+            Layout.preferredWidth: GTheme.sizeLarge
+            Layout.preferredHeight: GTheme.sizeLarge
+            Layout.minimumWidth: GTheme.sizeLarge
+            Layout.minimumHeight: GTheme.sizeLarge
             radius: GTheme.radiusMedium
-            color: root.accentBubble
+            color: root.enabled ? root.accentBubble : GTheme.fillLighter
+
+            AuroraIcon {
+                anchors.centerIn: parent
+                visible: root.iconName.length > 0
+                name: root.iconName.length > 0 ? root.iconName : "info"
+                iconSize: GTheme.fontSubtitle
+                color: root.enabled ? root.accentColor : GTheme.textDisabled
+            }
 
             FontIcon {
                 anchors.centerIn: parent
+                visible: root.iconName.length === 0 && root.iconSource > 0
                 iconSource: root.iconSource
-                iconSize: GTheme.fontBody
-                color: root.accentColor
+                iconSize: GTheme.fontSubtitle
+                color: root.enabled ? root.accentColor : GTheme.textDisabled
             }
         }
 
-        ColumnLayout {
+        Text {
             Layout.fillWidth: true
-            spacing: 0
-
-            Text {
-                text: root.title
-                font.pixelSize: GTheme.fontBody
-                font.weight: GTheme.weightMedium
-                color: GTheme.textPrimary
-                elide: Text.ElideRight
-                Layout.fillWidth: true
-            }
-
-            Text {
-                text: root.description
-                font.pixelSize: GTheme.fontCaption
-                color: GTheme.textSecondary
-                elide: Text.ElideRight
-                Layout.fillWidth: true
-            }
+            Layout.minimumWidth: 0
+            text: root.title
+            font.pixelSize: GTheme.fontBody
+            font.weight: GTheme.weightDemiBold
+            color: root.enabled ? GTheme.textPrimary : GTheme.textDisabled
+            elide: Text.ElideRight
+            maximumLineCount: 1
         }
+
+        Text {
+            Layout.fillWidth: true
+            Layout.minimumWidth: 0
+            Layout.fillHeight: true
+            text: root.description
+            font.pixelSize: GTheme.fontCaption
+            color: root.enabled ? GTheme.textSecondary : GTheme.textDisabled
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            maximumLineCount: 2
+            elide: Text.ElideRight
+        }
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        radius: root.radius
+        color: root.accentColor
+        opacity: actionArea.pressed ? 0.08 : 0
+
+        Behavior on opacity {
+            NumberAnimation { duration: GTheme.durationFast }
+        }
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        anchors.margins: -2
+        radius: root.radius + 2
+        color: "transparent"
+        border.width: 2
+        border.color: GTheme.focusRing
+        visible: root.activeFocus
+        z: 2
     }
 
     MouseArea {
         id: actionArea
         anchors.fill: parent
+        enabled: root.enabled
         hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
+        cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+        onPressed: root.forceActiveFocus()
         onClicked: root.clicked()
+    }
+
+    Keys.onReturnPressed: event => {
+        root.clicked()
+        event.accepted = true
+    }
+    Keys.onEnterPressed: event => {
+        root.clicked()
+        event.accepted = true
+    }
+    Keys.onSpacePressed: event => {
+        root.clicked()
+        event.accepted = true
     }
 }

@@ -8,9 +8,10 @@ Item {
     id: navigator
     Rectangle {
         id: systemNavigator
+        objectName: "primaryNavigationRail"
         anchors.fill: parent
         // 跟随主题的导航栏背景:去掉硬编码深色渐变(浅色主题错位 bug 根源)
-        color: GTheme.bgBase
+        color: GTheme.surfaceBase
 
         // 右侧分隔线,增强分区感
         Rectangle {
@@ -27,45 +28,82 @@ Item {
         // 顶部导航
         ColumnLayout {
             id: topLayout
+            width: GTheme.navBarWidth
+            height: implicitHeight
             anchors.top: parent.top
             anchors.topMargin: GTheme.spaceXL
             anchors.horizontalCenter: parent.horizontalCenter
-            spacing: GTheme.space2XL
+            spacing: GTheme.spaceMD
 
-            // 品牌标识:蓝色圆角方块 + G(对齐设计稿 App Shell 导航顶部 logo)
             Rectangle {
                 id: brandLogo
+                objectName: "repositoryLink"
                 Layout.alignment: Qt.AlignHCenter
-                Layout.preferredWidth: GTheme.sizeLarge
-                Layout.preferredHeight: GTheme.sizeLarge
-                radius: GTheme.radiusLarge
-                color: GTheme.primaryColor
+                Layout.preferredWidth: 42
+                Layout.preferredHeight: 42
+                radius: GTheme.radiusMedium
+                color: GTheme.fillLight
+                border.width: 1
+                border.color: GTheme.borderLighter
+                activeFocusOnTab: visible
+                Accessible.role: Accessible.Link
+                Accessible.name: qsTr("Open GDownload repository")
+                Accessible.description: qsTr("Opens in the default browser")
 
-                Text {
+                function activate() {
+                    Qt.openUrlExternally("https://github.com/cool2528/GDownload")
+                }
+
+                AuroraBrand {
                     anchors.centerIn: parent
-                    text: "G"
-                    color: "#FFFFFF"
-                    font.pixelSize: GTheme.fontTitle
-                    font.weight: GTheme.weightDemiBold
+                    markSize: 30
+                }
+
+                Rectangle {
+                    anchors.fill: parent
+                    anchors.margins: -3
+                    radius: parent.radius + 3
+                    color: "transparent"
+                    border.width: 2
+                    border.color: GTheme.focusRing
+                    visible: brandLogo.activeFocus
                 }
 
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: Qt.openUrlExternally("https://github.com/cool2528/GDownload")
+                    onPressed: brandLogo.forceActiveFocus()
+                    onClicked: brandLogo.activate()
+                }
+
+                Keys.onReturnPressed: event => {
+                    brandLogo.activate()
+                    event.accepted = true
+                }
+                Keys.onEnterPressed: event => {
+                    brandLogo.activate()
+                    event.accepted = true
+                }
+                Keys.onSpacePressed: event => {
+                    brandLogo.activate()
+                    event.accepted = true
                 }
             }
 
             GButton {
                 id: home
                 objectName: "navHome"
+                Accessible.name: qsTr("Home")
+                ToolTip.visible: hovered
+                ToolTip.text: qsTr("Home")
                 Layout.alignment: Qt.AlignHCenter
                 radius: GTheme.radiusLarge
-                implicitWidth: GTheme.sizeLarge
-                implicitHeight: GTheme.sizeLarge
+                Layout.preferredWidth: GTheme.sizeLarge
+                Layout.preferredHeight: GTheme.sizeLarge
                 checked: (typeof brower_view !== "undefined") && brower_view.index === 2
-                iconSource: SegoeFluentIcons.HomeSolid
-                iconSize: GTheme.fontH1
+                iconName: "home"
+                imageSize: Qt.size(20, 20)
+                tintColor: contentColor
                 onClicked: {
                     brower_view.index = 2
                 }
@@ -73,13 +111,17 @@ Item {
             GButton {
                 id: download
                 objectName: "navDownloading"
+                Accessible.name: qsTr("Active downloads")
+                ToolTip.visible: hovered
+                ToolTip.text: qsTr("Active downloads")
                 Layout.alignment: Qt.AlignHCenter
                 radius: GTheme.radiusLarge
-                implicitWidth: GTheme.sizeLarge
-                implicitHeight: GTheme.sizeLarge
+                Layout.preferredWidth: GTheme.sizeLarge
+                Layout.preferredHeight: GTheme.sizeLarge
                 checked: (typeof brower_view !== "undefined") && brower_view.index === 0 && brower_view.downloadIndex === 0
-                iconSource: SegoeFluentIcons.Download
-                iconSize: GTheme.fontH1
+                iconName: "download"
+                imageSize: Qt.size(20, 20)
+                tintColor: contentColor
                 onClicked: {
                     brower_view.index = 0
                     brower_view.switchDownloadPage(0)
@@ -89,13 +131,17 @@ Item {
             GButton {
                 id: waiting
                 objectName: "navWaiting"
+                Accessible.name: qsTr("Waiting downloads")
+                ToolTip.visible: hovered
+                ToolTip.text: qsTr("Waiting downloads")
                 Layout.alignment: Qt.AlignHCenter
                 radius: GTheme.radiusLarge
-                implicitWidth: GTheme.sizeLarge
-                implicitHeight: GTheme.sizeLarge
+                Layout.preferredWidth: GTheme.sizeLarge
+                Layout.preferredHeight: GTheme.sizeLarge
                 checked: (typeof brower_view !== "undefined") && brower_view.index === 0 && brower_view.downloadIndex === 1
-                iconSource: SegoeFluentIcons.History
-                iconSize: GTheme.fontH1
+                iconName: "queue"
+                imageSize: Qt.size(20, 20)
+                tintColor: contentColor
                 onClicked: {
                     brower_view.index = 0
                     brower_view.switchDownloadPage(1)
@@ -105,13 +151,17 @@ Item {
             GButton {
                 id: completed
                 objectName: "navCompleted"
+                Accessible.name: qsTr("Stopped downloads")
+                ToolTip.visible: hovered
+                ToolTip.text: qsTr("Stopped downloads")
                 Layout.alignment: Qt.AlignHCenter
                 radius: GTheme.radiusLarge
-                implicitWidth: GTheme.sizeLarge
-                implicitHeight: GTheme.sizeLarge
+                Layout.preferredWidth: GTheme.sizeLarge
+                Layout.preferredHeight: GTheme.sizeLarge
                 checked: (typeof brower_view !== "undefined") && brower_view.index === 0 && brower_view.downloadIndex === 2
-                iconSource: SegoeFluentIcons.Completed
-                iconSize: GTheme.fontH1
+                iconName: "completed"
+                imageSize: Qt.size(20, 20)
+                tintColor: contentColor
                 onClicked: {
                     brower_view.index = 0
                     brower_view.switchDownloadPage(2)
@@ -120,14 +170,17 @@ Item {
 
             GButton {
                 id: addTask
+                objectName: "navAddTask"
+                Accessible.name: qsTr("Add download")
+                ToolTip.visible: hovered
+                ToolTip.text: qsTr("Add download")
                 Layout.alignment: Qt.AlignHCenter
                 radius: GTheme.radiusLarge
-                implicitWidth: GTheme.sizeLarge
-                implicitHeight: GTheme.sizeLarge
-                // 用字体图标(随主题 textSecondary→primary),替代仅适配深色栏的白色 SVG,
-                // 避免浅色主题下白色"+"不可见
-                iconSource: SegoeFluentIcons.Add
-                iconSize: GTheme.fontH1
+                Layout.preferredWidth: GTheme.sizeLarge
+                Layout.preferredHeight: GTheme.sizeLarge
+                iconName: "add"
+                imageSize: Qt.size(20, 20)
+                tintColor: contentColor
                 onClicked: {
                     let task = addDownloadTask()
                     if (task) {
@@ -140,6 +193,8 @@ Item {
         // 底部导航
         ColumnLayout {
             id: bottomLayout
+            width: GTheme.navBarWidth
+            height: implicitHeight
             anchors.bottom: parent.bottom
             anchors.bottomMargin: GTheme.space3XL
             anchors.horizontalCenter: parent.horizontalCenter
@@ -147,25 +202,35 @@ Item {
 
             GButton {
                 id: setting
+                objectName: "navSettings"
+                Accessible.name: qsTr("Preferences")
+                ToolTip.visible: hovered
+                ToolTip.text: qsTr("Preferences")
                 Layout.alignment: Qt.AlignHCenter
                 radius: GTheme.radiusLarge
-                implicitWidth: GTheme.sizeLarge
-                implicitHeight: GTheme.sizeLarge
+                Layout.preferredWidth: GTheme.sizeLarge
+                Layout.preferredHeight: GTheme.sizeLarge
                 checked: (typeof brower_view !== "undefined") && brower_view.index === 1
-                iconSource: SegoeFluentIcons.SettingsSolid
-                iconSize: GTheme.fontH1
+                iconName: "settings"
+                imageSize: Qt.size(20, 20)
+                tintColor: contentColor
                 onClicked: {
                     brower_view.index = 1
                 }
             }
             GButton {
                 id: help
+                objectName: "navHelp"
+                Accessible.name: qsTr("Help and about")
+                ToolTip.visible: hovered
+                ToolTip.text: qsTr("Help and about")
                 Layout.alignment: Qt.AlignHCenter
                 radius: GTheme.radiusLarge
-                implicitWidth: GTheme.sizeLarge
-                implicitHeight: GTheme.sizeLarge
-                iconSource: SegoeFluentIcons.Info
-                iconSize: GTheme.fontH1
+                Layout.preferredWidth: GTheme.sizeLarge
+                Layout.preferredHeight: GTheme.sizeLarge
+                iconName: "help"
+                imageSize: Qt.size(20, 20)
+                tintColor: contentColor
                 onClicked: {
                     let about = showAboutDialog()
                     if (about) {

@@ -33,11 +33,11 @@ Item {
         anchors.fill: sourceLoader
         source: sourceLoader.item
         visible: sourceLoader.item !== null
-        color: elevation.color ?? Qt.rgba(0, 0, 0, 0.1)
-        radius: elevation.blur ?? 4
-        horizontalOffset: elevation.offsetX ?? 0
-        verticalOffset: elevation.offsetY ?? 1
-        spread: elevation.spread ?? 0
+        color: root.elevation.color
+        radius: root.elevation.blur
+        horizontalOffset: root.elevation.offsetX
+        verticalOffset: root.elevation.offsetY
+        spread: root.elevation.spread || 0
         transparentBorder: true
     }
 }
