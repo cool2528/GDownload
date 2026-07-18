@@ -154,8 +154,6 @@ class TstAuroraInputControlsContract : public QObject {
             {QStringLiteral("Browser/BitTorrentAdvancedSettingPage.qml"),
              {QStringLiteral("Enable DHT"), QStringLiteral("Maximum peers per torrent"),
               QStringLiteral("Require encrypted connections")}},
-            {QStringLiteral("Browser/BaiduCookieSettingPage.qml"),
-             {QStringLiteral("Baidu Netdisk cookie")}},
             {QStringLiteral("Browser/BasicSettingPage.qml"),
              {QStringLiteral("Display language"), QStringLiteral("Global proxy address")}},
             {QStringLiteral("Browser/ConnectionPerformanceSettingPage.qml"),
