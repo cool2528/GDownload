@@ -6,6 +6,7 @@
 #include <string>
 
 #include "JsPluginRuntime/plugin_manifest.h"
+#include "plugin_config_store.h"
 
 namespace fs = std::filesystem;
 
@@ -95,12 +96,64 @@ static void TestManifestSettings(const fs::path& root) {
 	CHECK(!LoadWithSettings(root / "no-label", R"([{ "key": "a", "type": "text" }])", error));
 }
 
+static void TestConfigStore(const fs::path& dir) {
+	fs::create_directories(dir);
+	using gdl::plugin::ConfigValue;
+	gdl::plugin::PluginConfigStore store(dir);
+
+	// 1. 空 store：读为空、GetValue 为 nullopt
+	CHECK(store.GetConfig("quark").empty());
+	CHECK(!store.GetValue("quark", "cookie").has_value());
+
+	// 2. 写入并读回三种类型
+	std::map<std::string, ConfigValue> values;
+	values["cookie"]  = ConfigValue::FromString("abc=1; def=2");
+	values["use_cdn"] = ConfigValue::FromBool(true);
+	values["retry"]   = ConfigValue::FromNumber(3);
+	CHECK(store.SetConfig("quark", values));
+
+	auto loaded = store.GetConfig("quark");
+	CHECK(loaded.size() == 3);
+	CHECK(loaded["cookie"].type == ConfigValue::Type::String);
+	CHECK(loaded["cookie"].string_value == "abc=1; def=2");
+	CHECK(loaded["use_cdn"].type == ConfigValue::Type::Bool);
+	CHECK(loaded["use_cdn"].bool_value == true);
+	CHECK(loaded["retry"].type == ConfigValue::Type::Number);
+	CHECK(loaded["retry"].number_value == 3);
+
+	// 3. 多插件隔离 + 新实例从磁盘读回（持久化）
+	std::map<std::string, ConfigValue> other;
+	other["token"] = ConfigValue::FromString("xyz");
+	CHECK(store.SetConfig("pan123", other));
+	gdl::plugin::PluginConfigStore reopened(dir);
+	CHECK(reopened.GetConfig("quark").size() == 3);
+	auto token = reopened.GetValue("pan123", "token");
+	CHECK(token.has_value() && token->string_value == "xyz");
+
+	// 4. RemoveConfig 只删目标插件
+	CHECK(store.RemoveConfig("quark"));
+	CHECK(store.GetConfig("quark").empty());
+	CHECK(store.GetValue("pan123", "token").has_value());
+
+	// 5. 损坏文件按空处理，不崩溃
+	{
+		std::ofstream f(dir / "plugin_configs.json", std::ios::trunc);
+		f << "{ not valid json";
+	}
+	gdl::plugin::PluginConfigStore corrupted(dir);
+	CHECK(corrupted.GetConfig("pan123").empty());
+	// 损坏后仍可写入恢复
+	CHECK(corrupted.SetConfig("pan123", other));
+	CHECK(corrupted.GetValue("pan123", "token").has_value());
+}
+
 int main() {
 	auto root = fs::temp_directory_path() / "gdl_plugin_config_test";
 	std::error_code ec;
 	fs::remove_all(root, ec);
 
 	TestManifestSettings(root / "manifest");
+	TestConfigStore(root / "store");
 
 	fs::remove_all(root, ec);
 	if (g_failures > 0) {
