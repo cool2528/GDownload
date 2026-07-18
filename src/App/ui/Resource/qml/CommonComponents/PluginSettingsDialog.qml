@@ -90,7 +90,10 @@ GDialogShell {
                     var collected = settingsForm.collect()
                     if (collected === null)
                         return
-                    PluginConfigManager.save(dialog.pluginName, collected)
+                    if (!PluginConfigManager.save(dialog.pluginName, collected)) {
+                        ToastManager.ShowError(qsTr("Failed to save plugin settings. Check disk permissions and retry."))
+                        return
+                    }
                     ToastManager.ShowSuccess(qsTr("Plugin settings saved."))
                     dialog.close()
                 }

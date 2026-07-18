@@ -112,9 +112,9 @@ namespace gdl {
 				return result;
 			}
 
-			void PluginConfigManager::save(const QString& name, const QVariantMap& new_values) {
+			bool PluginConfigManager::save(const QString& name, const QVariantMap& new_values) {
 				if (!store_) {
-					return;
+					return false;
 				}
 				auto manifest = plugin::DownloadPluginManager::Instance().GetManifestByName(name.toStdString());
 				std::map<std::string, plugin::ConfigValue> converted;
@@ -140,8 +140,12 @@ namespace gdl {
 						converted[key] = plugin::ConfigValue::FromString(it.value().toString().toStdString());
 					}
 				}
-				store_->SetConfig(name.toStdString(), converted);
-				Q_EMIT configChanged(name);
+				// 仅当落盘成功时才通知外部配置已变更，避免 UI 误判保存成功
+				const bool ok = store_->SetConfig(name.toStdString(), converted);
+				if (ok) {
+					Q_EMIT configChanged(name);
+				}
+				return ok;
 			}
 
 			void PluginConfigManager::clear(const QString& name) {
