@@ -7,6 +7,7 @@
 
 #include "JsPluginRuntime/plugin_manifest.h"
 #include "plugin_config_store.h"
+#include "plugin_manager.h"
 
 namespace fs = std::filesystem;
 
@@ -151,6 +152,74 @@ static void TestConfigStore(const fs::path& dir) {
 	CHECK(corrupted.GetValue("pan123", "token").has_value());
 }
 
+// 建一个最小插件：parseUrl 返回 gdl.config.get 的值，验证值优先级
+static void WriteConfigProbePlugin(const fs::path& plugins_dir) {
+	auto dir = plugins_dir / "config-probe";
+	fs::create_directories(dir);
+	{
+		std::ofstream f(dir / "manifest.json", std::ios::trunc);
+		f << R"({
+			"manifest_version": 1,
+			"name": "config-probe",
+			"version": "1.0.0",
+			"entry": "main.js",
+			"type": "netdisk",
+			"url_patterns": ["*://example.com*"],
+			"permissions": { "http": ["example.com"] },
+			"settings": [
+				{ "key": "quality", "type": "select", "default": "high",
+				  "options": ["high", "low"], "label": "Quality" },
+				{ "key": "cookie", "type": "textarea", "role": "token", "label": "Cookie" }
+			]
+		})";
+	}
+	{
+		std::ofstream f(dir / "main.js", std::ios::trunc);
+		f << R"(export default {
+			async parseUrl(url, userToken) {
+				const quality = gdl.config.get("quality");
+				const missing = gdl.config.get("nonexistent");
+				return [{
+					path: "/probe",
+					name: String(quality) + "|" + String(missing) + "|" + String(userToken),
+					size: 0, is_dir: false, file_id: "probe"
+				}];
+			}
+		};)";
+	}
+}
+
+static void TestGdlConfig(const fs::path& dir) {
+	auto plugins_dir = dir / "plugins";
+	auto data_dir	= dir / "data";
+	fs::create_directories(data_dir);
+	WriteConfigProbePlugin(plugins_dir);
+
+	auto& manager = gdl::plugin::DownloadPluginManager::Instance();
+	CHECK(manager.LoadJsPlugins(plugins_dir.string(), data_dir.string()));
+	auto plugin = manager.GetPluginByName("config-probe");
+	CHECK(plugin != nullptr);
+	if (!plugin) return;
+
+	// 1. 无用户配置：default 生效，未知 key 为 null
+	auto files = plugin->ParseUrl("https://example.com", "tok");
+	CHECK(files.has_value() && files->size() == 1);
+	if (files && !files->empty()) {
+		CHECK(files->front().name == "high|null|tok");
+	}
+
+	// 2. 用户保存配置后：用户值覆盖 default（gdl.config 每次读透传到 store）
+	gdl::plugin::PluginConfigStore store(data_dir);
+	std::map<std::string, gdl::plugin::ConfigValue> values;
+	values["quality"] = gdl::plugin::ConfigValue::FromString("low");
+	CHECK(store.SetConfig("config-probe", values));
+	auto files2 = plugin->ParseUrl("https://example.com", "tok");
+	CHECK(files2.has_value() && !files2->empty());
+	if (files2 && !files2->empty()) {
+		CHECK(files2->front().name == "low|null|tok");
+	}
+}
+
 int main() {
 	auto root = fs::temp_directory_path() / "gdl_plugin_config_test";
 	std::error_code ec;
@@ -158,6 +227,7 @@ int main() {
 
 	TestManifestSettings(root / "manifest");
 	TestConfigStore(root / "store");
+	TestGdlConfig(root / "jsplugin");
 
 	fs::remove_all(root, ec);
 	if (g_failures > 0) {

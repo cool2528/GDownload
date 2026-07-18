@@ -2,6 +2,7 @@
 #include <filesystem>
 
 #include "../../IDownload_Plugin.h"
+#include "../../plugin_config_store.h"
 #include "../cookie_jar.h"
 #include "../js_runtime.h"
 #include "../plugin_manifest.h"
@@ -18,6 +19,8 @@ namespace gdl {
 				CookieJar* cookie_jar{nullptr};
 				// 键值存储文件：plugin_storage/<name>.json
 				std::filesystem::path storage_file;
+				// 用户配置存储（gdl.config 只读来源；由 JsPluginHost 持有）
+				PluginConfigStore* config_store{nullptr};
 				// 宿主回调（指向 JsPluginHost 持有的 std::function，可能为空函数）
 				const INetDiskDownloadPlugin::VerificationCallback* verification_callback{nullptr};
 				const INetDiskDownloadPlugin::MessageNotifyCallback* notify_callback{nullptr};
@@ -39,6 +42,7 @@ namespace gdl {
 			JSValue CreateStorageApi(JSContext* ctx);
 			JSValue CreateUiApi(JSContext* ctx);
 			JSValue CreateLogApi(JSContext* ctx);
+			JSValue CreateConfigApi(JSContext* ctx);
 			// gdl.notify 挂在 gdl 根上（api_ui.cxx 提供实现）
 			JSValue CreateNotifyFunction(JSContext* ctx);
 

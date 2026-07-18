@@ -18,6 +18,7 @@ namespace gdl {
 				}
 				// runtime_ 在 cookie_jar_ 之前析构（Context 引用了 ApiContext 中的 jar 指针）
 				runtime_.reset();
+				config_store_.reset();
 				cookie_jar_.reset();
 			}
 
@@ -55,6 +56,10 @@ namespace gdl {
 				cookie_jar_ = std::make_unique<CookieJar>(data_root_ / "plugin_cookies" / (manifest_.name + ".json"),
 														  manifest_.permissions.http_domains);
 				cookie_jar_->Load();
+
+				// 用户配置存储：gdl.config 只读来源
+				config_store_			 = std::make_unique<PluginConfigStore>(data_root_);
+				api_context_.config_store = config_store_.get();
 
 				// 组装 ApiContext 并注入 gdl.*
 				api_context_.manifest			   = &manifest_;
