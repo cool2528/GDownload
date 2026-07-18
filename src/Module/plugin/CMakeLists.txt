@@ -1,5 +1,3 @@
 
-# 插件 管理器
+# 插件 管理器（含 JS 脚本插件运行时）
 add_subdirectory(PluginManager)
-# 百度 云盘插件
-add_subdirectory(Baidu_Plugin)
