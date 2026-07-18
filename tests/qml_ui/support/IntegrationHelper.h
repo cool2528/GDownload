@@ -10,6 +10,8 @@ namespace tests {
 class FakeBrowserManager;
 class FakeSettingsManager;
 class TestToastManager;
+class TestGTheme;
+class TestNetWorkDiskManager;
 
 // 集成测试共享引擎设置:注册全部 QML 单例 + 枚举 + 字体,使真实 QML 页面可加载
 //
@@ -24,7 +26,9 @@ class TestToastManager;
 // 调用方拥有 engine / fakeBrowser / fakeSettings 的生命周期(通常作为测试类成员)。
 // 本函数仅在 engine 上注册类型与上下文属性,不接管所有权。
 TestToastManager* setupIntegrationEngine(QQmlEngine* engine, FakeBrowserManager* fakeBrowser,
-										 FakeSettingsManager* fakeSettings);
+										 FakeSettingsManager* fakeSettings,
+										 TestGTheme** theme = nullptr,
+										 TestNetWorkDiskManager** netDisk = nullptr);
 
 // 加载 QML 组件并按 objectName 查找子控件。失败返回 nullptr 并输出错误到 qWarning
 template <typename T = QQuickItem>

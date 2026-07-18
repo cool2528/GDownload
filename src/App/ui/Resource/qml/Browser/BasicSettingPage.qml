@@ -30,12 +30,13 @@ Rectangle {
             // ========== 主题和语言设置 ==========
             SettingCard {
                 title: qsTr("Appearance & Language")
+                description: qsTr("Personalize the app appearance and display language")
                 Layout.fillWidth: true
                 Layout.leftMargin: GTheme.spaceLG
                 Layout.rightMargin: GTheme.spaceLG
                 Layout.topMargin: GTheme.spaceLG
 
-                // 主题切换:复合预览组件,高度跟随自身 implicitHeight(内含 60x60 主题预览按钮)
+                // Aurora 主题预览自绘并响应内容宽度，窄窗口改为单列以避免遮挡。
                 ThemeSwitch {
                     id: themeSwitch
                     Layout.fillWidth: true
@@ -49,8 +50,15 @@ Rectangle {
                         id: languageComBoBox
                         Layout.preferredWidth: 150  // 本地布局常量:语言下拉固定宽
                         Layout.preferredHeight: GTheme.sizeDefault
+                        Accessible.name: qsTr("Display language")
                         property var values: LanguageManager.GetSupportedLanguages()
-                        model: ["English", "简体中文", "繁體中文", "日本語", "한국어"]
+                        model: [
+                            qsTr("English"),
+                            qsTr("Simplified Chinese"),
+                            qsTr("Traditional Chinese"),
+                            qsTr("Japanese"),
+                            qsTr("Korean")
+                        ]
                         onActivated: function(selectIndex) {
                             let index = selectIndex
                             let value = languageComBoBox.values[index]
@@ -199,6 +207,7 @@ Rectangle {
                             id: proxySetting
                             Layout.fillWidth: true
                             Layout.preferredHeight: GTheme.sizeDefault
+                            Accessible.name: qsTr("Global proxy address")
                             placeholderText: "[http://][USER:PASSWORD@]HOST[:PORT]"
                             text: SettingsManager.qGlobalProxy
                         }

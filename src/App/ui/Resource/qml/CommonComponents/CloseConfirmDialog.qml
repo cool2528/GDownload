@@ -37,7 +37,7 @@ GMessageBox {
     title: qsTr("Close Confirmation")
     messageType: GMessageBox.Warning
     message: qsTr("Do you want to quit the application or minimize it to the system tray?")
-    dialogWidth: 420
+    dialogWidth: 460
     standardHeight: 360
 
     // 自定义内容:提示文字 + "不再询问"选项
@@ -45,19 +45,45 @@ GMessageBox {
         ColumnLayout {
             spacing: GTheme.spaceMD
 
-            Label {
-                text: qsTr("Tip: When minimized to tray, the application will continue running in the background. You can restore the window from the system tray.")
-                font.pixelSize: GTheme.fontCaption
-                color: GTheme.textSecondary
-                wrapMode: Text.WordWrap
+            Rectangle {
                 Layout.fillWidth: true
+                implicitHeight: trayTipRow.implicitHeight + GTheme.spaceMD * 2
+                radius: GTheme.radiusLarge
+                color: GTheme.bgInfo
+                border.width: 1
+                border.color: GTheme.borderInfo
+
+                RowLayout {
+                    id: trayTipRow
+                    anchors.fill: parent
+                    anchors.margins: GTheme.spaceMD
+                    spacing: GTheme.spaceMD
+
+                    AuroraIcon {
+                        name: "info"
+                        iconSize: GTheme.fontSubtitle
+                        color: GTheme.infoColor
+                        Layout.alignment: Qt.AlignTop
+                    }
+
+                    Label {
+                        text: qsTr("When minimized to tray, GDownload keeps running in the background. Restore it from the system tray at any time.")
+                        font.pixelSize: GTheme.fontCaption
+                        color: GTheme.textSecondary
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                        Accessible.role: Accessible.StaticText
+                        Accessible.name: text
+                    }
+                }
             }
 
             GCheckBox {
                 id: dontAskAgainCheckbox
                 objectName: "chkDontAskAgain"
-                text: qsTr("Don't ask again, remember my choice")
+                text: qsTr("Remember my choice")
                 checked: root.dontAskAgain
+                Accessible.name: text
                 onCheckedChanged: root.dontAskAgain = checked
             }
 
@@ -91,7 +117,7 @@ GMessageBox {
             objectName: "btnConfirmClose"
         }
     ]
-    defaultButtonIndex: -1
+    defaultButtonIndex: 1
 
     // ========== 事件处理 ==========
 
@@ -108,5 +134,6 @@ GMessageBox {
     // 打开时重置状态
     onOpened: {
         root.dontAskAgain = false
+        Qt.callLater(root.focusDefaultButton)
     }
 }

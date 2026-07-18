@@ -49,10 +49,15 @@ set(QML_UI_INTEGRATION_TESTS
     bulk_delete
     single_delete
     download_failure
+    download_lifecycle
     close_confirm
     theme_toggle
     navigation
     design_system_contract
+    surface_contract
+    aurora_input_controls_contract
+    aurora_icon_contract
+    runtime_behavior
 )
 
 set(QML_UI_APP_RESOURCES

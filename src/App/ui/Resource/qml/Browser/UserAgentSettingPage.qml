@@ -11,7 +11,9 @@ import gdl.sdk
 // 颜色/尺寸/间距/字号/圆角/动效一律取自 GTheme 令牌;buttonWidth 为页面级布局常量(spec 2.3)
 SettingCard {
     id: userAgentSettingPage
+    objectName: "userAgentSettingsCard"
     Layout.fillWidth: true
+    Layout.minimumWidth: 0
 
     title: qsTr("User-Agent")
     description: qsTr("Configure HTTP/HTTPS User-Agent string for compatibility with different servers")
@@ -75,6 +77,7 @@ SettingCard {
 
         Text {
             Layout.fillWidth: true
+            Layout.minimumWidth: 0
             text: qsTr("Preset User-Agent")
             font.pixelSize: GTheme.fontBody
             font.weight: GTheme.weightMedium
@@ -83,8 +86,11 @@ SettingCard {
 
         GComBoBox {
             id: userAgentPresetComboBox
+            objectName: "userAgentPresetComboBox"
             Layout.fillWidth: true
+            Layout.minimumWidth: 0
             Layout.preferredHeight: GTheme.sizeDefault
+            Accessible.name: qsTr("User-Agent preset")
 
             // 创建预设名称列表
             model: {
@@ -146,6 +152,7 @@ SettingCard {
 
         Text {
             Layout.fillWidth: true
+            Layout.minimumWidth: 0
             text: qsTr("Custom User-Agent")
             font.pixelSize: GTheme.fontBody
             font.weight: GTheme.weightMedium
@@ -154,8 +161,11 @@ SettingCard {
 
         GTextField {
             id: customUserAgentField
+            objectName: "customUserAgentField"
             Layout.fillWidth: true
+            Layout.minimumWidth: 0
             Layout.preferredHeight: GTheme.sizeDefault
+            Accessible.name: qsTr("Custom User-Agent")
             placeholderText: qsTr("Enter custom User-Agent string...")
 
             onEditingFinished: {
@@ -201,9 +211,9 @@ SettingCard {
 
             // 验证不能为空
             if (userAgent === "") {
-                formActions.statusText = qsTr("✗ User-Agent cannot be empty!")
+                formActions.statusText = qsTr("User-Agent cannot be empty.")
                 formActions.statusColor = GTheme.dangerColor
-                ToastManager.ShowError(qsTr("User-Agent cannot be empty!"), 3000)
+                ToastManager.ShowError(qsTr("User-Agent cannot be empty."), 3000)
                 return
             }
 
@@ -215,7 +225,7 @@ SettingCard {
                 SettingsManager.SetAria2UserAgent(userAgent)
 
                 ToastManager.ShowSuccess(
-                    qsTr("✓ User-Agent settings saved and applied successfully!"),
+                    qsTr("User-Agent settings saved and applied successfully."),
                     3000
                 )
 
@@ -228,7 +238,7 @@ SettingCard {
                     }
                 }
 
-                formActions.statusText = qsTr("✓ Settings saved: %1").arg(presetName)
+                formActions.statusText = qsTr("Settings saved: %1").arg(presetName)
                 formActions.statusColor = GTheme.successColor
             } else {
                 ToastManager.ShowInfo(qsTr("No changes detected."), 2000)

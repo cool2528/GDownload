@@ -174,6 +174,66 @@ class TstCreateTask : public QObject {
 		QVERIFY(!toastManager_->lastMessage().isEmpty());
 	}
 
+	void test_torrent_advanced_options_are_forwarded_to_addTorrent() {
+		QQmlComponent comp(&engine_, QUrl("qrc:/qml/CommonComponents/TaskDialogPage.qml"));
+		QVERIFY2(!comp.isError(), qPrintable(comp.errorString()));
+		QScopedPointer<QObject> dialog(comp.createWithInitialProperties(
+			{{QStringLiteral("initialTab"), 1}}));
+		QVERIFY2(!dialog.isNull(), "TaskDialogPage 实例化失败");
+
+		auto* dropArea = dialog->findChild<QQuickItem*>("taskTorrentDropArea");
+		auto* advancedToggle = dialog->findChild<QQuickItem*>("taskAdvancedOptionsToggle");
+		auto* trackers = dialog->findChild<QQuickItem*>("taskTorrentTrackerUrls");
+		auto* dhtSwitch = dialog->findChild<QQuickItem*>("taskTorrentDhtSwitch");
+		auto* peerLimit = dialog->findChild<QQuickItem*>("taskTorrentPeerLimit");
+		auto* encryption = dialog->findChild<QQuickItem*>("taskTorrentEncryption");
+		auto* seedRatio = dialog->findChild<QQuickItem*>("taskTorrentSeedRatio");
+		auto* seedTime = dialog->findChild<QQuickItem*>("taskTorrentSeedTime");
+		QVERIFY(dropArea);
+		QVERIFY(advancedToggle);
+		QVERIFY(trackers);
+		QVERIFY(dhtSwitch);
+		QVERIFY(peerLimit);
+		QVERIFY(encryption);
+		QVERIFY(seedRatio);
+		QVERIFY(seedTime);
+
+		dropArea->setProperty("path", QStringLiteral("C:/Temp/aurora-options.torrent"));
+		advancedToggle->setProperty("checked", true);
+		trackers->setProperty("text",
+			QStringLiteral("udp://tracker.example.org:1337/announce\n"
+						   "https://tracker.example.org/announce\n"
+						   "udp://tracker.example.org:1337/announce"));
+		dhtSwitch->setProperty("checked", false);
+		peerLimit->setProperty("value", 80);
+		encryption->setProperty("currentIndex", 1);
+		seedRatio->setProperty("text", QStringLiteral("1.5"));
+		seedTime->setProperty("value", 45);
+
+		auto* btnCreateTask = dialog->findChild<QQuickItem*>("btnCreateTask");
+		QVERIFY(btnCreateTask);
+		QMetaObject::invokeMethod(btnCreateTask, "clicked");
+
+		QTRY_COMPARE_WITH_TIMEOUT(fakeBrowser_->lastRpcMethod(),
+								  QStringLiteral("AddTorrentTask"), 1000);
+		const auto args = fakeBrowser_->lastRpcCall().args;
+		QVERIFY2(args.size() == 2, "AddTorrentTask 应有 2 个参数(torrent, options)");
+		QCOMPARE(args.at(0).toString(), QStringLiteral("C:/Temp/aurora-options.torrent"));
+
+		const auto options = args.at(1).toMap();
+		QCOMPARE(options.value(QStringLiteral("bt-tracker")).toString(),
+				 QStringLiteral("udp://tracker.example.org:1337/announce,"
+							"https://tracker.example.org/announce"));
+		QCOMPARE(options.value(QStringLiteral("enable-dht")).toString(), QStringLiteral("false"));
+		QCOMPARE(options.value(QStringLiteral("bt-max-peers")).toString(), QStringLiteral("80"));
+		QCOMPARE(options.value(QStringLiteral("bt-require-crypto")).toString(), QStringLiteral("true"));
+		QCOMPARE(options.value(QStringLiteral("bt-force-encryption")).toString(), QStringLiteral("false"));
+		QCOMPARE(options.value(QStringLiteral("seed-ratio")).toString(), QStringLiteral("1.5"));
+		QCOMPARE(options.value(QStringLiteral("seed-time")).toString(), QStringLiteral("45"));
+		QVERIFY(!options.contains(QStringLiteral("user-agent")));
+		QVERIFY(!options.contains(QStringLiteral("header")));
+	}
+
 	void test_addUri_failure_stays_on_dialog() {
 		fakeBrowser_->setAddTaskResult(false);
 

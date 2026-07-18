@@ -20,8 +20,9 @@ ScrollBar {
 
     property alias running: anim.running
 
-    x: parent.width - width
-    height: parent.availableHeight
+    x: parent ? parent.width - width : 0
+    height: parent ? parent.availableHeight : implicitHeight
+    implicitWidth: fixWidth > 0 ? fixWidth : (thin ? 4 : 8)
 
     policy: ScrollBar.AsNeeded
     interactive: true
@@ -76,25 +77,40 @@ ScrollBar {
         anim.destPosition = scrollBar.position
     }
 
+    background: Rectangle {
+        implicitWidth: scrollBar.implicitWidth
+        radius: width / 2
+        color: GTheme.fillBase
+        opacity: scrollBar.maxPosition > 0 ? 0.55 : 0
+    }
+
     contentItem: Rectangle {
-        id: contentItem
+        id: thumb
 
-        color: GTheme.dark ? GTheme.borderLight : GTheme.borderBase
-        radius: 5
+        color: scrollBar.activeFocus ? GTheme.focusRing : GTheme.textSecondary
+        radius: width / 2
 
-        implicitWidth: fixWidth > 0 ? fixWidth : 15
+        implicitWidth: fixWidth > 0 ? fixWidth
+                                    : (hoverHandler.hovered || scrollBar.pressed ? (thin ? 8 : 10)
+                                                                                 : (thin ? 4 : 6))
         implicitHeight: 65
 
         opacity: maxPosition <= 0 ? 0 :
                 scrollBar.policy === ScrollBar.AlwaysOn ? 1 :
                 scrollBar.policy === ScrollBar.AlwaysOff ? 0 :
-                anim.running ? 1 :
-                hoverHandler.hovered ? 1 : 0
+                anim.running || scrollBar.pressed || hoverHandler.hovered ? 0.95 : 0.72
 
         Behavior on opacity {
             NumberAnimation {
-                duration: 200
-                easing.type: Easing.OutExpo
+                duration: GTheme.durationFast
+                easing.type: GTheme.easingStandard
+            }
+        }
+
+        Behavior on implicitWidth {
+            NumberAnimation {
+                duration: GTheme.durationFast
+                easing.type: GTheme.easingStandard
             }
         }
     }
@@ -103,7 +119,8 @@ ScrollBar {
         id: anim
 
         property real delta: -scrollBar.mouseAngleDelta / 120
-        property real stepTo: delta * scrollBar.step / (scrollBar.viewContentHeight - scrollBar.viewHeight)
+        property real scrollRange: scrollBar.viewContentHeight - scrollBar.viewHeight
+        property real stepTo: scrollRange > 0 ? delta * scrollBar.step / scrollRange : 0
         property real destPosition: 0.0
 
         target: scrollBar
@@ -116,20 +133,6 @@ ScrollBar {
     HoverHandler {
         id: hoverHandler
 
-        onHoveredChanged: {
-            if (!hovered) contentItem.implicitWidth = fixWidth > 0 ? fixWidth : 5
-        }
-
-        onPointChanged: {
-            if(fixWidth > 0) {
-               contentItem.implicitWidth = fixWidth 
-               return
-            }
-            if (scrollBar.thin) {
-                contentItem.implicitWidth = Math.min(10, 5 + point.position.x / 4)
-            } else {
-                contentItem.implicitWidth = Math.min(15, 5 + point.position.x / 1.5)
-            }
-        }
+        acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
     }
 }

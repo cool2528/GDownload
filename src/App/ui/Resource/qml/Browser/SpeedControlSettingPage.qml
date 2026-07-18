@@ -41,6 +41,7 @@ SettingCard {
                 Layout.preferredHeight: GTheme.sizeDefault
                 text: SettingsManager.qMaxOverallDownloadLimit.toString()
                 placeholderText: "0"
+                Accessible.name: qsTr("Global download speed limit")
 
                 // 只允许输入数字
                 validator: IntValidator {
@@ -81,6 +82,7 @@ SettingCard {
                 Layout.preferredHeight: GTheme.sizeDefault
                 text: SettingsManager.qMaxOverallUploadLimit.toString()
                 placeholderText: "0"
+                Accessible.name: qsTr("Global upload speed limit")
 
                 // 只允许输入数字
                 validator: IntValidator {
@@ -121,6 +123,7 @@ SettingCard {
                 Layout.preferredHeight: GTheme.sizeDefault
                 text: SettingsManager.qLowestSpeedLimit.toString()
                 placeholderText: "0"
+                Accessible.name: qsTr("Lowest download speed limit")
 
                 // 只允许输入数字
                 validator: IntValidator {
@@ -157,19 +160,19 @@ SettingCard {
 
             // 范围校验(业务边界值,非设计令牌)
             if (downloadLimit < 0 || downloadLimit > 102400) {
-                formActions.statusText = qsTr("✗ Download limit must be between 0 and 102400 KB/s")
+                formActions.statusText = qsTr("Download limit must be between 0 and 102400 KB/s")
                 formActions.statusColor = GTheme.dangerColor
                 ToastManager.ShowError(qsTr("Invalid download limit!"), 3000)
                 return
             }
             if (uploadLimit < 0 || uploadLimit > 10240) {
-                formActions.statusText = qsTr("✗ Upload limit must be between 0 and 10240 KB/s")
+                formActions.statusText = qsTr("Upload limit must be between 0 and 10240 KB/s")
                 formActions.statusColor = GTheme.dangerColor
                 ToastManager.ShowError(qsTr("Invalid upload limit!"), 3000)
                 return
             }
             if (lowestSpeed < 0 || lowestSpeed > 1024) {
-                formActions.statusText = qsTr("✗ Lowest speed must be between 0 and 1024 KB/s")
+                formActions.statusText = qsTr("Lowest speed must be between 0 and 1024 KB/s")
                 formActions.statusColor = GTheme.dangerColor
                 ToastManager.ShowError(qsTr("Invalid lowest speed!"), 3000)
                 return
@@ -186,7 +189,7 @@ SettingCard {
                 { val: lowestSpeed, old: SettingsManager.qLowestSpeedLimit,
                   setter: function (v) { SettingsManager.SetAria2LowestSpeedLimit(v) },
                   label: qsTr("LowestSpeed") }
-            ], qsTr("✓ Speed control settings saved and applied successfully!"))
+            ], qsTr("Speed control settings saved and applied successfully!"))
         }
     }
 }

@@ -1,60 +1,82 @@
 import QtQuick
 import gdl.sdk
 
-// 顶部消息堆叠容器:监听 ToastManager.messageRequested,用统一的 GMessage 模板渲染
-// (System A 的 C++ 接口与所有调用点不变;此处仅把渲染模板从 MessageToast 切到 GMessage)
+// Aurora toast host. A clipped viewport and a real Column own stack geometry,
+// so long or numerous messages never rely on unconstrained y assignments.
 Item {
     id: root
 
-    // 消息之间的垂直间距
-    property int spacing: GTheme.spaceMD
-
-    // 存储所有活动消息
+    property int spacing: GTheme.spaceSM
+    property int edgeMargin: GTheme.spaceLG
+    property int maxToastWidth: 420
     property var activeMessages: []
+    property int nextMessageId: 1
 
-    // GMessage 模板组件
+    readonly property real stackContentHeight: toastStack.height
+    readonly property real viewportHeight: toastViewport.height
+
     Component {
         id: messageComponent
+
         GMessage {
-            // GMessage 关闭时(定时器到点或手动)会发出 messageClosed,并在 onClosed 中自销毁
+            showClose: true
+
             onMessageClosed: {
-                let index = root.activeMessages.indexOf(this)
+                const index = root.activeMessages.indexOf(this)
                 if (index !== -1) {
                     root.activeMessages.splice(index, 1)
-                    root.repositionMessages()
+                    root.activeMessages = root.activeMessages.slice(0)
                 }
-                // 不在此处 destroy:GMessage 自身 onClosed 已延迟销毁,避免双重释放
             }
         }
     }
 
-    // 重新堆叠所有消息的纵向位置
-    function repositionMessages() {
-        let currentY = GTheme.spaceXL
-        for (let i = 0; i < activeMessages.length; i++) {
-            let msg = activeMessages[i]
-            msg.y = currentY
-            currentY += msg.height + spacing
+    Flickable {
+        id: toastViewport
+        objectName: "toastViewport"
+
+        anchors.top: parent.top
+        anchors.topMargin: root.edgeMargin
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: root.edgeMargin
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: Math.max(0, Math.min(root.maxToastWidth, parent.width - root.edgeMargin * 2))
+        contentWidth: width
+        contentHeight: toastStack.height
+        clip: true
+        interactive: contentHeight > height
+        boundsBehavior: Flickable.StopAtBounds
+
+        Column {
+            id: toastStack
+            objectName: "toastStack"
+
+            width: toastViewport.width
+            spacing: root.spacing
         }
     }
 
-    // 显示新消息;type 为 ToastManager 的整型(0=Success,1=Warning,2=Info,3=Error)
-    // GMessage 枚举为 Primary=0/Success=1/Warning=2/Info=3/Error=4,故 +1 映射
-    function showToast(message, type, duration, id) {
-        let msg = messageComponent.createObject(root, {
+    function showToast(message, type, duration) {
+        const messageId = nextMessageId++
+        const item = messageComponent.createObject(toastStack, {
+            messageId: messageId,
             placement: GMessage.Top
         })
-        if (msg === null) {
+        if (item === null) {
             console.error("ToastContainer: failed to create GMessage")
             return
         }
 
-        activeMessages.push(msg)
-        repositionMessages()
-        msg.show(message, type + 1, duration)
+        activeMessages.push(item)
+        activeMessages = activeMessages.slice(0)
+        item.show(message, type + 1, duration)
     }
 
-    Component.onCompleted: {
-        ToastManager.messageRequested.connect(showToast)
+    Connections {
+        target: ToastManager
+        ignoreUnknownSignals: true
+        function onMessageRequested(message, type, duration) {
+            root.showToast(message, type, duration)
+        }
     }
 }

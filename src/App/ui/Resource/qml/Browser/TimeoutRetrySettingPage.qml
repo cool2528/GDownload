@@ -34,6 +34,7 @@ SettingCard {
             from: 1
             to: 600
             value: SettingsManager.qTimeout
+            Accessible.name: qsTr("Connection timeout")
         }
     }
 
@@ -50,6 +51,7 @@ SettingCard {
             from: 1
             to: 300
             value: SettingsManager.qConnectTimeout
+            Accessible.name: qsTr("Initial connection timeout")
         }
     }
 
@@ -73,6 +75,7 @@ SettingCard {
             from: 0
             to: 999
             value: SettingsManager.qMaxTries
+            Accessible.name: qsTr("Maximum retry attempts")
         }
     }
 
@@ -89,6 +92,7 @@ SettingCard {
             from: 0
             to: 600
             value: SettingsManager.qRetryWait
+            Accessible.name: qsTr("Retry wait time")
         }
     }
 
@@ -127,7 +131,7 @@ SettingCard {
                 { val: retryWaitSpinBox.value, old: SettingsManager.qRetryWait,
                   setter: function (v) { SettingsManager.SetAria2RetryWait(v) },
                   label: qsTr("RetryWait") }
-            ], qsTr("✓ Timeout and retry settings saved and applied successfully!"))
+            ], qsTr("Timeout and retry settings saved and applied successfully!"))
         }
     }
 

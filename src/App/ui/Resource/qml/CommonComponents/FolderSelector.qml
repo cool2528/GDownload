@@ -5,277 +5,206 @@ import Qt.labs.platform
 import gdl.sdk
 import "../Utils/utils.js" as Utils
 
+// Aurora 文件夹选择器：保留历史、路径编辑和原生目录选择行为，窄宽度下自动使用纯图标 Browse。
 Item {
     id: folderSelector
+
     property string path: ""
     property bool readOnly: true
     property FolderHistoryModel historyModel: FolderHistoryModel {
         maxHistoryCount: 10
     }
+
     signal actived
     signal textChanged(string text)
     signal historySelected(string path)
-    
-    // 内部属性用于颜色管理
-    readonly property var colors: {
-        const darkTheme = {
-            background: GTheme.fillBase,
-            backgroundFocus: GTheme.fillLight,
-            border: GTheme.borderBase,
-            borderFocus: GTheme.primaryColor,
-            text: GTheme.textPrimary,
-            buttonBg: GTheme.fillLight,
-            buttonIcon: GTheme.textSecondary,
-            buttonIconHover: GTheme.primaryColor,
-            popupBg: GTheme.bgWhite,
-            historyItemHover: GTheme.fillLight,
-            historyIcon: GTheme.textSecondary
-        }
-        
-        const lightTheme = {
-            background: GTheme.bgWhite,
-            backgroundFocus: GTheme.fillLight,
-            border: GTheme.borderBase,
-            borderFocus: GTheme.primaryColor,
-            text: GTheme.textPrimary,
-            buttonBg: GTheme.fillLight,
-            buttonIcon: GTheme.textSecondary,
-            buttonIconHover: GTheme.primaryColor,
-            popupBg: GTheme.bgWhite,
-            historyItemHover: GTheme.fillLight,
-            historyIcon: GTheme.textSecondary
-        }
-        
-        return GTheme.dark ? darkTheme : lightTheme
-    }
 
-    // 历史记录按钮
-    Button {
-        id: historyBtn
-        anchors {
-            left: parent.left
-            verticalCenter: parent.verticalCenter
+    readonly property bool showBrowseLabel: width >= 360
+
+    implicitWidth: 360
+    implicitHeight: GTheme.sizeLarge
+    Layout.minimumHeight: implicitHeight
+
+    RowLayout {
+        anchors.fill: parent
+        spacing: GTheme.spaceSM
+
+        GButton {
+            id: historyBtn
+            Layout.preferredWidth: GTheme.sizeLarge
+            Layout.preferredHeight: GTheme.sizeLarge
+            Layout.minimumWidth: GTheme.sizeLarge
+            Layout.leftMargin: GTheme.spaceXS
+            Layout.rightMargin: GTheme.spaceXS
+            size: "large"
+            variant: "plain"
+            iconName: "history"
+            imageSize: Qt.size(GTheme.fontSubtitle, GTheme.fontSubtitle)
+            tintColor: enabled ? GTheme.textSecondary : GTheme.textDisabled
+            enabled: folderSelector.enabled
+            activeFocusOnTab: true
+            Accessible.name: qsTr("Folder history")
+            ToolTip.visible: hovered
+            ToolTip.text: qsTr("Folder history")
+            KeyNavigation.tab: textField
+            onClicked: historyPopup.opened ? historyPopup.close() : historyPopup.open()
         }
-        width: 30
-        height: 30
-        
-        background: Rectangle {
-            color: colors.buttonBg
-            border.color: historyBtn.hovered ? colors.borderFocus : colors.border
-            border.width: 1
-            radius: 2
-            
-            Behavior on border.color {
-                ColorAnimation { duration: 150 }
+
+        Item {
+            Layout.fillWidth: true
+            Layout.minimumWidth: GTheme.sizeLarge
+            Layout.preferredHeight: GTheme.sizeLarge
+
+            TextField {
+                id: textField
+                anchors.fill: parent
+                readOnly: folderSelector.readOnly
+                enabled: folderSelector.enabled
+                text: folderSelector.path
+                selectByMouse: true
+                leftPadding: GTheme.spaceMD
+                rightPadding: GTheme.spaceMD
+                font.pixelSize: GTheme.fontBody
+                color: readOnly && !activeFocus ? "transparent"
+                                                   : (enabled ? GTheme.textPrimary : GTheme.textDisabled)
+                selectionColor: GTheme.primaryLight(5)
+                selectedTextColor: GTheme.textPrimary
+                activeFocusOnTab: true
+                Accessible.name: qsTr("Download folder")
+                KeyNavigation.tab: selectorBtn
+                KeyNavigation.backtab: historyBtn
+
+                background: Rectangle {
+                    color: textField.enabled ? GTheme.surfaceBase : GTheme.fillLighter
+                    border.color: textField.activeFocus ? GTheme.focusRing : GTheme.borderBase
+                    border.width: textField.activeFocus ? 2 : 1
+                    radius: GTheme.radiusMedium
+
+                    Behavior on border.color {
+                        ColorAnimation { duration: GTheme.durationBase }
+                    }
+                }
+
+                onEditingFinished: {
+                    if (text !== folderSelector.path) {
+                        let value = text
+                        text = Qt.binding(function() { return folderSelector.path })
+                        folderSelector.textChanged(value)
+                    }
+                }
+
+                onActiveFocusChanged: {
+                    if (activeFocus) {
+                        selectAll()
+                        folderSelector.actived()
+                    }
+                }
+            }
+
+            Text {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.leftMargin: GTheme.spaceMD
+                anchors.rightMargin: GTheme.spaceMD
+                visible: textField.readOnly && !textField.activeFocus
+                enabled: false
+                text: folderSelector.path
+                font.pixelSize: GTheme.fontBody
+                color: folderSelector.enabled ? GTheme.textPrimary : GTheme.textDisabled
+                elide: Text.ElideMiddle
+                maximumLineCount: 1
             }
         }
 
-        contentItem: Canvas {
-            id: canvas
-            onPaint: {
-                var ctx = getContext("2d")
-                ctx.reset()
-                ctx.strokeStyle = historyBtn.hovered ? colors.buttonIconHover : colors.buttonIcon
-                ctx.lineWidth = 2
-                
-                // 绘制时钟图标
-                const centerX = width / 2
-                const centerY = height / 2
-                const radius = Math.min(width, height) / 3
-                
-                // 绘制圆形
-                ctx.beginPath()
-                ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI)
-                ctx.stroke()
-                
-                // 绘制指针
-                ctx.beginPath()
-                ctx.moveTo(centerX, centerY)
-                ctx.lineTo(centerX, centerY - radius * 0.6) // 分针
-                ctx.moveTo(centerX, centerY)
-                ctx.lineTo(centerX + radius * 0.4, centerY) // 时针
-                ctx.stroke()
-            }
-            
-            Connections {
-                target: historyBtn
-                function onHoveredChanged() { canvas.requestPaint() }
-            }
+        GButton {
+            id: selectorBtn
+            Layout.preferredWidth: folderSelector.showBrowseLabel ? 104 : GTheme.sizeLarge
+            Layout.preferredHeight: GTheme.sizeLarge
+            Layout.minimumWidth: folderSelector.showBrowseLabel ? 88 : GTheme.sizeLarge
+            size: "large"
+            text: folderSelector.showBrowseLabel ? qsTr("Browse") : ""
+            iconName: "folder"
+            imageSize: Qt.size(GTheme.fontSubtitle, GTheme.fontSubtitle)
+            tintColor: enabled ? GTheme.textSecondary : GTheme.textDisabled
+            enabled: folderSelector.enabled
+            activeFocusOnTab: true
+            Accessible.name: qsTr("Browse folders")
+            ToolTip.visible: hovered && !folderSelector.showBrowseLabel
+            ToolTip.text: qsTr("Browse folders")
+            KeyNavigation.tab: historyBtn
+            KeyNavigation.backtab: textField
+            onClicked: folderDialog.open()
         }
-
-        HoverHandler {
-            cursorShape: Qt.PointingHandCursor
-        }
-
-        onClicked: historyPopup.opened ? historyPopup.close() : historyPopup.open()
-    }
-
-    TextField {
-        id: textField
-        anchors {
-            left: historyBtn.right
-            right: selectorBtn.left
-            leftMargin: 5
-            rightMargin: 5
-            top: parent.top
-            bottom: parent.bottom
-        }
-        readOnly: folderSelector.readOnly
-        padding: 0
-        leftPadding: 10
-        
-        color: colors.text
-        text: path
-        selectByMouse: true
-        selectionColor: GTheme.primaryLight(5)
-        font.pixelSize: 14
-        
-        background: Rectangle {
-            color: parent.activeFocus ? colors.backgroundFocus : colors.background
-            border.color: parent.activeFocus ? colors.borderFocus : colors.border
-            border.width: parent.activeFocus ? 1.5 : 1
-            radius: 2
-            
-            Behavior on color {
-                ColorAnimation { duration: 150 }
-            }
-            Behavior on border.color {
-                ColorAnimation { duration: 150 }
-            }
-        }
-
-        onEditingFinished: {
-            if (text !== path) {
-                let tmp = text
-                text = Qt.binding(function() { return path })
-                folderSelector.textChanged(tmp)
-            }
-        }
-
-        onActiveFocusChanged: {
-            if (activeFocus) {
-                selectAll()
-                folderSelector.actived()
-            }
-        }
-    }
-
-    Button {
-        id: selectorBtn
-        anchors {
-            right: parent.right
-            verticalCenter: parent.verticalCenter
-        }
-        width: 30
-        height: 30
-        
-        background: Rectangle {
-            color: colors.buttonBg
-            border.color: selectorBtn.hovered ? colors.borderFocus : colors.border
-            border.width: 1
-            radius: 2
-            
-            Behavior on border.color {
-                ColorAnimation { duration: 150 }
-            }
-        }
-
-        contentItem: Canvas {
-            id: canvas_icon
-            onPaint: {
-                var ctx = getContext("2d")
-                ctx.reset()
-                ctx.strokeStyle = selectorBtn.hovered ? colors.buttonIconHover : colors.buttonIcon
-                ctx.lineWidth = 2
-                
-                // 绘制文件夹图标 - 调整大小和位置
-                const margin = 4  // 减小边距以增大图标
-                const w = width - 2 * margin
-                const h = height - 2 * margin
-                
-                // 文件夹主体
-                ctx.beginPath()
-                ctx.moveTo(margin, margin + h * 0.3)
-                ctx.lineTo(margin + w * 0.3, margin + h * 0.3)
-                ctx.lineTo(margin + w * 0.4, margin)
-                ctx.lineTo(margin + w, margin)
-                ctx.lineTo(margin + w, margin + h)
-                ctx.lineTo(margin, margin + h)
-                ctx.closePath()
-                ctx.stroke()
-            }
-            
-            Connections {
-                target: selectorBtn
-                function onHoveredChanged() { canvas_icon.requestPaint() }
-            }
-        }
-
-        HoverHandler {
-            cursorShape: Qt.PointingHandCursor
-        }
-
-        onClicked: folderDialog.open()
     }
 
     Popup {
         id: historyPopup
-        y: parent.height
-        width: parent.width
+        x: 0
+        y: folderSelector.height + GTheme.spaceXS
+        width: folderSelector.width
         padding: 1
-        
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
         background: Rectangle {
-            color: colors.popupBg
-            border.color: colors.border
+            color: GTheme.surfaceElevated
+            border.color: GTheme.borderLight
             border.width: 1
-            radius: 2
+            radius: GTheme.radiusMedium
         }
 
         contentItem: ListView {
             id: historyList
-            implicitHeight: Math.min(contentHeight, 200)
+            implicitHeight: Math.min(contentHeight, 240)
             model: folderSelector.historyModel
             clip: true
-            
+
             delegate: ItemDelegate {
-                width: parent.width
-                height: 36
-                
+                width: historyList.width
+                height: GTheme.sizeLarge
+                hoverEnabled: true
+
                 background: Rectangle {
-                    color: parent.hovered ? colors.historyItemHover : "transparent"
+                    color: parent.hovered ? GTheme.fillLight : "transparent"
+                    radius: GTheme.radiusBase
                 }
-                
+
                 contentItem: RowLayout {
-                    spacing: 8
-                    
-                    Text {
-                        text: "⏱"
-                        color: colors.historyIcon
-                        font.pixelSize: 14
+                    spacing: GTheme.spaceSM
+
+                    AuroraIcon {
+                        Layout.preferredWidth: GTheme.fontSubtitle
+                        Layout.preferredHeight: GTheme.fontSubtitle
+                        name: "history"
+                        iconSize: GTheme.fontSubtitle
+                        color: GTheme.textSecondary
                     }
-                    
+
                     Text {
                         Layout.fillWidth: true
+                        Layout.minimumWidth: 0
                         text: model.path
-                        color: colors.text
+                        color: GTheme.textPrimary
                         elide: Text.ElideMiddle
-                        font.pixelSize: 14
+                        maximumLineCount: 1
+                        font.pixelSize: GTheme.fontBody
                     }
-                    
+
                     GButton {
-                        buttonType: "danger"
                         Layout.preferredWidth: GTheme.sizeSmall
                         Layout.preferredHeight: GTheme.sizeSmall
-                        visible: parent.parent.hovered
-                        iconSource: 0xE711
-                        iconSize: GTheme.fontCaption
-
-                        onClicked: {
-                            folderSelector.historyModel.removePath(index)
-                        }
+                        visible: parent.parent.hovered || activeFocus
+                        variant: "plain"
+                        iconName: "delete"
+                        imageSize: Qt.size(GTheme.fontCaption, GTheme.fontCaption)
+                        tintColor: GTheme.dangerColor
+                        Accessible.name: qsTr("Remove from history")
+                        ToolTip.visible: hovered
+                        ToolTip.text: qsTr("Remove from history")
+                        onClicked: folderSelector.historyModel.removePath(index)
                     }
                 }
-                
+
                 onClicked: {
                     folderSelector.path = model.path
                     historyPopup.close()
@@ -283,15 +212,15 @@ Item {
                     folderSelector.historySelected(model.path)
                 }
             }
-            
+
             ScrollBar.vertical: ScrollBar {}
         }
     }
 
     FolderDialog {
         id: folderDialog
-        folder: Qt.resolvedUrl(path)
-        
+        folder: Qt.resolvedUrl(folderSelector.path)
+
         onAccepted: {
             if (folder !== "") {
                 let newPath = Utils.urlToLocalPath(folder)

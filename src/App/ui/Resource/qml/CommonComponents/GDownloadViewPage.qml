@@ -3,26 +3,126 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import gdl.sdk
 
-// Element Plus 风格下载列表页面
+// Aurora 下载生命周期列表。旧模型和 BrowserManager 行为保持不变，视觉按生命周期重组。
 Control {
     id: downloadView
+
     property alias model: downloadListView.model
-    property int pageType: -1 // 0 downloadPage 1 waitingPage  2 completedPage
+    property int pageType: -1 // 0 active, 1 waiting, 2 stopped
+
     readonly property int taskCount: downloadListView.count
-    readonly property int taskCardHeight: 104
-    readonly property int failedTaskCardHeight: 120
-    readonly property int taskIconSize: GTheme.sizeLarge
     readonly property int failedTaskState: 4
+    readonly property bool compactLayout: width < 680
+    readonly property int pagePadding: compactLayout ? GTheme.spaceSM : GTheme.space2XL
+    readonly property int taskIconSize: compactLayout ? GTheme.sizeDefault : GTheme.sizeLarge
+
+    function refreshLayout() {
+        downloadListView.forceLayout()
+    }
+
+    component MetaChip: Rectangle {
+        id: metaChip
+
+        property string label: ""
+        property string value: ""
+        property color accentColor: GTheme.textSecondary
+        property color fillColor: GTheme.fillLighter
+        property color borderColor: GTheme.borderLighter
+
+        implicitWidth: Math.min(downloadView.width - downloadView.pagePadding * 2,
+                                metaRow.implicitWidth + GTheme.spaceSM * 2)
+        implicitHeight: GTheme.sizeSmall
+        radius: GTheme.radiusRound
+        color: fillColor
+        border.width: 1
+        border.color: borderColor
+
+        Row {
+            id: metaRow
+            anchors.centerIn: parent
+            spacing: GTheme.spaceXS
+
+            Text {
+                visible: metaChip.label.length > 0
+                text: metaChip.label
+                font.pixelSize: GTheme.fontCaption
+                color: GTheme.textSecondary
+            }
+
+            Text {
+                text: metaChip.value
+                font.pixelSize: GTheme.fontCaption
+                font.weight: GTheme.weightMedium
+                color: metaChip.accentColor
+                elide: Text.ElideRight
+                maximumLineCount: 1
+            }
+        }
+    }
+
+    component StatusBadge: Rectangle {
+        id: statusBadge
+
+        property string label: ""
+        property string iconName: "info"
+        property color accentColor: GTheme.infoColor
+        property color fillColor: GTheme.bgInfo
+        property color borderColor: GTheme.borderInfo
+
+        implicitWidth: statusRow.implicitWidth + GTheme.spaceSM * 2
+        implicitHeight: GTheme.sizeSmall
+        radius: GTheme.radiusRound
+        color: fillColor
+        border.width: 1
+        border.color: borderColor
+
+        Row {
+            id: statusRow
+            anchors.centerIn: parent
+            spacing: GTheme.spaceXS
+
+            AuroraIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                name: statusBadge.iconName
+                iconSize: GTheme.fontCaption
+                color: statusBadge.accentColor
+            }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: statusBadge.label
+                font.pixelSize: GTheme.fontCaption
+                font.weight: GTheme.weightMedium
+                color: statusBadge.accentColor
+            }
+        }
+    }
 
     background: Rectangle {
         color: GTheme.bgPage
 
-        // 空状态显示
-        Item {
+        EmptyState {
             objectName: "downloadEmptyState"
-            anchors.fill: parent
+            anchors.centerIn: parent
+            width: Math.max(0, Math.min(parent.width - GTheme.space2XL * 2, maximumContentWidth))
             opacity: downloadListView.count > 0 ? 0 : 1
             visible: opacity > 0
+            iconName: downloadView.pageType === 1 ? "queue"
+                                                    : (downloadView.pageType === 2 ? "completed" : "download")
+            accentColor: downloadView.pageType === 1 ? GTheme.warningColor
+                                                       : (downloadView.pageType === 2 ? GTheme.successColor
+                                                                                     : GTheme.primaryColor)
+            title: {
+                switch (downloadView.pageType) {
+                case 0: return qsTr("No active downloads")
+                case 1: return qsTr("No waiting downloads")
+                case 2: return qsTr("No stopped downloads")
+                default: return qsTr("No downloads")
+                }
+            }
+            description: downloadView.pageType === 2
+                         ? qsTr("Completed and failed downloads will appear here.")
+                         : qsTr("Add a download to begin building your queue.")
 
             Behavior on opacity {
                 NumberAnimation {
@@ -31,55 +131,6 @@ Control {
                 }
             }
 
-            ColumnLayout {
-                anchors.centerIn: parent
-                spacing: GTheme.spaceLG
-
-                // 空状态插图:渐变圆角瓦片 + 下载箭头(替换原破损 no-task.svg),
-                // 规格参照 design-system component-polish 的 empty-illustration:
-                // 柔和的 primary→success 浅色渐变底 + 主色箭头,跨平台一致、无外部资源依赖
-                Rectangle {
-                    id: emptyStateTile
-                    Layout.preferredWidth: 112
-                    Layout.preferredHeight: 88
-                    Layout.alignment: Qt.AlignHCenter
-                    radius: GTheme.radiusRound
-                    gradient: Gradient {
-                        orientation: Gradient.Horizontal
-                        GradientStop { position: 0.0; color: GTheme.primaryLight(9) }
-                        GradientStop { position: 1.0; color: GTheme.successLight(9) }
-                    }
-
-                    FontIcon {
-                        anchors.centerIn: parent
-                        iconSource: SegoeFluentIcons.Download
-                        iconSize: GTheme.fontH1 + GTheme.spaceMD
-                        color: GTheme.primaryColor
-                    }
-                }
-
-                Text {
-                    text: {
-                        switch(downloadView.pageType) {
-                            case 0: return qsTr("No active downloads")
-                            case 1: return qsTr("No waiting downloads")
-                            case 2: return qsTr("No completed downloads")
-                            default: return qsTr("No downloads")
-                        }
-                    }
-                    font.pixelSize: GTheme.fontSubtitle
-                    font.weight: GTheme.weightMedium
-                    color: GTheme.textSecondary
-                    Layout.alignment: Qt.AlignHCenter
-                }
-
-                Text {
-                    text: qsTr("Add some download links to get started")
-                    font.pixelSize: GTheme.fontBody
-                    color: GTheme.textPlaceholder
-                    Layout.alignment: Qt.AlignHCenter
-                }
-            }
         }
     }
 
@@ -91,47 +142,119 @@ Control {
 
         ListView {
             id: downloadListView
+            objectName: "downloadLifecycleList"
             spacing: GTheme.spaceSM
             topMargin: GTheme.spaceSM
             bottomMargin: GTheme.spaceLG
-            leftMargin: GTheme.space2XL
-            rightMargin: GTheme.space2XL
+            leftMargin: downloadView.pagePadding
+            rightMargin: downloadView.pagePadding
             clip: true
             interactive: true
             orientation: ListView.Vertical
             model: downloadView.model
 
-            delegate: GCard {
-                readonly property bool failedTask: model.taskState === downloadView.failedTaskState
+            section.property: downloadView.pageType === 2 ? "taskState" : ""
+            section.criteria: ViewSection.FullString
+            section.delegate: Item {
+                required property string section
+
+                objectName: Number(section) === downloadView.failedTaskState
+                            ? "failedSectionHeader" : "completedSectionHeader"
                 width: downloadListView.width - downloadListView.leftMargin - downloadListView.rightMargin
-                height: failedTask ? downloadView.failedTaskCardHeight : downloadView.taskCardHeight
-                padding: GTheme.spaceMD
+                height: downloadView.pageType === 2 ? GTheme.sizeDefault + GTheme.spaceSM : 0
+                visible: downloadView.pageType === 2
+                clip: true
+
+                RowLayout {
+                    anchors.fill: parent
+                    visible: downloadView.pageType === 2
+                    spacing: GTheme.spaceSM
+
+                    AuroraIcon {
+                        name: Number(parent.parent.section) === downloadView.failedTaskState ? "error" : "completed"
+                        iconSize: GTheme.fontBody
+                        color: Number(parent.parent.section) === downloadView.failedTaskState
+                               ? GTheme.dangerColor : GTheme.successColor
+                    }
+
+                    Text {
+                        text: Number(parent.parent.section) === downloadView.failedTaskState
+                              ? qsTr("Failed") : qsTr("Completed")
+                        font.pixelSize: GTheme.fontSubtitle
+                        font.weight: GTheme.weightDemiBold
+                        color: Number(parent.parent.section) === downloadView.failedTaskState
+                               ? GTheme.textDanger : GTheme.textSuccess
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 1
+                        color: Number(parent.parent.section) === downloadView.failedTaskState
+                               ? GTheme.borderDanger : GTheme.borderSuccess
+                    }
+                }
+            }
+
+            delegate: GCard {
+                id: taskCard
+
+                objectName: "downloadTaskCard"
+                readonly property bool activeTask: downloadView.pageType === 0 && model.taskState === 1
+                readonly property bool pausedTask: downloadView.pageType === 0 && model.taskState !== 1
+                readonly property bool waitingTask: downloadView.pageType === 1
+                readonly property bool stoppedTask: downloadView.pageType === 2
+                readonly property bool failedTask: stoppedTask && model.taskState === downloadView.failedTaskState
+                readonly property bool completedTask: stoppedTask && !failedTask
+                readonly property color stateColor: failedTask ? GTheme.dangerColor
+                                                                : (completedTask ? GTheme.successColor
+                                                                                 : (waitingTask ? GTheme.warningColor
+                                                                                                : (pausedTask ? GTheme.infoColor
+                                                                                                              : GTheme.primaryColor)))
+
+                function openDeleteDialog() {
+                    deleteConfirmDialog.pageType = downloadView.pageType
+                    deleteConfirmDialog.taskFileName = model.fileName
+                    deleteConfirmDialog.currentTaskId = model.taskId
+                    deleteConfirmDialog.open()
+                }
+
+                width: downloadListView.width - downloadListView.leftMargin - downloadListView.rightMargin
+                height: taskContent.implicitHeight + resolvedPadding * 2
+                padding: downloadView.compactLayout ? GTheme.spaceSM : GTheme.spaceMD
                 outlined: true
                 hoverEnabled: true
                 interactive: true
-                radius: GTheme.radiusRound
+                radius: GTheme.radiusLarge
                 variant: "elevated"
                 selected: hovered
 
-                ColumnLayout {
-                    anchors.fill: parent
-                    spacing: GTheme.spaceSM
-                    // 文件名和操作按钮行
+                    ColumnLayout {
+                        id: taskContent
+                        anchors.fill: parent
+                        anchors.margins: taskCard.resolvedPadding
+                        spacing: GTheme.spaceSM
+
                     RowLayout {
                         Layout.fillWidth: true
-                        Layout.leftMargin: GTheme.spaceSM
-                        Layout.rightMargin: GTheme.spaceSM
-                        spacing: GTheme.spaceLG
+                        Layout.minimumWidth: 0
+                        spacing: GTheme.spaceSM
 
-                        // 文件类型徽标:不依赖平台图标,使用扩展名文本保持跨平台一致
                         Rectangle {
                             Layout.preferredWidth: downloadView.taskIconSize
                             Layout.preferredHeight: downloadView.taskIconSize
-                            Layout.alignment: Qt.AlignVCenter
+                            Layout.minimumWidth: downloadView.taskIconSize
+                            Layout.minimumHeight: downloadView.taskIconSize
+                            Layout.alignment: Qt.AlignTop
                             radius: GTheme.radiusMedium
-                            color: failedTask ? GTheme.dangerLight(9) : GTheme.primaryLight(9)
+                            color: taskCard.failedTask ? GTheme.bgDanger
+                                                       : (taskCard.completedTask ? GTheme.bgSuccess
+                                                                                 : (taskCard.waitingTask ? GTheme.bgWarning
+                                                                                                         : GTheme.primaryLight(9)))
                             border.width: 1
-                            border.color: failedTask ? GTheme.dangerLight(7) : GTheme.primaryLight(7)
+                            border.color: taskCard.failedTask ? GTheme.borderDanger
+                                                              : (taskCard.completedTask ? GTheme.borderSuccess
+                                                                                        : (taskCard.waitingTask ? GTheme.borderWarning
+                                                                                                                : GTheme.primaryLight(7)))
 
                             Text {
                                 anchors.centerIn: parent
@@ -142,258 +265,321 @@ Control {
                                 }
                                 font.pixelSize: GTheme.fontCaption
                                 font.weight: GTheme.weightDemiBold
-                                color: failedTask ? GTheme.dangerColor : GTheme.primaryColor
+                                color: taskCard.stateColor
                             }
                         }
 
-                        // 文件名区域
                         ColumnLayout {
                             Layout.fillWidth: true
+                            Layout.minimumWidth: 0
+                            Layout.preferredWidth: 0
+                            Layout.maximumWidth: Math.max(0,
+                                taskCard.width - taskCard.leftPadding - taskCard.rightPadding
+                                - downloadView.taskIconSize - 188 - (GTheme.spaceSM * 2))
                             spacing: GTheme.spaceXS
 
                             Text {
+                                id: fileNameText
+                                objectName: "taskFileName"
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
                                 text: model.fileName
                                 font.pixelSize: GTheme.fontBody
-                                font.weight: GTheme.weightMedium
+                                font.weight: GTheme.weightDemiBold
                                 color: GTheme.textPrimary
+                                wrapMode: downloadView.compactLayout ? Text.WrapAnywhere : Text.NoWrap
                                 elide: Text.ElideRight
-                                Layout.fillWidth: true
-                                maximumLineCount: 1
+                                maximumLineCount: downloadView.compactLayout ? 2 : 1
                             }
 
                             Text {
-                                text: downloadView.pageType === 2
-                                      ? qsTr("Saved to %1").arg(model.savePath)
-                                      : qsTr("%1 of %2 • %3% • %4 left").arg(model.currentSize).arg(model.totalSize).arg(model.progress).arg(model.remainingTime)
-                                font.pixelSize: GTheme.fontCaption
-                                color: GTheme.textSecondary
                                 Layout.fillWidth: true
-                                visible: !failedTask
-                            }
-
-                            Text {
-                                objectName: "taskErrorDetails"
+                                Layout.minimumWidth: 0
                                 text: {
-                                    const code = String(model.errorCode || "").trim()
-                                    const message = String(model.errorMessage || "").trim()
-                                    if (code.length > 0 && message.length > 0) {
-                                        return qsTr("Error %1: %2").arg(code).arg(message)
+                                    if (taskCard.waitingTask) {
+                                        return qsTr("Ready to start when a download slot is available.")
                                     }
-                                    if (message.length > 0) {
-                                        return message
+                                    if (taskCard.completedTask) {
+                                        return qsTr("Saved to %1").arg(model.savePath)
                                     }
-                                    return qsTr("Download failed")
+                                    if (taskCard.failedTask) {
+                                        return qsTr("The transfer stopped before completion.")
+                                    }
+                                    return taskCard.activeTask
+                                            ? qsTr("Downloading now") : qsTr("Paused — resume when ready")
                                 }
                                 font.pixelSize: GTheme.fontCaption
-                                color: GTheme.textDanger
-                                Layout.fillWidth: true
-                                elide: Text.ElideRight
+                                color: GTheme.textSecondary
+                                elide: Text.ElideMiddle
                                 maximumLineCount: 1
-                                visible: failedTask
                             }
                         }
 
-                        // 操作按钮区域
-                        RowLayout {
+                        ColumnLayout {
+                            id: taskTrailingColumn
+                            Layout.alignment: Qt.AlignTop
+                            Layout.preferredWidth: 188
+                            Layout.minimumWidth: 0
                             spacing: GTheme.spaceXS
 
-                            // 开始/恢复按钮
-                            GButton {
-                                visible: model.taskState !== 1 && !failedTask
-                                iconSource: downloadView.pageType === 2 ?
-                                           SegoeFluentIcons.OpenFile : SegoeFluentIcons.Play
-                                iconSize: GTheme.fontBody
-                                Layout.preferredWidth: GTheme.sizeSmall + GTheme.spaceXS
-                                Layout.preferredHeight: GTheme.sizeSmall + GTheme.spaceXS
-                                onClicked: {
-                                    if (downloadView.pageType === 2) {
-                                        Qt.openUrlExternally(model.savePath)
-                                    } else if (downloadView.pageType === 0) {
-                                        BrowserManager.UnpauseTask(0, model.taskId)
-                                    } else if (downloadView.pageType === 1) {
-                                        BrowserManager.UnpauseTask(1, model.taskId)
+                            StatusBadge {
+                                Layout.alignment: Qt.AlignRight
+                                label: taskCard.activeTask ? qsTr("Downloading")
+                                                           : (taskCard.pausedTask ? qsTr("Paused")
+                                                                                  : (taskCard.waitingTask ? qsTr("Queued")
+                                                                                                          : (taskCard.failedTask ? qsTr("Failed")
+                                                                                                                                 : qsTr("Completed"))))
+                                iconName: taskCard.activeTask ? "download"
+                                                             : (taskCard.pausedTask ? "pause"
+                                                                                    : (taskCard.waitingTask ? "queue"
+                                                                                                            : (taskCard.failedTask ? "error"
+                                                                                                                                   : "completed")))
+                                accentColor: taskCard.stateColor
+                                fillColor: taskCard.failedTask ? GTheme.bgDanger
+                                                               : (taskCard.completedTask ? GTheme.bgSuccess
+                                                                                         : (taskCard.waitingTask ? GTheme.bgWarning
+                                                                                                                 : GTheme.bgInfo))
+                                borderColor: taskCard.failedTask ? GTheme.borderDanger
+                                                                 : (taskCard.completedTask ? GTheme.borderSuccess
+                                                                                           : (taskCard.waitingTask ? GTheme.borderWarning
+                                                                                                                   : GTheme.borderInfo))
+                            }
+
+                            RowLayout {
+                                id: actionFlow
+                                objectName: "taskActionFlow"
+                                Layout.fillWidth: true
+                                Layout.alignment: Qt.AlignRight
+                                spacing: GTheme.spaceXS
+                                layoutDirection: Qt.RightToLeft
+
+                                GButton {
+                                    objectName: taskCard.waitingTask ? "btnRemoveWaitingTask" : "btnDeleteTask"
+                                    text: taskCard.waitingTask ? qsTr("Remove") : ""
+                                    iconName: "delete"
+                                    buttonType: "danger"
+                                    size: "small"
+                                    width: implicitWidth
+                                    height: implicitHeight
+                                    onClicked: taskCard.openDeleteDialog()
+                                }
+
+                                GButton {
+                                    objectName: "btnCopyTaskLink"
+                                    visible: String(model.downloadLink || "").trim().length > 0
+                                    iconName: "link"
+                                    size: "small"
+                                    width: implicitWidth
+                                    height: implicitHeight
+                                    onClicked: {
+                                        UtilsToolsManager.SetClipboardText(model.downloadLink)
+                                        ToastManager.ShowSuccess(qsTr("Link copied to clipboard"))
                                     }
                                 }
-                            }
 
-                            // 失败任务重试
-                            GButton {
-                                objectName: "btnRetryTask"
-                                visible: downloadView.pageType === 2
-                                         && failedTask
-                                         && String(model.downloadLink || "").trim().length > 0
-                                text: qsTr("Retry")
-                                buttonType: "primary"
-                                iconSource: SegoeFluentIcons.Refresh
-                                iconSize: GTheme.fontBody
-                                Layout.preferredHeight: GTheme.sizeSmall + GTheme.spaceXS
-                                onClicked: BrowserManager.RetryTask(model.taskId)
-                            }
-
-                            // 暂停按钮
-                            GButton {
-                                visible: model.taskState === 1
-                                iconSource: SegoeFluentIcons.Pause
-                                iconSize: GTheme.fontBody
-                                Layout.preferredWidth: GTheme.sizeSmall + GTheme.spaceXS
-                                Layout.preferredHeight: GTheme.sizeSmall + GTheme.spaceXS
-                                onClicked: {
-                                    if (downloadView.pageType === 0) {
-                                        BrowserManager.PauseTask(0, model.taskId)
-                                    } else if (downloadView.pageType === 1) {
-                                        BrowserManager.PauseTask(1, model.taskId)
-                                    }
+                                GButton {
+                                    objectName: "btnOpenTaskLocation"
+                                    visible: !taskCard.waitingTask && !taskCard.failedTask
+                                    iconName: "folder"
+                                    size: "small"
+                                    width: implicitWidth
+                                    height: implicitHeight
+                                    onClicked: BrowserManager.OpenFileLocation(model.savePath)
                                 }
-                            }
 
-                            // 分隔线
-                            Rectangle {
-                                Layout.preferredWidth: 1
-                                Layout.preferredHeight: GTheme.spaceLG
-                                color: GTheme.borderLight
-                                Layout.alignment: Qt.AlignVCenter
-                            }
-
-                            // 打开文件夹按钮
-                            GButton {
-                                iconSource: SegoeFluentIcons.Folder
-                                iconSize: GTheme.fontBody
-                                Layout.preferredWidth: GTheme.sizeSmall + GTheme.spaceXS
-                                Layout.preferredHeight: GTheme.sizeSmall + GTheme.spaceXS
-                                onClicked: {
-                                    BrowserManager.OpenFileLocation(model.savePath)
+                                GButton {
+                                    objectName: "btnOpenCompletedTask"
+                                    visible: taskCard.completedTask
+                                    text: qsTr("Open")
+                                    iconName: "open-file"
+                                    buttonType: "success"
+                                    size: "small"
+                                    width: implicitWidth
+                                    height: implicitHeight
+                                    onClicked: Qt.openUrlExternally(model.savePath)
                                 }
-                            }
 
-                            // 复制链接按钮
-                            GButton {
-                                iconSource: SegoeFluentIcons.Link
-                                iconSize: GTheme.fontBody
-                                Layout.preferredWidth: GTheme.sizeSmall + GTheme.spaceXS
-                                Layout.preferredHeight: GTheme.sizeSmall + GTheme.spaceXS
-                                onClicked: {
-                                    UtilsToolsManager.SetClipboardText(model.downloadLink)
-                                    ToastManager.ShowSuccess(qsTr("Link copied to clipboard"))
+                                GButton {
+                                    objectName: "btnRetryTask"
+                                    visible: taskCard.failedTask && String(model.downloadLink || "").trim().length > 0
+                                    text: qsTr("Retry")
+                                    iconName: "refresh"
+                                    buttonType: "primary"
+                                    size: "small"
+                                    width: implicitWidth
+                                    height: implicitHeight
+                                    onClicked: BrowserManager.RetryTask(model.taskId)
                                 }
-                            }
 
-                            // 删除按钮
-                            GButton {
-                                buttonType: "danger"
-                                iconSource: SegoeFluentIcons.Delete
-                                iconSize: GTheme.fontBody
-                                Layout.preferredWidth: GTheme.sizeSmall + GTheme.spaceXS
-                                Layout.preferredHeight: GTheme.sizeSmall + GTheme.spaceXS
-                                onClicked: {
-                                    // 打开删除确认对话框
-                                    deleteConfirmDialog.pageType = downloadView.pageType
-                                    deleteConfirmDialog.taskFileName = model.fileName
-                                    deleteConfirmDialog.currentTaskId = model.taskId
-                                    deleteConfirmDialog.open()
+                                GButton {
+                                    objectName: "btnStartWaitingTask"
+                                    visible: taskCard.waitingTask
+                                    text: qsTr("Start")
+                                    iconName: "play"
+                                    buttonType: "primary"
+                                    size: "small"
+                                    width: implicitWidth
+                                    height: implicitHeight
+                                    onClicked: BrowserManager.UnpauseTask(1, model.taskId)
+                                }
+
+                                GButton {
+                                    objectName: "btnResumeTask"
+                                    visible: taskCard.pausedTask
+                                    text: qsTr("Resume")
+                                    iconName: "play"
+                                    buttonType: "primary"
+                                    size: "small"
+                                    width: implicitWidth
+                                    height: implicitHeight
+                                    onClicked: BrowserManager.UnpauseTask(0, model.taskId)
+                                }
+
+                                GButton {
+                                    objectName: "btnPauseTask"
+                                    visible: taskCard.activeTask
+                                    text: qsTr("Pause")
+                                    iconName: "pause"
+                                    size: "small"
+                                    width: implicitWidth
+                                    height: implicitHeight
+                                    onClicked: BrowserManager.PauseTask(0, model.taskId)
                                 }
                             }
                         }
                     }
 
-                    // 进度条
                     GProgressBar {
+                        objectName: "taskTransferProgress"
                         Layout.fillWidth: true
                         Layout.preferredHeight: 8
-                        Layout.leftMargin: GTheme.spaceSM
-                        Layout.rightMargin: GTheme.spaceSM
                         from: 0
                         to: 100
                         value: model.progress
-                        fgColor: model.taskState === 1 ? GTheme.successColor : GTheme.warningColor
-                        status: model.taskState === 1 ? "success" : "warning"
-                        visible: downloadView.pageType !== 2  // 已完成任务不显示进度条
+                        fgColor: taskCard.activeTask ? GTheme.primaryColor : GTheme.infoColor
+                        status: taskCard.activeTask ? "primary" : "info"
+                        visible: downloadView.pageType === 0
                     }
 
-                    // 下载状态信息行
-                    RowLayout {
+                    Flow {
+                        id: metadataFlow
+                        objectName: "taskMetadataFlow"
+                        visible: !taskCard.failedTask
                         Layout.fillWidth: true
-                        Layout.leftMargin: GTheme.spaceSM
-                        Layout.rightMargin: GTheme.spaceSM
-                        Layout.bottomMargin: GTheme.spaceSM
-                        spacing: GTheme.spaceLG
+                        spacing: GTheme.spaceXS
 
-                        Text {
-                            text: model.currentSize + "/" + model.totalSize
-                            font.pixelSize: GTheme.fontCaption
-                            color: GTheme.textSecondary
-                            Layout.alignment: Qt.AlignLeft
-                        }
-
-                        Item {
-                            Layout.fillWidth: true
-                        }
-
-                        // 下载速度
-                        Text {
-                            text: model.downloadSpeed
-                            font.pixelSize: GTheme.fontCaption
-                            color: GTheme.textSuccess
-                            visible: downloadView.pageType === 0 && model.taskState === 1
-                        }
-
-                        // 剩余时间
-                        Text {
-                            text: qsTr("Remaining ") + model.remainingTime
-                            font.pixelSize: GTheme.fontCaption
-                            color: GTheme.textSecondary
-                            visible: downloadView.pageType === 0 && model.taskState === 1
-                        }
-
-                        // 连接数
-                        RowLayout {
-                            spacing: GTheme.spaceXS
+                        MetaChip {
+                            objectName: "activeTransferredMetadata"
                             visible: downloadView.pageType === 0
-                            FontIcon {
-                                iconSource: SegoeFluentIcons.Connected
-                                iconSize: GTheme.fontCaption
-                                color: GTheme.textSecondary
-                            }
+                            label: qsTr("Transferred")
+                            value: qsTr("%1 of %2").arg(model.currentSize).arg(model.totalSize)
+                            accentColor: GTheme.textPrimary
+                        }
 
-                            Text {
-                                text: String("%1").arg(model.connections)
-                                font.pixelSize: GTheme.fontCaption
-                                color: GTheme.textSecondary
-                            }
+                        MetaChip {
+                            objectName: "activeSpeedMetadata"
+                            visible: taskCard.activeTask
+                            label: qsTr("Speed")
+                            value: model.downloadSpeed
+                            accentColor: GTheme.textSuccess
+                            fillColor: GTheme.bgSuccess
+                            borderColor: GTheme.borderSuccess
+                        }
+
+                        MetaChip {
+                            objectName: "activeEtaMetadata"
+                            visible: taskCard.activeTask
+                            label: qsTr("ETA")
+                            value: model.remainingTime
+                            accentColor: GTheme.textPrimary
+                        }
+
+                        MetaChip {
+                            visible: taskCard.activeTask
+                            label: qsTr("Connections")
+                            value: String(model.connections)
+                            accentColor: GTheme.textPrimary
+                        }
+
+                        MetaChip {
+                            objectName: "waitingQueuePosition"
+                            visible: taskCard.waitingTask
+                            label: qsTr("Queue")
+                            value: qsTr("Position %1").arg(index + 1)
+                            accentColor: GTheme.textWarning
+                            fillColor: GTheme.bgWarning
+                            borderColor: GTheme.borderWarning
+                        }
+
+                        MetaChip {
+                            objectName: "waitingExpectedSize"
+                            visible: taskCard.waitingTask
+                            label: qsTr("Expected size")
+                            value: model.totalSize
+                            accentColor: GTheme.textPrimary
+                        }
+
+                        MetaChip {
+                            objectName: "completedSizeMetadata"
+                            visible: taskCard.completedTask
+                            label: qsTr("Completed size")
+                            value: model.totalSize
+                            accentColor: GTheme.textSuccess
+                            fillColor: GTheme.bgSuccess
+                            borderColor: GTheme.borderSuccess
+                        }
+
+                        MetaChip {
+                            visible: taskCard.completedTask
+                            label: qsTr("Transferred")
+                            value: model.currentSize
+                            accentColor: GTheme.textPrimary
                         }
                     }
+
+                    Text {
+                        objectName: "taskErrorDetails"
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 0
+                        visible: taskCard.failedTask
+                        text: {
+                            const code = String(model.errorCode || "").trim()
+                            const message = String(model.errorMessage || "").trim()
+                            if (code.length > 0 && message.length > 0) {
+                                return qsTr("Error %1: %2").arg(code).arg(message)
+                            }
+                            if (message.length > 0) return message
+                            return qsTr("Download failed")
+                        }
+                        font.pixelSize: GTheme.fontCaption
+                        color: GTheme.textDanger
+                        wrapMode: Text.Wrap
+                        maximumLineCount: 2
+                        elide: Text.ElideRight
+                    }
+
                 }
             }
         }
     }
 
-    // 删除确认对话框
     DeleteConfirmDialog {
         id: deleteConfirmDialog
+        objectName: "deleteConfirmDialog"
         parent: Overlay.overlay
 
-        // 存储当前要删除的任务ID
         property string currentTaskId: ""
 
-        // 处理删除操作
         onActionSelected: function(action) {
-            if (action === DeleteConfirmDialog.Cancel) {
-                // 用户取消，不执行任何操作
-                return
-            }
+            if (action === DeleteConfirmDialog.CancelAction) return
 
-            // 确定是否删除文件
-            const shouldDeleteFile = (action === DeleteConfirmDialog.DeleteBoth)
-
-            // 根据页面类型调用相应的删除方法
+            const shouldDeleteFile = action === DeleteConfirmDialog.DeleteBothAction
             let result
             if (downloadView.pageType === 0) {
-                // 正在下载页面
                 result = BrowserManager.RemoveTask(0, currentTaskId, shouldDeleteFile)
             } else if (downloadView.pageType === 1) {
-                // 等待中页面（通常没有文件，但保持一致性）
                 result = BrowserManager.RemoveTask(1, currentTaskId, shouldDeleteFile)
             } else if (downloadView.pageType === 2) {
-                // 已完成页面
                 result = BrowserManager.RemoveStopTask(currentTaskId, shouldDeleteFile)
             } else {
                 return

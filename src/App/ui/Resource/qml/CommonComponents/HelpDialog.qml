@@ -3,55 +3,66 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import gdl.sdk
 
-// 关于对话框:复用 GDialogShell 外壳(背景/阴影/进出动效/表头/分隔线)
+// Aurora help/about surface. The two-tab contract and manager calls
+// are preserved while the layout now stacks safely in narrow windows.
 GDialogShell {
     id: helpDialog
-    width: 640
-    height: 520
+    objectName: "helpDialog"
+
+    readonly property real outerMargin: GTheme.spaceLG
+    readonly property bool narrowLayout: width < 500
+
+    width: Math.min(640, parent ? Math.max(0, parent.width - outerMargin * 2) : 640)
+    height: Math.min(540, parent ? Math.max(0, parent.height - outerMargin * 2) : 540)
 
     title: qsTr("About GDownload")
     subtitle: qsTr("Version %1").arg(UtilsToolsManager.Version())
-    iconImage: "/images/logo/icon.ico"
-    iconBgColor: GTheme.infoLight(9)
+    iconName: "help"
+    iconBgColor: GTheme.bgInfo
+    iconColor: GTheme.infoColor
 
-    // ===== body:标签页导航 + 内容堆栈 =====
     ColumnLayout {
         anchors.fill: parent
         spacing: GTheme.spaceLG
 
-        // 标签页导航
-        Item {
+        GridLayout {
+            id: helpTabs
+            objectName: "helpTabs"
             Layout.fillWidth: true
-            Layout.preferredHeight: GTheme.navItemHeight + GTheme.spaceXS
             Layout.topMargin: GTheme.spaceLG
-            Layout.leftMargin: GTheme.space2XL
-            Layout.rightMargin: GTheme.space2XL
+            Layout.leftMargin: helpDialog.narrowLayout ? GTheme.spaceLG : GTheme.space2XL
+            Layout.rightMargin: helpDialog.narrowLayout ? GTheme.spaceLG : GTheme.space2XL
+            columns: helpDialog.narrowLayout ? 1 : 2
+            rowSpacing: GTheme.spaceSM
+            columnSpacing: GTheme.spaceSM
 
-            RowLayout {
-                anchors.fill: parent
-                spacing: 0
+            Repeater {
+                model: [
+                    { name: qsTr("License"), icon: "code" },
+                    { name: qsTr("About"), icon: "info" }
+                ]
 
-                Repeater {
-                    model: [
-                        { name: qsTr("License"), icon: SegoeFluentIcons.Code },
-                        { name: qsTr("About"), icon: SegoeFluentIcons.Info }
-                    ]
+                GButton {
+                    required property int index
+                    required property var modelData
 
-                    GButton {
-                        variant: "nav"
-                        required property int index
-                        required property var modelData
-
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: GTheme.navItemHeight
-                        checkable: true
-                        checked: index === tabNavigation.currentIndex
-                        iconSource: modelData.icon
-                        text: modelData.name
-                        ButtonGroup.group: tabGroup
-                        onClicked: {
-                            tabNavigation.currentIndex = index
-                        }
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: GTheme.sizeDefault
+                    checkable: true
+                    checked: index === tabNavigation.currentIndex
+                    iconName: modelData.icon
+                    text: modelData.name
+                    ButtonGroup.group: tabGroup
+                    Accessible.name: text
+                    Accessible.description: checked ? qsTr("Selected tab") : qsTr("Open tab")
+                    onClicked: tabNavigation.currentIndex = index
+                    Keys.onReturnPressed: event => {
+                        tabNavigation.currentIndex = index
+                        event.accepted = true
+                    }
+                    Keys.onEnterPressed: event => {
+                        tabNavigation.currentIndex = index
+                        event.accepted = true
                     }
                 }
             }
@@ -66,31 +77,42 @@ GDialogShell {
             property int currentIndex: 0
         }
 
-        // 内容区域
         StackLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.leftMargin: GTheme.space2XL
-            Layout.rightMargin: GTheme.space2XL
+            Layout.leftMargin: helpDialog.narrowLayout ? GTheme.spaceLG : GTheme.space2XL
+            Layout.rightMargin: helpDialog.narrowLayout ? GTheme.spaceLG : GTheme.space2XL
             Layout.bottomMargin: GTheme.spaceLG
             currentIndex: tabNavigation.currentIndex
 
 
-
-            // 许可证页面
             GCard {
                 outlined: true
-                padding: GTheme.spaceLG
+                interactive: false
+                hoverEnabled: false
+                padding: helpDialog.narrowLayout ? GTheme.spaceMD : GTheme.spaceLG
 
                 ColumnLayout {
                     anchors.fill: parent
-                    spacing: GTheme.spaceSM
+                    spacing: GTheme.spaceMD
 
-                    Text {
-                        text: qsTr("Open Source Licenses")
-                        font.pixelSize: GTheme.fontSubtitle
-                        font.weight: GTheme.weightMedium
-                        color: GTheme.textPrimary
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: GTheme.spaceMD
+
+                        AuroraIcon {
+                            name: "code"
+                            iconSize: GTheme.fontTitle
+                            color: GTheme.primaryColor
+                        }
+
+                        Text {
+                            text: qsTr("Open Source Licenses")
+                            font.pixelSize: GTheme.fontSubtitle
+                            font.weight: GTheme.weightDemiBold
+                            color: GTheme.textPrimary
+                            Layout.fillWidth: true
+                        }
                     }
 
                     ScrollText {
@@ -98,24 +120,37 @@ GDialogShell {
                         Layout.fillHeight: true
                         text: UtilsToolsManager.GetNoticeContent()
                         font.pixelSize: GTheme.fontCaption
+                        Accessible.name: qsTr("Open source license notices")
                     }
                 }
             }
 
-            // 关于页面
             GCard {
                 outlined: true
-                padding: GTheme.spaceLG
+                interactive: false
+                hoverEnabled: false
+                padding: helpDialog.narrowLayout ? GTheme.spaceMD : GTheme.spaceLG
 
                 ColumnLayout {
                     anchors.fill: parent
-                    spacing: GTheme.spaceSM
+                    spacing: GTheme.spaceMD
 
-                    Text {
-                        text: qsTr("About GDownload")
-                        font.pixelSize: GTheme.fontSubtitle
-                        font.weight: GTheme.weightMedium
-                        color: GTheme.textPrimary
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: GTheme.spaceMD
+
+                        AuroraBrand {
+                            variant: "monochrome"
+                            markSize: GTheme.sizeLarge
+                        }
+
+                        Text {
+                            text: qsTr("About GDownload")
+                            font.pixelSize: GTheme.fontSubtitle
+                            font.weight: GTheme.weightDemiBold
+                            color: GTheme.textPrimary
+                            Layout.fillWidth: true
+                        }
                     }
 
                     ScrollText {
@@ -123,52 +158,43 @@ GDialogShell {
                         Layout.fillHeight: true
                         textFormat: Text.MarkdownText
                         font.pixelSize: GTheme.fontBody
+                        Accessible.name: qsTr("About GDownload")
                         text: qsTr(`# GDownload
 
 **A modern cross-platform download manager**
 
 ## Core Features
 
-✅ **Multi-Platform Support** - Windows, macOS, Linux
-✅ **High-Performance Engine** - Powered by aria2c
-✅ **Multi-Protocol Support** - HTTP/HTTPS/FTP/BitTorrent/Metalink
-✅ **Smart Download Management** - Multi-threaded, resume capability
-✅ **Modern UI** - Built with Qt Quick and Element Plus design
+- Multi-platform support for Windows, macOS, and Linux
+- High-performance downloads powered by aria2c
+- HTTP, HTTPS, FTP, BitTorrent, and Metalink support
+- Multi-threaded downloads with resume capability
+- A native Qt Quick desktop experience
 
-## Technology Stack
+## Technology
 
-- **Frontend**: Qt Quick (QML) + Element Plus Design
-- **Backend**: Qt C++ + Modern C++20
-- **Download Engine**: aria2c
+- **Frontend**: Qt Quick (QML)
+- **Backend**: Qt and modern C++20
+- **Download engine**: aria2c
 - **Network**: Boost.Asio with SSL
-- **BitTorrent**: LibtorrentRasterbar
-- **Build System**: CMake + vcpkg
-
-## Development Team
-
-GDownload is maintained by passionate developers who believe in:
-- Open source software
-- Modern UI/UX design
-- High-quality code
-- Community collaboration
+- **BitTorrent**: libtorrent
+- **Build system**: CMake and vcpkg
 
 ## Get Involved
 
-🔗 **GitHub**: [https://github.com/cool2528/GDownload](https://github.com/cool2528/GDownload)
-🐛 **Issues**: [Report bugs or request features](https://github.com/cool2528/GDownload/issues)
-📝 **Contribute**: Pull requests are welcome!
+- [GitHub](https://github.com/cool2528/GDownload)
+- [Report an issue](https://github.com/cool2528/GDownload/issues)
+- Pull requests are welcome
 
 ## License
 
 Copyright © 2024 GDownload Team
-Licensed under the Apache License 2.0
 
----
-
-*Thank you to all contributors and users who make GDownload better!* 🚀`)
+Licensed under the Apache License 2.0.`)
                     }
                 }
             }
         }
     }
+
 }

@@ -37,10 +37,13 @@ add_custom_target(qml_ui_test_binaries
         qml_ui_tst_bulk_delete
         qml_ui_tst_single_delete
         qml_ui_tst_download_failure
+        qml_ui_tst_download_lifecycle
         qml_ui_tst_close_confirm
         qml_ui_tst_theme_toggle
         qml_ui_tst_navigation
-        qml_ui_tst_design_system_contract)
+        qml_ui_tst_design_system_contract
+        qml_ui_tst_surface_contract
+        qml_ui_tst_aurora_input_controls_contract)
 
 # 一键跑全部 qml_ui 测试的便利目标
 add_custom_target(run_qml_ui_tests

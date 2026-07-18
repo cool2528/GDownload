@@ -45,11 +45,13 @@ class TestGTheme : public QObject {
 	Q_PROPERTY(int theme READ Gettheme WRITE Settheme NOTIFY themeChanged)
 
 	// 主色与状态色(浅暗色共用,Element Plus 标准)
-	Q_PROPERTY(QColor primaryColor READ primaryColor CONSTANT)
-	Q_PROPERTY(QColor successColor READ successColor CONSTANT)
-	Q_PROPERTY(QColor warningColor READ warningColor CONSTANT)
-	Q_PROPERTY(QColor dangerColor READ dangerColor CONSTANT)
-	Q_PROPERTY(QColor infoColor READ infoColor CONSTANT)
+	Q_PROPERTY(QColor primaryColor READ primaryColor NOTIFY darkChanged)
+	Q_PROPERTY(QColor brandHover READ brandHover NOTIFY darkChanged)
+	Q_PROPERTY(QColor brandPressed READ brandPressed NOTIFY darkChanged)
+	Q_PROPERTY(QColor successColor READ successColor NOTIFY darkChanged)
+	Q_PROPERTY(QColor warningColor READ warningColor NOTIFY darkChanged)
+	Q_PROPERTY(QColor dangerColor READ dangerColor NOTIFY darkChanged)
+	Q_PROPERTY(QColor infoColor READ infoColor NOTIFY darkChanged)
 
 	// 文字色(随 dark 切换)
 	Q_PROPERTY(QColor textPrimary READ textPrimary NOTIFY darkChanged)
@@ -57,6 +59,7 @@ class TestGTheme : public QObject {
 	Q_PROPERTY(QColor textSecondary READ textSecondary NOTIFY darkChanged)
 	Q_PROPERTY(QColor textPlaceholder READ textPlaceholder NOTIFY darkChanged)
 	Q_PROPERTY(QColor textDisabled READ textDisabled NOTIFY darkChanged)
+	Q_PROPERTY(QColor textInverse READ textInverse CONSTANT)
 
 	// 边框色
 	Q_PROPERTY(QColor borderBase READ borderBase NOTIFY darkChanged)
@@ -73,6 +76,11 @@ class TestGTheme : public QObject {
 	Q_PROPERTY(QColor bgPage READ bgPage NOTIFY darkChanged)
 	Q_PROPERTY(QColor bgBase READ bgBase NOTIFY darkChanged)
 	Q_PROPERTY(QColor bgElevated READ bgElevated NOTIFY darkChanged)
+	Q_PROPERTY(QColor bgOverlay READ bgOverlay NOTIFY darkChanged)
+	Q_PROPERTY(QColor surfaceBase READ surfaceBase NOTIFY darkChanged)
+	Q_PROPERTY(QColor surfaceElevated READ surfaceElevated NOTIFY darkChanged)
+	Q_PROPERTY(QColor focusRing READ focusRing NOTIFY darkChanged)
+	Q_PROPERTY(QColor overlayScrim READ overlayScrim NOTIFY darkChanged)
 
 	// 告警语义令牌(背景/边框/文字)
 	Q_PROPERTY(QColor bgInfo READ bgInfo NOTIFY darkChanged)
@@ -153,34 +161,42 @@ class TestGTheme : public QObject {
 	int Gettheme() const { return dark_ ? 2 : 1; }
 
 	// 主色与状态色
-	QColor primaryColor() const { return QColor("#409EFF"); }
-	QColor successColor() const { return QColor("#67C23A"); }
-	QColor warningColor() const { return QColor("#E6A23C"); }
-	QColor dangerColor() const { return QColor("#F56C6C"); }
-	QColor infoColor() const { return QColor("#909399"); }
+	QColor primaryColor() const { return dark() ? QColor("#5AAEFF") : QColor("#409EFF"); }
+	QColor brandHover() const { return dark() ? QColor("#73B7FF") : QColor("#2F8EEA"); }
+	QColor brandPressed() const { return dark() ? QColor("#3F95EC") : QColor("#237FD6"); }
+	QColor successColor() const { return dark() ? QColor("#4ADE80") : QColor("#34C759"); }
+	QColor warningColor() const { return dark() ? QColor("#FBBF24") : QColor("#F5A524"); }
+	QColor dangerColor() const { return dark() ? QColor("#FB7185") : QColor("#F05252"); }
+	QColor infoColor() const { return dark() ? QColor("#94A3B8") : QColor("#909399"); }
 
 	// 文字色
-	QColor textPrimary() const { return dark() ? QColor("#E5EAF3") : QColor("#303133"); }
-	QColor textRegular() const { return dark() ? QColor("#CFD3DC") : QColor("#606266"); }
-	QColor textSecondary() const { return dark() ? QColor("#8896AE") : QColor("#7B8798"); }
-	QColor textPlaceholder() const { return dark() ? QColor("#6E7C99") : QColor("#97A3B6"); }
-	QColor textDisabled() const { return dark() ? QColor("#6C6E72") : QColor("#C0C4CC"); }
+	QColor textPrimary() const { return dark() ? QColor("#F3F7FF") : QColor("#1F2937"); }
+	QColor textRegular() const { return dark() ? QColor("#D7E0EF") : QColor("#414C5E"); }
+	QColor textSecondary() const { return dark() ? QColor("#A8B4C7") : QColor("#596579"); }
+	QColor textPlaceholder() const { return dark() ? QColor("#8090AA") : QColor("#7B879B"); }
+	QColor textDisabled() const { return dark() ? QColor("#62708A") : QColor("#A8B1C0"); }
+	QColor textInverse() const { return QColor("#FFFFFF"); }
 
 	// 边框色
-	QColor borderBase() const { return dark() ? QColor("#2C3A55") : QColor("#D5DEEA"); }
-	QColor borderLight() const { return dark() ? QColor("#263146") : QColor("#E8EEF7"); }
-	QColor borderLighter() const { return dark() ? QColor("#222E44") : QColor("#EEF3FA"); }
+	QColor borderBase() const { return dark() ? QColor("#34435E") : QColor("#CBD6E5"); }
+	QColor borderLight() const { return dark() ? QColor("#2B3951") : QColor("#DCE5F0"); }
+	QColor borderLighter() const { return dark() ? QColor("#233149") : QColor("#E7EDF5"); }
 
 	// 填充色
 	QColor fillBase() const { return dark() ? QColor("#243049") : QColor("#EDF2FA"); }
-	QColor fillLight() const { return dark() ? QColor("#1B2335") : QColor("#F2F6FC"); }
+	QColor fillLight() const { return dark() ? QColor("#1B263A") : QColor("#F2F6FC"); }
 	QColor fillLighter() const { return dark() ? QColor("#131C2E") : QColor("#F7FAFE"); }
 
 	// 背景色
-	QColor bgWhite() const { return dark() ? QColor("#161E2E") : QColor("#FFFFFF"); }
-	QColor bgPage() const { return dark() ? QColor("#0E1524") : QColor("#EEF2F7"); }
-	QColor bgBase() const { return dark() ? QColor("#161E2E") : QColor("#F7FAFE"); }
-	QColor bgElevated() const { return dark() ? QColor("#1A2438") : QColor("#FFFFFF"); }
+	QColor bgWhite() const { return dark() ? QColor("#101827") : QColor("#FFFFFF"); }
+	QColor bgPage() const { return dark() ? QColor("#080D18") : QColor("#F3F6FB"); }
+	QColor bgBase() const { return dark() ? QColor("#101827") : QColor("#FFFFFF"); }
+	QColor bgElevated() const { return dark() ? QColor("#151F31") : QColor("#FFFFFF"); }
+	QColor bgOverlay() const { return bgElevated(); }
+	QColor surfaceBase() const { return bgBase(); }
+	QColor surfaceElevated() const { return bgElevated(); }
+	QColor focusRing() const { return primaryColor(); }
+	QColor overlayScrim() const { return dark() ? QColor(0, 0, 0, 153) : QColor(8, 13, 24, 82); }
 
 	// 告警语义令牌
 	QColor bgInfo() const { return dark() ? QColor("#1D1D1D") : QColor("#F4F4F5"); }
@@ -318,6 +334,7 @@ class TestGTheme : public QObject {
 // 下载任务视觉模型桩:给 DownloadPageView 截图提供稳定样例数据
 class TestDownloadTaskModel : public QAbstractListModel {
 	Q_OBJECT
+	Q_PROPERTY(int count READ count NOTIFY countChanged)
    public:
 	enum Roles {
 		kTaskId = Qt::UserRole + 1,
@@ -336,6 +353,7 @@ class TestDownloadTaskModel : public QAbstractListModel {
 	};
 
 	explicit TestDownloadTaskModel(QObject* parent = nullptr) : QAbstractListModel(parent) {}
+	int count() const { return rows_.size(); }
 
 	int rowCount(const QModelIndex& parent = QModelIndex()) const override {
 		if (parent.isValid()) return 0;
@@ -367,7 +385,11 @@ class TestDownloadTaskModel : public QAbstractListModel {
 		beginResetModel();
 		rows_ = rows;
 		endResetModel();
+		Q_EMIT countChanged();
 	}
+
+   Q_SIGNALS:
+	void countChanged();
 
    private:
 	QList<QVariantMap> rows_;
@@ -456,6 +478,7 @@ class TestSettingsManager : public QObject {
 
 	// BasicSettingPage:应用行为 / 下载路径 / 网络代理 / 剪贴板监听
 	Q_PROPERTY(bool qEnableAutoUpdate MEMBER enable_auto_update_ CONSTANT)
+	Q_PROPERTY(bool qEnableGithubAccelerate MEMBER enable_github_accelerate_ CONSTANT)
 	Q_PROPERTY(bool qAutoStart MEMBER auto_start_ CONSTANT)
 	Q_PROPERTY(bool qAutoResumeTask MEMBER auto_resume_task_ CONSTANT)
 	Q_PROPERTY(QString qDir MEMBER dir_ CONSTANT)
@@ -510,6 +533,7 @@ class TestSettingsManager : public QObject {
 
 	// BasicSettingPage setters(空实现,视觉用例不验证保存)
 	Q_INVOKABLE void SetEnableAutoUpdate(bool v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetEnableGithubAccelerate(bool v) { Q_UNUSED(v); }
 	Q_INVOKABLE void SetAutoStart(bool v) { Q_UNUSED(v); }
 	Q_INVOKABLE void SetRememberWindowPosition(bool v) { Q_UNUSED(v); }
 	Q_INVOKABLE void SetAria2AutoResumeTask(bool v) { Q_UNUSED(v); }
@@ -580,6 +604,7 @@ class TestSettingsManager : public QObject {
 
 	// BasicSettingPage 默认值(开关为合理开启态,使页面视觉更饱满)
 	bool enable_auto_update_ = true;
+	bool enable_github_accelerate_ = true;
 	bool auto_start_ = false;
 	bool auto_resume_task_ = true;
 	QString dir_ = QStringLiteral("C:/Downloads");
@@ -653,19 +678,109 @@ class TestToastManager : public QObject {
 	QList<QPair<QString, QString>> messages_;
 };
 
-// NetWorkDiskManager 桩:ParseShareUrl 空实现
+// 云目录模型桩:覆盖 NetDiskPageView 委托使用的全部角色，并允许运行时测试
+// 注入大目录以验证 ListView 虚拟化和 resize 行为。
+class TestNetDiskFileModel : public QAbstractListModel {
+	Q_OBJECT
+	Q_PROPERTY(int count READ count NOTIFY countChanged)
+   public:
+	enum Roles {
+		kFileName = Qt::UserRole + 1,
+		kFilePath,
+		kFileId,
+		kFileSize,
+		kCreateTime,
+		kIsDir,
+		kIsSelected,
+	};
+
+	explicit TestNetDiskFileModel(QObject* parent = nullptr) : QAbstractListModel(parent) {}
+	int count() const { return rows_.size(); }
+
+	int rowCount(const QModelIndex& parent = QModelIndex()) const override {
+		if (parent.isValid()) return 0;
+		return rows_.size();
+	}
+
+	QVariant data(const QModelIndex& index, int role) const override {
+		if (!index.isValid() || index.row() < 0 || index.row() >= rows_.size()) return {};
+		return rows_.at(index.row()).value(QString::fromUtf8(roleNames().value(role)));
+	}
+
+	QHash<int, QByteArray> roleNames() const override {
+		return {{kFileName, "fileName"},
+			{kFilePath, "filePath"},
+			{kFileId, "fileId"},
+			{kFileSize, "fileSize"},
+			{kCreateTime, "createTime"},
+			{kIsDir, "isDir"},
+			{kIsSelected, "isSelected"}};
+	}
+
+	void setRows(const QList<QVariantMap>& rows) {
+		beginResetModel();
+		rows_ = rows;
+		endResetModel();
+		Q_EMIT countChanged();
+	}
+
+	void setSelected(int row, bool selected) {
+		if (row < 0 || row >= rows_.size() || rows_[row].value("isSelected").toBool() == selected)
+			return;
+		rows_[row].insert("isSelected", selected);
+		const QModelIndex changed = index(row, 0);
+		Q_EMIT dataChanged(changed, changed, {kIsSelected});
+	}
+
+	void setAllSelected(bool selected) {
+		if (rows_.isEmpty()) return;
+		for (QVariantMap& row : rows_) row.insert("isSelected", selected);
+		Q_EMIT dataChanged(index(0, 0), index(rows_.size() - 1, 0), {kIsSelected});
+	}
+
+   Q_SIGNALS:
+	void countChanged();
+
+   private:
+	QList<QVariantMap> rows_;
+};
+
+// NetWorkDiskManager 桩:提供真实可绑定的目录模型和页面调用契约。
 class TestNetWorkDiskManager : public QObject {
 	Q_OBJECT
    public:
 	explicit TestNetWorkDiskManager(QObject* parent = nullptr) : QObject(parent) {}
 	Q_INVOKABLE void ParseShareUrl(const QString& url) { Q_UNUSED(url); }
+	Q_INVOKABLE QObject* GetNetWorkDiskModel() { return &model_; }
+	Q_INVOKABLE void ChangeDir(const QString& path, const QString& file_id) {
+		Q_UNUSED(path);
+		Q_UNUSED(file_id);
+	}
+	Q_INVOKABLE void ToggleSelection(int index, bool selected) { model_.setSelected(index, selected); }
+	Q_INVOKABLE void SelectAll() { model_.setAllSelected(true); }
+	Q_INVOKABLE void UnselectAll() { model_.setAllSelected(false); }
+
+	void setRows(const QList<QVariantMap>& rows) { model_.setRows(rows); }
+	TestNetDiskFileModel* model() { return &model_; }
+
+   Q_SIGNALS:
+	void taskFinished(const QString& message, bool success, int taskType);
+
+   private:
+	TestNetDiskFileModel model_{this};
 };
 
-// UpdateManager 桩:空对象,QML 引用其存在即可
+// UpdateManager 桩:复刻 UpdateDialog 依赖的方法与信号契约
 class TestUpdateManager : public QObject {
 	Q_OBJECT
    public:
 	explicit TestUpdateManager(QObject* parent = nullptr) : QObject(parent) {}
+	Q_INVOKABLE bool StartUpdate() { return false; }
+
+   Q_SIGNALS:
+	void updateAvailable(const QVariantMap& info);
+	void updateProgress(const QVariantMap& progress);
+	void updateFinished(bool success);
 };
 
 // UtilsToolsManager 桩:HideMacOsxWindowStandardButtons 等空实现
@@ -682,6 +797,9 @@ class TestUtilsToolsManager : public QObject {
 		return false;
 	}
 	Q_INVOKABLE QString Version() const { return QStringLiteral("test-stub"); }
+	Q_INVOKABLE QString GetNoticeContent() const {
+		return QStringLiteral("GDownload test notice\n\nThird-party license information is available in the packaged NOTICE file.");
+	}
 	// BasicSettingPage:开机自启动(空实现)
 	Q_INVOKABLE void SetAutoStart(bool v) { Q_UNUSED(v); }
 	// Aria2RpcSettingPage:保存后重启应用(空实现)
@@ -690,6 +808,18 @@ class TestUtilsToolsManager : public QObject {
    private:
 	// TrackerServerSettingPage TextArea 绑定此属性展示 tracker 列表
 	QString server_list_ = QStringLiteral("udp://tracker.example.com:1337\nhttp://tracker.example.com/announce");
+};
+
+// ClipboardWatcher 桩:TaskDialogPage 在创建 URL 输入框时读取剪贴板,
+// 并监听 clipboardChanged。视觉测试不触碰真实系统剪贴板,只提供稳定的空值契约。
+class TestClipboardWatcher : public QObject {
+	Q_OBJECT
+	public:
+	explicit TestClipboardWatcher(QObject* parent = nullptr) : QObject(parent) {}
+	Q_INVOKABLE QString GetClipboardText() const { return QString(); }
+
+	Q_SIGNALS:
+	void clipboardChanged(const QString& text);
 };
 
 // LanguageManager 桩:BasicSettingPage 语言下拉引用 GetSupportedLanguages /

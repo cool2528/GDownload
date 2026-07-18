@@ -1,163 +1,182 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
-import QtQuick.Effects
 import "../CommonComponents"
 import gdl.sdk 1.0
 
-// Element Plus 风格设置页面
+// Aurora preferences shell. The navigation becomes a compact horizontal rail
+// before the former fixed sidebar could force the content outside the window.
 Item {
     id: control
-    property alias currentIndex: bar.currentIndex
-
     objectName: "settingsShell"
 
-    // 设置页壳布局令牌:只做别名,数值仍由 GTheme 统一管理
-    readonly property int shellSpacing: GTheme.spaceLG
-    readonly property int shellRadius: GTheme.radiusRound
+    property alias currentIndex: bar.currentIndex
+    readonly property bool compactLayout: width < 760
+    readonly property int shellSpacing: compactLayout ? GTheme.spaceMD : GTheme.spaceLG
+    readonly property int shellRadius: GTheme.radiusLarge
     readonly property int shellSidebarWidth: GTheme.sidebarWidth
 
-    RowLayout {
+    GridLayout {
         id: browserLayout
         anchors.fill: parent
-        spacing: 0
-        // Element Plus 风格侧边栏
+        columns: control.compactLayout ? 1 : 2
+        columnSpacing: 0
+        rowSpacing: 0
+
         Rectangle {
             id: leftMenuBar
             objectName: "settingsSidebar"
-            color: GTheme.bgPage
-            Layout.fillHeight: true
-            Layout.minimumWidth: control.shellSidebarWidth
-            Layout.preferredWidth: control.shellSidebarWidth
-            Layout.maximumWidth: control.shellSidebarWidth
+            Layout.fillWidth: control.compactLayout
+            Layout.fillHeight: !control.compactLayout
+            Layout.minimumWidth: control.compactLayout ? 0 : control.shellSidebarWidth
+            Layout.preferredWidth: control.compactLayout ? -1 : control.shellSidebarWidth
+            Layout.maximumWidth: control.compactLayout ? 100000 : control.shellSidebarWidth
+            Layout.preferredHeight: control.compactLayout
+                                    ? compactSidebarLayout.implicitHeight + control.shellSpacing * 2
+                                    : -1
+            color: GTheme.surfaceBase
 
-            // Element Plus 风格右侧分隔线
             Rectangle {
-                anchors.right: parent.right
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                width: 1
-                color: GTheme.borderBase
+                anchors.right: control.compactLayout ? undefined : parent.right
+                anchors.bottom: control.compactLayout ? parent.bottom : undefined
+                width: control.compactLayout ? parent.width : 1
+                height: control.compactLayout ? 1 : parent.height
+                color: GTheme.borderLight
             }
-            // Element Plus 风格标题
-            Text {
-                id: title
-                objectName: "settingsTitle"
-                text: qsTr("Preferences")
-                anchors.left: parent.left
-                anchors.leftMargin: control.shellSpacing + GTheme.spaceSM
-                anchors.top: parent.top
-                anchors.topMargin: GTheme.space3XL
-                font.pixelSize: GTheme.fontTitle
-                font.weight: GTheme.weightMedium
-                color: GTheme.textPrimary
-            }
-            // Element Plus 风格导航菜单
+
             ColumnLayout {
-                id: bar
-                objectName: "settingsNav"
-                anchors.top: title.bottom
-                anchors.topMargin: GTheme.space2XL
+                id: compactSidebarLayout
                 anchors.left: parent.left
-                anchors.leftMargin: control.shellSpacing
                 anchors.right: parent.right
-                anchors.rightMargin: control.shellSpacing
-                spacing: GTheme.spaceXS
-                property int currentIndex: 0
-                property var buttonsArr: [basic, advanced, lab]
-                ButtonGroup{
-                    id:titleGroup
-                    onCheckedButtonChanged: {
-                        let index  = bar.buttonsArr.indexOf(titleGroup.checkedButton)
-                        bar.currentIndex = index
+                anchors.top: parent.top
+                anchors.margins: control.shellSpacing
+                spacing: GTheme.spaceMD
+
+                Text {
+                    id: title
+                    objectName: "settingsTitle"
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
+                    text: qsTr("Preferences")
+                    font.pixelSize: control.compactLayout ? GTheme.fontSubtitle : GTheme.fontTitle
+                    font.weight: GTheme.weightDemiBold
+                    color: GTheme.textPrimary
+                    elide: Text.ElideRight
+                    maximumLineCount: 1
+                }
+
+                GridLayout {
+                    id: bar
+                    objectName: "settingsNav"
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
+                    columns: control.compactLayout ? 3 : 1
+                    columnSpacing: control.compactLayout ? GTheme.spaceSM : 0
+                    rowSpacing: GTheme.spaceXS
+
+                    property int currentIndex: 0
+                    property var buttonsArr: [basic, advanced, lab]
+
+                    ButtonGroup {
+                        id: titleGroup
+                        onCheckedButtonChanged: {
+                            const index = bar.buttonsArr.indexOf(titleGroup.checkedButton)
+                            if (index >= 0)
+                                bar.currentIndex = index
+                        }
                     }
-                }
-                // Element Plus 风格导航项
-                GButton {
-                    variant: "nav"
-                    id: basic
-                    checkable: true
-                    checked: true
-                    ButtonGroup.group: titleGroup
-                    iconSource: SegoeFluentIcons.PlayerSettings
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: GTheme.navItemHeight
-                    text: qsTr("Basic")
-                    onClicked: { checked = true }
-                }
 
-                GButton {
-                    variant: "nav"
-                    id: advanced
-                    checkable: true
-                    ButtonGroup.group: titleGroup
-                    iconSource: SegoeFluentIcons.KeyboardSettings
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: GTheme.navItemHeight
-                    text: qsTr("Advanced")
-                    onClicked: { checked = true }
-                }
+                    GButton {
+                        id: basic
+                        objectName: "settingsBasicNav"
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 0
+                        Layout.preferredHeight: GTheme.navItemHeight
+                        variant: "nav"
+                        checkable: true
+                        checked: true
+                        ButtonGroup.group: titleGroup
+                        iconName: "settings"
+                        text: qsTr("Basic")
+                        activeFocusOnTab: true
+                        Accessible.name: text
+                        onClicked: checked = true
+                    }
 
-                GButton {
-                    variant: "nav"
-                    id: lab
-                    checkable: true
-                    ButtonGroup.group: titleGroup
-                    iconSource: SegoeFluentIcons.ExploitProtectionSettings
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: GTheme.navItemHeight
-                    text: qsTr("Lab")
-                    onClicked: { checked = true }
+                    GButton {
+                        id: advanced
+                        objectName: "settingsAdvancedNav"
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 0
+                        Layout.preferredHeight: GTheme.navItemHeight
+                        variant: "nav"
+                        checkable: true
+                        ButtonGroup.group: titleGroup
+                        iconName: "keyboard"
+                        text: qsTr("Advanced")
+                        activeFocusOnTab: true
+                        Accessible.name: text
+                        onClicked: checked = true
+                    }
+
+                    GButton {
+                        id: lab
+                        objectName: "settingsLabNav"
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 0
+                        Layout.preferredHeight: GTheme.navItemHeight
+                        variant: "nav"
+                        checkable: true
+                        ButtonGroup.group: titleGroup
+                        iconName: "lightbulb"
+                        text: qsTr("Lab")
+                        activeFocusOnTab: true
+                        Accessible.name: text
+                        onClicked: checked = true
+                    }
                 }
             }
         }
 
-        // Element Plus 风格主内容区域
         Rectangle {
             id: browser
-            color: GTheme.dark ? GTheme.bgPage : GTheme.bgWhite
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.minimumWidth: 480  // 更宽的最小宽度
+            Layout.minimumWidth: 0
+            Layout.minimumHeight: 0
+            color: GTheme.bgPage
 
-            // Element Plus 风格容器背景
             Rectangle {
                 anchors.fill: parent
                 anchors.margins: control.shellSpacing
-                color: GTheme.bgWhite
                 radius: control.shellRadius
-
-                // 微妙的阴影效果
-                layer.enabled: !GTheme.dark
-                layer.effect: MultiEffect {
-                    shadowEnabled: true
-                    shadowColor: Qt.rgba(0, 0, 0, 0.08)
-                    shadowBlur: 8
-                    shadowVerticalOffset: 2
-                }
+                color: GTheme.surfaceElevated
+                border.width: 1
+                border.color: GTheme.borderLighter
             }
+
             SettingPageTitle {
                 id: settingTitle
                 type: bar.currentIndex
                 anchors.top: parent.top
-                anchors.topMargin: GTheme.space3XL
+                anchors.topMargin: control.shellSpacing + GTheme.spaceMD
                 anchors.left: parent.left
-                anchors.leftMargin: GTheme.space2XL
+                anchors.leftMargin: control.shellSpacing + GTheme.spaceMD
                 anchors.right: parent.right
-                anchors.rightMargin: GTheme.space2XL
+                anchors.rightMargin: control.shellSpacing + GTheme.spaceMD
             }
 
             StackLayout {
                 id: settingsStack
                 objectName: "settingsStack"
                 anchors.top: settingTitle.bottom
-                anchors.topMargin: control.shellSpacing
+                anchors.topMargin: GTheme.spaceMD
                 anchors.left: parent.left
-                anchors.leftMargin: GTheme.space2XL
+                anchors.leftMargin: control.shellSpacing + GTheme.spaceMD
                 anchors.right: parent.right
-                anchors.rightMargin: GTheme.space2XL
+                anchors.rightMargin: control.shellSpacing + GTheme.spaceMD
                 anchors.bottom: parent.bottom
-                anchors.bottomMargin: GTheme.space2XL
+                anchors.bottomMargin: control.shellSpacing + GTheme.spaceMD
                 currentIndex: bar.currentIndex
 
                 BasicSettingPage {

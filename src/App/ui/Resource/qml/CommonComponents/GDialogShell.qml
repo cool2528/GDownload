@@ -1,10 +1,10 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Qt5Compat.GraphicalEffects
+import QtQuick.Effects
 import gdl.sdk
 
-// 对话框外壳:统一 弹层背景 + 阴影(elevation4)+ 进出动效 + 表头(图标/标题/副标题/关闭)+ 分隔线
+// Aurora 对话框外壳：统一 scrim、elevated surface、焦点、动效、表头和底栏。
 // body 走默认内容槽(需 anchors.fill: parent),footer 走可选 Component 槽(自动在其上加分隔线)
 Popup {
     id: shell
@@ -12,12 +12,18 @@ Popup {
     // ===== 表头配置 =====
     property string title: ""
     property string subtitle: ""
-    // 字体图标(>0 生效)与图片图标二选一
+    // Aurora 语义图标优先；图片和字体入口保留用于旧调用。
+    property string iconName: ""
     property int iconSource: 0
     property url iconImage: ""
-    property color iconBgColor: GTheme.fillLight
+    property color iconBgColor: GTheme.bgInfo
     property color iconColor: GTheme.primaryColor
     property bool showClose: true
+    // 对话框可指定语义上的默认操作；未指定时回退到关闭按钮。
+    property Item initialFocusItem: null
+    readonly property bool hasSemanticIcon: iconName.length > 0
+    readonly property bool hasImageIcon: iconImage.toString().length > 0
+    readonly property bool hasFontIcon: iconSource > 0
     // 表头/底栏高度:titleBarHeight(40) + space2XL(24) = 64
     property int barHeight: GTheme.titleBarHeight + GTheme.space2XL
 
@@ -35,20 +41,25 @@ Popup {
     x: parent ? Math.round((parent.width - width) / 2) : 0
     y: parent ? Math.round((parent.height - height) / 2) : 0
 
+    Overlay.modal: Rectangle {
+        color: GTheme.overlayScrim
+    }
+
     // ===== 背景 + 阴影(取自 elevation4 令牌)=====
     background: Rectangle {
-        color: GTheme.bgWhite
-        radius: GTheme.radiusBase * 2
+        color: GTheme.surfaceElevated
+        radius: GTheme.radiusLarge
         border.width: 1
-        border.color: GTheme.borderLight
+        border.color: GTheme.borderBase
 
         layer.enabled: true
-        layer.effect: DropShadow {
-            radius: GTheme.elevation4.blur
-            samples: GTheme.elevation4.blur * 2 + 1
-            color: GTheme.elevation4.color
-            horizontalOffset: GTheme.elevation4.offsetX
-            verticalOffset: GTheme.elevation4.offsetY
+        layer.effect: MultiEffect {
+            shadowEnabled: true
+            shadowColor: GTheme.elevation4.color
+            shadowBlur: Math.min(1.0, GTheme.elevation4.blur / 32)
+            shadowHorizontalOffset: GTheme.elevation4.offsetX
+            shadowVerticalOffset: GTheme.elevation4.offsetY
+            autoPaddingEnabled: true
         }
     }
 
@@ -91,6 +102,9 @@ Popup {
     }
 
     contentItem: ColumnLayout {
+        Accessible.role: Accessible.Dialog
+        Accessible.name: shell.title
+        Accessible.description: shell.subtitle
         spacing: 0
 
         // ===== 表头 =====
@@ -111,18 +125,26 @@ Popup {
                     Layout.alignment: Qt.AlignVCenter
                     radius: GTheme.radiusBase * 2
                     color: shell.iconBgColor
-                    visible: shell.iconSource > 0 || String(shell.iconImage).length > 0
+                    visible: shell.hasSemanticIcon || shell.hasImageIcon || shell.hasFontIcon
+
+                    AuroraIcon {
+                        anchors.centerIn: parent
+                        visible: shell.hasSemanticIcon
+                        name: shell.hasSemanticIcon ? shell.iconName : "info"
+                        iconSize: GTheme.fontTitle
+                        color: shell.iconColor
+                    }
 
                     FontIcon {
                         anchors.centerIn: parent
-                        visible: shell.iconSource > 0 && String(shell.iconImage).length === 0
+                        visible: !shell.hasSemanticIcon && !shell.hasImageIcon && shell.hasFontIcon
                         iconSource: shell.iconSource
                         iconSize: GTheme.fontTitle
                         color: shell.iconColor
                     }
                     Image {
                         anchors.centerIn: parent
-                        visible: String(shell.iconImage).length > 0
+                        visible: !shell.hasSemanticIcon && shell.hasImageIcon
                         source: shell.iconImage
                         sourceSize: Qt.size(GTheme.space2XL, GTheme.space2XL)
                     }
@@ -153,13 +175,25 @@ Popup {
 
                 // 关闭按钮(GButton icon-only)
                 GButton {
+                    id: closeButton
                     visible: shell.showClose
-                    iconSource: SegoeFluentIcons.ChromeClose
-                    iconSize: GTheme.fontBody
+                    iconName: "close"
+                    iconColor: GTheme.textSecondary
                     implicitWidth: GTheme.sizeSmall + GTheme.spaceXS
                     implicitHeight: GTheme.sizeSmall + GTheme.spaceXS
                     Layout.alignment: Qt.AlignVCenter
+                    Accessible.name: qsTr("Close dialog")
+                    ToolTip.visible: hovered
+                    ToolTip.text: qsTr("Close")
                     onClicked: shell.close()
+                    Keys.onReturnPressed: event => {
+                        shell.close()
+                        event.accepted = true
+                    }
+                    Keys.onEnterPressed: event => {
+                        shell.close()
+                        event.accepted = true
+                    }
                 }
             }
         }
@@ -187,4 +221,14 @@ Popup {
             sourceComponent: shell.footer
         }
     }
+
+    onOpened: Qt.callLater(function() {
+        if (shell.initialFocusItem
+                && shell.initialFocusItem.visible
+                && shell.initialFocusItem.enabled) {
+            shell.initialFocusItem.forceActiveFocus()
+        } else if (shell.showClose) {
+            closeButton.forceActiveFocus()
+        }
+    })
 }

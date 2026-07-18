@@ -50,6 +50,7 @@ SettingCard {
                 from: 1
                 to: 64
                 value: SettingsManager.qMaxConcurrentDownloads
+                Accessible.name: qsTr("Maximum concurrent downloads")
             }
         }
     }
@@ -85,6 +86,7 @@ SettingCard {
                 from: 1
                 to: 64
                 value: SettingsManager.qMaxConnectionPerServer
+                Accessible.name: qsTr("Maximum connections per server")
             }
         }
     }
@@ -120,6 +122,7 @@ SettingCard {
                 from: 1
                 to: 64
                 value: SettingsManager.qSplit
+                Accessible.name: qsTr("Download splits")
             }
         }
     }
@@ -153,6 +156,7 @@ SettingCard {
                 Layout.preferredWidth: root.inputWidth
                 Layout.preferredHeight: GTheme.sizeDefault
                 model: ["1M", "5M", "10M", "20M", "50M", "100M"]
+                Accessible.name: qsTr("Minimum split size")
 
                 Component.onCompleted: {
                     // 根据已保存的最小分片大小匹配下拉索引,未匹配时回退 20M(索引 3)
@@ -208,7 +212,7 @@ SettingCard {
                 { val: minSplitSize, old: SettingsManager.qMinSplitSize,
                   setter: function (v) { SettingsManager.SetAria2MinSplitSize(v) },
                   label: qsTr("MinSize") }
-            ], qsTr("✓ Connection & Performance settings saved and applied successfully!"))
+            ], qsTr("Connection and performance settings saved and applied successfully!"))
         }
     }
 }

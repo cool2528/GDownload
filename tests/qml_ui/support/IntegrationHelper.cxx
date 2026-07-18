@@ -6,7 +6,6 @@
 #include "Definitions/appDef.h"
 #include "Definitions/fluentEnumDef.h"
 
-#include <QFontDatabase>
 #include <QQmlContext>
 #include <QtQml/qqml.h>
 
@@ -14,7 +13,8 @@ namespace gdl {
 namespace tests {
 
 TestToastManager* setupIntegrationEngine(QQmlEngine* engine, FakeBrowserManager* fakeBrowser,
-										 FakeSettingsManager* fakeSettings) {
+										 FakeSettingsManager* fakeSettings, TestGTheme** theme,
+										 TestNetWorkDiskManager** netDisk) {
 	// 桩单例(非记录类)parent 设为 engine,引擎销毁时自动释放
 	auto* g_theme = new TestGTheme(engine);
 	auto* toast_mgr = new TestToastManager(engine);
@@ -22,6 +22,8 @@ TestToastManager* setupIntegrationEngine(QQmlEngine* engine, FakeBrowserManager*
 	auto* update_mgr = new TestUpdateManager(engine);
 	auto* utils_mgr = new TestUtilsToolsManager(engine);
 	auto* lang_mgr = new TestLanguageManager(engine);
+	if (theme) *theme = g_theme;
+	if (netDisk) *netDisk = netdisk_mgr;
 
 	// 记录版单例:BrowserManager / SettingsManager(调用方拥有,fakeBrowser/fakeSettings
 	// 通常为测试类成员,生命周期跨多个用例)。这里不转移所有权,parent=nullptr
@@ -49,18 +51,6 @@ TestToastManager* setupIntegrationEngine(QQmlEngine* engine, FakeBrowserManager*
 
 	// FolderHistoryModel:NavigatorView / TaskDialogPage 内 Component 链引用
 	qmlRegisterType<TestFolderHistoryModel>("gdl.sdk", 1, 0, "FolderHistoryModel");
-
-	// FluentIcons 字体加载 + 上下文属性(复刻 mainwindow.cxx InitFont)
-	const int font_id = QFontDatabase::addApplicationFont(QStringLiteral("://font/SegoeFluentIcons.ttf"));
-	if (font_id != -1) {
-		const auto families = QFontDatabase::applicationFontFamilies(font_id);
-		if (!families.isEmpty()) {
-			engine->rootContext()->setContextProperty("FluentIcons", families.first());
-		}
-	} else {
-		// 字体加载失败回退:Windows 11 系统自带
-		engine->rootContext()->setContextProperty("FluentIcons", QStringLiteral("Segoe Fluent Icons"));
-	}
 
 	return toast_mgr;
 }

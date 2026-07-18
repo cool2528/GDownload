@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Qt5Compat.GraphicalEffects
 import gdl.sdk
 
 /**
@@ -29,9 +28,9 @@ GMessageBox {
     // ========== 删除操作类型枚举 ==========
 
     enum DeleteAction {
-        Cancel,         // 取消
-        DeleteTask,     // 仅删除任务记录
-        DeleteBoth      // 删除任务和文件
+        CancelAction,         // 取消
+        DeleteTaskAction,     // 仅删除任务记录
+        DeleteBothAction      // 删除任务和文件
     }
 
     // ========== 信号 ==========
@@ -43,6 +42,8 @@ GMessageBox {
 
     title: qsTr("Delete Confirmation")
     messageType: GMessageBox.Warning
+    dialogWidth: 460
+    standardHeight: 330
     message: batchMode
              ? qsTr("Are you sure you want to delete all tasks in this list?")
              : qsTr("Are you sure you want to delete this download task?")
@@ -55,12 +56,12 @@ GMessageBox {
             // 文件名显示框
             Rectangle {
                 Layout.fillWidth: true
-                height: GTheme.sizeLarge
+                Layout.preferredHeight: GTheme.sizeLarge
                 visible: !root.batchMode
-                color: GTheme.fillLight
-                radius: GTheme.radiusBase
+                color: GTheme.fillLighter
+                radius: GTheme.radiusLarge
                 border.width: 1
-                border.color: GTheme.borderLighter
+                border.color: GTheme.borderBase
 
                 Label {
                     anchors.fill: parent
@@ -71,6 +72,8 @@ GMessageBox {
                     color: GTheme.textPrimary
                     elide: Text.ElideMiddle
                     verticalAlignment: Text.AlignVCenter
+                    Accessible.role: Accessible.StaticText
+                    Accessible.name: qsTr("Download task: %1").arg(text)
                 }
             }
 
@@ -82,6 +85,7 @@ GMessageBox {
                       : qsTr("Also delete downloaded file")
                 checked: root.deleteFileChecked
                 visible: root.pageType === 0 || root.pageType === 2
+                Accessible.name: text
 
                 onCheckedChanged: {
                     root.deleteFileChecked = checked
@@ -97,29 +101,61 @@ GMessageBox {
                 }
             }
 
-            // 提示文字
-            Label {
-                text: {
-                    if (root.pageType === 1) {
-                        return root.batchMode
-                               ? qsTr("This will only remove all tasks from the waiting list.")
-                               : qsTr("This will only remove the task from the waiting list.")
-                    } else if (root.deleteFileChecked && (root.pageType === 0 || root.pageType === 2)) {
-                        return root.batchMode
-                               ? qsTr("Warning: Downloaded files will be permanently deleted and cannot be recovered!")
-                               : qsTr("Warning: The downloaded file will be permanently deleted and cannot be recovered!")
-                    } else {
-                        return root.batchMode
-                               ? qsTr("This will only remove task records. Downloaded files will be kept.")
-                               : qsTr("This will only remove the task record. The downloaded file will be kept.")
-                    }
-                }
-                font.pixelSize: GTheme.fontCaption
-                color: (root.deleteFileChecked && (root.pageType === 0 || root.pageType === 2)) ?
-                       GTheme.dangerColor : GTheme.textSecondary
-                wrapMode: Text.WordWrap
+            Rectangle {
                 Layout.fillWidth: true
                 visible: root.pageType !== -1
+                implicitHeight: deleteHintRow.implicitHeight + GTheme.spaceMD * 2
+                radius: GTheme.radiusLarge
+                color: root.deleteFileChecked && (root.pageType === 0 || root.pageType === 2)
+                       ? GTheme.bgDanger : GTheme.bgInfo
+                border.width: 1
+                border.color: root.deleteFileChecked && (root.pageType === 0 || root.pageType === 2)
+                              ? GTheme.borderDanger : GTheme.borderInfo
+
+                RowLayout {
+                    id: deleteHintRow
+                    anchors.fill: parent
+                    anchors.margins: GTheme.spaceMD
+                    spacing: GTheme.spaceMD
+
+                    AuroraIcon {
+                        name: root.deleteFileChecked
+                              && (root.pageType === 0 || root.pageType === 2)
+                              ? "warning" : "info"
+                        iconSize: GTheme.fontSubtitle
+                        color: root.deleteFileChecked
+                               && (root.pageType === 0 || root.pageType === 2)
+                               ? GTheme.dangerColor : GTheme.infoColor
+                        Layout.alignment: Qt.AlignTop
+                    }
+
+                    Label {
+                        id: deleteHintText
+                        text: {
+                            if (root.pageType === 1) {
+                                return root.batchMode
+                                       ? qsTr("This will only remove all tasks from the waiting list.")
+                                       : qsTr("This will only remove the task from the waiting list.")
+                            } else if (root.deleteFileChecked
+                                       && (root.pageType === 0 || root.pageType === 2)) {
+                                return root.batchMode
+                                       ? qsTr("Downloaded files will be permanently deleted and cannot be recovered.")
+                                       : qsTr("The downloaded file will be permanently deleted and cannot be recovered.")
+                            }
+                            return root.batchMode
+                                   ? qsTr("This will only remove task records. Downloaded files will be kept.")
+                                   : qsTr("This will only remove the task record. The downloaded file will be kept.")
+                        }
+                        font.pixelSize: GTheme.fontCaption
+                        color: root.deleteFileChecked
+                               && (root.pageType === 0 || root.pageType === 2)
+                               ? GTheme.dangerColor : GTheme.textSecondary
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                        Accessible.role: Accessible.StaticText
+                        Accessible.name: text
+                    }
+                }
             }
         }
     }
@@ -129,12 +165,12 @@ GMessageBox {
         {
             text: qsTr("Cancel"),
             type: "default",
-            action: DeleteConfirmDialog.Cancel
+            action: DeleteConfirmDialog.CancelAction
         },
         {
             text: qsTr("Delete"),
             type: "danger",
-            action: DeleteConfirmDialog.DeleteTask,
+            action: DeleteConfirmDialog.DeleteTaskAction,
             width: 90
         }
     ]
@@ -146,13 +182,13 @@ GMessageBox {
     onButtonClicked: function(index, buttonData) {
         if (index === 0) {
             // 取消按钮
-            root.actionSelected(DeleteConfirmDialog.Cancel)
+            root.actionSelected(DeleteConfirmDialog.CancelAction)
         } else if (index === 1) {
             // 删除按钮 - 根据复选框状态决定操作类型
             if (root.deleteFileChecked) {
-                root.actionSelected(DeleteConfirmDialog.DeleteBoth)
+                root.actionSelected(DeleteConfirmDialog.DeleteBothAction)
             } else {
-                root.actionSelected(DeleteConfirmDialog.DeleteTask)
+                root.actionSelected(DeleteConfirmDialog.DeleteTaskAction)
             }
         }
     }
@@ -160,5 +196,6 @@ GMessageBox {
     // 打开时重置状态
     onOpened: {
         root.deleteFileChecked = false
+        Qt.callLater(root.focusDefaultButton)
     }
 }

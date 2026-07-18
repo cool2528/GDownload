@@ -14,22 +14,32 @@ using namespace gdl::tests;
 class StubBrowserView : public QObject {
 	Q_OBJECT
 	Q_PROPERTY(int index READ index WRITE setIndex NOTIFY indexChanged)
+	Q_PROPERTY(int downloadIndex READ downloadIndex WRITE setDownloadIndex NOTIFY downloadIndexChanged)
    public:
 	explicit StubBrowserView(QObject* p = nullptr) : QObject(p) {}
 	int index() const { return index_; }
+	int downloadIndex() const { return downloadIndex_; }
 	void setIndex(int i) {
 		if (i != index_) {
 			index_ = i;
 			Q_EMIT indexChanged();
 		}
 	}
-	Q_INVOKABLE void switchDownloadPage(int i) { setIndex(i); }
+	void setDownloadIndex(int i) {
+		if (i != downloadIndex_) {
+			downloadIndex_ = i;
+			Q_EMIT downloadIndexChanged();
+		}
+	}
+	Q_INVOKABLE void switchDownloadPage(int i) { setDownloadIndex(i); }
 	Q_INVOKABLE void switchSettingPage(int i) { Q_UNUSED(i); }
    Q_SIGNALS:
 	void indexChanged();
+	void downloadIndexChanged();
 
    private:
 	int index_ = -1;
+	int downloadIndex_ = 0;
 };
 
 // tst_navigation:验证 NavigatorView 导航按钮点击切换主视图索引
@@ -60,6 +70,7 @@ class TstNavigation : public QObject {
 
 	void init() {
 		stubBrowserView_->setIndex(-1);
+		stubBrowserView_->setDownloadIndex(0);
 		fakeBrowser_->clearHistory();
 	}
 
@@ -68,6 +79,11 @@ class TstNavigation : public QObject {
 		QVERIFY2(!comp.isError(), qPrintable(comp.errorString()));
 		QScopedPointer<QObject> navigator(comp.create());
 		QVERIFY2(!navigator.isNull(), "NavigatorView 实例化失败");
+		auto* navigatorItem = qobject_cast<QQuickItem*>(navigator.data());
+		QVERIFY2(navigatorItem, "NavigatorView root must be a QQuickItem");
+		navigatorItem->setWidth(74);
+		navigatorItem->setHeight(720);
+		QCoreApplication::processEvents();
 
 		// 初始 index 应为 -1(桩默认)
 		QCOMPARE(stubBrowserView_->index(), -1);
@@ -75,10 +91,29 @@ class TstNavigation : public QObject {
 		// 找到 navDownloading 按钮,点击 → brower_view.index = 0
 		auto* navDownloading = navigator->findChild<QQuickItem*>("navDownloading");
 		QVERIFY2(navDownloading, "未找到 navDownloading");
+		QVERIFY2(navDownloading->property("hasSemanticIcon").toBool(), "navDownloading must resolve its Aurora SVG source");
 		QMetaObject::invokeMethod(navDownloading, "clicked");
 
 		// 断言 index 切换为 0(下载页)
 		QTRY_COMPARE_WITH_TIMEOUT(stubBrowserView_->index(), 0, 1000);
+
+		auto* navWaiting = navigator->findChild<QQuickItem*>("navWaiting");
+		QVERIFY2(navWaiting, "未找到 navWaiting");
+		QVERIFY2(navWaiting->y() > navDownloading->y(), "navWaiting must be laid out below navDownloading");
+		QMetaObject::invokeMethod(navWaiting, "clicked");
+		QTRY_COMPARE_WITH_TIMEOUT(stubBrowserView_->index(), 0, 1000);
+		QTRY_COMPARE_WITH_TIMEOUT(stubBrowserView_->downloadIndex(), 1, 1000);
+
+		auto* navHome = navigator->findChild<QQuickItem*>("navHome");
+		QVERIFY2(navHome, "未找到 navHome");
+		QVERIFY2(navDownloading->y() > navHome->y(), "navDownloading must be laid out below navHome");
+		QMetaObject::invokeMethod(navHome, "clicked");
+		QTRY_COMPARE_WITH_TIMEOUT(stubBrowserView_->index(), 2, 1000);
+
+		auto* navSettings = navigator->findChild<QQuickItem*>("navSettings");
+		QVERIFY2(navSettings, "未找到 navSettings");
+		QMetaObject::invokeMethod(navSettings, "clicked");
+		QTRY_COMPARE_WITH_TIMEOUT(stubBrowserView_->index(), 1, 1000);
 	}
 
    private:

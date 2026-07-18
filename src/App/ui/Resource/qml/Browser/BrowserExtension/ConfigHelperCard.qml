@@ -4,310 +4,276 @@ import QtQuick.Layouts
 import "../../CommonComponents"
 import gdl.sdk
 
-// 配置助手卡片 - 帮助用户配置浏览器插件连接
-// 颜色/尺寸/间距/字号/动效一律取自 GTheme 令牌,零魔法数字(装饰尺寸以局部常量标注)
+// Aurora connection handoff for the browser extension. Long endpoint and
+// secret values stay selectable while action buttons move below them on a
+// narrow page.
 GCard {
     id: configCard
+    objectName: "extensionConfigCard"
+
     Layout.fillWidth: true
-    // 高度 = 内容隐式高度 + 上下 GCard padding(各 spaceLG,单层边距,消除原双重 16 边距)
-    Layout.preferredHeight: contentLayout.implicitHeight + 2 * GTheme.spaceLG
+    implicitHeight: contentLayout.implicitHeight + padding * 2
     outlined: true
+    hoverEnabled: false
+    interactive: false
+    variant: "elevated"
     padding: GTheme.spaceLG
+    radius: GTheme.radiusLarge
 
-    // 局部布局/装饰常量(EP 令牌无直接对应,显式标注用途,值由令牌派生)
-    readonly property int copyButtonWidth: GTheme.spaceLG * 5       // 单项复制按钮宽(=80)
-    readonly property int copyAllButtonWidth: GTheme.spaceLG * 10   // 一键复制按钮宽(=160)
-    readonly property int statusDotSize: 10                         // 状态圆点直径(装饰元素,EP 令牌无对应尺寸)
-    readonly property int pulseDuration: GTheme.durationSlow * 4    // 脉冲动画半周期(呼吸效果,慢于通用动效令牌)
-
-    // 从 SettingsManager 读取 aria2c 配置
+    readonly property bool compactLayout: width < 520
     readonly property string rpcUrl: "ws://127.0.0.1:" + SettingsManager.qRpcListenPort + "/jsonrpc"
     readonly property string rpcSecret: SettingsManager.qRpcSecret
 
-    // 复制到剪贴板的辅助函数
-    function copyToClipboard(text, successMessage) {
-        UtilsToolsManager.SetClipboardText(text)
+    function copyToClipboard(value, successMessage) {
+        UtilsToolsManager.SetClipboardText(value)
         ToastManager.ShowSuccess(successMessage, 2000)
     }
 
     ColumnLayout {
         id: contentLayout
         anchors.fill: parent
-        anchors.margins: 0
-        spacing: GTheme.spaceXL
+        anchors.margins: configCard.padding
+        spacing: GTheme.spaceLG
 
-        // 卡片标题
-        ColumnLayout {
+        RowLayout {
             Layout.fillWidth: true
-            spacing: GTheme.spaceXS
+            Layout.minimumWidth: 0
+            spacing: GTheme.spaceMD
 
-            RowLayout {
-                spacing: GTheme.spaceSM
+            Rectangle {
+                Layout.preferredWidth: GTheme.sizeLarge
+                Layout.preferredHeight: GTheme.sizeLarge
+                Layout.minimumWidth: GTheme.sizeLarge
+                Layout.minimumHeight: GTheme.sizeLarge
+                Layout.alignment: Qt.AlignTop
+                radius: GTheme.radiusMedium
+                color: GTheme.dark ? GTheme.fillLight : GTheme.primaryLight(9)
 
-                Text {
-                    text: "\uE713"  // settings icon
-                    font.family: "Segoe Fluent Icons"
-                    font.pixelSize: GTheme.fontTitle
+                AuroraIcon {
+                    anchors.centerIn: parent
+                    name: "settings"
+                    iconSize: GTheme.fontSubtitle
                     color: GTheme.primaryColor
                 }
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                spacing: GTheme.spaceXS
 
                 Text {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
                     text: qsTr("Configuration Helper")
                     font.pixelSize: GTheme.fontSubtitle
-                    font.weight: GTheme.weightMedium
+                    font.weight: GTheme.weightDemiBold
                     color: GTheme.textPrimary
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 }
-            }
 
-            Text {
-                text: qsTr("Copy these settings to your browser extension")
-                font.pixelSize: GTheme.fontCaption
-                color: GTheme.textSecondary
+                Text {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
+                    text: qsTr("Copy the local connection values into the browser extension options page.")
+                    font.pixelSize: GTheme.fontCaption
+                    color: GTheme.textSecondary
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                }
             }
         }
 
-        // 当前 GDownload 设置
+        AlertTip {
+            Layout.fillWidth: true
+            severity: "success"
+            iconName: "connected"
+            title: qsTr("Local endpoint ready")
+            description: qsTr("Keep GDownload running while the extension is connected.")
+        }
+
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: GTheme.spaceLG
+            Layout.minimumWidth: 0
+            spacing: GTheme.spaceMD
 
             Text {
-                text: qsTr("Current GDownload Settings:")
+                Layout.fillWidth: true
+                text: qsTr("Current GDownload Settings")
                 font.pixelSize: GTheme.fontBody
-                font.weight: GTheme.weightMedium
-                color: GTheme.textRegular
+                font.weight: GTheme.weightDemiBold
+                color: GTheme.textPrimary
             }
 
-            // WebSocket URL 配置
-            ColumnLayout {
-                Layout.fillWidth: true
-                spacing: GTheme.spaceSM
-
-                Text {
-                    text: qsTr("WebSocket URL:")
-                    font.pixelSize: GTheme.fontCaption
-                    color: GTheme.textSecondary
-                }
-
-                RowLayout {
-                    spacing: GTheme.spaceSM
-                    Layout.fillWidth: true
-
-                    GTextField {
-                        id: urlField
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: GTheme.sizeDefault
-                        text: rpcUrl
-                        readOnly: true
-                        selectByMouse: true
-                    }
-
-                    GButton {
-                        text: qsTr("Copy")
-                        type: 2
-                        Layout.preferredWidth: configCard.copyButtonWidth
-                        Layout.preferredHeight: GTheme.sizeDefault
-                        onClicked: {
-                            copyToClipboard(rpcUrl, qsTr("✓ WebSocket URL copied!"))
-                        }
-                    }
-                }
+            ValueRow {
+                label: qsTr("WebSocket URL")
+                value: configCard.rpcUrl
+                fieldObjectName: "extensionRpcUrlField"
+                buttonObjectName: "extensionCopyUrlButton"
+                onCopyRequested: configCard.copyToClipboard(configCard.rpcUrl,
+                                                             qsTr("WebSocket URL copied."))
             }
 
-            // RPC Secret 配置
-            ColumnLayout {
-                Layout.fillWidth: true
-                spacing: GTheme.spaceSM
-
-                Text {
-                    text: qsTr("RPC Secret:")
-                    font.pixelSize: GTheme.fontCaption
-                    color: GTheme.textSecondary
-                }
-
-                RowLayout {
-                    spacing: GTheme.spaceSM
-                    Layout.fillWidth: true
-
-                    GTextField {
-                        id: secretField
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: GTheme.sizeDefault
-                        text: rpcSecret
-                        readOnly: true
-                        selectByMouse: true
-                    }
-
-                    GButton {
-                        text: qsTr("Copy")
-                        type: 2
-                        Layout.preferredWidth: configCard.copyButtonWidth
-                        Layout.preferredHeight: GTheme.sizeDefault
-                        onClicked: {
-                            copyToClipboard(rpcSecret, qsTr("✓ RPC Secret copied!"))
-                        }
-                    }
-                }
-            }
-
-            // 状态指示器(成功语义浅底,告警令牌 bgSuccess)
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: statusLayout.implicitHeight + GTheme.spaceLG
-                color: GTheme.bgSuccess
-                radius: GTheme.radiusBase
-
-                RowLayout {
-                    id: statusLayout
-                    anchors.fill: parent
-                    anchors.margins: GTheme.spaceMD
-                    spacing: GTheme.spaceSM
-
-                    // 状态圆点(由 RowLayout 管理尺寸,用 Layout.preferred* 避免 UB)
-                    Rectangle {
-                        Layout.preferredWidth: configCard.statusDotSize
-                        Layout.preferredHeight: configCard.statusDotSize
-                        radius: configCard.statusDotSize / 2
-                        color: GTheme.successColor
-
-                        // 脉冲动画
-                        SequentialAnimation on opacity {
-                            running: true
-                            loops: Animation.Infinite
-                            NumberAnimation { from: 1.0; to: 0.3; duration: configCard.pulseDuration }
-                            NumberAnimation { from: 0.3; to: 1.0; duration: configCard.pulseDuration }
-                        }
-                    }
-
-                    Text {
-                        text: qsTr("Requires GDownload running")
-                        font.pixelSize: GTheme.fontCaption
-                        color: GTheme.successColor
-                        font.weight: GTheme.weightMedium
-                    }
-                }
+            ValueRow {
+                label: qsTr("RPC Secret")
+                value: configCard.rpcSecret
+                fieldObjectName: "extensionRpcSecretField"
+                buttonObjectName: "extensionCopySecretButton"
+                onCopyRequested: configCard.copyToClipboard(configCard.rpcSecret,
+                                                             qsTr("RPC Secret copied."))
             }
         }
 
-        // 分隔线(色 borderLight)
         Divider {
             Layout.fillWidth: true
-            Layout.preferredHeight: 1
             color: GTheme.borderLight
         }
 
-        // 使用说明
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: GTheme.spaceMD
+            Layout.minimumWidth: 0
+            spacing: GTheme.spaceSM
 
             RowLayout {
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 spacing: GTheme.spaceSM
 
-                Text {
-                    text: "\uEA80"  // lightbulb icon
-                    font.family: "Segoe Fluent Icons"
-                    font.pixelSize: GTheme.fontSubtitle
+                AuroraIcon {
+                    name: "lightbulb"
+                    iconSize: GTheme.fontSubtitle
                     color: GTheme.warningColor
                 }
 
                 Text {
-                    text: qsTr("How to use:")
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
+                    text: qsTr("Connect the extension")
                     font.pixelSize: GTheme.fontBody
-                    font.weight: GTheme.weightMedium
+                    font.weight: GTheme.weightDemiBold
                     color: GTheme.textPrimary
                 }
             }
 
-            Text {
-                text: qsTr("1. Copy the settings above using the Copy buttons")
-                font.pixelSize: GTheme.fontCaption
-                color: GTheme.textRegular
-                leftPadding: GTheme.space2XL
-            }
-
-            Text {
-                text: qsTr("2. Open your browser extension options page")
-                font.pixelSize: GTheme.fontCaption
-                color: GTheme.textRegular
-                leftPadding: GTheme.space2XL
-            }
-
-            Text {
-                text: qsTr("3. Paste the values into the corresponding fields")
-                font.pixelSize: GTheme.fontCaption
-                color: GTheme.textRegular
-                leftPadding: GTheme.space2XL
-            }
-
-            Text {
-                text: qsTr("4. Click 'Test Connection' to verify")
-                font.pixelSize: GTheme.fontCaption
-                color: GTheme.textRegular
-                leftPadding: GTheme.space2XL
-            }
+            InstructionRow { text: qsTr("Copy the endpoint and secret shown above.") }
+            InstructionRow { text: qsTr("Open the browser extension options page.") }
+            InstructionRow { text: qsTr("Paste both values into the matching connection fields.") }
+            InstructionRow { text: qsTr("Run Test Connection before saving the extension settings.") }
         }
 
-        // 操作按钮
-        RowLayout {
+        GridLayout {
             Layout.fillWidth: true
-            spacing: GTheme.spaceMD
-            Layout.topMargin: GTheme.spaceSM
+            Layout.minimumWidth: 0
+            columns: configCard.compactLayout ? 1 : 2
+            columnSpacing: GTheme.spaceMD
+            rowSpacing: GTheme.spaceSM
 
             GButton {
-                text: qsTr("📋 Copy All Settings")
+                objectName: "extensionCopyAllButton"
+                Layout.fillWidth: configCard.compactLayout
+                Layout.maximumWidth: configCard.compactLayout ? 100000 : 220
+                text: qsTr("Copy All Settings")
+                iconName: "copy"
                 type: 1
-                Layout.preferredWidth: configCard.copyAllButtonWidth
-                Layout.preferredHeight: GTheme.sizeDefault
+                activeFocusOnTab: true
+                Accessible.name: text
                 onClicked: {
-                    var allSettings = "WebSocket URL: " + rpcUrl + "\n" +
-                                    "RPC Secret: " + rpcSecret
-                    copyToClipboard(allSettings, qsTr("✓ All settings copied!"))
+                    const allSettings = "WebSocket URL: " + configCard.rpcUrl + "\n" +
+                                        "RPC Secret: " + configCard.rpcSecret
+                    configCard.copyToClipboard(allSettings, qsTr("All connection settings copied."))
                 }
             }
 
-            Item { Layout.fillWidth: true }
-
             Text {
-                text: qsTr("Need help? Check the FAQ below")
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                Layout.alignment: configCard.compactLayout ? Qt.AlignLeft : Qt.AlignVCenter
+                text: qsTr("Need help? Open the FAQ below for connection troubleshooting.")
                 font.pixelSize: GTheme.fontCaption
-                color: GTheme.textPlaceholder
-                Layout.alignment: Qt.AlignVCenter
+                color: GTheme.textSecondary
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                horizontalAlignment: configCard.compactLayout ? Text.AlignLeft : Text.AlignRight
             }
         }
 
-        // 重要提示(警示语义浅底+边框,告警令牌 bgWarning/borderWarning)
-        Rectangle {
+        AlertTip {
             Layout.fillWidth: true
-            Layout.preferredHeight: importantLayout.implicitHeight + GTheme.spaceLG
-            color: GTheme.bgWarning
-            radius: GTheme.radiusBase
-            border.width: 1
-            border.color: GTheme.borderWarning
+            severity: "warning"
+            iconName: "warning"
+            title: qsTr("GDownload must remain open")
+            description: qsTr("The extension connects directly to the local aria2c service and cannot submit tasks after GDownload exits.")
+        }
+    }
 
-            RowLayout {
-                id: importantLayout
-                anchors.fill: parent
-                anchors.margins: GTheme.spaceMD
-                spacing: GTheme.spaceSM
+    component ValueRow: ColumnLayout {
+        property string label: ""
+        property string value: ""
+        property string fieldObjectName: ""
+        property string buttonObjectName: ""
+        signal copyRequested()
 
-                Text {
-                    text: "\uE7BA"  // alert icon
-                    font.family: "Segoe Fluent Icons"
-                    font.pixelSize: GTheme.fontSubtitle
-                    color: GTheme.warningColor
-                    Layout.alignment: Qt.AlignTop
-                }
+        Layout.fillWidth: true
+        Layout.minimumWidth: 0
+        spacing: GTheme.spaceSM
 
-                Text {
-                    text: qsTr("Important: Keep GDownload running for the browser extension to work. The extension connects directly to aria2c via these settings.")
-                    font.pixelSize: GTheme.fontCaption
-                    color: GTheme.textRegular
-                    Layout.fillWidth: true
-                    wrapMode: Text.WordWrap
-                    lineHeight: 1.4
-                }
+        Text {
+            Layout.fillWidth: true
+            text: label
+            font.pixelSize: GTheme.fontCaption
+            font.weight: GTheme.weightMedium
+            color: GTheme.textRegular
+        }
+
+        GridLayout {
+            Layout.fillWidth: true
+            Layout.minimumWidth: 0
+            columns: configCard.compactLayout ? 1 : 2
+            columnSpacing: GTheme.spaceSM
+            rowSpacing: GTheme.spaceSM
+
+            GTextField {
+                objectName: fieldObjectName
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                text: value
+                readOnly: true
+                selectByMouse: true
+                Accessible.name: label
             }
+
+            GButton {
+                objectName: buttonObjectName
+                Layout.fillWidth: configCard.compactLayout
+                Layout.preferredWidth: configCard.compactLayout ? implicitWidth : 112
+                text: qsTr("Copy")
+                iconName: "copy"
+                activeFocusOnTab: true
+                Accessible.name: qsTr("Copy %1").arg(label)
+                onClicked: copyRequested()
+            }
+        }
+    }
+
+    component InstructionRow: RowLayout {
+        property alias text: instructionText.text
+
+        Layout.fillWidth: true
+        Layout.minimumWidth: 0
+        spacing: GTheme.spaceSM
+
+        AuroraIcon {
+            Layout.alignment: Qt.AlignTop
+            name: "completed"
+            iconSize: GTheme.fontBody
+            color: GTheme.successColor
+        }
+
+        Text {
+            id: instructionText
+            Layout.fillWidth: true
+            Layout.minimumWidth: 0
+            font.pixelSize: GTheme.fontCaption
+            color: GTheme.textRegular
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         }
     }
 }

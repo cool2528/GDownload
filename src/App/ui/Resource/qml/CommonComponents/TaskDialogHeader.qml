@@ -32,9 +32,9 @@ Item {
             color: GTheme.primaryLight(9)
             radius: GTheme.radiusBase
 
-            FontIcon {
+            AuroraIcon {
                 anchors.centerIn: parent
-                iconSource: SegoeFluentIcons.Add
+                name: "add"
                 iconSize: GTheme.fontTitle
                 color: GTheme.primaryColor
             }
@@ -46,7 +46,7 @@ Item {
 
             Text {
                 text: headerRoot.title
-                font.pixelSize: GTheme.fontTitle
+                font.pixelSize: headerRoot.width < 440 ? GTheme.fontSubtitle : GTheme.fontTitle
                 font.weight: GTheme.weightDemiBold
                 color: GTheme.textPrimary
                 elide: Text.ElideRight
@@ -55,6 +55,7 @@ Item {
 
             Text {
                 text: headerRoot.subtitle
+                visible: headerRoot.width >= 440
                 font.pixelSize: GTheme.fontBody
                 color: GTheme.textSecondary
                 elide: Text.ElideRight
@@ -63,10 +64,13 @@ Item {
         }
 
         GButton {
-            iconSource: SegoeFluentIcons.ChromeClose
+            iconName: "close"
             iconSize: GTheme.fontBody
             Layout.preferredWidth: headerRoot.closeButtonSize
             Layout.preferredHeight: headerRoot.closeButtonSize
+            Accessible.name: qsTr("Close dialog")
+            ToolTip.visible: hovered
+            ToolTip.text: qsTr("Close")
             onClicked: headerRoot.closeRequested()
         }
     }

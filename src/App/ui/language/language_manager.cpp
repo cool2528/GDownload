@@ -6,6 +6,21 @@
 #include "GDLCore/logger.h"
 #include "Settings/settings_manager.h"
 #include "os/os.h"
+
+namespace {
+	QString NormalizeLocale(QString locale) {
+		locale = locale.trimmed();
+		locale.replace('-', '_');
+		const QString lowered = locale.toLower();
+		if (lowered == "en_us") return "en_US";
+		if (lowered == "zh_cn") return "zh_CN";
+		if (lowered == "zh_tw") return "zh_TW";
+		if (lowered == "ja_jp") return "ja_JP";
+		if (lowered == "ko_kr") return "ko_KR";
+		return locale;
+	}
+}
+
 namespace gdl {
 	namespace ui {
 		namespace language {
@@ -36,16 +51,17 @@ namespace gdl {
 			}
 
 			bool LanguageManager::SwitchLanguage(const QString& locale) {
-				if (current_language_ == locale) {
+				const QString normalized_locale = NormalizeLocale(locale);
+				if (current_language_ == normalized_locale) {
 					return true;
 				}
 
 				RemoveCurrentTranslation();
 
-				if (LoadTranslation(locale)) {
-					current_language_ = locale;
+				if (LoadTranslation(normalized_locale)) {
+					current_language_ = normalized_locale;
 					// 保存语言设置
-					gdl::ui::settings::Settings::Instance().SetLanguage(locale);
+					gdl::ui::settings::Settings::Instance().SetLanguage(normalized_locale);
 					return true;
 				}
 

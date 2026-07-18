@@ -27,6 +27,7 @@ Rectangle {
             // 速度控制设置卡片
             SpeedControlSettingPage {
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 Layout.topMargin: GTheme.spaceLG  // 顶部留白
                 Layout.leftMargin: GTheme.spaceLG
                 Layout.rightMargin: GTheme.spaceLG
@@ -35,6 +36,7 @@ Rectangle {
             // 连接和性能参数设置卡片
             ConnectionPerformanceSettingPage {
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 Layout.leftMargin: GTheme.spaceLG
                 Layout.rightMargin: GTheme.spaceLG
             }
@@ -42,6 +44,7 @@ Rectangle {
             // 下载完成后操作设置卡片
             PostDownloadActionsSettingPage {
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 Layout.leftMargin: GTheme.spaceLG
                 Layout.rightMargin: GTheme.spaceLG
             }
@@ -49,6 +52,7 @@ Rectangle {
             // 超时和重试设置卡片
             TimeoutRetrySettingPage {
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 Layout.leftMargin: GTheme.spaceLG
                 Layout.rightMargin: GTheme.spaceLG
             }
@@ -56,6 +60,7 @@ Rectangle {
             // BitTorrent 高级设置卡片
             BitTorrentAdvancedSettingPage {
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 Layout.leftMargin: GTheme.spaceLG
                 Layout.rightMargin: GTheme.spaceLG
             }
@@ -63,6 +68,7 @@ Rectangle {
             // User-Agent 设置卡片
             UserAgentSettingPage {
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 Layout.leftMargin: GTheme.spaceLG
                 Layout.rightMargin: GTheme.spaceLG
             }
@@ -70,6 +76,7 @@ Rectangle {
             // Aria2 RPC 设置卡片
             Aria2RpcSettingPage {
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 Layout.leftMargin: GTheme.spaceLG
                 Layout.rightMargin: GTheme.spaceLG
             }
@@ -77,6 +84,7 @@ Rectangle {
             // 百度网盘设置卡片
             BaiduCookieSettingPage {
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 Layout.leftMargin: GTheme.spaceLG
                 Layout.rightMargin: GTheme.spaceLG
             }
@@ -84,6 +92,7 @@ Rectangle {
             // Tracker 服务器设置卡片
             TrackerServerSettingPage {
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 Layout.leftMargin: GTheme.spaceLG
                 Layout.rightMargin: GTheme.spaceLG
                 Layout.bottomMargin: GTheme.spaceLG  // 底部留白

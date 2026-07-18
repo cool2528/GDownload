@@ -51,6 +51,7 @@ SettingCard {
             Layout.preferredHeight: GTheme.sizeDefault
             text: SettingsManager.qBaiduPanCookies
             placeholderText: qsTr("Paste your Baidu Netdisk cookie here")
+            Accessible.name: qsTr("Baidu Netdisk cookie")
         }
 
         GButton {

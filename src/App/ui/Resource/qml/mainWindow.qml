@@ -10,8 +10,12 @@ import "Browser"
 import "CommonComponents"
 FramelessWindow{
     id: mainWindow
+    objectName: "mainWindow"
     width: 1024
     height: 768
+    minimumWidth: 900
+    minimumHeight: 640
+    color: GTheme.bgPage
     title:"GDownload"
     visible: false
     property var helper: FramelessHelper
@@ -62,6 +66,8 @@ FramelessWindow{
     }
     TitleBar{
         id:title_bar
+        sectionTitle: brower_view.currentSectionTitle
+        windowActive: mainWindow.active
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right

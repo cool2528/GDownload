@@ -27,6 +27,7 @@ SettingCard {
         GCheckBox {
             id: enableDhtCheckBox
             checked: SettingsManager.qEnableDht
+            Accessible.name: qsTr("Enable DHT")
         }
 
         ColumnLayout {
@@ -80,6 +81,7 @@ SettingCard {
                 from: 0
                 to: 999  // 业务值:对等节点数上界(非设计令牌)
                 value: SettingsManager.qBtMaxPeers
+                Accessible.name: qsTr("Maximum peers per torrent")
             }
             hint: qsTr("Maximum number of peers to connect per torrent (0 = unlimited)")
         }
@@ -100,6 +102,7 @@ SettingCard {
         GCheckBox {
             id: btRequireCryptoCheckBox
             checked: SettingsManager.qBtRequireCrypto
+            Accessible.name: qsTr("Require encrypted connections")
         }
 
         ColumnLayout {
@@ -157,7 +160,7 @@ SettingCard {
                 { val: btRequireCryptoCheckBox.checked, old: SettingsManager.qBtRequireCrypto,
                   setter: function (v) { SettingsManager.SetAria2BtRequireCrypto(v) },
                   label: qsTr("RequireCrypto") }
-            ], qsTr("✓ BitTorrent advanced settings saved and applied successfully!"))
+            ], qsTr("BitTorrent advanced settings saved and applied successfully!"))
         }
     }
 
