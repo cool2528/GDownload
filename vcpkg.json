@@ -23,6 +23,7 @@
     "nlohmann-json",
     "openssl",
     "pugixml",
+    "quickjs-ng",
     "rapidjson",
     "spdlog",
     "sqlite3",
