@@ -1,0 +1,19 @@
+{
+    "manifest_version": 1,
+    "name": "demo-httpbin",
+    "display_name": "Demo Plugin (httpbin)",
+    "version": "0.1.0",
+    "author": "GDownload Official",
+    "description": "SDK acceptance demo plugin backed by httpbingo.org",
+    "entry": "main.js",
+    "type": "netdisk",
+    "url_patterns": [
+        "*://httpbingo.org/*"
+    ],
+    "permissions": {
+        "http": ["httpbingo.org"],
+        "storage": true,
+        "verification_ui": false
+    },
+    "min_app_version": "0.0.0"
+}

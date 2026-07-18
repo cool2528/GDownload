@@ -1,0 +1,21 @@
+{
+    "manifest_version": 1,
+    "name": "baidu-netdisk",
+    "display_name": "Baidu NetDisk",
+    "version": "2.0.0",
+    "author": "GDownload Official",
+    "description": "Parse Baidu netdisk share links (JS rewrite of the native Baidu plugin)",
+    "homepage": "https://github.com/cool2528/GDownload",
+    "entry": "main.js",
+    "type": "netdisk",
+    "url_patterns": [
+        "*://pan.baidu.com/s/*",
+        "*://pan.baidu.com/share/*"
+    ],
+    "permissions": {
+        "http": ["baidu.com", "pan.baidu.com", "*.baidupcs.com", "pcs.baidu.com", "tieba.baidu.com", "*.baidu.com"],
+        "storage": true,
+        "verification_ui": true
+    },
+    "min_app_version": "0.0.0"
+}

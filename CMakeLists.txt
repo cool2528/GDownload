@@ -163,6 +163,9 @@ if(WIN32)
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/extra/win32/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,ia32>/engine/ DESTINATION engine)
     install(DIRECTORY ${CMAKE_BINARY_DIR}/$<IF:$<CONFIG:Debug>,debug,release>/bin/ DESTINATION .)
     install(FILES README.md LICENSE.txt DESTINATION .)
+    # 内置 JS 插件（应用从 <appdir>/plugins 加载）；demo-httpbin 仅供 SDK 验收，不随包分发
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/plugins/ DESTINATION plugins
+        PATTERN "demo-httpbin" EXCLUDE)
 
     # 设置默认安装前缀为程序文件目录
     if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
@@ -178,12 +181,15 @@ elseif(APPLE)
     )
 
     # 这里要复制 vcpkg 的依赖库到Frameworks目录
-    file(GLOB VCPKG_LIBS 
+    file(GLOB VCPKG_LIBS
         "${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/lib/*.dylib"
     )
     install(FILES ${VCPKG_LIBS}
         DESTINATION ${PROJECT_NAME}.app/Contents/Frameworks
     )
+    # 内置 JS 插件（应用从 <appdir>/plugins 加载，macOS 下即 Contents/MacOS/plugins）
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/plugins/ DESTINATION ${PROJECT_NAME}.app/Contents/MacOS/plugins
+        PATTERN "demo-httpbin" EXCLUDE)
     # 先删除目标目录中可能存在的 Sparkle.framework
     install(CODE "
         if(EXISTS \"\${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app/Contents/Frameworks/Sparkle.framework\")
@@ -346,13 +352,16 @@ elseif(UNIX AND NOT APPLE)
     )
 
     # 复制 aria2c文件和配置文件
-    install(DIRECTORY ${CMAKE_SOURCE_DIR}/extra/linux/$<IF:$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},x86_64>,x64,arm64>/engine/ 
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/extra/linux/$<IF:$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},x86_64>,x64,arm64>/engine/
         DESTINATION ${APP_BIN_DIR}/engine
-        FILE_PERMISSIONS 
+        FILE_PERMISSIONS
         OWNER_READ OWNER_WRITE OWNER_EXECUTE
         GROUP_READ GROUP_EXECUTE
         WORLD_READ WORLD_EXECUTE
     )
+    # 内置 JS 插件（应用从 <appdir>/plugins 加载）；demo-httpbin 不随包分发
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/plugins/ DESTINATION ${APP_BIN_DIR}/plugins
+        PATTERN "demo-httpbin" EXCLUDE)
     # 复制translations 文件夹下的文件
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/src/App/ui/Resource/translations/
         DESTINATION  ${APP_BIN_DIR}/translations
