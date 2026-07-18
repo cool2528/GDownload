@@ -4,12 +4,12 @@
 <context>
     <name>AlertTip</name>
     <message>
-        <location filename="../qml/CommonComponents/AlertTip.qml" line="202"/>
+        <location filename="../qml/CommonComponents/AlertTip.qml" line="203"/>
         <source>Dismiss alert</source>
         <translation>アラートを閉じる</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/AlertTip.qml" line="204"/>
+        <location filename="../qml/CommonComponents/AlertTip.qml" line="205"/>
         <source>Dismiss</source>
         <translation>閉じる</translation>
     </message>
@@ -1163,12 +1163,12 @@
 <context>
     <name>GDialogShell</name>
     <message>
-        <location filename="../qml/CommonComponents/GDialogShell.qml" line="185"/>
+        <location filename="../qml/CommonComponents/GDialogShell.qml" line="187"/>
         <source>Close dialog</source>
         <translation>ダイアログを閉じる</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDialogShell.qml" line="187"/>
+        <location filename="../qml/CommonComponents/GDialogShell.qml" line="189"/>
         <source>Close</source>
         <translation>閉じる</translation>
     </message>
@@ -2249,68 +2249,68 @@ Apache License 2.0 に基づきライセンスされています。</translation
 <context>
     <name>PluginMarketCard</name>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="113"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="114"/>
         <source>Verified</source>
         <translation>検証済み</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="114"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="115"/>
         <source>Third-party</source>
         <translation>サードパーティ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="140"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="141"/>
         <source>Installed</source>
         <translation>インストール済み</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="141"/>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="264"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="142"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="266"/>
         <source>Update</source>
         <translation>更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="142"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="143"/>
         <source>Working</source>
         <translation>処理中</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="143"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="144"/>
         <source>Available</source>
         <translation>利用可能</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="204"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="206"/>
         <source>Working…</source>
         <translation>処理中…</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="238"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="240"/>
         <source>Settings</source>
         <translation>設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="239"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="241"/>
         <source>Plugin settings</source>
         <translation>プラグイン設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="256"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="258"/>
         <source>Install</source>
         <translation>インストール</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="248"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="250"/>
         <source>Remove</source>
         <translation>削除</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="225"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="227"/>
         <source>Enabled</source>
         <translation>有効</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="225"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="227"/>
         <source>Disabled</source>
         <translation>無効</translation>
     </message>
@@ -2412,6 +2412,11 @@ Apache License 2.0 に基づきライセンスされています。</translation
     </message>
     <message>
         <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="94"/>
+        <source>Failed to save plugin settings. Check disk permissions and retry.</source>
+        <translation>プラグイン設定の保存に失敗しました。ディスクの権限を確認して再試行してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="97"/>
         <source>Plugin settings saved.</source>
         <translation>プラグイン設定を保存しました。</translation>
     </message>

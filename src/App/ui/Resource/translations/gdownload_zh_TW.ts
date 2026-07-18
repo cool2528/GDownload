@@ -4,12 +4,12 @@
 <context>
     <name>AlertTip</name>
     <message>
-        <location filename="../qml/CommonComponents/AlertTip.qml" line="202"/>
+        <location filename="../qml/CommonComponents/AlertTip.qml" line="203"/>
         <source>Dismiss alert</source>
         <translation>關閉提示</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/AlertTip.qml" line="204"/>
+        <location filename="../qml/CommonComponents/AlertTip.qml" line="205"/>
         <source>Dismiss</source>
         <translation>關閉</translation>
     </message>
@@ -1163,12 +1163,12 @@
 <context>
     <name>GDialogShell</name>
     <message>
-        <location filename="../qml/CommonComponents/GDialogShell.qml" line="185"/>
+        <location filename="../qml/CommonComponents/GDialogShell.qml" line="187"/>
         <source>Close dialog</source>
         <translation>關閉對話方塊</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDialogShell.qml" line="187"/>
+        <location filename="../qml/CommonComponents/GDialogShell.qml" line="189"/>
         <source>Close</source>
         <translation>關閉</translation>
     </message>
@@ -2249,68 +2249,68 @@ Copyright © 2024 GDownload Team
 <context>
     <name>PluginMarketCard</name>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="113"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="114"/>
         <source>Verified</source>
         <translation>已驗證</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="114"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="115"/>
         <source>Third-party</source>
         <translation>第三方</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="140"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="141"/>
         <source>Installed</source>
         <translation>已安裝</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="141"/>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="264"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="142"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="266"/>
         <source>Update</source>
         <translation>更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="142"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="143"/>
         <source>Working</source>
         <translation>處理中</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="143"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="144"/>
         <source>Available</source>
         <translation>可安裝</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="204"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="206"/>
         <source>Working…</source>
         <translation>處理中…</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="238"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="240"/>
         <source>Settings</source>
         <translation>設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="239"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="241"/>
         <source>Plugin settings</source>
         <translation>外掛設定</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="256"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="258"/>
         <source>Install</source>
         <translation>安裝</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="248"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="250"/>
         <source>Remove</source>
         <translation>移除</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="225"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="227"/>
         <source>Enabled</source>
         <translation>已啟用</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="225"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="227"/>
         <source>Disabled</source>
         <translation>已停用</translation>
     </message>
@@ -2412,6 +2412,11 @@ Copyright © 2024 GDownload Team
     </message>
     <message>
         <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="94"/>
+        <source>Failed to save plugin settings. Check disk permissions and retry.</source>
+        <translation>外掛設定儲存失敗，請檢查磁碟權限後重試。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="97"/>
         <source>Plugin settings saved.</source>
         <translation>外掛設定已儲存。</translation>
     </message>

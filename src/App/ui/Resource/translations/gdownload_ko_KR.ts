@@ -4,12 +4,12 @@
 <context>
     <name>AlertTip</name>
     <message>
-        <location filename="../qml/CommonComponents/AlertTip.qml" line="202"/>
+        <location filename="../qml/CommonComponents/AlertTip.qml" line="203"/>
         <source>Dismiss alert</source>
         <translation>알림 닫기</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/AlertTip.qml" line="204"/>
+        <location filename="../qml/CommonComponents/AlertTip.qml" line="205"/>
         <source>Dismiss</source>
         <translation>닫기</translation>
     </message>
@@ -1163,12 +1163,12 @@
 <context>
     <name>GDialogShell</name>
     <message>
-        <location filename="../qml/CommonComponents/GDialogShell.qml" line="185"/>
+        <location filename="../qml/CommonComponents/GDialogShell.qml" line="187"/>
         <source>Close dialog</source>
         <translation>대화 상자 닫기</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDialogShell.qml" line="187"/>
+        <location filename="../qml/CommonComponents/GDialogShell.qml" line="189"/>
         <source>Close</source>
         <translation>닫기</translation>
     </message>
@@ -2249,68 +2249,68 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
 <context>
     <name>PluginMarketCard</name>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="113"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="114"/>
         <source>Verified</source>
         <translation>검증됨</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="114"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="115"/>
         <source>Third-party</source>
         <translation>서드파티</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="140"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="141"/>
         <source>Installed</source>
         <translation>설치됨</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="141"/>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="264"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="142"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="266"/>
         <source>Update</source>
         <translation>업데이트</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="142"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="143"/>
         <source>Working</source>
         <translation>작업 중</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="143"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="144"/>
         <source>Available</source>
         <translation>설치 가능</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="204"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="206"/>
         <source>Working…</source>
         <translation>작업 중…</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="238"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="240"/>
         <source>Settings</source>
         <translation>설정</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="239"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="241"/>
         <source>Plugin settings</source>
         <translation>플러그인 설정</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="256"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="258"/>
         <source>Install</source>
         <translation>설치</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="248"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="250"/>
         <source>Remove</source>
         <translation>제거</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="225"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="227"/>
         <source>Enabled</source>
         <translation>사용</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketCard.qml" line="225"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="227"/>
         <source>Disabled</source>
         <translation>사용 안 함</translation>
     </message>
@@ -2412,6 +2412,11 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="94"/>
+        <source>Failed to save plugin settings. Check disk permissions and retry.</source>
+        <translation>플러그인 설정을 저장하지 못했습니다. 디스크 권한을 확인한 후 다시 시도하세요.</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsDialog.qml" line="97"/>
         <source>Plugin settings saved.</source>
         <translation>플러그인 설정이 저장되었습니다.</translation>
     </message>
