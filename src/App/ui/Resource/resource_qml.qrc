@@ -37,6 +37,8 @@
         <file>qml/Browser/BasicSettingPage.qml</file>
         <file>qml/Browser/AdvancedSettingPage.qml</file>
         <file>qml/Browser/LabSettingPage.qml</file>
+        <file>qml/Browser/PluginMarketPage.qml</file>
+        <file>qml/Browser/PluginMarketCard.qml</file>
         <file>qml/CommonComponents/ThemeSwitch.qml</file>
         <file>qml/CommonComponents/ThemeButton.qml</file>
         <file>qml/CommonComponents/GButtonSwitch.qml</file>

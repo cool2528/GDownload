@@ -8,21 +8,24 @@ import gdl.sdk
 Item {
     property int type: 0
 
-    // 标题区固定高度:标题字号 + 描述字号 + 行间留白(令牌组合,保留原视觉高度)
-    height: GTheme.fontTitle + GTheme.fontBody + GTheme.space2XL
+    // 标题区高度:标题 + 描述 + 行间距 + 与分隔线的下方留白(令牌组合)
+    height: GTheme.fontTitle + GTheme.fontBody + GTheme.spaceXS + GTheme.space3XL
 
-    // Element Plus 风格标题文本
+    // Element Plus 风格标题文本(顶部对齐,保证描述与分隔线之间有足够间距)
     Text {
         id: titleText
         anchors.left: parent.left
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.top: parent.top
+        anchors.topMargin: GTheme.spaceXS
         text: {
             if (type === 0) {
                 return qsTr("Basic Settings")
             } else if (type === 1) {
                 return qsTr("Advanced Settings")
-            } else {
+            } else if (type === 2) {
                 return qsTr("Lab Settings")
+            } else {
+                return qsTr("Plugin Market")
             }
         }
         font.pixelSize: GTheme.fontTitle
@@ -41,8 +44,10 @@ Item {
                 return qsTr("Configure basic download preferences")
             } else if (type === 1) {
                 return qsTr("Advanced configuration options")
-            } else {
+            } else if (type === 2) {
                 return qsTr("Experimental features and settings")
+            } else {
+                return qsTr("Browse, install and update netdisk parser plugins")
             }
         }
         font.pixelSize: GTheme.fontBody
