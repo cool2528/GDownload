@@ -11,6 +11,7 @@ enable_testing()
 # 包含测试子目录
 add_subdirectory(unit)
 add_subdirectory(integration)
+add_subdirectory(js_plugin)
 
 find_package(Python3 COMPONENTS Interpreter QUIET)
 if(Python3_Interpreter_FOUND)
