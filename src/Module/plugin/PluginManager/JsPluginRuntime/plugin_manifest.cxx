@@ -104,6 +104,101 @@ namespace gdl {
 					}
 				}
 
+				// 可选声明式配置 settings（设计文档第 2 节）
+				if (json.contains("settings")) {
+					if (!json["settings"].is_array()) {
+						error_out = "settings must be an array";
+						return std::nullopt;
+					}
+					int token_count = 0;
+					for (const auto& item : json["settings"]) {
+						if (!item.is_object()) {
+							error_out = "settings item must be an object";
+							return std::nullopt;
+						}
+						SettingField field;
+						try {
+							field.key	= item.at("key").get<std::string>();
+							field.type	= item.at("type").get<std::string>();
+							field.label = item.at("label").get<std::string>();
+						} catch (const nlohmann::json::exception& e) {
+							error_out = std::string("settings item missing required field: ") + e.what();
+							return std::nullopt;
+						}
+						// key 格式：[a-z0-9_]+
+						if (field.key.empty()) {
+							error_out = "settings key is empty";
+							return std::nullopt;
+						}
+						for (char c : field.key) {
+							bool valid = (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_';
+							if (!valid) {
+								error_out = "invalid settings key (must be [a-z0-9_]+): " + field.key;
+								return std::nullopt;
+							}
+						}
+						// key 唯一
+						for (const auto& existing : manifest.settings) {
+							if (existing.key == field.key) {
+								error_out = "duplicated settings key: " + field.key;
+								return std::nullopt;
+							}
+						}
+						// type 合法性
+						const bool type_ok = field.type == "text" || field.type == "password"
+											 || field.type == "textarea" || field.type == "bool"
+											 || field.type == "select" || field.type == "number";
+						if (!type_ok) {
+							error_out = "unsupported settings type: " + field.type;
+							return std::nullopt;
+						}
+						field.hint	   = item.value("hint", "");
+						field.required = item.value("required", false);
+						field.role	   = item.value("role", "");
+						if (!field.role.empty() && field.role != "token") {
+							error_out = "unsupported settings role: " + field.role;
+							return std::nullopt;
+						}
+						if (field.role == "token") {
+							++token_count;
+							// token 值要作为字符串传给 parseUrl，仅允许文本类字段
+							const bool token_type_ok =
+								field.type == "text" || field.type == "password" || field.type == "textarea";
+							if (!token_type_ok) {
+								error_out = "role=token requires a text-like type, got: " + field.type;
+								return std::nullopt;
+							}
+						}
+						if (item.contains("default")) {
+							field.default_json = item["default"].dump();
+						}
+						if (item.contains("options") && item["options"].is_array()) {
+							field.options = item["options"].get<std::vector<std::string>>();
+						}
+						if (field.type == "select" && field.options.empty()) {
+							error_out = "settings select field requires non-empty options: " + field.key;
+							return std::nullopt;
+						}
+						// 本地化 label/hint
+						if (item.contains("locales") && item["locales"].is_object()) {
+							for (auto it = item["locales"].begin(); it != item["locales"].end(); ++it) {
+								if (!it.value().is_object()) {
+									continue;
+								}
+								SettingFieldLocale locale_strings;
+								locale_strings.label	= it.value().value("label", "");
+								locale_strings.hint	= it.value().value("hint", "");
+								field.locales[it.key()] = std::move(locale_strings);
+							}
+						}
+						manifest.settings.push_back(std::move(field));
+					}
+					if (token_count > 1) {
+						error_out = "at most one settings field may have role=token";
+						return std::nullopt;
+					}
+				}
+
 				// manifest_version 支持范围
 				if (manifest.manifest_version != kSupportedManifestVersion) {
 					error_out = "unsupported manifest_version: " + std::to_string(manifest.manifest_version);
