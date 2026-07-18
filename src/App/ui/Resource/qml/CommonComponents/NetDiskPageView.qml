@@ -16,6 +16,17 @@ Rectangle {
     property string lastErrorText: ""
     readonly property int operationTimeoutMs: 70000
 
+    // MatchPlugins 返回的候选插件([{name, displayName, needsConfig, configured}])
+    property var matchedPlugins: []
+    property int selectedPluginIndex: 0
+    property bool noPluginMatched: false
+    readonly property var selectedPlugin: matchedPlugins.length > 0
+                                          ? matchedPlugins[Math.min(selectedPluginIndex, matchedPlugins.length - 1)]
+                                          : null
+    readonly property bool selectedPluginNeedsSetup: selectedPlugin !== null
+                                                     && selectedPlugin.needsConfig === true
+                                                     && selectedPlugin.configured !== true
+
     readonly property bool compact: width < 620
     readonly property bool veryCompact: width < 460
     readonly property int rowHeight: compact ? 52 : 48
@@ -42,20 +53,32 @@ Rectangle {
         }
     }
 
+    function refreshMatches() {
+        var url = Utils.removeNewlineAndTrim(urlInput.text)
+        matchedPlugins = url.length > 0 ? NetWorkDiskManager.MatchPlugins(url) : []
+        if (selectedPluginIndex >= matchedPlugins.length)
+            selectedPluginIndex = 0
+        if (matchedPlugins.length > 0)
+            noPluginMatched = false
+    }
+
     function parseShareLink() {
-        if (!checkShareUrl(urlInput.text)) {
-            lastErrorText = qsTr("Enter a valid Baidu Netdisk share link before parsing.")
-            ToastManager.ShowError(qsTr("Invalid Baidu Netdisk URL, please check."))
+        var url = Utils.removeNewlineAndTrim(urlInput.text)
+        refreshMatches()
+        if (url.length === 0) {
+            lastErrorText = qsTr("Enter a share link before parsing.")
+            ToastManager.ShowError(lastErrorText)
             return
         }
-        if (SettingsManager.qBaiduPanCookies.length === 0) {
-            lastErrorText = qsTr("Baidu Netdisk cookies are required. Add them in Preferences and try again.")
-            ToastManager.ShowError(qsTr("Please set Baidu Netdisk cookies first."))
+        if (matchedPlugins.length === 0) {
+            noPluginMatched = true
+            lastErrorText = qsTr("No installed plugin can handle this link. Install one from the Plugin Market.")
+            ToastManager.ShowError(lastErrorText)
             return
         }
         homePath = ""
         parentPath = ""
-        NetWorkDiskManager.ParseShareUrl(Utils.removeNewlineAndTrim(urlInput.text))
+        NetWorkDiskManager.ParseShareUrl(url, matchedPlugins[selectedPluginIndex].name)
         beginOperation()
     }
 
@@ -111,7 +134,7 @@ Rectangle {
                     }
 
                     Text {
-                        text: qsTr("Preview a Baidu share safely before adding selected files to the queue.")
+                        text: qsTr("Preview a cloud share before adding selected files to the queue.")
                         font.pixelSize: GTheme.fontBody
                         color: GTheme.textSecondary
                         Layout.fillWidth: true
@@ -137,7 +160,7 @@ Rectangle {
                     spacing: GTheme.spaceSM
 
                     Text {
-                        text: qsTr("Baidu share link")
+                        text: qsTr("Cloud share link")
                         color: GTheme.textPrimary
                         font.pixelSize: GTheme.fontBody
                         font.weight: GTheme.weightMedium
@@ -152,8 +175,8 @@ Rectangle {
                         wrapMode: TextEdit.WrapAnywhere
                         selectByMouse: true
                         font.pixelSize: GTheme.fontBody
-                        placeholderText: qsTr("Paste https://pan.baidu.com/s/... here")
-                        Accessible.name: qsTr("Baidu share link")
+                        placeholderText: qsTr("Paste a share link from a supported cloud drive here")
+                        Accessible.name: qsTr("Cloud share link")
                         color: GTheme.textPrimary
                         placeholderTextColor: GTheme.textPlaceholder
                         background: Rectangle {
@@ -163,7 +186,34 @@ Rectangle {
                             border.color: netDiskPage.lastErrorText.length > 0 ? GTheme.dangerColor
                                                                                  : (urlInput.activeFocus ? GTheme.primaryColor : GTheme.borderLight)
                         }
-                        onTextChanged: if (netDiskPage.lastErrorText.length > 0) netDiskPage.lastErrorText = ""
+                        onTextChanged: {
+                            if (netDiskPage.lastErrorText.length > 0)
+                                netDiskPage.lastErrorText = ""
+                            netDiskPage.refreshMatches()
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: GTheme.spaceSM
+                        visible: netDiskPage.matchedPlugins.length > 1
+
+                        Text {
+                            text: qsTr("Parse with")
+                            color: GTheme.textSecondary
+                            font.pixelSize: GTheme.fontCaption
+                        }
+                        GComBoBox {
+                            id: pluginSelector
+                            objectName: "netDiskPluginSelector"
+                            Layout.preferredWidth: 220
+                            Layout.preferredHeight: GTheme.sizeDefault
+                            model: netDiskPage.matchedPlugins.map(p => p.displayName)
+                            currentIndex: netDiskPage.selectedPluginIndex
+                            Accessible.name: qsTr("Plugin used for parsing")
+                            onActivated: index => netDiskPage.selectedPluginIndex = index
+                        }
+                        Item { Layout.fillWidth: true }
                     }
 
                     RowLayout {
@@ -210,7 +260,7 @@ Rectangle {
 
                 Repeater {
                     model: [
-                        { icon: "link", title: qsTr("Paste link"), description: qsTr("Validate the share URL and cookie.") },
+                        { icon: "link", title: qsTr("Paste link"), description: qsTr("Auto-match an installed plugin for the link.") },
                         { icon: "view", title: qsTr("Preview files"), description: qsTr("Browse folders and select files.") },
                         { icon: "cloud-download", title: qsTr("Add to queue"), description: qsTr("Send the selection to aria2.") }
                     ]
@@ -264,21 +314,37 @@ Rectangle {
 
             AlertTip {
                 Layout.fillWidth: true
-                severity: SettingsManager.qBaiduPanCookies.length === 0 ? "warning" : "success"
-                text: SettingsManager.qBaiduPanCookies.length === 0
-                      ? qsTr("Cookie required. Set Baidu Netdisk cookies in Preferences before parsing share links.")
-                      : qsTr("Baidu Netdisk is ready. Parsed files remain local until you add them to the queue.")
+                visible: netDiskPage.selectedPlugin !== null
+                severity: netDiskPage.selectedPluginNeedsSetup ? "warning" : "success"
+                text: netDiskPage.selectedPlugin === null ? ""
+                      : (netDiskPage.selectedPluginNeedsSetup
+                         ? qsTr("%1 needs to be configured before parsing.").arg(netDiskPage.selectedPlugin.displayName)
+                         : qsTr("%1 is ready. Parsed files remain local until you add them to the queue.").arg(netDiskPage.selectedPlugin.displayName))
             }
 
-            GButton {
-                visible: SettingsManager.qBaiduPanCookies.length === 0
-                text: qsTr("Open Baidu cookie settings")
-                buttonType: "primary"
-                Layout.alignment: netDiskPage.compact ? Qt.AlignLeft : Qt.AlignRight
-                Layout.fillWidth: netDiskPage.veryCompact
-                onClicked: {
-                    brower_view.index = 1
-                    brower_view.switchSettingPage(1)
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: GTheme.spaceSM
+
+                Item { Layout.fillWidth: true }
+
+                GButton {
+                    visible: netDiskPage.noPluginMatched
+                    text: qsTr("Open Plugin Market")
+                    buttonType: "primary"
+                    Layout.fillWidth: netDiskPage.veryCompact
+                    onClicked: {
+                        brower_view.index = 1
+                        brower_view.switchSettingPage(3)
+                    }
+                }
+
+                GButton {
+                    visible: netDiskPage.selectedPluginNeedsSetup
+                    text: qsTr("Configure plugin")
+                    buttonType: "primary"
+                    Layout.fillWidth: netDiskPage.veryCompact
+                    onClicked: pluginSettingsDialog.openFor(netDiskPage.selectedPlugin.name)
                 }
             }
         }
@@ -590,8 +656,16 @@ Rectangle {
         }
     }
 
-    function checkShareUrl(url) {
-        var reg = /https:\/\/pan\.baidu\.com\/s\/[A-Za-z0-9_-]+(\?pwd=[A-Za-z0-9]+)?/
-        return reg.test(url)
+    PluginSettingsDialog {
+        id: pluginSettingsDialog
+        parent: Overlay.overlay
+    }
+
+    Connections {
+        target: PluginConfigManager
+        // 配置保存/清除后刷新候选插件的 configured 状态
+        function onConfigChanged(name) {
+            netDiskPage.refreshMatches()
+        }
     }
 }
