@@ -1,7 +1,9 @@
 #pragma once
+#include <optional>
 #include <string>
 #include <vector>
 #include "IDownload_Plugin.h"
+#include "JsPluginRuntime/plugin_manifest.h"
 #include "PluginManager_export.h"
 #include "singleton.hpp"
 namespace gdl {
@@ -20,6 +22,9 @@ namespace gdl {
 
             std::vector<INetDiskDownloadPlugin::IDownloadPluginPtr> GetPluginsForUrl(std::string_view url);
             INetDiskDownloadPlugin::IDownloadPluginPtr GetPluginByName(std::string_view name);
+
+			// 取指定插件的 manifest 副本（本地化名称/声明式配置 Schema 供 UI 使用）
+			std::optional<js::PluginManifest> GetManifestByName(std::string_view name);
 
 		   private:
 			explicit DownloadPluginManager();

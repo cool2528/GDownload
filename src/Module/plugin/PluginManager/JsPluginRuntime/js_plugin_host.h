@@ -33,6 +33,9 @@ namespace gdl {
 				PluginMetadata GetPluginMetadata() override;
 				bool CanHandle(const std::string& url) const override;
 
+				// 只读访问插件 manifest（UI 层取 display_name/settings 用）
+				const PluginManifest& manifest() const { return manifest_; }
+
 			   private:
 				// 懒初始化 Runtime、注入 gdl.*、加载入口模块（需持锁调用）
 				bool EnsureInitializedLocked();
