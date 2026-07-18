@@ -166,3 +166,6 @@ check_translations.sh
 setup_env.sh
 .superpowers/
 tools/
+
+# 嵌套的插件市场注册表仓库（独立 git 仓库，不纳入主仓库跟踪）
+gdownload-plugin-registry/
