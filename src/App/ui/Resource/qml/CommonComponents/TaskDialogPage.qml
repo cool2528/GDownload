@@ -17,8 +17,8 @@ Popup {
     closePolicy: Popup.CloseOnEscape
     focus: true
 
-    // 打开时预选的标签页:0=URL,1=Torrent,2=Baidu。
-    // 供下载页空状态快捷入口(Add URL / Torrent / Baidu)按入口类型直达对应标签。
+    // 打开时预选的标签页:0=URL,1=Torrent,2=Cloud Drive。
+    // 供下载页空状态快捷入口(Add URL / Torrent / Cloud Drive)按入口类型直达对应标签。
     property int initialTab: 0
     property string validationMessage: ""
 
@@ -113,7 +113,7 @@ Popup {
                             model: [
                                 { name: qsTr("URL"), iconName: "link" },
                                 { name: qsTr("Torrent"), iconName: "cloud-download" },
-                                { name: qsTr("Baidu"), iconName: "cloud" }
+                                { name: qsTr("Cloud Drive"), iconName: "cloud" }
                             ]
 
                             GButton {
@@ -250,7 +250,7 @@ Popup {
                         }
                     }
 
-                    // 百度网盘页面
+                    // 网盘解析页面(插件通用)
                         GCard {
                             outlined: true
                             padding: taskPage.cardPadding

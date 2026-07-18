@@ -122,7 +122,7 @@ TestCase {
 
         var names = ["homeAddDownloadButton", "homeActiveMetric",
                      "homeWaitingMetric", "homeCompletedMetric",
-                     "homeAddUrlAction", "homeAddTorrentAction", "homeAddBaiduAction"]
+                     "homeAddUrlAction", "homeAddTorrentAction", "homeAddCloudAction"]
         for (var i = 0; i < names.length; ++i) {
             var item = findChild(harness.loadedItem, names[i])
             verify(item !== null, "Missing Home item: " + names[i])
