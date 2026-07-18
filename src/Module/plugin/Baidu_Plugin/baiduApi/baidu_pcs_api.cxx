@@ -10,6 +10,7 @@
 #include <sstream>
 #include <vector>
 #include "GDLCore/encoding/encoding.h"
+#include "GDLCore/logger.h"
 
 #ifdef _DEBUG
 #define IS_DEBUG_MODE true
@@ -19,6 +20,18 @@
 
 namespace gdl {
     namespace plugin {
+
+        namespace {
+            constexpr int kBaiduConnectTimeoutMs = 5000;
+            constexpr int kBaiduRequestTimeoutMs = 12000;
+
+            void LogBaiduResponse(const char* stage, const cpr::Response& response) {
+                if (response.status_code < 200 || response.status_code >= 400 || !response.error.message.empty()) {
+                    LOG_WARN("Baidu share request stage={} status={} error={}", stage, response.status_code,
+                             response.error.message);
+                }
+            }
+        }  // namespace
 
         namespace baidu {
             const std::string BAIDU_PCS_URL = "https://pan.baidu.com/api/sharedownload";
@@ -173,8 +186,10 @@ namespace gdl {
 
         std::optional<std::vector<INetDiskDownloadPlugin::FileInfo>> BaiduPcsApi::ParseShareUrl(
             const std::string& url, const std::string& user_token) {
+			LOG_INFO("Baidu share parse started");
 			ProcessBaiduCookies(user_token);
             if (!ValidateShareUrl(url)) {
+                LOG_WARN("Baidu share parse rejected an invalid URL");
                 return std::nullopt;
             }
 
@@ -193,36 +208,45 @@ namespace gdl {
 
             auto initial_response = FetchInitialPage(url);
             if (!initial_response) {
+                LOG_WARN("Baidu share parse failed at initial page");
                 return std::nullopt;
             }
             std::string new_url = url;
             if (has_password) {
                 new_url = GetRedirectUrl(initial_response->header);
-                if (new_url.empty()) return std::nullopt;
+                if (new_url.empty()) {
+                    LOG_WARN("Baidu share parse failed: password redirect location missing");
+                    return std::nullopt;
+                }
                 auto redirect_response = FetchRedirectPage(new_url);
                 if (!redirect_response) {
+                    LOG_WARN("Baidu share parse failed at password redirect page");
                     return std::nullopt;
                 }
             }
 
             std::string surl = ExtractSurl(new_url, has_password);
             if (surl.empty()) {
+                LOG_WARN("Baidu share parse failed: share id not found");
                 return std::nullopt;
             }
 
             bool need_verify = has_password || !pwd.empty();
             if (need_verify && !VerifySharePassword(surl, pwd, new_url)) {
+                LOG_WARN("Baidu share parse failed at password verification");
                 return std::nullopt;
             }
 
             auto file_list = FetchShareFileList(surl, new_url);
             if (!file_list.has_value()) {
+                LOG_WARN("Baidu share parse failed at file list request");
                 return std::nullopt;
             }
             auto file_list_value = file_list.value();
             for (auto& file : file_list_value) {
                 file.path = plugin::CookiesUtils::UrlDecode(file.root_path) + "/" + file.name;
             }
+            LOG_INFO("Baidu share parse completed files={}", file_list_value.size());
             return file_list_value;
         }
 
@@ -258,11 +282,14 @@ namespace gdl {
             auto redirect_params = cpr::Redirect{50, false, false, cpr::PostRedirectFlags::POST_ALL};
 
             if (use_debug_settings_) {
-                reply = cpr::Get(request_params, redirect_params, proxy_settings_, ssl_opts_, baidu_cookies_);
+                reply = cpr::Get(request_params, redirect_params, proxy_settings_, ssl_opts_, baidu_cookies_,
+                                 cpr::ConnectTimeout{kBaiduConnectTimeoutMs}, cpr::Timeout{kBaiduRequestTimeoutMs});
             }
             else {
-				reply = cpr::Get(request_params, redirect_params, baidu_cookies_);
+				reply = cpr::Get(request_params, redirect_params, baidu_cookies_,
+							 cpr::ConnectTimeout{kBaiduConnectTimeoutMs}, cpr::Timeout{kBaiduRequestTimeoutMs});
             }
+            LogBaiduResponse("initial-page", reply);
 
             std::string baidu_id;
             baidu_cookies_.encode = false;
@@ -300,11 +327,14 @@ namespace gdl {
             auto header_params	= cpr::Header{{baidu::UA_KEY, baidu::BAIDU_UA_WEB}};
 
             if (use_debug_settings_) {
-                reply = cpr::Get(request_params, header_params, baidu_cookies_, proxy_settings_, ssl_opts_);
+                reply = cpr::Get(request_params, header_params, baidu_cookies_, proxy_settings_, ssl_opts_,
+                                 cpr::ConnectTimeout{kBaiduConnectTimeoutMs}, cpr::Timeout{kBaiduRequestTimeoutMs});
             }
             else {
-                reply = cpr::Get(request_params, header_params, baidu_cookies_);
+                reply = cpr::Get(request_params, header_params, baidu_cookies_,
+                                 cpr::ConnectTimeout{kBaiduConnectTimeoutMs}, cpr::Timeout{kBaiduRequestTimeoutMs});
             }
+            LogBaiduResponse("redirect-page", reply);
 
             baidu_cookies_ = detail::MergeCookies(baidu_cookies_, reply.cookies);
             return reply;
@@ -368,27 +398,34 @@ namespace gdl {
 
             if (use_debug_settings_) {
                 reply = cpr::Post(request_params, header_params, verify_parameters, verify_payload, baidu_cookies_,
-                                  proxy_settings_, ssl_opts_);
+                                  proxy_settings_, ssl_opts_, cpr::ConnectTimeout{kBaiduConnectTimeoutMs},
+                                  cpr::Timeout{kBaiduRequestTimeoutMs});
             }
             else {
-                reply = cpr::Post(request_params, header_params, verify_parameters, verify_payload, baidu_cookies_);
+                reply = cpr::Post(request_params, header_params, verify_parameters, verify_payload, baidu_cookies_,
+                                  cpr::ConnectTimeout{kBaiduConnectTimeoutMs}, cpr::Timeout{kBaiduRequestTimeoutMs});
             }
+            LogBaiduResponse("verify-password", reply);
 
             if (reply.status_code != 200) {
+                LOG_WARN("Baidu password verification returned status={}", reply.status_code);
                 return false;
             }
 
             try {
                 nlohmann::json doc = nlohmann::json::parse(reply.text);
                 if (doc.contains("error") && doc["error"] != 0) {
+                    LOG_WARN("Baidu password verification returned an error response");
                     return false;
                 }
                 if (!doc.contains("randsk")) {
+                    LOG_WARN("Baidu password verification response did not contain randsk");
                     return false;
                 }
 
                 rand_sk_string_ = doc["randsk"].get<std::string>();
-            } catch (const std::exception&) {
+            } catch (const std::exception& e) {
+                LOG_WARN("Baidu password verification response parsing failed: {}", e.what());
                 return false;
             }
 
@@ -412,11 +449,14 @@ namespace gdl {
 
             if (use_debug_settings_) {
                 reply = cpr::Get(request_params, header_params, baidu_cookies_, proxy_settings_, ssl_opts_,
-                                 request_options);
+                                 request_options, cpr::ConnectTimeout{kBaiduConnectTimeoutMs},
+                                 cpr::Timeout{kBaiduRequestTimeoutMs});
             }
             else {
-                reply = cpr::Get(request_params, header_params, baidu_cookies_, request_options);
+                reply = cpr::Get(request_params, header_params, baidu_cookies_, request_options,
+                                 cpr::ConnectTimeout{kBaiduConnectTimeoutMs}, cpr::Timeout{kBaiduRequestTimeoutMs});
             }
+            LogBaiduResponse("share-page", reply);
 
             if (reply.status_code != 200) {
                 return std::nullopt;
@@ -426,12 +466,15 @@ namespace gdl {
                 detail::WriteTextToFile(reply.text, "baidu_share_list.html");
             }
             if (!ExtractShareInfo(reply.text)) {
+                LOG_WARN("Baidu share page metadata format is unsupported");
                 return std::nullopt;
             }
             baidu_cookies_ = detail::MergeCookies(baidu_cookies_, reply.cookies);
 
             if (!ReportUserBehavior(real_url)) {
-                return std::nullopt;
+                // Telemetry is not required to enumerate the shared files. A
+                // rejected report must not turn a valid share into a parse failure.
+                LOG_WARN("Baidu share telemetry request was rejected; continuing");
             }
 
             std::string share_list = baidu::BAIDU_PAN_HOST + baidu::BAIDU_PCS_SHARE_LIST;
@@ -455,13 +498,16 @@ namespace gdl {
             if (use_debug_settings_) {
                 reply = cpr::Get(cpr::Url(share_list), share_list_parameters,
                                  cpr::Header{{baidu::UA_KEY, baidu::BAIDU_UA_WEB}, {"Referer", real_url}},
-                                 baidu_cookies_, proxy_settings_, ssl_opts_);
+                                 baidu_cookies_, proxy_settings_, ssl_opts_, cpr::ConnectTimeout{kBaiduConnectTimeoutMs},
+                                 cpr::Timeout{kBaiduRequestTimeoutMs});
             }
             else {
                 reply =
                     cpr::Get(cpr::Url(share_list), share_list_parameters,
-                             cpr::Header{{baidu::UA_KEY, baidu::BAIDU_UA_WEB}, {"Referer", real_url}}, baidu_cookies_);
+                             cpr::Header{{baidu::UA_KEY, baidu::BAIDU_UA_WEB}, {"Referer", real_url}}, baidu_cookies_,
+                             cpr::ConnectTimeout{kBaiduConnectTimeoutMs}, cpr::Timeout{kBaiduRequestTimeoutMs});
             }
+            LogBaiduResponse("share-list", reply);
 
             if (reply.status_code != 200) {
                 return std::nullopt;
@@ -490,12 +536,15 @@ namespace gdl {
 
             if (use_debug_settings_) {
                 reply = cpr::Post(request_params, header_params, report_user_parameters, report_user_payload,
-                                  baidu_cookies_, proxy_settings_, ssl_opts_);
+                                  baidu_cookies_, proxy_settings_, ssl_opts_, cpr::ConnectTimeout{kBaiduConnectTimeoutMs},
+                                  cpr::Timeout{kBaiduRequestTimeoutMs});
             }
             else {
                 reply = cpr::Post(request_params, header_params, report_user_parameters, report_user_payload,
-                                  baidu_cookies_);
+                                  baidu_cookies_, cpr::ConnectTimeout{kBaiduConnectTimeoutMs},
+                                  cpr::Timeout{kBaiduRequestTimeoutMs});
             }
+            LogBaiduResponse("report-user", reply);
 
             return reply.status_code == 200;
         }
@@ -515,7 +564,9 @@ namespace gdl {
                                                       {"dp-logid", detail::DpLogId().GetDpLogId()}};
             auto reply =
                 cpr::Get(cpr::Url(sig_request_url), sig_request_parameters,
-                         cpr::Header{{baidu::UA_KEY, baidu::BAIDU_UA_WEB}, {"Referer", referer_url}}, baidu_cookies_);
+                         cpr::Header{{baidu::UA_KEY, baidu::BAIDU_UA_WEB}, {"Referer", referer_url}}, baidu_cookies_,
+                         cpr::ConnectTimeout{kBaiduConnectTimeoutMs}, cpr::Timeout{kBaiduRequestTimeoutMs});
+            LogBaiduResponse("download-signature", reply);
             baidu_cookies_ = detail::MergeCookies(baidu_cookies_, reply.cookies);
             return reply;
         }
@@ -612,7 +663,9 @@ namespace gdl {
 
             auto reply =
                 cpr::Get(cpr::Url(share_list), share_list_parameters,
-                         cpr::Header{{baidu::UA_KEY, baidu::BAIDU_UA_WEB}, {"Referer", real_url}}, baidu_cookies_);
+                         cpr::Header{{baidu::UA_KEY, baidu::BAIDU_UA_WEB}, {"Referer", real_url}}, baidu_cookies_,
+                         cpr::ConnectTimeout{kBaiduConnectTimeoutMs}, cpr::Timeout{kBaiduRequestTimeoutMs});
+            LogBaiduResponse("share-home-list", reply);
 
             if (reply.status_code != 200) {
                 return std::nullopt;
@@ -672,7 +725,9 @@ namespace gdl {
                       {baidu::UA_KEY, baidu::BAIDU_UA_WEB},
                       {"Referer", real_url},
                   };
-                auto reply = cpr::Get(cpr::Url(share_list_url), share_list_parameters, header, baidu_cookies_);
+                auto reply = cpr::Get(cpr::Url(share_list_url), share_list_parameters, header, baidu_cookies_,
+                                      cpr::ConnectTimeout{kBaiduConnectTimeoutMs}, cpr::Timeout{kBaiduRequestTimeoutMs});
+                LogBaiduResponse("share-directory-list", reply);
                 if (reply.status_code != 200) {
                     return std::nullopt;
                 }
@@ -840,12 +895,13 @@ namespace gdl {
 
         bool BaiduPcsApi::ExtractShareInfo(const std::string& html_content) {
             try {
-
+                bool has_share_context = false;
                 std::regex pattern(R"(locals\.mset\((\{.*?\})\);)");
                 std::smatch matches;
                 if (std::regex_search(html_content, matches, pattern) && matches.size() > 1) {
                     std::string json_str	 = matches[1].str();
                     nlohmann::json json_data = nlohmann::json::parse(json_str);
+                    has_share_context = true;
                     if (json_data.contains("bdstoken") && json_data["bdstoken"].is_string()) {
                         this->bds_token_ = json_data["bdstoken"].get<std::string>();
                     }
@@ -854,6 +910,9 @@ namespace gdl {
                     }
                     if (json_data.contains("share_uk") && json_data["share_uk"].is_string()) {
                         user_uk_ = json_data["share_uk"].get<std::string>();
+                    }
+                    else if (json_data.contains("share_uk") && json_data["share_uk"].is_number()) {
+                        user_uk_ = std::to_string(json_data["share_uk"].get<std::uint64_t>());
                     }
                     if (json_data.contains("is_vip") && json_data["is_vip"].is_number()) {
                         is_vip_ = std::to_string(json_data["is_vip"].get<std::uint64_t>());
@@ -865,10 +924,46 @@ namespace gdl {
                                 break;
 							}
 						}
-					}
+                    }
                 }
-                return ExtractJsToken(html_content) && !bds_token_.empty();
+
+                // Baidu's current anonymous share page exposes the share identity in
+                // locals.mset/yunData but leaves bdstoken empty and no longer emits
+                // the old fn%28... token fragment. Those values are not required for
+                // the share verification/list endpoints, so treat jsToken/bdstoken as
+                // optional rather than rejecting an otherwise valid share context.
+                if (!has_share_context) {
+                    std::regex yun_data_pattern(R"(window\.yunData\s*=\s*\{.*?\};)");
+                    has_share_context = std::regex_search(html_content, yun_data_pattern);
+                }
+                // Keep a small field-level fallback for pages that expose yunData
+                // without a parseable locals.mset JSON object.
+                if (user_share_id_.empty()) {
+                    std::smatch share_id_match;
+                    if (std::regex_search(html_content, share_id_match,
+                                          std::regex(R"(["']?shareid["']?\s*[:=]\s*["']?([0-9]+))")) &&
+                        share_id_match.size() > 1) {
+                        user_share_id_ = share_id_match[1].str();
+                    }
+                }
+                if (user_uk_.empty()) {
+                    std::smatch share_uk_match;
+                    if (std::regex_search(html_content, share_uk_match,
+                                          std::regex(R"(["']?share_uk["']?\s*[:=]\s*["']?([0-9]+))")) &&
+                        share_uk_match.size() > 1) {
+                        user_uk_ = share_uk_match[1].str();
+                    }
+                }
+                const bool has_share_identity = !user_share_id_.empty() && !user_uk_.empty();
+                if (ExtractJsToken(html_content)) {
+                    LOG_DBG("Baidu share page provided legacy jsToken");
+                }
+                else {
+                    js_token_.clear();
+                }
+                return has_share_context && has_share_identity;
             } catch (const std::exception& e) {
+                LOG_WARN("Baidu share metadata extraction failed: {}", e.what());
                 return false;
             }
 
@@ -877,13 +972,19 @@ namespace gdl {
 
         bool BaiduPcsApi::ExtractJsToken(const std::string& html_content) {
             try {
-                std::regex pattern(R"(fn%28%22(\w+)%22)");
-                std::smatch matches;
-                if (std::regex_search(html_content, matches, pattern) && matches.size() > 1) {
-                    js_token_ = matches[1].str();
-                    return true;
+                const std::regex patterns[] = {
+                    std::regex(R"(fn%28%22([A-Za-z0-9_]+)%22\))"),
+                    std::regex(R"(fn\(["']([A-Za-z0-9_]+)["']\))"),
+                };
+                for (const auto& pattern : patterns) {
+                    std::smatch matches;
+                    if (std::regex_search(html_content, matches, pattern) && matches.size() > 1) {
+                        js_token_ = matches[1].str();
+                        return true;
+                    }
                 }
             } catch (const std::regex_error& e) {
+                LOG_WARN("Baidu jsToken extraction regex failed: {}", e.what());
                 return false;
             }
 
@@ -914,13 +1015,8 @@ namespace gdl {
             }
 			cookies_utils_.Clear();
             cookies_utils_	  = CookiesUtils(cookies_list);
-            auto bduss_cookie = cookies_utils_.GetCookie("BDUSS");
-			if (bduss_cookie.empty()) {
-				bduss_cookie = cookies_utils_.GetCookie("BDUSS_BFESS");
-            }
-			if (!pcs_.IsValidate()) {
-				pcs_.InitUserInfo(bduss_cookie);
-			}
+            // User metadata is only needed when resolving a download address. Do not
+            // perform an unrelated Tieba request while parsing a share page.
         }
 
         std::vector<std::string> BaiduPcsApi::GetRealDownloadAddress(const INetDiskDownloadPlugin::FileInfo& link) {
@@ -964,7 +1060,8 @@ namespace gdl {
 			std::string url		= baidu::PCS_BAIDU_COM + "/rest/2.0/pcs/file?" + params_str;
             url += "&rand=" + rand + "&devuid=" + devuid + "&cuid=" + devuid;
 			std::vector<std::string> urls;
-			auto response = cpr::Get(cpr::Url{url}, headers, cpr::Cookies{{"BDUSS", bduss_cookie}});
+			auto response = cpr::Get(cpr::Url{url}, headers, cpr::Cookies{{"BDUSS", bduss_cookie}},
+								 cpr::ConnectTimeout{kBaiduConnectTimeoutMs}, cpr::Timeout{kBaiduRequestTimeoutMs});
 			if (response.status_code != 200) return urls;
             try {
 				json info = json::parse(response.text);
@@ -1015,7 +1112,8 @@ namespace gdl {
 				   {"Referer", "https://pan.baidu.com/disk/main"},
 				   {"User-Agent", baidu::BAIDU_UA_WEB},
 			   };
-			auto response = cpr::Post(cpr::Url(transfer_url), params, payload, headers, baidu_cookies_);
+			auto response = cpr::Post(cpr::Url(transfer_url), params, payload, headers, baidu_cookies_,
+								  cpr::ConnectTimeout{kBaiduConnectTimeoutMs}, cpr::Timeout{kBaiduRequestTimeoutMs});
 			if (response.status_code != 200) return std::nullopt;
 			try {
 
@@ -1065,7 +1163,8 @@ namespace gdl {
             auto response		 = cpr::Post(cpr::Url(file_manger_url),
 										cpr::Parameters{{"method", "delete"}, {"app_id", baidu::PCS_APP_ID}},
 										cpr::Cookies{{"BDUSS",bduss_cookie},false},
-										multipart_data);
+										multipart_data, cpr::ConnectTimeout{kBaiduConnectTimeoutMs},
+										cpr::Timeout{kBaiduRequestTimeoutMs});
 			if (response.status_code != 200) return false;
 			return true;
         }

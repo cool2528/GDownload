@@ -483,7 +483,7 @@ namespace gdl {
 
                 // 使用 HTTPS 传输 BDUSS 等长期登录凭证，避免明文 HTTP 被中间人截获导致账号被盗
                 cpr::Response resp = cpr::Post(cpr::Url{"https://tieba.baidu.com/c/s/login"}, headers,
-                                               payload);
+                                               payload, cpr::ConnectTimeout{5000}, cpr::Timeout{12000});
 
                 if (resp.status_code == 200) {
                     try {
