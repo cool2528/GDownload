@@ -4,6 +4,7 @@
 #include <mutex>
 
 #include "../IDownload_Plugin.h"
+#include "../plugin_config_store.h"
 #include "api/api_context.h"
 #include "cookie_jar.h"
 #include "js_runtime.h"
@@ -47,6 +48,7 @@ namespace gdl {
 
 				std::unique_ptr<JsRuntime> runtime_;
 				std::unique_ptr<CookieJar> cookie_jar_;
+				std::unique_ptr<PluginConfigStore> config_store_;
 				ApiContext api_context_;
 				// 插件的 default export 对象
 				JSValue plugin_object_{JS_UNDEFINED};

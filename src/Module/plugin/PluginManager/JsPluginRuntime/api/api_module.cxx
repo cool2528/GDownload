@@ -14,6 +14,7 @@ namespace gdl {
 				JS_SetPropertyStr(ctx, gdl, "storage", CreateStorageApi(ctx));
 				JS_SetPropertyStr(ctx, gdl, "ui", CreateUiApi(ctx));
 				JS_SetPropertyStr(ctx, gdl, "log", CreateLogApi(ctx));
+				JS_SetPropertyStr(ctx, gdl, "config", CreateConfigApi(ctx));
 				JS_SetPropertyStr(ctx, gdl, "notify", CreateNotifyFunction(ctx));
 
 				JS_SetPropertyStr(ctx, global, "gdl", gdl);
