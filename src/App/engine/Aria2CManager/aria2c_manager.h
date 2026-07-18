@@ -1,6 +1,7 @@
 #pragma once
 #include <atomic>
 #include <future>
+#include <vector>
 #include "tracker_sync_gate.h"
 #include <boost/asio.hpp>
 #include "Engine_export.h"
@@ -222,8 +223,8 @@ namespace gdl {
             std::string SyncActiveTaskInfo();
 			std::string ParseTextUrls(const std::string& input);
 			// Tracker 优化相关方法
-			/// 带降级策略的 URL 获取
-			std::string GetBitTorrentUrlWithFallback(const std::string& url);
+			/// 带降级策略的 URL 获取：按序尝试镜像列表，GitHub Raw 自动补充 jsDelivr 兜底
+			std::string GetBitTorrentUrlWithFallback(const std::vector<std::string>& urls);
 			/// GitHub Raw 转 jsDelivr CDN
 			std::string ConvertToJsDelivrCDN(const std::string& url);
 			/// 统计 Tracker 数量

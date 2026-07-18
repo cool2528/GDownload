@@ -5,7 +5,9 @@ import "../CommonComponents"
 import gdl.sdk
 
 // Element Plus 风格 Tracker 服务器设置卡片(B 类,即时提交派)
-// Tracker 源勾选与自动更新开关直接 SetXxx 提交,同步按钮调用 BrowserManager;
+// 源按提供方分组展示逻辑源(镜像通道由引擎自动回退,不再暴露给用户);
+// 支持用户自定义源 URL 增删;勾选与自动更新开关直接 SetXxx 提交,同步按钮调用 BrowserManager;
+// 旧版「源×通道」配置名(-link/-mirror/-cdn)在展示与保存时归一化为逻辑源名;
 // 骨架走 SettingCard;设置项行走 SettingRow;分隔线统一 Divider;尺寸/间距/字号/圆角全走 GTheme 令牌
 SettingCard {
     id: trackServerPage
@@ -14,81 +16,367 @@ SettingCard {
     Layout.fillWidth: true
 
     title: qsTr("BitTorrent Tracker Servers")
-    description: qsTr("Configure tracker servers for BitTorrent downloads")
+    description: qsTr("Choose tracker lists to merge into aria2c. Mirrors are tried automatically when a source is unreachable.")
 
-    // ========== Tracker 源选择区域 ==========
+    // ========== 源分组模型(与 aria2c_manager 的 TrackerSourceMirrors 逻辑源名保持一致) ==========
+    readonly property var sourceGroups: [
+        {
+            provider: "ngosang / trackerslist",
+            hint: qsTr("Curated public tracker lists, updated daily on GitHub"),
+            sources: [
+                { key: "ngosang-best", name: qsTr("Best"), desc: qsTr("About 20 stable and fast trackers"), recommended: true },
+                { key: "ngosang-best-ip", name: qsTr("Best (IP)"), desc: qsTr("IP-address version, useful when DNS is blocked"), recommended: false },
+                { key: "ngosang-all", name: qsTr("All"), desc: qsTr("Full list of working trackers"), recommended: false },
+                { key: "ngosang-all_udp", name: qsTr("UDP only"), desc: qsTr("Only udp:// trackers"), recommended: false },
+                { key: "ngosang-all_http", name: qsTr("HTTP only"), desc: qsTr("Only http:// trackers"), recommended: false },
+                { key: "ngosang-all_https", name: qsTr("HTTPS only"), desc: qsTr("Only https:// trackers"), recommended: false }
+            ]
+        },
+        {
+            provider: "XIU2 / TrackersListCollection",
+            hint: qsTr("Popular tracker collection with China-friendly mirrors, updated daily"),
+            sources: [
+                { key: "XIU2-best", name: qsTr("Best"), desc: qsTr("About 20 popular and reliable trackers"), recommended: true },
+                { key: "XIU2-all", name: qsTr("All"), desc: qsTr("Aggregated list of all working trackers"), recommended: false },
+                { key: "XIU2-http", name: qsTr("HTTP / HTTPS only"), desc: qsTr("Only HTTP and HTTPS trackers"), recommended: false },
+                { key: "XIU2-nohttp", name: qsTr("UDP / WSS only"), desc: qsTr("Excludes HTTP and HTTPS trackers"), recommended: false }
+            ]
+        },
+        {
+            provider: "newTrackon",
+            hint: qsTr("Monitors public trackers and lists the reliable ones"),
+            sources: [
+                { key: "newtrackon-stable", name: qsTr("Stable"), desc: qsTr("Trackers with at least 95% uptime"), recommended: false }
+            ]
+        }
+    ]
+
+    // 内置逻辑源 key 全集,用于旧配置名归一化判断
+    readonly property var builtinKeys: {
+        var keys = []
+        for (var i = 0; i < sourceGroups.length; ++i) {
+            var sources = sourceGroups[i].sources
+            for (var j = 0; j < sources.length; ++j) {
+                keys.push(sources[j].key)
+            }
+        }
+        return keys
+    }
+
+    // 自定义源为用户直接填写的列表 URL
+    function isCustomSourceUrl(name) {
+        return name.indexOf("http://") === 0 || name.indexOf("https://") === 0
+    }
+
+    // 旧版「源×通道」名称(-link/-mirror/-cdn 后缀)归一化为逻辑源名;未知名称原样返回
+    function normalizeSourceName(name) {
+        if (isCustomSourceUrl(name)) {
+            return name
+        }
+        var suffixes = ["-link", "-mirror", "-cdn"]
+        for (var i = 0; i < suffixes.length; ++i) {
+            var suffix = suffixes[i]
+            if (name.length > suffix.length && name.lastIndexOf(suffix) === name.length - suffix.length) {
+                var stripped = name.substring(0, name.length - suffix.length)
+                if (builtinKeys.indexOf(stripped) !== -1) {
+                    return stripped
+                }
+            }
+        }
+        return name
+    }
+
+    // 当前选中的源(逻辑源名 + 自定义 URL);读取时归一化并去重
+    property var selectedItems: {
+        var raw
+        // 防御:配置被外部写成空串/非法 JSON 时 JSON.parse 会抛异常
+        try {
+            raw = JSON.parse(SettingsManager.qTrackerSourceNames || "[]")
+        } catch (e) {
+            raw = []
+        }
+        if (!Array.isArray(raw)) {
+            raw = []
+        }
+        var result = []
+        for (var i = 0; i < raw.length; ++i) {
+            var name = normalizeSourceName(String(raw[i]))
+            if (result.indexOf(name) === -1) {
+                result.push(name)
+            }
+        }
+        return result
+    }
+
+    readonly property var customSources: selectedItems.filter(function(name) {
+        return trackServerPage.isCustomSourceUrl(name)
+    })
+
+    // 同步进行中标记:用独立属性驱动按钮可用态,避免命令式赋值破坏 enabled 绑定
+    property bool syncing: false
+
+    // 勾选/取消一个源并即时提交;赋值新数组以触发绑定更新
+    function setSourceSelected(key, on) {
+        var items = selectedItems
+        var newItems
+        if (on) {
+            newItems = items.indexOf(key) === -1 ? items.concat(key) : items
+        } else {
+            newItems = items.filter(function(name) { return name !== key })
+        }
+        selectedItems = newItems
+        SettingsManager.SetTrackerSourceNames(JSON.stringify(newItems))
+    }
+
+    // ========== Tracker 源选择区域(按提供方分组) ==========
     ColumnLayout {
         Layout.fillWidth: true
         spacing: GTheme.spaceMD
 
-        Text {
-            Layout.fillWidth: true
-            text: qsTr("Tracker Sources")
-            font.pixelSize: GTheme.fontBody
-            font.weight: GTheme.weightMedium
-            color: GTheme.textPrimary
-        }
+        Repeater {
+            model: trackServerPage.sourceGroups
 
-        // Tracker 服务器选择
-        ScrollView {
-            Layout.fillWidth: true
-            Layout.preferredHeight: GTheme.sizeDefault * 6 + GTheme.spaceSM
-            clip: true
-            background: Rectangle {
-                color: GTheme.bgWhite
-                border.color: GTheme.borderLight
-                border.width: 1
-                radius: GTheme.radiusBase
-            }
+            ColumnLayout {
+                id: groupColumn
+                required property var modelData
+                required property int index
 
-            GridLayout {
-                id: checkboxGroup
-                width: parent.width
-                columns: 2  // 两列布局提升可读性(布局业务值,非尺寸令牌)
-                columnSpacing: GTheme.spaceLG
-                rowSpacing: GTheme.spaceSM
+                Layout.fillWidth: true
+                spacing: GTheme.spaceSM
 
-                property var selectedItems: {
-                    // 防御:配置被外部写成空串/非法 JSON 时 JSON.parse 会抛异常(Q3)
-                    try {
-                        return JSON.parse(SettingsManager.qTrackerSourceNames || "[]")
-                    } catch (e) {
-                        return []
+                // 分组标头:提供方名 + 说明
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: GTheme.spaceXS
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: groupColumn.modelData.provider
+                        font.pixelSize: GTheme.fontBody
+                        font.weight: GTheme.weightDemiBold
+                        color: GTheme.textPrimary
+                    }
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: groupColumn.modelData.hint
+                        font.pixelSize: GTheme.fontCaption
+                        color: GTheme.textSecondary
+                        wrapMode: Text.WordWrap
                     }
                 }
 
-                Repeater {
-                    model: ["ngosang-best-link","ngosang-best-mirror","ngosang-best-cdn","ngosang-all-link","ngosang-all-mirror","ngosang-all-cdn",
-                        "ngosang-all_udp-link","ngosang-all_udp-mirror","ngosang-all_udp-cdn",
-                        "ngosang-all_http-link","ngosang-all_http-mirror","ngosang-all_http-cdn",
-                        "ngosang-all_https-link","ngosang-all_https-mirror","ngosang-all_https-cdn",
-                        "XIU2-best-link","XIU2-best-cdn","XIU2-all-link","XIU2-all-cdn","XIU2-http-link","XIU2-http-cdn","XIU2-nohttp-link","XIU2-nohttp-cdn"]
+                // 源列表:两列布局提升可读性(布局业务值,非尺寸令牌)
+                GridLayout {
+                    Layout.fillWidth: true
+                    columns: 2
+                    columnSpacing: GTheme.spaceLG
+                    rowSpacing: GTheme.spaceSM
 
-                    GCheckBox {
-                        text: modelData
-                        checked: checkboxGroup.selectedItems.indexOf(modelData) !== -1
-                        Layout.fillWidth: true
-                        onClicked: {
-                            // 原地 push/splice 修改 property var 数组不触发变更信号，
-                            // 改用 concat/filter 返回新数组重新赋值，确保 UI 同步。
-                            let items = checkboxGroup.selectedItems
-                            let pos = items.indexOf(modelData)
-                            let newItems
-                            if (checked) {
-                                newItems = pos === -1 ? items.concat(modelData) : items
-                            } else {
-                                newItems = pos !== -1 ? items.filter(i => i !== modelData) : items
+                    Repeater {
+                        model: groupColumn.modelData.sources
+
+                        RowLayout {
+                            id: sourceRow
+                            required property var modelData
+
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignTop
+                            spacing: GTheme.spaceSM
+
+                            GCheckBox {
+                                id: sourceCheckBox
+                                Layout.alignment: Qt.AlignTop
+                                checked: trackServerPage.selectedItems.indexOf(sourceRow.modelData.key) !== -1
+                                Accessible.name: sourceRow.modelData.name
+                                onClicked: {
+                                    trackServerPage.setSourceSelected(sourceRow.modelData.key, checked)
+                                    // 点击会破坏 checked 绑定,重建以保持与 selectedItems 同步
+                                    checked = Qt.binding(function() {
+                                        return trackServerPage.selectedItems.indexOf(sourceRow.modelData.key) !== -1
+                                    })
+                                }
                             }
-                            checkboxGroup.selectedItems = newItems
-                            // 点击会破坏 checked 绑定，重建以保持与 selectedItems 同步
-                            checked = Qt.binding(function() { return checkboxGroup.selectedItems.indexOf(modelData) !== -1 })
-                            let new_names = JSON.stringify(newItems)
-                            SettingsManager.SetTrackerSourceNames(new_names)
+
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: GTheme.spaceXS
+
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    spacing: GTheme.spaceSM
+
+                                    Text {
+                                        text: sourceRow.modelData.name
+                                        font.pixelSize: GTheme.fontBody
+                                        font.weight: GTheme.weightMedium
+                                        color: GTheme.textPrimary
+                                    }
+
+                                    // 推荐标记(Element Plus success 色系药丸标签)
+                                    Rectangle {
+                                        visible: sourceRow.modelData.recommended
+                                        implicitWidth: recommendedText.implicitWidth + GTheme.spaceSM * 2
+                                        implicitHeight: recommendedText.implicitHeight + GTheme.spaceXS
+                                        radius: height / 2
+                                        color: GTheme.bgSuccess
+
+                                        Text {
+                                            id: recommendedText
+                                            anchors.centerIn: parent
+                                            text: qsTr("Recommended")
+                                            font.pixelSize: GTheme.fontCaption
+                                            color: GTheme.successColor
+                                        }
+                                    }
+
+                                    Item {
+                                        Layout.fillWidth: true
+                                    }
+                                }
+
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: sourceRow.modelData.desc
+                                    font.pixelSize: GTheme.fontCaption
+                                    color: GTheme.textSecondary
+                                    wrapMode: Text.WordWrap
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 组间分隔线(最后一组后不加,由外层 Divider 收尾)
+                Divider {
+                    Layout.fillWidth: true
+                    visible: groupColumn.index < trackServerPage.sourceGroups.length - 1
+                    color: GTheme.borderLighter
+                }
+            }
+        }
+    }
+
+    // 分隔线(统一 Divider,色 borderLight)
+    Divider {
+        Layout.fillWidth: true
+    }
+
+    // ========== 自定义源区域 ==========
+    ColumnLayout {
+        Layout.fillWidth: true
+        spacing: GTheme.spaceSM
+
+        Text {
+            Layout.fillWidth: true
+            text: qsTr("Custom Sources")
+            font.pixelSize: GTheme.fontBody
+            font.weight: GTheme.weightDemiBold
+            color: GTheme.textPrimary
+        }
+
+        Text {
+            Layout.fillWidth: true
+            text: qsTr("Add your own tracker list URLs (plain text, one tracker per line)")
+            font.pixelSize: GTheme.fontCaption
+            color: GTheme.textSecondary
+            wrapMode: Text.WordWrap
+        }
+
+        Repeater {
+            model: trackServerPage.customSources
+
+            Rectangle {
+                id: customSourceRow
+                required property string modelData
+
+                Layout.fillWidth: true
+                implicitHeight: customRowLayout.implicitHeight + GTheme.spaceSM * 2
+                radius: GTheme.radiusBase
+                color: GTheme.fillLighter
+                border.color: GTheme.borderLight
+                border.width: 1
+
+                RowLayout {
+                    id: customRowLayout
+                    anchors.fill: parent
+                    anchors.leftMargin: GTheme.spaceMD
+                    anchors.rightMargin: GTheme.spaceSM
+                    spacing: GTheme.spaceSM
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: customSourceRow.modelData
+                        font.pixelSize: GTheme.fontCaption
+                        color: GTheme.textRegular
+                        elide: Text.ElideMiddle
+                    }
+
+                    GButton {
+                        buttonType: "danger"
+                        variant: "link"
+                        size: "small"
+                        text: qsTr("Remove")
+                        Accessible.name: qsTr("Remove custom tracker source")
+                        onClicked: {
+                            trackServerPage.setSourceSelected(customSourceRow.modelData, false)
                         }
                     }
                 }
             }
         }
+
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: GTheme.spaceSM
+
+            GTextField {
+                id: customSourceInput
+                Layout.fillWidth: true
+                placeholderText: qsTr("https://example.com/trackers.txt")
+                Accessible.name: qsTr("Custom tracker source URL")
+                onTextEdited: {
+                    // 重新编辑时清除错误态
+                    if (status !== "normal") {
+                        status = "normal"
+                    }
+                }
+                onAccepted: trackServerPage.addCustomSource()
+            }
+
+            GButton {
+                type: 1
+                text: qsTr("Add")
+                enabled: customSourceInput.text.trim().length > 0
+                Layout.preferredHeight: GTheme.sizeDefault
+                Accessible.name: qsTr("Add custom tracker source")
+                onClicked: trackServerPage.addCustomSource()
+            }
+        }
+
+        Text {
+            Layout.fillWidth: true
+            visible: customSourceInput.status === "error"
+            text: qsTr("URL must start with http:// or https://")
+            font.pixelSize: GTheme.fontCaption
+            color: GTheme.dangerColor
+            wrapMode: Text.WordWrap
+        }
+    }
+
+    // 校验并添加自定义源 URL
+    function addCustomSource() {
+        var url = customSourceInput.text.trim()
+        if (url.length === 0) {
+            return
+        }
+        if (!isCustomSourceUrl(url)) {
+            customSourceInput.status = "error"
+            return
+        }
+        customSourceInput.status = "normal"
+        setSourceSelected(url, true)
+        customSourceInput.text = ""
     }
 
     // 分隔线(统一 Divider,色 borderLight)
@@ -109,14 +397,21 @@ SettingCard {
                 id: syncBtn
                 type: 1
                 text: qsTr("Sync Trackers")
+                enabled: !trackServerPage.syncing && trackServerPage.selectedItems.length > 0
                 Layout.preferredHeight: GTheme.sizeDefault
                 onClicked: {
                     BrowserManager.SyncTrackersServerlist()
                 }
             }
 
-            Item {
+            Text {
                 Layout.fillWidth: true
+                text: trackServerPage.selectedItems.length > 0
+                      ? qsTr("%1 source(s) selected").arg(trackServerPage.selectedItems.length)
+                      : qsTr("Select at least one source to sync")
+                font.pixelSize: GTheme.fontCaption
+                color: GTheme.textSecondary
+                elide: Text.ElideRight
             }
         }
 
@@ -196,12 +491,33 @@ SettingCard {
         Layout.fillWidth: true
         spacing: GTheme.spaceSM
 
-        Text {
+        RowLayout {
             Layout.fillWidth: true
-            text: qsTr("Current Tracker List")
-            font.pixelSize: GTheme.fontBody
-            font.weight: GTheme.weightMedium
-            color: GTheme.textPrimary
+            spacing: GTheme.spaceSM
+
+            Text {
+                text: qsTr("Current Tracker List")
+                font.pixelSize: GTheme.fontBody
+                font.weight: GTheme.weightMedium
+                color: GTheme.textPrimary
+            }
+
+            Text {
+                Layout.fillWidth: true
+                text: {
+                    var list = UtilsToolsManager.serverList
+                    if (!list || list.trim() === "") {
+                        return ""
+                    }
+                    var count = list.trim().split("\n").filter(function(line) {
+                        return line.trim() !== ""
+                    }).length
+                    return qsTr("%1 tracker(s)").arg(count)
+                }
+                font.pixelSize: GTheme.fontCaption
+                color: GTheme.textSecondary
+                elide: Text.ElideRight
+            }
         }
 
         ScrollView {
@@ -214,6 +530,7 @@ SettingCard {
                 id: serverResult
                 text: UtilsToolsManager.serverList
                 color: GTheme.textPrimary
+                placeholderText: qsTr("No trackers synced yet")
                 placeholderTextColor: GTheme.textPlaceholder
                 selectByMouse: true
                 readOnly: true
@@ -247,7 +564,7 @@ SettingCard {
                     if (data.status === "started") {
                         statusText.text = data.message || qsTr("Updating tracker list...")
                         statusDetails.text = ""
-                        syncBtn.enabled = false
+                        trackServerPage.syncing = true
                     } else if (data.status === "success") {
                         statusText.text = data.message || qsTr("Tracker list updated successfully")
                         statusDetails.text = qsTr("%1 trackers, %2/%3 sources succeeded, took %4ms")
@@ -255,14 +572,14 @@ SettingCard {
                             .arg(data.successful_sources || 0)
                             .arg((data.successful_sources || 0) + (data.failed_sources || 0))
                             .arg(data.elapsed_ms || 0)
-                        syncBtn.enabled = true
+                        trackServerPage.syncing = false
 
                         // 13 秒后自动隐藏成功消息(业务时间值)
                         hideTimer.restart()
                     } else if (data.status === "error") {
                         statusText.text = data.message || qsTr("Failed to update tracker list")
                         statusDetails.text = data.error || ""
-                        syncBtn.enabled = true
+                        trackServerPage.syncing = false
 
                         // 15 秒后自动隐藏错误消息(业务时间值)
                         hideTimer.interval = 15000

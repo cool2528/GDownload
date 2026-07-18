@@ -98,31 +98,15 @@
 • 변경 사항은 즉시 저장되지만 재시작 후에만 적용됩니다</translation>
     </message>
     <message>
-        <source>✗ Invalid port. Please enter a value between 1024 and 65535.</source>
-        <translation type="vanished">✗ 잘못된 포트입니다. 1024에서 65535 사이의 값을 입력하십시오.</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="158"/>
         <source>Invalid port number!</source>
         <translation>잘못된 포트 번호!</translation>
-    </message>
-    <message>
-        <source>✗ Secret cannot be empty!</source>
-        <translation type="vanished">✗ 시크릿은 비어 있을 수 없습니다!</translation>
     </message>
     <message>
         <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="164"/>
         <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="166"/>
         <source>Secret cannot be empty!</source>
         <translation>시크릿은 비어 있을 수 없습니다!</translation>
-    </message>
-    <message>
-        <source>✓ RPC settings saved successfully! Please restart the application to apply changes.</source>
-        <translation type="vanished">✓ RPC 설정이 성공적으로 저장되었습니다! 변경 사항을 적용하려면 애플리케이션을 재시작하십시오.</translation>
-    </message>
-    <message>
-        <source>✓ Settings saved: Port=%1, Secret updated (Restart required)</source>
-        <translation type="vanished">✓ 설정이 저장되었습니다: 포트=%1, 시크릿이 업데이트되었습니다 (재시작 필요)</translation>
     </message>
     <message>
         <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="189"/>
@@ -133,26 +117,6 @@
         <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="190"/>
         <source>Settings unchanged.</source>
         <translation>설정이 변경되지 않았습니다.</translation>
-    </message>
-    <message>
-        <source>• The RPC port is used for communication between the application and Aria2 engine
-• Default port is 16888
-• The RPC secret is used for authentication between the application and Aria2 engine
-• The RPC secret is generated automatically on first launch
-• It&apos;s recommended to use a strong random secret for security
-• Make sure the port is not used by other applications
-• ⚠️ You MUST restart the application after changing the port or secret!
-• Choose a port number between 1024 and 65535
-• Changes are saved immediately but only take effect after restart</source>
-        <translation type="vanished">• RPC 포트는 애플리케이션과 Aria2 엔진 간의 통신에 사용됩니다
-• 기본 포트는 16888입니다
-• RPC 시크릿은 애플리케이션과 Aria2 엔진 간의 인증에 사용됩니다
-• RPC 시크릿은 첫 실행 시 자동으로 생성됩니다
-• 보안을 위해 강력한 무작위 시크릿 사용을 권장합니다
-• 포트가 다른 애플리케이션에서 사용되지 않는지 확인하세요
-• ⚠️ 포트나 시크릿을 변경한 후에는 반드시 애플리케이션을 다시 시작해야 합니다!
-• 1024에서 65535 사이의 포트 번호를 선택하세요
-• 변경 사항은 즉시 저장되지만 다시 시작한 후에만 적용됩니다</translation>
     </message>
     <message>
         <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="68"/>
@@ -443,10 +407,6 @@
         <source>Input fields reset to default values (not saved yet)</source>
         <translation>입력 필드가 기본값으로 재설정됨(아직 저장되지 않음)</translation>
     </message>
-    <message>
-        <source>✓ BitTorrent advanced settings saved and applied successfully!</source>
-        <translation type="vanished">비트토렌트 고급 설정 저장 및 적용 성공!</translation>
-    </message>
 </context>
 <context>
     <name>BrowserView</name>
@@ -487,14 +447,6 @@
         <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="39"/>
         <source>Do you want to quit the application or minimize it to the system tray?</source>
         <translation>애플리케이션을 종료하거나 시스템 트레이로 최소화하시겠습니까?</translation>
-    </message>
-    <message>
-        <source>Tip: When minimized to tray, the application will continue running in the background. You can restore the window from the system tray.</source>
-        <translation type="vanished">팁: 트레이로 최소화하면 애플리케이션이 백그라운드에서 계속 실행됩니다. 시스템 트레이에서 창을 복원할 수 있습니다.</translation>
-    </message>
-    <message>
-        <source>Don&apos;t ask again, remember my choice</source>
-        <translation type="vanished">다시 묻지 마세요, 내 선택을 기억하세요</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="70"/>
@@ -625,73 +577,9 @@
         <translation>%1 복사</translation>
     </message>
     <message>
-        <source>Copy these settings to your browser extension</source>
-        <translation type="vanished">다음 설정을 브라우저 확장 프로그램에 복사하세요.</translation>
-    </message>
-    <message>
-        <source>Current GDownload Settings:</source>
-        <translation type="vanished">현재 GDownload 설정:</translation>
-    </message>
-    <message>
-        <source>WebSocket URL:</source>
-        <translation type="vanished">웹소켓 URL:</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="247"/>
         <source>Copy</source>
         <translation>복사</translation>
-    </message>
-    <message>
-        <source>✓ WebSocket URL copied!</source>
-        <translation type="vanished">웹소켓 URL 복사 완료!</translation>
-    </message>
-    <message>
-        <source>RPC Secret:</source>
-        <translation type="vanished">RPC 비밀:</translation>
-    </message>
-    <message>
-        <source>✓ RPC Secret copied!</source>
-        <translation type="vanished">RPC 비밀 복사 완료!</translation>
-    </message>
-    <message>
-        <source>Requires GDownload running</source>
-        <translation type="vanished">GDownload 실행 필요</translation>
-    </message>
-    <message>
-        <source>How to use:</source>
-        <translation type="vanished">사용 방법:</translation>
-    </message>
-    <message>
-        <source>1. Copy the settings above using the Copy buttons</source>
-        <translation type="vanished">1. 복사 버튼을 사용하여 위의 설정을 복사합니다.</translation>
-    </message>
-    <message>
-        <source>2. Open your browser extension options page</source>
-        <translation type="vanished">2. 브라우저 확장 프로그램 옵션 페이지를 엽니다.</translation>
-    </message>
-    <message>
-        <source>3. Paste the values into the corresponding fields</source>
-        <translation type="vanished">3. 해당 필드에 값을 붙여넣습니다.</translation>
-    </message>
-    <message>
-        <source>4. Click &apos;Test Connection&apos; to verify</source>
-        <translation type="vanished">4. &apos;연결 테스트&apos;를 클릭하여 확인합니다.</translation>
-    </message>
-    <message>
-        <source>📋 Copy All Settings</source>
-        <translation type="vanished">📋 모든 설정 복사</translation>
-    </message>
-    <message>
-        <source>✓ All settings copied!</source>
-        <translation type="vanished">모든 설정이 복사되었습니다!</translation>
-    </message>
-    <message>
-        <source>Need help? Check the FAQ below</source>
-        <translation type="vanished">도움이 필요하신가요? 아래 FAQ를 확인하세요.</translation>
-    </message>
-    <message>
-        <source>Important: Keep GDownload running for the browser extension to work. The extension connects directly to aria2c via these settings.</source>
-        <translation type="vanished">중요: 브라우저 확장 프로그램이 작동하려면 GDownload를 계속 실행하세요. 확장 프로그램은 이 설정을 통해 aria2c에 직접 연결됩니다.</translation>
     </message>
 </context>
 <context>
@@ -808,10 +696,6 @@
         <source>Input fields reset to default values (not saved yet)</source>
         <translation>입력 필드가 기본값으로 재설정됨(아직 저장되지 않음)</translation>
     </message>
-    <message>
-        <source>✓ Connection &amp; Performance settings saved and applied successfully!</source>
-        <translation type="vanished">연결 및 성능 설정이 성공적으로 저장 및 적용되었습니다!</translation>
-    </message>
 </context>
 <context>
     <name>DeleteConfirmDialog</name>
@@ -869,10 +753,6 @@
         <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="146"/>
         <source>This will only remove task records. Downloaded files will be kept.</source>
         <translation>작업 기록만 제거됩니다. 다운로드한 파일은 유지됩니다.</translation>
-    </message>
-    <message>
-        <source>Warning: The downloaded file will be permanently deleted and cannot be recovered!</source>
-        <translation type="vanished">경고: 다운로드한 파일은 영구적으로 삭제되며 복구할 수 없습니다!</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="147"/>
@@ -944,25 +824,9 @@
         <translation>일부 작업 기록이 제거되었지만 일부 정리 작업을 완료할 수 없었습니다.</translation>
     </message>
     <message>
-        <source>Queued tasks are ready to start</source>
-        <translation type="vanished">대기 중인 작업이 시작 준비되었습니다</translation>
-    </message>
-    <message>
-        <source>Completed and stopped tasks</source>
-        <translation type="vanished">완료 및 중지된 작업</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="79"/>
         <source>Add Download</source>
         <translation>다운로드 추가</translation>
-    </message>
-    <message>
-        <source>Delete Confirmation</source>
-        <translation type="vanished">삭제 확인</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete all tasks in this list? This action cannot be undone.</source>
-        <translation type="vanished">이 목록의 모든 작업을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="56"/>
@@ -1013,17 +877,9 @@
         <translation>자주 묻는 질문</translation>
     </message>
     <message>
-        <source>Find answers to common questions</source>
-        <translation type="vanished">자주 묻는 질문에 대한 답변 찾기</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="91"/>
         <source>Why do I need the browser extension?</source>
         <translation>브라우저 확장 프로그램이 필요한 이유는 무엇인가요?</translation>
-    </message>
-    <message>
-        <source>The extension allows you to capture download links directly from web pages and send them to GDownload with a single click. It seamlessly integrates with your browsing experience.</source>
-        <translation type="vanished">이 확장 프로그램을 사용하면 웹 페이지에서 직접 다운로드 링크를 캡처하여 클릭 한 번으로 GDownload로 전송할 수 있습니다. 이 확장 프로그램은 브라우징 환경과 원활하게 통합됩니다.</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="97"/>
@@ -1031,23 +887,9 @@
         <translation>내 데이터는 안전한가요?</translation>
     </message>
     <message>
-        <source>Yes! The extension connects locally to aria2c via WebSocket. All communication stays on your computer - no data is sent to external servers. Your privacy is fully protected.</source>
-        <translation type="vanished">예! 확장 프로그램은 WebSocket을 통해 aria2c에 로컬로 연결됩니다. 모든 통신은 사용자의 컴퓨터에 유지되며 외부 서버로 데이터가 전송되지 않습니다. 사용자의 개인정보는 완벽하게 보호됩니다.</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="103"/>
         <source>Connection failed. What should I do?</source>
         <translation>연결에 실패했습니다. 어떻게 해야 하나요?</translation>
-    </message>
-    <message>
-        <source>1. Ensure GDownload is running
-2. Check that aria2c is enabled in GDownload settings
-3. Verify the WebSocket URL and RPC Secret match the values shown above
-4. Try restarting both GDownload and your browser</source>
-        <translation type="vanished">1. GDownload가 실행 중인지 확인합니다.
-2. GDownload 설정에서 aria2c가 활성화되어 있는지 확인합니다.
-3. 웹소켓 URL과 RPC 시크릿이 위에 표시된 값과 일치하는지 확인합니다.
-4. GDownload와 브라우저를 모두 재시작합니다.</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="109"/>
@@ -1055,46 +897,14 @@
         <translation>어떤 브라우저가 지원되나요?</translation>
     </message>
     <message>
-        <source>The extension supports Chrome 110+, Firefox 115+, and Edge 110+. It uses the standard Web Extensions API (Manifest V3) for maximum compatibility.</source>
-        <translation type="vanished">이 확장 프로그램은 Chrome 110+, Firefox 115+, Edge 110+를 지원합니다. 호환성을 극대화하기 위해 표준 웹 확장 API(매니페스트 V3)를 사용합니다.</translation>
-    </message>
-    <message>
-        <source>Can I customize what links are captured?</source>
-        <translation type="vanished">캡처할 링크를 사용자 지정할 수 있나요?</translation>
-    </message>
-    <message>
-        <source>Yes! The extension has powerful filtering options:
-• Set minimum file size
-• Filter by file type (video, audio, archive, etc.)
-• Add URL blacklist patterns
-• Configure domain whitelist</source>
-        <translation type="vanished">예! 확장 프로그램에는 강력한 필터링 옵션이 있습니다:
-- 최소 파일 크기 설정
-- 파일 유형별 필터링(동영상, 오디오, 아카이브 등)
-- URL 블랙리스트 패턴 추가
-- 도메인 화이트리스트 구성</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="121"/>
         <source>Does it work with password-protected sites?</source>
         <translation>비밀번호로 보호된 사이트에서도 작동하나요?</translation>
     </message>
     <message>
-        <source>Yes. The extension can optionally send cookies and authorization headers (disabled by default for security). Enable these in the extension&apos;s Privacy &amp; Security settings for sites that require login.</source>
-        <translation type="vanished">예. 확장 프로그램은 선택적으로 쿠키 및 인증 헤더를 전송할 수 있습니다(보안을 위해 기본적으로 비활성화됨). 로그인이 필요한 사이트의 경우 확장 프로그램의 개인정보 및 보안 설정에서 이를 사용하도록 설정하세요.</translation>
-    </message>
-    <message>
-        <source>📖 Need more help?</source>
-        <translation type="vanished">📖 도움이 더 필요하신가요?</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="167"/>
         <source>GitHub Issues</source>
         <translation>GitHub 이슈</translation>
-    </message>
-    <message>
-        <source>Report bugs</source>
-        <translation type="vanished">버그 신고</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="171"/>
@@ -1105,10 +915,6 @@
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="177"/>
         <source>Documentation</source>
         <translation>문서</translation>
-    </message>
-    <message>
-        <source>Full user guide</source>
-        <translation type="vanished">전체 사용자 가이드</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="76"/>
@@ -1210,26 +1016,6 @@
         <source>Collapsed</source>
         <translation>접힘</translation>
     </message>
-    <message>
-        <source>Opening website...</source>
-        <translation type="vanished">웹사이트 열기...</translation>
-    </message>
-    <message>
-        <source>Join Our Community</source>
-        <translation type="vanished">커뮤니티 가입</translation>
-    </message>
-    <message>
-        <source>Get help from other users, share tips, and stay updated with the latest features. Star us on GitHub to show your support!</source>
-        <translation type="vanished">다른 사용자의 도움을 받고, 팁을 공유하고, 최신 기능을 계속 업데이트하세요. GitHub에서 별표를 표시하여 지지를 보내주세요!</translation>
-    </message>
-    <message>
-        <source>⭐ Star on GitHub</source>
-        <translation type="vanished">GitHub에 별표 표시</translation>
-    </message>
-    <message>
-        <source>Thank you for your support!</source>
-        <translation type="vanished">여러분의 성원에 감사드립니다!</translation>
-    </message>
 </context>
 <context>
     <name>FeatureHighlightCard</name>
@@ -1284,17 +1070,9 @@
         <translation>크기, 유형, 도메인 및 사용자 지정 규칙으로 링크를 필터링합니다.</translation>
     </message>
     <message>
-        <source>Discover what makes our browser extension special</source>
-        <translation type="vanished">브라우저 확장 프로그램이 특별한 이유 알아보기</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="66"/>
         <source>One-Click Capture</source>
         <translation>원클릭 캡처</translation>
-    </message>
-    <message>
-        <source>Quickly capture download links from web pages</source>
-        <translation type="vanished">웹 페이지에서 다운로드 링크를 빠르게 캡처</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="73"/>
@@ -1302,42 +1080,14 @@
         <translation>일괄 다운로드</translation>
     </message>
     <message>
-        <source>Select multiple links and send them all at once</source>
-        <translation type="vanished">여러 개의 링크를 선택하여 한 번에 모두 보내기</translation>
-    </message>
-    <message>
-        <source>Unified UI</source>
-        <translation type="vanished">통합 UI</translation>
-    </message>
-    <message>
-        <source>Perfectly matches GDownload&apos;s Element Plus design</source>
-        <translation type="vanished">GDownload의 Element Plus 디자인과 완벽하게 어울립니다.</translation>
-    </message>
-    <message>
-        <source>Secure Connection</source>
-        <translation type="vanished">보안 연결</translation>
-    </message>
-    <message>
-        <source>Direct WebSocket connection to aria2c via JSON-RPC</source>
-        <translation type="vanished">JSON-RPC를 통해 aria2c에 직접 웹소켓 연결</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="94"/>
         <source>Cross-Browser</source>
         <translation>크로스 브라우저</translation>
     </message>
     <message>
-        <source>Compatible with Chrome, Firefox, and Edge</source>
-        <translation type="vanished">크롬, 파이어폭스, 엣지와 호환 가능</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="101"/>
         <source>Smart Filtering</source>
         <translation>스마트 필터링</translation>
-    </message>
-    <message>
-        <source>Filter links by file size, type, and custom rules</source>
-        <translation type="vanished">파일 크기, 유형 및 사용자 지정 규칙에 따라 링크 필터링하기</translation>
     </message>
 </context>
 <context>
@@ -1622,17 +1372,9 @@
         <translation>작업을 제거하지 못했습니다.</translation>
     </message>
     <message>
-        <source>No completed downloads</source>
-        <translation type="vanished">완료된 다운로드 없음</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="120"/>
         <source>No downloads</source>
         <translation>다운로드 없음</translation>
-    </message>
-    <message>
-        <source>Add some download links to get started</source>
-        <translation type="vanished">시작하려면 다운로드 링크를 추가하세요.</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="263"/>
@@ -1648,14 +1390,6 @@
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="303"/>
         <source>Saved to %1</source>
         <translation>%1에 저장됨</translation>
-    </message>
-    <message>
-        <source>%1 of %2 • %3% • %4 left</source>
-        <translation type="vanished">%1 / %2 • %3% • %4 남음</translation>
-    </message>
-    <message>
-        <source>Remaining </source>
-        <translation type="vanished">남아있음</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="376"/>
@@ -1857,105 +1591,9 @@ Copyright © 2024 GDownload Team
 Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
     </message>
     <message>
-        <source>If you like GDownload, you can support us through the following platforms:</source>
-        <translation type="vanished">GDownload가 마음에 드신다면 다음 플랫폼을 통해 후원하실 수 있습니다:</translation>
-    </message>
-    <message>
-        <source>Thank you for your support! ❤️</source>
-        <translation type="vanished">여러분의 성원에 감사드립니다! ❤️</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="184"/>
         <source>Open Source Licenses</source>
         <translation>오픈 소스 라이선스</translation>
-    </message>
-    <message>
-        <source># GDownload
-
-**A modern cross-platform download manager**
-
-## Core Features
-
-✅ **Multi-Platform Support** - Windows, macOS, Linux
-✅ **High-Performance Engine** - Powered by aria2c
-✅ **Multi-Protocol Support** - HTTP/HTTPS/FTP/BitTorrent/Metalink
-✅ **Smart Download Management** - Multi-threaded, resume capability
-✅ **Modern UI** - Built with Qt Quick and Element Plus design
-
-## Technology Stack
-
-- **Frontend**: Qt Quick (QML) + Element Plus Design
-- **Backend**: Qt C++ + Modern C++20
-- **Download Engine**: aria2c
-- **Network**: Boost.Asio with SSL
-- **BitTorrent**: LibtorrentRasterbar
-- **Build System**: CMake + vcpkg
-
-## Development Team
-
-GDownload is maintained by passionate developers who believe in:
-- Open source software
-- Modern UI/UX design
-- High-quality code
-- Community collaboration
-
-## Get Involved
-
-🔗 **GitHub**: [https://github.com/cool2528/GDownload](https://github.com/cool2528/GDownload)
-🐛 **Issues**: [Report bugs or request features](https://github.com/cool2528/GDownload/issues)
-📝 **Contribute**: Pull requests are welcome!
-
-## License
-
-Copyright © 2024 GDownload Team
-Licensed under the Apache License 2.0
-
----
-
-*Thank you to all contributors and users who make GDownload better!* 🚀</source>
-        <translation type="vanished"># GDownload
-
-**최신 크로스 플랫폼 다운로드 관리자**
-
-## 핵심 기능
-
-✅ **멀티 플랫폼 지원** - 윈도우, 맥OS, 리눅스
-✅ **고성능 엔진** - aria2c 제공
-✅ **멀티 프로토콜 지원** - HTTP/HTTPS/FTP/비트토렌트/메탈링크
-✅ **스마트 다운로드 관리** - 멀티 스레드, 재개 기능
-✅ **현대적인 UI** - Qt Quick 및 Element Plus 디자인으로 구축됨
-
-## 기술 스택
-
-- **프론트엔드**: Qt Quick(QML) + 엘리먼트 플러스 디자인
-- **백엔드**: Qt C++ + 모던 C++20
-- **다운로드 엔진**: aria2c
-- **네트워크**: SSL이 포함된 Boost.Asio
-- **비트 토렌트**: LibtorrentRasterbar
-- **빌드 시스템**: CMake + vcpkg
-
-## 개발팀
-
-GDownload는 신념을 가진 열정적인 개발자들이 관리합니다:
-- 오픈 소스 소프트웨어
-- 최신 UI/UX 디자인
-- 고품질 코드
-- 커뮤니티 협업
-
-## 참여하기
-
-🔗 **GitHub**: [https://github.com/cool2528/GDownload](https://github.com/cool2528/GDownload)
-🐛 **이슈**: [버그 신고 또는 기능 요청](https://github.com/cool2528/GDownload/issues)
-📝 **기여**: 풀 리퀘스트를 환영합니다!
-
-## 라이선스
-
-저작권 © 2024 GDownload Team
-Apache License 2.0에 따라 라이선스가 부여되었습니다.
-
----
-
-*더 나은 GDownload를 만드는 모든 기여자와 사용자에게 감사드립니다!* 🚀</translation>
     </message>
 </context>
 <context>
@@ -1964,10 +1602,6 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
         <location filename="../qml/Browser/HomePage.qml" line="75"/>
         <source>Welcome back</source>
         <translation>다시 오신 것을 환영합니다</translation>
-    </message>
-    <message>
-        <source>Manage your downloads and start new tasks here.</source>
-        <translation type="vanished">여기에서 다운로드를 관리하고 새 작업을 시작하세요.</translation>
     </message>
     <message>
         <location filename="../qml/Browser/HomePage.qml" line="83"/>
@@ -2080,10 +1714,6 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
         <location filename="../qml/Browser/HomePage.qml" line="204"/>
         <source>Add download</source>
         <translation>다운로드 추가</translation>
-    </message>
-    <message>
-        <source>No completed downloads yet.</source>
-        <translation type="vanished">완료된 다운로드가 아직 없습니다.</translation>
     </message>
     <message>
         <location filename="../qml/Browser/HomePage.qml" line="254"/>
@@ -2255,41 +1885,9 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
         <translation>%1용 다운로드</translation>
     </message>
     <message>
-        <source>Follow these simple steps to get started</source>
-        <translation type="vanished">다음의 간단한 단계를 따라 시작하세요.</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="64"/>
         <source>Download Extension</source>
         <translation>확장 프로그램 다운로드</translation>
-    </message>
-    <message>
-        <source>Choose your browser and download the extension</source>
-        <translation type="vanished">브라우저를 선택하고 확장 프로그램을 다운로드하세요.</translation>
-    </message>
-    <message>
-        <source>Select your browser:</source>
-        <translation type="vanished">브라우저를 선택합니다:</translation>
-    </message>
-    <message>
-        <source>Opening Chrome download page...</source>
-        <translation type="vanished">Chrome 다운로드 페이지 열기...</translation>
-    </message>
-    <message>
-        <source>Opening Firefox download page...</source>
-        <translation type="vanished">Firefox 다운로드 페이지 열기...</translation>
-    </message>
-    <message>
-        <source>Opening Edge download page...</source>
-        <translation type="vanished">엣지 다운로드 페이지 열기...</translation>
-    </message>
-    <message>
-        <source>GitHub Release:</source>
-        <translation type="vanished">GitHub 릴리스:</translation>
-    </message>
-    <message>
-        <source>Visit Repository</source>
-        <translation type="vanished">리포지토리 방문</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="119"/>
@@ -2297,17 +1895,9 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
         <translation>GitHub 열기...</translation>
     </message>
     <message>
-        <source>Official Site:</source>
-        <translation type="vanished">공식 사이트:</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="126"/>
         <source>Download from gdownload.uk</source>
         <translation>gdownload.uk에서 다운로드</translation>
-    </message>
-    <message>
-        <source>Opening official website...</source>
-        <translation type="vanished">공식 웹사이트 오픈...</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="137"/>
@@ -2315,85 +1905,9 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
         <translation>확장 프로그램 설치</translation>
     </message>
     <message>
-        <source>Load the extension in your browser</source>
-        <translation type="vanished">브라우저에서 확장 프로그램 로드</translation>
-    </message>
-    <message>
-        <source>For Chrome/Edge:</source>
-        <translation type="vanished">Chrome/Edge의 경우:</translation>
-    </message>
-    <message>
-        <source>1. Open chrome://extensions/ (or edge://extensions/)</source>
-        <translation type="vanished">1. 크롬://익스텐션/(또는 엣지://익스텐션/)을 엽니다.</translation>
-    </message>
-    <message>
-        <source>2. Enable &quot;Developer mode&quot; toggle</source>
-        <translation type="vanished">2. &apos;개발자 모드&apos; 토글 활성화</translation>
-    </message>
-    <message>
-        <source>3. Click &quot;Load unpacked&quot;</source>
-        <translation type="vanished">3. &quot;포장 풀기 로드&quot;를 클릭합니다.</translation>
-    </message>
-    <message>
-        <source>4. Select the dist folder from extracted files</source>
-        <translation type="vanished">4. 압축을 푼 파일에서 dist 폴더를 선택합니다.</translation>
-    </message>
-    <message>
-        <source>For Firefox:</source>
-        <translation type="vanished">Firefox의 경우:</translation>
-    </message>
-    <message>
-        <source>1. Open about:debugging#/runtime/this-firefox</source>
-        <translation type="vanished">1. 약:디버깅#/런타임/이-파이어폭스를 엽니다.</translation>
-    </message>
-    <message>
-        <source>2. Click &quot;Load Temporary Add-on&quot;</source>
-        <translation type="vanished">2. &quot;임시 애드온 로드&quot;를 클릭합니다.</translation>
-    </message>
-    <message>
-        <source>3. Select manifest.json from the dist folder</source>
-        <translation type="vanished">3. dist 폴더에서 manifest.json을 선택합니다.</translation>
-    </message>
-    <message>
-        <source>4. Extension will be loaded temporarily</source>
-        <translation type="vanished">4. 확장 프로그램이 일시적으로 로드됩니다.</translation>
-    </message>
-    <message>
-        <source>Coming Soon: Direct installation from browser web stores!</source>
-        <translation type="vanished">곧 출시됩니다: 브라우저 웹 스토어에서 직접 설치!</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="175"/>
         <source>Configure Connection</source>
         <translation>연결 구성</translation>
-    </message>
-    <message>
-        <source>Set up the connection to GDownload</source>
-        <translation type="vanished">GDownload에 대한 연결 설정</translation>
-    </message>
-    <message>
-        <source>The extension needs to connect to GDownload&apos;s aria2c:</source>
-        <translation type="vanished">확장 프로그램은 GDownload의 aria2c에 연결해야 합니다:</translation>
-    </message>
-    <message>
-        <source>Default settings are pre-configured</source>
-        <translation type="vanished">기본 설정이 미리 구성되어 있습니다.</translation>
-    </message>
-    <message>
-        <source>Works out-of-the-box with GDownload</source>
-        <translation type="vanished">GDownload로 바로 사용 가능</translation>
-    </message>
-    <message>
-        <source>Configuration values (see below for details):</source>
-        <translation type="vanished">구성 값(자세한 내용은 아래 참조):</translation>
-    </message>
-    <message>
-        <source>📖 View Configuration</source>
-        <translation type="vanished">📖 구성 보기</translation>
-    </message>
-    <message>
-        <source>See Configuration Helper below</source>
-        <translation type="vanished">아래 구성 도우미를 참조하세요.</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="337"/>
@@ -2422,10 +1936,6 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
         <location filename="../qml/Browser/LabSettingPage.qml" line="113"/>
         <source>Review the connection values and browser permissions before enabling capture for authenticated websites.</source>
         <translation>인증된 웹사이트에 대한 캡처를 활성화하기 전에 연결 값과 브라우저 권한을 검토하세요.</translation>
-    </message>
-    <message>
-        <source>Enhance your download experience with our browser extension. Capture links from any webpage and send them directly to GDownload.</source>
-        <translation type="vanished">브라우저 확장 프로그램으로 다운로드 경험을 향상하세요. 모든 웹페이지에서 링크를 캡처하여 GDownload로 바로 전송하세요.</translation>
     </message>
 </context>
 <context>
@@ -2486,14 +1996,6 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
 <context>
     <name>NetDiskPageView</name>
     <message>
-        <source>Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</source>
-        <translation type="vanished">바이두 넷디스크 공유 링크 형식(https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</translation>
-    </message>
-    <message>
-        <source>Parse</source>
-        <translation type="vanished">구문 분석</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="48"/>
         <source>Invalid Baidu Netdisk URL, please check.</source>
         <translation>잘못된 바이두 넷디스크 URL을 확인하세요.</translation>
@@ -2509,17 +2011,9 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
         <translation>클라우드 링크 분석</translation>
     </message>
     <message>
-        <source>Paste a Baidu share link, preview files, then add selected items to the queue.</source>
-        <translation type="vanished">Baidu 공유 링크를 붙여넣고 파일을 미리 본 다음 선택한 항목을 대기열에 추가합니다.</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="213"/>
         <source>Paste link</source>
         <translation>링크 붙여넣기</translation>
-    </message>
-    <message>
-        <source>Validate share URL and cookie.</source>
-        <translation type="vanished">공유 URL과 쿠키를 확인합니다.</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="214"/>
@@ -2527,25 +2021,9 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
         <translation>파일 미리보기</translation>
     </message>
     <message>
-        <source>Select files before downloading.</source>
-        <translation type="vanished">다운로드 전에 파일을 선택합니다.</translation>
-    </message>
-    <message>
-        <source>Add queue</source>
-        <translation type="vanished">대기열에 추가</translation>
-    </message>
-    <message>
-        <source>Send selected files to aria2.</source>
-        <translation type="vanished">선택한 파일을 aria2로 보냅니다.</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="269"/>
         <source>Cookie required. Set Baidu Netdisk cookies in Preferences before parsing share links.</source>
         <translation>쿠키가 필요합니다. 공유 링크를 분석하기 전에 환경설정에서 Baidu Netdisk 쿠키를 설정하세요.</translation>
-    </message>
-    <message>
-        <source>Ready to parse. The parser will preview files before adding them to the download queue.</source>
-        <translation type="vanished">분석 준비 완료. 파서가 파일을 다운로드 대기열에 추가하기 전에 미리 봅니다.</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="40"/>
@@ -2718,9 +2196,112 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
         <source>The cloud request failed. Please try again.</source>
         <translation>클라우드 요청이 실패했습니다. 다시 시도하세요.</translation>
     </message>
+</context>
+<context>
+    <name>PluginMarketCard</name>
     <message>
-        <source>Return parsing</source>
-        <translation type="vanished">반환 구문 분석</translation>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="106"/>
+        <source>Verified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="107"/>
+        <source>Third-party</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="131"/>
+        <source>Installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="132"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="220"/>
+        <source>Update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="133"/>
+        <source>Working</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="134"/>
+        <source>Available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="211"/>
+        <source>Install</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="230"/>
+        <source>Remove</source>
+        <translation type="unfinished">제거</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="240"/>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="240"/>
+        <source>Disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PluginMarketPage</name>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="27"/>
+        <source>Failed to load plugin market: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="31"/>
+        <source>%1 succeeded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="33"/>
+        <source>%1 failed: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="50"/>
+        <source>All</source>
+        <translation type="unfinished">전체</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="50"/>
+        <source>Installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="50"/>
+        <source>Updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="66"/>
+        <source>Search plugins…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="73"/>
+        <source>Refresh</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="145"/>
+        <source>No plugins available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="151"/>
+        <source>Check your network connection and refresh</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2870,28 +2451,36 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
 <context>
     <name>QObject</name>
     <message>
+        <location filename="../../Browser/download_task_model.h" line="121"/>
         <source>Unknown</source>
-        <translation type="vanished">알 수 없음</translation>
+        <translation>알 수 없음</translation>
     </message>
     <message>
+        <location filename="../../Browser/download_task_model.h" line="131"/>
         <source>h</source>
-        <translation type="vanished">h</translation>
+        <translation>h</translation>
     </message>
     <message>
+        <location filename="../../Browser/download_task_model.h" line="134"/>
+        <location filename="../../Browser/download_task_model.h" line="138"/>
         <source>m</source>
-        <translation type="vanished">m</translation>
+        <translation>m</translation>
     </message>
     <message>
+        <location filename="../../Browser/download_task_model.h" line="141"/>
+        <location filename="../../Browser/download_task_model.h" line="145"/>
         <source>s</source>
-        <translation type="vanished">s</translation>
+        <translation>s</translation>
     </message>
     <message>
-        <source>Task was removed locally, but aria2 cleanup failed.</source>
-        <translation type="vanished">작업은 로컬에서 제거되었지만 aria2 정리에 실패했습니다.</translation>
+        <location filename="../../view/mainwindow.cxx" line="126"/>
+        <source>The download engine stopped unexpectedly.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Task was removed locally, but aria2 cleanup failed: %1</source>
-        <translation type="vanished">작업은 로컬에서 제거되었지만 aria2 정리에 실패했습니다: %1</translation>
+        <location filename="../../view/mainwindow.cxx" line="134"/>
+        <source>Download engine is unavailable.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2945,19 +2534,29 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
         <translation>실험실 설정</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="41"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="27"/>
+        <source>Plugin Market</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="43"/>
         <source>Configure basic download preferences</source>
         <translation>기본 다운로드 환경 설정 구성</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="43"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="45"/>
         <source>Advanced configuration options</source>
         <translation>고급 구성 옵션</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="45"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="47"/>
         <source>Experimental features and settings</source>
         <translation>실험적 기능 및 설정</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="49"/>
+        <source>Browse, install and update netdisk parser plugins</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2981,6 +2580,11 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
         <location filename="../qml/Browser/SettingsPageView.qml" line="132"/>
         <source>Lab</source>
         <translation>실험실 기능</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="148"/>
+        <source>Plugin Market</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3073,26 +2677,14 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
         <translation>속도 제어 설정이 성공적으로 저장 및 적용되었습니다!</translation>
     </message>
     <message>
-        <source>✗ Download limit must be between 0 and 102400 KB/s</source>
-        <translation type="vanished">✔ 다운로드 제한은 0~102400KB/s여야 합니다.</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="165"/>
         <source>Invalid download limit!</source>
         <translation>다운로드 제한이 잘못되었습니다!</translation>
     </message>
     <message>
-        <source>✗ Upload limit must be between 0 and 10240 KB/s</source>
-        <translation type="vanished">✔ 업로드 제한은 0~10240KB/s 사이여야 합니다.</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="171"/>
         <source>Invalid upload limit!</source>
         <translation>업로드 제한이 잘못되었습니다!</translation>
-    </message>
-    <message>
-        <source>✗ Lowest speed must be between 0 and 1024 KB/s</source>
-        <translation type="vanished">참고 최저 속도는 0~1024KB/s 사이여야 합니다.</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="177"/>
@@ -3113,10 +2705,6 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="191"/>
         <source>LowestSpeed</source>
         <translation>최저 속도</translation>
-    </message>
-    <message>
-        <source>✓ Speed control settings saved and applied successfully!</source>
-        <translation type="vanished">속도 제어 설정이 저장되고 성공적으로 적용되었습니다!</translation>
     </message>
 </context>
 <context>
@@ -3461,10 +3049,6 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
 <context>
     <name>ThemeSwitch</name>
     <message>
-        <source>Theme Mode:</source>
-        <translation type="vanished">테마 모드:</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="42"/>
         <source>Theme mode</source>
         <translation>테마 모드</translation>
@@ -3620,10 +3204,6 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
         <source>Input fields reset to default values (not saved yet)</source>
         <translation>입력 필드가 기본값으로 재설정됨(아직 저장되지 않음)</translation>
     </message>
-    <message>
-        <source>✓ Timeout and retry settings saved and applied successfully!</source>
-        <translation type="vanished">시간 초과 및 재시도 설정이 저장되고 성공적으로 적용되었습니다!</translation>
-    </message>
 </context>
 <context>
     <name>TitleBar</name>
@@ -3678,67 +3258,249 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
 <context>
     <name>TrackerServerSettingPage</name>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="16"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="18"/>
         <source>BitTorrent Tracker Servers</source>
         <translation>BitTorrent 트래커 서버</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="17"/>
-        <source>Configure tracker servers for BitTorrent downloads</source>
-        <translation>BitTorrent 다운로드를 위한 트래커 서버 구성하기</translation>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="19"/>
+        <source>Choose tracker lists to merge into aria2c. Mirrors are tried automatically when a source is unreachable.</source>
+        <translation>aria2c에 병합할 트래커 목록을 선택하세요. 소스에 접근할 수 없으면 미러를 자동으로 시도합니다.</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="26"/>
-        <source>Tracker Sources</source>
-        <translation>트래커 소스</translation>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="25"/>
+        <source>Curated public tracker lists, updated daily on GitHub</source>
+        <translation>엄선된 공개 트래커 목록, GitHub에서 매일 업데이트</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="111"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="27"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="39"/>
+        <source>Best</source>
+        <translation>베스트</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="27"/>
+        <source>About 20 stable and fast trackers</source>
+        <translation>약 20개의 안정적이고 빠른 트래커</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="28"/>
+        <source>Best (IP)</source>
+        <translation>베스트 (IP)</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="28"/>
+        <source>IP-address version, useful when DNS is blocked</source>
+        <translation>IP 주소 버전, DNS가 차단된 환경에서 유용</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="29"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="40"/>
+        <source>All</source>
+        <translation>전체</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="29"/>
+        <source>Full list of working trackers</source>
+        <translation>작동 중인 트래커의 전체 목록</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="30"/>
+        <source>UDP only</source>
+        <translation>UDP 전용</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="30"/>
+        <source>Only udp:// trackers</source>
+        <translation>udp:// 트래커만 포함</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="31"/>
+        <source>HTTP only</source>
+        <translation>HTTP 전용</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="31"/>
+        <source>Only http:// trackers</source>
+        <translation>http:// 트래커만 포함</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="32"/>
+        <source>HTTPS only</source>
+        <translation>HTTPS 전용</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="32"/>
+        <source>Only https:// trackers</source>
+        <translation>https:// 트래커만 포함</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="37"/>
+        <source>Popular tracker collection with China-friendly mirrors, updated daily</source>
+        <translation>중국에서 접근하기 쉬운 미러를 제공하는 인기 트래커 모음, 매일 업데이트</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="39"/>
+        <source>About 20 popular and reliable trackers</source>
+        <translation>약 20개의 인기 있고 신뢰할 수 있는 트래커</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="40"/>
+        <source>Aggregated list of all working trackers</source>
+        <translation>작동 중인 모든 트래커를 모은 목록</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="41"/>
+        <source>HTTP / HTTPS only</source>
+        <translation>HTTP / HTTPS 전용</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="41"/>
+        <source>Only HTTP and HTTPS trackers</source>
+        <translation>HTTP 및 HTTPS 트래커만 포함</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="42"/>
+        <source>UDP / WSS only</source>
+        <translation>UDP / WSS 전용</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="42"/>
+        <source>Excludes HTTP and HTTPS trackers</source>
+        <translation>HTTP 및 HTTPS 트래커 제외</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="47"/>
+        <source>Monitors public trackers and lists the reliable ones</source>
+        <translation>공개 트래커를 모니터링하여 신뢰할 수 있는 항목을 나열</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="49"/>
+        <source>Stable</source>
+        <translation>안정</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="49"/>
+        <source>Trackers with at least 95% uptime</source>
+        <translation>가동률 95% 이상인 트래커</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="227"/>
+        <source>Recommended</source>
+        <translation>추천</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="272"/>
+        <source>Custom Sources</source>
+        <translation>사용자 지정 소스</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="280"/>
+        <source>Add your own tracker list URLs (plain text, one tracker per line)</source>
+        <translation>자체 트래커 목록 URL 추가 (일반 텍스트, 한 줄에 트래커 하나)</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="319"/>
+        <source>Remove</source>
+        <translation>제거</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="320"/>
+        <source>Remove custom tracker source</source>
+        <translation>사용자 지정 트래커 소스 제거</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="336"/>
+        <source>https://example.com/trackers.txt</source>
+        <translation>https://example.com/trackers.txt</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="337"/>
+        <source>Custom tracker source URL</source>
+        <translation>사용자 지정 트래커 소스 URL</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="349"/>
+        <source>Add</source>
+        <translation>추가</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="352"/>
+        <source>Add custom tracker source</source>
+        <translation>사용자 지정 트래커 소스 추가</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="360"/>
+        <source>URL must start with http:// or https://</source>
+        <translation>URL은 http:// 또는 https://로 시작해야 합니다</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="399"/>
         <source>Sync Trackers</source>
         <translation>동기화 추적기</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="125"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="410"/>
+        <source>%1 source(s) selected</source>
+        <translation>%1개 소스 선택됨</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="411"/>
+        <source>Select at least one source to sync</source>
+        <translation>동기화하려면 최소 하나의 소스를 선택하세요</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="420"/>
         <source>Auto Update:</source>
         <translation>자동 업데이트:</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="126"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="421"/>
         <source>Enable daily tracker source synchronization</source>
         <translation>매일 트래커 소스 동기화 활성화</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="133"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="428"/>
         <source>Automatically update tracker sources</source>
         <translation>트래커 소스 자동 업데이트</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="201"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="499"/>
         <source>Current Tracker List</source>
         <translation>현재 트래커 목록</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="221"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="515"/>
+        <source>%1 tracker(s)</source>
+        <translation>트래커 %1개</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="533"/>
+        <source>No trackers synced yet</source>
+        <translation>아직 동기화된 트래커가 없습니다</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="538"/>
         <source>Tracker server update result</source>
         <translation>트래커 서버 업데이트 결과</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="248"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="565"/>
         <source>Updating tracker list...</source>
         <translation>트래커 목록 업데이트 중...</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="252"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="569"/>
         <source>Tracker list updated successfully</source>
         <translation>트래커 목록이 성공적으로 업데이트되었습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="253"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="570"/>
         <source>%1 trackers, %2/%3 sources succeeded, took %4ms</source>
         <translation>1 추적기, %2/%3 소스 성공, %4ms가 걸렸습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="263"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="580"/>
         <source>Failed to update tracker list</source>
         <translation>트래커 목록을 업데이트하지 못했습니다.</translation>
     </message>
@@ -3848,14 +3610,6 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="368"/>
         <source>Open Download Page</source>
         <translation>다운로드 페이지 열기</translation>
-    </message>
-    <message>
-        <source>Updating...</source>
-        <translation type="vanished">업데이트 중...</translation>
-    </message>
-    <message>
-        <source>Go to Download Page</source>
-        <translation type="vanished">다운로드 페이지로 이동</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="329"/>
@@ -3986,22 +3740,6 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
         <translation>사용자 지정 사용자 에이전트 문자열 입력...</translation>
     </message>
     <message>
-        <source>✗ User-Agent cannot be empty!</source>
-        <translation type="vanished">참고 사용자 에이전트는 비어 있을 수 없습니다!</translation>
-    </message>
-    <message>
-        <source>User-Agent cannot be empty!</source>
-        <translation type="vanished">사용자 에이전트는 비어있을 수 없습니다!</translation>
-    </message>
-    <message>
-        <source>✓ User-Agent settings saved and applied successfully!</source>
-        <translation type="vanished">사용자-에이전트 설정이 저장되고 성공적으로 적용되었습니다!</translation>
-    </message>
-    <message>
-        <source>✓ Settings saved: %1</source>
-        <translation type="vanished">설정 저장됨: %1</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/UserAgentSettingPage.qml" line="244"/>
         <source>No changes detected.</source>
         <translation>변경 사항이 감지되지 않았습니다.</translation>
@@ -4020,115 +3758,118 @@ Apache License 2.0에 따라 라이선스가 부여되었습니다.
 <context>
     <name>gdl::ui::browser::BrowserManagerImpl</name>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="163"/>
         <source>Invalid download link: %1</source>
-        <translation type="vanished">잘못된 다운로드 링크: %1</translation>
+        <translation>잘못된 다운로드 링크: %1</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="176"/>
         <source>Failed to add download task. Please check the link or aria2 connection.</source>
-        <translation type="vanished">다운로드 작업을 추가하지 못했습니다. 링크 또는 aria2 연결을 확인하세요.</translation>
+        <translation>다운로드 작업을 추가하지 못했습니다. 링크 또는 aria2 연결을 확인하세요.</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="177"/>
         <source>Failed to add download task: %1</source>
-        <translation type="vanished">다운로드 작업을 추가하지 못했습니다: %1</translation>
+        <translation>다운로드 작업을 추가하지 못했습니다: %1</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="202"/>
         <source>Torrent file does not exist: %1</source>
-        <translation type="vanished">토렌트 파일이 없습니다: %1</translation>
+        <translation>토렌트 파일이 없습니다: %1</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="208"/>
         <source>Failed to read torrent file: %1</source>
-        <translation type="vanished">토렌트 파일을 읽지 못했습니다: %1</translation>
+        <translation>토렌트 파일을 읽지 못했습니다: %1</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="222"/>
         <source>Failed to add torrent task. Please check the file or aria2 connection.</source>
-        <translation type="vanished">토렌트 작업을 추가하지 못했습니다. 파일 또는 aria2 연결을 확인하세요.</translation>
+        <translation>토렌트 작업을 추가하지 못했습니다. 파일 또는 aria2 연결을 확인하세요.</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="223"/>
         <source>Failed to add torrent task: %1</source>
-        <translation type="vanished">토렌트 작업을 추가하지 못했습니다: %1</translation>
+        <translation>토렌트 작업을 추가하지 못했습니다: %1</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="246"/>
         <source>Metalink file does not exist: %1</source>
-        <translation type="vanished">Metalink 파일이 없습니다: %1</translation>
+        <translation>Metalink 파일이 없습니다: %1</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="252"/>
         <source>Failed to read metalink file: %1</source>
-        <translation type="vanished">Metalink 파일을 읽지 못했습니다: %1</translation>
+        <translation>Metalink 파일을 읽지 못했습니다: %1</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="266"/>
         <source>Failed to add metalink task. Please check the file or aria2 connection.</source>
-        <translation type="vanished">Metalink 작업을 추가하지 못했습니다. 파일 또는 aria2 연결을 확인하세요.</translation>
+        <translation>Metalink 작업을 추가하지 못했습니다. 파일 또는 aria2 연결을 확인하세요.</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="267"/>
         <source>Failed to add metalink task: %1</source>
-        <translation type="vanished">Metalink 작업을 추가하지 못했습니다: %1</translation>
+        <translation>Metalink 작업을 추가하지 못했습니다: %1</translation>
     </message>
     <message>
-        <source>Failed to delete task: missing task id.</source>
-        <translation type="vanished">작업 삭제 실패: 작업 ID가 없습니다.</translation>
+        <location filename="../../Browser/browser_manager.cxx" line="558"/>
+        <source>Failed to retry task: missing task id.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to delete task: stopped task list is not available.</source>
-        <translation type="vanished">작업 삭제 실패: 중지된 작업 목록을 사용할 수 없습니다.</translation>
+        <location filename="../../Browser/browser_manager.cxx" line="562"/>
+        <source>Failed to retry task: stopped task list is not available.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to delete task: task was not found.</source>
-        <translation type="vanished">작업 삭제 실패: 작업을 찾을 수 없습니다.</translation>
+        <location filename="../../Browser/browser_manager.cxx" line="568"/>
+        <source>Failed to retry task: task was not found.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to delete task from aria2.</source>
-        <translation type="vanished">aria2에서 작업을 삭제하지 못했습니다.</translation>
+        <location filename="../../Browser/browser_manager.cxx" line="572"/>
+        <source>Only failed tasks can be retried.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to delete task from aria2: %1</source>
-        <translation type="vanished">aria2에서 작업을 삭제하지 못했습니다: %1</translation>
+        <location filename="../../Browser/browser_manager.cxx" line="578"/>
+        <source>Failed to retry task: original download link is unavailable.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to remove task from the stopped list.</source>
-        <translation type="vanished">중지된 목록에서 작업을 제거하지 못했습니다.</translation>
+        <location filename="../../Browser/browser_manager.cxx" line="604"/>
+        <source>Retry started, but the old failed task could not be removed from history.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Task was removed, but the downloaded file could not be deleted.</source>
-        <translation type="vanished">작업은 제거되었지만 다운로드한 파일을 삭제하지 못했습니다.</translation>
-    </message>
-    <message>
-        <source>Task was removed, but the downloaded file could not be deleted: %1</source>
-        <translation type="vanished">작업은 제거되었지만 다운로드한 파일을 삭제하지 못했습니다: %1</translation>
-    </message>
-    <message>
-        <source>Task was removed, but the aria2 control file could not be deleted.</source>
-        <translation type="vanished">작업은 제거되었지만 aria2 제어 파일을 삭제하지 못했습니다.</translation>
-    </message>
-    <message>
-        <source>Task was removed, but the aria2 control file could not be deleted: %1</source>
-        <translation type="vanished">작업은 제거되었지만 aria2 제어 파일을 삭제하지 못했습니다: %1</translation>
-    </message>
-    <message>
-        <source>Failed to delete tasks: stopped task list is not available.</source>
-        <translation type="vanished">작업 삭제 실패: 중지된 작업 목록을 사용할 수 없습니다.</translation>
-    </message>
-    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="1030"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1093"/>
         <source>Download failed. Please check the link or network connection.</source>
-        <translation type="vanished">다운로드 실패. 링크 또는 네트워크 연결을 확인하세요.</translation>
+        <translation>다운로드 실패. 링크 또는 네트워크 연결을 확인하세요.</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="1031"/>
         <source>Download failed: %1</source>
-        <translation type="vanished">다운로드 실패: %1</translation>
+        <translation>다운로드 실패: %1</translation>
     </message>
 </context>
 <context>
     <name>gdl::ui::netdisk::AsyncTaskWorker</name>
     <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="189"/>
         <source>Failed to parse the share link.</source>
-        <translation type="vanished">공유 링크를 구문 분석하지 못했습니다.</translation>
+        <translation>공유 링크를 구문 분석하지 못했습니다.</translation>
     </message>
     <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="195"/>
         <source>Failed to retrieve download link information.</source>
-        <translation type="vanished">다운로드 링크 정보를 검색하지 못했습니다.</translation>
+        <translation>다운로드 링크 정보를 검색하지 못했습니다.</translation>
     </message>
     <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="201"/>
         <source>Failed to switch directory.</source>
-        <translation type="vanished">디렉터리 전환에 실패했습니다.</translation>
+        <translation>디렉터리 전환에 실패했습니다.</translation>
     </message>
 </context>
 <context>

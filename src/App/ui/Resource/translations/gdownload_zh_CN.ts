@@ -98,31 +98,15 @@
 • 更改会立即保存，但仅在重启后生效</translation>
     </message>
     <message>
-        <source>✗ Invalid port. Please enter a value between 1024 and 65535.</source>
-        <translation type="vanished">✗ 无效端口。请输入 1024 到 65535 之间的值。</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="158"/>
         <source>Invalid port number!</source>
         <translation>无效的端口号！</translation>
-    </message>
-    <message>
-        <source>✗ Secret cannot be empty!</source>
-        <translation type="vanished">✗ 密钥不能为空！</translation>
     </message>
     <message>
         <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="164"/>
         <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="166"/>
         <source>Secret cannot be empty!</source>
         <translation>密钥不能为空！</translation>
-    </message>
-    <message>
-        <source>✓ RPC settings saved successfully! Please restart the application to apply changes.</source>
-        <translation type="vanished">✓ RPC 设置保存成功！请重启应用程序以使更改生效。</translation>
-    </message>
-    <message>
-        <source>✓ Settings saved: Port=%1, Secret updated (Restart required)</source>
-        <translation type="vanished">✓ 设置已保存：端口=%1，密钥已更新（需要重启）</translation>
     </message>
     <message>
         <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="189"/>
@@ -133,26 +117,6 @@
         <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="190"/>
         <source>Settings unchanged.</source>
         <translation>设置未更改。</translation>
-    </message>
-    <message>
-        <source>• The RPC port is used for communication between the application and Aria2 engine
-• Default port is 16888
-• The RPC secret is used for authentication between the application and Aria2 engine
-• The RPC secret is generated automatically on first launch
-• It&apos;s recommended to use a strong random secret for security
-• Make sure the port is not used by other applications
-• ⚠️ You MUST restart the application after changing the port or secret!
-• Choose a port number between 1024 and 65535
-• Changes are saved immediately but only take effect after restart</source>
-        <translation type="vanished">• RPC 端口用于应用程序与 Aria2 引擎之间的通信
-• 默认端口为 16888
-• RPC 密钥用于应用程序与 Aria2 引擎之间的身份验证
-• RPC 密钥在首次启动时自动生成
-• 出于安全考虑,建议使用强随机密钥
-• 请确保该端口未被其他应用程序占用
-• ⚠️ 修改端口或密钥后,必须重启应用程序!
-• 请选择 1024 到 65535 之间的端口号
-• 更改会立即保存,但需重启后才生效</translation>
     </message>
     <message>
         <location filename="../qml/Browser/Aria2RpcSettingPage.qml" line="68"/>
@@ -443,10 +407,6 @@
         <source>Input fields reset to default values (not saved yet)</source>
         <translation>输入字段重置为默认值（尚未保存）</translation>
     </message>
-    <message>
-        <source>✓ BitTorrent advanced settings saved and applied successfully!</source>
-        <translation type="vanished">✓ BitTorrent 高级设置已保存并成功应用！</translation>
-    </message>
 </context>
 <context>
     <name>BrowserView</name>
@@ -487,14 +447,6 @@
         <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="39"/>
         <source>Do you want to quit the application or minimize it to the system tray?</source>
         <translation>您想退出应用程序还是将其最小化到系统托盘？</translation>
-    </message>
-    <message>
-        <source>Tip: When minimized to tray, the application will continue running in the background. You can restore the window from the system tray.</source>
-        <translation type="vanished">提示：最小化到托盘后，应用程序将继续在后台运行。您可以从系统托盘还原窗口。</translation>
-    </message>
-    <message>
-        <source>Don&apos;t ask again, remember my choice</source>
-        <translation type="vanished">别再问了，记住我的选择</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="70"/>
@@ -625,73 +577,9 @@
         <translation>复制 %1</translation>
     </message>
     <message>
-        <source>Copy these settings to your browser extension</source>
-        <translation type="vanished">将这些设置复制到浏览器扩展</translation>
-    </message>
-    <message>
-        <source>Current GDownload Settings:</source>
-        <translation type="vanished">当前的 GDownload 设置：</translation>
-    </message>
-    <message>
-        <source>WebSocket URL:</source>
-        <translation type="vanished">WebSocket URL：</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="247"/>
         <source>Copy</source>
         <translation>复制</translation>
-    </message>
-    <message>
-        <source>✓ WebSocket URL copied!</source>
-        <translation type="vanished">✓ 复制了 WebSocket URL！</translation>
-    </message>
-    <message>
-        <source>RPC Secret:</source>
-        <translation type="vanished">RPC 秘密：</translation>
-    </message>
-    <message>
-        <source>✓ RPC Secret copied!</source>
-        <translation type="vanished">✓ 复制了 RPC 秘密！</translation>
-    </message>
-    <message>
-        <source>Requires GDownload running</source>
-        <translation type="vanished">需要 GDownload 正在运行</translation>
-    </message>
-    <message>
-        <source>How to use:</source>
-        <translation type="vanished">如何使用</translation>
-    </message>
-    <message>
-        <source>1. Copy the settings above using the Copy buttons</source>
-        <translation type="vanished">1.使用复制按钮复制上述设置</translation>
-    </message>
-    <message>
-        <source>2. Open your browser extension options page</source>
-        <translation type="vanished">2.打开浏览器扩展选项页面</translation>
-    </message>
-    <message>
-        <source>3. Paste the values into the corresponding fields</source>
-        <translation type="vanished">3.将数值粘贴到相应字段</translation>
-    </message>
-    <message>
-        <source>4. Click &apos;Test Connection&apos; to verify</source>
-        <translation type="vanished">4.单击 &quot;测试连接 &quot;以验证</translation>
-    </message>
-    <message>
-        <source>📋 Copy All Settings</source>
-        <translation type="vanished">复制所有设置</translation>
-    </message>
-    <message>
-        <source>✓ All settings copied!</source>
-        <translation type="vanished">✓ 复制所有设置！</translation>
-    </message>
-    <message>
-        <source>Need help? Check the FAQ below</source>
-        <translation type="vanished">需要帮助？查看下面的常见问题</translation>
-    </message>
-    <message>
-        <source>Important: Keep GDownload running for the browser extension to work. The extension connects directly to aria2c via these settings.</source>
-        <translation type="vanished">重要： 保持 GDownload 运行，浏览器扩展才能正常工作。该扩展通过这些设置直接连接到 aria2c。</translation>
     </message>
 </context>
 <context>
@@ -808,10 +696,6 @@
         <source>Input fields reset to default values (not saved yet)</source>
         <translation>输入字段重置为默认值（尚未保存）</translation>
     </message>
-    <message>
-        <source>✓ Connection &amp; Performance settings saved and applied successfully!</source>
-        <translation type="vanished">连接和性能设置已保存并成功应用！</translation>
-    </message>
 </context>
 <context>
     <name>DeleteConfirmDialog</name>
@@ -869,10 +753,6 @@
         <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="146"/>
         <source>This will only remove task records. Downloaded files will be kept.</source>
         <translation>此操作仅移除任务记录，已下载的文件将被保留。</translation>
-    </message>
-    <message>
-        <source>Warning: The downloaded file will be permanently deleted and cannot be recovered!</source>
-        <translation type="vanished">警告：下载的文件将被永久删除，无法恢复！</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="147"/>
@@ -944,25 +824,9 @@
         <translation>部分任务记录已移除，但部分清理操作无法完成。</translation>
     </message>
     <message>
-        <source>Queued tasks are ready to start</source>
-        <translation type="vanished">排队任务已就绪,等待开始</translation>
-    </message>
-    <message>
-        <source>Completed and stopped tasks</source>
-        <translation type="vanished">已完成和已停止的任务</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="79"/>
         <source>Add Download</source>
         <translation>添加下载</translation>
-    </message>
-    <message>
-        <source>Delete Confirmation</source>
-        <translation type="vanished">删除确认</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete all tasks in this list? This action cannot be undone.</source>
-        <translation type="vanished">确定要删除此列表中的所有任务吗?此操作无法撤销。</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="56"/>
@@ -1013,17 +877,9 @@
         <translation>常见问题</translation>
     </message>
     <message>
-        <source>Find answers to common questions</source>
-        <translation type="vanished">查找常见问题的答案</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="91"/>
         <source>Why do I need the browser extension?</source>
         <translation>为什么需要浏览器扩展？</translation>
-    </message>
-    <message>
-        <source>The extension allows you to capture download links directly from web pages and send them to GDownload with a single click. It seamlessly integrates with your browsing experience.</source>
-        <translation type="vanished">该扩展允许你直接从网页上抓取下载链接，并一键发送到 GDownload。它能与你的浏览体验无缝整合。</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="97"/>
@@ -1031,23 +887,9 @@
         <translation>我的数据安全吗？</translation>
     </message>
     <message>
-        <source>Yes! The extension connects locally to aria2c via WebSocket. All communication stays on your computer - no data is sent to external servers. Your privacy is fully protected.</source>
-        <translation type="vanished">是的！该扩展通过 WebSocket 与 aria2c 进行本地连接。所有通信都保留在您的计算机上，不会将数据发送到外部服务器。您的隐私将受到全面保护。</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="103"/>
         <source>Connection failed. What should I do?</source>
         <translation>连接失败。我该怎么办？</translation>
-    </message>
-    <message>
-        <source>1. Ensure GDownload is running
-2. Check that aria2c is enabled in GDownload settings
-3. Verify the WebSocket URL and RPC Secret match the values shown above
-4. Try restarting both GDownload and your browser</source>
-        <translation type="vanished">1.确保 GDownload 正在运行
-2.检查 GDownload 设置中是否启用了 aria2c
-3.确认 WebSocket URL 和 RPC Secret 与上面显示的值一致
-4.尝试重启 GDownload 和浏览器</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="109"/>
@@ -1055,46 +897,14 @@
         <translation>支持哪些浏览器？</translation>
     </message>
     <message>
-        <source>The extension supports Chrome 110+, Firefox 115+, and Edge 110+. It uses the standard Web Extensions API (Manifest V3) for maximum compatibility.</source>
-        <translation type="vanished">该扩展支持 Chrome 110+、Firefox 115+ 和 Edge 110+。它使用标准 Web 扩展 API（Manifest V3），以实现最大兼容性。</translation>
-    </message>
-    <message>
-        <source>Can I customize what links are captured?</source>
-        <translation type="vanished">我能否自定义捕获的链接？</translation>
-    </message>
-    <message>
-        <source>Yes! The extension has powerful filtering options:
-• Set minimum file size
-• Filter by file type (video, audio, archive, etc.)
-• Add URL blacklist patterns
-• Configure domain whitelist</source>
-        <translation type="vanished">是的！该扩展具有强大的过滤选项：
-- 设置最小文件大小
-- 按文件类型（视频、音频、压缩文件等）过滤
-- 添加 URL 黑名单模式
-- 配置域名白名单</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="121"/>
         <source>Does it work with password-protected sites?</source>
         <translation>它是否适用于受密码保护的网站？</translation>
     </message>
     <message>
-        <source>Yes. The extension can optionally send cookies and authorization headers (disabled by default for security). Enable these in the extension&apos;s Privacy &amp; Security settings for sites that require login.</source>
-        <translation type="vanished">扩展可以选择发送 cookie 和授权标题（为安全起见默认为禁用）。对于需要登录的网站，请在扩展的 &quot;隐私与安全 &quot;设置中启用这些功能。</translation>
-    </message>
-    <message>
-        <source>📖 Need more help?</source>
-        <translation type="vanished">📖 需要更多帮助？</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="167"/>
         <source>GitHub Issues</source>
         <translation>GitHub 问题</translation>
-    </message>
-    <message>
-        <source>Report bugs</source>
-        <translation type="vanished">报告错误</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="171"/>
@@ -1105,10 +915,6 @@
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="177"/>
         <source>Documentation</source>
         <translation>文档</translation>
-    </message>
-    <message>
-        <source>Full user guide</source>
-        <translation type="vanished">完整的用户指南</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="76"/>
@@ -1210,26 +1016,6 @@
         <source>Collapsed</source>
         <translation>已折叠</translation>
     </message>
-    <message>
-        <source>Opening website...</source>
-        <translation type="vanished">开通网站...</translation>
-    </message>
-    <message>
-        <source>Join Our Community</source>
-        <translation type="vanished">加入我们的社区</translation>
-    </message>
-    <message>
-        <source>Get help from other users, share tips, and stay updated with the latest features. Star us on GitHub to show your support!</source>
-        <translation type="vanished">从其他用户那里获得帮助、分享技巧并随时了解最新功能。在 GitHub 上为我们加星，以表示您的支持！</translation>
-    </message>
-    <message>
-        <source>⭐ Star on GitHub</source>
-        <translation type="vanished">⭐ GitHub 上的明星</translation>
-    </message>
-    <message>
-        <source>Thank you for your support!</source>
-        <translation type="vanished">感谢您的支持！</translation>
-    </message>
 </context>
 <context>
     <name>FeatureHighlightCard</name>
@@ -1284,17 +1070,9 @@
         <translation>按大小、类型、域名和自定义规则筛选链接。</translation>
     </message>
     <message>
-        <source>Discover what makes our browser extension special</source>
-        <translation type="vanished">了解我们的浏览器扩展有何特别之处</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="66"/>
         <source>One-Click Capture</source>
         <translation>一键采集</translation>
-    </message>
-    <message>
-        <source>Quickly capture download links from web pages</source>
-        <translation type="vanished">快速捕捉网页中的下载链接</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="73"/>
@@ -1302,42 +1080,14 @@
         <translation>批量下载</translation>
     </message>
     <message>
-        <source>Select multiple links and send them all at once</source>
-        <translation type="vanished">选择多个链接并同时发送</translation>
-    </message>
-    <message>
-        <source>Unified UI</source>
-        <translation type="vanished">统一用户界面</translation>
-    </message>
-    <message>
-        <source>Perfectly matches GDownload&apos;s Element Plus design</source>
-        <translation type="vanished">与 GDownload 的 Element Plus 设计完美匹配</translation>
-    </message>
-    <message>
-        <source>Secure Connection</source>
-        <translation type="vanished">安全连接</translation>
-    </message>
-    <message>
-        <source>Direct WebSocket connection to aria2c via JSON-RPC</source>
-        <translation type="vanished">通过 JSON-RPC 将 WebSocket 直接连接到 aria2c</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="94"/>
         <source>Cross-Browser</source>
         <translation>跨浏览器</translation>
     </message>
     <message>
-        <source>Compatible with Chrome, Firefox, and Edge</source>
-        <translation type="vanished">与 Chrome、Firefox 和 Edge 兼容</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="101"/>
         <source>Smart Filtering</source>
         <translation>智能过滤</translation>
-    </message>
-    <message>
-        <source>Filter links by file size, type, and custom rules</source>
-        <translation type="vanished">按文件大小、类型和自定义规则过滤链接</translation>
     </message>
 </context>
 <context>
@@ -1622,17 +1372,9 @@
         <translation>移除任务失败。</translation>
     </message>
     <message>
-        <source>No completed downloads</source>
-        <translation type="vanished">未完成下载</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="120"/>
         <source>No downloads</source>
         <translation>没有下载</translation>
-    </message>
-    <message>
-        <source>Add some download links to get started</source>
-        <translation type="vanished">添加一些下载链接以开始使用</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="263"/>
@@ -1648,14 +1390,6 @@
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="303"/>
         <source>Saved to %1</source>
         <translation>已保存到 %1</translation>
-    </message>
-    <message>
-        <source>%1 of %2 • %3% • %4 left</source>
-        <translation type="vanished">%1 / %2 • %3% • 剩余 %4</translation>
-    </message>
-    <message>
-        <source>Remaining </source>
-        <translation type="vanished">剩余</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="376"/>
@@ -1857,105 +1591,9 @@ Copyright © 2024 GDownload Team
 基于 Apache License 2.0 许可。</translation>
     </message>
     <message>
-        <source>If you like GDownload, you can support us through the following platforms:</source>
-        <translation type="vanished">如果您喜欢 GDownload，可以通过以下平台支持我们：</translation>
-    </message>
-    <message>
-        <source>Thank you for your support! ❤️</source>
-        <translation type="vanished">感谢您的支持！❤️</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="184"/>
         <source>Open Source Licenses</source>
         <translation>开源许可证</translation>
-    </message>
-    <message>
-        <source># GDownload
-
-**A modern cross-platform download manager**
-
-## Core Features
-
-✅ **Multi-Platform Support** - Windows, macOS, Linux
-✅ **High-Performance Engine** - Powered by aria2c
-✅ **Multi-Protocol Support** - HTTP/HTTPS/FTP/BitTorrent/Metalink
-✅ **Smart Download Management** - Multi-threaded, resume capability
-✅ **Modern UI** - Built with Qt Quick and Element Plus design
-
-## Technology Stack
-
-- **Frontend**: Qt Quick (QML) + Element Plus Design
-- **Backend**: Qt C++ + Modern C++20
-- **Download Engine**: aria2c
-- **Network**: Boost.Asio with SSL
-- **BitTorrent**: LibtorrentRasterbar
-- **Build System**: CMake + vcpkg
-
-## Development Team
-
-GDownload is maintained by passionate developers who believe in:
-- Open source software
-- Modern UI/UX design
-- High-quality code
-- Community collaboration
-
-## Get Involved
-
-🔗 **GitHub**: [https://github.com/cool2528/GDownload](https://github.com/cool2528/GDownload)
-🐛 **Issues**: [Report bugs or request features](https://github.com/cool2528/GDownload/issues)
-📝 **Contribute**: Pull requests are welcome!
-
-## License
-
-Copyright © 2024 GDownload Team
-Licensed under the Apache License 2.0
-
----
-
-*Thank you to all contributors and users who make GDownload better!* 🚀</source>
-        <translation type="vanished"># 下载
-
-**一个现代的跨平台下载管理器**
-
-## 核心功能
-
-✅ **多平台支持** - Windows、macOS、Linux
-✅ **高性能引擎** - 由 aria2c 支持
-✅ **多协议支持** - HTTP/HTTPS/FTP/BitTorrent/Metalink
-✅ **智能下载管理** - 多线程、恢复功能
-✅ **现代用户界面** - 使用 Qt Quick 和 Element Plus 设计构建
-
-## 技术栈
-
-- 前端**：Qt Quick (QML) + Element Plus 设计
-- 后端**：Qt C++ + 现代 C++20
-- 下载引擎**： aria2c
-- 网络***：带 SSL 的 Boost.Asio
-- BitTorrent**：LibtorrentRasterbar
-- 编译系统**：CMake + vcpkg
-
-## 开发团队
-
-GDownload 由充满热情的开发人员维护，他们相信
-- 开源软件
-- 现代化的用户界面/用户体验设计
-- 高质量代码
-- 社区协作
-
-## 参与
-
-🔗 **GitHub**：[https://github.com/cool2528/GDownload](https://github.com/cool2528/GDownload)
-🐛 **问题**：[报告错误或请求功能](https://github.com/cool2528/GDownload/issues)
-📝 **贡献**：欢迎拉取请求！
-
-## 许可证
-
-版权 © 2024 GDownload 团队
-使用 Apache License 2.0 许可证授权
-
-
-
-*感谢所有使 GDownload 更好的贡献者和用户！* 🚀</translation>
     </message>
 </context>
 <context>
@@ -1964,10 +1602,6 @@ GDownload 由充满热情的开发人员维护，他们相信
         <location filename="../qml/Browser/HomePage.qml" line="75"/>
         <source>Welcome back</source>
         <translation>欢迎回来</translation>
-    </message>
-    <message>
-        <source>Manage your downloads and start new tasks here.</source>
-        <translation type="vanished">在这里管理下载并开始新任务。</translation>
     </message>
     <message>
         <location filename="../qml/Browser/HomePage.qml" line="83"/>
@@ -2080,10 +1714,6 @@ GDownload 由充满热情的开发人员维护，他们相信
         <location filename="../qml/Browser/HomePage.qml" line="204"/>
         <source>Add download</source>
         <translation>添加下载</translation>
-    </message>
-    <message>
-        <source>No completed downloads yet.</source>
-        <translation type="vanished">暂无已完成的下载。</translation>
     </message>
     <message>
         <location filename="../qml/Browser/HomePage.qml" line="254"/>
@@ -2255,41 +1885,9 @@ GDownload 由充满热情的开发人员维护，他们相信
         <translation>下载 %1 版</translation>
     </message>
     <message>
-        <source>Follow these simple steps to get started</source>
-        <translation type="vanished">按照以下简单步骤开始</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="64"/>
         <source>Download Extension</source>
         <translation>下载扩展程序</translation>
-    </message>
-    <message>
-        <source>Choose your browser and download the extension</source>
-        <translation type="vanished">选择浏览器并下载扩展</translation>
-    </message>
-    <message>
-        <source>Select your browser:</source>
-        <translation type="vanished">选择您的浏览器：</translation>
-    </message>
-    <message>
-        <source>Opening Chrome download page...</source>
-        <translation type="vanished">打开 Chrome 浏览器下载页面...</translation>
-    </message>
-    <message>
-        <source>Opening Firefox download page...</source>
-        <translation type="vanished">打开 Firefox 下载页面...</translation>
-    </message>
-    <message>
-        <source>Opening Edge download page...</source>
-        <translation type="vanished">打开 Edge 下载页面...</translation>
-    </message>
-    <message>
-        <source>GitHub Release:</source>
-        <translation type="vanished">GitHub 发布：</translation>
-    </message>
-    <message>
-        <source>Visit Repository</source>
-        <translation type="vanished">访问存储库</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="119"/>
@@ -2297,17 +1895,9 @@ GDownload 由充满热情的开发人员维护，他们相信
         <translation>打开 GitHub...</translation>
     </message>
     <message>
-        <source>Official Site:</source>
-        <translation type="vanished">官方网站：</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="126"/>
         <source>Download from gdownload.uk</source>
         <translation>从 gdownload.uk 下载</translation>
-    </message>
-    <message>
-        <source>Opening official website...</source>
-        <translation type="vanished">开设官方网站...</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="137"/>
@@ -2315,85 +1905,9 @@ GDownload 由充满热情的开发人员维护，他们相信
         <translation>安装扩展</translation>
     </message>
     <message>
-        <source>Load the extension in your browser</source>
-        <translation type="vanished">在浏览器中加载扩展</translation>
-    </message>
-    <message>
-        <source>For Chrome/Edge:</source>
-        <translation type="vanished">用于铬/边缘：</translation>
-    </message>
-    <message>
-        <source>1. Open chrome://extensions/ (or edge://extensions/)</source>
-        <translation type="vanished">1.打开 chrome://extensions/（或 edge://extensions/）。</translation>
-    </message>
-    <message>
-        <source>2. Enable &quot;Developer mode&quot; toggle</source>
-        <translation type="vanished">2.启用 &quot;开发者模式 &quot;切换</translation>
-    </message>
-    <message>
-        <source>3. Click &quot;Load unpacked&quot;</source>
-        <translation type="vanished">3.点击 &quot;加载已解压&quot;。</translation>
-    </message>
-    <message>
-        <source>4. Select the dist folder from extracted files</source>
-        <translation type="vanished">4.从提取的文件中选择 dist 文件夹</translation>
-    </message>
-    <message>
-        <source>For Firefox:</source>
-        <translation type="vanished">火狐浏览器</translation>
-    </message>
-    <message>
-        <source>1. Open about:debugging#/runtime/this-firefox</source>
-        <translation type="vanished">1.打开 about:debugging#/runtime/this-firefox</translation>
-    </message>
-    <message>
-        <source>2. Click &quot;Load Temporary Add-on&quot;</source>
-        <translation type="vanished">2.点击 &quot;加载临时插件</translation>
-    </message>
-    <message>
-        <source>3. Select manifest.json from the dist folder</source>
-        <translation type="vanished">3.从 dist 文件夹中选择 manifest.json</translation>
-    </message>
-    <message>
-        <source>4. Extension will be loaded temporarily</source>
-        <translation type="vanished">4.扩展程序将临时加载</translation>
-    </message>
-    <message>
-        <source>Coming Soon: Direct installation from browser web stores!</source>
-        <translation type="vanished">即将推出：从浏览器网络商店直接安装！</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="175"/>
         <source>Configure Connection</source>
         <translation>配置连接</translation>
-    </message>
-    <message>
-        <source>Set up the connection to GDownload</source>
-        <translation type="vanished">设置与 GDownload 的连接</translation>
-    </message>
-    <message>
-        <source>The extension needs to connect to GDownload&apos;s aria2c:</source>
-        <translation type="vanished">扩展需要连接到 GDownload 的 aria2c：</translation>
-    </message>
-    <message>
-        <source>Default settings are pre-configured</source>
-        <translation type="vanished">默认设置已预先配置</translation>
-    </message>
-    <message>
-        <source>Works out-of-the-box with GDownload</source>
-        <translation type="vanished">可与 GDownload 一同使用</translation>
-    </message>
-    <message>
-        <source>Configuration values (see below for details):</source>
-        <translation type="vanished">配置值（详见下文）：</translation>
-    </message>
-    <message>
-        <source>📖 View Configuration</source>
-        <translation type="vanished">📖 查看配置</translation>
-    </message>
-    <message>
-        <source>See Configuration Helper below</source>
-        <translation type="vanished">请参阅下面的配置助手</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="337"/>
@@ -2422,10 +1936,6 @@ GDownload 由充满热情的开发人员维护，他们相信
         <location filename="../qml/Browser/LabSettingPage.qml" line="113"/>
         <source>Review the connection values and browser permissions before enabling capture for authenticated websites.</source>
         <translation>在为需要认证的网站启用捕获前，请检查连接信息和浏览器权限。</translation>
-    </message>
-    <message>
-        <source>Enhance your download experience with our browser extension. Capture links from any webpage and send them directly to GDownload.</source>
-        <translation type="vanished">使用我们的浏览器扩展程序，提升您的下载体验。从任何网页捕获链接并直接发送到 GDownload。</translation>
     </message>
 </context>
 <context>
@@ -2486,14 +1996,6 @@ GDownload 由充满热情的开发人员维护，他们相信
 <context>
     <name>NetDiskPageView</name>
     <message>
-        <source>Baidu Netdisk share link format (https://pan.baidu.com/s/1xxxxxxxxxx/?pwd=xxxx)</source>
-        <translation type="vanished">百度网盘分享链接格式（https://pan.baidu.com/s/1xxxxxxxxxxxx/?pwd=xxxx）</translation>
-    </message>
-    <message>
-        <source>Parse</source>
-        <translation type="vanished">解析</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="48"/>
         <source>Invalid Baidu Netdisk URL, please check.</source>
         <translation>百度网盘 URL 无效，请检查。</translation>
@@ -2509,17 +2011,9 @@ GDownload 由充满热情的开发人员维护，他们相信
         <translation>网盘链接解析</translation>
     </message>
     <message>
-        <source>Paste a Baidu share link, preview files, then add selected items to the queue.</source>
-        <translation type="vanished">粘贴百度网盘分享链接,预览文件,然后将所选项目添加到队列。</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="213"/>
         <source>Paste link</source>
         <translation>粘贴链接</translation>
-    </message>
-    <message>
-        <source>Validate share URL and cookie.</source>
-        <translation type="vanished">验证分享链接和 Cookie。</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="214"/>
@@ -2527,25 +2021,9 @@ GDownload 由充满热情的开发人员维护，他们相信
         <translation>预览文件</translation>
     </message>
     <message>
-        <source>Select files before downloading.</source>
-        <translation type="vanished">下载前选择文件。</translation>
-    </message>
-    <message>
-        <source>Add queue</source>
-        <translation type="vanished">添加到队列</translation>
-    </message>
-    <message>
-        <source>Send selected files to aria2.</source>
-        <translation type="vanished">将所选文件发送到 aria2。</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="269"/>
         <source>Cookie required. Set Baidu Netdisk cookies in Preferences before parsing share links.</source>
         <translation>需要 Cookie。解析分享链接前,请在首选项中设置百度网盘 Cookie。</translation>
-    </message>
-    <message>
-        <source>Ready to parse. The parser will preview files before adding them to the download queue.</source>
-        <translation type="vanished">准备就绪。解析器会先预览文件,再将其添加到下载队列。</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="40"/>
@@ -2718,9 +2196,112 @@ GDownload 由充满热情的开发人员维护，他们相信
         <source>The cloud request failed. Please try again.</source>
         <translation>云端请求失败，请重试。</translation>
     </message>
+</context>
+<context>
+    <name>PluginMarketCard</name>
     <message>
-        <source>Return parsing</source>
-        <translation type="vanished">返回解析</translation>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="106"/>
+        <source>Verified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="107"/>
+        <source>Third-party</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="131"/>
+        <source>Installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="132"/>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="220"/>
+        <source>Update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="133"/>
+        <source>Working</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="134"/>
+        <source>Available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="211"/>
+        <source>Install</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="230"/>
+        <source>Remove</source>
+        <translation type="unfinished">移除</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="240"/>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketCard.qml" line="240"/>
+        <source>Disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PluginMarketPage</name>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="27"/>
+        <source>Failed to load plugin market: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="31"/>
+        <source>%1 succeeded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="33"/>
+        <source>%1 failed: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="50"/>
+        <source>All</source>
+        <translation type="unfinished">全部</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="50"/>
+        <source>Installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="50"/>
+        <source>Updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="66"/>
+        <source>Search plugins…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="73"/>
+        <source>Refresh</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="145"/>
+        <source>No plugins available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="151"/>
+        <source>Check your network connection and refresh</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2870,28 +2451,36 @@ GDownload 由充满热情的开发人员维护，他们相信
 <context>
     <name>QObject</name>
     <message>
+        <location filename="../../Browser/download_task_model.h" line="121"/>
         <source>Unknown</source>
-        <translation type="vanished">未知</translation>
+        <translation>未知</translation>
     </message>
     <message>
+        <location filename="../../Browser/download_task_model.h" line="131"/>
         <source>h</source>
-        <translation type="vanished">时</translation>
+        <translation>时</translation>
     </message>
     <message>
+        <location filename="../../Browser/download_task_model.h" line="134"/>
+        <location filename="../../Browser/download_task_model.h" line="138"/>
         <source>m</source>
-        <translation type="vanished">分</translation>
+        <translation>分</translation>
     </message>
     <message>
+        <location filename="../../Browser/download_task_model.h" line="141"/>
+        <location filename="../../Browser/download_task_model.h" line="145"/>
         <source>s</source>
-        <translation type="vanished">秒</translation>
+        <translation>秒</translation>
     </message>
     <message>
-        <source>Task was removed locally, but aria2 cleanup failed.</source>
-        <translation type="vanished">任务已从本地移除，但 aria2 清理失败。</translation>
+        <location filename="../../view/mainwindow.cxx" line="126"/>
+        <source>The download engine stopped unexpectedly.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Task was removed locally, but aria2 cleanup failed: %1</source>
-        <translation type="vanished">任务已从本地移除，但 aria2 清理失败：%1</translation>
+        <location filename="../../view/mainwindow.cxx" line="134"/>
+        <source>Download engine is unavailable.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2945,19 +2534,29 @@ GDownload 由充满热情的开发人员维护，他们相信
         <translation>实验室设置</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="41"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="27"/>
+        <source>Plugin Market</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="43"/>
         <source>Configure basic download preferences</source>
         <translation>配置基本下载偏好</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="43"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="45"/>
         <source>Advanced configuration options</source>
         <translation>高级配置选项</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/SettingPageTitle.qml" line="45"/>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="47"/>
         <source>Experimental features and settings</source>
         <translation>实验性功能和设置</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/SettingPageTitle.qml" line="49"/>
+        <source>Browse, install and update netdisk parser plugins</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2981,6 +2580,11 @@ GDownload 由充满热情的开发人员维护，他们相信
         <location filename="../qml/Browser/SettingsPageView.qml" line="132"/>
         <source>Lab</source>
         <translation>实验室</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/SettingsPageView.qml" line="148"/>
+        <source>Plugin Market</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3073,26 +2677,14 @@ GDownload 由充满热情的开发人员维护，他们相信
         <translation>速度控制设置保存并应用成功！</translation>
     </message>
     <message>
-        <source>✗ Download limit must be between 0 and 102400 KB/s</source>
-        <translation type="vanished">✗ 下载限制必须介于 0 和 102400 KB/s 之间</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="165"/>
         <source>Invalid download limit!</source>
         <translation>下载限速值无效！</translation>
     </message>
     <message>
-        <source>✗ Upload limit must be between 0 and 10240 KB/s</source>
-        <translation type="vanished">✗ 上传限制必须介于 0 和 10240 KB/s 之间</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="171"/>
         <source>Invalid upload limit!</source>
         <translation>上传限速值无效！</translation>
-    </message>
-    <message>
-        <source>✗ Lowest speed must be between 0 and 1024 KB/s</source>
-        <translation type="vanished">✗ 最低速度必须介于 0 和 1024 KB/s 之间</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="177"/>
@@ -3113,10 +2705,6 @@ GDownload 由充满热情的开发人员维护，他们相信
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="191"/>
         <source>LowestSpeed</source>
         <translation>最低速度</translation>
-    </message>
-    <message>
-        <source>✓ Speed control settings saved and applied successfully!</source>
-        <translation type="vanished">速度控制设置已保存并成功应用！</translation>
     </message>
 </context>
 <context>
@@ -3461,10 +3049,6 @@ GDownload 由充满热情的开发人员维护，他们相信
 <context>
     <name>ThemeSwitch</name>
     <message>
-        <source>Theme Mode:</source>
-        <translation type="vanished">主题模式</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/ThemeSwitch.qml" line="42"/>
         <source>Theme mode</source>
         <translation>主题模式</translation>
@@ -3620,10 +3204,6 @@ GDownload 由充满热情的开发人员维护，他们相信
         <source>Input fields reset to default values (not saved yet)</source>
         <translation>输入字段重置为默认值（尚未保存）</translation>
     </message>
-    <message>
-        <source>✓ Timeout and retry settings saved and applied successfully!</source>
-        <translation type="vanished">✓ 超时和重试设置已保存并成功应用！</translation>
-    </message>
 </context>
 <context>
     <name>TitleBar</name>
@@ -3678,67 +3258,249 @@ GDownload 由充满热情的开发人员维护，他们相信
 <context>
     <name>TrackerServerSettingPage</name>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="16"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="18"/>
         <source>BitTorrent Tracker Servers</source>
         <translation>BitTorrent Tracker 服务器</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="17"/>
-        <source>Configure tracker servers for BitTorrent downloads</source>
-        <translation>为 BitTorrent 下载配置 Tracker 服务器</translation>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="19"/>
+        <source>Choose tracker lists to merge into aria2c. Mirrors are tried automatically when a source is unreachable.</source>
+        <translation>选择要合并到 aria2c 的 Tracker 列表。当某个源无法访问时会自动尝试镜像。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="26"/>
-        <source>Tracker Sources</source>
-        <translation>Tracker 来源</translation>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="25"/>
+        <source>Curated public tracker lists, updated daily on GitHub</source>
+        <translation>精选公共 Tracker 列表，每日在 GitHub 更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="111"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="27"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="39"/>
+        <source>Best</source>
+        <translation>精选</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="27"/>
+        <source>About 20 stable and fast trackers</source>
+        <translation>约 20 个稳定且快速的 Tracker</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="28"/>
+        <source>Best (IP)</source>
+        <translation>精选（IP 版）</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="28"/>
+        <source>IP-address version, useful when DNS is blocked</source>
+        <translation>IP 地址版本，适用于 DNS 受阻的环境</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="29"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="40"/>
+        <source>All</source>
+        <translation>全部</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="29"/>
+        <source>Full list of working trackers</source>
+        <translation>全部可用 Tracker 的完整列表</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="30"/>
+        <source>UDP only</source>
+        <translation>仅 UDP</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="30"/>
+        <source>Only udp:// trackers</source>
+        <translation>仅包含 udp:// Tracker</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="31"/>
+        <source>HTTP only</source>
+        <translation>仅 HTTP</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="31"/>
+        <source>Only http:// trackers</source>
+        <translation>仅包含 http:// Tracker</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="32"/>
+        <source>HTTPS only</source>
+        <translation>仅 HTTPS</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="32"/>
+        <source>Only https:// trackers</source>
+        <translation>仅包含 https:// Tracker</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="37"/>
+        <source>Popular tracker collection with China-friendly mirrors, updated daily</source>
+        <translation>热门 Tracker 收集列表，自带国内可达镜像，每日更新</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="39"/>
+        <source>About 20 popular and reliable trackers</source>
+        <translation>约 20 个热门且可靠的 Tracker</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="40"/>
+        <source>Aggregated list of all working trackers</source>
+        <translation>汇总的全部可用 Tracker 列表</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="41"/>
+        <source>HTTP / HTTPS only</source>
+        <translation>仅 HTTP / HTTPS</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="41"/>
+        <source>Only HTTP and HTTPS trackers</source>
+        <translation>仅包含 HTTP 和 HTTPS Tracker</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="42"/>
+        <source>UDP / WSS only</source>
+        <translation>仅 UDP / WSS</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="42"/>
+        <source>Excludes HTTP and HTTPS trackers</source>
+        <translation>不包含 HTTP 和 HTTPS Tracker</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="47"/>
+        <source>Monitors public trackers and lists the reliable ones</source>
+        <translation>持续监测公共 Tracker 并列出可靠的条目</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="49"/>
+        <source>Stable</source>
+        <translation>稳定</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="49"/>
+        <source>Trackers with at least 95% uptime</source>
+        <translation>可用率不低于 95% 的 Tracker</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="227"/>
+        <source>Recommended</source>
+        <translation>推荐</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="272"/>
+        <source>Custom Sources</source>
+        <translation>自定义源</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="280"/>
+        <source>Add your own tracker list URLs (plain text, one tracker per line)</source>
+        <translation>添加自己的 Tracker 列表 URL（纯文本，每行一个 Tracker）</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="319"/>
+        <source>Remove</source>
+        <translation>移除</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="320"/>
+        <source>Remove custom tracker source</source>
+        <translation>移除自定义 Tracker 源</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="336"/>
+        <source>https://example.com/trackers.txt</source>
+        <translation>https://example.com/trackers.txt</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="337"/>
+        <source>Custom tracker source URL</source>
+        <translation>自定义 Tracker 源 URL</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="349"/>
+        <source>Add</source>
+        <translation>添加</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="352"/>
+        <source>Add custom tracker source</source>
+        <translation>添加自定义 Tracker 源</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="360"/>
+        <source>URL must start with http:// or https://</source>
+        <translation>URL 必须以 http:// 或 https:// 开头</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="399"/>
         <source>Sync Trackers</source>
         <translation>同步 Tracker</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="125"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="410"/>
+        <source>%1 source(s) selected</source>
+        <translation>已选择 %1 个源</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="411"/>
+        <source>Select at least one source to sync</source>
+        <translation>请至少选择一个源后再同步</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="420"/>
         <source>Auto Update:</source>
         <translation>自动更新:</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="126"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="421"/>
         <source>Enable daily tracker source synchronization</source>
         <translation>启用每日 Tracker 源同步</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="133"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="428"/>
         <source>Automatically update tracker sources</source>
         <translation>自动更新 Tracker 来源</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="201"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="499"/>
         <source>Current Tracker List</source>
         <translation>当前 Tracker 列表</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="221"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="515"/>
+        <source>%1 tracker(s)</source>
+        <translation>%1 个 Tracker</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="533"/>
+        <source>No trackers synced yet</source>
+        <translation>尚未同步任何 Tracker</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="538"/>
         <source>Tracker server update result</source>
         <translation>Tracker 服务器更新结果</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="248"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="565"/>
         <source>Updating tracker list...</source>
         <translation>正在更新 Tracker 列表...</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="252"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="569"/>
         <source>Tracker list updated successfully</source>
         <translation>Tracker 列表更新成功</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="253"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="570"/>
         <source>%1 trackers, %2/%3 sources succeeded, took %4ms</source>
         <translation>%1 追踪器，%2/%3 来源成功，耗时 %4ms</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="263"/>
+        <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="580"/>
         <source>Failed to update tracker list</source>
         <translation>更新 Tracker 列表失败</translation>
     </message>
@@ -3848,14 +3610,6 @@ GDownload 由充满热情的开发人员维护，他们相信
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="368"/>
         <source>Open Download Page</source>
         <translation>打开下载页面</translation>
-    </message>
-    <message>
-        <source>Updating...</source>
-        <translation type="vanished">更新...</translation>
-    </message>
-    <message>
-        <source>Go to Download Page</source>
-        <translation type="vanished">转至下载页面</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="329"/>
@@ -3986,22 +3740,6 @@ GDownload 由充满热情的开发人员维护，他们相信
         <translation>输入自定义 User-Agent 字符串...</translation>
     </message>
     <message>
-        <source>✗ User-Agent cannot be empty!</source>
-        <translation type="vanished">✗ User-Agent 不能为空！</translation>
-    </message>
-    <message>
-        <source>User-Agent cannot be empty!</source>
-        <translation type="vanished">User-Agent 不能为空！</translation>
-    </message>
-    <message>
-        <source>✓ User-Agent settings saved and applied successfully!</source>
-        <translation type="vanished">✓ 用户代理设置已保存并成功应用！</translation>
-    </message>
-    <message>
-        <source>✓ Settings saved: %1</source>
-        <translation type="vanished">✓ 已保存的设置： %1</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/UserAgentSettingPage.qml" line="244"/>
         <source>No changes detected.</source>
         <translation>未检测到任何变化。</translation>
@@ -4020,115 +3758,118 @@ GDownload 由充满热情的开发人员维护，他们相信
 <context>
     <name>gdl::ui::browser::BrowserManagerImpl</name>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="163"/>
         <source>Invalid download link: %1</source>
-        <translation type="vanished">下载链接无效：%1</translation>
+        <translation>下载链接无效：%1</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="176"/>
         <source>Failed to add download task. Please check the link or aria2 connection.</source>
-        <translation type="vanished">添加下载任务失败。请检查链接或 aria2 连接。</translation>
+        <translation>添加下载任务失败。请检查链接或 aria2 连接。</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="177"/>
         <source>Failed to add download task: %1</source>
-        <translation type="vanished">添加下载任务失败：%1</translation>
+        <translation>添加下载任务失败：%1</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="202"/>
         <source>Torrent file does not exist: %1</source>
-        <translation type="vanished">种子文件不存在：%1</translation>
+        <translation>种子文件不存在：%1</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="208"/>
         <source>Failed to read torrent file: %1</source>
-        <translation type="vanished">读取种子文件失败：%1</translation>
+        <translation>读取种子文件失败：%1</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="222"/>
         <source>Failed to add torrent task. Please check the file or aria2 connection.</source>
-        <translation type="vanished">添加种子任务失败。请检查文件或 aria2 连接。</translation>
+        <translation>添加种子任务失败。请检查文件或 aria2 连接。</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="223"/>
         <source>Failed to add torrent task: %1</source>
-        <translation type="vanished">添加种子任务失败：%1</translation>
+        <translation>添加种子任务失败：%1</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="246"/>
         <source>Metalink file does not exist: %1</source>
-        <translation type="vanished">Metalink 文件不存在：%1</translation>
+        <translation>Metalink 文件不存在：%1</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="252"/>
         <source>Failed to read metalink file: %1</source>
-        <translation type="vanished">读取 Metalink 文件失败：%1</translation>
+        <translation>读取 Metalink 文件失败：%1</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="266"/>
         <source>Failed to add metalink task. Please check the file or aria2 connection.</source>
-        <translation type="vanished">添加 Metalink 任务失败。请检查文件或 aria2 连接。</translation>
+        <translation>添加 Metalink 任务失败。请检查文件或 aria2 连接。</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="267"/>
         <source>Failed to add metalink task: %1</source>
-        <translation type="vanished">添加 Metalink 任务失败：%1</translation>
+        <translation>添加 Metalink 任务失败：%1</translation>
     </message>
     <message>
-        <source>Failed to delete task: missing task id.</source>
-        <translation type="vanished">删除任务失败：缺少任务 ID。</translation>
+        <location filename="../../Browser/browser_manager.cxx" line="558"/>
+        <source>Failed to retry task: missing task id.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to delete task: stopped task list is not available.</source>
-        <translation type="vanished">删除任务失败：停止任务列表不可用。</translation>
+        <location filename="../../Browser/browser_manager.cxx" line="562"/>
+        <source>Failed to retry task: stopped task list is not available.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to delete task: task was not found.</source>
-        <translation type="vanished">删除任务失败：未找到任务。</translation>
+        <location filename="../../Browser/browser_manager.cxx" line="568"/>
+        <source>Failed to retry task: task was not found.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to delete task from aria2.</source>
-        <translation type="vanished">从 aria2 删除任务失败。</translation>
+        <location filename="../../Browser/browser_manager.cxx" line="572"/>
+        <source>Only failed tasks can be retried.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to delete task from aria2: %1</source>
-        <translation type="vanished">从 aria2 删除任务失败：%1</translation>
+        <location filename="../../Browser/browser_manager.cxx" line="578"/>
+        <source>Failed to retry task: original download link is unavailable.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to remove task from the stopped list.</source>
-        <translation type="vanished">从停止列表移除任务失败。</translation>
+        <location filename="../../Browser/browser_manager.cxx" line="604"/>
+        <source>Retry started, but the old failed task could not be removed from history.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Task was removed, but the downloaded file could not be deleted.</source>
-        <translation type="vanished">任务已移除，但无法删除已下载文件。</translation>
-    </message>
-    <message>
-        <source>Task was removed, but the downloaded file could not be deleted: %1</source>
-        <translation type="vanished">任务已移除，但无法删除已下载文件：%1</translation>
-    </message>
-    <message>
-        <source>Task was removed, but the aria2 control file could not be deleted.</source>
-        <translation type="vanished">任务已移除，但无法删除 aria2 控制文件。</translation>
-    </message>
-    <message>
-        <source>Task was removed, but the aria2 control file could not be deleted: %1</source>
-        <translation type="vanished">任务已移除，但无法删除 aria2 控制文件：%1</translation>
-    </message>
-    <message>
-        <source>Failed to delete tasks: stopped task list is not available.</source>
-        <translation type="vanished">删除任务失败：停止任务列表不可用。</translation>
-    </message>
-    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="1030"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1093"/>
         <source>Download failed. Please check the link or network connection.</source>
-        <translation type="vanished">下载失败。请检查链接或网络连接。</translation>
+        <translation>下载失败。请检查链接或网络连接。</translation>
     </message>
     <message>
+        <location filename="../../Browser/browser_manager.cxx" line="1031"/>
         <source>Download failed: %1</source>
-        <translation type="vanished">下载失败：%1</translation>
+        <translation>下载失败：%1</translation>
     </message>
 </context>
 <context>
     <name>gdl::ui::netdisk::AsyncTaskWorker</name>
     <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="189"/>
         <source>Failed to parse the share link.</source>
-        <translation type="vanished">解析分享链接失败</translation>
+        <translation>解析分享链接失败</translation>
     </message>
     <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="195"/>
         <source>Failed to retrieve download link information.</source>
-        <translation type="vanished">获取下载链接信息失败</translation>
+        <translation>获取下载链接信息失败</translation>
     </message>
     <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="201"/>
         <source>Failed to switch directory.</source>
-        <translation type="vanished">切换目录失败</translation>
+        <translation>切换目录失败</translation>
     </message>
 </context>
 <context>
