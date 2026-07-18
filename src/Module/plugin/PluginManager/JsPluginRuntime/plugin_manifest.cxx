@@ -152,9 +152,15 @@ namespace gdl {
 							error_out = "unsupported settings type: " + field.type;
 							return std::nullopt;
 						}
-						field.hint	   = item.value("hint", "");
-						field.required = item.value("required", false);
-						field.role	   = item.value("role", "");
+						// 可选字段类型可能被第三方 manifest 写错（如 required 传字符串），需捕获异常避免崩溃
+						try {
+							field.hint	   = item.value("hint", "");
+							field.required = item.value("required", false);
+							field.role	   = item.value("role", "");
+						} catch (const nlohmann::json::exception& e) {
+							error_out = std::string("settings item invalid field type: ") + e.what();
+							return std::nullopt;
+						}
 						if (!field.role.empty() && field.role != "token") {
 							error_out = "unsupported settings role: " + field.role;
 							return std::nullopt;
@@ -173,21 +179,31 @@ namespace gdl {
 							field.default_json = item["default"].dump();
 						}
 						if (item.contains("options") && item["options"].is_array()) {
-							field.options = item["options"].get<std::vector<std::string>>();
+							try {
+								field.options = item["options"].get<std::vector<std::string>>();
+							} catch (const nlohmann::json::exception& e) {
+								error_out = std::string("settings item invalid field type: ") + e.what();
+								return std::nullopt;
+							}
 						}
 						if (field.type == "select" && field.options.empty()) {
 							error_out = "settings select field requires non-empty options: " + field.key;
 							return std::nullopt;
 						}
-						// 本地化 label/hint
+						// 本地化 label/hint（同样需要防御字段类型错误）
 						if (item.contains("locales") && item["locales"].is_object()) {
 							for (auto it = item["locales"].begin(); it != item["locales"].end(); ++it) {
 								if (!it.value().is_object()) {
 									continue;
 								}
 								SettingFieldLocale locale_strings;
-								locale_strings.label	= it.value().value("label", "");
-								locale_strings.hint	= it.value().value("hint", "");
+								try {
+									locale_strings.label = it.value().value("label", "");
+									locale_strings.hint	 = it.value().value("hint", "");
+								} catch (const nlohmann::json::exception& e) {
+									error_out = std::string("settings item invalid field type: ") + e.what();
+									return std::nullopt;
+								}
 								field.locales[it.key()] = std::move(locale_strings);
 							}
 						}
