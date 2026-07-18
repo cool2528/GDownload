@@ -19,6 +19,7 @@ find_package(nlohmann_json CONFIG REQUIRED)
 find_package(boost_url CONFIG REQUIRED)
 find_package(qjs CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
+find_package(miniz CONFIG REQUIRED)
 if(APPLE)
     find_library(COREFOUNDATION_FRAMEWORK CoreFoundation)
     find_library(SECURITY_FRAMEWORK Security)
@@ -38,6 +39,7 @@ target_link_libraries(${PROJECT_NAME}
         OpenSSL::Crypto
         qjs
         spdlog::spdlog
+        miniz::miniz
 )
 # JS 插件运行时需要读取构建目录生成的 version.h（min_app_version 比对）
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/src)

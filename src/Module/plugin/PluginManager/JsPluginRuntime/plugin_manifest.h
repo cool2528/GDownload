@@ -1,5 +1,6 @@
 #pragma once
 #include <filesystem>
+#include <map>
 #include <optional>
 #include <string>
 #include <vector>
@@ -7,6 +8,12 @@
 namespace gdl {
 	namespace plugin {
 		namespace js {
+
+			// 单语言的本地化文案
+			struct LocaleStrings {
+				std::string display_name;
+				std::string description;
+			};
 
 			// manifest.json 的解析结果（设计文档 4.2 规范）
 			struct PluginManifest {
@@ -29,11 +36,30 @@ namespace gdl {
 
 				std::string min_app_version;
 
+				// 本地化文案：locale（如 zh_CN）-> {display_name, description}，缺失回退默认字段
+				std::map<std::string, LocaleStrings> locales;
+
 				// 插件目录（加载时填充，非 manifest 字段）
 				std::filesystem::path plugin_dir;
 
 				// 入口脚本绝对路径
 				std::filesystem::path EntryPath() const { return plugin_dir / entry; }
+
+				// 按 locale 取本地化 display_name/description，缺失回退默认
+				std::string LocalizedDisplayName(const std::string& locale) const {
+					auto it = locales.find(locale);
+					if (it != locales.end() && !it->second.display_name.empty()) {
+						return it->second.display_name;
+					}
+					return display_name;
+				}
+				std::string LocalizedDescription(const std::string& locale) const {
+					auto it = locales.find(locale);
+					if (it != locales.end() && !it->second.description.empty()) {
+						return it->second.description;
+					}
+					return description;
+				}
 			};
 
 			// 解析并校验 manifest.json

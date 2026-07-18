@@ -15,6 +15,9 @@ namespace gdl {
 			// data_dir 为插件数据根目录（存放 plugin_storage/ 与 plugin_cookies/）
 			bool LoadJsPlugins(const std::string& plugins_dir, const std::string& data_dir);
 
+			// 热重载：清空现有 JS 插件后重新扫描加载（市场安装/卸载/启用禁用后调用）
+			bool ReloadJsPlugins(const std::string& plugins_dir, const std::string& data_dir);
+
             std::vector<INetDiskDownloadPlugin::IDownloadPluginPtr> GetPluginsForUrl(std::string_view url);
             INetDiskDownloadPlugin::IDownloadPluginPtr GetPluginByName(std::string_view name);
 

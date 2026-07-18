@@ -2,20 +2,44 @@
     "manifest_version": 1,
     "name": "baidu-netdisk",
     "display_name": "Baidu NetDisk",
-    "version": "2.0.0",
+    "version": "2.0.2",
     "author": "GDownload Official",
     "description": "Parse Baidu netdisk share links (JS rewrite of the native Baidu plugin)",
     "homepage": "https://github.com/cool2528/GDownload",
     "entry": "main.js",
     "type": "netdisk",
     "url_patterns": [
-        "*://pan.baidu.com/s/*",
-        "*://pan.baidu.com/share/*"
+        "*://pan.baidu.com*"
     ],
     "permissions": {
-        "http": ["baidu.com", "pan.baidu.com", "*.baidupcs.com", "pcs.baidu.com", "tieba.baidu.com", "*.baidu.com"],
+        "http": [
+            "baidu.com",
+            "pan.baidu.com",
+            "*.baidupcs.com",
+            "pcs.baidu.com",
+            "tieba.baidu.com",
+            "*.baidu.com"
+        ],
         "storage": true,
         "verification_ui": true
     },
-    "min_app_version": "0.0.0"
+    "min_app_version": "0.0.0",
+    "locales": {
+        "zh_CN": {
+            "display_name": "百度网盘",
+            "description": "解析百度网盘分享链接（原生百度插件的 JS 重写版）"
+        },
+        "zh_TW": {
+            "display_name": "百度網盤",
+            "description": "解析百度網盤分享連結（原生百度外掛的 JS 重寫版）"
+        },
+        "ja_JP": {
+            "display_name": "Baidu ネットディスク",
+            "description": "Baidu ネットディスクの共有リンクを解析（ネイティブ Baidu プラグインの JS 移植版）"
+        },
+        "ko_KR": {
+            "display_name": "바이두 넷디스크",
+            "description": "바이두 넷디스크 공유 링크 파싱 (네이티브 바이두 플러그인의 JS 재작성판)"
+        }
+    }
 }
