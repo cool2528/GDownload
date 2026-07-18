@@ -94,6 +94,10 @@ static void TestManifestSettings(const fs::path& root) {
 	CHECK(!LoadWithSettings(root / "bad-role", R"([{ "key": "a", "type": "text", "role": "admin", "label": "x" }])", error));
 	// 10. 非法：缺 label
 	CHECK(!LoadWithSettings(root / "no-label", R"([{ "key": "a", "type": "text" }])", error));
+	// 11. 非法：required 类型错误（字符串而非 bool）不得抛异常，应拒绝加载
+	CHECK(!LoadWithSettings(root / "bad-required", R"([{ "key": "a", "type": "text", "label": "x", "required": "yes" }])", error));
+	// 12. 非法：options 元素类型错误（数字而非字符串）不得抛异常，应拒绝加载
+	CHECK(!LoadWithSettings(root / "bad-options", R"([{ "key": "a", "type": "select", "label": "x", "options": [1, 2] }])", error));
 }
 
 static void TestConfigStore(const fs::path& dir) {
