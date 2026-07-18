@@ -4,7 +4,7 @@ import QtQuick.Layouts
 import gdl.sdk
 
 // Element Plus 风格高级设置页面(A 类纯容器)
-// 仅作容器嵌入 9 个 B 类设置卡片,自身不承载设置项;
+// 仅作容器嵌入 8 个 B 类设置卡片,自身不承载设置项;
 // 颜色/尺寸/间距一律取自 GTheme 令牌,零魔法数字(原本地三常量已删除)
 Rectangle {
     id: advancedSetting
@@ -75,14 +75,6 @@ Rectangle {
 
             // Aria2 RPC 设置卡片
             Aria2RpcSettingPage {
-                Layout.fillWidth: true
-                Layout.minimumWidth: 0
-                Layout.leftMargin: GTheme.spaceLG
-                Layout.rightMargin: GTheme.spaceLG
-            }
-
-            // 百度网盘设置卡片
-            BaiduCookieSettingPage {
                 Layout.fillWidth: true
                 Layout.minimumWidth: 0
                 Layout.leftMargin: GTheme.spaceLG

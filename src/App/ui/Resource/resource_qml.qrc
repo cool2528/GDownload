@@ -60,7 +60,6 @@
         <file>qml/CommonComponents/TaskAdvancedOptionsCard.qml</file>
         <file>qml/CommonComponents/UpdateDialog.qml</file>
         <file>qml/CommonComponents/NetDiskPageView.qml</file>
-        <file>qml/Browser/BaiduCookieSettingPage.qml</file>
         <file>qml/Browser/TrackerServerSettingPage.qml</file>
         <file>qml/Browser/Aria2RpcSettingPage.qml</file>
         <file>qml/Browser/SpeedControlSettingPage.qml</file>
