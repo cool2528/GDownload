@@ -2,6 +2,7 @@
 #include <QApplication>
 #include "engine_startup_policy.h"
 #include <QQmlContext>
+#include <QStandardPaths>
 #include <QUrl>
 #include <filesystem>
 #include "Browser/browser_manager.h"
@@ -170,10 +171,15 @@ namespace gd {
 		}
 
         void MainWindow::InitNetDiskPlugins() {
-            auto current_path = QCoreApplication::applicationDirPath().toStdString();
-            auto res		  = gdl::plugin::DownloadPluginManager::Instance().LoadPlugins(current_path);
-            if (!res) {
-                LOG_ERR("load plugins fail")
+            // JS 脚本插件：<appdir>/plugins/ 下含 manifest.json 的子目录
+            // 插件数据（storage/cookies）落在应用数据目录
+            auto current_path	= QCoreApplication::applicationDirPath().toStdString();
+            auto js_plugins_dir = current_path + "/plugins";
+            auto data_dir =
+                QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString();
+            auto js_res = gdl::plugin::DownloadPluginManager::Instance().LoadJsPlugins(js_plugins_dir, data_dir);
+            if (!js_res) {
+                LOG_INFO("no js plugins loaded from {}", js_plugins_dir)
             }
         }
 

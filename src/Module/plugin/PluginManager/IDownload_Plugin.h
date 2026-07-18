@@ -78,9 +78,3 @@ class INetDiskDownloadPlugin {
     VerificationCallback verification_callback_{nullptr};
     MessageNotifyCallback message_notify_callback_{nullptr};
 };
-
-// Function pointer type for creating plugin instances
-typedef INetDiskDownloadPlugin* (*CreatePluginFunc)();
-
-// Function pointer type for destroying plugin instances
-typedef void (*DestroyPluginFunc)(INetDiskDownloadPlugin*);

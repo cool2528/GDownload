@@ -17,6 +17,8 @@ find_package(cpr CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(boost_url CONFIG REQUIRED)
+find_package(qjs CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 if(APPLE)
     find_library(COREFOUNDATION_FRAMEWORK CoreFoundation)
     find_library(SECURITY_FRAMEWORK Security)
@@ -24,17 +26,21 @@ endif()
 add_library(${PROJECT_NAME} SHARED ${SOURCES_FILES} ${HEADERS_FILES})
 register_target(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PRIVATE ${MODULE_INCLUDE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} 
-    PRIVATE 
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
         GDLCore
-        Boost::system 
-        Boost::property_tree 
-        Boost::asio 
-        cpr::cpr 
-        nlohmann_json::nlohmann_json 
+        Boost::system
+        Boost::property_tree
+        Boost::asio
+        cpr::cpr
+        nlohmann_json::nlohmann_json
         Boost::url
         OpenSSL::Crypto
+        qjs
+        spdlog::spdlog
 )
+# JS 插件运行时需要读取构建目录生成的 version.h（min_app_version 比对）
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/src)
 
 if(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -58,5 +64,4 @@ FOLDER "Plugin"
 
 add_dependencies(${PROJECT_NAME}
     GDLCore
-    Baidu_Plugin
 )

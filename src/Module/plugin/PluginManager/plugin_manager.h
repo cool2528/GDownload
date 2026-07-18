@@ -3,7 +3,6 @@
 #include <vector>
 #include "IDownload_Plugin.h"
 #include "PluginManager_export.h"
-#include "loader/plugin_loader.h"
 #include "singleton.hpp"
 namespace gdl {
 	namespace plugin {
@@ -11,44 +10,20 @@ namespace gdl {
 			SINGLETON_DECLARE(DownloadPluginManager)
 		   public:
 			~DownloadPluginManager() override;
-			struct LoadPluginOptions {
-				bool validate_signature = false;
-				std::vector<std::string> allowed_plugins_hash_list;
-				std::vector<std::string> blocked_plugins_hash_list;
-			};
 
-			bool LoadPlugins(const std::string& plugins_dir, const LoadPluginOptions& options = {});
+			// 加载 JS 脚本插件：扫描 plugins_dir 下含 manifest.json 的子目录
+			// data_dir 为插件数据根目录（存放 plugin_storage/ 与 plugin_cookies/）
+			bool LoadJsPlugins(const std::string& plugins_dir, const std::string& data_dir);
 
             std::vector<INetDiskDownloadPlugin::IDownloadPluginPtr> GetPluginsForUrl(std::string_view url);
             INetDiskDownloadPlugin::IDownloadPluginPtr GetPluginByName(std::string_view name);
 
 		   private:
-			bool LoadPlugin(const std::string& plugin_path, const LoadPluginOptions& options);
 			explicit DownloadPluginManager();
 
-            // 插件资源管理类 用于安全加载和卸载插件
-            class PluginResourceGuard {
-               public:
-                using Ptr = std::shared_ptr<PluginResourceGuard>;
-
-               public:
-                explicit PluginResourceGuard(const std::string& path);
-				~PluginResourceGuard() = default;
-                INetDiskDownloadPlugin::IDownloadPluginPtr GetPlugin() const { return plugin_; }
-                bool InitPlugin();
-
-               private:
-                // loader 共享所有权：plugin_ 的自定义 deleter 会持有其副本，
-                // 保证 guard 析构后、最后一个 plugin_ 引用释放前库仍存活，避免 UAF。
-                std::shared_ptr<loader::PluginLoader> loader_;
-                INetDiskDownloadPlugin::IDownloadPluginPtr plugin_;
-                CreatePluginFunc create_plugin_{nullptr};
-                DestroyPluginFunc destroy_plugin_{nullptr};
-                std::string path_;
-			};
-
 		   private:
-            std::vector<PluginResourceGuard::Ptr> plugins_;
+            // JS 脚本插件列表（JsPluginHost 实例）
+            std::vector<INetDiskDownloadPlugin::IDownloadPluginPtr> js_plugins_;
 			std::mutex mutex_;
 		};
 	}  // namespace plugin
