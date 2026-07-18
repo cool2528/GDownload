@@ -364,7 +364,7 @@ class TstAuroraInputControlsContract : public QObject {
         QVERIFY(taskDialog.contains(QStringLiteral("objectName: \"taskDialogValidationAlert\"")));
 
         const QString netDisk = readComponent(QStringLiteral("NetDiskPageView.qml"));
-        QVERIFY(netDisk.contains(QStringLiteral("Accessible.name: qsTr(\"Baidu share link\")")));
+        QVERIFY(netDisk.contains(QStringLiteral("Accessible.name: qsTr(\"Cloud share link\")")));
         QVERIFY(netDisk.contains(QStringLiteral("Accessible.name: qsTr(\"Select %1\").arg(model.fileName)")));
         QVERIFY(netDisk.contains(QStringLiteral("Keys.onReturnPressed")));
         QVERIFY(netDisk.contains(QStringLiteral("Keys.onEnterPressed")));
