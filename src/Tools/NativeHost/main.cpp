@@ -148,8 +148,19 @@ bool IsAppRunning(int port) {
 #endif
 }
 
-// 唤起 GDownload 主程序（与 host 同目录或上级目录查找 GDownload 可执行文件）
-bool LaunchApp() {
+#ifdef _WIN32
+// UTF-8 -> 宽字符
+std::wstring Utf8ToWide(const std::string& s) {
+	if (s.empty()) return std::wstring();
+	const int n = ::MultiByteToWideChar(CP_UTF8, 0, s.data(), static_cast<int>(s.size()), nullptr, 0);
+	std::wstring w(static_cast<size_t>(n), L'\0');
+	::MultiByteToWideChar(CP_UTF8, 0, s.data(), static_cast<int>(s.size()), w.data(), n);
+	return w;
+}
+#endif
+
+// 以指定参数唤起 GDownload 主程序（与 host 同目录或上级目录查找可执行文件）
+bool LaunchAppWithArgs(const std::wstring& args) {
 #ifdef _WIN32
 	wchar_t module_path[MAX_PATH] = {0};
 	if (::GetModuleFileNameW(nullptr, module_path, MAX_PATH) == 0) {
@@ -163,17 +174,23 @@ bool LaunchApp() {
 	// 依次尝试同目录、上级目录下的 GDownload 可执行文件（Windows 大小写不敏感）
 	const std::wstring candidates[] = {dir + L"\\gdownload.exe", dir + L"\\..\\gdownload.exe"};
 	for (const auto& exe : candidates) {
-		// --silent：静默启动到系统托盘（浏览器扩展唤起时不打扰用户）
 		const HINSTANCE result =
-			::ShellExecuteW(nullptr, L"open", exe.c_str(), L"--silent", dir.c_str(), SW_SHOWNORMAL);
+			::ShellExecuteW(nullptr, L"open", exe.c_str(), args.empty() ? nullptr : args.c_str(), dir.c_str(),
+							SW_SHOWNORMAL);
 		if (reinterpret_cast<INT_PTR>(result) > 32) {
 			return true;
 		}
 	}
 	return false;
 #else
+	(void)args;
 	return false;  // 非 Windows 平台后续补
 #endif
+}
+
+// --silent：静默启动到系统托盘（浏览器扩展唤起时不打扰用户）
+bool LaunchApp() {
+	return LaunchAppWithArgs(L"--silent");
 }
 
 json HandleMessage(const json& in) {
@@ -194,8 +211,18 @@ json HandleMessage(const json& in) {
 		return json{{"type", "pong"}};
 	}
 	if (type == "parseShare") {
-		// T4.1 网盘解析转发：需主程序单实例 IPC 接收，当前尚未实现，返回未支持
-		return json{{"type", "parseShareResult"}, {"ok", false}, {"error", "not_implemented"}};
+		// 网盘解析转发：把分享 URL 作为参数唤起主程序，单实例转发给运行中的实例打开通用解析页
+		const std::string share_url = in.value("shareUrl", "");
+		if (share_url.empty()) {
+			return json{{"type", "parseShareResult"}, {"ok", false}, {"error", "empty_url"}};
+		}
+#ifdef _WIN32
+		const std::wstring quoted = L"\"" + Utf8ToWide(share_url) + L"\"";
+		const bool ok = LaunchAppWithArgs(quoted);
+#else
+		const bool ok = false;
+#endif
+		return json{{"type", "parseShareResult"}, {"ok", ok}};
 	}
 	return json{};  // 未知类型：不回复（返回空对象，由调用方跳过）
 }
