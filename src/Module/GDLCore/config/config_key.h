@@ -61,6 +61,7 @@ namespace gdl {
             CONFIG_PATH(EnableGithubAccelerate, "general.enable-github-accelerate", "false");
             CONFIG_PATH(WindowPosition, "general.window-position", "");
             CONFIG_PATH(BaiduPanCookies, "plugin.baidu-pan-cookies", "");
+            CONFIG_PATH(PluginSourceProxy, "plugin.source-proxy", "");
 			CONFIG_PATH(TrackerSourceNames,"aria2c.tracker_source_name","");
 			CONFIG_PATH(EnableTrackerSourceAutoUpdate,"aria2c.enable_tracker_source_auto_update","true");
 			CONFIG_PATH(ShowCloseConfirm, "general.show-close-confirm", "true");
@@ -124,6 +125,7 @@ namespace gdl {
                                              EnableGithubAccelerate.get(),
                                              WindowPosition.get(),
                                              BaiduPanCookies.get(),
+                                             PluginSourceProxy.get(),
 									         TrackerSourceNames.get(),
 											 EnableTrackerSourceAutoUpdate.get(),
 											 ShowCloseConfirm.get(),
@@ -181,6 +183,7 @@ namespace gdl {
                                              EnableGithubAccelerate.val(),
                                              WindowPosition.val(),
                                              BaiduPanCookies.val(),
+                                             PluginSourceProxy.val(),
 											 TrackerSourceNames.val(),
 											 EnableTrackerSourceAutoUpdate.val(),
 											 ShowCloseConfirm.val(),

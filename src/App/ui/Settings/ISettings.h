@@ -46,6 +46,8 @@ namespace gdl {
 				virtual void	 SetGlobalProxy(QString value)	  = 0;
 				virtual QString GetBaiduPanCookies() const		  = 0;
 				virtual void	 SetBaiduPanCookies(QString value)  = 0;
+				virtual QString GetPluginSourceProxy() const	  = 0;
+				virtual void	 SetPluginSourceProxy(QString value) = 0;
 
 				// 端口与 RPC
 				virtual int GetListenPort() const				  = 0;

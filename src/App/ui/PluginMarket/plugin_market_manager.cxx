@@ -7,6 +7,7 @@
 
 #include "GDLCore/logger.h"
 #include "PluginManager/plugin_manager.h"
+#include "Settings/settings_manager.h"
 #include "language/language_manager.h"
 
 namespace gdl {
@@ -143,14 +144,15 @@ namespace gdl {
 			}
 
 			std::vector<std::string> PluginMarketManager::RegistryUrls() const {
-				// registry.json 是可变索引：raw（5 分钟缓存，破缓存有效）优先，
-				// 其次 ghproxy 代理 raw（同样较新），jsDelivr 放最后（按 path 缓存、忽略查询参数，最易滞后）
+				// registry.json 是可变索引：以 raw 为基准，ExpandMirrorUrls 自动补齐中国可达镜像
+				// （ghproxy 系前缀 + jsDelivr 各节点）与用户自定义代理前缀
 				const std::string repo = "cool2528/gdownload-plugin-registry";
-				return {
+				const std::vector<std::string> base = {
 					"https://raw.githubusercontent.com/" + repo + "/main/registry.json",
-					"https://ghproxy.net/https://raw.githubusercontent.com/" + repo + "/main/registry.json",
-					"https://cdn.jsdelivr.net/gh/" + repo + "@main/registry.json",
 				};
+				const std::string proxy =
+					settings::Settings::Instance().GetPluginSourceProxy().toStdString();
+				return gdl::market::ExpandMirrorUrls(base, proxy);
 			}
 
 			void PluginMarketManager::SetBusy(bool busy) {
@@ -176,6 +178,7 @@ namespace gdl {
 				}
 				// 离线优先：先用本地已装插件立即填充模型，再后台拉取注册表
 				SyncLocale();  // 读取当前界面语言，用于本地化插件名称/描述
+				service_->SetUserProxy(settings::Settings::Instance().GetPluginSourceProxy().toStdString());
 				RefreshModelFromLocal();
 				SetBusy(true);
 				auto urls  = RegistryUrls();
@@ -228,6 +231,7 @@ namespace gdl {
 					return;
 				}
 				SetBusy(true);
+				service_->SetUserProxy(settings::Settings::Instance().GetPluginSourceProxy().toStdString());
 				model_->SetBusy(name, 0, QStringLiteral("starting"));
 				std::thread([this, name, target_name, version]() {
 					std::string err;

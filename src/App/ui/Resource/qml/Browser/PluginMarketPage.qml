@@ -15,6 +15,9 @@ Item {
     // 配置修订号：保存/清除插件配置后自增，强制重算依赖 hasSchema 的绑定
     property int configRevision: 0
 
+    // 是否展开「插件源代理」配置行
+    property bool showSourceConfig: false
+
     // 状态枚举（与 C++ InstallState / Busy 对齐）
     readonly property int stAvailable: 0
     readonly property int stInstalled: 1
@@ -79,6 +82,20 @@ Item {
                 placeholderText: qsTr("Search plugins…")
             }
 
+            // 源设置：展开/收起「插件源代理」配置行（大陆用户可填 GitHub 代理前缀）
+            GButton {
+                Layout.preferredWidth: 36
+                Layout.preferredHeight: 36
+                iconName: "settings"
+                variant: "default"
+                checkable: true
+                checked: root.showSourceConfig
+                Accessible.name: qsTr("Plugin source settings")
+                ToolTip.visible: hovered
+                ToolTip.text: qsTr("Plugin source settings")
+                onClicked: root.showSourceConfig = !root.showSourceConfig
+            }
+
             // 刷新按钮：刷新时图标显式旋转（不依赖 BusyIndicator 样式，保证动起来）
             GButton {
                 id: refreshBtn
@@ -99,6 +116,37 @@ Item {
                     to: 360
                     duration: 900
                     onRunningChanged: if (!running) refreshBtn.rotation = 0
+                }
+            }
+        }
+
+        // ---- 插件源代理配置行（可折叠）----
+        RowLayout {
+            Layout.fillWidth: true
+            visible: root.showSourceConfig
+            spacing: GTheme.spaceSM
+
+            Text {
+                text: qsTr("Source proxy")
+                color: GTheme.textSecondary
+                font.pixelSize: GTheme.fontBody
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            GTextField {
+                id: proxyField
+                Layout.fillWidth: true
+                text: SettingsManager.qPluginSourceProxy
+                placeholderText: qsTr("Optional GitHub proxy prefix for China, e.g. https://ghfast.top/")
+                onEditingFinished: SettingsManager.SetPluginSourceProxy(text)
+            }
+
+            GButton {
+                text: qsTr("Apply & Refresh")
+                buttonType: "primary"
+                onClicked: {
+                    SettingsManager.SetPluginSourceProxy(proxyField.text)
+                    PluginMarketManager.refresh()
                 }
             }
         }

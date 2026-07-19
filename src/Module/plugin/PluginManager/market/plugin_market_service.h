@@ -69,6 +69,9 @@ namespace gdl {
 			// 设置当前界面语言（如 zh_CN），用于本地化插件名称/描述；空表示默认（英文）
 			void SetLocale(const std::string& locale) { locale_ = locale; }
 
+			// 设置用户自定义源代理前缀（如 https://ghfast.top/），下载时对 GitHub 系 URL 生效；空表示不用
+			void SetUserProxy(const std::string& proxy) { user_proxy_ = proxy; }
+
 			// 从多源拉取并解析 registry.json（按序回退，单源超时切换）
 			bool FetchRegistry(const std::vector<std::string>& registry_urls, std::string& error_out);
 
@@ -104,7 +107,8 @@ namespace gdl {
 			std::filesystem::path plugins_dir_;
 			std::filesystem::path data_dir_;
 			std::vector<RegistryPlugin> registry_;
-			std::string locale_;  // 当前界面语言
+			std::string locale_;	   // 当前界面语言
+			std::string user_proxy_;   // 用户自定义源代理前缀（可空）
 		};
 
 		// ---- 校验原语（也供测试直接调用）----
@@ -112,6 +116,12 @@ namespace gdl {
 		PluginManager_API std::string Sha256Hex(const std::string& bytes);
 		// 用内置 Ed25519 公钥验证签名（base64）对 bytes 是否有效
 		PluginManager_API bool VerifyEd25519(const std::string& bytes, const std::string& signature_base64);
+
+		// 把基础 URL 列表扩展为更多镜像（GitHub raw/release/jsDelivr 的中国可达镜像 + 用户代理前缀），
+		// 保序去重。user_proxy 非空时对 GitHub 系 URL 追加 <proxy>+<url> 变体（放在最前）。
+		// 供注册表拉取与插件下载共用。
+		PluginManager_API std::vector<std::string> ExpandMirrorUrls(const std::vector<std::string>& base,
+																   const std::string& user_proxy);
 
 	}  // namespace market
 }  // namespace gdl
