@@ -49,7 +49,6 @@ namespace gdl {
                 SETTING_PROPERTY(bool, EnableGithubAccelerate)
                 SETTING_PROPERTY(QPoint, WindowPosition)
                 SETTING_PROPERTY(QString, BaiduPanCookies)
-                SETTING_PROPERTY(QString, PluginSourceProxy)
                 SETTING_PROPERTY(QString, TrackerSourceNames)
                 SETTING_PROPERTY(bool, EnableTrackerSourceAutoUpdate)
                 SETTING_PROPERTY(bool, ShowCloseConfirm)
@@ -73,6 +72,9 @@ namespace gdl {
                 SETTING_PROPERTY(bool, EnableDht)
                 SETTING_PROPERTY(int, BtMaxPeers)
                 SETTING_PROPERTY(bool, BtRequireCrypto)
+                // 追加在属性列表末尾:新增 Q_PROPERTY/Q_INVOKABLE 不移动已有 moc 索引,
+                // 避免增量构建下 QML 元调用错位(读取属性时错调到其它 getter 导致类型混淆崩溃)
+                SETTING_PROPERTY(QString, PluginSourceProxy)
 
                public:
                 ~SettingsImpl() override;
