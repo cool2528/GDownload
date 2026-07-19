@@ -1,0 +1,16 @@
+{
+  "name": "ed2k-engine",
+  "version": "2.3.0",
+  "description": "Self-implemented eD2k/eMule protocol engine (ed2k::core)",
+  "homepage": "https://github.com/cool2528/ed2k-engine-cpp",
+  "license": "MIT",
+  "dependencies": [
+    "zlib",
+    "tl-expected",
+    "openssl",
+    "spdlog",
+    { "name": "boost-asio", "features": ["ssl"] },
+    { "name": "vcpkg-cmake", "host": true },
+    { "name": "vcpkg-cmake-config", "host": true }
+  ]
+}
