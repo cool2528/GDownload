@@ -27,8 +27,6 @@
 #include "theme/theme.h"
 #include "toast/toast_manager.h"
 #include "update/update_manager.h"
-#include "utils/install_guide_manager.h"
-#include "utils/native_host_registrar.h"
 #include "utils/single_instance.h"
 #include "utils/utils.h"
 #include "version.h"
@@ -51,46 +49,31 @@ namespace gd {
 			QApplication::setApplicationName("gdownload");
 			QApplication app(argc, argv);
 
-			// 命令行解析：--silent 静默启动到托盘；位置参数为网盘分享 URL（供浏览器扩展交接）
+			// 命令行解析：--silent 静默启动到系统托盘
 			QCommandLineParser cmd_parser;
 			const QCommandLineOption silent_option(QStringLiteral("silent"),
 												   QStringLiteral("Start minimized to system tray"));
 			cmd_parser.addOption(silent_option);
-			cmd_parser.addPositionalArgument(QStringLiteral("url"), QStringLiteral("Netdisk share URL to open"));
 			cmd_parser.parse(app.arguments());  // 容错解析，不用 process 以免未知项时退出
 			const bool start_silent = cmd_parser.isSet(silent_option);
-			const QStringList positional_args = cmd_parser.positionalArguments();
-			const QString open_url = positional_args.isEmpty() ? QString() : positional_args.first();
 
-			// 单实例：已有实例在运行则把参数转发给它后退出，避免多开
+			// 单实例：已有实例在运行则退出，避免多开（并通知主实例提升窗口）
 			gd::ui::SingleInstanceGuard instance_guard(QStringLiteral("gdownload-single-instance"));
 			if (!instance_guard.tryBecomePrimary()) {
-				QStringList forward_args;
-				if (start_silent) forward_args << QStringLiteral("--silent");
-				if (!open_url.isEmpty()) forward_args << open_url;
-				instance_guard.sendToPrimary(forward_args);
-				LOG_INFO("another GDownload instance is running, forwarded args and exiting");
+				instance_guard.sendToPrimary(QStringList());
+				LOG_INFO("another GDownload instance is running, exiting");
 				return 0;
 			}
-			// 主实例：收到后续实例转发的参数 -> 提升窗口 + 打开网盘解析页
+			// 主实例：收到后续实例通知 -> 提升主窗口
 			QObject::connect(&instance_guard, &gd::ui::SingleInstanceGuard::messageReceived, &app,
-							 [](const QStringList& args) {
-								 QString url;
-								 for (const QString& a : args) {
-									 if (!a.startsWith(QStringLiteral("--"))) {
-										 url = a;
-										 break;
-									 }
-								 }
-								 gdl::ui::browser::BrowserManagerImpl::Instance().TriggerExternalActivate(url);
+							 [](const QStringList&) {
+								 gdl::ui::browser::BrowserManagerImpl::Instance().TriggerActivateWindow();
 							 });
 
 			InitIcon(&app);
 			QQmlApplicationEngine engine;
 			if (!gdl::ui::isTestMode()) {
 				InitNetDiskPlugins();
-				// 自注册 Native Messaging host（幂等，per-user，无需管理员），使浏览器扩展可发现并唤起 host
-				gd::ui::NativeHostRegistrar::EnsureRegistered();
 			}
 			InitQmlEngine(&engine);
 			// 供 QML 读取：是否静默启动到托盘（--silent）
@@ -101,13 +84,6 @@ namespace gd {
 			const QUrl url(QStringLiteral("qrc:/qml/mainWindow.qml"));
 			engine.addImportPath(QStringLiteral("qrc:/qml"));
 			engine.load(url);
-			// 本实例启动时携带的网盘 URL：入队等事件循环+QML 就绪后触发
-			if (!open_url.isEmpty()) {
-				QMetaObject::invokeMethod(
-					&app,
-					[open_url]() { gdl::ui::browser::BrowserManagerImpl::Instance().TriggerExternalActivate(open_url); },
-					Qt::QueuedConnection);
-			}
 			const auto code = app.exec();
 			// 事件循环结束后先销毁 QML 根对象，取消 ListView 等仍在孵化的委托。
 			// Managers 必须保持到 QML 对象析构完成，避免析构期绑定访问已反初始化的单例。
@@ -158,8 +134,6 @@ namespace gd {
 			qmlRegisterSingletonInstance<gdl::ui::market::PluginConfigManager>(
 				GEXPORT_MODULE_URL, 1, 0, "PluginConfigManager",
 				&gdl::ui::market::PluginConfigManager::Instance());
-			qmlRegisterSingletonInstance<gd::ui::InstallGuideManager>(
-				GEXPORT_MODULE_URL, 1, 0, "InstallGuideManager", &gd::ui::InstallGuideManager::Instance());
 			// 启动期副作用:测试模式下跳过 aria2c 子进程、自动更新 HTTP
 			if (!is_test) {
 				// aria2c 引擎初始化(原 browser_manager.cxx RegisterTypes 内的逻辑)

@@ -166,8 +166,9 @@ check_translations.sh
 setup_env.sh
 .superpowers/
 tools/
-# 显式纳入源码目录 src/Tools（Windows 大小写不敏感下会被上面的 tools/ 误伤）
-!/src/Tools/
 
 # 嵌套的插件市场注册表仓库（独立 git 仓库，不纳入主仓库跟踪）
 gdownload-plugin-registry/
+
+# Playwright MCP 临时快照/日志
+.playwright-mcp/
