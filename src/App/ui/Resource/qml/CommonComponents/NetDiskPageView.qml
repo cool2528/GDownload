@@ -62,6 +62,15 @@ Rectangle {
             noPluginMatched = false
     }
 
+    // 外部预填分享 URL 并立即解析（浏览器扩展交接入口）
+    function loadUrl(url) {
+        if (!url || url.length === 0)
+            return
+        parseMode = true
+        urlInput.text = url
+        parseShareLink()
+    }
+
     function parseShareLink() {
         var url = Utils.removeNewlineAndTrim(urlInput.text)
         refreshMatches()

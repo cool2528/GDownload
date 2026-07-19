@@ -33,7 +33,10 @@ FramelessWindow{
             mainWindow.width = SettingsManager.qWindowSize.width
             mainWindow.height = SettingsManager.qWindowSize.height
         }
-        mainWindow.visible = true;
+        // --silent 静默启动：不显示主窗口，仅驻留系统托盘（供 host launch 静默唤起）
+        if (typeof gAppStartSilent === "undefined" || !gAppStartSilent) {
+            mainWindow.visible = true;
+        }
         if(Qt.platform.os === "osx"){
             UtilsToolsManager.HideMacOsxWindowStandardButtons(mainWindow)
         }
@@ -184,6 +187,19 @@ FramelessWindow{
                 onTriggered: {
                     Qt.quit()
                 }
+            }
+        }
+    }
+
+    // 外部激活（次实例转发 / 浏览器扩展 host）：提升窗口，携带网盘 URL 则打开添加任务对话框
+    Connections {
+        target: BrowserManager
+        function onSigExternalActivate(shareUrl) {
+            mainWindow.showNormal()
+            mainWindow.raise()
+            mainWindow.requestActivate()
+            if (shareUrl && shareUrl.length > 0) {
+                navigator_view.addDownloadTask(shareUrl)
             }
         }
     }

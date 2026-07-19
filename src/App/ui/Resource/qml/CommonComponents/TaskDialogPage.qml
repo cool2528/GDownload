@@ -20,7 +20,23 @@ Popup {
     // 打开时预选的标签页:0=URL,1=Torrent,2=Cloud Drive。
     // 供下载页空状态快捷入口(Add URL / Torrent / Cloud Drive)按入口类型直达对应标签。
     property int initialTab: 0
+    // 外部（浏览器扩展）交接的初始 URL：网盘分享则切到 Cloud Drive 页并解析，否则填入 URL 页
+    property string initialUrl: ""
     property string validationMessage: ""
+
+    // 外部交接 URL 路由：网盘分享切到 Cloud Drive 页并解析，否则填入 URL 页
+    Component.onCompleted: {
+        if (initialUrl && initialUrl.length > 0) {
+            var matched = NetWorkDiskManager.MatchPlugins(initialUrl)
+            if (matched && matched.length > 0) {
+                tabNavigation.currentIndex = 2   // Cloud Drive（网盘）
+                netDiskPageView.loadUrl(initialUrl)
+            } else {
+                tabNavigation.currentIndex = 0   // URL
+                input.text = initialUrl
+            }
+        }
+    }
 
     // 页面级布局常量:对话框宽度和内容高度只服务本弹窗,不是通用设计令牌
     readonly property int dialogWidth: 720
