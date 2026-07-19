@@ -1,0 +1,68 @@
+{
+    "manifest_version": 1,
+    "name": "pan123-netdisk",
+    "display_name": "123 Pan",
+    "version": "1.0.0",
+    "author": "GDownload Official",
+    "description": "Parse 123pan share links (anonymous listing, login token for downloads)",
+    "homepage": "https://github.com/cool2528/GDownload",
+    "entry": "main.js",
+    "type": "netdisk",
+    "url_patterns": [
+        "*://*.123pan.com*",
+        "*://*.123pan.cn*",
+        "*://*.123684.com*",
+        "*://*.123865.com*",
+        "*://*.123912.com*",
+        "*://*.123952.com*",
+        "*://*.123684.cn*"
+    ],
+    "permissions": {
+        "http": [
+            "*.123pan.com", "*.123pan.cn", "123pan.com", "123pan.cn",
+            "*.123684.com", "*.123865.com", "*.123912.com", "*.123952.com",
+            "*.123624.com", "*.123254.com", "*.123957.com", "*.123295.com",
+            "*.123860.com", "*.123245.com", "*.123278.com", "*.123842.com",
+            "*.123294.com", "*.123773.com", "*.123641.com", "*.123259.com",
+            "*.123652.com", "*.123635.com", "*.123242.com", "*.123795.com",
+            "*.123nav.com", "*.123pan.net"
+        ],
+        "storage": false,
+        "verification_ui": false
+    },
+    "settings": [
+        {
+            "key": "token",
+            "type": "password",
+            "required": false,
+            "role": "token",
+            "label": "123pan Login Token",
+            "hint": "Optional. Browsing works without it; downloading requires a login token (from a logged-in 123pan web session)",
+            "locales": {
+                "zh_CN": { "label": "123云盘登录 Token", "hint": "可选。浏览无需 Token；下载需要登录 Token（从已登录的 123pan 网页会话获取）" },
+                "zh_TW": { "label": "123雲盤登入 Token", "hint": "可選。瀏覽無需 Token；下載需要登入 Token（從已登入的 123pan 網頁會話取得）" },
+                "ja_JP": { "label": "123pan ログイン Token", "hint": "任意。閲覧は不要；ダウンロードにはログイン Token が必要（ログイン済み 123pan セッションから取得）" },
+                "ko_KR": { "label": "123pan 로그인 Token", "hint": "선택. 탐색은 불필요；다운로드에는 로그인 Token 필요（로그인된 123pan 웹 세션에서 획득）" }
+            }
+        }
+    ],
+    "min_app_version": "0.0.0",
+    "locales": {
+        "zh_CN": {
+            "display_name": "123云盘",
+            "description": "解析 123 云盘分享链接（浏览免登录，下载需登录 Token）"
+        },
+        "zh_TW": {
+            "display_name": "123雲盤",
+            "description": "解析 123 雲盤分享連結（瀏覽免登入，下載需登入 Token）"
+        },
+        "ja_JP": {
+            "display_name": "123 パン",
+            "description": "123pan の共有リンクを解析（閲覧はログイン不要、ダウンロードには Token が必要）"
+        },
+        "ko_KR": {
+            "display_name": "123 클라우드",
+            "description": "123pan 공유 링크 파싱 (탐색은 로그인 불필요, 다운로드는 Token 필요)"
+        }
+    }
+}
