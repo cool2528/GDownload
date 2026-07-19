@@ -7,6 +7,9 @@ const API_HOST = "https://api.alipan.com";
 const AUTH_HOST = "https://auth.alipan.com";
 const REFERER = "https://www.alipan.com/";
 const X_CANARY = "client=web,app=share,version=v2.3.1";
+// 设备签名(过下载风控)用的 Android canary 与 appId
+const CANARY_SIGN = "client=Android,app=adrive,version=v4.1.0";
+const SIGN_APP_ID = "5dde4e1bdf9e4966b387ba58f4b3fdc3";
 const UA =
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) " +
     "Chrome/114.0.0.0 Safari/537.36";
@@ -24,6 +27,181 @@ export class AliApi {
         this.shareToken = "";
         // file_id -> drive_id(取直链需要)
         this.driveByFid = {};
+        // 设备签名会话(下载风控)
+        this.userId = "";
+        this.deviceId = "";
+        this.signature = "";
+        this.myDriveId = "";
+        this.deviceReady = false;
+    }
+
+    // 随机 UUID v4(x-request-id 用)
+    uuid() {
+        const hex = "0123456789abcdef";
+        let u = "";
+        for (let i = 0; i < 36; i++) {
+            if (i === 8 || i === 13 || i === 18 || i === 23) u += "-";
+            else if (i === 14) u += "4";
+            else if (i === 19) u += hex[(Math.floor(Math.random() * 4) + 8)];
+            else u += hex[Math.floor(Math.random() * 16)];
+        }
+        return u;
+    }
+
+    // 建立设备签名会话:取 user_id -> 确定性派生设备密钥/公钥/签名 -> create_session 注册
+    // deviceId 与私钥同源 = SHA256(userId);nonce 恒为 0,故签名值恒定
+    async ensureDeviceSession() {
+        if (this.deviceReady) return true;
+        if (!(await this.ensureAccessToken())) return false;
+
+        // 取 user_id(Authorization 用 Bearer + TAB,阿里的隐蔽约定)
+        const uResp = await this.postRetry(API_HOST + "/v2/user/get", {
+            json: {},
+            headers: this.baseHeaders({
+                "Authorization": "Bearer\t" + this.accessToken,
+                "X-Canary": CANARY_SIGN,
+            }),
+            timeout: 15000,
+        }, "user_get");
+        if (!uResp || uResp.status !== 200) {
+            gdl.log.warn("ali user/get failed");
+            return false;
+        }
+        let udoc;
+        try {
+            udoc = uResp.json();
+        } catch (e) {
+            return false;
+        }
+        if (typeof udoc.user_id !== "string" || !udoc.user_id) {
+            gdl.log.warn("ali user_id missing");
+            return false;
+        }
+        this.userId = udoc.user_id;
+        this.myDriveId = typeof udoc.default_drive_id === "string" ? udoc.default_drive_id : "";
+
+        // 确定性派生:seed = SHA256(userId) 既是 deviceId 也是私钥标量
+        const seed = gdl.crypto.sha256(this.userId);
+        this.deviceId = seed;
+        const pubKey = gdl.crypto.secp256k1PubKey(seed);
+        const signMsg = SIGN_APP_ID + ":" + seed + ":" + this.userId + ":0";
+        this.signature = gdl.crypto.secp256k1Sign(seed, gdl.crypto.sha256(signMsg));
+
+        const cResp = await this.postRetry(API_HOST + "/users/v1/users/device/create_session", {
+            json: {
+                deviceName: "samsung",
+                modelName: "SM-G9810",
+                nonce: 0,
+                pubKey: pubKey,
+                refreshToken: this.refreshToken,
+            },
+            headers: this.baseHeaders({
+                "Authorization": "Bearer\t" + this.accessToken,
+                "X-Signature": this.signature,
+                "X-Device-Id": this.deviceId,
+                "X-Canary": CANARY_SIGN,
+                "x-request-id": this.uuid(),
+            }),
+            timeout: 15000,
+        }, "create_session");
+        if (!cResp || cResp.status !== 200) {
+            gdl.log.warn("ali create_session http " + (cResp ? cResp.status : "null"));
+            return false;
+        }
+        let cdoc;
+        try {
+            cdoc = cResp.json();
+        } catch (e) {
+            cdoc = {};
+        }
+        if (cdoc.code) {
+            gdl.log.warn("ali create_session error: " + cdoc.code);
+            return false;
+        }
+        this.deviceReady = true;
+        return true;
+    }
+
+    // 设备签名请求头(个人端点需要):Bearer+TAB + X-Device-Id + X-Signature + Android canary
+    signedHeaders(extra) {
+        return this.baseHeaders(Object.assign({
+            "Authorization": "Bearer\t" + this.accessToken,
+            "X-Device-Id": this.deviceId,
+            "X-Signature": this.signature,
+            "X-Canary": CANARY_SIGN,
+            "x-request-id": this.uuid(),
+        }, extra || {}));
+    }
+
+    // 转存分享文件到自己网盘(batch copy),返回自己网盘里的新 file_id
+    async transferShareFile(info) {
+        const resp = await this.postRetry(API_HOST + "/adrive/v2/batch", {
+            json: {
+                requests: [{
+                    body: {
+                        file_id: info.file_id,
+                        share_id: this.shareId,
+                        auto_rename: true,
+                        to_parent_file_id: "root",
+                        to_drive_id: this.myDriveId,
+                    },
+                    headers: { "Content-Type": "application/json" },
+                    id: "0",
+                    method: "POST",
+                    url: "/file/copy",
+                }],
+                resource: "file",
+            },
+            headers: this.signedHeaders({ "x-share-token": this.shareToken }),
+            timeout: 15000,
+        }, "transfer");
+        if (!resp || resp.status !== 200) {
+            gdl.log.warn("ali transfer http " + (resp ? resp.status : "null"));
+            return null;
+        }
+        let doc;
+        try {
+            doc = resp.json();
+        } catch (e) {
+            return null;
+        }
+        const responses = Array.isArray(doc.responses) ? doc.responses : [];
+        if (responses.length && responses[0].body && typeof responses[0].body.file_id === "string") {
+            return responses[0].body.file_id;
+        }
+        gdl.log.warn("ali transfer no file_id (folder or failed)");
+        return null;
+    }
+
+    // 个人网盘取下载直链(设备签名端点)
+    async getPersonalDownloadUrl(fileId) {
+        const resp = await this.postRetry(API_HOST + "/v2/file/get_download_url", {
+            json: { drive_id: this.myDriveId, file_id: fileId },
+            headers: this.signedHeaders(),
+            timeout: 15000,
+        }, "get_download_url");
+        if (!resp || resp.status !== 200) {
+            gdl.log.warn("ali get_download_url http " + (resp ? resp.status : "null"));
+            return null;
+        }
+        let doc;
+        try {
+            doc = resp.json();
+        } catch (e) {
+            return null;
+        }
+        return typeof doc.url === "string" && doc.url ? doc.url : null;
+    }
+
+    // 清理转存文件(移入回收站,best effort)
+    async deleteOwnFile(fileId) {
+        try {
+            await this.postRetry(API_HOST + "/v2/recyclebin/trash", {
+                json: { drive_id: this.myDriveId, file_id: fileId },
+                headers: this.signedHeaders(),
+                timeout: 15000,
+            }, "trash");
+        } catch (e) { /* 忽略 */ }
     }
 
     baseHeaders(extra) {
@@ -172,45 +350,22 @@ export class AliApi {
             gdl.notify("Aliyundrive download requires a refresh_token (set it in plugin settings)", "error");
             return null;
         }
-        const driveId = this.driveByFid[info.file_id] || "";
-        const resp = await this.postRetry(API_HOST + "/v2/file/get_share_link_download_url", {
-            json: {
-                share_id: this.shareId,
-                file_id: info.file_id,
-                drive_id: driveId,
-                expire_sec: 600,
-            },
-            headers: this.baseHeaders({
-                "x-share-token": this.shareToken,
-                "X-Canary": X_CANARY,
-                "Authorization": "Bearer " + this.accessToken,
-            }),
-            timeout: 15000,
-        }, "download");
-        if (!resp) return null;
-        if (resp.status === 410) {
-            // 阿里在下载端点加了设备签名(x-signature)风控,未签名请求被网关拒绝
-            gdl.log.warn("ali download blocked (410): endpoint requires device signature");
-            gdl.notify("Aliyundrive blocked the download (device signature required)", "error");
+        // 阿里已下线分享直链端点,改走"转存到自己网盘 -> 个人下载端点取直链 -> 清理";
+        // 个人下载端点需设备签名,先建立设备会话
+        if (!(await this.ensureDeviceSession())) {
+            gdl.notify("Aliyundrive device session failed (check refresh_token)", "error");
             return null;
         }
-        if (resp.status !== 200) {
-            gdl.log.warn("ali download url http " + resp.status);
+        const ownFid = await this.transferShareFile(info);
+        if (!ownFid) {
+            gdl.notify("Aliyundrive transfer failed", "error");
             return null;
         }
-        let doc;
-        try {
-            doc = resp.json();
-        } catch (e) {
-            return null;
-        }
-        const url = typeof doc.download_url === "string" ? doc.download_url
-            : (typeof doc.url === "string" ? doc.url : "");
-        if (!url) {
-            gdl.log.warn("ali download url error: " + (doc.message || doc.code));
-            if (doc.message) gdl.notify(doc.message, "error");
-            return null;
-        }
+        const url = await this.getPersonalDownloadUrl(ownFid);
+        // 取到直链后清理转存副本(best effort,直链为预签名地址)
+        await this.deleteOwnFile(ownFid);
+        if (!url) return null;
+
         // 阿里直链需带 Referer,否则 403
         return {
             real_url: url,
