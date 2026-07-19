@@ -2611,12 +2611,12 @@ Copyright © 2024 GDownload Team
         <translation>秒</translation>
     </message>
     <message>
-        <location filename="../../view/mainwindow.cxx" line="130"/>
+        <location filename="../../view/mainwindow.cxx" line="156"/>
         <source>The download engine stopped unexpectedly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/mainwindow.cxx" line="138"/>
+        <location filename="../../view/mainwindow.cxx" line="164"/>
         <source>Download engine is unavailable.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3900,98 +3900,104 @@ Copyright © 2024 GDownload Team
 <context>
     <name>gdl::ui::browser::BrowserManagerImpl</name>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="163"/>
+        <location filename="../../Browser/browser_manager.cxx" line="206"/>
+        <location filename="../../Browser/browser_manager.cxx" line="879"/>
+        <source>Invalid ed2k link: %1</source>
+        <translation>ed2k 链接无效：%1</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="216"/>
         <source>Invalid download link: %1</source>
         <translation>下载链接无效：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="176"/>
+        <location filename="../../Browser/browser_manager.cxx" line="229"/>
         <source>Failed to add download task. Please check the link or aria2 connection.</source>
         <translation>添加下载任务失败。请检查链接或 aria2 连接。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="177"/>
+        <location filename="../../Browser/browser_manager.cxx" line="230"/>
         <source>Failed to add download task: %1</source>
         <translation>添加下载任务失败：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="202"/>
+        <location filename="../../Browser/browser_manager.cxx" line="255"/>
         <source>Torrent file does not exist: %1</source>
         <translation>种子文件不存在：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="208"/>
+        <location filename="../../Browser/browser_manager.cxx" line="261"/>
         <source>Failed to read torrent file: %1</source>
         <translation>读取种子文件失败：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="222"/>
+        <location filename="../../Browser/browser_manager.cxx" line="275"/>
         <source>Failed to add torrent task. Please check the file or aria2 connection.</source>
         <translation>添加种子任务失败。请检查文件或 aria2 连接。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="223"/>
+        <location filename="../../Browser/browser_manager.cxx" line="276"/>
         <source>Failed to add torrent task: %1</source>
         <translation>添加种子任务失败：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="246"/>
+        <location filename="../../Browser/browser_manager.cxx" line="299"/>
         <source>Metalink file does not exist: %1</source>
         <translation>Metalink 文件不存在：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="252"/>
+        <location filename="../../Browser/browser_manager.cxx" line="305"/>
         <source>Failed to read metalink file: %1</source>
         <translation>读取 Metalink 文件失败：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="266"/>
+        <location filename="../../Browser/browser_manager.cxx" line="319"/>
         <source>Failed to add metalink task. Please check the file or aria2 connection.</source>
         <translation>添加 Metalink 任务失败。请检查文件或 aria2 连接。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="267"/>
+        <location filename="../../Browser/browser_manager.cxx" line="320"/>
         <source>Failed to add metalink task: %1</source>
         <translation>添加 Metalink 任务失败：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="558"/>
+        <location filename="../../Browser/browser_manager.cxx" line="634"/>
         <source>Failed to retry task: missing task id.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="562"/>
+        <location filename="../../Browser/browser_manager.cxx" line="638"/>
         <source>Failed to retry task: stopped task list is not available.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="568"/>
+        <location filename="../../Browser/browser_manager.cxx" line="644"/>
         <source>Failed to retry task: task was not found.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="572"/>
+        <location filename="../../Browser/browser_manager.cxx" line="648"/>
         <source>Only failed tasks can be retried.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="578"/>
+        <location filename="../../Browser/browser_manager.cxx" line="654"/>
         <source>Failed to retry task: original download link is unavailable.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="604"/>
+        <location filename="../../Browser/browser_manager.cxx" line="680"/>
         <source>Retry started, but the old failed task could not be removed from history.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1030"/>
-        <location filename="../../Browser/browser_manager.cxx" line="1093"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1172"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1235"/>
         <source>Download failed. Please check the link or network connection.</source>
         <translation>下载失败。请检查链接或网络连接。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1031"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1173"/>
         <source>Download failed: %1</source>
         <translation>下载失败：%1</translation>
     </message>
@@ -4022,17 +4028,17 @@ Copyright © 2024 GDownload Team
 <context>
     <name>mainWindow</name>
     <message>
-        <location filename="../qml/mainWindow.qml" line="163"/>
+        <location filename="../qml/mainWindow.qml" line="166"/>
         <source>Show main interface</source>
         <translation>显示主界面</translation>
     </message>
     <message>
-        <location filename="../qml/mainWindow.qml" line="176"/>
+        <location filename="../qml/mainWindow.qml" line="179"/>
         <source>Hide main interface</source>
         <translation>隐藏主界面</translation>
     </message>
     <message>
-        <location filename="../qml/mainWindow.qml" line="183"/>
+        <location filename="../qml/mainWindow.qml" line="186"/>
         <source>Exit</source>
         <translation>退出</translation>
     </message>

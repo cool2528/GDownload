@@ -2611,12 +2611,12 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
         <translation>s</translation>
     </message>
     <message>
-        <location filename="../../view/mainwindow.cxx" line="130"/>
+        <location filename="../../view/mainwindow.cxx" line="156"/>
         <source>The download engine stopped unexpectedly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/mainwindow.cxx" line="138"/>
+        <location filename="../../view/mainwindow.cxx" line="164"/>
         <source>Download engine is unavailable.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3900,98 +3900,104 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
 <context>
     <name>gdl::ui::browser::BrowserManagerImpl</name>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="163"/>
+        <location filename="../../Browser/browser_manager.cxx" line="206"/>
+        <location filename="../../Browser/browser_manager.cxx" line="879"/>
+        <source>Invalid ed2k link: %1</source>
+        <translation>잘못된 ed2k 링크: %1</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="216"/>
         <source>Invalid download link: %1</source>
         <translation>잘못된 다운로드 링크: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="176"/>
+        <location filename="../../Browser/browser_manager.cxx" line="229"/>
         <source>Failed to add download task. Please check the link or aria2 connection.</source>
         <translation>다운로드 작업을 추가하지 못했습니다. 링크 또는 aria2 연결을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="177"/>
+        <location filename="../../Browser/browser_manager.cxx" line="230"/>
         <source>Failed to add download task: %1</source>
         <translation>다운로드 작업을 추가하지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="202"/>
+        <location filename="../../Browser/browser_manager.cxx" line="255"/>
         <source>Torrent file does not exist: %1</source>
         <translation>토렌트 파일이 없습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="208"/>
+        <location filename="../../Browser/browser_manager.cxx" line="261"/>
         <source>Failed to read torrent file: %1</source>
         <translation>토렌트 파일을 읽지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="222"/>
+        <location filename="../../Browser/browser_manager.cxx" line="275"/>
         <source>Failed to add torrent task. Please check the file or aria2 connection.</source>
         <translation>토렌트 작업을 추가하지 못했습니다. 파일 또는 aria2 연결을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="223"/>
+        <location filename="../../Browser/browser_manager.cxx" line="276"/>
         <source>Failed to add torrent task: %1</source>
         <translation>토렌트 작업을 추가하지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="246"/>
+        <location filename="../../Browser/browser_manager.cxx" line="299"/>
         <source>Metalink file does not exist: %1</source>
         <translation>Metalink 파일이 없습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="252"/>
+        <location filename="../../Browser/browser_manager.cxx" line="305"/>
         <source>Failed to read metalink file: %1</source>
         <translation>Metalink 파일을 읽지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="266"/>
+        <location filename="../../Browser/browser_manager.cxx" line="319"/>
         <source>Failed to add metalink task. Please check the file or aria2 connection.</source>
         <translation>Metalink 작업을 추가하지 못했습니다. 파일 또는 aria2 연결을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="267"/>
+        <location filename="../../Browser/browser_manager.cxx" line="320"/>
         <source>Failed to add metalink task: %1</source>
         <translation>Metalink 작업을 추가하지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="558"/>
+        <location filename="../../Browser/browser_manager.cxx" line="634"/>
         <source>Failed to retry task: missing task id.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="562"/>
+        <location filename="../../Browser/browser_manager.cxx" line="638"/>
         <source>Failed to retry task: stopped task list is not available.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="568"/>
+        <location filename="../../Browser/browser_manager.cxx" line="644"/>
         <source>Failed to retry task: task was not found.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="572"/>
+        <location filename="../../Browser/browser_manager.cxx" line="648"/>
         <source>Only failed tasks can be retried.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="578"/>
+        <location filename="../../Browser/browser_manager.cxx" line="654"/>
         <source>Failed to retry task: original download link is unavailable.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="604"/>
+        <location filename="../../Browser/browser_manager.cxx" line="680"/>
         <source>Retry started, but the old failed task could not be removed from history.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1030"/>
-        <location filename="../../Browser/browser_manager.cxx" line="1093"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1172"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1235"/>
         <source>Download failed. Please check the link or network connection.</source>
         <translation>다운로드 실패. 링크 또는 네트워크 연결을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1031"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1173"/>
         <source>Download failed: %1</source>
         <translation>다운로드 실패: %1</translation>
     </message>
@@ -4022,17 +4028,17 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
 <context>
     <name>mainWindow</name>
     <message>
-        <location filename="../qml/mainWindow.qml" line="163"/>
+        <location filename="../qml/mainWindow.qml" line="166"/>
         <source>Show main interface</source>
         <translation>기본 인터페이스 표시</translation>
     </message>
     <message>
-        <location filename="../qml/mainWindow.qml" line="176"/>
+        <location filename="../qml/mainWindow.qml" line="179"/>
         <source>Hide main interface</source>
         <translation>기본 인터페이스 숨기기</translation>
     </message>
     <message>
-        <location filename="../qml/mainWindow.qml" line="183"/>
+        <location filename="../qml/mainWindow.qml" line="186"/>
         <source>Exit</source>
         <translation>종료</translation>
     </message>
