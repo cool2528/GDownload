@@ -11,18 +11,9 @@ target_compile_features(qml_ui_integration_smoke PRIVATE cxx_std_20)
 # 显式启用 AUTOMOC:tst_smoke.cpp 内 TstSmoke 含 Q_OBJECT,
 # 需 moc 生成 tst_smoke.moc 供 #include "tst_smoke.moc" 使用
 set_target_properties(qml_ui_integration_smoke PROPERTIES AUTOMOC ON)
-
-# 复制测试所需的 Qt DLL 与 offscreen 平台插件到可执行文件目录
-get_filename_component(QT_BIN_DIR "${Qt6_DIR}/../../../bin" ABSOLUTE)
-get_filename_component(QT_PLATFORMS_DIR "${Qt6_DIR}/../../../plugins/platforms" ABSOLUTE)
-add_custom_command(TARGET qml_ui_integration_smoke POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${QT_BIN_DIR}/$<IF:$<CONFIG:Debug>,Qt6Testd.dll,Qt6Test.dll>"
-        "$<TARGET_FILE_DIR:qml_ui_integration_smoke>/$<IF:$<CONFIG:Debug>,Qt6Testd.dll,Qt6Test.dll>"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${QT_PLATFORMS_DIR}/$<IF:$<CONFIG:Debug>,qoffscreend.dll,qoffscreen.dll>"
-        "$<TARGET_FILE_DIR:qml_ui_integration_smoke>/platforms/$<IF:$<CONFIG:Debug>,qoffscreend.dll,qoffscreen.dll>"
-    COMMENT "Copying Qt Test DLL and offscreen platform plugin for headless testing")
+# 关闭 vcpkg applocal:运行时 DLL 由主程序部署到同一共享目录,避免并行 z-applocal 竞争
+# 测试所需 Qt DLL 由父级 qml_ui_test_dlls 目标统一部署一次
+set_target_properties(qml_ui_integration_smoke PROPERTIES VS_GLOBAL_VcpkgApplocalDeps false)
 
 add_test(NAME qml_ui_integration_smoke
     COMMAND qml_ui_integration_smoke -platform offscreen)
@@ -81,16 +72,8 @@ foreach(name ${QML_UI_INTEGRATION_TESTS})
     # AUTOMOC:测试类含 Q_OBJECT;AUTORCC:resource_qml.qrc / resource_icons.qrc
     # 编译为 qrc_*.cpp 链入二进制,使 qrc:/qml/... 路径可解析
     set_target_properties(qml_ui_tst_${name} PROPERTIES AUTOMOC ON AUTORCC ON)
-
-    # 复制 Qt6Testd.dll + qoffscreend.dll 到可执行文件目录(主程序 windeployqt 不复制 QtTest)
-    add_custom_command(TARGET qml_ui_tst_${name} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${QT_BIN_DIR}/$<IF:$<CONFIG:Debug>,Qt6Testd.dll,Qt6Test.dll>"
-            "$<TARGET_FILE_DIR:qml_ui_tst_${name}>/$<IF:$<CONFIG:Debug>,Qt6Testd.dll,Qt6Test.dll>"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${QT_PLATFORMS_DIR}/$<IF:$<CONFIG:Debug>,qoffscreend.dll,qoffscreen.dll>"
-            "$<TARGET_FILE_DIR:qml_ui_tst_${name}>/platforms/$<IF:$<CONFIG:Debug>,qoffscreend.dll,qoffscreen.dll>"
-        COMMENT "Copying Qt Test DLL and offscreen platform plugin for ${name}")
+    # 关闭 vcpkg applocal(见 smoke 处说明);Qt 测试 DLL 由父级 qml_ui_test_dlls 统一部署
+    set_target_properties(qml_ui_tst_${name} PROPERTIES VS_GLOBAL_VcpkgApplocalDeps false)
 
     add_test(NAME qml_ui_tst_${name}
         COMMAND qml_ui_tst_${name} -platform offscreen
