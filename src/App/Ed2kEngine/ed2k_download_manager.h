@@ -50,6 +50,8 @@ class Ed2kEngine_API Ed2kDownloadManager : public Singleton<Ed2kDownloadManager>
 
    private:
 	explicit Ed2kDownloadManager();
+	// 安排下一次 1s 采样（内部递归重排，网络线程执行）
+	void ScheduleSampling();
 	struct Impl;
 	std::unique_ptr<Impl> impl_;
 };
