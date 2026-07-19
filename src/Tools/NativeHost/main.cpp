@@ -160,10 +160,12 @@ bool LaunchApp() {
 	if (slash != std::wstring::npos) {
 		dir = dir.substr(0, slash);
 	}
-	// 依次尝试同目录、上级目录下的 GDownload.exe
-	const std::wstring candidates[] = {dir + L"\\GDownload.exe", dir + L"\\..\\GDownload.exe"};
+	// 依次尝试同目录、上级目录下的 GDownload 可执行文件（Windows 大小写不敏感）
+	const std::wstring candidates[] = {dir + L"\\gdownload.exe", dir + L"\\..\\gdownload.exe"};
 	for (const auto& exe : candidates) {
-		const HINSTANCE result = ::ShellExecuteW(nullptr, L"open", exe.c_str(), nullptr, dir.c_str(), SW_SHOWNORMAL);
+		// --silent：静默启动到系统托盘（浏览器扩展唤起时不打扰用户）
+		const HINSTANCE result =
+			::ShellExecuteW(nullptr, L"open", exe.c_str(), L"--silent", dir.c_str(), SW_SHOWNORMAL);
 		if (reinterpret_cast<INT_PTR>(result) > 32) {
 			return true;
 		}
