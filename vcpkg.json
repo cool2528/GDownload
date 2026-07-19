@@ -28,9 +28,10 @@
     "rapidjson",
     "spdlog",
     "sqlite3",
-    "tomlplusplus"
+    "tomlplusplus",
+    "ed2k-engine"
   ],
-  "builtin-baseline": "c8696863d371ab7f46545af949dfc541a6a5c4f0",
+  "builtin-baseline": "cd61e1e26a038e82d6550a3ebbe0fbbfe7da78e3",
   "overrides": [
     {
       "name": "framelesshelper",
