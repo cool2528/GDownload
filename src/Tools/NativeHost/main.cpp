@@ -7,9 +7,12 @@
 //   host -> 扩展: {type:"handshakeAck",hostVersion,appRunning,rpcPort,rpcSecret,appVersion}
 //                 {type:"launchResult",ok} / {type:"pong"}
 
+#include <chrono>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <filesystem>
+#include <fstream>
 #include <optional>
 #include <string>
 
@@ -87,6 +90,44 @@ std::string GetConfigPath() {
 	}
 	return std::string(home) + "/.local/share/gdownload/gd.toml";
 #endif
+}
+
+// 握手标记文件路径（供主程序检测"扩展已配对"，即设计文档完成判据）
+std::string GetHandshakeMarkerPath() {
+#ifdef _WIN32
+	const char* appdata = std::getenv("APPDATA");
+	if (!appdata) {
+		return "";
+	}
+	return std::string(appdata) + "\\gdownload\\native-host\\handshake.marker";
+#elif defined(__APPLE__)
+	const char* home = std::getenv("HOME");
+	return home ? std::string(home) + "/Library/Application Support/gdownload/native-host/handshake.marker" : "";
+#else
+	const char* home = std::getenv("HOME");
+	return home ? std::string(home) + "/.local/share/gdownload/native-host/handshake.marker" : "";
+#endif
+}
+
+// 握手时写标记文件（内容为 Unix 时间戳），主程序据此判定扩展已配对
+void WriteHandshakeMarker() {
+	const std::string path = GetHandshakeMarkerPath();
+	if (path.empty()) {
+		return;
+	}
+	try {
+		std::error_code ec;
+		std::filesystem::create_directories(std::filesystem::path(path).parent_path(), ec);
+		std::ofstream out(path, std::ios::binary | std::ios::trunc);
+		if (out.is_open()) {
+			const auto now = std::chrono::duration_cast<std::chrono::seconds>(
+								 std::chrono::system_clock::now().time_since_epoch())
+								 .count();
+			out << now;
+		}
+	} catch (...) {
+		// 忽略写入失败
+	}
 }
 
 struct RpcConfig {
@@ -196,6 +237,7 @@ bool LaunchApp() {
 json HandleMessage(const json& in) {
 	const std::string type = in.value("type", "");
 	if (type == "handshake") {
+		WriteHandshakeMarker();  // 记录配对时刻，供主程序检测扩展已连通（完成判据）
 		const RpcConfig config = ReadRpcConfig();
 		return json{{"type", "handshakeAck"},
 					{"hostVersion", kHostVersion},
