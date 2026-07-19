@@ -1,0 +1,9 @@
+{
+  "name": "com.gdownload.host",
+  "description": "GDownload browser extension native messaging host",
+  "path": "@HOST_EXE_PATH@",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://@CHROME_EXTENSION_ID@/"
+  ]
+}
