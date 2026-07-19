@@ -59,6 +59,49 @@ GCard {
             }
         }
 
+        // 配对状态横幅：Native host 收到扩展握手即视为连通（设计文档完成判据）
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: statusRow.implicitHeight + GTheme.spaceMD * 2
+            radius: GTheme.radiusMedium
+            color: GTheme.fillLighter
+            border.width: 1
+            border.color: InstallGuideManager.extensionPaired ? GTheme.successColor : GTheme.borderLight
+
+            RowLayout {
+                id: statusRow
+                anchors.fill: parent
+                anchors.leftMargin: GTheme.spaceMD
+                anchors.rightMargin: GTheme.spaceMD
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: GTheme.spaceSM
+
+                Rectangle {
+                    width: 10
+                    height: 10
+                    radius: 5
+                    color: InstallGuideManager.extensionPaired ? GTheme.successColor : GTheme.textPlaceholder
+                }
+                Text {
+                    Layout.fillWidth: true
+                    text: InstallGuideManager.extensionPaired
+                          ? qsTr("Extension connected. Setup complete.")
+                          : qsTr("Not connected yet. Finish the steps below, then reopen your browser.")
+                    color: InstallGuideManager.extensionPaired ? GTheme.successColor : GTheme.textSecondary
+                    font.pixelSize: GTheme.fontBody
+                    wrapMode: Text.WordWrap
+                }
+            }
+
+            // 定期刷新配对状态，握手到达后自动转为已连通
+            Timer {
+                interval: 3000
+                running: true
+                repeat: true
+                onTriggered: InstallGuideManager.refresh()
+            }
+        }
+
         StepSection {
             stepNumber: 1
             stepTitle: qsTr("Download Extension")

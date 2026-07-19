@@ -27,6 +27,7 @@
 #include "theme/theme.h"
 #include "toast/toast_manager.h"
 #include "update/update_manager.h"
+#include "utils/install_guide_manager.h"
 #include "utils/native_host_registrar.h"
 #include "utils/single_instance.h"
 #include "utils/utils.h"
@@ -157,6 +158,8 @@ namespace gd {
 			qmlRegisterSingletonInstance<gdl::ui::market::PluginConfigManager>(
 				GEXPORT_MODULE_URL, 1, 0, "PluginConfigManager",
 				&gdl::ui::market::PluginConfigManager::Instance());
+			qmlRegisterSingletonInstance<gd::ui::InstallGuideManager>(
+				GEXPORT_MODULE_URL, 1, 0, "InstallGuideManager", &gd::ui::InstallGuideManager::Instance());
 			// 启动期副作用:测试模式下跳过 aria2c 子进程、自动更新 HTTP
 			if (!is_test) {
 				// aria2c 引擎初始化(原 browser_manager.cxx RegisterTypes 内的逻辑)
