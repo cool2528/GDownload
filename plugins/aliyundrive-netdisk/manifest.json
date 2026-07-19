@@ -1,0 +1,60 @@
+{
+    "manifest_version": 1,
+    "name": "aliyundrive-netdisk",
+    "display_name": "Aliyundrive",
+    "version": "1.0.0",
+    "author": "GDownload Official",
+    "description": "Parse Aliyundrive (alipan.com) share links via the web share API",
+    "homepage": "https://github.com/cool2528/GDownload",
+    "entry": "main.js",
+    "type": "netdisk",
+    "url_patterns": [
+        "*://*.alipan.com*",
+        "*://*.aliyundrive.com*",
+        "*://alipan.com*",
+        "*://aliyundrive.com*"
+    ],
+    "permissions": {
+        "http": [
+            "*.alipan.com", "alipan.com",
+            "*.aliyundrive.com", "aliyundrive.com"
+        ],
+        "storage": false,
+        "verification_ui": false
+    },
+    "settings": [
+        {
+            "key": "refresh_token",
+            "type": "password",
+            "required": false,
+            "role": "token",
+            "label": "Aliyundrive refresh_token (web)",
+            "hint": "Optional. Browsing works without it; downloading requires the web refresh_token (from alipan.com localStorage 'token')",
+            "locales": {
+                "zh_CN": { "label": "阿里云盘 refresh_token（网页端）", "hint": "可选。浏览无需；下载需要网页端 refresh_token（取自 alipan.com localStorage 的 token）" },
+                "zh_TW": { "label": "阿里雲盤 refresh_token（網頁端）", "hint": "可選。瀏覽無需；下載需要網頁端 refresh_token（取自 alipan.com localStorage 的 token）" },
+                "ja_JP": { "label": "Aliyundrive refresh_token（Web）", "hint": "任意。閲覧は不要；ダウンロードには Web の refresh_token が必要（alipan.com の localStorage 'token' から取得）" },
+                "ko_KR": { "label": "알리윈드라이브 refresh_token（웹）", "hint": "선택. 탐색은 불필요；다운로드에는 웹 refresh_token 필요（alipan.com localStorage 'token'에서 획득）" }
+            }
+        }
+    ],
+    "min_app_version": "0.0.0",
+    "locales": {
+        "zh_CN": {
+            "display_name": "阿里云盘",
+            "description": "解析阿里云盘分享链接（网页端分享 API，下载需 refresh_token）"
+        },
+        "zh_TW": {
+            "display_name": "阿里雲盤",
+            "description": "解析阿里雲盤分享連結（網頁端分享 API，下載需 refresh_token）"
+        },
+        "ja_JP": {
+            "display_name": "Aliyundrive",
+            "description": "Aliyundrive の共有リンクを解析（Web 共有 API、ダウンロードには refresh_token が必要）"
+        },
+        "ko_KR": {
+            "display_name": "알리윈드라이브",
+            "description": "알리윈드라이브 공유 링크 파싱 (웹 공유 API, 다운로드에는 refresh_token 필요)"
+        }
+    }
+}
