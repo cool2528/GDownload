@@ -17,7 +17,7 @@ Popup {
     closePolicy: Popup.CloseOnEscape
     focus: true
 
-    // 打开时预选的标签页:0=URL,1=Torrent,2=Cloud Drive。
+    // 打开时预选的标签页:0=URL,1=Torrent,2=eD2k,3=Cloud Drive。
     // 供下载页空状态快捷入口(Add URL / Torrent / Cloud Drive)按入口类型直达对应标签。
     property int initialTab: 0
     property string validationMessage: ""
@@ -28,6 +28,7 @@ Popup {
     readonly property int contentMinHeight: 460
     readonly property int urlPanelHeight: 120
     readonly property int torrentPanelHeight: 150
+    readonly property int ed2kPanelHeight: 300
     readonly property int netDiskPanelHeight: 300
     readonly property bool compactDialog: width < 560
     readonly property int generalPanelHeight: compactDialog ? 330 : 150
@@ -113,6 +114,7 @@ Popup {
                             model: [
                                 { name: qsTr("URL"), iconName: "link" },
                                 { name: qsTr("Torrent"), iconName: "cloud-download" },
+                                { name: qsTr("eD2k"), iconName: "connected" },
                                 { name: qsTr("Cloud Drive"), iconName: "cloud" }
                             ]
 
@@ -147,13 +149,18 @@ Popup {
                     id: taskPageLayout
                     objectName: "taskDialogStack"
                     Layout.fillWidth: true
-                    Layout.preferredHeight: tabNavigation.currentIndex === 2
+                    Layout.preferredHeight: tabNavigation.currentIndex === 3
                                             ? taskPage.netDiskPanelHeight
-                                            : (tabNavigation.currentIndex === 1
-                                               ? taskPage.torrentPanelHeight
-                                               : taskPage.urlPanelHeight)
+                                            : (tabNavigation.currentIndex === 2
+                                               ? taskPage.ed2kPanelHeight
+                                               : (tabNavigation.currentIndex === 1
+                                                  ? taskPage.torrentPanelHeight
+                                                  : taskPage.urlPanelHeight))
                     currentIndex: tabNavigation.currentIndex
                     property int urlType: 0
+                    // eD2k tab 专用：previewModel 只携带文件名/大小等展示信息，不保留原始链接，
+                    // 这里按解析文本的顺序另存一份原始链接，供提交时用勾选的 1-based 索引反查完整链接
+                    property var ed2kLinks: []
 
                     // URL 输入页面
                         GCard {
@@ -250,6 +257,94 @@ Popup {
                         }
                     }
 
+                    // eD2k 链接页面：粘贴 ed2k://|file|...| 链接，实时解析出文件列表供勾选
+                        GCard {
+                            outlined: true
+                            padding: taskPage.cardPadding
+                            Layout.preferredHeight: taskPage.ed2kPanelHeight
+                            ColumnLayout {
+                                anchors.fill: parent
+                                anchors.margins: taskPage.cardPadding
+                                spacing: taskPage.contentSpacing
+
+                            ScrollView {
+                                id: view_ed2kInput
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: Math.round(taskPage.ed2kPanelHeight * 0.35)
+                                TextArea {
+                                    id: ed2kInput
+                                    objectName: "inputEd2k"
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    font.pixelSize: GTheme.fontBody
+                                    placeholderText: qsTr("Enter ed2k links (one per line)")
+                                    color: GTheme.textPrimary
+                                    placeholderTextColor: GTheme.textPlaceholder
+                                    selectByMouse: true
+                                    wrapMode: TextArea.Wrap
+                                    activeFocusOnTab: enabled && visible
+                                    Accessible.name: qsTr("eD2k Links")
+                                    onTextChanged: {
+                                        taskPage.validationMessage = ""
+                                        ed2kParseTimer.restart()
+                                    }
+
+                                    background: Rectangle {
+                                        color: GTheme.fillLighter
+                                        border.width: 1
+                                        border.color: ed2kInput.activeFocus ? GTheme.primaryColor : GTheme.borderLight
+                                        radius: GTheme.radiusBase
+
+                                        Behavior on border.color {
+                                            ColorAnimation { duration: GTheme.durationBase }
+                                        }
+                                    }
+
+                                    Component.onCompleted: {
+                                        ed2kInput.text = ClipboardWatcher.GetClipboardText()
+                                    }
+                                    // 用 Connections 而非匿名 connect：组件销毁时自动断开，
+                                    // 避免对话框关闭后仍向已销毁的 ed2kInput 写入（UAF）。
+                                    Connections {
+                                        target: ClipboardWatcher
+                                        function onClipboardChanged(text) {
+                                            if (taskPage.visible && text.length > 3) {
+                                                ed2kInput.text = text
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // 防抖：避免粘贴/输入过程中每个字符都触发一次模型重建
+                            Timer {
+                                id: ed2kParseTimer
+                                interval: 300
+                                repeat: false
+                                onTriggered: {
+                                    const text = ed2kInput.text
+                                    if (text.trim().length === 0) {
+                                        if (ed2kPreview.previewModel) {
+                                            ed2kPreview.previewModel.clear()
+                                        }
+                                        ed2kPreview.previewModel = null
+                                        taskPageLayout.ed2kLinks = []
+                                    } else {
+                                        taskPageLayout.ed2kLinks = taskPageLayout.parseEd2kRawLinks(text)
+                                        ed2kPreview.previewModel = BrowserManager.ParseEd2kLinks(text)
+                                    }
+                                }
+                            }
+
+                            FilePreviewList {
+                                id: ed2kPreview
+                                objectName: "taskEd2kFilePreview"
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                            }
+                        }
+                    }
+
                     // 网盘解析页面(插件通用)
                         GCard {
                             outlined: true
@@ -277,7 +372,7 @@ Popup {
                                 }
                             }
                             return urls
-                        } else {
+                        } else if (currentIndex === 1) {
                             const path = String(dropTorrent.path || "").trim()
                             taskPageLayout.urlType = 1
                             let ext = path.split('.').pop().toLowerCase()
@@ -287,7 +382,44 @@ Popup {
                                 taskPageLayout.urlType = 2
                             }
                             return path
+                        } else {
+                            // eD2k：previewModel.getSelectedFiles() 返回的是勾选行的 1-based 索引字符串
+                            // （与 torrent 的 select-file 语义一致），这里映射回 ed2kLinks 里的原始链接
+                            taskPageLayout.urlType = 3
+                            let selected = []
+                            if (ed2kPreview.previewModel) {
+                                const indices = ed2kPreview.previewModel.getSelectedFiles()
+                                for (let i = 0; i < indices.length; ++i) {
+                                    const idx = parseInt(indices[i], 10) - 1
+                                    if (idx >= 0 && idx < taskPageLayout.ed2kLinks.length) {
+                                        selected.push(taskPageLayout.ed2kLinks[idx])
+                                    }
+                                }
+                            }
+                            return selected
                         }
+                    }
+
+                    // 按 ed2k_link.cxx (ParseEd2kLink) 同样的合法性规则，从粘贴文本中原样提取
+                    // 有效的 ed2k 链接（顺序与 BrowserManager.ParseEd2kLinks 生成的 previewModel 行一一对应）。
+                    // FilePreviewModel 只保存文件名/大小等展示字段，不携带原始链接，故需要在 QML 侧
+                    // 重新做一次同规则的过滤，才能把勾选的行索引映射回完整链接字符串。
+                    function parseEd2kRawLinks(text) {
+                        let links = []
+                        const lines = Utils.splitPath(text)
+                        for (let i = 0; i < lines.length; ++i) {
+                            const line = String(lines[i]).trim()
+                            if (line.length === 0) continue
+                            if (!/^ed2k:\/\//i.test(line)) continue
+                            const tokens = line.split('|')
+                            if (tokens.length < 5) continue
+                            if (tokens[1].toLowerCase() !== "file") continue
+                            if (tokens[2].length === 0) continue
+                            if (!/^\d+$/.test(tokens[3]) || Number(tokens[3]) <= 0) continue
+                            if (!/^[0-9A-Fa-f]{32}$/.test(tokens[4])) continue
+                            links.push(line)
+                        }
+                        return links
                     }
 
                     function getOptions() {
@@ -360,18 +492,18 @@ Popup {
                     Layout.fillWidth: true
                     Layout.preferredHeight: taskPage.generalPanelHeight
                     standardSpacing: taskPage.contentSpacing
-                    visible: tabNavigation.currentIndex !== 2
+                    visible: tabNavigation.currentIndex !== 3
                 }
 
-                // 高级配置区域
+                // 高级配置区域：eD2k(2) 与 Cloud Drive(3) 都没有对应的 HTTP/Torrent 高级选项，隐藏
                 TaskAdvancedOptionsCard {
                     id: additionalConfig
                     optionMode: tabNavigation.currentIndex === 1 ? "torrent" : "http"
                     standardSpacing: taskPage.contentSpacing
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Layout.topMargin: advanced.checked && tabNavigation.currentIndex !== 2 ? GTheme.spaceSM : 0
-                    visible: advanced.checked && tabNavigation.currentIndex !== 2
+                    Layout.topMargin: advanced.checked && tabNavigation.currentIndex !== 2 && tabNavigation.currentIndex !== 3 ? GTheme.spaceSM : 0
+                    visible: advanced.checked && tabNavigation.currentIndex !== 2 && tabNavigation.currentIndex !== 3
                     Layout.preferredHeight: visible ? additionalConfig.view.implicitHeight + GTheme.sizeLarge + taskPage.contentSpacing : 0
                     Layout.minimumHeight: Layout.preferredHeight
                 }
@@ -406,7 +538,7 @@ Popup {
                     id: advanced
                     objectName: "taskAdvancedOptionsToggle"
                     text: qsTr("Advanced Options")
-                    visible: tabNavigation.currentIndex !== 2
+                    visible: tabNavigation.currentIndex !== 2 && tabNavigation.currentIndex !== 3
                     Layout.alignment: Qt.AlignVCenter
                     Layout.columnSpan: taskPage.compactDialog ? 2 : 1
 
@@ -438,7 +570,20 @@ Popup {
                     Layout.preferredHeight: GTheme.sizeDefault
                     onClicked: {
                         let taskAdded = true
-                        if (tabNavigation.currentIndex !== 2) {
+                        if (tabNavigation.currentIndex === 3) {
+                            // Cloud Drive：由插件层触发批量下载，不经过 aria2/ed2k 任务体系
+                            NetWorkDiskManager.DownloadSelectedFiles()
+                        } else if (tabNavigation.currentIndex === 2) {
+                            // eD2k：提交勾选的原始链接列表，交给独立的 Ed2kDownloadManager
+                            const links = taskPageLayout.geturls()
+                            if (links.length === 0) {
+                                taskPage.validationMessage = qsTr("Please paste at least one eD2k link and select a file.")
+                                ToastManager.ShowError(taskPage.validationMessage)
+                                return
+                            }
+                            const options = taskPageLayout.getOptions()
+                            taskAdded = BrowserManager.AddEd2kTask(links, options)
+                        } else {
                             taskAdded = false
                             let url = taskPageLayout.geturls()
                             if (tabNavigation.currentIndex === 1 &&
@@ -473,18 +618,20 @@ Popup {
                                 }
                                 taskAdded = BrowserManager.AddTorrentTask(url, options)
                             }
-                        } else {
-                            NetWorkDiskManager.DownloadSelectedFiles()
                         }
                         if (!taskAdded) {
+                            if (tabNavigation.currentIndex === 2) {
+                                taskPage.validationMessage = qsTr("Failed to add eD2k task. Please check the link(s).")
+                                ToastManager.ShowError(taskPage.validationMessage)
+                            }
                             return
                         }
-                        if (tabNavigation.currentIndex !== 2) {
+                        if (tabNavigation.currentIndex !== 3) {
                             ToastManager.ShowSuccess(qsTr("Download task added successfully."))
                         }
                         brower_view.index = 0
                         brower_view.switchDownloadPage(0)
-                        if (tabNavigation.currentIndex !== 2) {
+                        if (tabNavigation.currentIndex !== 3) {
                             taskPage.close()
                         }
                     }
