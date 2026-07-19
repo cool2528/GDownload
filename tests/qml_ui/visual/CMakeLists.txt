@@ -27,26 +27,9 @@ target_compile_features(qml_ui_visual PRIVATE cxx_std_20)
 # main.moc 供 #include "main.moc" 使用;resource_qml.qrc / resource_icons.qrc
 # 通过 AUTORCC 由 rcc 编译为 qrc_*.cpp 链入二进制,使 qrc:/qml/... 路径可解析
 set_target_properties(qml_ui_visual PROPERTIES AUTOMOC ON AUTORCC ON)
-
-# 复制测试所需的 Qt DLL 与 offscreen 平台插件到可执行文件目录
-# gdownload 的 windeployqt 不会复制 Qt6Testd/Qt6QuickTestd(主程序不用 QtTest)
-get_filename_component(QT_BIN_DIR "${Qt6_DIR}/../../../bin" ABSOLUTE)
-get_filename_component(QT_PLATFORMS_DIR "${Qt6_DIR}/../../../plugins/platforms" ABSOLUTE)
-set(QT_TEST_DLLS
-    "$<IF:$<CONFIG:Debug>,Qt6Testd.dll,Qt6Test.dll>"
-    "$<IF:$<CONFIG:Debug>,Qt6QuickTestd.dll,Qt6QuickTest.dll>"
-)
-add_custom_command(TARGET qml_ui_visual POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${QT_BIN_DIR}/$<IF:$<CONFIG:Debug>,Qt6Testd.dll,Qt6Test.dll>"
-        "$<TARGET_FILE_DIR:qml_ui_visual>/$<IF:$<CONFIG:Debug>,Qt6Testd.dll,Qt6Test.dll>"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${QT_BIN_DIR}/$<IF:$<CONFIG:Debug>,Qt6QuickTestd.dll,Qt6QuickTest.dll>"
-        "$<TARGET_FILE_DIR:qml_ui_visual>/$<IF:$<CONFIG:Debug>,Qt6QuickTestd.dll,Qt6QuickTest.dll>"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${QT_PLATFORMS_DIR}/$<IF:$<CONFIG:Debug>,qoffscreend.dll,qoffscreen.dll>"
-        "$<TARGET_FILE_DIR:qml_ui_visual>/platforms/$<IF:$<CONFIG:Debug>,qoffscreend.dll,qoffscreen.dll>"
-    COMMENT "Copying Qt Test DLLs and offscreen platform plugin for headless testing")
+# 关闭 vcpkg applocal:运行时 DLL 由主程序部署到同一共享目录,避免并行 z-applocal 竞争
+# 测试所需 Qt DLL(含 Qt6QuickTest)由父级 qml_ui_test_dlls 目标统一部署一次
+set_target_properties(qml_ui_visual PROPERTIES VS_GLOBAL_VcpkgApplocalDeps false)
 
 add_test(NAME qml_ui_visual
     COMMAND qml_ui_visual -input ${CMAKE_CURRENT_SOURCE_DIR} -platform offscreen
