@@ -1,0 +1,71 @@
+{
+    "manifest_version": 1,
+    "name": "quark-netdisk",
+    "display_name": "Quark NetDisk",
+    "version": "1.0.0",
+    "author": "GDownload Official",
+    "description": "Parse Quark netdisk share links (transfer-to-drive then direct link)",
+    "homepage": "https://github.com/cool2528/GDownload",
+    "entry": "main.js",
+    "type": "netdisk",
+    "url_patterns": [
+        "*://pan.quark.cn*"
+    ],
+    "permissions": {
+        "http": [
+            "pan.quark.cn",
+            "drive-pc.quark.cn",
+            "*.quark.cn"
+        ],
+        "storage": false,
+        "verification_ui": false
+    },
+    "settings": [
+        {
+            "key": "cookie",
+            "type": "textarea",
+            "required": true,
+            "role": "token",
+            "label": "Quark Netdisk Cookie",
+            "hint": "Paste the Cookie of a logged-in pan.quark.cn session",
+            "locales": {
+                "zh_CN": { "label": "夸克网盘 Cookie", "hint": "粘贴登录 pan.quark.cn 后的 Cookie" },
+                "zh_TW": { "label": "夸克網盤 Cookie", "hint": "貼上登入 pan.quark.cn 後的 Cookie" },
+                "ja_JP": { "label": "Quark ネットディスク Cookie", "hint": "pan.quark.cn にログイン後の Cookie を貼り付け" },
+                "ko_KR": { "label": "Quark 넷디스크 Cookie", "hint": "pan.quark.cn 로그인 후 Cookie를 붙여넣기" }
+            }
+        },
+        {
+            "key": "auto_clean",
+            "type": "bool",
+            "default": true,
+            "label": "Auto-remove transferred files",
+            "hint": "Delete the temporary saved copy from your drive after fetching the download link",
+            "locales": {
+                "zh_CN": { "label": "自动清理转存文件", "hint": "取得下载直链后删除网盘中的临时转存副本" },
+                "zh_TW": { "label": "自動清理轉存檔案", "hint": "取得下載直連後刪除網盤中的臨時轉存副本" },
+                "ja_JP": { "label": "転送ファイルを自動削除", "hint": "ダウンロードリンク取得後に一時保存したコピーを削除" },
+                "ko_KR": { "label": "전송 파일 자동 삭제", "hint": "다운로드 링크를 가져온 후 임시 저장 사본을 삭제" }
+            }
+        }
+    ],
+    "min_app_version": "0.0.0",
+    "locales": {
+        "zh_CN": {
+            "display_name": "夸克网盘",
+            "description": "解析夸克网盘分享链接（转存到网盘后取直链下载）"
+        },
+        "zh_TW": {
+            "display_name": "夸克網盤",
+            "description": "解析夸克網盤分享連結（轉存到網盤後取直連下載）"
+        },
+        "ja_JP": {
+            "display_name": "Quark ネットディスク",
+            "description": "Quark ネットディスクの共有リンクを解析（ドライブへ転送後に直リンクで取得）"
+        },
+        "ko_KR": {
+            "display_name": "Quark 넷디스크",
+            "description": "Quark 넷디스크 공유 링크 파싱 (드라이브로 전송 후 직접 링크로 다운로드)"
+        }
+    }
+}
