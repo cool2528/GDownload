@@ -28,6 +28,11 @@
 #include <windows.h>
 #include <shellapi.h>
 // clang-format on
+#else
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
 #endif
 
 using json = nlohmann::json;
@@ -184,8 +189,18 @@ bool IsAppRunning(int port) {
 	::closesocket(sock);
 	return connected;
 #else
-	(void)port;
-	return false;  // 非 Windows 平台暂用进程检测（后续补），此处保守返回 false
+	// POSIX：连接本地 aria2 RPC 端口探测主程序是否运行
+	const int sock = ::socket(AF_INET, SOCK_STREAM, 0);
+	if (sock < 0) {
+		return false;
+	}
+	sockaddr_in addr{};
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(static_cast<uint16_t>(port));
+	::inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
+	const bool connected = ::connect(sock, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == 0;
+	::close(sock);
+	return connected;
 #endif
 }
 
