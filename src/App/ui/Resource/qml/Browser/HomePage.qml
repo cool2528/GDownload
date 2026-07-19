@@ -23,7 +23,7 @@ Item {
     // 快捷入口复用 TaskDialogPage,不新增第二套任务创建 UI
     Component { id: taskDialogComponent; TaskDialogPage {} }
 
-    // 打开新建任务弹窗并预选标签(0=URL 1=Torrent 2=Cloud Drive)
+    // 打开新建任务弹窗并预选标签(0=URL 1=Torrent 2=eD2k 3=Cloud Drive)
     function openTaskDialog(tab) {
         let parentItem = (typeof mainWindow !== "undefined" && mainWindow) ? mainWindow : control
         let task = taskDialogComponent.createObject(parentItem, { initialTab: tab })
@@ -182,7 +182,7 @@ Item {
                             description: qsTr("Parse cloud links")
                             iconName: "cloud"
                             accent: "warning"
-                            onClicked: control.openTaskDialog(2)
+                            onClicked: control.openTaskDialog(3)
                         }
                     }
                 }
