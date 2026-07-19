@@ -4,6 +4,13 @@
 // 官方 Open API 不支持解析他人分享,故走网页端 API。协议参考公开的网页接口约定,实现为原创。
 
 const DEFAULT_BASE = "https://www.123pan.com";
+// 官方域 www.123pan.com 的网页端 API 已被封(只回 SPA HTML),镜像域仍开放匿名接口;
+// shareKey 与域名无关,可在镜像域间回退
+const API_HOSTS = [
+    "https://www.123912.com", "https://www.123684.com",
+    "https://www.123865.com", "https://www.123952.com",
+    "https://www.123pan.com",
+];
 const PLATFORM = "web";
 const APP_VERSION = "3";
 const UA =
@@ -80,7 +87,8 @@ export class Pan123Api {
     }
 
     reset() {
-        this.base = DEFAULT_BASE;
+        this.base = "";                       // 命中可用镜像后 pin
+        this.hostCandidates = API_HOSTS.slice();
         this.shareKey = "";
         this.sharePwd = "";
         this.token = "";
@@ -88,16 +96,46 @@ export class Pan123Api {
         this.metaByFid = {};
     }
 
-    commonHeaders(extra) {
-        const h = {
+    commonHeaders(host, extra) {
+        const h = host || this.base || DEFAULT_BASE;
+        const headers = {
             "User-Agent": UA,
             "Platform": PLATFORM,
             "App-Version": APP_VERSION,
-            "Referer": this.base + "/s/" + this.shareKey + ".html",
-            "Origin": this.base,
+            "Referer": h + "/s/" + this.shareKey + ".html",
+            "Origin": h,
         };
-        if (this.token) h["Authorization"] = "Bearer " + this.token;
-        return extra ? Object.assign(h, extra) : h;
+        if (this.token) headers["Authorization"] = "Bearer " + this.token;
+        return extra ? Object.assign(headers, extra) : headers;
+    }
+
+    // 匿名列目录:在镜像域间回退,命中(返回 JSON 且带 code)后 pin this.base
+    async shareGet(params) {
+        const hosts = this.base ? [this.base] : this.hostCandidates;
+        for (const host of hosts) {
+            let resp;
+            try {
+                resp = await gdl.http.get(host + "/b/api/share/get", {
+                    params: params,
+                    headers: this.commonHeaders(host),
+                    timeout: 15000,
+                });
+            } catch (e) {
+                continue;
+            }
+            if (resp.status !== 200) continue;
+            let doc;
+            try {
+                doc = resp.json();
+            } catch (e) {
+                continue; // 被封域名返回 SPA HTML,非 JSON
+            }
+            if (doc && typeof doc.code === "number") {
+                this.base = host; // API 可用(无论 code 是否为 0),锁定该镜像
+                return doc;
+            }
+        }
+        return null;
     }
 
     // 从分享链接提取 shareKey(去 .html / query / fragment)
@@ -111,29 +149,18 @@ export class Pan123Api {
         const out = [];
         let page = 1;
         for (; page <= 100; page++) {
-            const resp = await gdl.http.get(this.base + "/b/api/share/get", {
-                params: {
-                    shareKey: this.shareKey,
-                    SharePwd: this.sharePwd || "",
-                    ParentFileId: parentFileId,
-                    Page: String(page),
-                    limit: "100",
-                    next: "0",
-                    orderBy: "file_name",
-                    orderDirection: "asc",
-                },
-                headers: this.commonHeaders(),
-                timeout: 15000,
+            const doc = await this.shareGet({
+                shareKey: this.shareKey,
+                SharePwd: this.sharePwd || "",
+                ParentFileId: parentFileId,
+                Page: String(page),
+                limit: "100",
+                next: "0",
+                orderBy: "file_name",
+                orderDirection: "asc",
             });
-            if (resp.status !== 200) {
-                gdl.log.warn("123 share/get http " + resp.status);
-                return out.length ? out : null;
-            }
-            let doc;
-            try {
-                doc = resp.json();
-            } catch (e) {
-                gdl.log.warn("123 share/get parse failed: " + e);
+            if (!doc) {
+                gdl.log.warn("123 share/get unreachable (all mirrors failed)");
                 return out.length ? out : null;
             }
             if (doc.code !== 0) {
@@ -235,7 +262,7 @@ export class Pan123Api {
                     Etag: meta.etag || "",
                     SharePwd: this.sharePwd || "",
                 },
-                headers: this.commonHeaders({ "Content-Type": "application/json" }),
+                headers: this.commonHeaders(this.base, { "Content-Type": "application/json" }),
                 timeout: 15000,
             });
         } catch (e) {
@@ -291,8 +318,11 @@ export class Pan123Api {
         this.reset();
         this.token = (userToken || "").trim().replace(/^bearer\s+/i, "");
 
+        // 候选 API 域:用户粘贴的域优先(若是 123 域),再镜像域回退
         const origin = originOf(url);
-        if (origin && /123/.test(origin)) this.base = origin;
+        if (origin && /123/.test(origin) && this.hostCandidates.indexOf(origin) < 0) {
+            this.hostCandidates.unshift(origin);
+        }
 
         this.shareKey = this.extractShareKey(url);
         if (!this.shareKey) {

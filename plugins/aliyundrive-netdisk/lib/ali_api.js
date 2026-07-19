@@ -36,21 +36,31 @@ export class AliApi {
         return extra ? Object.assign(h, extra) : h;
     }
 
+    // 带瞬时错误重试的 POST(阿里 api 偶发 TLS 握手/连接重置)
+    async postRetry(url, opts, label) {
+        let lastErr = "";
+        for (let i = 0; i < 3; i++) {
+            try {
+                return await gdl.http.post(url, opts);
+            } catch (e) {
+                lastErr = String(e);
+                await gdl.utils.sleep(600);
+            }
+        }
+        gdl.log.warn("ali " + label + " request failed after retries: " + lastErr);
+        return null;
+    }
+
     // refresh_token -> access_token(web 端)
     async ensureAccessToken() {
         if (this.accessToken) return true;
         if (!this.refreshToken) return false;
-        let resp;
-        try {
-            resp = await gdl.http.post(AUTH_HOST + "/v2/account/token", {
-                json: { refresh_token: this.refreshToken, grant_type: "refresh_token" },
-                headers: this.baseHeaders(),
-                timeout: 15000,
-            });
-        } catch (e) {
-            gdl.log.warn("ali token refresh failed: " + e);
-            return false;
-        }
+        const resp = await this.postRetry(AUTH_HOST + "/v2/account/token", {
+            json: { refresh_token: this.refreshToken, grant_type: "refresh_token" },
+            headers: this.baseHeaders(),
+            timeout: 15000,
+        }, "token");
+        if (!resp) return false;
         if (resp.status !== 200) {
             gdl.log.warn("ali token http " + resp.status);
             return false;
@@ -72,17 +82,12 @@ export class AliApi {
 
     // 分享口令 -> share_token(匿名可调)
     async fetchShareToken() {
-        let resp;
-        try {
-            resp = await gdl.http.post(API_HOST + "/v2/share_link/get_share_token", {
-                json: { share_id: this.shareId, share_pwd: this.sharePwd || "" },
-                headers: this.baseHeaders(),
-                timeout: 15000,
-            });
-        } catch (e) {
-            gdl.log.warn("ali share_token failed: " + e);
-            return false;
-        }
+        const resp = await this.postRetry(API_HOST + "/v2/share_link/get_share_token", {
+            json: { share_id: this.shareId, share_pwd: this.sharePwd || "" },
+            headers: this.baseHeaders(),
+            timeout: 15000,
+        }, "share_token");
+        if (!resp) return false;
         if (resp.status !== 200) {
             gdl.log.warn("ali share_token http " + resp.status);
             return false;
@@ -115,17 +120,12 @@ export class AliApi {
                 order_direction: "ASC",
             };
             if (marker) body.marker = marker;
-            let resp;
-            try {
-                resp = await gdl.http.post(API_HOST + "/adrive/v3/file/list", {
-                    json: body,
-                    headers: this.baseHeaders({ "x-share-token": this.shareToken, "X-Canary": X_CANARY }),
-                    timeout: 15000,
-                });
-            } catch (e) {
-                gdl.log.warn("ali list failed: " + e);
-                return out.length ? out : null;
-            }
+            const resp = await this.postRetry(API_HOST + "/adrive/v3/file/list", {
+                json: body,
+                headers: this.baseHeaders({ "x-share-token": this.shareToken, "X-Canary": X_CANARY }),
+                timeout: 15000,
+            }, "list");
+            if (!resp) return out.length ? out : null;
             if (resp.status !== 200) {
                 gdl.log.warn("ali list http " + resp.status);
                 return out.length ? out : null;
@@ -173,26 +173,21 @@ export class AliApi {
             return null;
         }
         const driveId = this.driveByFid[info.file_id] || "";
-        let resp;
-        try {
-            resp = await gdl.http.post(API_HOST + "/v2/file/get_share_link_download_url", {
-                json: {
-                    share_id: this.shareId,
-                    file_id: info.file_id,
-                    drive_id: driveId,
-                    expire_sec: 600,
-                },
-                headers: this.baseHeaders({
-                    "x-share-token": this.shareToken,
-                    "X-Canary": X_CANARY,
-                    "Authorization": "Bearer " + this.accessToken,
-                }),
-                timeout: 15000,
-            });
-        } catch (e) {
-            gdl.log.warn("ali download url failed: " + e);
-            return null;
-        }
+        const resp = await this.postRetry(API_HOST + "/v2/file/get_share_link_download_url", {
+            json: {
+                share_id: this.shareId,
+                file_id: info.file_id,
+                drive_id: driveId,
+                expire_sec: 600,
+            },
+            headers: this.baseHeaders({
+                "x-share-token": this.shareToken,
+                "X-Canary": X_CANARY,
+                "Authorization": "Bearer " + this.accessToken,
+            }),
+            timeout: 15000,
+        }, "download");
+        if (!resp) return null;
         if (resp.status !== 200) {
             gdl.log.warn("ali download url http " + resp.status);
             return null;
