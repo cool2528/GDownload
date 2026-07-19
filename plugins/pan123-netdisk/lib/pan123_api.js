@@ -138,9 +138,13 @@ export class Pan123Api {
         return null;
     }
 
-    // 从分享链接提取 shareKey(去 .html / query / fragment)
+    // 从分享链接提取 shareKey(兼容多种格式:/s/<key>.html、/123pan/<key>、末段兜底)
     extractShareKey(url) {
-        const m = url.match(/\/s\/([A-Za-z0-9_-]+)/);
+        let m = url.match(/\/s\/([A-Za-z0-9_-]+)/);
+        if (m) return m[1];
+        m = url.match(/\/123pan\/([A-Za-z0-9_-]+)/);
+        if (m) return m[1];
+        m = url.match(/\/([A-Za-z0-9_-]+)(?:\.html)?(?:[?#]|$)/);
         return m ? m[1] : "";
     }
 
@@ -329,7 +333,7 @@ export class Pan123Api {
             gdl.log.warn("123 invalid share url");
             return null;
         }
-        const pm = url.match(/[?&#](?:pwd|SharePwd|passcode)=([^&\s]+)/);
+        const pm = url.match(/[?&#](?:pwd|SharePwd|passcode)=([^&#\s]+)/);
         this.sharePwd = pm ? gdl.utils.urlDecode(pm[1]) : "";
 
         const files = await this.listDir("0", "/");
