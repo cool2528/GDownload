@@ -46,8 +46,6 @@ namespace gdl {
 				virtual void	 SetGlobalProxy(QString value)	  = 0;
 				virtual QString GetBaiduPanCookies() const		  = 0;
 				virtual void	 SetBaiduPanCookies(QString value)  = 0;
-				virtual QString GetPluginSourceProxy() const	  = 0;
-				virtual void	 SetPluginSourceProxy(QString value) = 0;
 
 				// 端口与 RPC
 				virtual int GetListenPort() const				  = 0;
@@ -146,6 +144,10 @@ namespace gdl {
 				virtual void	 SetTrackerSourceNames(QString value) = 0;
 				virtual bool GetEnableTrackerSourceAutoUpdate() const = 0;
 				virtual void SetEnableTrackerSourceAutoUpdate(bool value) = 0;
+
+				// 插件源代理(追加在接口末尾:新增虚函数不移动已有 vtable 索引,避免增量构建下的错位调度)
+				virtual QString GetPluginSourceProxy() const	  = 0;
+				virtual void	 SetPluginSourceProxy(QString value) = 0;
 			};
 
 		}  // namespace settings
