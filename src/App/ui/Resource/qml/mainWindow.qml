@@ -191,16 +191,13 @@ FramelessWindow{
         }
     }
 
-    // 外部激活（次实例转发 / 浏览器扩展 host）：提升窗口，携带网盘 URL 则打开添加任务对话框
+    // 单实例：后续实例启动时提升已有主窗口
     Connections {
         target: BrowserManager
-        function onSigExternalActivate(shareUrl) {
+        function onSigActivateWindow() {
             mainWindow.showNormal()
             mainWindow.raise()
             mainWindow.requestActivate()
-            if (shareUrl && shareUrl.length > 0) {
-                navigator_view.addDownloadTask(shareUrl)
-            }
         }
     }
 

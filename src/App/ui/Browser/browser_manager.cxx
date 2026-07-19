@@ -122,9 +122,9 @@ namespace gdl {
 				emit sigErrorMessage(message);
 			}
 
-			void BrowserManagerImpl::TriggerExternalActivate(const QString& shareUrl) {
-				// 由主实例在收到次实例转发参数时调用，转成信号交 QML 侧处理（提升窗口 + 打开解析页）
-				emit sigExternalActivate(shareUrl);
+			void BrowserManagerImpl::TriggerActivateWindow() {
+				// 由主实例在检测到后续实例启动时调用，转成信号交 QML 侧提升主窗口
+				emit sigActivateWindow();
 			}
 
 			Q_INVOKABLE void BrowserManagerImpl::SyncTrackersServerlist(){

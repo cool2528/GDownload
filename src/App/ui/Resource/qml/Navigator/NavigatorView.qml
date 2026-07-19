@@ -245,11 +245,8 @@ Item {
     Component { id: taskDialogComponent; TaskDialogPage {} }
     Component { id: aboutDialogComponent; HelpDialog {} }
 
-    function addDownloadTask(initialUrl){
-        let props = {}
-        if (initialUrl && initialUrl.length > 0)
-            props.initialUrl = initialUrl
-        let task = taskDialogComponent.createObject(mainWindow, props)
+    function addDownloadTask(){
+        let task = taskDialogComponent.createObject(mainWindow)
         if(task === null){
             console.error("Error creating object")
             return null
