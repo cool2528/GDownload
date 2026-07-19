@@ -126,7 +126,7 @@ find_package(LibtorrentRasterbar CONFIG REQUIRED)
 find_package(pugixml CONFIG REQUIRED)
 
 # set dependencies library
-set(DEPENDENCIES_LIBRARIES FramelessHelper::Core FramelessHelper::Widgets FramelessHelper::Quick GDLCore Engine PluginManager)
+set(DEPENDENCIES_LIBRARIES FramelessHelper::Core FramelessHelper::Widgets FramelessHelper::Quick GDLCore Engine PluginManager Ed2kEngine)
 list(APPEND DEPENDENCIES_LIBRARIES ${QT_PREFIXED_MODULES})
 # 打印操作系统名称
 message("Operating System: ${CMAKE_SYSTEM_NAME}")
@@ -248,6 +248,7 @@ register_target(${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${MODULE_INCLUDE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src/App/engine
+    ${CMAKE_SOURCE_DIR}/src/App/Ed2kEngine
     $<$<CXX_COMPILER_ID:AppleClang>:${SPARKLE_FRAMEWORK_PATH}>
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE ${DEPENDENCIES_LIBRARIES} 

@@ -1,12 +1,14 @@
 #pragma once
 #include "IBrowserManager.h"
 #include <QtQml/qqml.h>
+#include <QHash>
 #include <QObject>
 #include <QVariantMap>
 #include "Aria2CManager/aria2c_http_rpc_client.h"
 #include "Aria2CManager/aria2c_manager.h"
 #include "Parser/file_preview_model.h"
 #include "download_task_model.h"
+#include "ed2k_download_manager.h"
 #include "task_deletion_result.h"
 #include "singleton.hpp"
 class QQmlEngine;
@@ -84,6 +86,11 @@ namespace gdl {
                 Q_INVOKABLE void RefreshTaskList(int page_index) override;
                 Q_INVOKABLE parser::FilePreviewModel* GetFilePreviewModel(const QString& file_path) override;
 
+                // 解析多行 ed2k 链接文本为文件预览模型,供 QML 新建任务对话框展示(Task 6 使用)
+                Q_INVOKABLE parser::FilePreviewModel* ParseEd2kLinks(const QString& text);
+                // 批量提交 ed2k 下载任务,options 目前仅识别 "dir"(保存目录);任一成功即返回 true
+                Q_INVOKABLE bool AddEd2kTask(const QVariantList& links, const QVariantMap& options);
+
 				bool Init();
 				void UnInit();
 				bool engineAvailable() const { return engine_available_; }
@@ -115,6 +122,9 @@ namespace gdl {
 				void OnHandleAria2Message(const std::string& msg);
                 void OnHandleAria2ActiveProgress(const std::string& msg);
 				void OnHandleTrackerUpdateStatus(const std::string& msg);
+				// ed2k 事件转发:两者均在 ed2k 引擎网络线程回调,遵循与 aria2 相同的跨线程 Q_EMIT 模式
+				void OnHandleEd2kActiveProgress(const std::string& msg);
+				void OnHandleEd2kTaskState(const std::string& msg);
 				void InitDownloadHistoryCache() const;
 				static gdl::cache::DownloadRecord DownloadTaskInfoToRecord(const DownloadTaskInfo& info);
 				static DownloadTaskInfo DownloadRecordToTaskInfo(const gdl::cache::DownloadRecord& record);
@@ -133,6 +143,12 @@ namespace gdl {
                 engine::Subscription aria2_active_progress_subcription_{nullptr};
 				engine::Subscription aria2_sync_server_list_subcription_{nullptr};
 				engine::Subscription aria2_tracker_update_status_subscription_{nullptr};
+				engine::Ed2kDownloadManager::Subscription ed2k_active_progress_subscription_{nullptr};
+				engine::Ed2kDownloadManager::Subscription ed2k_task_state_subscription_{nullptr};
+				// ed2k 任务最近一次采样信息缓存,用于状态事件(payload 仅含 id/state/error)补全文件名/大小等字段。
+				// 仅在 ed2k 引擎网络线程读写:OnHandleEd2kActiveProgress/OnHandleEd2kTaskState 均由该库内部
+				// 单线程 io_context 串行派发(见 PubSubSystem::Publish 的 post 语义),两者不会并发访问此表,无需加锁。
+				QHash<QString, DownloadTaskInfo> ed2k_task_cache_;
 				bool engine_available_{true};
 				QString engine_unavailable_message_;
 			};

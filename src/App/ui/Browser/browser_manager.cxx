@@ -5,6 +5,7 @@
 #include <QOperatingSystemVersion>
 #include <QProcess>
 #include <QQmlEngine>
+#include <QUrl>
 #include <nlohmann/json.hpp>
 #include "Aria2CManager/engine_def.h"
 #include "Browser/download_task_utils.h"
@@ -15,6 +16,7 @@
 #include "Parser/file_parser.h"
 #include "PluginManager/plugin_manager.h"
 #include "Settings/settings_manager.h"
+#include "ed2k_engine_def.h"
 #include "logger.h"
 #include "os/os.h"
 #include "toast/toast_manager.h"
@@ -104,6 +106,35 @@ namespace gdl {
 				DownloadTaskInfo ParseAria2TaskObject(const nlohmann::json& object) {
 					return DownloadTaskInfoFromAria2Object(object);
 				}
+
+				// ed2k 引擎 state 字符串 -> 现有 TaskState 枚举映射(与 aria2 任务共用同一套下载列表/历史管道)
+				TaskState Ed2kStateStringToTaskState(const std::string& state) {
+					if (state == "downloading" || state == "connecting") return TaskState::kActive;
+					if (state == "paused") return TaskState::kPause;
+					if (state == "completed") return TaskState::kComplete;
+					if (state == "failed") return TaskState::kError;
+					if (state == "cancelled") return TaskState::kRemoved;
+					if (state == "queued") return TaskState::kWaiting;
+					LOG_WARN("Unknown ed2k task state: {}", state);
+					return TaskState::kActive;
+				}
+
+				// 从 ed2k 任务 ID(格式 "ed2k-<md4hex>")中提取 md4 十六进制串;非法格式返回空串
+				QString Ed2kTaskIdToMd4(const QString& task_id) {
+					static const QString kPrefix = QStringLiteral("ed2k-");
+					if (!task_id.startsWith(kPrefix)) return {};
+					return task_id.mid(kPrefix.size());
+				}
+
+				// 依据任务信息反向拼回 ed2k://|file|name|size|md4|/ 链接,供失败任务重试
+				// (RetryTask -> AddHttpTask 会按 scheme 再次路由回 ed2k 引擎)。信息不全时返回空串。
+				QString BuildEd2kDownloadLink(const QString& task_id, const QString& file_name,
+											 std::int64_t total_size) {
+					const QString md4 = Ed2kTaskIdToMd4(task_id);
+					if (md4.isEmpty() || file_name.isEmpty() || total_size <= 0) return {};
+					const QString encoded_name = QString::fromUtf8(QUrl::toPercentEncoding(file_name));
+					return QStringLiteral("ed2k://|file|%1|%2|%3|/").arg(encoded_name).arg(total_size).arg(md4);
+				}
 			}  // namespace
 
 			BrowserManager* BrowserManagerImpl::create(QQmlEngine* qmlengine, QJSEngine* jsengine) {
@@ -162,6 +193,23 @@ namespace gdl {
 				for (const auto& url : urls) {
 					if (url.canConvert<QString>()) {
 						const QString url_str = url.toString().trimmed();
+						// ed2k 链接走独立引擎,不进入 aria2 的 URL 规范化/添加流程
+						if (IsEd2kLink(url_str)) {
+							QString save_dir = options.value(QStringLiteral("dir")).toString().trimmed();
+							if (save_dir.isEmpty()) {
+								save_dir = settings::Settings::Instance().GetDir();
+							}
+							const auto id = engine::Ed2kDownloadManager::Instance().AddEd2kTask(
+								url_str.toStdString(), save_dir.toStdString());
+							if (id.empty()) {
+								LOG_WARN("Failed to add ed2k download task: {}", url_str.toStdString());
+								Q_EMIT sigErrorMessage(tr("Invalid ed2k link: %1").arg(url_str));
+							}
+							else {
+								++count;
+							}
+							continue;
+						}
 						const auto normalized_url = NormalizeDownloadUrlForAria2(url_str);
 						if (!normalized_url.has_value()) {
 							LOG_WARN("Skip invalid download URL: {}", url_str.toStdString());
@@ -278,6 +326,9 @@ namespace gdl {
 
 			bool BrowserManagerImpl::PauseTask(int page_index, const QString& gid) {
 				if (gid.isEmpty()) return false;
+				if (gid.startsWith(QStringLiteral("ed2k-"))) {
+					return engine::Ed2kDownloadManager::Instance().PauseTask(gid.toStdString());
+				}
 				if (page_index == 0) {
 
 					return engine::Aria2cDownloadManager::Instance()
@@ -349,6 +400,9 @@ namespace gdl {
 
 			bool BrowserManagerImpl::UnpauseTask(int page_index, const QString& gid) {
 				if (gid.isEmpty()) return false;
+				if (gid.startsWith(QStringLiteral("ed2k-"))) {
+					return engine::Ed2kDownloadManager::Instance().UnpauseTask(gid.toStdString());
+				}
 				if (page_index == 0) {
 					if (active_model_) {
 						return engine::Aria2cDownloadManager::Instance()
@@ -400,6 +454,23 @@ namespace gdl {
 															 bool is_remove_file) {
 				TaskDeletionResult result{.content_requested = is_remove_file};
 				if (gid.isEmpty()) return result;
+
+				// ed2k 任务由独立引擎管理,删除(含可选文件删除)在其网络线程内异步完成,不复用 aria2 清理路径
+				if (gid.startsWith(QStringLiteral("ed2k-"))) {
+					const bool removed =
+						engine::Ed2kDownloadManager::Instance().RemoveTask(gid.toStdString(), is_remove_file);
+					if (!removed) return result;
+					if (active_model_) {
+						active_model_->RemoveTaskById(gid);
+					}
+					if (waiting_model_) {
+						waiting_model_->RemoveTaskById(gid);
+					}
+					result.task_removed = true;
+					result.aria2_cleaned = true;
+					return result;
+				}
+
                 if (page_index != 0 && page_index != 1) {
 					return result;
 				}
@@ -772,6 +843,48 @@ namespace gdl {
 				return nullptr;
 			}
 
+			parser::FilePreviewModel* BrowserManagerImpl::ParseEd2kLinks(const QString& text) {
+				const auto entries = gdl::ui::browser::ParseEd2kLinks(text);
+				if (entries.isEmpty()) return nullptr;
+
+				auto* file_preview_model = new parser::FilePreviewModel();
+				QVector<parser::PreviewFileInfo> file_model_list;
+				file_model_list.reserve(entries.size());
+				for (const auto& entry : entries) {
+					parser::PreviewFileInfo info;
+					info.file_name		= entry.name;
+					info.file_extension = QFileInfo(entry.name).suffix();
+					info.file_size		= parser::PreviewFileInfo::FormatFileSize(entry.size);
+					info.is_selected	= true;
+					file_model_list.append(info);
+				}
+				file_preview_model->setFiles(file_model_list);
+				return file_preview_model;
+			}
+
+			bool BrowserManagerImpl::AddEd2kTask(const QVariantList& links, const QVariantMap& options) {
+				QString save_dir = options.value(QStringLiteral("dir")).toString().trimmed();
+				if (save_dir.isEmpty()) {
+					save_dir = settings::Settings::Instance().GetDir();
+				}
+				bool any_succeeded = false;
+				for (const auto& link : links) {
+					if (!link.canConvert<QString>()) continue;
+					const QString link_str = link.toString().trimmed();
+					if (link_str.isEmpty()) continue;
+					const auto id = engine::Ed2kDownloadManager::Instance().AddEd2kTask(
+						link_str.toStdString(), save_dir.toStdString());
+					if (id.empty()) {
+						LOG_WARN("Failed to add ed2k download task: {}", link_str.toStdString());
+						Q_EMIT sigErrorMessage(tr("Invalid ed2k link: %1").arg(link_str));
+					}
+					else {
+						any_succeeded = true;
+					}
+				}
+				return any_succeeded;
+			}
+
 			bool BrowserManagerImpl::Init() {
 				// 下载历史读取需在 DownloadHistoryCache::Initialize(mainwindow.cxx:86) 之后,
 				// 故从构造函数移到此处;测试模式不调用 Init(),Fake 路径不加载历史(U1)
@@ -798,6 +911,21 @@ namespace gdl {
 					kAria2TrackerUpdateStatus, [this](const std::string& msg) { OnHandleTrackerUpdateStatus(msg); });
 				if (res.HasError()) { UnInit(); return false; }
 				aria2_tracker_update_status_subscription_ = res.Value();
+
+				// ed2k 引擎为可选能力:初始化失败仅记录日志,不影响 aria2 主流程可用性
+				engine::Ed2kDownloadManager::Ed2kEngineConfig ed2k_config;
+				ed2k_config.data_dir = os::GetAppDataDir() + "/gdownload/ed2k";
+				if (!engine::Ed2kDownloadManager::Instance().InitEd2kEngine(ed2k_config)) {
+					LOG_ERR("Failed to init ed2k engine, data_dir:{}", ed2k_config.data_dir);
+				}
+				else {
+					ed2k_active_progress_subscription_ = engine::Ed2kDownloadManager::Instance()
+						.SubscriptionEd2kMessage(kEd2kActiveProgress,
+							[this](const std::string& msg) { OnHandleEd2kActiveProgress(msg); });
+					ed2k_task_state_subscription_ = engine::Ed2kDownloadManager::Instance()
+						.SubscriptionEd2kMessage(kEd2kTaskState,
+							[this](const std::string& msg) { OnHandleEd2kTaskState(msg); });
+				}
 				return true;
 			}
 
@@ -821,6 +949,15 @@ namespace gdl {
 						aria2_tracker_update_status_subscription_);
 					aria2_tracker_update_status_subscription_.reset();
 				}
+				if (ed2k_active_progress_subscription_) {
+					engine::Ed2kDownloadManager::Instance().UnSubscribeEd2kMessage(ed2k_active_progress_subscription_);
+					ed2k_active_progress_subscription_.reset();
+				}
+				if (ed2k_task_state_subscription_) {
+					engine::Ed2kDownloadManager::Instance().UnSubscribeEd2kMessage(ed2k_task_state_subscription_);
+					ed2k_task_state_subscription_.reset();
+				}
+				engine::Ed2kDownloadManager::Instance().ShutdownEngine();
 			}
 
 			gdl::cache::DownloadRecord BrowserManagerImpl::DownloadTaskInfoToRecord(const DownloadTaskInfo& info) {
@@ -1157,6 +1294,77 @@ namespace gdl {
 
 			void BrowserManagerImpl::OnHandleTrackerUpdateStatus(const std::string& msg) {
 				Q_EMIT sigTrackerUpdateStatus(QString::fromStdString(msg));
+			}
+
+			// 1s 采样的活动任务进度数组:[{id,name,total,done,speed,sources,state}, ...]
+			// 与 OnHandleAria2ActiveProgress 一样在 ed2k 引擎网络线程回调,经 Qt::QueuedConnection
+			// 的 sigUpdateTasksMessage 转发到主线程,构造函数里既有的 lambda 负责落 model + 历史。
+			void BrowserManagerImpl::OnHandleEd2kActiveProgress(const std::string& msg) {
+				try {
+					const nlohmann::json doc = nlohmann::json::parse(msg);
+					if (!doc.is_array()) return;
+					for (const auto& item : doc) {
+						if (!item.is_object() || !item.contains("id") || !item["id"].is_string()) continue;
+						const QString task_id = QString::fromStdString(item["id"].get<std::string>());
+						if (task_id.isEmpty()) continue;
+
+						DownloadTaskInfo task_info;
+						task_info.set_task_id(task_id);
+						task_info.set_task_file_name(QString::fromStdString(item.value("name", std::string())));
+						task_info.set_task_total_size(item.value("total", static_cast<std::int64_t>(0)));
+						task_info.set_task_current_size(item.value("done", static_cast<std::int64_t>(0)));
+						task_info.set_task_download_speed(item.value("speed", static_cast<std::int64_t>(0)));
+						task_info.set_task_connections(item.value("sources", static_cast<std::int64_t>(0)));
+						task_info.set_task_download_link(
+							BuildEd2kDownloadLink(task_id, task_info.task_file_name(), task_info.task_total_size()));
+						task_info.set_task_state(Ed2kStateStringToTaskState(item.value("state", std::string())));
+
+						// 缓存最近一次采样,供 OnHandleEd2kTaskState 在仅含 id/state/error 的终态事件中补全字段;
+						// 两个回调同在 ed2k 网络线程单线程串行执行,读写此表无需加锁(详见头文件成员注释)。
+						ed2k_task_cache_[task_id] = task_info;
+						Q_EMIT sigUpdateTasksMessage(task_info);
+					}
+				} catch (const std::exception& e) {
+					LOG_ERR("{}", e.what())
+				} catch (...) {
+					LOG_ERR("OnHandleEd2kActiveProgress exception");
+				}
+			}
+
+			// 单任务状态变更事件:{id,state,error}。payload 不含文件名/大小,从采样缓存补全后再转发。
+			void BrowserManagerImpl::OnHandleEd2kTaskState(const std::string& msg) {
+				try {
+					const nlohmann::json doc = nlohmann::json::parse(msg);
+					if (!doc.is_object() || !doc.contains("id") || !doc["id"].is_string()) return;
+					const QString task_id = QString::fromStdString(doc["id"].get<std::string>());
+					if (task_id.isEmpty()) return;
+
+					DownloadTaskInfo task_info = ed2k_task_cache_.value(task_id);
+					task_info.set_task_id(task_id);
+					const TaskState state = Ed2kStateStringToTaskState(doc.value("state", std::string()));
+					task_info.set_task_state(state);
+					const QString error = QString::fromStdString(doc.value("error", std::string()));
+					if (!error.isEmpty()) {
+						task_info.set_task_error_message(error);
+					}
+					if (task_info.task_download_link().isEmpty()) {
+						task_info.set_task_download_link(BuildEd2kDownloadLink(
+							task_id, task_info.task_file_name(), task_info.task_total_size()));
+					}
+
+					// 终态之后该任务不会再出现在采样数组中,清理缓存避免无界增长;非终态则刷新缓存内容
+					if (state == TaskState::kComplete || state == TaskState::kError || state == TaskState::kRemoved) {
+						ed2k_task_cache_.remove(task_id);
+					}
+					else {
+						ed2k_task_cache_[task_id] = task_info;
+					}
+					Q_EMIT sigUpdateTasksMessage(task_info);
+				} catch (const std::exception& e) {
+					LOG_ERR("{}", e.what())
+				} catch (...) {
+					LOG_ERR("OnHandleEd2kTaskState exception");
+				}
 			}
 
 			DownloadTaskInfo BrowserManagerImpl::Aria2QueryByGidTaskInfo(const std::string& gid) {
