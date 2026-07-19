@@ -90,6 +90,10 @@ namespace gdl {
 				QString engineUnavailableMessage() const { return engine_unavailable_message_; }
 				void SetEngineUnavailable(const QString& message);
 
+				// 外部（次实例转发/浏览器扩展）请求激活主窗口，可携带网盘分享 URL；
+				// 由 QML 侧连接 sigExternalActivate 提升窗口并打开通用网盘解析页
+				void TriggerExternalActivate(const QString& shareUrl);
+
 			   public:
 			   Q_SIGNALS:
 				void sigErrorMessage(const QString& error) override;
@@ -98,6 +102,8 @@ namespace gdl {
 				void sigUpdateSyncServerList(const QString& list) override;
 				void sigTrackerUpdateStatus(const QString& status) override;
 				void engineAvailabilityChanged();
+				// 外部激活请求（携带可选网盘分享 URL），QML 侧连接以提升窗口 + 打开解析页
+				void sigExternalActivate(const QString& shareUrl);
 
 			   protected:
 				// 构造函数为 protected:允许测试替身 FakeBrowserManager 继承并构造基类子对象

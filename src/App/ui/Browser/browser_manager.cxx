@@ -122,6 +122,11 @@ namespace gdl {
 				emit sigErrorMessage(message);
 			}
 
+			void BrowserManagerImpl::TriggerExternalActivate(const QString& shareUrl) {
+				// 由主实例在收到次实例转发参数时调用，转成信号交 QML 侧处理（提升窗口 + 打开解析页）
+				emit sigExternalActivate(shareUrl);
+			}
+
 			Q_INVOKABLE void BrowserManagerImpl::SyncTrackersServerlist(){
 				engine::Aria2cDownloadManager::Instance().UpdateMagnetServerList();
 			}
