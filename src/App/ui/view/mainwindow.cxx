@@ -27,6 +27,7 @@
 #include "theme/theme.h"
 #include "toast/toast_manager.h"
 #include "update/update_manager.h"
+#include "utils/native_host_registrar.h"
 #include "utils/single_instance.h"
 #include "utils/utils.h"
 #include "version.h"
@@ -87,6 +88,8 @@ namespace gd {
 			QQmlApplicationEngine engine;
 			if (!gdl::ui::isTestMode()) {
 				InitNetDiskPlugins();
+				// 自注册 Native Messaging host（幂等，per-user，无需管理员），使浏览器扩展可发现并唤起 host
+				gd::ui::NativeHostRegistrar::EnsureRegistered();
 			}
 			InitQmlEngine(&engine);
 			// 供 QML 读取：是否静默启动到托盘（--silent）
