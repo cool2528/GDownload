@@ -204,6 +204,11 @@ void Ed2kDownloadManager::ScheduleSampling() {
 }
 
 std::string Ed2kDownloadManager::AddEd2kTask(const std::string& link, const std::string& save_dir) {
+	// 与其它对外方法一致：引擎未初始化或已关闭时直接失败，避免把任务 post 到不再运行的
+	// io_context 上——那样会返回一个看似有效但永不入队的 task_id，破坏"失败返回空"契约。
+	if (!impl_->running.load()) {
+		return {};
+	}
 	auto parsed = ed2k::parse_link(link);
 	if (!parsed) {
 		return {};
