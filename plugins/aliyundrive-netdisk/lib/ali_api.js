@@ -39,12 +39,12 @@ export class AliApi {
     // 带瞬时错误重试的 POST(阿里 api 偶发 TLS 握手/连接重置)
     async postRetry(url, opts, label) {
         let lastErr = "";
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 5; i++) {
             try {
                 return await gdl.http.post(url, opts);
             } catch (e) {
                 lastErr = String(e);
-                await gdl.utils.sleep(600);
+                await gdl.utils.sleep(500 + i * 500); // 递增退避:0.5s,1s,1.5s,2s
             }
         }
         gdl.log.warn("ali " + label + " request failed after retries: " + lastErr);
@@ -188,6 +188,12 @@ export class AliApi {
             timeout: 15000,
         }, "download");
         if (!resp) return null;
+        if (resp.status === 410) {
+            // 阿里在下载端点加了设备签名(x-signature)风控,未签名请求被网关拒绝
+            gdl.log.warn("ali download blocked (410): endpoint requires device signature");
+            gdl.notify("Aliyundrive blocked the download (device signature required)", "error");
+            return null;
+        }
         if (resp.status !== 200) {
             gdl.log.warn("ali download url http " + resp.status);
             return null;
