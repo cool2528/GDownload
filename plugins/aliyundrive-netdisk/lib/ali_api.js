@@ -10,6 +10,10 @@ const X_CANARY = "client=web,app=share,version=v2.3.1";
 // 设备签名(过下载风控)用的 Android canary 与 appId
 const CANARY_SIGN = "client=Android,app=adrive,version=v4.1.0";
 const SIGN_APP_ID = "5dde4e1bdf9e4966b387ba58f4b3fdc3";
+// OpenList 全局 UA(含 OpenList/x 标记):部分网关只对该端点做 UA 过滤,直连分享直链需精确匹配
+const OPENLIST_UA =
+    "Mozilla/5.0 (Macintosh; Apple macOS 26_1_0) AppleWebKit/537.36 (KHTML, like Gecko) " +
+    "Safari/537.36 Chrome/142.0.0.0 OpenList/425.6.30";
 const UA =
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) " +
     "Chrome/114.0.0.0 Safari/537.36";
@@ -344,29 +348,8 @@ export class AliApi {
         return out;
     }
 
-    // 取分享文件真实下载直链
-    async fetchDownloadUrl(info) {
-        if (!(await this.ensureAccessToken())) {
-            gdl.notify("Aliyundrive download requires a refresh_token (set it in plugin settings)", "error");
-            return null;
-        }
-        // 阿里已下线分享直链端点,改走"转存到自己网盘 -> 个人下载端点取直链 -> 清理";
-        // 个人下载端点需设备签名,先建立设备会话
-        if (!(await this.ensureDeviceSession())) {
-            gdl.notify("Aliyundrive device session failed (check refresh_token)", "error");
-            return null;
-        }
-        const ownFid = await this.transferShareFile(info);
-        if (!ownFid) {
-            gdl.notify("Aliyundrive transfer failed", "error");
-            return null;
-        }
-        const url = await this.getPersonalDownloadUrl(ownFid);
-        // 取到直链后清理转存副本(best effort,直链为预签名地址)
-        await this.deleteOwnFile(ownFid);
-        if (!url) return null;
-
-        // 阿里直链需带 Referer,否则 403
+    // 组装下载结果(阿里直链需带 Referer,否则 403)
+    makeResult(info, url) {
         return {
             real_url: url,
             file_name: info.name,
@@ -378,6 +361,69 @@ export class AliApi {
             options: {},
             mirrors: [],
         };
+    }
+
+    // 直连分享直链端点(residential 网络通常可用,不动网盘);被网关拦截(410)时返回 null
+    async fetchShareDownloadDirect(info) {
+        const driveId = this.driveByFid[info.file_id] || "";
+        const resp = await this.postRetry(API_HOST + "/v2/file/get_share_link_download_url", {
+            json: {
+                drive_id: driveId,
+                file_id: info.file_id,
+                expire_sec: 600,
+                share_id: this.shareId,
+            },
+            // 精确复刻 OpenList:仅 4 个头 + OpenList UA(含 OpenList 标记),Bearer+TAB
+            headers: {
+                "User-Agent": OPENLIST_UA,
+                "Content-Type": "application/json",
+                "Authorization": "Bearer\t" + this.accessToken,
+                "X-Canary": X_CANARY,
+                "x-share-token": this.shareToken,
+            },
+            timeout: 15000,
+        }, "share_download");
+        if (!resp || resp.status !== 200) {
+            gdl.log.warn("ali direct share download http " + (resp ? resp.status : "null"));
+            return null;
+        }
+        let doc;
+        try {
+            doc = resp.json();
+        } catch (e) {
+            return null;
+        }
+        const url = typeof doc.download_url === "string" ? doc.download_url
+            : (typeof doc.url === "string" ? doc.url : "");
+        return url ? this.makeResult(info, url) : null;
+    }
+
+    // 转存路径(直连被拦截时的回退):转存到自己网盘 -> 个人下载端点(设备签名)取直链 -> 清理
+    async fetchViaTransfer(info) {
+        if (!(await this.ensureDeviceSession())) {
+            gdl.notify("Aliyundrive device session failed (check refresh_token)", "error");
+            return null;
+        }
+        const ownFid = await this.transferShareFile(info);
+        if (!ownFid) {
+            gdl.notify("Aliyundrive transfer failed", "error");
+            return null;
+        }
+        const url = await this.getPersonalDownloadUrl(ownFid);
+        await this.deleteOwnFile(ownFid);
+        return url ? this.makeResult(info, url) : null;
+    }
+
+    // 取分享文件真实下载直链:优先直连端点,被网关拦截时回退转存
+    async fetchDownloadUrl(info) {
+        if (!(await this.ensureAccessToken())) {
+            gdl.notify("Aliyundrive download requires a refresh_token (set it in plugin settings)", "error");
+            return null;
+        }
+        const direct = await this.fetchShareDownloadDirect(info);
+        if (direct) return direct;
+        gdl.log.info("ali direct share download unavailable, falling back to transfer");
+        return this.fetchViaTransfer(info);
     }
 
     // ---- 对外主流程 ----
