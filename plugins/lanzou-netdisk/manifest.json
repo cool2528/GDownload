@@ -1,0 +1,49 @@
+{
+    "manifest_version": 1,
+    "name": "lanzou-netdisk",
+    "display_name": "Lanzou NetDisk",
+    "version": "1.0.0",
+    "author": "GDownload Official",
+    "description": "Parse Lanzou (lanzou.com) share links, no login required",
+    "homepage": "https://github.com/cool2528/GDownload",
+    "entry": "main.js",
+    "type": "netdisk",
+    "url_patterns": [
+        "*://*.lanzou*.com*",
+        "*://*.lanzn.com*",
+        "*://lanzou*.com*",
+        "*://lanzn.com*"
+    ],
+    "permissions": {
+        "http": [
+            "*.lanzoui.com", "*.lanzoux.com", "*.lanzouo.com",
+            "*.lanzouw.com", "*.lanzoup.com", "*.lanzous.com",
+            "*.lanzn.com", "*.woozooo.com",
+            "lanzoui.com", "lanzoux.com", "lanzouo.com",
+            "lanzouw.com", "lanzoup.com", "lanzous.com", "lanzn.com",
+            "*.lanrar.com", "*.lanosso.com", "*.baidupan.com",
+            "*.lanpan.top", "*.ilanzou.com"
+        ],
+        "storage": false,
+        "verification_ui": false
+    },
+    "min_app_version": "0.0.0",
+    "locales": {
+        "zh_CN": {
+            "display_name": "蓝奏云",
+            "description": "解析蓝奏云分享链接（无需登录）"
+        },
+        "zh_TW": {
+            "display_name": "藍奏雲",
+            "description": "解析藍奏雲分享連結（無需登入）"
+        },
+        "ja_JP": {
+            "display_name": "Lanzou ネットディスク",
+            "description": "Lanzou の共有リンクを解析（ログイン不要）"
+        },
+        "ko_KR": {
+            "display_name": "란저우 넷디스크",
+            "description": "란저우 공유 링크 파싱 (로그인 불필요)"
+        }
+    }
+}
