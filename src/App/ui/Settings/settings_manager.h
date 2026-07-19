@@ -49,6 +49,7 @@ namespace gdl {
                 SETTING_PROPERTY(bool, EnableGithubAccelerate)
                 SETTING_PROPERTY(QPoint, WindowPosition)
                 SETTING_PROPERTY(QString, BaiduPanCookies)
+                SETTING_PROPERTY(QString, PluginSourceProxy)
                 SETTING_PROPERTY(QString, TrackerSourceNames)
                 SETTING_PROPERTY(bool, EnableTrackerSourceAutoUpdate)
                 SETTING_PROPERTY(bool, ShowCloseConfirm)

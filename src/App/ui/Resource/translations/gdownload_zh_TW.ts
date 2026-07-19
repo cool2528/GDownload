@@ -2318,62 +2318,83 @@ Copyright © 2024 GDownload Team
 <context>
     <name>PluginMarketPage</name>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="30"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="33"/>
         <source>Plugin list refreshed</source>
         <translation>外掛清單已重新整理</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="32"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="35"/>
         <source>Failed to load plugin market: %1</source>
         <translation>載入外掛市集失敗：%1</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="36"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="39"/>
         <source>%1 succeeded</source>
         <translation>%1 成功</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="38"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="41"/>
         <source>%1 failed: %2</source>
         <translation>%1 失敗：%2</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="63"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="66"/>
         <source>All</source>
         <translation>全部</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="63"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="66"/>
         <source>Installed</source>
         <translation>已安裝</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="63"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="66"/>
         <source>Updates</source>
         <translation>可更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="79"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="82"/>
         <source>Search plugins…</source>
         <translation>搜尋外掛…</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="89"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="93"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="95"/>
+        <source>Plugin source settings</source>
+        <translation>外掛來源設定</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="106"/>
         <source>Refresh</source>
         <translation>重新整理</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="91"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="108"/>
         <source>Refresh plugin list</source>
         <translation>重新整理外掛清單</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="175"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="130"/>
+        <source>Source proxy</source>
+        <translation>來源代理</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="140"/>
+        <source>Optional GitHub proxy prefix for China, e.g. https://ghfast.top/</source>
+        <translation>大陸可選的 GitHub 代理前綴，如 https://ghfast.top/</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="145"/>
+        <source>Apply &amp; Refresh</source>
+        <translation>套用並重新整理</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="223"/>
         <source>No plugins available</source>
         <translation>暫無可用外掛</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="181"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="229"/>
         <source>Check your network connection and refresh</source>
         <translation>請檢查網路連線後重新整理</translation>
     </message>

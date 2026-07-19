@@ -2318,62 +2318,83 @@ Apache License 2.0 に基づきライセンスされています。</translation
 <context>
     <name>PluginMarketPage</name>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="30"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="33"/>
         <source>Plugin list refreshed</source>
         <translation>プラグイン一覧を更新しました</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="32"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="35"/>
         <source>Failed to load plugin market: %1</source>
         <translation>プラグインマーケットの読み込みに失敗しました：%1</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="36"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="39"/>
         <source>%1 succeeded</source>
         <translation>%1 が成功しました</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="38"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="41"/>
         <source>%1 failed: %2</source>
         <translation>%1 が失敗しました：%2</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="63"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="66"/>
         <source>All</source>
         <translation>すべて</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="63"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="66"/>
         <source>Installed</source>
         <translation>インストール済み</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="63"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="66"/>
         <source>Updates</source>
         <translation>更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="79"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="82"/>
         <source>Search plugins…</source>
         <translation>プラグインを検索…</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="89"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="93"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="95"/>
+        <source>Plugin source settings</source>
+        <translation>プラグインソース設定</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="106"/>
         <source>Refresh</source>
         <translation>更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="91"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="108"/>
         <source>Refresh plugin list</source>
         <translation>プラグイン一覧を更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="175"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="130"/>
+        <source>Source proxy</source>
+        <translation>ソースプロキシ</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="140"/>
+        <source>Optional GitHub proxy prefix for China, e.g. https://ghfast.top/</source>
+        <translation>中国向け GitHub プロキシ接頭辞（任意）例: https://ghfast.top/</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="145"/>
+        <source>Apply &amp; Refresh</source>
+        <translation>適用して更新</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="223"/>
         <source>No plugins available</source>
         <translation>利用可能なプラグインがありません</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/PluginMarketPage.qml" line="181"/>
+        <location filename="../qml/Browser/PluginMarketPage.qml" line="229"/>
         <source>Check your network connection and refresh</source>
         <translation>ネットワーク接続を確認して更新してください</translation>
     </message>

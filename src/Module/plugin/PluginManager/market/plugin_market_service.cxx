@@ -10,6 +10,7 @@
 #include <ctime>
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <set>
 
 #include "../JsPluginRuntime/plugin_manifest.h"
 
@@ -17,6 +18,35 @@ namespace gdl {
 	namespace market {
 
 		namespace {
+			// 解析 https://raw.githubusercontent.com/<owner>/<repo>/<branch>/<path> 的四段
+			bool ParseRawGithub(const std::string& url, std::string& owner, std::string& repo,
+								std::string& branch, std::string& path) {
+				const std::string host = "raw.githubusercontent.com/";
+				auto pos			   = url.find(host);
+				if (pos == std::string::npos) {
+					return false;
+				}
+				std::string rest = url.substr(pos + host.size());
+				auto q			 = rest.find('?');
+				if (q != std::string::npos) {
+					rest = rest.substr(0, q);
+				}
+				// 前三段为 owner/repo/branch，其余为 path
+				std::string* fields[3] = {&owner, &repo, &branch};
+				size_t start		   = 0;
+				int idx				   = 0;
+				for (; idx < 3; ++idx) {
+					auto slash = rest.find('/', start);
+					if (slash == std::string::npos) {
+						return false;
+					}
+					*fields[idx] = rest.substr(start, slash - start);
+					start		 = slash + 1;
+				}
+				path = rest.substr(start);
+				return !owner.empty() && !repo.empty() && !branch.empty() && !path.empty();
+			}
+
 			// 注册表 Ed25519 公钥（raw 32 字节的 base64），对应 gdownload-plugin-registry/keys
 			constexpr const char* kRegistryPublicKeyB64 = "NTXbQg1oeXn+HePHCGRi4XHagyLhBKkMOe3ODeBvOPs=";
 			constexpr int kDownloadTimeoutMs			 = 20000;
@@ -291,14 +321,74 @@ namespace gdl {
 			return items;
 		}
 
+		std::vector<std::string> ExpandMirrorUrls(const std::vector<std::string>& base,
+												  const std::string& user_proxy) {
+			// ghproxy 风格前缀镜像（代理整条 github.com / raw.githubusercontent.com URL）
+			static const char* kGhProxies[] = {
+				"https://ghfast.top/", "https://gh-proxy.com/", "https://mirror.ghproxy.com/"};
+			// jsDelivr 各节点（中国可达性各异，多试几个）
+			static const char* kJsdHosts[] = {"cdn.jsdelivr.net", "fastly.jsdelivr.net", "gcore.jsdelivr.net",
+											  "cdn.jsdmirror.com"};
+
+			std::vector<std::string> out;
+			std::set<std::string> seen;
+			auto add = [&](const std::string& u) {
+				if (!u.empty() && seen.insert(u).second) {
+					out.push_back(u);
+				}
+			};
+			// 仅「裸 github/raw 开头」的 URL 适合加代理前缀（避免给已代理的 URL 再套一层）
+			auto is_bare_github = [](const std::string& u) {
+				return u.rfind("https://github.com/", 0) == 0
+					|| u.rfind("https://raw.githubusercontent.com/", 0) == 0;
+			};
+
+			for (const auto& url : base) {
+				// 1. 用户自定义代理前缀（仅对裸 GitHub URL，放最前优先尝试）
+				if (!user_proxy.empty() && is_bare_github(url)) {
+					std::string p = user_proxy;
+					if (p.back() != '/') {
+						p += '/';
+					}
+					add(p + url);
+				}
+				// 2. 原始 URL
+				add(url);
+				// 3. 内置 ghproxy 前缀镜像
+				if (is_bare_github(url)) {
+					for (auto* pfx : kGhProxies) {
+						add(std::string(pfx) + url);
+					}
+				}
+				// 4. raw.githubusercontent → jsDelivr 各节点
+				std::string o, r, b, path;
+				if (ParseRawGithub(url, o, r, b, path)) {
+					for (auto* h : kJsdHosts) {
+						add("https://" + std::string(h) + "/gh/" + o + "/" + r + "@" + b + "/" + path);
+					}
+				}
+				// 5. cdn.jsdelivr.net/gh/... → 其它 jsDelivr 节点
+				auto gh = url.find("jsdelivr.net/gh/");
+				if (gh != std::string::npos) {
+					std::string tail = url.substr(url.find("/gh/"));  // "/gh/owner/repo@branch/path"
+					for (auto* h : kJsdHosts) {
+						add("https://" + std::string(h) + tail);
+					}
+				}
+			}
+			return out;
+		}
+
 		std::optional<std::string> PluginMarketService::DownloadWithFallback(
 			const std::vector<std::string>& urls, const ProgressCallback& progress, std::string& error_out) const {
 			std::string last_error = "no download url";
-			for (size_t i = 0; i < urls.size(); ++i) {
-				const auto& url = urls[i];
+			// 扩展为更多中国可达镜像 + 用户自定义代理
+			const std::vector<std::string> expanded = ExpandMirrorUrls(urls, user_proxy_);
+			for (size_t i = 0; i < expanded.size(); ++i) {
+				const auto& url = expanded[i];
 				if (progress) {
-					progress(5, "downloading (source " + std::to_string(i + 1) + "/" + std::to_string(urls.size())
-									 + ")");
+					progress(5, "downloading (source " + std::to_string(i + 1) + "/"
+									 + std::to_string(expanded.size()) + ")");
 				}
 				cpr::Session session;
 				session.SetUrl(cpr::Url{url});

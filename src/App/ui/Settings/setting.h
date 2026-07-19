@@ -664,6 +664,24 @@ namespace gdl {
 			}
 			SETTING_IMP_END(BaiduPanCookies)
 
+			// PluginSourceProxy:插件市场源代理前缀(如 https://ghfast.top/),空则用内置镜像
+			SETTING_IMP_BEGIN(PluginSourceProxy, CONFIG_KEY_PATH(PluginSourceProxy), QString)
+			void Default() override {
+				value_ = "";
+			}
+			void Put(const QVariant& value) override {
+				if (value.canConvert<QString>()) {
+					value_ = value.toString();
+				}
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return value_;
+			}
+			SETTING_IMP_END(PluginSourceProxy)
+
 			// TrackerSourceNames
 			SETTING_IMP_BEGIN(TrackerSourceNames, CONFIG_KEY_PATH(TrackerSourceNames), QString)
 			void Default() override {
