@@ -191,6 +191,8 @@ void Ed2kDownloadManager::ScheduleSampling() {
 				item["speed"] = snap.speed_bps;
 				item["sources"] = snap.known_sources;
 				item["state"] = TaskStateToString(snap.state);
+				// 目标文件完整路径，供上层展示“打开文件位置”及重启续传时反推 save_dir
+				item["out_path"] = snap.out_path.string();
 				arr.push_back(std::move(item));
 			}
 			if (impl_->pubsub) {
