@@ -6,6 +6,10 @@
 #include <string>
 #include <unordered_map>
 
+// IsEd2kLink 已在 gdl::ui::browser 命名空间下声明(ed2k_link.h)，
+// 与本文件同处一个命名空间，无需再做转发，直接引入声明即可在调用点使用。
+#include "ed2k_link.h"
+
 namespace gdl {
 	namespace ui {
 		namespace browser {
