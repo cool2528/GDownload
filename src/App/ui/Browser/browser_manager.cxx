@@ -925,6 +925,8 @@ namespace gdl {
 					ed2k_task_state_subscription_ = engine::Ed2kDownloadManager::Instance()
 						.SubscriptionEd2kMessage(kEd2kTaskState,
 							[this](const std::string& msg) { OnHandleEd2kTaskState(msg); });
+					// 重启续传:必须在引擎初始化成功、订阅就绪之后才能重建任务
+					RestoreEd2kDownloadHistory();
 				}
 				return true;
 			}
@@ -1102,6 +1104,50 @@ namespace gdl {
 					}
 				}
 			}
+			// 重启续传:ed2k 引擎在进程内运行,没有像 aria2c 那样依赖外部进程 --save-session/
+			// --input-file 的会话续传机制,Session 重建后 id_to_session 映射为空、之前的任务需要
+			// 显式重新调用 AddEd2kTask 才能被重新纳入调度——引擎内部按 md4 定位同名 .part.met
+			// 实现真正的断点续传(不会从 0 重新下载已有分片)。
+			// 只处理 kError:kRemoved 代表用户已主动移除任务,不应自动复活;kComplete 已完成无需处理;
+			// kActive/kWaiting/kPause 这几个非终态从不写入历史缓存(参见 sigUpdateTasksMessage 中
+			// 落库逻辑只在 kComplete/kRemoved/kError 分支触发),因此这里能观察到的"非 complete"
+			// 记录事实上只有 kError 一种。
+			// 调用时机:必须晚于 ed2k 引擎 InitEd2kEngine 成功(AddEd2kTask 依赖 Session 已在跑)。
+			void BrowserManagerImpl::RestoreEd2kDownloadHistory() const {
+				const auto records_result = gdl::cache::DownloadHistoryCache::Instance().GetRecords();
+				if (records_result.HasError()) {
+					// 错误已由 InitDownloadHistoryCache 记录过一次,这里不重复打日志
+					return;
+				}
+				for (const auto& record : records_result.Value()) {
+					if (record.state != gdl::cache::DownloadState::kError) continue;
+					const QString link = QString::fromStdString(record.download_url);
+					if (!IsEd2kLink(link)) continue;
+
+					// save_path 存的是完整目标文件路径,反推所在目录作为 save_dir;取不到时退回默认下载目录
+					QString save_dir = QFileInfo(QString::fromStdString(record.save_path)).path();
+					if (save_dir.isEmpty() || save_dir == QStringLiteral(".")) {
+						save_dir = settings::Settings::Instance().GetDir();
+					}
+					const auto task_id = engine::Ed2kDownloadManager::Instance().AddEd2kTask(
+						record.download_url, save_dir.toStdString());
+					if (task_id.empty()) {
+						LOG_WARN("Failed to restore ed2k task on restart: {}", record.download_url);
+						continue;
+					}
+					// 恢复成功:task_id 由链接的 md4 确定性生成,与旧记录的 task_id 相同;移除旧的失败态
+					// 展示条目与历史记录,避免和即将到来的新状态事件重复——与 RetryTask 的既有约定一致。
+					if (stopped_model_) {
+						stopped_model_->RemoveTaskById(QString::fromStdString(task_id));
+					}
+					const auto delete_result = gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(task_id);
+					if (delete_result.HasError()) {
+						LOG_ERR("Failed to remove resumed ed2k record from history cache task_id:{} error:{}",
+								task_id, delete_result.GetError().Describe());
+					}
+				}
+			}
+
 			void BrowserManagerImpl::OnHandleAria2Message(const std::string& msg) {
 				try {
 
@@ -1317,6 +1363,7 @@ namespace gdl {
 						task_info.set_task_connections(item.value("sources", static_cast<std::int64_t>(0)));
 						task_info.set_task_download_link(
 							BuildEd2kDownloadLink(task_id, task_info.task_file_name(), task_info.task_total_size()));
+						task_info.set_task_save_path(QString::fromStdString(item.value("out_path", std::string())));
 						task_info.set_task_state(Ed2kStateStringToTaskState(item.value("state", std::string())));
 
 						// 缓存最近一次采样,供 OnHandleEd2kTaskState 在仅含 id/state/error 的终态事件中补全字段;

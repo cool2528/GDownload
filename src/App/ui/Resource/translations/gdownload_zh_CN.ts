@@ -145,41 +145,6 @@
     </message>
 </context>
 <context>
-    <name>BaiduCookieSettingPage</name>
-    <message>
-        <source>Baidu Netdisk Integration</source>
-        <translation type="vanished">百度网盘集成</translation>
-    </message>
-    <message>
-        <source>Configure Baidu Netdisk cookie for link parsing</source>
-        <translation type="vanished">为链接解析配置百度网盘 cookie</translation>
-    </message>
-    <message>
-        <source>Cookie</source>
-        <translation type="vanished">Cookie</translation>
-    </message>
-    <message>
-        <source>BDUSS value</source>
-        <translation type="vanished">BDUSS 值</translation>
-    </message>
-    <message>
-        <source>Paste your Baidu Netdisk cookie here</source>
-        <translation type="vanished">在此处粘贴您的百度网盘 cookie</translation>
-    </message>
-    <message>
-        <source>Baidu Netdisk cookie</source>
-        <translation type="vanished">百度网盘 Cookie</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation type="vanished">保存</translation>
-    </message>
-    <message>
-        <source>Baidu cookie saved successfully</source>
-        <translation type="vanished">成功保存百度 cookie</translation>
-    </message>
-</context>
-<context>
     <name>BasicSettingPage</name>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="32"/>
@@ -1658,10 +1623,6 @@ Copyright © 2024 GDownload Team
         <translation>网盘</translation>
     </message>
     <message>
-        <source>Add a new download from a link, torrent, or Baidu cloud share.</source>
-        <translation type="vanished">通过链接、种子或百度网盘分享添加新下载。</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/HomePage.qml" line="163"/>
         <source>Add URL</source>
         <translation>添加链接</translation>
@@ -1680,10 +1641,6 @@ Copyright © 2024 GDownload Team
         <location filename="../qml/Browser/HomePage.qml" line="173"/>
         <source>Drop torrent files</source>
         <translation>拖入种子文件</translation>
-    </message>
-    <message>
-        <source>Baidu</source>
-        <translation type="vanished">百度网盘</translation>
     </message>
     <message>
         <location filename="../qml/Browser/HomePage.qml" line="182"/>
@@ -1996,14 +1953,6 @@ Copyright © 2024 GDownload Team
 <context>
     <name>NetDiskPageView</name>
     <message>
-        <source>Invalid Baidu Netdisk URL, please check.</source>
-        <translation type="vanished">百度网盘 URL 无效，请检查。</translation>
-    </message>
-    <message>
-        <source>Please set Baidu Netdisk cookies first.</source>
-        <translation type="vanished">请先设置百度网盘 cookie</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="128"/>
         <source>Cloud link parser</source>
         <translation>网盘链接解析</translation>
@@ -2019,33 +1968,9 @@ Copyright © 2024 GDownload Team
         <translation>预览文件</translation>
     </message>
     <message>
-        <source>Cookie required. Set Baidu Netdisk cookies in Preferences before parsing share links.</source>
-        <translation type="vanished">需要 Cookie。解析分享链接前,请在首选项中设置百度网盘 Cookie。</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="51"/>
         <source>The cloud request timed out. Please check your network and try again.</source>
         <translation>云端请求超时，请检查网络后重试。</translation>
-    </message>
-    <message>
-        <source>Enter a valid Baidu Netdisk share link before parsing.</source>
-        <translation type="vanished">请输入有效的百度网盘分享链接后再解析。</translation>
-    </message>
-    <message>
-        <source>Baidu Netdisk cookies are required. Add them in Preferences and try again.</source>
-        <translation type="vanished">需要百度网盘 Cookie，请在偏好设置中添加后重试。</translation>
-    </message>
-    <message>
-        <source>Preview a Baidu share safely before adding selected files to the queue.</source>
-        <translation type="vanished">安全预览百度分享内容，然后将选中的文件添加到队列。</translation>
-    </message>
-    <message>
-        <source>Baidu share link</source>
-        <translation type="vanished">百度分享链接</translation>
-    </message>
-    <message>
-        <source>Paste https://pan.baidu.com/s/... here</source>
-        <translation type="vanished">在此粘贴 https://pan.baidu.com/s/... 链接</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="224"/>
@@ -2063,10 +1988,6 @@ Copyright © 2024 GDownload Team
         <translation>解析链接</translation>
     </message>
     <message>
-        <source>Validate the share URL and cookie.</source>
-        <translation type="vanished">验证分享链接和 Cookie。</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="264"/>
         <source>Browse folders and select files.</source>
         <translation>浏览文件夹并选择文件。</translation>
@@ -2080,14 +2001,6 @@ Copyright © 2024 GDownload Team
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="265"/>
         <source>Send the selection to aria2.</source>
         <translation>将选择发送到 aria2。</translation>
-    </message>
-    <message>
-        <source>Baidu Netdisk is ready. Parsed files remain local until you add them to the queue.</source>
-        <translation type="vanished">百度网盘已就绪。解析的文件保留在本地，直到你将其添加到队列。</translation>
-    </message>
-    <message>
-        <source>Open Baidu cookie settings</source>
-        <translation type="vanished">打开百度 Cookie 设置</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="69"/>
@@ -3085,67 +2998,88 @@ Copyright © 2024 GDownload Team
 <context>
     <name>TaskDialogPage</name>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="114"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="115"/>
         <source>URL</source>
         <translation>链接任务</translation>
     </message>
     <message>
-        <source>Baidu</source>
-        <translation type="vanished">百度网盘</translation>
-    </message>
-    <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="115"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="116"/>
         <source>Torrent</source>
         <translation>下载</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="116"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="117"/>
+        <source>eD2k</source>
+        <translation>eD2k</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="118"/>
         <source>Cloud Drive</source>
         <translation>网盘</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="177"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="184"/>
         <source>Enter download URLs (one per line, supports magnet links)</source>
         <translation>输入下载链接（每行一个，支持磁力链接）</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="183"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="190"/>
         <source>Download URLs</source>
         <translation>下载链接</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="351"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="280"/>
+        <source>Enter ed2k links (one per line)</source>
+        <translation>输入 eD2k 链接（每行一个）</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="286"/>
+        <source>eD2k Links</source>
+        <translation>eD2k 链接</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="483"/>
         <source>Check the task details</source>
         <translation>检查任务详情</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="435"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="567"/>
         <source>Add Task</source>
         <translation>添加任务</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="456"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="580"/>
+        <source>Please paste at least one eD2k link and select a file.</source>
+        <translation>请粘贴至少一个 eD2k 链接并选择一个文件。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="601"/>
         <source>Please enter at least one download URL.</source>
         <translation>请输入至少一个下载链接。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="463"/>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="470"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="608"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="615"/>
         <source>Please select a Torrent or Metalink file.</source>
         <translation>请选择一个 Torrent 或 Metalink 文件。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="483"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="624"/>
+        <source>Failed to add eD2k task. Please check the link(s).</source>
+        <translation>添加 eD2k 任务失败，请检查链接。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="630"/>
         <source>Download task added successfully.</source>
         <translation>下载任务添加成功。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="408"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="540"/>
         <source>Advanced Options</source>
         <translation>高级选项</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="424"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="556"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
@@ -3991,13 +3925,13 @@ Copyright © 2024 GDownload Team
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1172"/>
-        <location filename="../../Browser/browser_manager.cxx" line="1235"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1218"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1281"/>
         <source>Download failed. Please check the link or network connection.</source>
         <translation>下载失败。请检查链接或网络连接。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1173"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1219"/>
         <source>Download failed: %1</source>
         <translation>下载失败：%1</translation>
     </message>

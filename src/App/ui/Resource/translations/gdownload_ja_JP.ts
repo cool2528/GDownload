@@ -145,41 +145,6 @@
     </message>
 </context>
 <context>
-    <name>BaiduCookieSettingPage</name>
-    <message>
-        <source>Baidu Netdisk Integration</source>
-        <translation type="vanished">百度ネットディスクの統合</translation>
-    </message>
-    <message>
-        <source>Configure Baidu Netdisk cookie for link parsing</source>
-        <translation type="vanished">リンク解析用にBaidu Netdisk cookieを設定する</translation>
-    </message>
-    <message>
-        <source>Cookie</source>
-        <translation type="vanished">クッキー</translation>
-    </message>
-    <message>
-        <source>BDUSS value</source>
-        <translation type="vanished">BDUSS値</translation>
-    </message>
-    <message>
-        <source>Paste your Baidu Netdisk cookie here</source>
-        <translation type="vanished">Baidu Netdisk cookieをここに貼り付けます。</translation>
-    </message>
-    <message>
-        <source>Baidu Netdisk cookie</source>
-        <translation type="vanished">Baidu Netdisk Cookie</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation type="vanished">保存</translation>
-    </message>
-    <message>
-        <source>Baidu cookie saved successfully</source>
-        <translation type="vanished">百度のクッキーが正常に保存されました</translation>
-    </message>
-</context>
-<context>
     <name>BasicSettingPage</name>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="32"/>
@@ -1658,10 +1623,6 @@ Apache License 2.0 に基づきライセンスされています。</translation
         <translation>クラウドドライブ</translation>
     </message>
     <message>
-        <source>Add a new download from a link, torrent, or Baidu cloud share.</source>
-        <translation type="vanished">リンク、トレント、または Baidu の共有から新しいダウンロードを追加します。</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/HomePage.qml" line="163"/>
         <source>Add URL</source>
         <translation>URL を追加</translation>
@@ -1680,10 +1641,6 @@ Apache License 2.0 に基づきライセンスされています。</translation
         <location filename="../qml/Browser/HomePage.qml" line="173"/>
         <source>Drop torrent files</source>
         <translation>トレントファイルをドロップ</translation>
-    </message>
-    <message>
-        <source>Baidu</source>
-        <translation type="vanished">Baidu</translation>
     </message>
     <message>
         <location filename="../qml/Browser/HomePage.qml" line="182"/>
@@ -1996,14 +1953,6 @@ Apache License 2.0 に基づきライセンスされています。</translation
 <context>
     <name>NetDiskPageView</name>
     <message>
-        <source>Invalid Baidu Netdisk URL, please check.</source>
-        <translation type="vanished">百度ネットディスクのURLが無効です</translation>
-    </message>
-    <message>
-        <source>Please set Baidu Netdisk cookies first.</source>
-        <translation type="vanished">最初にBaidu Netdisk Cookieを設定してください</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="128"/>
         <source>Cloud link parser</source>
         <translation>クラウドリンク解析</translation>
@@ -2019,33 +1968,9 @@ Apache License 2.0 に基づきライセンスされています。</translation
         <translation>ファイルをプレビュー</translation>
     </message>
     <message>
-        <source>Cookie required. Set Baidu Netdisk cookies in Preferences before parsing share links.</source>
-        <translation type="vanished">Cookie が必要です。共有リンクを解析する前に、設定で Baidu Netdisk の Cookie を設定してください。</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="51"/>
         <source>The cloud request timed out. Please check your network and try again.</source>
         <translation>クラウドリクエストがタイムアウトしました。ネットワークを確認して再試行してください。</translation>
-    </message>
-    <message>
-        <source>Enter a valid Baidu Netdisk share link before parsing.</source>
-        <translation type="vanished">解析する前に、有効な Baidu Netdisk 共有リンクを入力してください。</translation>
-    </message>
-    <message>
-        <source>Baidu Netdisk cookies are required. Add them in Preferences and try again.</source>
-        <translation type="vanished">Baidu Netdisk の Cookie が必要です。設定で追加してから再試行してください。</translation>
-    </message>
-    <message>
-        <source>Preview a Baidu share safely before adding selected files to the queue.</source>
-        <translation type="vanished">選択したファイルをキューに追加する前に、Baidu 共有を安全にプレビューします。</translation>
-    </message>
-    <message>
-        <source>Baidu share link</source>
-        <translation type="vanished">Baidu 共有リンク</translation>
-    </message>
-    <message>
-        <source>Paste https://pan.baidu.com/s/... here</source>
-        <translation type="vanished">https://pan.baidu.com/s/... をここに貼り付け</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="224"/>
@@ -2063,10 +1988,6 @@ Apache License 2.0 に基づきライセンスされています。</translation
         <translation>リンクを解析</translation>
     </message>
     <message>
-        <source>Validate the share URL and cookie.</source>
-        <translation type="vanished">共有 URL と Cookie を検証します。</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="264"/>
         <source>Browse folders and select files.</source>
         <translation>フォルダを閲覧してファイルを選択します。</translation>
@@ -2080,14 +2001,6 @@ Apache License 2.0 に基づきライセンスされています。</translation
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="265"/>
         <source>Send the selection to aria2.</source>
         <translation>選択した項目を aria2 に送信します。</translation>
-    </message>
-    <message>
-        <source>Baidu Netdisk is ready. Parsed files remain local until you add them to the queue.</source>
-        <translation type="vanished">Baidu Netdisk は準備完了です。解析されたファイルはキューに追加するまでローカルに保持されます。</translation>
-    </message>
-    <message>
-        <source>Open Baidu cookie settings</source>
-        <translation type="vanished">Baidu Cookie 設定を開く</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="69"/>
@@ -3085,67 +2998,88 @@ Apache License 2.0 に基づきライセンスされています。</translation
 <context>
     <name>TaskDialogPage</name>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="114"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="115"/>
         <source>URL</source>
         <translation>タスクのリンク</translation>
     </message>
     <message>
-        <source>Baidu</source>
-        <translation type="vanished">百度ネットディスク</translation>
-    </message>
-    <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="115"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="116"/>
         <source>Torrent</source>
         <translation>激流</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="116"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="117"/>
+        <source>eD2k</source>
+        <translation>eD2k</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="118"/>
         <source>Cloud Drive</source>
         <translation>クラウドドライブ</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="177"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="184"/>
         <source>Enter download URLs (one per line, supports magnet links)</source>
         <translation>ダウンロードURLを入力（1行に1つ、マグネットリンクに対応）</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="183"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="190"/>
         <source>Download URLs</source>
         <translation>ダウンロード URL</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="351"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="280"/>
+        <source>Enter ed2k links (one per line)</source>
+        <translation>eD2k リンクを入力してください（1行に1つ）</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="286"/>
+        <source>eD2k Links</source>
+        <translation>eD2k リンク</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="483"/>
         <source>Check the task details</source>
         <translation>タスクの詳細を確認</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="435"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="567"/>
         <source>Add Task</source>
         <translation>タスクの追加</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="456"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="580"/>
+        <source>Please paste at least one eD2k link and select a file.</source>
+        <translation>少なくとも1つの eD2k リンクを貼り付け、ファイルを選択してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="601"/>
         <source>Please enter at least one download URL.</source>
         <translation>少なくとも1つのダウンロード URL を入力してください。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="463"/>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="470"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="608"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="615"/>
         <source>Please select a Torrent or Metalink file.</source>
         <translation>Torrent または Metalink ファイルを選択してください。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="483"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="624"/>
+        <source>Failed to add eD2k task. Please check the link(s).</source>
+        <translation>eD2k タスクの追加に失敗しました。リンクを確認してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="630"/>
         <source>Download task added successfully.</source>
         <translation>ダウンロードタスクが正常に追加されました。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="408"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="540"/>
         <source>Advanced Options</source>
         <translation>高度なオプション</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="424"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="556"/>
         <source>Cancel</source>
         <translation>キャンセル</translation>
     </message>
@@ -3991,13 +3925,13 @@ Apache License 2.0 に基づきライセンスされています。</translation
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1172"/>
-        <location filename="../../Browser/browser_manager.cxx" line="1235"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1218"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1281"/>
         <source>Download failed. Please check the link or network connection.</source>
         <translation>ダウンロードに失敗しました。リンクまたはネットワーク接続を確認してください。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1173"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1219"/>
         <source>Download failed: %1</source>
         <translation>ダウンロードに失敗しました: %1</translation>
     </message>

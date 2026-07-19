@@ -126,6 +126,9 @@ namespace gdl {
 				void OnHandleEd2kActiveProgress(const std::string& msg);
 				void OnHandleEd2kTaskState(const std::string& msg);
 				void InitDownloadHistoryCache() const;
+				// 重启续传:对历史记录中状态为失败(kError)的 ed2k 任务重新调用 AddEd2kTask,
+				// 依赖引擎 .part.met 实现断点续传;须在 ed2k 引擎初始化成功之后调用
+				void RestoreEd2kDownloadHistory() const;
 				static gdl::cache::DownloadRecord DownloadTaskInfoToRecord(const DownloadTaskInfo& info);
 				static DownloadTaskInfo DownloadRecordToTaskInfo(const gdl::cache::DownloadRecord& record);
 				static DownloadTaskInfo Aria2QueryByGidTaskInfo(const std::string& gid);

@@ -145,41 +145,6 @@
     </message>
 </context>
 <context>
-    <name>BaiduCookieSettingPage</name>
-    <message>
-        <source>Baidu Netdisk Integration</source>
-        <translation type="vanished">바이두 넷디스크 통합</translation>
-    </message>
-    <message>
-        <source>Configure Baidu Netdisk cookie for link parsing</source>
-        <translation type="vanished">링크 구문 분석을 위한 바이두 넷디스크 쿠키 구성</translation>
-    </message>
-    <message>
-        <source>Cookie</source>
-        <translation type="vanished">쿠키</translation>
-    </message>
-    <message>
-        <source>BDUSS value</source>
-        <translation type="vanished">BDUSS 값</translation>
-    </message>
-    <message>
-        <source>Paste your Baidu Netdisk cookie here</source>
-        <translation type="vanished">여기에 바이두 넷디스크 쿠키 붙여넣기</translation>
-    </message>
-    <message>
-        <source>Baidu Netdisk cookie</source>
-        <translation type="vanished">바이두 넷디스크 Cookie</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation type="vanished">저장</translation>
-    </message>
-    <message>
-        <source>Baidu cookie saved successfully</source>
-        <translation type="vanished">바이두 쿠키가 성공적으로 저장되었습니다.</translation>
-    </message>
-</context>
-<context>
     <name>BasicSettingPage</name>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="32"/>
@@ -1658,10 +1623,6 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
         <translation>클라우드 드라이브</translation>
     </message>
     <message>
-        <source>Add a new download from a link, torrent, or Baidu cloud share.</source>
-        <translation type="vanished">링크, 토렌트 또는 Baidu 공유에서 새 다운로드를 추가합니다.</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/HomePage.qml" line="163"/>
         <source>Add URL</source>
         <translation>URL 추가</translation>
@@ -1680,10 +1641,6 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
         <location filename="../qml/Browser/HomePage.qml" line="173"/>
         <source>Drop torrent files</source>
         <translation>토렌트 파일 끌어다 놓기</translation>
-    </message>
-    <message>
-        <source>Baidu</source>
-        <translation type="vanished">Baidu</translation>
     </message>
     <message>
         <location filename="../qml/Browser/HomePage.qml" line="182"/>
@@ -1996,14 +1953,6 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
 <context>
     <name>NetDiskPageView</name>
     <message>
-        <source>Invalid Baidu Netdisk URL, please check.</source>
-        <translation type="vanished">잘못된 바이두 넷디스크 URL을 확인하세요.</translation>
-    </message>
-    <message>
-        <source>Please set Baidu Netdisk cookies first.</source>
-        <translation type="vanished">먼저 바이두 넷디스크 쿠키를 설정하세요.</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="128"/>
         <source>Cloud link parser</source>
         <translation>클라우드 링크 분석</translation>
@@ -2019,33 +1968,9 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
         <translation>파일 미리보기</translation>
     </message>
     <message>
-        <source>Cookie required. Set Baidu Netdisk cookies in Preferences before parsing share links.</source>
-        <translation type="vanished">쿠키가 필요합니다. 공유 링크를 분석하기 전에 환경설정에서 Baidu Netdisk 쿠키를 설정하세요.</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="51"/>
         <source>The cloud request timed out. Please check your network and try again.</source>
         <translation>클라우드 요청이 시간 초과되었습니다. 네트워크를 확인하고 다시 시도하세요.</translation>
-    </message>
-    <message>
-        <source>Enter a valid Baidu Netdisk share link before parsing.</source>
-        <translation type="vanished">구문 분석 전에 유효한 바이두 넷디스크 공유 링크를 입력하세요.</translation>
-    </message>
-    <message>
-        <source>Baidu Netdisk cookies are required. Add them in Preferences and try again.</source>
-        <translation type="vanished">바이두 넷디스크 Cookie가 필요합니다. 기본 설정에서 추가한 후 다시 시도하세요.</translation>
-    </message>
-    <message>
-        <source>Preview a Baidu share safely before adding selected files to the queue.</source>
-        <translation type="vanished">선택한 파일을 대기열에 추가하기 전에 바이두 공유를 안전하게 미리 보세요.</translation>
-    </message>
-    <message>
-        <source>Baidu share link</source>
-        <translation type="vanished">바이두 공유 링크</translation>
-    </message>
-    <message>
-        <source>Paste https://pan.baidu.com/s/... here</source>
-        <translation type="vanished">https://pan.baidu.com/s/... 링크를 여기에 붙여넣으세요</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="224"/>
@@ -2063,10 +1988,6 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
         <translation>링크 분석</translation>
     </message>
     <message>
-        <source>Validate the share URL and cookie.</source>
-        <translation type="vanished">공유 URL과 Cookie를 확인합니다.</translation>
-    </message>
-    <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="264"/>
         <source>Browse folders and select files.</source>
         <translation>폴더를 찾아보고 파일을 선택합니다.</translation>
@@ -2080,14 +2001,6 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="265"/>
         <source>Send the selection to aria2.</source>
         <translation>선택한 항목을 aria2로 전송합니다.</translation>
-    </message>
-    <message>
-        <source>Baidu Netdisk is ready. Parsed files remain local until you add them to the queue.</source>
-        <translation type="vanished">바이두 넷디스크가 준비되었습니다. 분석된 파일은 대기열에 추가할 때까지 로컬에 유지됩니다.</translation>
-    </message>
-    <message>
-        <source>Open Baidu cookie settings</source>
-        <translation type="vanished">Baidu 쿠키 설정 열기</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/NetDiskPageView.qml" line="69"/>
@@ -3085,67 +2998,88 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
 <context>
     <name>TaskDialogPage</name>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="114"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="115"/>
         <source>URL</source>
         <translation>작업 연결</translation>
     </message>
     <message>
-        <source>Baidu</source>
-        <translation type="vanished">바이두</translation>
-    </message>
-    <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="115"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="116"/>
         <source>Torrent</source>
         <translation>토렌트</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="116"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="117"/>
+        <source>eD2k</source>
+        <translation>eD2k</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="118"/>
         <source>Cloud Drive</source>
         <translation>클라우드 드라이브</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="177"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="184"/>
         <source>Enter download URLs (one per line, supports magnet links)</source>
         <translation>다운로드 URL 입력(한 줄에 하나씩, 자석 링크 지원)</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="183"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="190"/>
         <source>Download URLs</source>
         <translation>다운로드 URL</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="351"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="280"/>
+        <source>Enter ed2k links (one per line)</source>
+        <translation>eD2k 링크를 입력하세요 (한 줄에 하나씩)</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="286"/>
+        <source>eD2k Links</source>
+        <translation>eD2k 링크</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="483"/>
         <source>Check the task details</source>
         <translation>작업 세부 정보 확인</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="435"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="567"/>
         <source>Add Task</source>
         <translation>작업 추가</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="456"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="580"/>
+        <source>Please paste at least one eD2k link and select a file.</source>
+        <translation>eD2k 링크를 하나 이상 붙여넣고 파일을 선택하세요.</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="601"/>
         <source>Please enter at least one download URL.</source>
         <translation>다운로드 URL을 최소 하나 이상 입력하세요.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="463"/>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="470"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="608"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="615"/>
         <source>Please select a Torrent or Metalink file.</source>
         <translation>Torrent 또는 Metalink 파일을 선택하세요.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="483"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="624"/>
+        <source>Failed to add eD2k task. Please check the link(s).</source>
+        <translation>eD2k 작업 추가에 실패했습니다. 링크를 확인하세요.</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="630"/>
         <source>Download task added successfully.</source>
         <translation>다운로드 작업이 성공적으로 추가되었습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="408"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="540"/>
         <source>Advanced Options</source>
         <translation>고급 옵션</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="424"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="556"/>
         <source>Cancel</source>
         <translation>취소</translation>
     </message>
@@ -3991,13 +3925,13 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1172"/>
-        <location filename="../../Browser/browser_manager.cxx" line="1235"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1218"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1281"/>
         <source>Download failed. Please check the link or network connection.</source>
         <translation>다운로드 실패. 링크 또는 네트워크 연결을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1173"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1219"/>
         <source>Download failed: %1</source>
         <translation>다운로드 실패: %1</translation>
     </message>
