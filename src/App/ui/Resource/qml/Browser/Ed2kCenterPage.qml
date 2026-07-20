@@ -125,8 +125,10 @@ Rectangle {
             Layout.margins: GTheme.spaceXL
             currentIndex: 0
 
-            // Task 6 替换为 Ed2kSearchPage
-            Item { objectName: "ed2kSearchPlaceholder" }
+            Ed2kSearchPage {
+                objectName: "ed2kSearchPage"
+                onGoToServers: ed2kStack.currentIndex = 1
+            }
             // Task 7 替换为 Ed2kServerPage
             Item { objectName: "ed2kServersPlaceholder" }
         }

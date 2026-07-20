@@ -1,0 +1,177 @@
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import gdl.sdk
+
+// eD2k 搜索页：关键词 + 过滤条件 + 结果列表(按源数降序) + Load More
+ColumnLayout {
+    id: root
+    spacing: GTheme.spaceMD
+
+    // 未连接服务器时点击"Go to Servers"：由 Ed2kCenterPage 连接切到服务器 tab
+    // (control 是 Ed2kCenterPage.qml 里的 id，跨文档不可见，故改用信号上抛)
+    signal goToServers()
+
+    property var resultModel: Ed2kManager.GetSearchResultModel()
+
+    Connections {
+        target: Ed2kManager
+        function onSearchFailed(error) {
+            ToastManager.ShowError(qsTr("Search failed: %1").arg(error))
+        }
+    }
+
+    // 搜索表单
+    GCard {
+        Layout.fillWidth: true
+        outlined: true
+        padding: GTheme.spaceMD
+
+        RowLayout {
+            anchors.fill: parent
+            spacing: GTheme.spaceSM
+
+            GTextField {
+                id: keywordInput
+                objectName: "ed2kSearchKeyword"
+                Layout.fillWidth: true
+                placeholderText: qsTr("Enter keywords to search the eD2k network")
+                onAccepted: searchButton.clicked()
+            }
+            GComBoBox {
+                id: typeFilter
+                objectName: "ed2kSearchType"
+                // 顺序与 ed2k::server::FileType 枚举值一致(Any=0..CdImage=7)
+                model: [qsTr("Any"), qsTr("Audio"), qsTr("Video"), qsTr("Image"),
+                        qsTr("Program"), qsTr("Document"), qsTr("Archive"), qsTr("CD Image")]
+            }
+            GComBoBox {
+                id: sourceFilter
+                objectName: "ed2kSearchSource"
+                model: [qsTr("Server"), qsTr("Kad")]
+            }
+            GButton {
+                id: searchButton
+                objectName: "ed2kSearchButton"
+                text: Ed2kManager.searching ? qsTr("Searching...") : qsTr("Search")
+                enabled: !Ed2kManager.searching && keywordInput.text.trim().length > 0
+                onClicked: {
+                    root.resultModel.clear()
+                    Ed2kManager.StartSearch(keywordInput.text, typeFilter.currentIndex, 0,
+                                            sourceFilter.currentIndex)
+                }
+            }
+        }
+    }
+
+    // 结果列表
+    GCard {
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        outlined: true
+        padding: GTheme.spaceSM
+
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: GTheme.spaceSM
+
+            // 占位态：未连接 / 空结果 / 搜索中
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                visible: root.resultModel.count === 0
+
+                ColumnLayout {
+                    anchors.centerIn: parent
+                    spacing: GTheme.spaceSM
+                    Text {
+                        Layout.alignment: Qt.AlignHCenter
+                        font.pixelSize: GTheme.fontBody
+                        color: GTheme.textSecondary
+                        text: Ed2kManager.searching ? qsTr("Searching...")
+                              : (!Ed2kManager.serverConnected && sourceFilter.currentIndex === 0)
+                                ? qsTr("Not connected to any server")
+                                : qsTr("No results. Try different keywords.")
+                    }
+                    GButton {
+                        Layout.alignment: Qt.AlignHCenter
+                        visible: !Ed2kManager.serverConnected && !Ed2kManager.searching
+                                 && sourceFilter.currentIndex === 0
+                        text: qsTr("Go to Servers")
+                        onClicked: root.goToServers()
+                    }
+                }
+            }
+
+            ListView {
+                id: resultList
+                objectName: "ed2kSearchResultList"
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                visible: root.resultModel.count > 0
+                clip: true
+                spacing: GTheme.spaceXS
+                model: root.resultModel
+                ScrollBar.vertical: ScrollBar {}
+
+                delegate: GCard {
+                    width: resultList.width
+                    outlined: true
+                    padding: GTheme.spaceSM
+
+                    RowLayout {
+                        anchors.fill: parent
+                        spacing: GTheme.spaceMD
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 2
+                            Text {
+                                Layout.fillWidth: true
+                                text: model.fileName
+                                elide: Text.ElideMiddle
+                                font.pixelSize: GTheme.fontBody
+                                color: GTheme.textPrimary
+                            }
+                            Text {
+                                font.pixelSize: GTheme.fontCaption
+                                color: GTheme.textSecondary
+                                text: qsTr("%1 · %2 sources (%3 complete)")
+                                      .arg(model.fileSizeText).arg(model.sources).arg(model.completeSources)
+                            }
+                        }
+                        GButton {
+                            objectName: "ed2kResultCopy" + index
+                            iconName: "link"
+                            ToolTip.visible: hovered
+                            ToolTip.text: qsTr("Copy ed2k link")
+                            onClicked: {
+                                UtilsToolsManager.SetClipboardText(model.rawLink)
+                                ToastManager.ShowSuccess(qsTr("Link copied"))
+                            }
+                        }
+                        GButton {
+                            objectName: "ed2kResultDownload" + index
+                            text: qsTr("Download")
+                            onClicked: {
+                                if (BrowserManager.AddEd2kTask([model.rawLink], {})) {
+                                    ToastManager.ShowSuccess(qsTr("Download started"))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Load More（仅服务器搜索有翻页）
+            GButton {
+                objectName: "ed2kLoadMoreButton"
+                Layout.alignment: Qt.AlignHCenter
+                visible: root.resultModel.count > 0 && sourceFilter.currentIndex === 0
+                enabled: !Ed2kManager.searching
+                text: Ed2kManager.searching ? qsTr("Loading...") : qsTr("Load More")
+                onClicked: Ed2kManager.LoadMore()
+            }
+        }
+    }
+}
