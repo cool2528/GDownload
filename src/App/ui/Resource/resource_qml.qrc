@@ -13,6 +13,7 @@
         <file>qml/Browser/HomePage.qml</file>
         <file>qml/Browser/Ed2kCenterPage.qml</file>
         <file>qml/Browser/Ed2kSearchPage.qml</file>
+        <file>qml/Browser/Ed2kServerPage.qml</file>
         <file>qml/Browser/DownloadPageTitle.qml</file>
         <file>qml/CommonComponents/TaskDialogPage.qml</file>
         <file>qml/CommonComponents/GSpinBox.qml</file>
