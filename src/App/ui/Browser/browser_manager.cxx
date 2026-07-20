@@ -467,6 +467,7 @@ namespace gdl {
 						waiting_model_->RemoveTaskById(gid);
 					}
 					result.task_removed = true;
+					// 无 aria2 参与,置位仅表示"引擎侧清理无遗留",满足上层统一的删除结果判定
 					result.aria2_cleaned = true;
 					return result;
 				}
@@ -665,11 +666,14 @@ namespace gdl {
 							history_remove_result.GetError().Describe());
 				}
 
-				QString aria2_error;
-				if (RemoveAria2DownloadResultByGid(gid, &aria2_error) ==
-					StoppedTaskAria2CleanupStatus::kFailed) {
-					LOG_WARN("Retry started but failed to remove old aria2 result gid:{} error:{}",
-							 gid.toStdString(), aria2_error.toStdString());
+				// ed2k 任务在 aria2 中不存在,跳过对其无意义的 RPC 清理调用
+				if (!gid.startsWith(QStringLiteral("ed2k-"))) {
+					QString aria2_error;
+					if (RemoveAria2DownloadResultByGid(gid, &aria2_error) ==
+						StoppedTaskAria2CleanupStatus::kFailed) {
+						LOG_WARN("Retry started but failed to remove old aria2 result gid:{} error:{}",
+								 gid.toStdString(), aria2_error.toStdString());
+					}
 				}
 				if (!stopped_model_->RemoveTaskById(gid)) {
 					LOG_WARN("Retry started but failed to remove old stopped task gid:{}", gid.toStdString());
@@ -701,6 +705,44 @@ namespace gdl {
 				const auto task = stopped_model_->GetTaskById(gid);
 				if (!task) {
 					LOG_ERR("RemoveStopTask failed: task was not found gid:{}", gid.toStdString());
+					return result;
+				}
+
+				// ed2k 任务与 aria2 无关:不能走 aria2 RPC 清理(对 "ed2k-" 前缀 GID aria2 返回
+				// "Invalid GID",不匹配"结果已缺失"判定,会导致删除流程中断、条目和历史永远删不掉)。
+				// 终态任务通常已被引擎自动移出任务表,这里再调一次引擎移除仅作防御(不存在时为空操作);
+				// 文件清理由本层负责:数据文件直接写在目标路径,控制文件为 <save_path>.part.met
+				if (gid.startsWith(QStringLiteral("ed2k-"))) {
+					if (engine::Ed2kDownloadManager::Instance().EngineIsRunning()) {
+						engine::Ed2kDownloadManager::Instance().RemoveTask(gid.toStdString(), false);
+					}
+					const QString ed2k_save_path = task->task_save_path();
+					if (!stopped_model_->RemoveTaskById(gid)) {
+						LOG_ERR("RemoveStopTask failed to remove stopped model entry gid:{}", gid.toStdString());
+						return result;
+					}
+					result.task_removed = true;
+					// 无 aria2 参与,置位仅表示"引擎侧清理无遗留",满足上层统一的删除结果判定
+					result.aria2_cleaned = true;
+					const auto ed2k_history_result =
+						gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
+					result.history_cleaned = ed2k_history_result.IsOk();
+					if (ed2k_history_result.HasError()) {
+						LOG_ERR("RemoveStopTask failed to remove history record gid:{} error:{}",
+								gid.toStdString(), ed2k_history_result.GetError().Describe());
+					}
+					if (is_remove_file) {
+						result.content = RemoveLocalContent(ed2k_save_path);
+						if (result.content.status == LocalRemovalStatus::kFailed) {
+							LOG_WARN("RemoveStopTask failed to remove downloaded content gid:{} error:{}",
+									 gid.toStdString(), result.content.error.toStdString());
+						}
+						result.control_file = RemoveLocalContent(ed2k_save_path + QStringLiteral(".part.met"));
+						if (result.control_file.status == LocalRemovalStatus::kFailed) {
+							LOG_WARN("RemoveStopTask failed to remove ed2k control file gid:{} error:{}",
+									 gid.toStdString(), result.control_file.error.toStdString());
+						}
+					}
 					return result;
 				}
 
@@ -860,6 +902,16 @@ namespace gdl {
 				}
 				file_preview_model->setFiles(file_model_list);
 				return file_preview_model;
+			}
+
+			QStringList BrowserManagerImpl::GetValidEd2kLinks(const QString& text) {
+				const auto entries = gdl::ui::browser::ParseEd2kLinks(text);
+				QStringList links;
+				links.reserve(entries.size());
+				for (const auto& entry : entries) {
+					links.append(entry.raw);
+				}
+				return links;
 			}
 
 			bool BrowserManagerImpl::AddEd2kTask(const QVariantList& links, const QVariantMap& options) {

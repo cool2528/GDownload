@@ -40,6 +40,12 @@ namespace gdl {
 				if (decoded_name.isEmpty()) {
 					return entry;
 				}
+				// 链接来自网页/剪贴板等外部输入,百分号解码可能还原出路径分隔符或 ".."(如 %2F%2E%2E),
+				// 文件名会被引擎拼进保存路径,必须拒绝任何可逃出目标目录的名字
+				if (decoded_name.contains(QLatin1Char('/')) || decoded_name.contains(QLatin1Char('\\')) ||
+					decoded_name == QStringLiteral("..") || decoded_name == QStringLiteral(".")) {
+					return entry;
+				}
 
 				bool size_ok = false;
 				const std::int64_t size = tokens.at(3).toLongLong(&size_ok);

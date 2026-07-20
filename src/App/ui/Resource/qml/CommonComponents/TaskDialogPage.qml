@@ -330,7 +330,8 @@ Popup {
                                         ed2kPreview.previewModel = null
                                         taskPageLayout.ed2kLinks = []
                                     } else {
-                                        taskPageLayout.ed2kLinks = taskPageLayout.parseEd2kRawLinks(text)
+                                        // 链接列表与预览模型必须来自同一 C++ 解析器，保证行索引一一对应
+                                        taskPageLayout.ed2kLinks = BrowserManager.GetValidEd2kLinks(text)
                                         ed2kPreview.previewModel = BrowserManager.ParseEd2kLinks(text)
                                     }
                                 }
@@ -398,28 +399,6 @@ Popup {
                             }
                             return selected
                         }
-                    }
-
-                    // 按 ed2k_link.cxx (ParseEd2kLink) 同样的合法性规则，从粘贴文本中原样提取
-                    // 有效的 ed2k 链接（顺序与 BrowserManager.ParseEd2kLinks 生成的 previewModel 行一一对应）。
-                    // FilePreviewModel 只保存文件名/大小等展示字段，不携带原始链接，故需要在 QML 侧
-                    // 重新做一次同规则的过滤，才能把勾选的行索引映射回完整链接字符串。
-                    function parseEd2kRawLinks(text) {
-                        let links = []
-                        const lines = Utils.splitPath(text)
-                        for (let i = 0; i < lines.length; ++i) {
-                            const line = String(lines[i]).trim()
-                            if (line.length === 0) continue
-                            if (!/^ed2k:\/\//i.test(line)) continue
-                            const tokens = line.split('|')
-                            if (tokens.length < 5) continue
-                            if (tokens[1].toLowerCase() !== "file") continue
-                            if (tokens[2].length === 0) continue
-                            if (!/^\d+$/.test(tokens[3]) || Number(tokens[3]) <= 0) continue
-                            if (!/^[0-9A-Fa-f]{32}$/.test(tokens[4])) continue
-                            links.push(line)
-                        }
-                        return links
                     }
 
                     function getOptions() {

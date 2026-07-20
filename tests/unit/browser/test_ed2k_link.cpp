@@ -42,6 +42,22 @@ TEST(Ed2kLinkTest, IsEd2kLinkTrimsAndIgnoresCase) {
 	EXPECT_FALSE(IsEd2kLink(QStringLiteral("magnet:?xt=...")));
 }
 
+// 文件名会被拼进保存路径,任何解码后含路径分隔符或目录跳转的名字都必须拒绝
+TEST(Ed2kLinkTest, RejectsPathTraversalFileName) {
+	// 百分号编码还原出 "../x"
+	EXPECT_FALSE(
+		ParseEd2kLink(QStringLiteral("ed2k://|file|%2E%2E%2Fx|100|00112233445566778899AABBCCDDEEFF|/")).valid);
+	// 反斜杠(Windows 分隔符)
+	EXPECT_FALSE(
+		ParseEd2kLink(QStringLiteral("ed2k://|file|a%5Cb.exe|100|00112233445566778899AABBCCDDEEFF|/")).valid);
+	// 纯 ".."
+	EXPECT_FALSE(
+		ParseEd2kLink(QStringLiteral("ed2k://|file|..|100|00112233445566778899AABBCCDDEEFF|/")).valid);
+	// 正常带点文件名不受影响
+	EXPECT_TRUE(
+		ParseEd2kLink(QStringLiteral("ed2k://|file|a.tar.gz|100|00112233445566778899AABBCCDDEEFF|/")).valid);
+}
+
 TEST(Ed2kLinkTest, ParsesMultipleLinesFromText) {
 	const QVector<Ed2kFileEntry> entries = ParseEd2kLinks(QStringLiteral(
 		"ed2k://|file|a|1|00112233445566778899AABBCCDDEEFF|/\n"
