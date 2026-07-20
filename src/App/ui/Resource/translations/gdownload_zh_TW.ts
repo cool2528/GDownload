@@ -379,16 +379,21 @@
     </message>
     <message>
         <location filename="../qml/Browser/BrowserView.qml" line="17"/>
+        <source>eD2k</source>
+        <translation>eD2k</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BrowserView.qml" line="19"/>
         <source>Waiting</source>
         <translation>等待中</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserView.qml" line="19"/>
+        <location filename="../qml/Browser/BrowserView.qml" line="21"/>
         <source>Stopped</source>
         <translation>已停止</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BrowserView.qml" line="20"/>
+        <location filename="../qml/Browser/BrowserView.qml" line="22"/>
         <source>Downloads</source>
         <translation>下載</translation>
     </message>
@@ -824,6 +829,268 @@
         <location filename="../qml/Browser/DownloadPageView.qml" line="110"/>
         <source>Comfort</source>
         <translation>舒適</translation>
+    </message>
+</context>
+<context>
+    <name>Ed2kCenterPage</name>
+    <message>
+        <location filename="../qml/Browser/Ed2kCenterPage.qml" line="33"/>
+        <source>eD2k Network</source>
+        <translation>eD2k 網路</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kCenterPage.qml" line="39"/>
+        <source>Search files and manage servers on the eD2k network</source>
+        <translation>在 eD2k 網路中搜尋檔案並管理伺服器</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kCenterPage.qml" line="72"/>
+        <source>Connected: %1</source>
+        <translation>已連線：%1</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kCenterPage.qml" line="73"/>
+        <source>Connected</source>
+        <translation>已連線</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kCenterPage.qml" line="74"/>
+        <source>Not connected</source>
+        <translation>未連線</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kCenterPage.qml" line="103"/>
+        <source>Search</source>
+        <translation>搜尋</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kCenterPage.qml" line="114"/>
+        <source>Servers</source>
+        <translation>伺服器</translation>
+    </message>
+</context>
+<context>
+    <name>Ed2kSearchPage</name>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="21"/>
+        <source>Search failed: %1</source>
+        <translation>搜尋失敗：%1</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="39"/>
+        <source>Enter keywords to search the eD2k network</source>
+        <translation>輸入關鍵字以在 eD2k 網路中搜尋</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="46"/>
+        <source>Any</source>
+        <translation>任意</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="46"/>
+        <source>Audio</source>
+        <translation>音訊</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="46"/>
+        <source>Video</source>
+        <translation>視訊</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="46"/>
+        <source>Image</source>
+        <translation>圖片</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="47"/>
+        <source>Program</source>
+        <translation>程式</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="47"/>
+        <source>Document</source>
+        <translation>文件</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="47"/>
+        <source>Archive</source>
+        <translation>壓縮檔</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="47"/>
+        <source>CD Image</source>
+        <translation>光碟映像</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="52"/>
+        <source>Server</source>
+        <translation>伺服器</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="52"/>
+        <source>Kad</source>
+        <translation>Kad</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="57"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="92"/>
+        <source>Searching...</source>
+        <translation>搜尋中…</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="57"/>
+        <source>Search</source>
+        <translation>搜尋</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="94"/>
+        <source>Not connected to any server</source>
+        <translation>未連線至任何伺服器</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="95"/>
+        <source>No results. Try different keywords.</source>
+        <translation>沒有結果，請嘗試其他關鍵字。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="101"/>
+        <source>Go to Servers</source>
+        <translation>前往伺服器</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="140"/>
+        <source>%1 · %2 sources (%3 complete)</source>
+        <translation>%1 · %2 個來源（%3 個完整）</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="148"/>
+        <source>Copy ed2k link</source>
+        <translation>複製 ed2k 連結</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="151"/>
+        <source>Link copied</source>
+        <translation>連結已複製</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="156"/>
+        <source>Download</source>
+        <translation>下載</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="159"/>
+        <source>Download started</source>
+        <translation>已開始下載</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="173"/>
+        <source>Loading...</source>
+        <translation>載入中…</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="173"/>
+        <source>Load More</source>
+        <translation>載入更多</translation>
+    </message>
+</context>
+<context>
+    <name>Ed2kServerPage</name>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="26"/>
+        <source>Update from URL</source>
+        <translation>從 URL 更新</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="31"/>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="137"/>
+        <source>Add Server</source>
+        <translation>新增伺服器</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="38"/>
+        <source>Disconnect</source>
+        <translation>中斷連線</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="85"/>
+        <source>%1 · %2 users · %3 files</source>
+        <translation>%1 · %2 個使用者 · %3 個檔案</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="91"/>
+        <source>Connected</source>
+        <translation>已連線</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="91"/>
+        <source>Connect</source>
+        <translation>連線</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="99"/>
+        <source>Remove server</source>
+        <translation>移除伺服器</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="124"/>
+        <source>Kad: connected (%1 contacts)</source>
+        <translation>Kad：已連線（%1 個節點）</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="125"/>
+        <source>Kad: not running</source>
+        <translation>Kad：未執行</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="176"/>
+        <source>Name (optional)</source>
+        <translation>名稱（可選）</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="182"/>
+        <source>IP address</source>
+        <translation>IP 位址</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="189"/>
+        <source>Port</source>
+        <translation>連接埠</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="200"/>
+        <source>Please enter an IP address and a port between 1 and 65535.</source>
+        <translation>請輸入 IP 位址與 1 到 65535 之間的連接埠。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="219"/>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="279"/>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="225"/>
+        <source>Add</source>
+        <translation>新增</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="246"/>
+        <source>Update Server List</source>
+        <translation>更新伺服器清單</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="259"/>
+        <source>server.met URL</source>
+        <translation>server.met 網址</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="260"/>
+        <source>http://upd.emule-security.org/server.met</source>
+        <translation>http://upd.emule-security.org/server.met</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="285"/>
+        <source>Update</source>
+        <translation>更新</translation>
     </message>
 </context>
 <context>
@@ -1934,18 +2201,24 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Navigator/NavigatorView.qml" line="174"/>
         <location filename="../qml/Navigator/NavigatorView.qml" line="176"/>
+        <source>eD2k network</source>
+        <translation>eD2k 網路</translation>
+    </message>
+    <message>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="193"/>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="195"/>
         <source>Add download</source>
         <translation>新增下載</translation>
     </message>
     <message>
-        <location filename="../qml/Navigator/NavigatorView.qml" line="206"/>
-        <location filename="../qml/Navigator/NavigatorView.qml" line="208"/>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="225"/>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="227"/>
         <source>Preferences</source>
         <translation>偏好設定</translation>
     </message>
     <message>
-        <location filename="../qml/Navigator/NavigatorView.qml" line="224"/>
-        <location filename="../qml/Navigator/NavigatorView.qml" line="226"/>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="243"/>
+        <location filename="../qml/Navigator/NavigatorView.qml" line="245"/>
         <source>Help and about</source>
         <translation>說明與關於</translation>
     </message>
@@ -2524,12 +2797,12 @@ Copyright © 2024 GDownload Team
         <translation>秒</translation>
     </message>
     <message>
-        <location filename="../../view/mainwindow.cxx" line="156"/>
+        <location filename="../../view/mainwindow.cxx" line="158"/>
         <source>The download engine stopped unexpectedly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/mainwindow.cxx" line="164"/>
+        <location filename="../../view/mainwindow.cxx" line="166"/>
         <source>Download engine is unavailable.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3038,48 +3311,48 @@ Copyright © 2024 GDownload Team
         <translation>eD2k 連結</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="483"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="462"/>
         <source>Check the task details</source>
         <translation>檢查任務詳情</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="567"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="546"/>
         <source>Add Task</source>
         <translation>添加任务</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="580"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="559"/>
         <source>Please paste at least one eD2k link and select a file.</source>
         <translation>請貼上至少一個 eD2k 連結並選擇一個檔案。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="601"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="580"/>
         <source>Please enter at least one download URL.</source>
         <translation>請至少輸入一個下載網址。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="608"/>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="615"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="587"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="594"/>
         <source>Please select a Torrent or Metalink file.</source>
         <translation>請選擇 Torrent 或 Metalink 檔案。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="624"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="603"/>
         <source>Failed to add eD2k task. Please check the link(s).</source>
         <translation>新增 eD2k 任務失敗，請檢查連結。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="630"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="609"/>
         <source>Download task added successfully.</source>
         <translation>下載任務已成功新增。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="540"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="519"/>
         <source>Advanced Options</source>
         <translation>進階選項</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="556"/>
+        <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="535"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
@@ -3835,7 +4108,7 @@ Copyright © 2024 GDownload Team
     <name>gdl::ui::browser::BrowserManagerImpl</name>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="206"/>
-        <location filename="../../Browser/browser_manager.cxx" line="879"/>
+        <location filename="../../Browser/browser_manager.cxx" line="931"/>
         <source>Invalid ed2k link: %1</source>
         <translation>ed2k 連結無效：%1</translation>
     </message>
@@ -3895,45 +4168,53 @@ Copyright © 2024 GDownload Team
         <translation>新增 Metalink 任務失敗：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="634"/>
+        <location filename="../../Browser/browser_manager.cxx" line="635"/>
         <source>Failed to retry task: missing task id.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="638"/>
+        <location filename="../../Browser/browser_manager.cxx" line="639"/>
         <source>Failed to retry task: stopped task list is not available.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="644"/>
+        <location filename="../../Browser/browser_manager.cxx" line="645"/>
         <source>Failed to retry task: task was not found.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="648"/>
+        <location filename="../../Browser/browser_manager.cxx" line="649"/>
         <source>Only failed tasks can be retried.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="654"/>
+        <location filename="../../Browser/browser_manager.cxx" line="655"/>
         <source>Failed to retry task: original download link is unavailable.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="680"/>
+        <location filename="../../Browser/browser_manager.cxx" line="684"/>
         <source>Retry started, but the old failed task could not be removed from history.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1218"/>
-        <location filename="../../Browser/browser_manager.cxx" line="1281"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1270"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1333"/>
         <source>Download failed. Please check the link or network connection.</source>
         <translation>下載失敗。請檢查連結或網路連線。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1219"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1271"/>
         <source>Download failed: %1</source>
         <translation>下載失敗：%1</translation>
+    </message>
+</context>
+<context>
+    <name>gdl::ui::ed2k::Ed2kManager</name>
+    <message>
+        <location filename="../../Ed2k/ed2k_manager.cxx" line="210"/>
+        <source>Search timed out</source>
+        <translation>搜尋逾時</translation>
     </message>
 </context>
 <context>
