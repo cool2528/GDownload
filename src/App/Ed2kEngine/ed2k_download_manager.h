@@ -44,6 +44,24 @@ class Ed2kEngine_API Ed2kDownloadManager : public Singleton<Ed2kDownloadManager>
 	void PauseAll();
 	void UnpauseAll();
 
+	// ---- Phase 2: 搜索与服务器管理（全部线程安全，post 到网络线程执行，结果经 PubSub 发布）----
+	// 发起搜索。file_type 对应 ed2k::server::FileType 枚举值(0=Any)；source 0=服务器 1=Kad。
+	// 结果发布到 kEd2kSearchResult；搜索进行中重复调用会被忽略(引擎前台请求必须串行)。
+	void Search(const std::string& keyword, int file_type, std::int64_t min_size, int source);
+	// 取回上一次服务器搜索的下一批结果（append=true 发布）
+	void SearchMore();
+	// 连接服务器；ip 为空串时由引擎自动选择。结果/状态发布到 kEd2kServerState。
+	void ConnectServer(const std::string& ip, std::uint16_t port);
+	void DisconnectServer();
+	// 请求服务器列表快照，发布到 kEd2kServerList
+	void RequestServerList();
+	void AddServer(const std::string& ip, std::uint16_t port, const std::string& name);
+	void RemoveServer(const std::string& ip, std::uint16_t port);
+	// 从 URL 更新 server.met，完成后自动发布最新列表
+	void UpdateServerMet(const std::string& url);
+	// 请求 Kad 状态快照，发布到 kEd2kKadStatus
+	void RequestKadStatus();
+
 	Subscription SubscriptionEd2kMessage(const std::string& topic,
 										 std::function<void(const std::string&)> handler);
 	void UnSubscribeEd2kMessage(Subscription subscription);
@@ -52,6 +70,8 @@ class Ed2kEngine_API Ed2kDownloadManager : public Singleton<Ed2kDownloadManager>
 	explicit Ed2kDownloadManager();
 	// 安排下一次 1s 采样（内部递归重排，网络线程执行）
 	void ScheduleSampling();
+	// 仅在网络线程调用：序列化当前服务器列表并发布 kEd2kServerList
+	void PublishServerListLocked();
 	struct Impl;
 	std::unique_ptr<Impl> impl_;
 };

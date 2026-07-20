@@ -8,6 +8,9 @@
 #include <thread>
 #include <variant>
 
+#include <boost/asio/awaitable.hpp>
+#include <boost/asio/co_spawn.hpp>
+#include <boost/asio/detached.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/post.hpp>
 #include <boost/asio/steady_timer.hpp>
@@ -18,6 +21,7 @@
 
 #include <ed2k/link/ed2k_link.hpp>
 #include <ed2k/net/runtime.hpp>
+#include <ed2k/server/opcodes.hpp>
 #include <ed2k/session/session.hpp>
 
 #include "ed2k_engine_def.h"
@@ -49,6 +53,35 @@ std::string TaskStateToString(ed2k::session::TaskState state) {
 	return "unknown";
 }
 
+// 把一批搜索结果序列化为 kEd2kSearchResult 的 JSON payload
+std::string SearchResultsToJson(const std::vector<ed2k::server::SearchResultItem>& items, bool append) {
+	nlohmann::json doc;
+	doc["ok"] = true;
+	doc["error"] = std::string();
+	doc["append"] = append;
+	nlohmann::json arr = nlohmann::json::array();
+	for (const auto& item : items) {
+		nlohmann::json j;
+		j["name"] = item.name;
+		j["size"] = item.size;
+		j["hash"] = item.hash.to_hex();
+		j["sources"] = item.sources;
+		j["complete_sources"] = item.complete_sources;
+		arr.push_back(std::move(j));
+	}
+	doc["items"] = std::move(arr);
+	return doc.dump();
+}
+
+std::string SearchErrorToJson(const std::string& error) {
+	nlohmann::json doc;
+	doc["ok"] = false;
+	doc["error"] = error;
+	doc["append"] = false;
+	doc["items"] = nlohmann::json::array();
+	return doc.dump();
+}
+
 }  // namespace
 
 // 内部实现：网络线程运行 ed2k::net::IoRuntime，Session 在其上构造/析构。
@@ -67,6 +100,11 @@ struct Ed2kDownloadManager::Impl {
 
 	// 1s 采样定时器，仅在网络线程上 arm/cancel
 	std::unique_ptr<boost::asio::steady_timer> sample_timer;
+
+	// 搜索/连接前台请求 in-flight 守卫：Session 同连接前台请求必须串行(引擎契约)，
+	// 进行中忽略新请求；仅在网络线程读写，无需加锁
+	bool search_in_flight = false;
+	bool connect_in_flight = false;
 };
 
 Ed2kDownloadManager::Ed2kDownloadManager() : impl_(std::make_unique<Impl>()) {}
@@ -107,7 +145,19 @@ bool Ed2kDownloadManager::InitEd2kEngine(const Ed2kEngineConfig& config) {
 			try {
 				const auto* task_event = std::get_if<ed2k::session::TaskStateEvent>(&event);
 				if (!task_event) {
-					// ServerStateEvent 等其它事件暂不在 Task 4 范围内处理
+					// 服务器状态事件：连接后服务器身份/用户数/文件数快照
+					if (const auto* srv = std::get_if<ed2k::session::ServerStateEvent>(&event)) {
+						nlohmann::json doc;
+						doc["connected"] = srv->connected;
+						doc["name"] = srv->name;
+						doc["high_id"] = srv->high_id;
+						doc["users"] = srv->users;
+						doc["files"] = srv->files;
+						doc["error"] = std::string();
+						if (impl_->pubsub) {
+							impl_->pubsub->Publish(kEd2kServerState, doc.dump());
+						}
+					}
 					return;
 				}
 				auto it = impl_->session_to_id.find(task_event->task_id);
@@ -399,6 +449,287 @@ void Ed2kDownloadManager::UnpauseAll() {
 		for (const auto& [task_id, session_id] : impl_->id_to_session) {
 			impl_->session->resume(session_id);
 		}
+	});
+}
+
+void Ed2kDownloadManager::Search(const std::string& keyword, int file_type, std::int64_t min_size,
+								 int source) {
+	if (!impl_->running.load()) {
+		return;
+	}
+	boost::asio::post(impl_->runtime.executor(), [this, keyword, file_type, min_size, source] {
+		if (!impl_->session || impl_->search_in_flight) {
+			return;
+		}
+		impl_->search_in_flight = true;
+		boost::asio::co_spawn(
+			impl_->runtime.executor(),
+			[this, keyword, file_type, min_size, source]() -> boost::asio::awaitable<void> {
+				try {
+					if (source == 1) {
+						// Kad 搜索：结果结构不同(KadSearchEntry)，转成与服务器搜索一致的 payload
+						auto r = co_await impl_->session->kad_search(keyword);
+						if (impl_->pubsub) {
+							if (r) {
+								nlohmann::json doc;
+								doc["ok"] = true;
+								doc["error"] = std::string();
+								doc["append"] = false;
+								nlohmann::json arr = nlohmann::json::array();
+								for (const auto& entry : r.value()) {
+									nlohmann::json j;
+									// KadSearchEntry 的名称/大小从 tags 提取(kad tag id: name=0x01 size=0x02 sources=0x15)
+									std::string name;
+									std::uint64_t size = 0;
+									std::uint64_t sources = 0;
+									for (const auto& t : entry.tags) {
+										if (t.name_id == 0x01 && std::holds_alternative<std::string>(t.value)) {
+											name = std::get<std::string>(t.value);
+										} else if (t.name_id == 0x02 && std::holds_alternative<std::uint64_t>(t.value)) {
+											size = std::get<std::uint64_t>(t.value);
+										} else if (t.name_id == 0x15 && std::holds_alternative<std::uint64_t>(t.value)) {
+											sources = std::get<std::uint64_t>(t.value);
+										}
+									}
+									if (name.empty() || size == 0) {
+										continue;
+									}
+									j["name"] = name;
+									j["size"] = size;
+									j["hash"] = entry.answer_id.to_hex();
+									j["sources"] = sources;
+									j["complete_sources"] = 0;
+									arr.push_back(std::move(j));
+								}
+								doc["items"] = std::move(arr);
+								impl_->pubsub->Publish(kEd2kSearchResult, doc.dump());
+							} else {
+								impl_->pubsub->Publish(kEd2kSearchResult, SearchErrorToJson(r.error().message()));
+							}
+						}
+					} else {
+						ed2k::session::SearchFilters filters;
+						filters.type = static_cast<ed2k::server::FileType>(file_type);
+						filters.min_size = min_size > 0 ? static_cast<std::uint64_t>(min_size) : 0;
+						auto r = co_await impl_->session->search(keyword, filters);
+						if (impl_->pubsub) {
+							impl_->pubsub->Publish(kEd2kSearchResult,
+								r ? SearchResultsToJson(r.value(), false) : SearchErrorToJson(r.error().message()));
+						}
+					}
+				} catch (const std::exception& e) {
+					LOG_ERR("ed2k search failed: {}", e.what());
+					if (impl_->pubsub) {
+						impl_->pubsub->Publish(kEd2kSearchResult, SearchErrorToJson(e.what()));
+					}
+				}
+				impl_->search_in_flight = false;
+				co_return;
+			},
+			boost::asio::detached);
+	});
+}
+
+void Ed2kDownloadManager::SearchMore() {
+	if (!impl_->running.load()) {
+		return;
+	}
+	boost::asio::post(impl_->runtime.executor(), [this] {
+		if (!impl_->session || impl_->search_in_flight) {
+			return;
+		}
+		impl_->search_in_flight = true;
+		boost::asio::co_spawn(impl_->runtime.executor(), [this]() -> boost::asio::awaitable<void> {
+			try {
+				auto r = co_await impl_->session->search_more();
+				if (impl_->pubsub) {
+					impl_->pubsub->Publish(kEd2kSearchResult,
+						r ? SearchResultsToJson(r.value(), true) : SearchErrorToJson(r.error().message()));
+				}
+			} catch (const std::exception& e) {
+				LOG_ERR("ed2k search_more failed: {}", e.what());
+				if (impl_->pubsub) {
+					impl_->pubsub->Publish(kEd2kSearchResult, SearchErrorToJson(e.what()));
+				}
+			}
+			impl_->search_in_flight = false;
+			co_return;
+		}, boost::asio::detached);
+	});
+}
+
+void Ed2kDownloadManager::ConnectServer(const std::string& ip, std::uint16_t port) {
+	if (!impl_->running.load()) {
+		return;
+	}
+	boost::asio::post(impl_->runtime.executor(), [this, ip, port] {
+		if (!impl_->session || impl_->connect_in_flight) {
+			return;
+		}
+		impl_->connect_in_flight = true;
+		boost::asio::co_spawn(impl_->runtime.executor(), [this, ip, port]() -> boost::asio::awaitable<void> {
+			try {
+				std::optional<ed2k::app::ServerTarget> target;
+				if (!ip.empty()) {
+					auto parsed = ed2k::IPv4::from_dotted(ip);
+					if (parsed) {
+						target = ed2k::app::ServerTarget{parsed.value(), port};
+					}
+				}
+				auto r = co_await impl_->session->connect_server(target);
+				nlohmann::json doc;
+				if (r) {
+					doc["connected"] = true;
+					doc["high_id"] = r->high_id;
+					doc["error"] = std::string();
+					// name/users/files 由 Session 的 ServerStateEvent 补充(见事件转发)
+					doc["name"] = std::string();
+					doc["users"] = 0;
+					doc["files"] = 0;
+				} else {
+					doc["connected"] = false;
+					doc["high_id"] = false;
+					doc["name"] = std::string();
+					doc["users"] = 0;
+					doc["files"] = 0;
+					doc["error"] = r.error().message();
+				}
+				if (impl_->pubsub) {
+					impl_->pubsub->Publish(kEd2kServerState, doc.dump());
+				}
+				// 连接态变化会影响列表 connected 标记，顺带刷新列表
+				PublishServerListLocked();
+			} catch (const std::exception& e) {
+				LOG_ERR("ed2k connect_server failed: {}", e.what());
+			}
+			impl_->connect_in_flight = false;
+			co_return;
+		}, boost::asio::detached);
+	});
+}
+
+void Ed2kDownloadManager::DisconnectServer() {
+	if (!impl_->running.load()) {
+		return;
+	}
+	boost::asio::post(impl_->runtime.executor(), [this] {
+		if (!impl_->session) {
+			return;
+		}
+		impl_->session->disconnect_server();
+		nlohmann::json doc;
+		doc["connected"] = false;
+		doc["high_id"] = false;
+		doc["error"] = std::string();
+		doc["name"] = std::string();
+		doc["users"] = 0;
+		doc["files"] = 0;
+		if (impl_->pubsub) {
+			impl_->pubsub->Publish(kEd2kServerState, doc.dump());
+		}
+		PublishServerListLocked();
+	});
+}
+
+// 仅网络线程调用：把当前 server_list 序列化发布
+void Ed2kDownloadManager::PublishServerListLocked() {
+	if (!impl_->session || !impl_->pubsub) {
+		return;
+	}
+	nlohmann::json doc;
+	nlohmann::json arr = nlohmann::json::array();
+	for (const auto& info : impl_->session->server_list()) {
+		nlohmann::json j;
+		j["ip"] = info.ip.to_dotted();
+		j["port"] = info.port;
+		j["name"] = info.name;
+		j["connected"] = info.connected;
+		j["users"] = info.users;
+		j["files"] = info.files;
+		j["max_users"] = info.max_users;
+		arr.push_back(std::move(j));
+	}
+	doc["servers"] = std::move(arr);
+	impl_->pubsub->Publish(kEd2kServerList, doc.dump());
+}
+
+void Ed2kDownloadManager::RequestServerList() {
+	if (!impl_->running.load()) {
+		return;
+	}
+	boost::asio::post(impl_->runtime.executor(), [this] { PublishServerListLocked(); });
+}
+
+void Ed2kDownloadManager::AddServer(const std::string& ip, std::uint16_t port, const std::string& name) {
+	if (!impl_->running.load()) {
+		return;
+	}
+	boost::asio::post(impl_->runtime.executor(), [this, ip, port, name] {
+		if (!impl_->session) {
+			return;
+		}
+		auto parsed = ed2k::IPv4::from_dotted(ip);
+		if (!parsed) {
+			return;
+		}
+		impl_->session->add_server(parsed.value(), port, name);
+		PublishServerListLocked();
+	});
+}
+
+void Ed2kDownloadManager::RemoveServer(const std::string& ip, std::uint16_t port) {
+	if (!impl_->running.load()) {
+		return;
+	}
+	boost::asio::post(impl_->runtime.executor(), [this, ip, port] {
+		if (!impl_->session) {
+			return;
+		}
+		auto parsed = ed2k::IPv4::from_dotted(ip);
+		if (!parsed) {
+			return;
+		}
+		impl_->session->remove_server(parsed.value(), port);
+		PublishServerListLocked();
+	});
+}
+
+void Ed2kDownloadManager::UpdateServerMet(const std::string& url) {
+	if (!impl_->running.load()) {
+		return;
+	}
+	boost::asio::post(impl_->runtime.executor(), [this, url] {
+		if (!impl_->session) {
+			return;
+		}
+		boost::asio::co_spawn(impl_->runtime.executor(), [this, url]() -> boost::asio::awaitable<void> {
+			try {
+				auto r = co_await impl_->session->update_server_met(url);
+				if (!r) {
+					LOG_WARN("ed2k update_server_met failed: {}", r.error().message());
+				}
+				PublishServerListLocked();
+			} catch (const std::exception& e) {
+				LOG_ERR("ed2k update_server_met exception: {}", e.what());
+			}
+			co_return;
+		}, boost::asio::detached);
+	});
+}
+
+void Ed2kDownloadManager::RequestKadStatus() {
+	if (!impl_->running.load()) {
+		return;
+	}
+	boost::asio::post(impl_->runtime.executor(), [this] {
+		if (!impl_->session || !impl_->pubsub) {
+			return;
+		}
+		auto status = impl_->session->kad_status();
+		nlohmann::json doc;
+		doc["running"] = status.running;
+		doc["contacts"] = status.contacts;
+		impl_->pubsub->Publish(kEd2kKadStatus, doc.dump());
 	});
 }
 
