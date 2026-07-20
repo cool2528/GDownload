@@ -15,6 +15,7 @@
 #include "FramelessHelper/Quick/framelessquickmodule.h"
 #include "GDLCore/logger.h"
 #include "Models/folder_history_model.h"
+#include "Ed2k/ed2k_manager.h"
 #include "NetDisk/NetWork_Disk_magager.h"
 #include "PluginManager/plugin_manager.h"
 #include "PluginMarket/plugin_config_manager.h"
@@ -127,6 +128,7 @@ namespace gd {
 			gdl::ui::toast::RegisterTypes(engine);
 			gdl::update::RegisterTypes(engine);
 			gdl::ui::netdisk::RegisterTypes(engine);
+			gdl::ui::ed2k::RegisterTypes(engine);
 			gdl::ui::market::RegisterTypes(engine);
 			qmlRegisterSingletonInstance<gdl::ui::market::PluginMarketManager>(
 				GEXPORT_MODULE_URL, 1, 0, "PluginMarketManager",
@@ -156,12 +158,17 @@ namespace gd {
 							manager->SetEngineUnavailable(QObject::tr("The download engine stopped unexpectedly."));
 						}, Qt::QueuedConnection);
 					});
-				gdl::ui::RunEngineStartupPolicy(
+				const bool engine_started = gdl::ui::RunEngineStartupPolicy(
 					[&] { return gdl::engine::Aria2cDownloadManager::Instance().InitAria2cEngine(
 						aria2c_engine_path.toStdString()); },
 					[&] { return browser_manager.Init(); },
 					[&] { gdl::engine::Aria2cDownloadManager::Instance().UninitAria2cEngine(); },
 					[&] { browser_manager.SetEngineUnavailable(QObject::tr("Download engine is unavailable.")); });
+				// ed2k 引擎(若可用)由 browser_manager.Init() 内部初始化完成，
+				// 此刻订阅其 PubSub 才不会订阅到一个还没起来的引擎上(RegisterTypes 早于此处执行)。
+				if (engine_started) {
+					gdl::ui::ed2k::Ed2kManager::Instance().Init();
+				}
 				// 自动更新检查
 				gdl::update::UpdateConfig update_config;
 				update_config.current_version	 = GDownload_VERSION_STRING;
@@ -193,6 +200,9 @@ namespace gd {
 		void MainWindow::UnInitEngine() {
 			// 与 Init 侧对称:测试模式下未启动 aria2c,跳过 uninit 避免对未初始化状态调用
 			const bool is_test = gdl::ui::isTestMode();
+			// 先取消 ed2k PubSub 订阅，再让 browser_manager.UnInit() 关闭 ed2k 引擎本体，
+			// 避免引擎关闭后订阅回调仍持有失效状态。UnInit() 内部对未订阅场景是安全的空操作。
+			gdl::ui::ed2k::Ed2kManager::Instance().UnInit();
 			gdl::ui::browser::BrowserManager::Instance().UnInit();
 			if (!is_test) {
 				gdl::engine::Aria2cDownloadManager::Instance().SetEngineAvailabilityCallback({});
