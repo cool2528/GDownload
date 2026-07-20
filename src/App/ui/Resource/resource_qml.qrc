@@ -11,6 +11,7 @@
         <file>qml/Browser/DownloadPageView.qml</file>
         <file>qml/Browser/SettingsPageView.qml</file>
         <file>qml/Browser/HomePage.qml</file>
+        <file>qml/Browser/Ed2kCenterPage.qml</file>
         <file>qml/Browser/DownloadPageTitle.qml</file>
         <file>qml/CommonComponents/TaskDialogPage.qml</file>
         <file>qml/CommonComponents/GSpinBox.qml</file>

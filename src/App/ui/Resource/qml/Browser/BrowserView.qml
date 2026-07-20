@@ -13,6 +13,8 @@ Rectangle {
             return qsTr("Preferences")
         if (index === 2)
             return qsTr("Home")
+        if (index === 3)
+            return qsTr("eD2k")
         if (downloadIndex === 1)
             return qsTr("Waiting")
         if (downloadIndex === 2)
@@ -42,6 +44,12 @@ Rectangle {
         HomePage {
             id: homePage
             objectName: "homeWorkspace"
+        }
+
+        // eD2k 中心页(导航 eD2k 按钮 → index 3)
+        Ed2kCenterPage {
+            id: ed2kPage
+            objectName: "ed2kWorkspace"
         }
     }
 

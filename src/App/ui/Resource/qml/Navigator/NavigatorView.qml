@@ -169,6 +169,25 @@ Item {
             }
 
             GButton {
+                id: ed2kCenter
+                objectName: "navEd2k"
+                Accessible.name: qsTr("eD2k network")
+                ToolTip.visible: hovered
+                ToolTip.text: qsTr("eD2k network")
+                Layout.alignment: Qt.AlignHCenter
+                radius: GTheme.radiusLarge
+                Layout.preferredWidth: GTheme.sizeLarge
+                Layout.preferredHeight: GTheme.sizeLarge
+                checked: (typeof brower_view !== "undefined") && brower_view.index === 3
+                iconName: "connected"
+                imageSize: Qt.size(20, 20)
+                tintColor: contentColor
+                onClicked: {
+                    brower_view.index = 3
+                }
+            }
+
+            GButton {
                 id: addTask
                 objectName: "navAddTask"
                 Accessible.name: qsTr("Add download")
