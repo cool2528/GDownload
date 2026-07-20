@@ -41,9 +41,11 @@ namespace gdl {
 					return entry;
 				}
 				// 链接来自网页/剪贴板等外部输入,百分号解码可能还原出路径分隔符或 ".."(如 %2F%2E%2E),
-				// 文件名会被引擎拼进保存路径,必须拒绝任何可逃出目标目录的名字
+				// 文件名会被引擎拼进保存路径,必须拒绝任何可逃出目标目录的名字;
+				// '|' 会破坏重建规范链接时的分段结构,一并拒绝
 				if (decoded_name.contains(QLatin1Char('/')) || decoded_name.contains(QLatin1Char('\\')) ||
-					decoded_name == QStringLiteral("..") || decoded_name == QStringLiteral(".")) {
+					decoded_name.contains(QLatin1Char('|')) || decoded_name == QStringLiteral("..") ||
+					decoded_name == QStringLiteral(".")) {
 					return entry;
 				}
 
@@ -84,6 +86,19 @@ namespace gdl {
 				}
 
 				return entries;
+			}
+
+			QString CanonicalizeEd2kLink(const QString& link) {
+				// 复用 ParseEd2kLink 的解码 + 安全校验，再用解码后的文件名重建标准链接，
+				// 交给引擎的链接文件名段即为可直接落盘的安全名字。
+				const Ed2kFileEntry entry = ParseEd2kLink(link);
+				if (!entry.valid) {
+					return QString();
+				}
+				return QStringLiteral("ed2k://|file|%1|%2|%3|/")
+					.arg(entry.name)
+					.arg(entry.size)
+					.arg(entry.md4_hex);
 			}
 
 			bool IsEd2kLink(const QString& url) {

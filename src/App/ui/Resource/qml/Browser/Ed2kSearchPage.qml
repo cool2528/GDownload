@@ -157,6 +157,8 @@ ColumnLayout {
                             onClicked: {
                                 if (BrowserManager.AddEd2kTask([model.rawLink], {})) {
                                     ToastManager.ShowSuccess(qsTr("Download started"))
+                                } else {
+                                    ToastManager.ShowError(qsTr("Failed to add download"))
                                 }
                             }
                         }

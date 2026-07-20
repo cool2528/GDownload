@@ -199,8 +199,15 @@ namespace gdl {
 							if (save_dir.isEmpty()) {
 								save_dir = settings::Settings::Instance().GetDir();
 							}
+							// 归一化:解码并安全校验文件名后重建链接,避免百分号编码名直接落盘(见 AddEd2kTask)
+							const QString canonical_url = CanonicalizeEd2kLink(url_str);
+							if (canonical_url.isEmpty()) {
+								LOG_WARN("Rejected invalid ed2k link: {}", url_str.toStdString());
+								Q_EMIT sigErrorMessage(tr("Invalid ed2k link: %1").arg(url_str));
+								continue;
+							}
 							const auto id = engine::Ed2kDownloadManager::Instance().AddEd2kTask(
-								url_str.toStdString(), save_dir.toStdString());
+								canonical_url.toStdString(), save_dir.toStdString());
 							if (id.empty()) {
 								LOG_WARN("Failed to add ed2k download task: {}", url_str.toStdString());
 								Q_EMIT sigErrorMessage(tr("Invalid ed2k link: %1").arg(url_str));
@@ -924,8 +931,16 @@ namespace gdl {
 					if (!link.canConvert<QString>()) continue;
 					const QString link_str = link.toString().trimmed();
 					if (link_str.isEmpty()) continue;
+					// 交给引擎前先归一化:把文件名段的百分号编码解码并做安全校验,再用解码后的
+					// 文件名重建链接,否则 "My%20File.mkv"/CJK 编码名会被引擎原样拼进保存路径落盘。
+					const QString canonical_link = CanonicalizeEd2kLink(link_str);
+					if (canonical_link.isEmpty()) {
+						LOG_WARN("Rejected invalid ed2k link: {}", link_str.toStdString());
+						Q_EMIT sigErrorMessage(tr("Invalid ed2k link: %1").arg(link_str));
+						continue;
+					}
 					const auto id = engine::Ed2kDownloadManager::Instance().AddEd2kTask(
-						link_str.toStdString(), save_dir.toStdString());
+						canonical_link.toStdString(), save_dir.toStdString());
 					if (id.empty()) {
 						LOG_WARN("Failed to add ed2k download task: {}", link_str.toStdString());
 						Q_EMIT sigErrorMessage(tr("Invalid ed2k link: %1").arg(link_str));
