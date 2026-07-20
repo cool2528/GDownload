@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "../CommonComponents"
 import gdl.sdk
 
 // eD2k 搜索页：关键词 + 过滤条件 + 结果列表(按源数降序) + Load More
