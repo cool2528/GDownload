@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "../CommonComponents"
 import gdl.sdk
 
 // eD2k 服务器页：列表(连接/移除) + 手动添加 + 从 URL 更新 + Kad 状态条
@@ -245,7 +246,7 @@ ColumnLayout {
                 objectName: "ed2kUpdateUrlInput"
                 Layout.fillWidth: true
                 placeholderText: qsTr("server.met URL")
-                text: "http://upd.emule-security.org/server.met"
+                text: qsTr("http://upd.emule-security.org/server.met")
             }
         }
 

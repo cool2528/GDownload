@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "../CommonComponents"
 import gdl.sdk
 
 // eD2k 中心页：搜索 / 服务器 两个子页，右上角常驻连接状态徽标
