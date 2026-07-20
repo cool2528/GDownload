@@ -151,7 +151,18 @@ ColumnLayout {
             showValidationError = false
         }
 
-        onOpened: reset()
+        // 覆盖 GDialogShell 的 onOpened 时需手动重放其初始焦点逻辑，否则 initialFocusItem 失效
+        // （closeButton 兜底分支在 GDialogShell 内部，外部无法引用，此处 initialFocusItem 始终有效，故不复制该分支）
+        onOpened: {
+            reset()
+            Qt.callLater(function() {
+                if (addServerDialog.initialFocusItem
+                        && addServerDialog.initialFocusItem.visible
+                        && addServerDialog.initialFocusItem.enabled) {
+                    addServerDialog.initialFocusItem.forceActiveFocus()
+                }
+            })
+        }
 
         ColumnLayout {
             anchors.fill: parent
