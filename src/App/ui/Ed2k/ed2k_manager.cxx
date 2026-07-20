@@ -59,6 +59,8 @@ namespace gdl {
 				kad_status_sub_ = mgr.SubscriptionEd2kMessage(kEd2kKadStatus, [this](const std::string& msg) {
 					Q_EMIT sigKadStatusPayload(QString::fromStdString(msg));
 				});
+				// 订阅全部就绪,引擎已可用:通知 QML 由占位态切回正常内容(engineAvailable 现为 NOTIFY 属性)
+				Q_EMIT engineAvailableChanged();
 			}
 
 			void Ed2kManager::UnInit() {
@@ -187,6 +189,12 @@ namespace gdl {
 						connected_server_name_ = server_connected_ ? name : QString();
 					}
 					Q_EMIT serverStateChanged();
+					// 连接失败:引擎在 ConnectServer 失败时发布 connected=false + 非空 error,
+					// 主动断开(DisconnectServer)时 error 为空,故仅在 error 非空时上抛失败提示。
+					const auto error = QString::fromStdString(doc.value("error", std::string()));
+					if (!server_connected_ && !error.isEmpty()) {
+						Q_EMIT serverConnectFailed(error);
+					}
 				} catch (const std::exception& e) {
 					LOG_ERR("Failed to parse ed2k server state payload: {}", e.what());
 				}

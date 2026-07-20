@@ -2,6 +2,7 @@
 
 #include "Browser/ed2k_link.h"
 
+using gdl::ui::browser::CanonicalizeEd2kLink;
 using gdl::ui::browser::Ed2kFileEntry;
 using gdl::ui::browser::IsEd2kLink;
 using gdl::ui::browser::ParseEd2kLink;
@@ -56,6 +57,43 @@ TEST(Ed2kLinkTest, RejectsPathTraversalFileName) {
 	// 正常带点文件名不受影响
 	EXPECT_TRUE(
 		ParseEd2kLink(QStringLiteral("ed2k://|file|a.tar.gz|100|00112233445566778899AABBCCDDEEFF|/")).valid);
+}
+
+// CanonicalizeEd2kLink 把外部链接归一化为"文件名已解码 + 已安全校验"的标准链接,
+// 供交给引擎前使用,防止 "My%20File.mkv" 之类的百分号编码名字直接落到磁盘上。
+TEST(Ed2kLinkTest, CanonicalizeDecodesEncodedSpace) {
+	const QString canonical =
+		CanonicalizeEd2kLink(QStringLiteral("ed2k://|file|My%20File.mkv|100|00112233445566778899AABBCCDDEEFF|/"));
+
+	// 规范化后链接中的文件名应为已解码的 "My File.mkv"(引擎会原样拼进保存路径)
+	EXPECT_EQ(canonical,
+			  QStringLiteral("ed2k://|file|My File.mkv|100|00112233445566778899AABBCCDDEEFF|/"));
+}
+
+TEST(Ed2kLinkTest, CanonicalizeDecodesCjkName) {
+	// "%E6%98%A0%E7%94%BB.mkv" 解码为 CJK "映画.mkv"
+	const QString canonical = CanonicalizeEd2kLink(QStringLiteral(
+		"ed2k://|file|%E6%98%A0%E7%94%BB.mkv|100|00112233445566778899AABBCCDDEEFF|/"));
+
+	EXPECT_EQ(canonical, QString::fromUtf8("ed2k://|file|\xE6\x98\xA0\xE7\x94\xBB.mkv|100|"
+										   "00112233445566778899AABBCCDDEEFF|/"));
+}
+
+TEST(Ed2kLinkTest, CanonicalizeRejectsEncodedTraversal) {
+	// 百分号编码的 "../"
+	EXPECT_TRUE(
+		CanonicalizeEd2kLink(QStringLiteral("ed2k://|file|%2e%2e%2fx|100|00112233445566778899AABBCCDDEEFF|/"))
+			.isEmpty());
+	// 编码反斜杠 "..\\"
+	EXPECT_TRUE(
+		CanonicalizeEd2kLink(QStringLiteral("ed2k://|file|..%5C|100|00112233445566778899AABBCCDDEEFF|/"))
+			.isEmpty());
+	// 编码正斜杠
+	EXPECT_TRUE(
+		CanonicalizeEd2kLink(QStringLiteral("ed2k://|file|a%2Fb|100|00112233445566778899AABBCCDDEEFF|/"))
+			.isEmpty());
+	// 非法链接
+	EXPECT_TRUE(CanonicalizeEd2kLink(QStringLiteral("http://x/y")).isEmpty());
 }
 
 TEST(Ed2kLinkTest, ParsesMultipleLinesFromText) {

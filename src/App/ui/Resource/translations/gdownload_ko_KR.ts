@@ -868,6 +868,16 @@
         <source>Servers</source>
         <translation>서버</translation>
     </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kCenterPage.qml" line="105"/>
+        <source>eD2k engine is unavailable</source>
+        <translation>eD2k 엔진을 사용할 수 없습니다</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kCenterPage.qml" line="113"/>
+        <source>The eD2k engine failed to start. Check the logs or restart the app.</source>
+        <translation>eD2k 엔진을 시작하지 못했습니다. 로그를 확인하거나 앱을 다시 시작하세요.</translation>
+    </message>
 </context>
 <context>
     <name>Ed2kSearchPage</name>
@@ -992,6 +1002,11 @@
         <source>Load More</source>
         <translation>더 불러오기</translation>
     </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="161"/>
+        <source>Failed to add download</source>
+        <translation>다운로드 추가에 실패했습니다</translation>
+    </message>
 </context>
 <context>
     <name>Ed2kServerPage</name>
@@ -1091,6 +1106,11 @@
         <location filename="../qml/Browser/Ed2kServerPage.qml" line="285"/>
         <source>Update</source>
         <translation>업데이트</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="23"/>
+        <source>Failed to connect: %1</source>
+        <translation>연결에 실패했습니다: %1</translation>
     </message>
 </context>
 <context>

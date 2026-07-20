@@ -16,6 +16,14 @@ ColumnLayout {
         Ed2kManager.RefreshKadStatus()
     }
 
+    // 连接服务器失败时弹出错误提示（引擎发布 connected=false 且带非空 error）
+    Connections {
+        target: Ed2kManager
+        function onServerConnectFailed(error) {
+            ToastManager.ShowError(qsTr("Failed to connect: %1").arg(error))
+        }
+    }
+
     // 工具条
     RowLayout {
         Layout.fillWidth: true
@@ -141,8 +149,24 @@ ColumnLayout {
         // 校验失败提示是否显示（点击 Add 后才出现，避免打开即报错）
         property bool showValidationError: false
         readonly property int parsedPort: parseInt(addPortInput.text, 10)
-        readonly property bool ipValid: addIpInput.text.trim().length > 0
+        // 引擎侧对无法解析的 IP 会静默丢弃，故此处按点分四段(每段 0-255)严格校验
+        readonly property bool ipValid: isValidIpv4(addIpInput.text)
         readonly property bool portValid: parsedPort >= 1 && parsedPort <= 65535
+
+        // 点分十进制 IPv4 校验：必须为四段，每段为 0-255 的十进制整数
+        function isValidIpv4(text) {
+            var parts = text.trim().split(".")
+            if (parts.length !== 4)
+                return false
+            for (var i = 0; i < parts.length; i++) {
+                if (!/^\d{1,3}$/.test(parts[i]))
+                    return false
+                var octet = parseInt(parts[i], 10)
+                if (octet < 0 || octet > 255)
+                    return false
+            }
+            return true
+        }
 
         function reset() {
             addNameInput.text = ""

@@ -28,7 +28,7 @@ namespace gdl {
 				Q_PROPERTY(QString connectedServerName READ connectedServerName NOTIFY serverStateChanged)
 				Q_PROPERTY(bool kadRunning READ kadRunning NOTIFY kadStatusChanged)
 				Q_PROPERTY(int kadContacts READ kadContacts NOTIFY kadStatusChanged)
-				Q_PROPERTY(bool engineAvailable READ engineAvailable CONSTANT)
+				Q_PROPERTY(bool engineAvailable READ engineAvailable NOTIFY engineAvailableChanged)
 			   public:
 				~Ed2kManager() override;
 
@@ -64,6 +64,10 @@ namespace gdl {
 				void serverStateChanged();
 				void kadStatusChanged();
 				void searchFailed(const QString& error);
+				// 连接服务器失败:引擎发布 connected=false 且带非空 error 时上抛,供 UI 弹错误提示
+				void serverConnectFailed(const QString& error);
+				// 引擎可用性变化:Init() 成功订阅后置真,QML 据此在引擎不可用时显示占位态
+				void engineAvailableChanged();
 				// 内部跨线程中转：引擎线程 Publish -> 主线程槽(Qt::QueuedConnection)
 				void sigSearchPayload(const QString& json);
 				void sigServerListPayload(const QString& json);

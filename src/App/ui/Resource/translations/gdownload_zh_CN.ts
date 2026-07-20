@@ -868,6 +868,16 @@
         <source>Servers</source>
         <translation>服务器</translation>
     </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kCenterPage.qml" line="105"/>
+        <source>eD2k engine is unavailable</source>
+        <translation>eD2k 引擎不可用</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kCenterPage.qml" line="113"/>
+        <source>The eD2k engine failed to start. Check the logs or restart the app.</source>
+        <translation>eD2k 引擎启动失败。请检查日志或重启应用。</translation>
+    </message>
 </context>
 <context>
     <name>Ed2kSearchPage</name>
@@ -992,6 +1002,11 @@
         <source>Load More</source>
         <translation>加载更多</translation>
     </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="161"/>
+        <source>Failed to add download</source>
+        <translation>添加下载失败</translation>
+    </message>
 </context>
 <context>
     <name>Ed2kServerPage</name>
@@ -1091,6 +1106,11 @@
         <location filename="../qml/Browser/Ed2kServerPage.qml" line="285"/>
         <source>Update</source>
         <translation>更新</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="23"/>
+        <source>Failed to connect: %1</source>
+        <translation>连接失败：%1</translation>
     </message>
 </context>
 <context>

@@ -85,12 +85,43 @@ Rectangle {
             }
         }
 
+        // 引擎不可用占位态：eD2k 引擎启动失败时，隐藏 Tab 栏与内容栈，仅保留标题区
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            visible: !Ed2kManager.engineAvailable
+
+            ColumnLayout {
+                anchors.centerIn: parent
+                width: Math.min(parent.width - GTheme.spaceXL * 2, 480)
+                spacing: GTheme.spaceSM
+
+                Text {
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pixelSize: GTheme.fontTitle
+                    font.weight: GTheme.weightDemiBold
+                    color: GTheme.textPrimary
+                    text: qsTr("eD2k engine is unavailable")
+                }
+                Text {
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.WordWrap
+                    font.pixelSize: GTheme.fontBody
+                    color: GTheme.textSecondary
+                    text: qsTr("The eD2k engine failed to start. Check the logs or restart the app.")
+                }
+            }
+        }
+
         // Tab 栏（照 SettingsPageView 的 GButton nav + ButtonGroup 模式）
         RowLayout {
             Layout.fillWidth: true
             Layout.leftMargin: GTheme.spaceXL
             Layout.topMargin: GTheme.spaceMD
             spacing: GTheme.spaceSM
+            visible: Ed2kManager.engineAvailable
 
             GButton {
                 id: searchTabButton
@@ -125,6 +156,7 @@ Rectangle {
             Layout.fillHeight: true
             Layout.margins: GTheme.spaceXL
             currentIndex: 0
+            visible: Ed2kManager.engineAvailable
 
             Ed2kSearchPage {
                 objectName: "ed2kSearchPage"
