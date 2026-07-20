@@ -129,8 +129,9 @@ Rectangle {
                 objectName: "ed2kSearchPage"
                 onGoToServers: ed2kStack.currentIndex = 1
             }
-            // Task 7 替换为 Ed2kServerPage
-            Item { objectName: "ed2kServersPlaceholder" }
+            Ed2kServerPage {
+                objectName: "ed2kServerPage"
+            }
         }
     }
 }
