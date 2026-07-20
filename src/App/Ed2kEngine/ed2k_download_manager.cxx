@@ -101,10 +101,13 @@ struct Ed2kDownloadManager::Impl {
 	// 1s 采样定时器，仅在网络线程上 arm/cancel
 	std::unique_ptr<boost::asio::steady_timer> sample_timer;
 
-	// 搜索/连接前台请求 in-flight 守卫：Session 同连接前台请求必须串行(引擎契约)，
-	// 进行中忽略新请求；仅在网络线程读写，无需加锁
-	bool search_in_flight = false;
-	bool connect_in_flight = false;
+	// 前台请求 in-flight 守卫：引擎契约要求同一 Session 连接上的前台请求
+	// (search/search_more/connect_server/disconnect_server/update_server_met 等)
+	// 必须串行执行——并发的前台请求会破坏单读者 socket 模型。这里用单个共享标志
+	// 覆盖所有这些方法，进行中直接丢弃新请求；仅在网络线程读写，无需加锁。
+	// RequestServerList/AddServer/RemoveServer/RequestKadStatus 是纯本地操作，
+	// 不经过服务器连接，不受此守卫约束。
+	bool foreground_in_flight = false;
 };
 
 Ed2kDownloadManager::Ed2kDownloadManager() : impl_(std::make_unique<Impl>()) {}
@@ -458,10 +461,10 @@ void Ed2kDownloadManager::Search(const std::string& keyword, int file_type, std:
 		return;
 	}
 	boost::asio::post(impl_->runtime.executor(), [this, keyword, file_type, min_size, source] {
-		if (!impl_->session || impl_->search_in_flight) {
+		if (!impl_->session || impl_->foreground_in_flight) {
 			return;
 		}
-		impl_->search_in_flight = true;
+		impl_->foreground_in_flight = true;
 		boost::asio::co_spawn(
 			impl_->runtime.executor(),
 			[this, keyword, file_type, min_size, source]() -> boost::asio::awaitable<void> {
@@ -523,7 +526,7 @@ void Ed2kDownloadManager::Search(const std::string& keyword, int file_type, std:
 						impl_->pubsub->Publish(kEd2kSearchResult, SearchErrorToJson(e.what()));
 					}
 				}
-				impl_->search_in_flight = false;
+				impl_->foreground_in_flight = false;
 				co_return;
 			},
 			boost::asio::detached);
@@ -535,10 +538,10 @@ void Ed2kDownloadManager::SearchMore() {
 		return;
 	}
 	boost::asio::post(impl_->runtime.executor(), [this] {
-		if (!impl_->session || impl_->search_in_flight) {
+		if (!impl_->session || impl_->foreground_in_flight) {
 			return;
 		}
-		impl_->search_in_flight = true;
+		impl_->foreground_in_flight = true;
 		boost::asio::co_spawn(impl_->runtime.executor(), [this]() -> boost::asio::awaitable<void> {
 			try {
 				auto r = co_await impl_->session->search_more();
@@ -552,7 +555,7 @@ void Ed2kDownloadManager::SearchMore() {
 					impl_->pubsub->Publish(kEd2kSearchResult, SearchErrorToJson(e.what()));
 				}
 			}
-			impl_->search_in_flight = false;
+			impl_->foreground_in_flight = false;
 			co_return;
 		}, boost::asio::detached);
 	});
@@ -563,10 +566,10 @@ void Ed2kDownloadManager::ConnectServer(const std::string& ip, std::uint16_t por
 		return;
 	}
 	boost::asio::post(impl_->runtime.executor(), [this, ip, port] {
-		if (!impl_->session || impl_->connect_in_flight) {
+		if (!impl_->session || impl_->foreground_in_flight) {
 			return;
 		}
-		impl_->connect_in_flight = true;
+		impl_->foreground_in_flight = true;
 		boost::asio::co_spawn(impl_->runtime.executor(), [this, ip, port]() -> boost::asio::awaitable<void> {
 			try {
 				std::optional<ed2k::app::ServerTarget> target;
@@ -602,7 +605,7 @@ void Ed2kDownloadManager::ConnectServer(const std::string& ip, std::uint16_t por
 			} catch (const std::exception& e) {
 				LOG_ERR("ed2k connect_server failed: {}", e.what());
 			}
-			impl_->connect_in_flight = false;
+			impl_->foreground_in_flight = false;
 			co_return;
 		}, boost::asio::detached);
 	});
@@ -613,9 +616,13 @@ void Ed2kDownloadManager::DisconnectServer() {
 		return;
 	}
 	boost::asio::post(impl_->runtime.executor(), [this] {
-		if (!impl_->session) {
+		// disconnect_server() 是同步调用，不挂起协程，但仍需遵守前台请求串行契约：
+		// 若此刻有 search/connect_server/update_server_met 正挂起在同一个 socket 上，
+		// 直接断开会破坏对方协程正在使用的连接，因此这里同样检查守卫并丢弃。
+		if (!impl_->session || impl_->foreground_in_flight) {
 			return;
 		}
+		impl_->foreground_in_flight = true;
 		impl_->session->disconnect_server();
 		nlohmann::json doc;
 		doc["connected"] = false;
@@ -628,6 +635,7 @@ void Ed2kDownloadManager::DisconnectServer() {
 			impl_->pubsub->Publish(kEd2kServerState, doc.dump());
 		}
 		PublishServerListLocked();
+		impl_->foreground_in_flight = false;
 	});
 }
 
@@ -699,9 +707,10 @@ void Ed2kDownloadManager::UpdateServerMet(const std::string& url) {
 		return;
 	}
 	boost::asio::post(impl_->runtime.executor(), [this, url] {
-		if (!impl_->session) {
+		if (!impl_->session || impl_->foreground_in_flight) {
 			return;
 		}
+		impl_->foreground_in_flight = true;
 		boost::asio::co_spawn(impl_->runtime.executor(), [this, url]() -> boost::asio::awaitable<void> {
 			try {
 				auto r = co_await impl_->session->update_server_met(url);
@@ -712,6 +721,7 @@ void Ed2kDownloadManager::UpdateServerMet(const std::string& url) {
 			} catch (const std::exception& e) {
 				LOG_ERR("ed2k update_server_met exception: {}", e.what());
 			}
+			impl_->foreground_in_flight = false;
 			co_return;
 		}, boost::asio::detached);
 	});
