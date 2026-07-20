@@ -88,6 +88,10 @@ namespace gdl {
 
                 // 解析多行 ed2k 链接文本为文件预览模型,供 QML 新建任务对话框展示(Task 6 使用)
                 Q_INVOKABLE parser::FilePreviewModel* ParseEd2kLinks(const QString& text);
+                // 返回同一文本中的有效 ed2k 链接原文列表,与 ParseEd2kLinks 产出的预览行一一对应。
+                // QML 勾选行索引依赖两者数量/顺序完全一致,故必须共用同一 C++ 解析器,
+                // 禁止在 QML 侧重新实现过滤规则(规则分歧会导致勾选 A 却下载 B)
+                Q_INVOKABLE QStringList GetValidEd2kLinks(const QString& text);
                 // 批量提交 ed2k 下载任务,options 目前仅识别 "dir"(保存目录);任一成功即返回 true
                 Q_INVOKABLE bool AddEd2kTask(const QVariantList& links, const QVariantMap& options);
 

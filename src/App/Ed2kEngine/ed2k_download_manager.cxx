@@ -14,6 +14,8 @@
 
 #include <nlohmann/json.hpp>
 
+#include "logger.h"
+
 #include <ed2k/link/ed2k_link.hpp>
 #include <ed2k/net/runtime.hpp>
 #include <ed2k/session/session.hpp>
@@ -77,56 +79,104 @@ bool Ed2kDownloadManager::InitEd2kEngine(const Ed2kEngineConfig& config) {
 	if (impl_->running.load()) {
 		return true;
 	}
-	impl_->config = config;
+	// 注意:ShutdownEngine 之后不支持再次 Init——runtime 内的 io_context 已 stop 且未 restart,
+	// 重新 Init 后 run() 会立即返回导致引擎静默失效。当前生命周期只在进程退出时 shutdown,
+	// 若将来引入"重启引擎"(如设置变更后)需先重建 Impl 或调用 io_context::restart()。
+	try {
+		impl_->config = config;
 
-	// PubSub 需要一个 io_context 跑 handler 派发，复用 runtime 的 context
-	impl_->pubsub = std::make_unique<PubSubSystem<std::string>>(impl_->runtime.context());
+		// PubSub 需要一个 io_context 跑 handler 派发，复用 runtime 的 context
+		impl_->pubsub = std::make_unique<PubSubSystem<std::string>>(impl_->runtime.context());
 
-	ed2k::session::SessionConfig scfg;
-	scfg.nickname = config.nickname;
-	scfg.tcp_port = config.tcp_port;
-	scfg.kad_udp_port = config.udp_port;
-	scfg.data_dir = std::filesystem::path(config.data_dir);
-	scfg.max_concurrent_tasks = config.max_concurrent_tasks;
-	scfg.enable_kad = config.enable_kad;
+		ed2k::session::SessionConfig scfg;
+		scfg.nickname = config.nickname;
+		scfg.tcp_port = config.tcp_port;
+		scfg.kad_udp_port = config.udp_port;
+		scfg.data_dir = std::filesystem::path(config.data_dir);
+		scfg.max_concurrent_tasks = config.max_concurrent_tasks;
+		scfg.enable_kad = config.enable_kad;
 
-	// Session 必须在网络线程构造/使用；这里在 worker 线程启动前构造（此时尚无并发），
-	// 之后所有对外访问都需要 post 到 worker 线程执行。
-	impl_->session = std::make_unique<ed2k::session::Session>(impl_->runtime, scfg);
+		// Session 必须在网络线程构造/使用；这里在 worker 线程启动前构造（此时尚无并发），
+		// 之后所有对外访问都需要 post 到 worker 线程执行。
+		// 构造可能因端口被占用(与 eMule 共存/双实例)等原因抛异常，由本函数末尾统一兜底。
+		impl_->session = std::make_unique<ed2k::session::Session>(impl_->runtime, scfg);
 
-	// 任务状态突变事件：反查 session_to_id 转为对外 task_id，转发到 PubSub。
-	// 契约要求 handler 不得抛出异常，也不得在回调内反调 Session 方法。
-	impl_->session->set_event_handler([this](const ed2k::session::SessionEvent& event) {
-		try {
-			const auto* task_event = std::get_if<ed2k::session::TaskStateEvent>(&event);
-			if (!task_event) {
-				// ServerStateEvent 等其它事件暂不在 Task 4 范围内处理
-				return;
+		// 任务状态突变事件：反查 session_to_id 转为对外 task_id，转发到 PubSub。
+		// 契约要求 handler 不得抛出异常，也不得在回调内反调 Session 方法。
+		impl_->session->set_event_handler([this](const ed2k::session::SessionEvent& event) {
+			try {
+				const auto* task_event = std::get_if<ed2k::session::TaskStateEvent>(&event);
+				if (!task_event) {
+					// ServerStateEvent 等其它事件暂不在 Task 4 范围内处理
+					return;
+				}
+				auto it = impl_->session_to_id.find(task_event->task_id);
+				if (it == impl_->session_to_id.end()) {
+					return;
+				}
+				nlohmann::json payload;
+				payload["id"] = it->second;
+				payload["state"] = TaskStateToString(task_event->state);
+				payload["error"] = task_event->error ? task_event->error.message() : std::string();
+				if (impl_->pubsub) {
+					impl_->pubsub->Publish(kEd2kTaskState, payload.dump());
+				}
+				// 终态任务不会被引擎自动移出任务表(只有 cancel 会 erase)，若不清理，
+				// query_all() 会每秒继续返回它——上层持续收到重复的终态采样并反复写历史。
+				// 这里在事件转发之后把任务从引擎移除并清双向映射(历史落库由上层负责，
+				// 不删文件，kError 任务重启续传所需的 .part.met 保持原样)。
+				// 契约禁止在回调内反调 Session 方法，post 延迟到回调所在协程退出后执行；
+				// io_context 单线程 FIFO 保证上面 Publish 派发的订阅回调先于本清理执行。
+				if (task_event->state == ed2k::session::TaskState::completed ||
+					task_event->state == ed2k::session::TaskState::failed) {
+					const std::uint64_t session_id = task_event->task_id;
+					boost::asio::post(impl_->runtime.executor(), [this, session_id] {
+						if (!impl_->session) {
+							return;
+						}
+						auto sid_it = impl_->session_to_id.find(session_id);
+						if (sid_it == impl_->session_to_id.end()) {
+							return;
+						}
+						impl_->session->cancel(session_id, false);
+						impl_->id_to_session.erase(sid_it->second);
+						impl_->session_to_id.erase(sid_it);
+					});
+				}
+			} catch (...) {
+				// 引擎契约：事件回调绝不允许抛出异常
 			}
-			auto it = impl_->session_to_id.find(task_event->task_id);
-			if (it == impl_->session_to_id.end()) {
-				return;
-			}
-			nlohmann::json payload;
-			payload["id"] = it->second;
-			payload["state"] = TaskStateToString(task_event->state);
-			payload["error"] = task_event->error ? task_event->error.message() : std::string();
-			if (impl_->pubsub) {
-				impl_->pubsub->Publish(kEd2kTaskState, payload.dump());
-			}
-		} catch (...) {
-			// 引擎契约：事件回调绝不允许抛出异常
-		}
-	});
+		});
 
-	// 1s 采样定时器：构造后立即 arm 一次；worker 线程启动后 io_context 开始处理挂起的 async_wait。
-	// 必须在 worker 线程启动前完成这次 arm（否则和 run() 所在线程存在并发访问同一 timer 的风险）。
-	impl_->sample_timer = std::make_unique<boost::asio::steady_timer>(impl_->runtime.context());
-	impl_->running.store(true);
-	ScheduleSampling();
+		// 1s 采样定时器：构造后立即 arm 一次；worker 线程启动后 io_context 开始处理挂起的 async_wait。
+		// 必须在 worker 线程启动前完成这次 arm（否则和 run() 所在线程存在并发访问同一 timer 的风险）。
+		impl_->sample_timer = std::make_unique<boost::asio::steady_timer>(impl_->runtime.context());
+		impl_->running.store(true);
+		ScheduleSampling();
 
-	impl_->worker = std::thread([this] { impl_->runtime.run(); });
-	return true;
+		// 引擎跑在进程内(不同于 aria2 的外部进程隔离)，run() 中任何逃逸异常都会
+		// terminate 整个应用，必须在线程入口兜底
+		impl_->worker = std::thread([this] {
+			try {
+				impl_->runtime.run();
+			} catch (const std::exception& e) {
+				LOG_ERR("ed2k engine network thread exited with exception: {}", e.what());
+			} catch (...) {
+				LOG_ERR("ed2k engine network thread exited with unknown exception");
+			}
+		});
+		return true;
+	} catch (const std::exception& e) {
+		LOG_ERR("Failed to init ed2k engine: {}", e.what());
+	} catch (...) {
+		LOG_ERR("Failed to init ed2k engine: unknown exception");
+	}
+	// 初始化中途失败：回滚已构造的部件，保持"未初始化"状态(引擎为可选能力，不影响 aria2)
+	impl_->running.store(false);
+	impl_->session.reset();
+	impl_->sample_timer.reset();
+	impl_->pubsub.reset();
+	return false;
 }
 
 void Ed2kDownloadManager::ShutdownEngine() {
@@ -178,6 +228,14 @@ void Ed2kDownloadManager::ScheduleSampling() {
 			auto snapshots = impl_->session->query_all();
 			nlohmann::json arr = nlohmann::json::array();
 			for (const auto& snap : snapshots) {
+				// 终态转换已由状态事件单独通知,采样只报告未完结任务的进度;
+				// 终态任务随后会被事件回调 post 的清理任务移出引擎,这里过滤掉
+				// 清理生效前的窗口期,避免上层重复收到终态数据
+				if (snap.state == ed2k::session::TaskState::completed ||
+					snap.state == ed2k::session::TaskState::failed ||
+					snap.state == ed2k::session::TaskState::cancelled) {
+					continue;
+				}
 				auto id_it = impl_->session_to_id.find(snap.id);
 				if (id_it == impl_->session_to_id.end()) {
 					// 尚未记录映射（理论上 add_download 已同步写入，防御性跳过）
@@ -229,9 +287,37 @@ std::string Ed2kDownloadManager::AddEd2kTask(const std::string& link, const std:
 		if (!impl_->session) {
 			return;
 		}
+		// 去重:同一 md4 重复添加会产生两个 session id 映射到同一个对外 task_id,
+		// 采样将对同一任务每秒发两份数据、RemoveTask 也只能清掉其中一条映射
+		if (impl_->id_to_session.count(task_id) > 0) {
+			return;
+		}
 		std::uint64_t session_id = impl_->session->add_download(link_copy, dir);
 		impl_->id_to_session[task_id] = session_id;
 		impl_->session_to_id[session_id] = task_id;
+
+		// 立即发布一条合成的初始快照(queued 态,元数据取自链接本身),不等首次 1s 采样:
+		// 否则任务在首次采样前进入终态(无服务器/端口被占时常见)时,上层只收到仅含
+		// {id,state,error} 的状态事件,采样缓存为空导致落库记录 name/size/link 全空——
+		// 恢复场景下旧记录已删,等于一次失败就把任务永久弄丢。同时这也让 UI 在添加后
+		// 立刻显示带文件名的等待条目。
+		try {
+			nlohmann::json item;
+			item["id"] = task_id;
+			item["name"] = link_copy.name;
+			item["total"] = static_cast<std::int64_t>(link_copy.size);
+			item["done"] = static_cast<std::int64_t>(0);
+			item["speed"] = static_cast<std::int64_t>(0);
+			item["sources"] = static_cast<std::int64_t>(0);
+			item["state"] = std::string("queued");
+			item["out_path"] = (dir / link_copy.name).string();
+			nlohmann::json arr = nlohmann::json::array({std::move(item)});
+			if (impl_->pubsub) {
+				impl_->pubsub->Publish(kEd2kActiveProgress, arr.dump());
+			}
+		} catch (const std::exception& e) {
+			LOG_ERR("Failed to publish initial ed2k task snapshot: {}", e.what());
+		}
 	});
 	return task_id;
 }
