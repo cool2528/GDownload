@@ -49,6 +49,7 @@ set(QML_UI_INTEGRATION_TESTS
     aurora_input_controls_contract
     aurora_icon_contract
     runtime_behavior
+    ed2k_center
 )
 
 set(QML_UI_APP_RESOURCES
@@ -82,3 +83,31 @@ foreach(name ${QML_UI_INTEGRATION_TESTS})
         LABELS qml_ui
         ENVIRONMENT "GDOWNLOAD_TEST=1;QT_QUICK_CONTROLS_STYLE=Basic")
 endforeach()
+
+# ============================================================================
+# ed2k_center 额外依赖:Ed2kCenterPage.qml 内嵌的 Ed2kSearchPage/Ed2kServerPage 在
+# 属性绑定与 Component.onCompleted 中直接调用真实 Ed2kManager 单例的方法(见
+# tst_ed2k_center.cpp 顶部注释),故需把生产代码里的 Ed2kManager 及其依赖的两个
+# QAbstractListModel 编译进本测试目标,并链接 Ed2kEngine(引擎层单例
+# engine::Ed2kDownloadManager 所在的共享库,未 InitEd2kEngine 时全部方法空转安全)
+# 与 GDLCore(LOG_WARN/LOG_ERR 等日志宏的实现)。其余 13 个测试不受影响。
+# ============================================================================
+find_package(nlohmann_json CONFIG REQUIRED)
+target_sources(qml_ui_tst_ed2k_center PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Ed2k/ed2k_manager.h
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Ed2k/ed2k_manager.cxx
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Ed2k/ed2k_search_result_model.h
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Ed2k/ed2k_search_result_model.cxx
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Ed2k/ed2k_server_list_model.h
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Ed2k/ed2k_server_list_model.cxx
+)
+target_include_directories(qml_ui_tst_ed2k_center PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Ed2k
+    ${CMAKE_SOURCE_DIR}/src/App/Ed2kEngine
+    ${CMAKE_SOURCE_DIR}/src/Module/GDLCore
+)
+target_link_libraries(qml_ui_tst_ed2k_center PRIVATE
+    Ed2kEngine
+    GDLCore
+    nlohmann_json::nlohmann_json
+)

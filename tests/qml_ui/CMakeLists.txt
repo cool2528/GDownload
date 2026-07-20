@@ -51,7 +51,8 @@ set(QML_UI_ALL_TEST_TARGETS
     qml_ui_tst_surface_contract
     qml_ui_tst_aurora_input_controls_contract
     qml_ui_tst_aurora_icon_contract
-    qml_ui_tst_runtime_behavior)
+    qml_ui_tst_runtime_behavior
+    qml_ui_tst_ed2k_center)
 foreach(_t ${QML_UI_ALL_TEST_TARGETS})
     add_dependencies(${_t} qml_ui_test_dlls)
 endforeach()
