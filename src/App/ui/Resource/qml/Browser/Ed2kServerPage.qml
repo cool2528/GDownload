@@ -152,6 +152,10 @@ ColumnLayout {
         objectName: "ed2kAddServerDialog"
         parent: Overlay.overlay
         width: Math.min(420, parent ? Math.max(0, parent.width - GTheme.spaceLG * 2) : 420)
+        // GDialogShell 的 body 容器不参与隐式高度，必须显式给高度，
+        // 否则 footer 会与内容重叠(参照 PluginSettingsDialog 显式高度先例)。
+        height: barHeight + addServerBodyCol.implicitHeight + GTheme.spaceLG * 2
+                + GTheme.sizeDefault + GTheme.spaceMD * 2 + 1
         title: qsTr("Add Server")
         iconName: "add"
         initialFocusItem: addIpInput
@@ -199,6 +203,7 @@ ColumnLayout {
         }
 
         ColumnLayout {
+            id: addServerBodyCol
             anchors.fill: parent
             anchors.margins: GTheme.spaceLG
             spacing: GTheme.spaceSM
@@ -277,6 +282,11 @@ ColumnLayout {
         objectName: "ed2kUpdateUrlDialog"
         parent: Overlay.overlay
         width: Math.min(440, parent ? Math.max(0, parent.width - GTheme.spaceLG * 2) : 440)
+        // GDialogShell 的 body 容器不参与隐式高度，必须显式给高度，
+        // 否则 footer 会与内容重叠(参照 PluginSettingsDialog 显式高度先例)。
+        // 高度 = 表头 + 内容(含上下边距) + footer(按钮高 + 上下边距) + 分隔线
+        height: barHeight + updateUrlBodyCol.implicitHeight + GTheme.spaceLG * 2
+                + GTheme.sizeDefault + GTheme.spaceMD * 2 + 1
         title: qsTr("Update Server List")
         iconName: "refresh"
         initialFocusItem: updateUrlInput
@@ -295,6 +305,7 @@ ColumnLayout {
         }
 
         ColumnLayout {
+            id: updateUrlBodyCol
             anchors.fill: parent
             anchors.margins: GTheme.spaceLG
             spacing: GTheme.spaceSM
