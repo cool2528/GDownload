@@ -3,6 +3,7 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 #include <boost/url.hpp>
+#include "aria2c_options_json.h"
 #include "config/config.h"
 #include "engine_def.h"
 #include "logger.h"
@@ -172,15 +173,9 @@ namespace gdl {
 				uriList.PushBack(uriValue, doc.GetAllocator());
 			}
 			params.PushBack(uriList, doc.GetAllocator());
-			rapidjson::Value optionsValue;
-			optionsValue.SetObject();
-			for (const auto& [key, value] : options) {
-				rapidjson::Value keyName;
-				keyName.SetString(key.c_str(), key.size(), doc.GetAllocator());
-				rapidjson::Value keyValue;
-				keyValue.SetString(value.c_str(), value.size(), doc.GetAllocator());
-				optionsValue.AddMember(keyName, keyValue, doc.GetAllocator());
-			}
+			rapidjson::Value optionsValue(rapidjson::kObjectType);
+			// 同名多值键(header)聚合为数组,避免重复键 JSON 丢失请求头(见 aria2c_options_json.h)
+			AppendAria2OptionsJson(options, optionsValue, doc.GetAllocator());
 			params.PushBack(optionsValue, doc.GetAllocator());
 			return Send("aria2.addUri", params);
 		}
@@ -203,15 +198,8 @@ namespace gdl {
 			params.PushBack(torrentValue, doc.GetAllocator());
 			rapidjson::Value emptyArray(rapidjson::kArrayType);
 			params.PushBack(emptyArray, doc.GetAllocator());
-			rapidjson::Value optionsValue;
-			optionsValue.SetObject();
-			for (const auto& [key, value] : options) {
-				rapidjson::Value keyName;
-				keyName.SetString(key.c_str(), key.size(), doc.GetAllocator());
-				rapidjson::Value keyValue;
-				keyValue.SetString(value.c_str(), value.size(), doc.GetAllocator());
-				optionsValue.AddMember(keyName, keyValue, doc.GetAllocator());
-			}
+			rapidjson::Value optionsValue(rapidjson::kObjectType);
+			AppendAria2OptionsJson(options, optionsValue, doc.GetAllocator());
 			params.PushBack(optionsValue, doc.GetAllocator());
 			return Send("aria2.addTorrent", params);
 		}
@@ -231,15 +219,8 @@ namespace gdl {
 			rapidjson::Value metalinkValue;
 			metalinkValue.SetString(metalink.c_str(), metalink.size(), doc.GetAllocator());
 			params.PushBack(metalinkValue, doc.GetAllocator());
-			rapidjson::Value optionsValue;
-			optionsValue.SetObject();
-			for (const auto& [key, value] : options) {
-				rapidjson::Value keyName;
-				keyName.SetString(key.c_str(), key.size(), doc.GetAllocator());
-				rapidjson::Value keyValue;
-				keyValue.SetString(value.c_str(), value.size(), doc.GetAllocator());
-				optionsValue.AddMember(keyName, keyValue, doc.GetAllocator());
-			}
+			rapidjson::Value optionsValue(rapidjson::kObjectType);
+			AppendAria2OptionsJson(options, optionsValue, doc.GetAllocator());
 			params.PushBack(optionsValue, doc.GetAllocator());
 			return Send("aria2.addMetalink", params);
 		}
@@ -592,13 +573,7 @@ namespace gdl {
 			params.PushBack(token, doc.GetAllocator());
 			params.PushBack(gidValue, doc.GetAllocator());
 			rapidjson::Value optionsValue(rapidjson::kObjectType);
-			for (const auto& [key, value] : options) {
-				rapidjson::Value keyName;
-				keyName.SetString(key.c_str(), key.size(), doc.GetAllocator());
-				rapidjson::Value valueName;
-				valueName.SetString(value.c_str(), value.size(), doc.GetAllocator());
-				optionsValue.AddMember(keyName, valueName, doc.GetAllocator());
-			}
+			AppendAria2OptionsJson(options, optionsValue, doc.GetAllocator());
 			params.PushBack(optionsValue, doc.GetAllocator());
 			return Send("aria2.changeOption", params);
 		}
@@ -623,13 +598,7 @@ namespace gdl {
 			token.SetString(token_str.c_str(), token_str.size(), doc.GetAllocator());
 			params.PushBack(token, doc.GetAllocator());
 			rapidjson::Value optionsValue(rapidjson::kObjectType);
-			for (const auto& [key, value] : options) {
-				rapidjson::Value keyName;
-				keyName.SetString(key.c_str(), key.size(), doc.GetAllocator());
-				rapidjson::Value valueName;
-				valueName.SetString(value.c_str(), value.size(), doc.GetAllocator());
-				optionsValue.AddMember(keyName, valueName, doc.GetAllocator());
-			}
+			AppendAria2OptionsJson(options, optionsValue, doc.GetAllocator());
 			params.PushBack(optionsValue, doc.GetAllocator());
 			return Send("aria2.changeGlobalOption", params);
 		}

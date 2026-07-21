@@ -2,6 +2,7 @@
 #include <cpr/cpr.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
+#include "aria2c_options_json.h"
 #include "config/config.h"
 #include "engine_def.h"
 #include "logger.h"
@@ -39,14 +40,9 @@ namespace gdl {
 			params.PushBack(uriArray, doc_.GetAllocator());
 
 			// Add options
+			// 同名多值键(header)聚合为数组,避免重复键 JSON 丢失请求头(见 aria2c_options_json.h)
 			rapidjson::Value optionsValue(rapidjson::kObjectType);
-			for (const auto& [key, value] : options) {
-				rapidjson::Value keyName;
-				keyName.SetString(key.c_str(), key.size(), doc_.GetAllocator());
-				rapidjson::Value valueName;
-				valueName.SetString(value.c_str(), value.size(), doc_.GetAllocator());
-				optionsValue.AddMember(keyName, valueName, doc_.GetAllocator());
-			}
+			AppendAria2OptionsJson(options, optionsValue, doc_.GetAllocator());
 			params.PushBack(optionsValue, doc_.GetAllocator());
 
 			return Send("aria2.addUri", params);
@@ -73,13 +69,7 @@ namespace gdl {
 
 			// Add options
 			rapidjson::Value optionsValue(rapidjson::kObjectType);
-			for (const auto& [key, value] : options) {
-				rapidjson::Value keyName;
-				keyName.SetString(key.c_str(), key.size(), doc_.GetAllocator());
-				rapidjson::Value valueName;
-				valueName.SetString(value.c_str(), value.size(), doc_.GetAllocator());
-				optionsValue.AddMember(keyName, valueName, doc_.GetAllocator());
-			}
+			AppendAria2OptionsJson(options, optionsValue, doc_.GetAllocator());
 			params.PushBack(optionsValue, doc_.GetAllocator());
 
 			return Send("aria2.addTorrent", params);
@@ -102,13 +92,7 @@ namespace gdl {
 
 			// Add options
 			rapidjson::Value optionsValue(rapidjson::kObjectType);
-			for (const auto& [key, value] : options) {
-				rapidjson::Value keyName;
-				keyName.SetString(key.c_str(), key.size(), doc_.GetAllocator());
-				rapidjson::Value valueName;
-				valueName.SetString(value.c_str(), value.size(), doc_.GetAllocator());
-				optionsValue.AddMember(keyName, valueName, doc_.GetAllocator());
-			}
+			AppendAria2OptionsJson(options, optionsValue, doc_.GetAllocator());
 			params.PushBack(optionsValue, doc_.GetAllocator());
 
 			return Send("aria2.addMetalink", params);
@@ -479,13 +463,7 @@ namespace gdl {
 
 			// Add options
 			rapidjson::Value optionsValue(rapidjson::kObjectType);
-			for (const auto& [key, value] : options) {
-				rapidjson::Value keyName;
-				keyName.SetString(key.c_str(), key.size(), doc_.GetAllocator());
-				rapidjson::Value valueName;
-				valueName.SetString(value.c_str(), value.size(), doc_.GetAllocator());
-				optionsValue.AddMember(keyName, valueName, doc_.GetAllocator());
-			}
+			AppendAria2OptionsJson(options, optionsValue, doc_.GetAllocator());
 			params.PushBack(optionsValue, doc_.GetAllocator());
 
 			return Send("aria2.changeOption", params);
@@ -516,13 +494,7 @@ namespace gdl {
 
 			// Add options
 			rapidjson::Value optionsValue(rapidjson::kObjectType);
-			for (const auto& [key, value] : options) {
-				rapidjson::Value keyName;
-				keyName.SetString(key.c_str(), key.size(), doc_.GetAllocator());
-				rapidjson::Value valueName;
-				valueName.SetString(value.c_str(), value.size(), doc_.GetAllocator());
-				optionsValue.AddMember(keyName, valueName, doc_.GetAllocator());
-			}
+			AppendAria2OptionsJson(options, optionsValue, doc_.GetAllocator());
 			params.PushBack(optionsValue, doc_.GetAllocator());
 
 			return Send("aria2.changeGlobalOption", params);
