@@ -878,6 +878,11 @@
         <source>The eD2k engine failed to start. Check the logs or restart the app.</source>
         <translation>eD2k 引擎启动失败。请检查日志或重启应用。</translation>
     </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kCenterPage.qml" line="157"/>
+        <source>Shares</source>
+        <translation>分享</translation>
+    </message>
 </context>
 <context>
     <name>Ed2kSearchPage</name>
@@ -1111,6 +1116,284 @@
         <location filename="../qml/Browser/Ed2kServerPage.qml" line="23"/>
         <source>Failed to connect: %1</source>
         <translation>连接失败：%1</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="32"/>
+        <source>Server list updated</source>
+        <translation>服务器列表已更新</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="34"/>
+        <source>Server list update failed: %1</source>
+        <translation>服务器列表更新失败：%1</translation>
+    </message>
+</context>
+<context>
+    <name>Ed2kSettingPage</name>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="17"/>
+        <source>eD2k Settings</source>
+        <translation>eD2k 设置</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="18"/>
+        <source>Configure eD2k network identity, connectivity, and performance</source>
+        <translation>配置 eD2k 网络身份、连接方式与性能</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="30"/>
+        <source>Identity &amp; Network</source>
+        <translation>身份与网络</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="38"/>
+        <source>Nickname:</source>
+        <translation>昵称：</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="45"/>
+        <source>GDownload</source>
+        <translation>GDownload</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="46"/>
+        <source>eD2k nickname</source>
+        <translation>eD2k 昵称</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="52"/>
+        <source>TCP Port:</source>
+        <translation>TCP 端口：</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="53"/>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="69"/>
+        <source>Takes effect after restarting the app</source>
+        <translation>重启应用后生效</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="62"/>
+        <source>eD2k TCP port</source>
+        <translation>eD2k TCP 端口</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="68"/>
+        <source>UDP Port:</source>
+        <translation>UDP 端口：</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="78"/>
+        <source>eD2k UDP port</source>
+        <translation>eD2k UDP 端口</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="91"/>
+        <source>Enable protocol obfuscation</source>
+        <translation>启用协议混淆</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="100"/>
+        <source>Enable Protocol Obfuscation</source>
+        <translation>启用协议混淆</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="108"/>
+        <source>Obscures eD2k traffic to help bypass ISP throttling. Takes effect after restarting the app.</source>
+        <translation>混淆 eD2k 流量以帮助绕过运营商限速。重启应用后生效。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="130"/>
+        <source>Network Access</source>
+        <translation>网络接入</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="144"/>
+        <source>Enable Kad network</source>
+        <translation>启用 Kad 网络</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="153"/>
+        <source>Enable Kad Network</source>
+        <translation>启用 Kad 网络</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="161"/>
+        <source>Serverless peer discovery via Kademlia DHT. Improves source availability. Takes effect after restarting the app.</source>
+        <translation>通过 Kademlia DHT 实现无服务器节点发现，提升资源可用性。重启应用后生效。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="177"/>
+        <source>Auto connect on startup</source>
+        <translation>启动时自动连接</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="186"/>
+        <source>Auto Connect on Startup</source>
+        <translation>启动时自动连接</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="194"/>
+        <source>Automatically connect to the best available server when the app starts.</source>
+        <translation>应用启动时自动连接到最佳可用服务器。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="204"/>
+        <source>server.met URL:</source>
+        <translation>server.met 地址：</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="205"/>
+        <source>Used by &apos;Update from URL&apos; on the eD2k Servers page</source>
+        <translation>供 eD2k 服务器页的“从 URL 更新”使用</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="212"/>
+        <source>http://upd.emule-security.org/server.met</source>
+        <translation>http://upd.emule-security.org/server.met</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="213"/>
+        <source>eD2k server.met URL</source>
+        <translation>eD2k server.met 地址</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="231"/>
+        <source>Performance</source>
+        <translation>性能</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="239"/>
+        <source>Max Concurrent Tasks:</source>
+        <translation>最大并发任务数：</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="240"/>
+        <source>Maximum number of eD2k downloads running at the same time (1-20)</source>
+        <translation>同时运行的 eD2k 下载任务数上限（1-20）</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="249"/>
+        <source>Maximum concurrent eD2k tasks</source>
+        <translation>最大并发 eD2k 任务数</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="281"/>
+        <source>Input fields reset to default values (not saved yet)</source>
+        <translation>输入字段重置为默认值（尚未保存）</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="288"/>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="290"/>
+        <source>TCP and UDP ports must be different</source>
+        <translation>TCP 端口和 UDP 端口不能相同</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="298"/>
+        <source>Nickname</source>
+        <translation>昵称</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="301"/>
+        <source>TcpPort</source>
+        <translation>TCP 端口</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="304"/>
+        <source>UdpPort</source>
+        <translation>UDP 端口</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="307"/>
+        <source>Obfuscation</source>
+        <translation>协议混淆</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="310"/>
+        <source>Kad</source>
+        <translation>Kad</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="313"/>
+        <source>AutoConnect</source>
+        <translation>自动连接</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="316"/>
+        <source>ServerMetUrl</source>
+        <translation>server.met 地址</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="319"/>
+        <source>MaxConcurrentTasks</source>
+        <translation>最大并发任务数</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="320"/>
+        <source>eD2k settings saved and applied successfully!</source>
+        <translation>eD2k 设置保存并应用成功！</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="328"/>
+        <source>Shared folders are managed in the eD2k page. Port, identity and network settings take effect after restarting the app.</source>
+        <translation>共享文件夹在 eD2k 页面中管理。端口、身份和网络设置在重启应用后生效。</translation>
+    </message>
+</context>
+<context>
+    <name>Ed2kSharePage</name>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="38"/>
+        <source>Share operation failed: %1</source>
+        <translation>分享操作失败：%1</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="77"/>
+        <source>Stop sharing this folder</source>
+        <translation>停止分享此文件夹</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="87"/>
+        <source>Add Folder</source>
+        <translation>添加文件夹</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="93"/>
+        <source>Rescan</source>
+        <translation>重新扫描</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="112"/>
+        <source>Upload: %1/s · Queued %2 · Active %3 · Total %4</source>
+        <translation>上传：%1/秒 · 排队 %2 · 活跃 %3 · 总计 %4</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="142"/>
+        <source>No shared folders. Add a folder to start sharing.</source>
+        <translation>暂无共享文件夹。添加一个文件夹以开始分享。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="143"/>
+        <source>Scanning or no files found in shared folders.</source>
+        <translation>正在扫描，或共享文件夹中未找到文件。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="179"/>
+        <source>%1 · Uploaded ~%2 · %3 requests</source>
+        <translation>%1 · 已上传约 %2 · %3 次请求</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="187"/>
+        <source>Copy ed2k link</source>
+        <translation>复制 ed2k 链接</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="190"/>
+        <source>Link copied</source>
+        <translation>链接已复制</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="197"/>
+        <source>Open containing folder</source>
+        <translation>打开所在文件夹</translation>
     </message>
 </context>
 <context>
