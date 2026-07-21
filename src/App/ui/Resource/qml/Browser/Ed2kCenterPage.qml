@@ -127,6 +127,9 @@ Rectangle {
                 id: searchTabButton
                 objectName: "ed2kTabSearch"
                 variant: "nav"
+                // nav 变体的文本区宽度与隐式宽度精确贴边，高分屏/中文字体度量的
+                // 浮点取整会触发省略号——三个 tab 按钮统一加一点余量
+                Layout.preferredWidth: implicitWidth + GTheme.spaceSM
                 checkable: true
                 checked: ed2kStack.currentIndex === 0
                 // AuroraIcons 中没有 "search" 图标，用语义相近的 "filter" 代替（不新增 SVG）
@@ -139,6 +142,7 @@ Rectangle {
                 id: serversTabButton
                 objectName: "ed2kTabServers"
                 variant: "nav"
+                Layout.preferredWidth: implicitWidth + GTheme.spaceSM
                 checkable: true
                 checked: ed2kStack.currentIndex === 1
                 iconName: "globe"
@@ -150,6 +154,7 @@ Rectangle {
                 id: sharesTabButton
                 objectName: "ed2kTabShares"
                 variant: "nav"
+                Layout.preferredWidth: implicitWidth + GTheme.spaceSM
                 checkable: true
                 checked: ed2kStack.currentIndex === 2
                 // AuroraIcons 中没有 "share" 图标，用语义相近的 "cloud" 代替（不新增 SVG）

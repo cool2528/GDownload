@@ -60,16 +60,17 @@ ColumnLayout {
     }
 
     // 服务器列表
+    // 内容必须经 contentItem 传入：GCard 的隐式高度只统计 contentItem
+    // (直接子项进的是 Control.data，卡片会塌缩成 2*padding 并把内容裁掉)
     GCard {
         Layout.fillWidth: true
         Layout.fillHeight: true
         outlined: true
         padding: GTheme.spaceSM
 
-        ListView {
+        contentItem: ListView {
             id: serverList
             objectName: "ed2kServerList"
-            anchors.fill: parent
             clip: true
             spacing: GTheme.spaceXS
             model: root.serverModel
@@ -80,8 +81,7 @@ ColumnLayout {
                 outlined: true
                 padding: GTheme.spaceSM
 
-                RowLayout {
-                    anchors.fill: parent
+                contentItem: RowLayout {
                     spacing: GTheme.spaceMD
 
                     Rectangle {
@@ -123,14 +123,13 @@ ColumnLayout {
         }
     }
 
-    // Kad 状态条
+    // Kad 状态条（内容经 contentItem 传入，理由同上）
     GCard {
         Layout.fillWidth: true
         outlined: true
         padding: GTheme.spaceSM
 
-        RowLayout {
-            anchors.fill: parent
+        contentItem: RowLayout {
             spacing: GTheme.spaceSM
             Rectangle {
                 width: 8; height: 8; radius: 4

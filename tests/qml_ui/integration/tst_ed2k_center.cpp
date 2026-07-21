@@ -113,7 +113,29 @@ class TstEd2kCenter : public QObject {
 		QTRY_COMPARE_WITH_TIMEOUT(page->property("currentTabIndex").toInt(), 1, 1000);
 	}
 
-	// 测试点 4:ed2kTabShares 存在,点击后 currentTabIndex 切换到 2(Phase 3b 分享 tab)
+	// 测试点 4:布局回归守卫(卡片必须由内容撑起高度,不得塌缩为 2*padding)
+	// 根因:GCard 是 Control,直接子项进 data 不进 contentItem,隐式高度塌缩且 clip 裁掉内容;
+	// 页面已改为 contentItem 传入,此测试钉住该行为(表单卡隐式高度应显著大于 2*padding)
+	void searchFormCardHasContentDrivenHeight() {
+		QQmlComponent comp(&engine_, QUrl(QStringLiteral("qrc:/qml/Browser/Ed2kCenterPage.qml")));
+		QVERIFY2(!comp.isError(), qPrintable(comp.errorString()));
+		QScopedPointer<QObject> page(comp.create(engine_.rootContext()));
+		QVERIFY2(!page.isNull(), qPrintable(comp.errorString()));
+		auto* keyword = page->findChild<QQuickItem*>(QStringLiteral("ed2kSearchKeyword"));
+		QVERIFY2(keyword, "未找到 ed2kSearchKeyword");
+		// 输入框所在表单卡:向上找最近的 GCard(类型名含 GCard)
+		QQuickItem* card = keyword->parentItem();
+		while (card && !QString::fromLatin1(card->metaObject()->className()).contains(
+						   QStringLiteral("GCard"))) {
+			card = card->parentItem();
+		}
+		QVERIFY2(card, "未找到输入框所在的 GCard");
+		// 塌缩时隐式高度 = 2*padding(约 24);内容驱动时应不低于输入框高度 + padding
+		QVERIFY2(card->implicitHeight() > 40.0,
+				 qPrintable(QStringLiteral("表单卡隐式高度塌缩: %1").arg(card->implicitHeight())));
+	}
+
+	// 测试点 5:ed2kTabShares 存在,点击后 currentTabIndex 切换到 2(Phase 3b 分享 tab)
 	void sharesTabSwitchesIndex2() {
 		QQmlComponent comp(&engine_, QUrl(QStringLiteral("qrc:/qml/Browser/Ed2kCenterPage.qml")));
 		QVERIFY2(!comp.isError(), qPrintable(comp.errorString()));

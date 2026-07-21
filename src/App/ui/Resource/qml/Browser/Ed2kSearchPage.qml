@@ -26,13 +26,14 @@ ColumnLayout {
     }
 
     // 搜索表单
+    // 内容必须经 contentItem 传入：GCard 的隐式高度只统计 contentItem
+    // (直接子项进的是 Control.data，卡片会塌缩成 2*padding 并把内容裁掉)
     GCard {
         Layout.fillWidth: true
         outlined: true
         padding: GTheme.spaceMD
 
-        RowLayout {
-            anchors.fill: parent
+        contentItem: RowLayout {
             spacing: GTheme.spaceSM
 
             GTextField {
@@ -69,15 +70,14 @@ ColumnLayout {
         }
     }
 
-    // 结果列表
+    // 结果列表（内容经 contentItem 传入，理由同上）
     GCard {
         Layout.fillWidth: true
         Layout.fillHeight: true
         outlined: true
         padding: GTheme.spaceSM
 
-        ColumnLayout {
-            anchors.fill: parent
+        contentItem: ColumnLayout {
             spacing: GTheme.spaceSM
 
             // 占位态：未连接 / 空结果 / 搜索中
@@ -124,8 +124,7 @@ ColumnLayout {
                     outlined: true
                     padding: GTheme.spaceSM
 
-                    RowLayout {
-                        anchors.fill: parent
+                    contentItem: RowLayout {
                         spacing: GTheme.spaceMD
 
                         ColumnLayout {

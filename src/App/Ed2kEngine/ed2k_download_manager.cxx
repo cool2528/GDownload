@@ -202,9 +202,13 @@ bool Ed2kDownloadManager::InitEd2kEngine(const Ed2kEngineConfig& config) {
 						if (sid_it == impl_->session_to_id.end()) {
 							return;
 						}
-						impl_->session->cancel(session_id, false);
+						// 必须先删双向映射再 cancel: cancel 会同步发出 cancelled 事件并再入
+						// 本事件回调,若映射仍在,该回声会以 kRemoved 覆盖刚写入的终态历史记录
+						// (上层缓存此刻已清,覆盖后的记录元数据为空,真实错误信息被吞)。
+						// 映射先删则回声在回调开头查表落空,静默丢弃。
 						impl_->id_to_session.erase(sid_it->second);
 						impl_->session_to_id.erase(sid_it);
+						impl_->session->cancel(session_id, false);
 					});
 				}
 			} catch (...) {

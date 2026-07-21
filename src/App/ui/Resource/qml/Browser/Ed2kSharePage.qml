@@ -40,13 +40,14 @@ ColumnLayout {
     }
 
     // 目录 chips 行
+    // 内容必须经 contentItem 传入：GCard 的隐式高度只统计 contentItem
+    // (直接子项进的是 Control.data，卡片会塌缩成 2*padding 并把内容裁掉)
     GCard {
         Layout.fillWidth: true
         outlined: true
         padding: GTheme.spaceSM
 
-        RowLayout {
-            anchors.fill: parent
+        contentItem: RowLayout {
             spacing: GTheme.spaceSM
 
             Flow {
@@ -97,13 +98,12 @@ ColumnLayout {
         }
     }
 
-    // 上传统计条
+    // 上传统计条（内容经 contentItem 传入，理由同上）
     GCard {
         Layout.fillWidth: true
         outlined: true
         padding: GTheme.spaceSM
-        RowLayout {
-            anchors.fill: parent
+        contentItem: RowLayout {
             spacing: GTheme.spaceSM
             Text {
                 font.pixelSize: GTheme.fontCaption
@@ -119,15 +119,14 @@ ColumnLayout {
         }
     }
 
-    // 分享文件列表
+    // 分享文件列表（内容经 contentItem 传入，理由同上）
     GCard {
         Layout.fillWidth: true
         Layout.fillHeight: true
         outlined: true
         padding: GTheme.spaceSM
 
-        ColumnLayout {
-            anchors.fill: parent
+        contentItem: ColumnLayout {
             spacing: GTheme.spaceSM
 
             Item {
@@ -159,8 +158,7 @@ ColumnLayout {
                     width: sharedList.width
                     outlined: true
                     padding: GTheme.spaceSM
-                    RowLayout {
-                        anchors.fill: parent
+                    contentItem: RowLayout {
                         spacing: GTheme.spaceMD
                         ColumnLayout {
                             Layout.fillWidth: true
