@@ -1,6 +1,7 @@
 #include "utils.h"
 #include <qdir.h>
 #include <QClipboard>
+#include <QFileInfo>
 #include <QGuiApplication>
 #if !defined(GDL_UTILS_DISABLE_QML_INTEGRATION)
 #include <QQmlContext>
@@ -62,6 +63,24 @@ namespace gdl {
                 clipboard->setText(text);
                 return true;
             }
+
+            // 打开文件所在目录并选中该文件；实现照抄 BrowserManagerImpl::ExecutePostDownloadAction
+            // 的“打开文件”分支（case 1），不改动 browser_manager 原处以避免回归
+            void UtilsToolsManager::OpenContainingFolder(const QString& filePath) {
+                if (filePath.isEmpty()) {
+                    LOG_WARN("OpenContainingFolder: empty filePath");
+                    return;
+                }
+#if defined(_WIN32) || defined(_WIN64)
+                QProcess::startDetached("explorer", {"/select,", QDir::toNativeSeparators(filePath)});
+#elif defined(__APPLE__)
+                QProcess::startDetached("open", {"-R", filePath});
+#else
+                QFileInfo fileInfo(filePath);
+                QProcess::startDetached("xdg-open", {fileInfo.absolutePath()});
+#endif
+            }
+
             void UtilsToolsManager::SetTaskbarProgress(double progress, void* nativeWindowHandle) {
 #if defined(_WIN32) || defined(_WIN64)
                 if (nativeWindowHandle) {

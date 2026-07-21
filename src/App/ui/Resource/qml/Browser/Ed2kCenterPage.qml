@@ -146,6 +146,18 @@ Rectangle {
                 ButtonGroup.group: ed2kTabGroup
                 onClicked: ed2kStack.currentIndex = 1
             }
+            GButton {
+                id: sharesTabButton
+                objectName: "ed2kTabShares"
+                variant: "nav"
+                checkable: true
+                checked: ed2kStack.currentIndex === 2
+                // AuroraIcons 中没有 "share" 图标，用语义相近的 "cloud" 代替（不新增 SVG）
+                iconName: "cloud"
+                text: qsTr("Shares")
+                ButtonGroup.group: ed2kTabGroup
+                onClicked: ed2kStack.currentIndex = 2
+            }
             Item { Layout.fillWidth: true }
         }
         ButtonGroup { id: ed2kTabGroup }
@@ -164,6 +176,9 @@ Rectangle {
             }
             Ed2kServerPage {
                 objectName: "ed2kServerPage"
+            }
+            Ed2kSharePage {
+                objectName: "ed2kSharePage"
             }
         }
     }
