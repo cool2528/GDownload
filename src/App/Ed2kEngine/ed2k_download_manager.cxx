@@ -313,6 +313,7 @@ void Ed2kDownloadManager::ScheduleSampling() {
 			if (impl_->pubsub) {
 				impl_->pubsub->Publish(kEd2kActiveProgress, arr.dump());
 			}
+			PublishShareStateLocked();
 		} catch (const std::exception&) {
 			// 单次采样失败不应中断定时器重排
 		}
@@ -722,8 +723,89 @@ void Ed2kDownloadManager::UpdateServerMet(const std::string& url) {
 					LOG_WARN("ed2k update_server_met failed: {}", r.error().message());
 				}
 				PublishServerListLocked();
+				nlohmann::json result;
+				result["ok"] = static_cast<bool>(r);
+				result["error"] = r ? std::string() : r.error().message();
+				if (impl_->pubsub) {
+					impl_->pubsub->Publish(kEd2kServerMetResult, result.dump());
+				}
 			} catch (const std::exception& e) {
 				LOG_ERR("ed2k update_server_met exception: {}", e.what());
+				if (impl_->pubsub) {
+					nlohmann::json result;
+					result["ok"] = false;
+					result["error"] = e.what();
+					impl_->pubsub->Publish(kEd2kServerMetResult, result.dump());
+				}
+			}
+			impl_->foreground_in_flight = false;
+			co_return;
+		}, boost::asio::detached);
+	});
+}
+
+// 仅网络线程调用：把当前上传统计与分享文件列表序列化发布
+void Ed2kDownloadManager::PublishShareStateLocked() {
+	if (!impl_->session || !impl_->pubsub) {
+		return;
+	}
+	const auto stats = impl_->session->upload_stats();
+	nlohmann::json doc;
+	doc["speed_bps"] = stats.speed_bps;
+	doc["queued"] = stats.queued_count;
+	doc["active"] = static_cast<std::uint32_t>(stats.active_sessions);
+	doc["total_uploaded"] = stats.total_uploaded;
+	nlohmann::json arr = nlohmann::json::array();
+	for (const auto& f : impl_->session->shared_files()) {
+		nlohmann::json j;
+		j["name"] = f.name;
+		j["path"] = f.path.string();
+		j["size"] = f.size;
+		j["hash"] = f.hash.to_hex();
+		j["uploaded"] = f.uploaded;
+		j["requests"] = f.requests;
+		arr.push_back(std::move(j));
+	}
+	doc["files"] = std::move(arr);
+	impl_->pubsub->Publish(kEd2kShareState, doc.dump());
+}
+
+void Ed2kDownloadManager::SetSharedDirs(const std::vector<std::string>& dirs) {
+	if (!impl_->running.load()) {
+		return;
+	}
+	boost::asio::post(impl_->runtime.executor(), [this, dirs] {
+		if (!impl_->session || impl_->foreground_in_flight) {
+			return;
+		}
+		impl_->foreground_in_flight = true;
+		std::vector<std::filesystem::path> paths;
+		paths.reserve(dirs.size());
+		for (const auto& d : dirs) {
+			paths.emplace_back(d);
+		}
+		boost::asio::co_spawn(impl_->runtime.executor(), [this, paths = std::move(paths)]() -> boost::asio::awaitable<void> {
+			try {
+				auto r = co_await impl_->session->set_shared_dirs(paths);
+				if (r) {
+					PublishShareStateLocked();
+				} else {
+					LOG_WARN("ed2k set_shared_dirs failed: {}", r.error().message());
+					if (impl_->pubsub) {
+						nlohmann::json result;
+						result["ok"] = false;
+						result["error"] = r.error().message();
+						impl_->pubsub->Publish(kEd2kShareOpResult, result.dump());
+					}
+				}
+			} catch (const std::exception& e) {
+				LOG_ERR("ed2k set_shared_dirs exception: {}", e.what());
+				if (impl_->pubsub) {
+					nlohmann::json result;
+					result["ok"] = false;
+					result["error"] = e.what();
+					impl_->pubsub->Publish(kEd2kShareOpResult, result.dump());
+				}
 			}
 			impl_->foreground_in_flight = false;
 			co_return;
