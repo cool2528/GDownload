@@ -100,6 +100,8 @@ target_sources(qml_ui_tst_ed2k_center PRIVATE
     ${CMAKE_SOURCE_DIR}/src/App/ui/Ed2k/ed2k_search_result_model.cxx
     ${CMAKE_SOURCE_DIR}/src/App/ui/Ed2k/ed2k_server_list_model.h
     ${CMAKE_SOURCE_DIR}/src/App/ui/Ed2k/ed2k_server_list_model.cxx
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Ed2k/ed2k_shared_file_model.h
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Ed2k/ed2k_shared_file_model.cxx
 )
 target_include_directories(qml_ui_tst_ed2k_center PRIVATE
     ${CMAKE_SOURCE_DIR}/src/App/ui/Ed2k
