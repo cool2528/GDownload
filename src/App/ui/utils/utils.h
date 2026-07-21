@@ -29,6 +29,10 @@ namespace gdl {
 #endif
                 Q_INVOKABLE bool SetClipboardText(const QString& text);
 
+                // 打开文件所在目录并在文件管理器中选中该文件
+                // （Windows: explorer /select,；macOS: open -R；Linux: xdg-open 父目录）
+                Q_INVOKABLE void OpenContainingFolder(const QString& filePath);
+
                 Q_INVOKABLE void SetTaskbarProgress(double progress, void* nativeWindowHandle = nullptr);
                 Q_INVOKABLE QString Version() const;
                 Q_INVOKABLE QString GetNoticeContent() const;
