@@ -1136,6 +1136,31 @@
 <context>
     <name>Ed2kSettingPage</name>
     <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="1"/>
+        <source>Auto-sync sources on startup</source>
+        <translation>起動時にソースを自動同期</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="1"/>
+        <source>Update the server list and Kad nodes automatically each time the app starts.</source>
+        <translation>アプリの起動ごとにサーバーリストと Kad ノードを自動的に更新します。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="1"/>
+        <source>Used to bootstrap the Kad network. Takes effect after restart.</source>
+        <translation>Kad ネットワークのブートストラップに使用します。再起動後に有効になります。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="1"/>
+        <source>Kad nodes source (nodes.dat URL):</source>
+        <translation>Kad ノードソース（nodes.dat URL）:</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="1"/>
+        <source>eD2k nodes.dat URL</source>
+        <translation>eD2k nodes.dat URL</translation>
+    </message>
+    <message>
         <location filename="../qml/Browser/Ed2kSettingPage.qml" line="17"/>
         <source>eD2k Settings</source>
         <translation>eD2k 設定</translation>
