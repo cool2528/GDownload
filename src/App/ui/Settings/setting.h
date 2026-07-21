@@ -1276,6 +1276,30 @@ namespace gdl {
 			}
 			SETTING_IMP_END(Ed2kNodesDatUrl)
 
+			// Ed2kAutoSyncSources (eD2k 启动时是否自动同步服务器列表与 Kad 节点)
+			SETTING_IMP_BEGIN(Ed2kAutoSyncSources, CONFIG_KEY_PATH(Ed2kAutoSyncSources), bool)
+			void Default() override {
+				value_ = true;
+			}
+			void Put(const QVariant& value) override {
+				if (value.canConvert<bool>()) {
+					value_ = value.toBool();
+				}
+				else if (value.canConvert<QString>()) {
+					value_ = value.toString() == "true" || value.toString() == "1";
+				}
+				else if (value.canConvert<int>()) {
+					value_ = value.toInt() == 1;
+				}
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return value_ ? "true" : "false";
+			}
+			SETTING_IMP_END(Ed2kAutoSyncSources)
+
 		}  // namespace settings
 	}  // namespace ui
 }  // namespace gdl

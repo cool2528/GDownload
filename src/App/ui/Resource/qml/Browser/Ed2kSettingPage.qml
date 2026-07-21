@@ -214,6 +214,55 @@ SettingCard {
                 Accessible.name: qsTr("eD2k server.met URL")
             }
         }
+
+        SettingRow {
+            Layout.fillWidth: true
+            label: qsTr("Kad nodes source (nodes.dat URL):")
+            hint: qsTr("Used to bootstrap the Kad network. Takes effect after restart.")
+            control: GTextField {
+                id: nodesDatUrlField
+                objectName: "ed2kNodesDatUrlField"
+                // nodes.dat URL 同 server.met URL，长文本用 fillWidth 展开容纳
+                Layout.fillWidth: true
+                Layout.preferredHeight: GTheme.sizeDefault
+                text: SettingsManager.qEd2kNodesDatUrl
+                placeholderText: qsTr("http://upd.emule-security.org/nodes.dat")
+                Accessible.name: qsTr("eD2k nodes.dat URL")
+            }
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: GTheme.spaceMD
+
+            GCheckBox {
+                id: autoSyncCheckBox
+                objectName: "ed2kAutoSyncCheckBox"
+                checked: SettingsManager.qEd2kAutoSyncSources
+                Accessible.name: qsTr("Auto-sync sources on startup")
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: GTheme.spaceXS
+
+                Text {
+                    Layout.fillWidth: true
+                    text: qsTr("Auto-sync sources on startup")
+                    font.pixelSize: GTheme.fontBody
+                    font.weight: GTheme.weightMedium
+                    color: GTheme.textPrimary
+                }
+
+                Text {
+                    Layout.fillWidth: true
+                    text: qsTr("Update the server list and Kad nodes automatically each time the app starts.")
+                    font.pixelSize: GTheme.fontCaption
+                    color: GTheme.textSecondary
+                    wrapMode: Text.WordWrap
+                }
+            }
+        }
     }
 
     // 分隔线:统一 Divider(色 borderLight,spec 3)
@@ -266,6 +315,8 @@ SettingCard {
                     enableKadCheckBox.checked !== SettingsManager.qEd2kEnableKad ||
                     autoConnectCheckBox.checked !== SettingsManager.qEd2kAutoConnect ||
                     serverMetUrlField.text !== SettingsManager.qEd2kServerMetUrl ||
+                    nodesDatUrlField.text !== SettingsManager.qEd2kNodesDatUrl ||
+                    autoSyncCheckBox.checked !== SettingsManager.qEd2kAutoSyncSources ||
                     maxConcurrentTasksSpinBox.value !== SettingsManager.qEd2kMaxConcurrentTasks
 
         onReset: {
@@ -277,6 +328,8 @@ SettingCard {
             enableKadCheckBox.checked = false
             autoConnectCheckBox.checked = true
             serverMetUrlField.text = "http://upd.emule-security.org/server.met"
+            nodesDatUrlField.text = "http://upd.emule-security.org/nodes.dat"
+            autoSyncCheckBox.checked = true
             maxConcurrentTasksSpinBox.value = 5
 
             formActions.statusText = qsTr("Input fields reset to default values (not saved yet)")
@@ -315,6 +368,12 @@ SettingCard {
                 { val: serverMetUrlField.text, old: SettingsManager.qEd2kServerMetUrl,
                   setter: function (v) { SettingsManager.SetEd2kServerMetUrl(v) },
                   label: qsTr("ServerMetUrl") },
+                { val: nodesDatUrlField.text, old: SettingsManager.qEd2kNodesDatUrl,
+                  setter: function (v) { SettingsManager.SetEd2kNodesDatUrl(v) },
+                  label: qsTr("NodesDatUrl") },
+                { val: autoSyncCheckBox.checked, old: SettingsManager.qEd2kAutoSyncSources,
+                  setter: function (v) { SettingsManager.SetEd2kAutoSyncSources(v) },
+                  label: qsTr("AutoSyncSources") },
                 { val: maxConcurrentTasksSpinBox.value, old: SettingsManager.qEd2kMaxConcurrentTasks,
                   setter: function (v) { SettingsManager.SetEd2kMaxConcurrentTasks(v) },
                   label: qsTr("MaxConcurrentTasks") }

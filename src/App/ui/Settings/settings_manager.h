@@ -86,6 +86,7 @@ namespace gdl {
                 SETTING_PROPERTY(QString, Ed2kSharedDirs)
                 SETTING_PROPERTY(QString, Ed2kServerMetUrl)
                 SETTING_PROPERTY(QString, Ed2kNodesDatUrl)
+                SETTING_PROPERTY(bool, Ed2kAutoSyncSources)
 
                public:
                 ~SettingsImpl() override;

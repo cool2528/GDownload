@@ -102,6 +102,7 @@ namespace gdl {
 			CONFIG_PATH(Ed2kSharedDirs, "ed2k.shared-dirs", "");
 			CONFIG_PATH(Ed2kServerMetUrl, "ed2k.server-met-url", "http://upd.emule-security.org/server.met");
 			CONFIG_PATH(Ed2kNodesDatUrl, "ed2k.nodes-dat-url", "http://upd.emule-security.org/nodes.dat");
+			CONFIG_PATH(Ed2kAutoSyncSources, "ed2k.auto-sync-sources", "true");
 
 			// static function all keys
 			static constexpr auto GetAllKeys() {
@@ -169,7 +170,8 @@ namespace gdl {
 											 Ed2kMaxConcurrentTasks.get(),
 											 Ed2kSharedDirs.get(),
 											 Ed2kServerMetUrl.get(),
-											 Ed2kNodesDatUrl.get()});
+											 Ed2kNodesDatUrl.get(),
+											 Ed2kAutoSyncSources.get()});
 			}
 			// static function all values
 			static constexpr auto GetAllValues() {
@@ -237,7 +239,8 @@ namespace gdl {
 											 Ed2kMaxConcurrentTasks.val(),
 											 Ed2kSharedDirs.val(),
 											 Ed2kServerMetUrl.val(),
-											 Ed2kNodesDatUrl.val()});
+											 Ed2kNodesDatUrl.val(),
+											 Ed2kAutoSyncSources.val()});
 			}
 		};
 	}  // namespace config
