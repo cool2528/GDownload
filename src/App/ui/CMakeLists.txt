@@ -124,6 +124,7 @@ find_package(boost_property_tree CONFIG REQUIRED)
 find_package(boost_asio CONFIG REQUIRED)
 find_package(LibtorrentRasterbar CONFIG REQUIRED)
 find_package(pugixml CONFIG REQUIRED)
+find_package(cpr CONFIG REQUIRED)
 
 # set dependencies library
 set(DEPENDENCIES_LIBRARIES FramelessHelper::Core FramelessHelper::Widgets FramelessHelper::Quick GDLCore Engine PluginManager Ed2kEngine)
@@ -260,6 +261,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system)
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::property_tree)
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::asio)
+target_link_libraries(${PROJECT_NAME} PRIVATE cpr::cpr)
 if(APPLE)
 target_link_libraries(${PROJECT_NAME} PRIVATE "-framework Sparkle")
 endif()

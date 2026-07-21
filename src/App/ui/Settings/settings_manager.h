@@ -85,6 +85,7 @@ namespace gdl {
                 SETTING_PROPERTY(int, Ed2kMaxConcurrentTasks)
                 SETTING_PROPERTY(QString, Ed2kSharedDirs)
                 SETTING_PROPERTY(QString, Ed2kServerMetUrl)
+                SETTING_PROPERTY(QString, Ed2kNodesDatUrl)
 
                public:
                 ~SettingsImpl() override;

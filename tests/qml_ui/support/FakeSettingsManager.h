@@ -116,6 +116,7 @@ class FakeSettingsManager : public QObject {
 	FAKE_SETTING(int, Ed2kMaxConcurrentTasks)
 	FAKE_SETTING(QString, Ed2kSharedDirs)
 	FAKE_SETTING(QString, Ed2kServerMetUrl)
+	FAKE_SETTING(QString, Ed2kNodesDatUrl)
 #undef FAKE_SETTING
 
 	// ===== SettingsImpl 显式声明的 Q_INVOKABLE 别名(SetAria2Xxx)=====
@@ -209,6 +210,7 @@ class FakeSettingsManager : public QObject {
 		store_[QStringLiteral("Ed2kMaxConcurrentTasks")] = 5;
 		store_[QStringLiteral("Ed2kSharedDirs")] = QStringLiteral("");
 		store_[QStringLiteral("Ed2kServerMetUrl")] = QStringLiteral("http://upd.emule-security.org/server.met");
+		store_[QStringLiteral("Ed2kNodesDatUrl")] = QStringLiteral("http://upd.emule-security.org/nodes.dat");
 	}
 
 	QList<FakeSettingsWrite> write_history_;

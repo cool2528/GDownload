@@ -1260,6 +1260,22 @@ namespace gdl {
 			}
 			SETTING_IMP_END(Ed2kServerMetUrl)
 
+			// Ed2kNodesDatUrl (eD2k Kad 引导节点 nodes.dat 更新源地址)
+			SETTING_IMP_BEGIN(Ed2kNodesDatUrl, CONFIG_KEY_PATH(Ed2kNodesDatUrl), QString)
+			void Default() override {
+				value_ = "http://upd.emule-security.org/nodes.dat";
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toString();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return value_;
+			}
+			SETTING_IMP_END(Ed2kNodesDatUrl)
+
 		}  // namespace settings
 	}  // namespace ui
 }  // namespace gdl
