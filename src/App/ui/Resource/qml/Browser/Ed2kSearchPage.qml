@@ -14,6 +14,9 @@ ColumnLayout {
     signal goToServers()
 
     property var resultModel: Ed2kManager.GetSearchResultModel()
+    // 记录"最近一次实际发起的搜索"所用的来源(0=Server/1=Kad)，供 Load More 可见性判断，
+    // 避免用户在结果展示期间切换下拉框导致 Load More 按钮跟错误的来源联动
+    property int lastSearchSource: 0
 
     Connections {
         target: Ed2kManager
@@ -58,6 +61,7 @@ ColumnLayout {
                 enabled: !Ed2kManager.searching && keywordInput.text.trim().length > 0
                 onClicked: {
                     root.resultModel.clear()
+                    root.lastSearchSource = sourceFilter.currentIndex
                     Ed2kManager.StartSearch(keywordInput.text, typeFilter.currentIndex, 0,
                                             sourceFilter.currentIndex)
                 }
@@ -170,7 +174,7 @@ ColumnLayout {
             GButton {
                 objectName: "ed2kLoadMoreButton"
                 Layout.alignment: Qt.AlignHCenter
-                visible: root.resultModel.count > 0 && sourceFilter.currentIndex === 0
+                visible: root.resultModel.count > 0 && root.lastSearchSource === 0
                 enabled: !Ed2kManager.searching
                 text: Ed2kManager.searching ? qsTr("Loading...") : qsTr("Load More")
                 onClicked: Ed2kManager.LoadMore()

@@ -96,6 +96,16 @@ TEST(Ed2kLinkTest, CanonicalizeRejectsEncodedTraversal) {
 	EXPECT_TRUE(CanonicalizeEd2kLink(QStringLiteral("http://x/y")).isEmpty());
 }
 
+// 带 AICH 与源提示尾段的链接: 文件名解码消毒, 尾段原样保留
+TEST(Ed2kLinkTest, CanonicalizePreservesTrailingSegments) {
+	const QString in = QStringLiteral(
+		"ed2k://|file|a%20b.mkv|123|00112233445566778899AABBCCDDEEFF|h=ABCDEFGH|/|sources,1.2.3.4:4662|/");
+	const QString out = CanonicalizeEd2kLink(in);
+	EXPECT_TRUE(out.contains(QStringLiteral("|a b.mkv|")) || out.contains(QStringLiteral("a b.mkv")));
+	EXPECT_TRUE(out.contains(QStringLiteral("h=ABCDEFGH")));
+	EXPECT_TRUE(out.contains(QStringLiteral("sources,1.2.3.4:4662")));
+}
+
 TEST(Ed2kLinkTest, ParsesMultipleLinesFromText) {
 	const QVector<Ed2kFileEntry> entries = ParseEd2kLinks(QStringLiteral(
 		"ed2k://|file|a|1|00112233445566778899AABBCCDDEEFF|/\n"

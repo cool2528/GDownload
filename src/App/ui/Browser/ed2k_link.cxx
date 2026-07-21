@@ -89,16 +89,16 @@ namespace gdl {
 			}
 
 			QString CanonicalizeEd2kLink(const QString& link) {
-				// 复用 ParseEd2kLink 的解码 + 安全校验，再用解码后的文件名重建标准链接，
-				// 交给引擎的链接文件名段即为可直接落盘的安全名字。
+				// 复用 ParseEd2kLink 的解码 + 安全校验；只原位替换文件名段(第 2 段)，
+				// 其余段(含 size|hash 之后的 h=AICH/part hash/|s=sources 等可选尾段)原样透传，
+				// 避免像原先"重建标准链接"那样丢弃这些尾段。
 				const Ed2kFileEntry entry = ParseEd2kLink(link);
 				if (!entry.valid) {
 					return QString();
 				}
-				return QStringLiteral("ed2k://|file|%1|%2|%3|/")
-					.arg(entry.name)
-					.arg(entry.size)
-					.arg(entry.md4_hex);
+				QStringList tokens = link.trimmed().split(QLatin1Char('|'));
+				tokens[2] = entry.name;
+				return tokens.join(QLatin1Char('|'));
 			}
 
 			bool IsEd2kLink(const QString& url) {

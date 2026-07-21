@@ -149,7 +149,7 @@
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="32"/>
         <source>Appearance &amp; Language</source>
-        <translation>外观与语言</translation>
+        <translation>外觀與語言</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="33"/>
@@ -194,7 +194,7 @@
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="77"/>
         <source>Application Behavior</source>
-        <translation>应用行为</translation>
+        <translation>應用行為</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="87"/>
@@ -219,7 +219,7 @@
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="144"/>
         <source>Show Close Confirmation</source>
-        <translation>显示关闭确认</translation>
+        <translation>顯示關閉確認</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="154"/>
@@ -229,12 +229,12 @@
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="155"/>
         <source>Global download folder</source>
-        <translation>全局下载文件夹</translation>
+        <translation>全域下載資料夾</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="174"/>
         <source>Network Proxy</source>
-        <translation>网络代理</translation>
+        <translation>網路代理</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="184"/>
@@ -254,12 +254,12 @@
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="231"/>
         <source>Clipboard Monitor</source>
-        <translation>剪贴板监控器</translation>
+        <translation>剪貼簿監控器</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="232"/>
         <source>Automatically detect download links from clipboard</source>
-        <translation>自动检测剪贴板中的下载链接</translation>
+        <translation>自動檢測剪貼簿中的下載連結</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BasicSettingPage.qml" line="241"/>
@@ -272,12 +272,12 @@
     <message>
         <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="15"/>
         <source>BitTorrent Advanced Options</source>
-        <translation>BitTorrent 高级选项</translation>
+        <translation>BitTorrent 高階選項</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="16"/>
         <source>Configure DHT, peer connections, and encryption for BitTorrent downloads</source>
-        <translation>为 BitTorrent 下载配置 DHT、对等连接和加密</translation>
+        <translation>為 BitTorrent 下載配置 DHT、對等連線和加密</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="30"/>
@@ -287,17 +287,17 @@
     <message>
         <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="39"/>
         <source>Enable DHT (Distributed Hash Table)</source>
-        <translation>启用 DHT（分布式散列表）</translation>
+        <translation>啟用 DHT（分散式雜湊表）</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="47"/>
         <source>Helps find more peers for torrent downloads. Also enables UDP tracker support.</source>
-        <translation>帮助为洪流下载找到更多同行。还可启用 UDP 跟踪器支持。</translation>
+        <translation>幫助為洪流下載找到更多同行。還可啟用 UDP 跟蹤器支援。</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="68"/>
         <source>Max Peers Per Torrent</source>
-        <translation>每个 Torrent 的最大同行数</translation>
+        <translation>每個 Torrent 的最大同行數</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="76"/>
@@ -347,22 +347,22 @@
     <message>
         <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="86"/>
         <source>Maximum number of peers to connect per torrent (0 = unlimited)</source>
-        <translation>每个洪流可连接的最大同行者数量（0 = 无限制）</translation>
+        <translation>每個洪流可連線的最大同行者數量（0 = 無限制）</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="114"/>
         <source>Require Encrypted Connections</source>
-        <translation>要求加密连接</translation>
+        <translation>要求加密連線</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="122"/>
         <source>Only accept encrypted BitTorrent handshake. Rejects legacy unencrypted connections.</source>
-        <translation>只接受加密的 BitTorrent 握手。拒绝传统的未加密连接。</translation>
+        <translation>只接受加密的 BitTorrent 握手。拒絕傳統的未加密連線。</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BitTorrentAdvancedSettingPage.qml" line="147"/>
         <source>Input fields reset to default values (not saved yet)</source>
-        <translation>输入字段重置为默认值（尚未保存）</translation>
+        <translation>輸入欄位重置為預設值（尚未儲存）</translation>
     </message>
 </context>
 <context>
@@ -403,12 +403,12 @@
     <message>
         <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="37"/>
         <source>Close Confirmation</source>
-        <translation>关闭确认</translation>
+        <translation>關閉確認</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="39"/>
         <source>Do you want to quit the application or minimize it to the system tray?</source>
-        <translation>您想退出应用程序还是将其最小化到系统托盘？</translation>
+        <translation>您想退出應用程式還是將其最小化到系統托盤？</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="70"/>
@@ -428,7 +428,7 @@
     <message>
         <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="109"/>
         <source>Minimize to Tray</source>
-        <translation>最小化到托盘</translation>
+        <translation>最小化到托盤</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/CloseConfirmDialog.qml" line="114"/>
@@ -541,7 +541,7 @@
     <message>
         <location filename="../qml/Browser/BrowserExtension/ConfigHelperCard.qml" line="247"/>
         <source>Copy</source>
-        <translation>复制</translation>
+        <translation>複製</translation>
     </message>
 </context>
 <context>
@@ -549,29 +549,29 @@
     <message>
         <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="23"/>
         <source>Connection &amp; Performance</source>
-        <translation>连接与性能</translation>
+        <translation>連線與效能</translation>
     </message>
     <message>
         <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="24"/>
         <source>Configure connection parameters and download performance</source>
-        <translation>配置连接参数和下载性能</translation>
+        <translation>配置連線引數和下載效能</translation>
     </message>
     <message>
         <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="33"/>
         <source>Max Concurrent Downloads</source>
-        <translation>最大同时下载量</translation>
+        <translation>最大同時下載量</translation>
     </message>
     <message>
         <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="41"/>
         <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="80"/>
         <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="116"/>
         <source>Count:</source>
-        <translation>计数：</translation>
+        <translation>計數：</translation>
     </message>
     <message>
         <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="42"/>
         <source>Number of downloads running at the same time</source>
-        <translation>同时运行的下载次数</translation>
+        <translation>同時執行的下載次數</translation>
     </message>
     <message>
         <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="53"/>
@@ -581,12 +581,12 @@
     <message>
         <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="72"/>
         <source>Max Connections Per Server</source>
-        <translation>每台服务器最大连接数</translation>
+        <translation>每台伺服器最大連線數</translation>
     </message>
     <message>
         <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="81"/>
         <source>More connections = faster speed, but may be blocked by servers</source>
-        <translation>连接越多 = 速度越快，但可能会被服务器屏蔽</translation>
+        <translation>連線越多 = 速度越快，但可能會被伺服器遮蔽</translation>
     </message>
     <message>
         <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="89"/>
@@ -601,7 +601,7 @@
     <message>
         <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="117"/>
         <source>Number of segments to split the file for downloading</source>
-        <translation>分割下载文件的段数</translation>
+        <translation>分割下載檔案的段數</translation>
     </message>
     <message>
         <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="125"/>
@@ -621,7 +621,7 @@
     <message>
         <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="153"/>
         <source>Don&apos;t split files smaller than this size</source>
-        <translation>不要分割小于此大小的文件</translation>
+        <translation>不要分割小於此大小的檔案</translation>
     </message>
     <message>
         <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="159"/>
@@ -656,7 +656,7 @@
     <message>
         <location filename="../qml/Browser/ConnectionPerformanceSettingPage.qml" line="190"/>
         <source>Input fields reset to default values (not saved yet)</source>
-        <translation>输入字段重置为默认值（尚未保存）</translation>
+        <translation>輸入欄位重置為預設值（尚未儲存）</translation>
     </message>
 </context>
 <context>
@@ -664,7 +664,7 @@
     <message>
         <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="43"/>
         <source>Delete Confirmation</source>
-        <translation>删除确认</translation>
+        <translation>刪除確認</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="48"/>
@@ -674,7 +674,7 @@
     <message>
         <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="49"/>
         <source>Are you sure you want to delete this download task?</source>
-        <translation>您确定要删除此下载任务吗？</translation>
+        <translation>您確定要刪除此下載任務嗎？</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="76"/>
@@ -689,7 +689,7 @@
     <message>
         <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="85"/>
         <source>Also delete downloaded file</source>
-        <translation>同时删除下载的文件</translation>
+        <translation>同時刪除下載的檔案</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="137"/>
@@ -699,7 +699,7 @@
     <message>
         <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="138"/>
         <source>This will only remove the task from the waiting list.</source>
-        <translation>这只会将任务从等待列表中删除。</translation>
+        <translation>這只會將任務從等待列表中刪除。</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="142"/>
@@ -719,7 +719,7 @@
     <message>
         <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="147"/>
         <source>This will only remove the task record. The downloaded file will be kept.</source>
-        <translation>这只会删除任务记录。下载的文件将被保留。</translation>
+        <translation>這只會刪除任務記錄。下載的檔案將被保留。</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="166"/>
@@ -729,7 +729,7 @@
     <message>
         <location filename="../qml/CommonComponents/DeleteConfirmDialog.qml" line="171"/>
         <source>Delete</source>
-        <translation>删除</translation>
+        <translation>刪除</translation>
     </message>
 </context>
 <context>
@@ -737,7 +737,7 @@
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="44"/>
         <source>Downloads</source>
-        <translation>下载</translation>
+        <translation>下載</translation>
     </message>
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="53"/>
@@ -793,7 +793,7 @@
     <message>
         <location filename="../qml/Browser/DownloadPageTitle.qml" line="56"/>
         <source>Manage your downloads</source>
-        <translation>管理下载</translation>
+        <translation>管理下載</translation>
     </message>
 </context>
 <context>
@@ -1118,42 +1118,42 @@
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="66"/>
         <source>Frequently Asked Questions</source>
-        <translation>常见问题</translation>
+        <translation>常見問題</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="91"/>
         <source>Why do I need the browser extension?</source>
-        <translation>为什么需要浏览器扩展？</translation>
+        <translation>為什麼需要瀏覽器擴充套件？</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="97"/>
         <source>Is my data safe?</source>
-        <translation>我的数据安全吗？</translation>
+        <translation>我的資料安全嗎？</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="103"/>
         <source>Connection failed. What should I do?</source>
-        <translation>连接失败。我该怎么办？</translation>
+        <translation>連線失敗。我該怎麼辦？</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="109"/>
         <source>Which browsers are supported?</source>
-        <translation>支持哪些浏览器？</translation>
+        <translation>支援哪些瀏覽器？</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="121"/>
         <source>Does it work with password-protected sites?</source>
-        <translation>它是否适用于受密码保护的网站？</translation>
+        <translation>它是否適用於受密碼保護的網站？</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="167"/>
         <source>GitHub Issues</source>
-        <translation>GitHub 问题</translation>
+        <translation>GitHub 問題</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="171"/>
         <source>Opening GitHub Issues...</source>
-        <translation>打开 GitHub 问题...</translation>
+        <translation>開啟 GitHub 問題...</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="177"/>
@@ -1218,17 +1218,17 @@
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="181"/>
         <source>Opening documentation...</source>
-        <translation>开幕文件...</translation>
+        <translation>開幕檔案...</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="187"/>
         <source>Official Website</source>
-        <translation>官方网站</translation>
+        <translation>官方網站</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="188"/>
         <source>Visit gdownload.uk</source>
-        <translation>访问 gdownload.uk</translation>
+        <translation>訪問 gdownload.uk</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FAQCard.qml" line="191"/>
@@ -1266,7 +1266,7 @@
     <message>
         <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="38"/>
         <source>Feature Highlights</source>
-        <translation>特色亮点</translation>
+        <translation>特色亮點</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="48"/>
@@ -1316,22 +1316,22 @@
     <message>
         <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="66"/>
         <source>One-Click Capture</source>
-        <translation>一键采集</translation>
+        <translation>一鍵採集</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="73"/>
         <source>Batch Download</source>
-        <translation>批量下载</translation>
+        <translation>批次下載</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="94"/>
         <source>Cross-Browser</source>
-        <translation>跨浏览器</translation>
+        <translation>跨瀏覽器</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/FeatureHighlightCard.qml" line="101"/>
         <source>Smart Filtering</source>
-        <translation>智能过滤</translation>
+        <translation>智慧過濾</translation>
     </message>
 </context>
 <context>
@@ -1430,12 +1430,12 @@
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="117"/>
         <source>No active downloads</source>
-        <translation>无活动下载</translation>
+        <translation>無活動下載</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="118"/>
         <source>No waiting downloads</source>
-        <translation>下载无需等待</translation>
+        <translation>下載無需等待</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="119"/>
@@ -1618,7 +1618,7 @@
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="120"/>
         <source>No downloads</source>
-        <translation>无下载</translation>
+        <translation>無下載</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="263"/>
@@ -1638,7 +1638,7 @@
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="376"/>
         <source>Link copied to clipboard</source>
-        <translation>链接复制到剪贴板</translation>
+        <translation>連結複製到剪貼簿</translation>
     </message>
 </context>
 <context>
@@ -1710,7 +1710,7 @@
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="222"/>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="235"/>
         <source>About GDownload</source>
-        <translation>关于 GDownload</translation>
+        <translation>關於 GDownload</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="19"/>
@@ -1745,7 +1745,7 @@
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="110"/>
         <source>Support GDownload Development</source>
-        <translation>支持 GDownload 开发</translation>
+        <translation>支援 GDownload 開發</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="120"/>
@@ -1837,7 +1837,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="184"/>
         <source>Open Source Licenses</source>
-        <translation>开源许可证</translation>
+        <translation>開源許可證</translation>
     </message>
 </context>
 <context>
@@ -1970,7 +1970,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="45"/>
         <source>Installation Guide</source>
-        <translation>安装指南</translation>
+        <translation>安裝指南</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="55"/>
@@ -2131,32 +2131,32 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="64"/>
         <source>Download Extension</source>
-        <translation>下载扩展程序</translation>
+        <translation>下載擴充套件程式</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="119"/>
         <source>Opening GitHub...</source>
-        <translation>打开 GitHub...</translation>
+        <translation>開啟 GitHub...</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="126"/>
         <source>Download from gdownload.uk</source>
-        <translation>从 gdownload.uk 下载</translation>
+        <translation>從 gdownload.uk 下載</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="137"/>
         <source>Install Extension</source>
-        <translation>安装扩展</translation>
+        <translation>安裝擴充套件</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="175"/>
         <source>Configure Connection</source>
-        <translation>配置连接</translation>
+        <translation>配置連線</translation>
     </message>
     <message>
         <location filename="../qml/Browser/BrowserExtension/InstallationGuideCard.qml" line="337"/>
         <source>Download</source>
-        <translation>下载</translation>
+        <translation>下載</translation>
     </message>
 </context>
 <context>
@@ -2164,7 +2164,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="89"/>
         <source>Browser Extension</source>
-        <translation>浏览器扩展</translation>
+        <translation>瀏覽器擴充套件</translation>
     </message>
     <message>
         <location filename="../qml/Browser/LabSettingPage.qml" line="99"/>
@@ -2653,17 +2653,17 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="16"/>
         <source>Post-Download Actions</source>
-        <translation>下载后操作</translation>
+        <translation>下載後操作</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="17"/>
         <source>Configure automated actions after download completes, fails, or starts</source>
-        <translation>配置下载完成、失败或启动后的自动操作</translation>
+        <translation>配置下載完成、失敗或啟動後的自動操作</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="32"/>
         <source>When Download Completes</source>
-        <translation>下载完成时</translation>
+        <translation>下載完成時</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="44"/>
@@ -2675,51 +2675,51 @@ Copyright © 2024 GDownload Team
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="158"/>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="264"/>
         <source>Do Nothing</source>
-        <translation>无所作为</translation>
+        <translation>無所作為</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="47"/>
         <source>Open File</source>
-        <translation>打开文件</translation>
+        <translation>開啟檔案</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="48"/>
         <source>Open Directory</source>
-        <translation>开放目录</translation>
+        <translation>開放目錄</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="49"/>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="159"/>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="265"/>
         <source>Play Sound</source>
-        <translation>播放声音</translation>
+        <translation>播放聲音</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="50"/>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="160"/>
         <source>Run Custom Command</source>
-        <translation>运行自定义命令</translation>
+        <translation>執行自定義命令</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="51"/>
         <source>Shutdown Computer</source>
-        <translation>关闭计算机</translation>
+        <translation>關閉計算機</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="52"/>
         <source>Sleep Computer</source>
-        <translation>睡眠电脑</translation>
+        <translation>睡眠電腦</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="53"/>
         <source>Restart Computer</source>
-        <translation>重新启动计算机</translation>
+        <translation>重新啟動計算機</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="74"/>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="180"/>
         <source>Custom Command</source>
-        <translation>自定义命令</translation>
+        <translation>自定義命令</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="85"/>
@@ -2729,31 +2729,31 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="86"/>
         <source>e.g., notify-send &quot;Download Complete&quot; &quot;{file}&quot;</source>
-        <translation>例如，notify-send &quot;下载完成&quot;&quot;{文件}&quot;</translation>
+        <translation>例如，notify-send &quot;下載完成&quot;&quot;{檔案}&quot;</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="101"/>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="207"/>
         <source>Available variables:</source>
-        <translation>可用变量</translation>
+        <translation>可用變數</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="110"/>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="216"/>
         <source>  {file} - Downloaded file path</source>
-        <translation>{文件｝- 下载文件路径</translation>
+        <translation>{檔案｝- 下載檔案路徑</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="111"/>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="217"/>
         <source>  {dir} - Download directory path</source>
-        <translation>{dir}-下载目录路径</translation>
+        <translation>{dir}-下載目錄路徑</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="112"/>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="218"/>
         <source>  {gid} - Download task ID</source>
-        <translation>{gid} - 下载任务 ID</translation>
+        <translation>{gid} - 下載任務 ID</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="123"/>
@@ -2764,7 +2764,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="144"/>
         <source>When Download Fails</source>
-        <translation>下载失败时</translation>
+        <translation>下載失敗時</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="156"/>
@@ -2779,12 +2779,12 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="192"/>
         <source>e.g., logger &quot;Download failed: {gid}&quot;</source>
-        <translation>例如，日志程序 &quot;下载失败：{gid}&quot;</translation>
+        <translation>例如，日誌程式 &quot;下載失敗：{gid}&quot;</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="250"/>
         <source>When Download Starts</source>
-        <translation>下载开始时</translation>
+        <translation>下載開始時</translation>
     </message>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="262"/>
@@ -2865,17 +2865,17 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="22"/>
         <source>Basic Settings</source>
-        <translation>基本设置</translation>
+        <translation>基本設定</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="24"/>
         <source>Advanced Settings</source>
-        <translation>高级设置</translation>
+        <translation>高階設定</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="26"/>
         <source>Lab Settings</source>
-        <translation>实验室设置</translation>
+        <translation>實驗室設定</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="28"/>
@@ -2885,17 +2885,17 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="44"/>
         <source>Configure basic download preferences</source>
-        <translation>配置基本下载首选项</translation>
+        <translation>配置基本下載首選項</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="46"/>
         <source>Advanced configuration options</source>
-        <translation>高级配置选项</translation>
+        <translation>高階配置選項</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="48"/>
         <source>Experimental features and settings</source>
-        <translation>实验特点和设置</translation>
+        <translation>實驗特點和設定</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SettingPageTitle.qml" line="50"/>
@@ -2941,12 +2941,12 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="19"/>
         <source>Configure download and upload speed limits</source>
-        <translation>配置下载和上传速度限制</translation>
+        <translation>配置下載和上傳速度限制</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="28"/>
         <source>Global Download Limit</source>
-        <translation>全球下载限制</translation>
+        <translation>全球下載限制</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="36"/>
@@ -2958,7 +2958,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="37"/>
         <source>KB/s (0 = unlimited)</source>
-        <translation>KB/s （0 = 无限制）</translation>
+        <translation>KB/s （0 = 無限制）</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="44"/>
@@ -2968,12 +2968,12 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="69"/>
         <source>Global Upload Limit</source>
-        <translation>全局上传限制</translation>
+        <translation>全域上傳限制</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="78"/>
         <source>KB/s (0 = unlimited, for BitTorrent seeding)</source>
-        <translation>KB/s （0 = 无限制，用于 BitTorrent 种子传输）</translation>
+        <translation>KB/s （0 = 無限制，用於 BitTorrent 種子傳輸）</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="85"/>
@@ -2988,7 +2988,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="119"/>
         <source>KB/s (0 = disabled, disconnect if speed is lower for 60s)</source>
-        <translation>KB/s （0 = 禁用，如果速度低于 60s 则断开连接）</translation>
+        <translation>KB/s （0 = 禁用，如果速度低於 60s 則斷開連線）</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="126"/>
@@ -2998,7 +2998,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="151"/>
         <source>Input fields reset to default values (not saved yet)</source>
-        <translation>输入字段重置为默认值（尚未保存）</translation>
+        <translation>輸入欄位重置為預設值（尚未儲存）</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="163"/>
@@ -3023,17 +3023,17 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="165"/>
         <source>Invalid download limit!</source>
-        <translation>下载限制无效！</translation>
+        <translation>下載限制無效！</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="171"/>
         <source>Invalid upload limit!</source>
-        <translation>上传限制无效！</translation>
+        <translation>上傳限制無效！</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="177"/>
         <source>Invalid lowest speed!</source>
-        <translation>最低速度无效！</translation>
+        <translation>最低速度無效！</translation>
     </message>
     <message>
         <location filename="../qml/Browser/SpeedControlSettingPage.qml" line="185"/>
@@ -3079,7 +3079,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="101"/>
         <source>Advanced Options</source>
-        <translation>高级选项</translation>
+        <translation>高階選項</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="101"/>
@@ -3150,12 +3150,12 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="203"/>
         <source>Custom Headers:</source>
-        <translation>定制接头：</translation>
+        <translation>定製接頭：</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="218"/>
         <source>Custom request headers (one per line: KEY:VALUE)</source>
-        <translation>自定义请求标头（每行一个：KEY:VALUE）</translation>
+        <translation>自定義請求標頭（每行一個：KEY:VALUE）</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskAdvancedOptionsCard.qml" line="225"/>
@@ -3270,12 +3270,12 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/CommonComponents/TaskDialogHeader.qml" line="9"/>
         <source>Add New Download Task</source>
-        <translation>添加新的下载任务</translation>
+        <translation>新增新的下載任務</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogHeader.qml" line="10"/>
         <source>Add downloads from URLs, torrents, or cloud storage</source>
-        <translation>添加从 URL、torrents 或云存储下载的内容</translation>
+        <translation>新增從 URL、torrents 或雲端儲存下載的內容</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogHeader.qml" line="71"/>
@@ -3298,7 +3298,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="116"/>
         <source>Torrent</source>
-        <translation>下载</translation>
+        <translation>下載</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="117"/>
@@ -3313,7 +3313,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="184"/>
         <source>Enter download URLs (one per line, supports magnet links)</source>
-        <translation>输入下载 URL（每行一个，支持磁铁链接）</translation>
+        <translation>輸入下載 URL（每行一個，支援磁鐵連結）</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="190"/>
@@ -3338,7 +3338,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="546"/>
         <source>Add Task</source>
-        <translation>添加任务</translation>
+        <translation>新增任務</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="559"/>
@@ -3382,7 +3382,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="25"/>
         <source>Download Settings</source>
-        <translation>下载设置</translation>
+        <translation>下載設定</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="42"/>
@@ -3392,7 +3392,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="53"/>
         <source>Optional filename</source>
-        <translation>可选文件名</translation>
+        <translation>可選檔名</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskGeneralOptionsCard.qml" line="54"/>
@@ -3463,30 +3463,30 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="21"/>
         <source>Timeout &amp; Retry Settings</source>
-        <translation>超时和重试设置</translation>
+        <translation>超時和重試設定</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="22"/>
         <source>Configure connection timeout and retry behavior for unstable networks</source>
-        <translation>为不稳定网络配置连接超时和重试行为</translation>
+        <translation>為不穩定網路配置連線超時和重試行為</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="28"/>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="124"/>
         <source>Timeout</source>
-        <translation>超时</translation>
+        <translation>超時</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="29"/>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="46"/>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="87"/>
         <source>seconds</source>
-        <translation>秒钟</translation>
+        <translation>秒鐘</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="29"/>
         <source>HTTP/FTP connection timeout after establishment</source>
-        <translation>HTTP/FTP 连接建立后超时</translation>
+        <translation>HTTP/FTP 連線建立後超時</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="37"/>
@@ -3496,12 +3496,12 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="45"/>
         <source>Connect Timeout</source>
-        <translation>连接超时</translation>
+        <translation>連線超時</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="46"/>
         <source>Timeout for establishing initial connection</source>
-        <translation>建立初始连接的超时</translation>
+        <translation>建立初始連線的超時</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="54"/>
@@ -3511,17 +3511,17 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="69"/>
         <source>Max Retry Attempts</source>
-        <translation>最大重试次数</translation>
+        <translation>最大重試次數</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="70"/>
         <source>times</source>
-        <translation>时代</translation>
+        <translation>時代</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="70"/>
         <source>Number of retry attempts (0 = unlimited)</source>
-        <translation>重试次数（0 = 无限制）</translation>
+        <translation>重試次數（0 = 無限制）</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="78"/>
@@ -3531,12 +3531,12 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="86"/>
         <source>Retry Wait Time</source>
-        <translation>重试等待时间</translation>
+        <translation>重試等待時間</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="87"/>
         <source>Wait time between retries (0 = disabled, only retry on HTTP 503)</source>
-        <translation>重试之间的等待时间（0 = 禁用，仅在 HTTP 503 时重试）</translation>
+        <translation>重試之間的等待時間（0 = 禁用，僅在 HTTP 503 時重試）</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="95"/>
@@ -3571,7 +3571,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/TimeoutRetrySettingPage.qml" line="115"/>
         <source>Input fields reset to default values (not saved yet)</source>
-        <translation>输入字段重置为默认值（尚未保存）</translation>
+        <translation>輸入欄位重置為預設值（尚未儲存）</translation>
     </message>
 </context>
 <context>
@@ -3629,7 +3629,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="18"/>
         <source>BitTorrent Tracker Servers</source>
-        <translation>BitTorrent 跟踪服务器</translation>
+        <translation>BitTorrent 跟蹤伺服器</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="19"/>
@@ -3806,7 +3806,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="399"/>
         <source>Sync Trackers</source>
-        <translation>同步跟踪器</translation>
+        <translation>同步跟蹤器</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="410"/>
@@ -3836,7 +3836,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="499"/>
         <source>Current Tracker List</source>
-        <translation>当前跟踪器列表</translation>
+        <translation>當前跟蹤器列表</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="515"/>
@@ -3856,22 +3856,22 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="565"/>
         <source>Updating tracker list...</source>
-        <translation>更新跟踪器列表...</translation>
+        <translation>更新跟蹤器列表...</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="569"/>
         <source>Tracker list updated successfully</source>
-        <translation>跟踪器列表更新成功</translation>
+        <translation>跟蹤器列表更新成功</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="570"/>
         <source>%1 trackers, %2/%3 sources succeeded, took %4ms</source>
-        <translation>%1 追踪器，%2/%3 来源成功，耗时 %4ms</translation>
+        <translation>%1 追蹤器，%2/%3 來源成功，耗時 %4ms</translation>
     </message>
     <message>
         <location filename="../qml/Browser/TrackerServerSettingPage.qml" line="580"/>
         <source>Failed to update tracker list</source>
-        <translation>更新跟踪器列表失败</translation>
+        <translation>更新跟蹤器列表失敗</translation>
     </message>
 </context>
 <context>
@@ -3884,7 +3884,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="21"/>
         <source>New Version Available</source>
-        <translation>新版本发布</translation>
+        <translation>新版本釋出</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="31"/>
@@ -3937,7 +3937,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="217"/>
         <source>Release Notes</source>
-        <translation>发布说明</translation>
+        <translation>釋出說明</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="232"/>
@@ -3947,12 +3947,12 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="250"/>
         <source>Enable GitHub Accelerated Download</source>
-        <translation>启用 GitHub 加速下载</translation>
+        <translation>啟用 GitHub 加速下載</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="257"/>
         <source>Use a GitHub mirror (ghproxy) when fetching update packages.</source>
-        <translation>获取更新软件包时使用 GitHub 镜像 (ghproxy)。</translation>
+        <translation>獲取更新軟體包時使用 GitHub 鏡像 (ghproxy)。</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/UpdateDialog.qml" line="274"/>
@@ -3998,7 +3998,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/UserAgentSettingPage.qml" line="32"/>
         <source>Aria2 Default</source>
-        <translation>Aria2 默认值</translation>
+        <translation>Aria2 預設值</translation>
     </message>
     <message>
         <location filename="../qml/Browser/UserAgentSettingPage.qml" line="36"/>
@@ -4018,7 +4018,7 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/UserAgentSettingPage.qml" line="48"/>
         <source>Edge 120 (Windows)</source>
-        <translation>边缘 120（视窗）</translation>
+        <translation>邊緣 120（視窗）</translation>
     </message>
     <message>
         <location filename="../qml/Browser/UserAgentSettingPage.qml" line="52"/>
@@ -4044,7 +4044,7 @@ Copyright © 2024 GDownload Team
         <location filename="../qml/Browser/UserAgentSettingPage.qml" line="68"/>
         <location filename="../qml/Browser/UserAgentSettingPage.qml" line="233"/>
         <source>Custom</source>
-        <translation>定制</translation>
+        <translation>定製</translation>
     </message>
     <message>
         <location filename="../qml/Browser/UserAgentSettingPage.qml" line="93"/>
@@ -4080,12 +4080,12 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/UserAgentSettingPage.qml" line="18"/>
         <source>User-Agent</source>
-        <translation>用户代理</translation>
+        <translation>使用者代理</translation>
     </message>
     <message>
         <location filename="../qml/Browser/UserAgentSettingPage.qml" line="19"/>
         <source>Configure HTTP/HTTPS User-Agent string for compatibility with different servers</source>
-        <translation>配置 HTTP/HTTPS 用户代理字符串，以便与不同服务器兼容</translation>
+        <translation>配置 HTTP/HTTPS 使用者代理字串，以便與不同伺服器相容</translation>
     </message>
     <message>
         <location filename="../qml/Browser/UserAgentSettingPage.qml" line="28"/>
@@ -4095,33 +4095,33 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../qml/Browser/UserAgentSettingPage.qml" line="81"/>
         <source>Preset User-Agent</source>
-        <translation>预设用户代理</translation>
+        <translation>預設使用者代理</translation>
     </message>
     <message>
         <location filename="../qml/Browser/UserAgentSettingPage.qml" line="156"/>
         <location filename="../qml/Browser/UserAgentSettingPage.qml" line="168"/>
         <source>Custom User-Agent</source>
-        <translation>自定义用户代理</translation>
+        <translation>自定義使用者代理</translation>
     </message>
     <message>
         <location filename="../qml/Browser/UserAgentSettingPage.qml" line="169"/>
         <source>Enter custom User-Agent string...</source>
-        <translation>输入自定义 User-Agent 字符串...</translation>
+        <translation>輸入自定義 User-Agent 字串...</translation>
     </message>
     <message>
         <location filename="../qml/Browser/UserAgentSettingPage.qml" line="244"/>
         <source>No changes detected.</source>
-        <translation>未检测到任何变化。</translation>
+        <translation>未檢測到任何變化。</translation>
     </message>
     <message>
         <location filename="../qml/Browser/UserAgentSettingPage.qml" line="245"/>
         <source>Settings unchanged.</source>
-        <translation>设置不变。</translation>
+        <translation>設定不變。</translation>
     </message>
     <message>
         <location filename="../qml/Browser/UserAgentSettingPage.qml" line="194"/>
         <source>Select a preset or enter custom User-Agent, then click &apos;Save Settings&apos; to apply.</source>
-        <translation>选择预设或输入自定义用户代理，然后点击 &quot;保存设置 &quot;应用。</translation>
+        <translation>選擇預設或輸入自定義使用者代理，然後點選 &quot;儲存設定 &quot;應用。</translation>
     </message>
 </context>
 <context>
