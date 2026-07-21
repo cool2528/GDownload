@@ -4,6 +4,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "Ed2kEngine_export.h"
 #include "publish_subscribe_system.h"
@@ -64,6 +65,11 @@ class Ed2kEngine_API Ed2kDownloadManager : public Singleton<Ed2kDownloadManager>
 	// 请求 Kad 状态快照，发布到 kEd2kKadStatus
 	void RequestKadStatus();
 
+	// ---- Phase 3: 分享 ----
+	// 设置分享目录(全量替换; 空列表=停止分享)。完成后发布 kEd2kShareState 快照, 失败发布 kEd2kShareOpResult。
+	// 引擎 set_shared_dirs 含重扫+发布, 属前台请求, 复用 foreground_in_flight 守卫。
+	void SetSharedDirs(const std::vector<std::string>& dirs);
+
 	Subscription SubscriptionEd2kMessage(const std::string& topic,
 										 std::function<void(const std::string&)> handler);
 	void UnSubscribeEd2kMessage(Subscription subscription);
@@ -74,6 +80,8 @@ class Ed2kEngine_API Ed2kDownloadManager : public Singleton<Ed2kDownloadManager>
 	void ScheduleSampling();
 	// 仅在网络线程调用：序列化当前服务器列表并发布 kEd2kServerList
 	void PublishServerListLocked();
+	// 仅在网络线程调用：序列化当前上传统计与分享文件列表并发布 kEd2kShareState
+	void PublishShareStateLocked();
 	struct Impl;
 	std::unique_ptr<Impl> impl_;
 };

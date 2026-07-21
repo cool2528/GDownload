@@ -14,3 +14,10 @@
 #define kEd2kServerState "ed2k.server.state"
 // Kad 状态快照（JSON 对象）
 #define kEd2kKadStatus "ed2k.kad.status"
+
+// 分享状态快照（上传统计 + 分享文件列表，JSON 对象）
+#define kEd2kShareState "ed2k.share.state"
+// 分享操作结果（SetSharedDirs 等，JSON 对象）
+#define kEd2kShareOpResult "ed2k.share.op.result"
+// server.met 更新结果（JSON 对象）
+#define kEd2kServerMetResult "ed2k.servermet.result"
