@@ -26,6 +26,8 @@ class Ed2kEngine_API Ed2kDownloadManager : public Singleton<Ed2kDownloadManager>
 		std::string data_dir;  // <app数据目录>/ed2k
 		std::size_t max_concurrent_tasks = 5;
 		bool enable_kad = false;
+		// 是否启用协议混淆(映射引擎 ObfuscationPolicy)
+		bool enable_obfuscation = false;
 	};
 
 	~Ed2kDownloadManager();

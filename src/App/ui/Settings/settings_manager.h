@@ -75,6 +75,16 @@ namespace gdl {
                 // 追加在属性列表末尾:新增 Q_PROPERTY/Q_INVOKABLE 不移动已有 moc 索引,
                 // 避免增量构建下 QML 元调用错位(读取属性时错调到其它 getter 导致类型混淆崩溃)
                 SETTING_PROPERTY(QString, PluginSourceProxy)
+                // eD2k 设置组(追加在属性列表末尾,同上避免 moc 索引错位)
+                SETTING_PROPERTY(QString, Ed2kNickname)
+                SETTING_PROPERTY(int, Ed2kTcpPort)
+                SETTING_PROPERTY(int, Ed2kUdpPort)
+                SETTING_PROPERTY(bool, Ed2kEnableKad)
+                SETTING_PROPERTY(bool, Ed2kEnableObfuscation)
+                SETTING_PROPERTY(bool, Ed2kAutoConnect)
+                SETTING_PROPERTY(int, Ed2kMaxConcurrentTasks)
+                SETTING_PROPERTY(QString, Ed2kSharedDirs)
+                SETTING_PROPERTY(QString, Ed2kServerMetUrl)
 
                public:
                 ~SettingsImpl() override;

@@ -91,6 +91,16 @@ namespace gdl {
 			CONFIG_PATH(BtMaxPeers, "aria2c.bt-max-peers", "55");
 			CONFIG_PATH(BtRequireCrypto, "aria2c.bt-require-crypto", "false");
 
+			// eD2k 引擎设置组
+			CONFIG_PATH(Ed2kNickname, "ed2k.nickname", "GDownload");
+			CONFIG_PATH(Ed2kTcpPort, "ed2k.tcp-port", "4662");
+			CONFIG_PATH(Ed2kUdpPort, "ed2k.udp-port", "4672");
+			CONFIG_PATH(Ed2kEnableKad, "ed2k.enable-kad", "false");
+			CONFIG_PATH(Ed2kEnableObfuscation, "ed2k.enable-obfuscation", "false");
+			CONFIG_PATH(Ed2kAutoConnect, "ed2k.auto-connect", "true");
+			CONFIG_PATH(Ed2kMaxConcurrentTasks, "ed2k.max-concurrent-tasks", "5");
+			CONFIG_PATH(Ed2kSharedDirs, "ed2k.shared-dirs", "");
+			CONFIG_PATH(Ed2kServerMetUrl, "ed2k.server-met-url", "http://upd.emule-security.org/server.met");
 
 			// static function all keys
 			static constexpr auto GetAllKeys() {
@@ -148,7 +158,16 @@ namespace gdl {
 											 RetryWait.get(),
 											 EnableDht.get(),
 											 BtMaxPeers.get(),
-											 BtRequireCrypto.get()});
+											 BtRequireCrypto.get(),
+											 Ed2kNickname.get(),
+											 Ed2kTcpPort.get(),
+											 Ed2kUdpPort.get(),
+											 Ed2kEnableKad.get(),
+											 Ed2kEnableObfuscation.get(),
+											 Ed2kAutoConnect.get(),
+											 Ed2kMaxConcurrentTasks.get(),
+											 Ed2kSharedDirs.get(),
+											 Ed2kServerMetUrl.get()});
 			}
 			// static function all values
 			static constexpr auto GetAllValues() {
@@ -206,7 +225,16 @@ namespace gdl {
 											 RetryWait.val(),
 											 EnableDht.val(),
 											 BtMaxPeers.val(),
-											 BtRequireCrypto.val()});
+											 BtRequireCrypto.val(),
+											 Ed2kNickname.val(),
+											 Ed2kTcpPort.val(),
+											 Ed2kUdpPort.val(),
+											 Ed2kEnableKad.val(),
+											 Ed2kEnableObfuscation.val(),
+											 Ed2kAutoConnect.val(),
+											 Ed2kMaxConcurrentTasks.val(),
+											 Ed2kSharedDirs.val(),
+											 Ed2kServerMetUrl.val()});
 			}
 		};
 	}  // namespace config

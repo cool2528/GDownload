@@ -21,6 +21,7 @@
 
 #include <ed2k/link/ed2k_link.hpp>
 #include <ed2k/net/runtime.hpp>
+#include <ed2k/peer/c2c_connection.hpp>
 #include <ed2k/server/opcodes.hpp>
 #include <ed2k/session/session.hpp>
 
@@ -136,6 +137,9 @@ bool Ed2kDownloadManager::InitEd2kEngine(const Ed2kEngineConfig& config) {
 		scfg.data_dir = std::filesystem::path(config.data_dir);
 		scfg.max_concurrent_tasks = config.max_concurrent_tasks;
 		scfg.enable_kad = config.enable_kad;
+		// preferred：优先使用混淆但不强制，兼容未启用混淆的对端；required 会拒绝所有非混淆连接过于激进
+		scfg.obfuscation = config.enable_obfuscation ? ed2k::peer::ObfuscationPolicy::preferred
+													  : ed2k::peer::ObfuscationPolicy::disabled;
 
 		// Session 必须在网络线程构造/使用；这里在 worker 线程启动前构造（此时尚无并发），
 		// 之后所有对外访问都需要 post 到 worker 线程执行。
