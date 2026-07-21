@@ -18,6 +18,9 @@ ColumnLayout {
     // 避免用户在结果展示期间切换下拉框导致 Load More 按钮跟错误的来源联动
     property int lastSearchSource: 0
 
+    // 进入搜索页时刷新一次 Kad 状态，使"Kad 是否就绪"的判断/提示准确
+    Component.onCompleted: Ed2kManager.RefreshKadStatus()
+
     Connections {
         target: Ed2kManager
         function onSearchFailed(error) {
@@ -68,6 +71,13 @@ ColumnLayout {
                 text: Ed2kManager.searching ? qsTr("Searching...") : qsTr("Search")
                 enabled: !Ed2kManager.searching && keywordInput.text.trim().length > 0
                 onClicked: {
+                    // Kad 源前置就绪检查:Kad 未启用/未生效(通常是启用后未重启)时,
+                    // 直接给明确引导而非发起注定失败的搜索、让用户对着"没有结果"猜。
+                    if (sourceFilter.currentIndex === 1 && !Ed2kManager.kadRunning) {
+                        ToastManager.ShowError(
+                            qsTr("Kad is not ready. Enable Kad in settings and restart the app, or use Server search."))
+                        return
+                    }
                     root.resultModel.clear()
                     root.lastSearchSource = sourceFilter.currentIndex
                     Ed2kManager.StartSearch(keywordInput.text, typeFilter.currentIndex, 0,
@@ -103,6 +113,8 @@ ColumnLayout {
                         text: Ed2kManager.searching ? qsTr("Searching...")
                               : (!Ed2kManager.serverConnected && sourceFilter.currentIndex === 0)
                                 ? qsTr("Not connected to any server")
+                              : (sourceFilter.currentIndex === 1 && !Ed2kManager.kadRunning)
+                                ? qsTr("Kad is not ready. Enable Kad in settings and restart the app.")
                                 : qsTr("No results. Try different keywords.")
                     }
                     GButton {

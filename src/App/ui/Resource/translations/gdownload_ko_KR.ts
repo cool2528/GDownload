@@ -887,6 +887,16 @@
 <context>
     <name>Ed2kSearchPage</name>
     <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="1"/>
+        <source>Kad is not ready. Enable Kad in settings and restart the app, or use Server search.</source>
+        <translation>Kad가 준비되지 않았습니다. 설정에서 Kad를 활성화하고 앱을 다시 시작하거나 서버 검색을 사용하세요.</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="1"/>
+        <source>Kad is not ready. Enable Kad in settings and restart the app.</source>
+        <translation>Kad가 준비되지 않았습니다. 설정에서 Kad를 활성화하고 앱을 다시 시작하세요.</translation>
+    </message>
+    <message>
         <location filename="../qml/Browser/Ed2kSearchPage.qml" line="27"/>
         <source>Kad search is unavailable. Enable Kad in settings, or use Server search instead.</source>
         <translation>Kad 검색을 사용할 수 없습니다. 설정에서 Kad를 활성화하거나 서버 검색을 사용하세요.</translation>
