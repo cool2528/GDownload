@@ -282,6 +282,19 @@ ColumnLayout {
         iconName: "refresh"
         initialFocusItem: updateUrlInput
 
+        // 覆盖 GDialogShell 的 onOpened 时需手动重放其初始焦点逻辑，否则 initialFocusItem 失效
+        // 绑定被用户编辑破坏后，每次打开重新取设置值
+        onOpened: {
+            updateUrlInput.text = SettingsManager.qEd2kServerMetUrl
+            Qt.callLater(function() {
+                if (updateUrlDialog.initialFocusItem
+                        && updateUrlDialog.initialFocusItem.visible
+                        && updateUrlDialog.initialFocusItem.enabled) {
+                    updateUrlDialog.initialFocusItem.forceActiveFocus()
+                }
+            })
+        }
+
         ColumnLayout {
             anchors.fill: parent
             anchors.margins: GTheme.spaceLG
