@@ -24,6 +24,17 @@ ColumnLayout {
         }
     }
 
+    // server.met 更新结果提示
+    Connections {
+        target: Ed2kManager
+        function onServerMetUpdateFinished(ok, error) {
+            if (ok)
+                ToastManager.ShowSuccess(qsTr("Server list updated"))
+            else
+                ToastManager.ShowError(qsTr("Server list update failed: %1").arg(error))
+        }
+    }
+
     // 工具条
     RowLayout {
         Layout.fillWidth: true
@@ -281,7 +292,7 @@ ColumnLayout {
                 objectName: "ed2kUpdateUrlInput"
                 Layout.fillWidth: true
                 placeholderText: qsTr("server.met URL")
-                text: qsTr("http://upd.emule-security.org/server.met")
+                text: SettingsManager.qEd2kServerMetUrl
             }
         }
 
