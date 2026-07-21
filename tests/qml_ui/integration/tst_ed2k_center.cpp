@@ -140,6 +140,36 @@ class TstEd2kCenter : public QObject {
 		QVERIFY2(!page.isNull(), qPrintable(comp.errorString()));
 	}
 
+	// 测试点 6:分享目录增删经 QML 注册的 Ed2kManager 单例往返 FakeSettingsManager
+	// (initTestCase 已 RegisterTypes + AttachQmlEngine,分享域反射命中同一 "SettingsManager"
+	// 单例即 fakeSettings_)。验证 QDir::cleanPath 去重(分隔符归一)、'|' 分隔存储约定,以及
+	// RemoveSharedDir 收缩列表。纯主线程:引擎未 InitEd2kEngine,PushSharedDirsToEngine 内的
+	// SetSharedDirs 因 running_ 为 false 直接返回(不触碰网络线程),调用链安全不崩。
+	void sharedDirsRoundTrip() {
+		auto& ed2k = gdl::ui::ed2k::Ed2kManager::Instance();
+		// 干净起点:清掉可能残留的分享目录设置
+		fakeSettings_->SetEd2kSharedDirs(QString());
+
+		ed2k.AddSharedDir(QStringLiteral("D:/media/movies"));
+		ed2k.AddSharedDir(QStringLiteral("E:/downloads/ed2k"));
+		// 分隔符变体的重复项:QDir::cleanPath 把反斜杠归一为正斜杠后与第一项相同,应被去重
+		ed2k.AddSharedDir(QStringLiteral("D:\\media\\movies"));
+
+		const QStringList dirs = ed2k.GetSharedDirs();
+		QCOMPARE(dirs.size(), 2);
+		QVERIFY2(dirs.contains(QStringLiteral("D:/media/movies")), "缺少归一化后的第一项");
+		QVERIFY2(dirs.contains(QStringLiteral("E:/downloads/ed2k")), "缺少第二项");
+
+		// 存储约定:多目录以 '|' 分隔写入 qEd2kSharedDirs
+		const QString stored = fakeSettings_->GetEd2kSharedDirs();
+		QVERIFY2(stored.contains(QLatin1Char('|')),
+				 qPrintable(QStringLiteral("qEd2kSharedDirs 未使用 '|' 分隔: ") + stored));
+
+		// 移除一项后列表收缩
+		ed2k.RemoveSharedDir(QStringLiteral("E:/downloads/ed2k"));
+		QCOMPARE(ed2k.GetSharedDirs().size(), 1);
+	}
+
    private:
 	QQmlEngine engine_;
 	FakeBrowserManager* fakeBrowser_ = nullptr;

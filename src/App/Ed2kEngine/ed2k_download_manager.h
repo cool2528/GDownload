@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <filesystem>
 #include <functional>
 #include <memory>
 #include <string>
@@ -82,6 +83,11 @@ class Ed2kEngine_API Ed2kDownloadManager : public Singleton<Ed2kDownloadManager>
 	void PublishServerListLocked();
 	// 仅在网络线程调用：序列化当前上传统计与分享文件列表并发布 kEd2kShareState
 	void PublishShareStateLocked();
+	// 仅网络线程调用：复位前台守卫；若有暂存的分享目录请求则取出并立即重放
+	void ReleaseForegroundGuardLocked();
+	// 仅网络线程调用：占用前台守卫并 co_spawn set_shared_dirs 协程
+	// (SetSharedDirs 与守卫释放后的重放共用同一份 spawn 逻辑)
+	void SpawnSetSharedDirsLocked(std::vector<std::filesystem::path> paths);
 	struct Impl;
 	std::unique_ptr<Impl> impl_;
 };

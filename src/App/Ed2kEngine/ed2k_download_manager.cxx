@@ -5,6 +5,7 @@
 #include <exception>
 #include <filesystem>
 #include <map>
+#include <optional>
 #include <thread>
 #include <variant>
 
@@ -109,6 +110,12 @@ struct Ed2kDownloadManager::Impl {
 	// RequestServerList/AddServer/RemoveServer/RequestKadStatus 是纯本地操作，
 	// 不经过服务器连接，不受此守卫约束。
 	bool foreground_in_flight = false;
+
+	// 前台守卫占用期间暂存最新分享目录请求，守卫释放时重放；只保留最新一份。
+	// 启动时 ConnectServer(自动连接)先占用守卫并跨整个网络往返，紧随其后的 SetSharedDirs
+	// (Ed2kManager::Init 的分享恢复)会命中忙守卫——若直接丢弃则每次启动分享都恢复不了，
+	// 故在此暂存，守卫释放时由 ReleaseForegroundGuardLocked 取出重放。仅网络线程读写。
+	std::optional<std::vector<std::filesystem::path>> pending_shared_dirs;
 };
 
 Ed2kDownloadManager::Ed2kDownloadManager() : impl_(std::make_unique<Impl>()) {}
@@ -531,7 +538,7 @@ void Ed2kDownloadManager::Search(const std::string& keyword, int file_type, std:
 						impl_->pubsub->Publish(kEd2kSearchResult, SearchErrorToJson(e.what()));
 					}
 				}
-				impl_->foreground_in_flight = false;
+				ReleaseForegroundGuardLocked();
 				co_return;
 			},
 			boost::asio::detached);
@@ -560,7 +567,7 @@ void Ed2kDownloadManager::SearchMore() {
 					impl_->pubsub->Publish(kEd2kSearchResult, SearchErrorToJson(e.what()));
 				}
 			}
-			impl_->foreground_in_flight = false;
+			ReleaseForegroundGuardLocked();
 			co_return;
 		}, boost::asio::detached);
 	});
@@ -610,7 +617,7 @@ void Ed2kDownloadManager::ConnectServer(const std::string& ip, std::uint16_t por
 			} catch (const std::exception& e) {
 				LOG_ERR("ed2k connect_server failed: {}", e.what());
 			}
-			impl_->foreground_in_flight = false;
+			ReleaseForegroundGuardLocked();
 			co_return;
 		}, boost::asio::detached);
 	});
@@ -640,7 +647,7 @@ void Ed2kDownloadManager::DisconnectServer() {
 			impl_->pubsub->Publish(kEd2kServerState, doc.dump());
 		}
 		PublishServerListLocked();
-		impl_->foreground_in_flight = false;
+		ReleaseForegroundGuardLocked();
 	});
 }
 
@@ -738,7 +745,7 @@ void Ed2kDownloadManager::UpdateServerMet(const std::string& url) {
 					impl_->pubsub->Publish(kEd2kServerMetResult, result.dump());
 				}
 			}
-			impl_->foreground_in_flight = false;
+			ReleaseForegroundGuardLocked();
 			co_return;
 		}, boost::asio::detached);
 	});
@@ -770,46 +777,70 @@ void Ed2kDownloadManager::PublishShareStateLocked() {
 	impl_->pubsub->Publish(kEd2kShareState, doc.dump());
 }
 
+// 仅网络线程调用：复位前台守卫；若前台守卫占用期间累积了分享目录请求，取出最新一份立即重放。
+// 取值在重放前先移出 optional，配合"只保留最新一份"语义可避免无界递归。
+void Ed2kDownloadManager::ReleaseForegroundGuardLocked() {
+	impl_->foreground_in_flight = false;
+	if (impl_->pending_shared_dirs.has_value()) {
+		auto paths = std::move(*impl_->pending_shared_dirs);
+		impl_->pending_shared_dirs.reset();
+		SpawnSetSharedDirsLocked(std::move(paths));
+	}
+}
+
+// 仅网络线程调用：占用前台守卫并 co_spawn set_shared_dirs 协程；协程结束经
+// ReleaseForegroundGuardLocked 释放守卫并重放暂存请求。SetSharedDirs 与守卫释放重放共用本方法。
+void Ed2kDownloadManager::SpawnSetSharedDirsLocked(std::vector<std::filesystem::path> paths) {
+	impl_->foreground_in_flight = true;
+	boost::asio::co_spawn(impl_->runtime.executor(), [this, paths = std::move(paths)]() -> boost::asio::awaitable<void> {
+		try {
+			auto r = co_await impl_->session->set_shared_dirs(paths);
+			if (r) {
+				PublishShareStateLocked();
+			} else {
+				LOG_WARN("ed2k set_shared_dirs failed: {}", r.error().message());
+				if (impl_->pubsub) {
+					nlohmann::json result;
+					result["ok"] = false;
+					result["error"] = r.error().message();
+					impl_->pubsub->Publish(kEd2kShareOpResult, result.dump());
+				}
+			}
+		} catch (const std::exception& e) {
+			LOG_ERR("ed2k set_shared_dirs exception: {}", e.what());
+			if (impl_->pubsub) {
+				nlohmann::json result;
+				result["ok"] = false;
+				result["error"] = e.what();
+				impl_->pubsub->Publish(kEd2kShareOpResult, result.dump());
+			}
+		}
+		ReleaseForegroundGuardLocked();
+		co_return;
+	}, boost::asio::detached);
+}
+
 void Ed2kDownloadManager::SetSharedDirs(const std::vector<std::string>& dirs) {
 	if (!impl_->running.load()) {
 		return;
 	}
 	boost::asio::post(impl_->runtime.executor(), [this, dirs] {
-		if (!impl_->session || impl_->foreground_in_flight) {
+		if (!impl_->session) {
 			return;
 		}
-		impl_->foreground_in_flight = true;
 		std::vector<std::filesystem::path> paths;
 		paths.reserve(dirs.size());
 		for (const auto& d : dirs) {
-			paths.emplace_back(d);
+			// 入参为 UTF-8(QString::toStdString 上游)，须经 u8string 构造避免 Windows 按活动
+			// 代码页误解码导致中文目录名损坏；data_dir/save_dir 同类问题属既有约定，另行跟进。
+			paths.emplace_back(std::u8string(reinterpret_cast<const char8_t*>(d.data()), d.size()));
 		}
-		boost::asio::co_spawn(impl_->runtime.executor(), [this, paths = std::move(paths)]() -> boost::asio::awaitable<void> {
-			try {
-				auto r = co_await impl_->session->set_shared_dirs(paths);
-				if (r) {
-					PublishShareStateLocked();
-				} else {
-					LOG_WARN("ed2k set_shared_dirs failed: {}", r.error().message());
-					if (impl_->pubsub) {
-						nlohmann::json result;
-						result["ok"] = false;
-						result["error"] = r.error().message();
-						impl_->pubsub->Publish(kEd2kShareOpResult, result.dump());
-					}
-				}
-			} catch (const std::exception& e) {
-				LOG_ERR("ed2k set_shared_dirs exception: {}", e.what());
-				if (impl_->pubsub) {
-					nlohmann::json result;
-					result["ok"] = false;
-					result["error"] = e.what();
-					impl_->pubsub->Publish(kEd2kShareOpResult, result.dump());
-				}
-			}
-			impl_->foreground_in_flight = false;
-			co_return;
-		}, boost::asio::detached);
+		// 前台守卫占用期间(如启动时自动连接在途)暂存最新一份请求，守卫释放时重放，避免被静默丢弃
+		if (impl_->foreground_in_flight) {
+			impl_->pending_shared_dirs = std::move(paths);
+			return;
+		}
+		SpawnSetSharedDirsLocked(std::move(paths));
 	});
 }
 
