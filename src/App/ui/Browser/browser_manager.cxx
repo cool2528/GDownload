@@ -1007,7 +1007,20 @@ namespace gdl {
 						const std::string url = ed2k_settings.GetEd2kNodesDatUrl().toStdString();
 						if (!url.empty()) {
 							// 复用系统代理(与 aria2 server.met 下载同口径);无代理时不设 Proxies 避免空串失败
-							cpr::Response reply = cpr::Get(cpr::Url(url), cpr::Timeout(8000));
+							auto system_proxy = os::GetSystemHTTPProxy();
+							std::string proxy_str;
+							if (system_proxy.has_value()) {
+								proxy_str = "http://" + system_proxy.value().first + ":" +
+								            std::to_string(system_proxy.value().second);
+							}
+							cpr::Response reply;
+							if (proxy_str.empty()) {
+								reply = cpr::Get(cpr::Url(url), cpr::Timeout(5000));
+							} else {
+								reply = cpr::Get(cpr::Url(url),
+								                 cpr::Proxies({{"http", proxy_str}, {"https", proxy_str}}),
+								                 cpr::Timeout(5000));
+							}
 							if (reply.status_code == 200 && reply.text.size() >= 100) {
 								QFile f(nodes_path);
 								if (f.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
