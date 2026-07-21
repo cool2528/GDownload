@@ -982,6 +982,11 @@ namespace gdl {
 				// ed2k 引擎为可选能力:初始化失败仅记录日志,不影响 aria2 主流程可用性
 				engine::Ed2kDownloadManager::Ed2kEngineConfig ed2k_config;
 				ed2k_config.data_dir = os::GetAppDataDir() + "/gdownload/ed2k";
+				// 引擎数据目录(server.met/known.met/nodes.dat 落盘处)必须先存在:
+				// 引擎自身不建目录,缺失时首次持久化会静默失败,重启后服务器列表/哈希缓存全部丢失
+				if (!QDir().mkpath(QString::fromStdString(ed2k_config.data_dir))) {
+					LOG_WARN("Failed to create ed2k data dir: {}", ed2k_config.data_dir);
+				}
 				// 从设置系统读取引擎配置(SessionConfig 类设置下次启动生效)
 				auto& ed2k_settings = settings::Settings::Instance();
 				ed2k_config.nickname = ed2k_settings.GetEd2kNickname().toStdString();
