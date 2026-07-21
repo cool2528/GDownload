@@ -1092,6 +1092,174 @@ namespace gdl {
 			}
 			SETTING_IMP_END(BtRequireCrypto)
 
+			// Ed2kNickname (eD2k 昵称)
+			SETTING_IMP_BEGIN(Ed2kNickname, CONFIG_KEY_PATH(Ed2kNickname), QString)
+			void Default() override {
+				value_ = "GDownload";
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toString();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return value_;
+			}
+			SETTING_IMP_END(Ed2kNickname)
+
+			// Ed2kTcpPort (eD2k TCP 监听端口,重启应用后生效)
+			SETTING_IMP_BEGIN(Ed2kTcpPort, CONFIG_KEY_PATH(Ed2kTcpPort), int)
+			void Default() override {
+				value_ = 4662;
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toInt();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return QString::number(value_);
+			}
+			SETTING_IMP_END(Ed2kTcpPort)
+
+			// Ed2kUdpPort (eD2k UDP/Kad 监听端口,重启应用后生效)
+			SETTING_IMP_BEGIN(Ed2kUdpPort, CONFIG_KEY_PATH(Ed2kUdpPort), int)
+			void Default() override {
+				value_ = 4672;
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toInt();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return QString::number(value_);
+			}
+			SETTING_IMP_END(Ed2kUdpPort)
+
+			// Ed2kEnableKad (eD2k 是否启用 Kad 网络,重启应用后生效)
+			SETTING_IMP_BEGIN(Ed2kEnableKad, CONFIG_KEY_PATH(Ed2kEnableKad), bool)
+			void Default() override {
+				value_ = false;
+			}
+			void Put(const QVariant& value) override {
+				if (value.canConvert<bool>()) {
+					value_ = value.toBool();
+				}
+				else if (value.canConvert<QString>()) {
+					value_ = value.toString() == "true" || value.toString() == "1";
+				}
+				else if (value.canConvert<int>()) {
+					value_ = value.toInt() == 1;
+				}
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return value_ ? "true" : "false";
+			}
+			SETTING_IMP_END(Ed2kEnableKad)
+
+			// Ed2kEnableObfuscation (eD2k 是否启用协议混淆,重启应用后生效)
+			SETTING_IMP_BEGIN(Ed2kEnableObfuscation, CONFIG_KEY_PATH(Ed2kEnableObfuscation), bool)
+			void Default() override {
+				value_ = false;
+			}
+			void Put(const QVariant& value) override {
+				if (value.canConvert<bool>()) {
+					value_ = value.toBool();
+				}
+				else if (value.canConvert<QString>()) {
+					value_ = value.toString() == "true" || value.toString() == "1";
+				}
+				else if (value.canConvert<int>()) {
+					value_ = value.toInt() == 1;
+				}
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return value_ ? "true" : "false";
+			}
+			SETTING_IMP_END(Ed2kEnableObfuscation)
+
+			// Ed2kAutoConnect (启动后是否自动连接 eD2k 服务器)
+			SETTING_IMP_BEGIN(Ed2kAutoConnect, CONFIG_KEY_PATH(Ed2kAutoConnect), bool)
+			void Default() override {
+				value_ = true;
+			}
+			void Put(const QVariant& value) override {
+				if (value.canConvert<bool>()) {
+					value_ = value.toBool();
+				}
+				else if (value.canConvert<QString>()) {
+					value_ = value.toString() == "true" || value.toString() == "1";
+				}
+				else if (value.canConvert<int>()) {
+					value_ = value.toInt() == 1;
+				}
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return value_ ? "true" : "false";
+			}
+			SETTING_IMP_END(Ed2kAutoConnect)
+
+			// Ed2kMaxConcurrentTasks (eD2k 最大并发下载任务数)
+			SETTING_IMP_BEGIN(Ed2kMaxConcurrentTasks, CONFIG_KEY_PATH(Ed2kMaxConcurrentTasks), int)
+			void Default() override {
+				value_ = 5;
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toInt();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return QString::number(value_);
+			}
+			SETTING_IMP_END(Ed2kMaxConcurrentTasks)
+
+			// Ed2kSharedDirs (eD2k 共享目录列表)
+			SETTING_IMP_BEGIN(Ed2kSharedDirs, CONFIG_KEY_PATH(Ed2kSharedDirs), QString)
+			void Default() override {
+				value_ = "";
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toString();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return value_;
+			}
+			SETTING_IMP_END(Ed2kSharedDirs)
+
+			// Ed2kServerMetUrl (eD2k server.met 更新源地址)
+			SETTING_IMP_BEGIN(Ed2kServerMetUrl, CONFIG_KEY_PATH(Ed2kServerMetUrl), QString)
+			void Default() override {
+				value_ = "http://upd.emule-security.org/server.met";
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toString();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return value_;
+			}
+			SETTING_IMP_END(Ed2kServerMetUrl)
+
 		}  // namespace settings
 	}  // namespace ui
 }  // namespace gdl

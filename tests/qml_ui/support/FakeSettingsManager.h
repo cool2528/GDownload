@@ -107,6 +107,15 @@ class FakeSettingsManager : public QObject {
 	FAKE_SETTING(bool, EnableDht)
 	FAKE_SETTING(int, BtMaxPeers)
 	FAKE_SETTING(bool, BtRequireCrypto)
+	FAKE_SETTING(QString, Ed2kNickname)
+	FAKE_SETTING(int, Ed2kTcpPort)
+	FAKE_SETTING(int, Ed2kUdpPort)
+	FAKE_SETTING(bool, Ed2kEnableKad)
+	FAKE_SETTING(bool, Ed2kEnableObfuscation)
+	FAKE_SETTING(bool, Ed2kAutoConnect)
+	FAKE_SETTING(int, Ed2kMaxConcurrentTasks)
+	FAKE_SETTING(QString, Ed2kSharedDirs)
+	FAKE_SETTING(QString, Ed2kServerMetUrl)
 #undef FAKE_SETTING
 
 	// ===== SettingsImpl 显式声明的 Q_INVOKABLE 别名(SetAria2Xxx)=====
@@ -191,6 +200,15 @@ class FakeSettingsManager : public QObject {
 		store_[QStringLiteral("AutoResumeTask")] = true;
 		store_[QStringLiteral("RememberWindowPosition")] = true;
 		store_[QStringLiteral("EnableTrayIcon")] = true;
+		store_[QStringLiteral("Ed2kNickname")] = QStringLiteral("GDownload");
+		store_[QStringLiteral("Ed2kTcpPort")] = 4662;
+		store_[QStringLiteral("Ed2kUdpPort")] = 4672;
+		store_[QStringLiteral("Ed2kEnableKad")] = false;
+		store_[QStringLiteral("Ed2kEnableObfuscation")] = false;
+		store_[QStringLiteral("Ed2kAutoConnect")] = true;
+		store_[QStringLiteral("Ed2kMaxConcurrentTasks")] = 5;
+		store_[QStringLiteral("Ed2kSharedDirs")] = QStringLiteral("");
+		store_[QStringLiteral("Ed2kServerMetUrl")] = QStringLiteral("http://upd.emule-security.org/server.met");
 	}
 
 	QList<FakeSettingsWrite> write_history_;

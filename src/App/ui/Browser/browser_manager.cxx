@@ -982,6 +982,14 @@ namespace gdl {
 				// ed2k 引擎为可选能力:初始化失败仅记录日志,不影响 aria2 主流程可用性
 				engine::Ed2kDownloadManager::Ed2kEngineConfig ed2k_config;
 				ed2k_config.data_dir = os::GetAppDataDir() + "/gdownload/ed2k";
+				// 从设置系统读取引擎配置(SessionConfig 类设置下次启动生效)
+				auto& ed2k_settings = settings::Settings::Instance();
+				ed2k_config.nickname = ed2k_settings.GetEd2kNickname().toStdString();
+				ed2k_config.tcp_port = static_cast<std::uint16_t>(ed2k_settings.GetEd2kTcpPort());
+				ed2k_config.udp_port = static_cast<std::uint16_t>(ed2k_settings.GetEd2kUdpPort());
+				ed2k_config.enable_kad = ed2k_settings.GetEd2kEnableKad();
+				ed2k_config.enable_obfuscation = ed2k_settings.GetEd2kEnableObfuscation();
+				ed2k_config.max_concurrent_tasks = static_cast<std::size_t>(ed2k_settings.GetEd2kMaxConcurrentTasks());
 				if (!engine::Ed2kDownloadManager::Instance().InitEd2kEngine(ed2k_config)) {
 					LOG_ERR("Failed to init ed2k engine, data_dir:{}", ed2k_config.data_dir);
 				}
@@ -994,6 +1002,10 @@ namespace gdl {
 							[this](const std::string& msg) { OnHandleEd2kTaskState(msg); });
 					// 重启续传:必须在引擎初始化成功、订阅就绪之后才能重建任务
 					RestoreEd2kDownloadHistory();
+					// 启动自动连接服务器(空 ip = 引擎自动选择)
+					if (ed2k_settings.GetEd2kAutoConnect()) {
+						engine::Ed2kDownloadManager::Instance().ConnectServer(std::string(), 0);
+					}
 				}
 				return true;
 			}

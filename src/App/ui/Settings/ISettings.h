@@ -148,6 +148,26 @@ namespace gdl {
 				// 插件源代理(追加在接口末尾:新增虚函数不移动已有 vtable 索引,避免增量构建下的错位调度)
 				virtual QString GetPluginSourceProxy() const	  = 0;
 				virtual void	 SetPluginSourceProxy(QString value) = 0;
+
+				// eD2k 引擎设置(追加在接口末尾:新增虚函数不移动已有 vtable 索引,避免增量构建下的错位调度)
+				virtual QString GetEd2kNickname() const		  = 0;
+				virtual void	 SetEd2kNickname(QString value)	  = 0;
+				virtual int  GetEd2kTcpPort() const			  = 0;
+				virtual void SetEd2kTcpPort(int value)			  = 0;
+				virtual int  GetEd2kUdpPort() const			  = 0;
+				virtual void SetEd2kUdpPort(int value)			  = 0;
+				virtual bool GetEd2kEnableKad() const			  = 0;
+				virtual void SetEd2kEnableKad(bool value)		  = 0;
+				virtual bool GetEd2kEnableObfuscation() const	  = 0;
+				virtual void SetEd2kEnableObfuscation(bool value) = 0;
+				virtual bool GetEd2kAutoConnect() const		  = 0;
+				virtual void SetEd2kAutoConnect(bool value)	  = 0;
+				virtual int  GetEd2kMaxConcurrentTasks() const	  = 0;
+				virtual void SetEd2kMaxConcurrentTasks(int value) = 0;
+				virtual QString GetEd2kSharedDirs() const		  = 0;
+				virtual void	 SetEd2kSharedDirs(QString value)  = 0;
+				virtual QString GetEd2kServerMetUrl() const	  = 0;
+				virtual void	 SetEd2kServerMetUrl(QString value) = 0;
 			};
 
 		}  // namespace settings
