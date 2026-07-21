@@ -65,6 +65,14 @@ Rectangle {
                 Layout.rightMargin: GTheme.spaceLG
             }
 
+            // eD2k 设置卡片
+            Ed2kSettingPage {
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                Layout.leftMargin: GTheme.spaceLG
+                Layout.rightMargin: GTheme.spaceLG
+            }
+
             // User-Agent 设置卡片
             UserAgentSettingPage {
                 Layout.fillWidth: true
