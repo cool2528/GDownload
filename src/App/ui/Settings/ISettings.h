@@ -168,6 +168,8 @@ namespace gdl {
 				virtual void	 SetEd2kSharedDirs(QString value)  = 0;
 				virtual QString GetEd2kServerMetUrl() const	  = 0;
 				virtual void	 SetEd2kServerMetUrl(QString value) = 0;
+				virtual QString GetEd2kNodesDatUrl() const		  = 0;
+				virtual void	 SetEd2kNodesDatUrl(QString value)  = 0;
 			};
 
 		}  // namespace settings

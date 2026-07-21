@@ -1,11 +1,13 @@
 ﻿#include "browser_manager.h"
 #include <QApplication>
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QOperatingSystemVersion>
 #include <QProcess>
 #include <QQmlEngine>
 #include <QUrl>
+#include <cpr/cpr.h>
 #include <nlohmann/json.hpp>
 #include "Aria2CManager/engine_def.h"
 #include "Browser/download_task_utils.h"
@@ -995,6 +997,33 @@ namespace gdl {
 				ed2k_config.enable_kad = ed2k_settings.GetEd2kEnableKad();
 				ed2k_config.enable_obfuscation = ed2k_settings.GetEd2kEnableObfuscation();
 				ed2k_config.max_concurrent_tasks = static_cast<std::size_t>(ed2k_settings.GetEd2kMaxConcurrentTasks());
+				// Kad 引导节点:引擎用 data_dir/nodes.dat 做 Kad DHT 种子,但引擎不自建/不下载。
+				// nodes.dat 缺失或为空(仅文件头,<100 字节)时,从设置的 URL 同步下载一份,使 Kad 首次启动即可加入网络。
+				// 下载放在 InitEd2kEngine 之前(引擎 init-once,只在启动时读一次 nodes.dat);失败仅告警不阻断主流程。
+				{
+					const QString nodes_path = QString::fromStdString(ed2k_config.data_dir) + "/nodes.dat";
+					QFileInfo nodes_info(nodes_path);
+					if (!nodes_info.exists() || nodes_info.size() < 100) {
+						const std::string url = ed2k_settings.GetEd2kNodesDatUrl().toStdString();
+						if (!url.empty()) {
+							// 复用系统代理(与 aria2 server.met 下载同口径);无代理时不设 Proxies 避免空串失败
+							cpr::Response reply = cpr::Get(cpr::Url(url), cpr::Timeout(8000));
+							if (reply.status_code == 200 && reply.text.size() >= 100) {
+								QFile f(nodes_path);
+								if (f.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+									f.write(reply.text.data(), static_cast<qint64>(reply.text.size()));
+									f.close();
+									LOG_INFO("Downloaded ed2k Kad nodes.dat: {} bytes", reply.text.size());
+								} else {
+									LOG_WARN("Failed to write nodes.dat to {}", nodes_path.toStdString());
+								}
+							} else {
+								LOG_WARN("Failed to download nodes.dat (status {}, {} bytes) from {}",
+										  reply.status_code, reply.text.size(), url);
+							}
+						}
+					}
+				}
 				if (!engine::Ed2kDownloadManager::Instance().InitEd2kEngine(ed2k_config)) {
 					LOG_ERR("Failed to init ed2k engine, data_dir:{}", ed2k_config.data_dir);
 				}
