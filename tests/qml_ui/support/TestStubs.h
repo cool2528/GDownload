@@ -539,6 +539,8 @@ class TestSettingsManager : public QObject {
 	Q_PROPERTY(bool qEd2kAutoConnect MEMBER ed2k_auto_connect_ CONSTANT)
 	Q_PROPERTY(int qEd2kMaxConcurrentTasks MEMBER ed2k_max_concurrent_tasks_ CONSTANT)
 	Q_PROPERTY(QString qEd2kServerMetUrl MEMBER ed2k_server_met_url_ CONSTANT)
+	Q_PROPERTY(QString qEd2kNodesDatUrl MEMBER ed2k_nodes_dat_url_ CONSTANT)
+	Q_PROPERTY(bool qEd2kAutoSyncSources MEMBER ed2k_auto_sync_sources_ CONSTANT)
 
    public:
 	explicit TestSettingsManager(QObject* parent = nullptr) : QObject(parent) {}
@@ -613,6 +615,8 @@ class TestSettingsManager : public QObject {
 	Q_INVOKABLE void SetEd2kAutoConnect(bool v) { Q_UNUSED(v); }
 	Q_INVOKABLE void SetEd2kMaxConcurrentTasks(int v) { Q_UNUSED(v); }
 	Q_INVOKABLE void SetEd2kServerMetUrl(const QString& v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetEd2kNodesDatUrl(const QString& v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetEd2kAutoSyncSources(bool v) { Q_UNUSED(v); }
 
    private:
 	bool remember_window_position_ = false;
@@ -685,6 +689,8 @@ class TestSettingsManager : public QObject {
 	bool ed2k_auto_connect_ = true;
 	int ed2k_max_concurrent_tasks_ = 5;
 	QString ed2k_server_met_url_ = QStringLiteral("http://upd.emule-security.org/server.met");
+	QString ed2k_nodes_dat_url_ = QStringLiteral("http://upd.emule-security.org/nodes.dat");
+	bool ed2k_auto_sync_sources_ = true;
 };
 
 // ToastManager 桩:记录 ShowXxx 调用,供集成测试验证用户反馈。

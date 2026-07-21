@@ -998,12 +998,14 @@ namespace gdl {
 				ed2k_config.enable_obfuscation = ed2k_settings.GetEd2kEnableObfuscation();
 				ed2k_config.max_concurrent_tasks = static_cast<std::size_t>(ed2k_settings.GetEd2kMaxConcurrentTasks());
 				// Kad 引导节点:引擎用 data_dir/nodes.dat 做 Kad DHT 种子,但引擎不自建/不下载。
-				// nodes.dat 缺失或为空(仅文件头,<100 字节)时,从设置的 URL 同步下载一份,使 Kad 首次启动即可加入网络。
+				// 自动同步开启(ed2k.auto-sync-sources,默认 true)时,每次启动都从设置的 URL 刷新一份,
+				// 保持节点列表新鲜;关闭时退回旧逻辑,仅在文件缺失或为空(仅文件头,<100 字节)时补下载一次。
 				// 下载放在 InitEd2kEngine 之前(引擎 init-once,只在启动时读一次 nodes.dat);失败仅告警不阻断主流程。
 				{
 					const QString nodes_path = QString::fromStdString(ed2k_config.data_dir) + "/nodes.dat";
 					QFileInfo nodes_info(nodes_path);
-					if (!nodes_info.exists() || nodes_info.size() < 100) {
+					const bool auto_sync = ed2k_settings.GetEd2kAutoSyncSources();
+					if (auto_sync || !nodes_info.exists() || nodes_info.size() < 100) {
 						const std::string url = ed2k_settings.GetEd2kNodesDatUrl().toStdString();
 						if (!url.empty()) {
 							// 复用系统代理(与 aria2 server.met 下载同口径);无代理时不设 Proxies 避免空串失败
@@ -1052,6 +1054,10 @@ namespace gdl {
 					// 启动自动连接服务器(空 ip = 引擎自动选择)
 					if (ed2k_settings.GetEd2kAutoConnect()) {
 						engine::Ed2kDownloadManager::Instance().ConnectServer(std::string(), 0);
+					}
+					// 自动同步开启时启动刷新服务器列表(引擎运行时下载 server.met)
+					if (ed2k_settings.GetEd2kAutoSyncSources()) {
+						engine::Ed2kDownloadManager::Instance().UpdateServerMet(ed2k_settings.GetEd2kServerMetUrl().toStdString());
 					}
 				}
 				return true;
