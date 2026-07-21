@@ -21,7 +21,14 @@ ColumnLayout {
     Connections {
         target: Ed2kManager
         function onSearchFailed(error) {
-            ToastManager.ShowError(qsTr("Search failed: %1").arg(error))
+            // Kad 搜索失败多因 Kad 未启用/未就绪(默认关闭,无节点)，
+            // 给出明确引导而非透出笼统的引擎错误("connect failed")
+            if (root.lastSearchSource === 1) {
+                ToastManager.ShowError(
+                    qsTr("Kad search is unavailable. Enable Kad in settings, or use Server search instead."))
+            } else {
+                ToastManager.ShowError(qsTr("Search failed: %1").arg(error))
+            }
         }
     }
 
