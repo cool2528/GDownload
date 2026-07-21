@@ -20,6 +20,7 @@
 
 #include "logger.h"
 
+#include <ed2k/kad/messages.hpp>
 #include <ed2k/link/ed2k_link.hpp>
 #include <ed2k/net/runtime.hpp>
 #include <ed2k/peer/c2c_connection.hpp>
@@ -497,17 +498,24 @@ void Ed2kDownloadManager::Search(const std::string& keyword, int file_type, std:
 								nlohmann::json arr = nlohmann::json::array();
 								for (const auto& entry : r.value()) {
 									nlohmann::json j;
-									// KadSearchEntry 的名称/大小从 tags 提取(kad tag id: name=0x01 size=0x02 sources=0x15)
-									std::string name;
-									std::uint64_t size = 0;
+									// KadSearchEntry 的 tag 可能是数值 name_id, 也可能是单字节 string-name
+									// (name_id==0 且 name_str 为单字节, 字节值即 tag id) 两种编码。Kad 结果里
+									// filename/size 常是 string-name 形式, 若只按 name_id 手动匹配会全部漏掉,
+									// 导致 size 恒 0、结果被下面的 continue 全部跳过(表现为"没有结果")。
+									// 名称/大小改用引擎 helper(内部 has_name_id 兼容两种形式)。
+									const std::string name = ed2k::kad::file_name(entry);
+									const std::uint64_t size = ed2k::kad::file_size(entry);
+									// 可用源数(tag 0x15)引擎无专用 helper, 内联做同样的双形式匹配
 									std::uint64_t sources = 0;
 									for (const auto& t : entry.tags) {
-										if (t.name_id == 0x01 && std::holds_alternative<std::string>(t.value)) {
-											name = std::get<std::string>(t.value);
-										} else if (t.name_id == 0x02 && std::holds_alternative<std::uint64_t>(t.value)) {
-											size = std::get<std::uint64_t>(t.value);
-										} else if (t.name_id == 0x15 && std::holds_alternative<std::uint64_t>(t.value)) {
+										const bool match =
+											(t.name_id == 0x15) ||
+											(t.name_str.size() == 1 &&
+											 static_cast<std::uint8_t>(static_cast<unsigned char>(t.name_str[0])) ==
+												 0x15);
+										if (match && std::holds_alternative<std::uint64_t>(t.value)) {
 											sources = std::get<std::uint64_t>(t.value);
+											break;
 										}
 									}
 									if (name.empty() || size == 0) {
