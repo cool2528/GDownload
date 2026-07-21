@@ -4,22 +4,12 @@
 
 #include <QLocale>
 #include <QSet>
-#include <QUrl>
+
+#include "ed2k_link_builder.h"
 
 namespace gdl {
 	namespace ui {
 		namespace ed2k {
-
-			namespace {
-				// 依据条目信息拼回标准 ed2k 文件链接，文件名做百分号编码
-				QString BuildRawLink(const Ed2kSearchItem& item) {
-					const QString encoded = QString::fromUtf8(QUrl::toPercentEncoding(item.name));
-					return QStringLiteral("ed2k://|file|%1|%2|%3|/")
-						.arg(encoded)
-						.arg(item.size)
-						.arg(item.hash_hex);
-				}
-			}  // namespace
 
 			Ed2kSearchResultModel::Ed2kSearchResultModel(QObject* parent) : QAbstractListModel(parent) {}
 
@@ -38,7 +28,7 @@ namespace gdl {
 					case kHash: return item.hash_hex;
 					case kSources: return item.sources;
 					case kCompleteSources: return item.complete_sources;
-					case kRawLink: return BuildRawLink(item);
+					case kRawLink: return BuildRawLink(item.name, item.size, item.hash_hex);
 					default: return {};
 				}
 			}

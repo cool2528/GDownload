@@ -22,12 +22,14 @@ add_executable(gdownload_unit_tests
     browser/test_ed2k_link.cpp
     browser/test_ed2k_search_model.cpp
     browser/test_ed2k_server_model.cpp
+    browser/test_ed2k_shared_model.cpp
     settings/test_aria2_defaults.cpp
     utils/test_relaunch_function.cpp
     ${CMAKE_SOURCE_DIR}/src/App/ui/Browser/download_task_model.cxx
     ${CMAKE_SOURCE_DIR}/src/App/ui/Browser/ed2k_link.cxx
     ${CMAKE_SOURCE_DIR}/src/App/ui/Ed2k/ed2k_search_result_model.cxx
     ${CMAKE_SOURCE_DIR}/src/App/ui/Ed2k/ed2k_server_list_model.cxx
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Ed2k/ed2k_shared_file_model.cxx
     ${CMAKE_SOURCE_DIR}/src/App/ui/utils/utils.cxx
 )
 
