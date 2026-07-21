@@ -100,6 +100,8 @@ namespace gdl {
 						sub->reset();
 					}
 				}
+				// 清空分享负载去重缓存：下次 Init 后首帧分享推送必被处理
+				last_share_payload_.clear();
 			}
 
 			Ed2kSearchResultModel* Ed2kManager::GetSearchResultModel() {
@@ -180,16 +182,24 @@ namespace gdl {
 				auto* settings_obj = SettingsSingleton();
 				if (!settings_obj) return QString();
 				QString value;
-				QMetaObject::invokeMethod(settings_obj, "GetEd2kSharedDirs", Qt::DirectConnection,
-										  Q_RETURN_ARG(QString, value));
+				const bool ok = QMetaObject::invokeMethod(settings_obj, "GetEd2kSharedDirs", Qt::DirectConnection,
+														  Q_RETURN_ARG(QString, value));
+				if (!ok) {
+					// 设置反射调用失败，签名可能已漂移
+					LOG_ERR("Ed2kManager: reflect invoke GetEd2kSharedDirs failed (signature drift?)");
+				}
 				return value;
 			}
 
 			void Ed2kManager::WriteSharedDirsSetting(const QString& value) {
 				auto* settings_obj = SettingsSingleton();
 				if (!settings_obj) return;
-				QMetaObject::invokeMethod(settings_obj, "SetEd2kSharedDirs", Qt::DirectConnection,
-										  Q_ARG(QString, value));
+				const bool ok = QMetaObject::invokeMethod(settings_obj, "SetEd2kSharedDirs", Qt::DirectConnection,
+														  Q_ARG(QString, value));
+				if (!ok) {
+					// 设置反射调用失败，签名可能已漂移
+					LOG_ERR("Ed2kManager: reflect invoke SetEd2kSharedDirs failed (signature drift?)");
+				}
 			}
 
 			QStringList Ed2kManager::GetSharedDirs() {
@@ -327,6 +337,9 @@ namespace gdl {
 			}
 
 			void Ed2kManager::OnShareStatePayload(const QString& json) {
+				// 采样每秒推送，负载未变时跳过解析与模型重置，避免 delegate 每秒重建
+				if (json == last_share_payload_) return;
+				last_share_payload_ = json;
 				try {
 					const auto doc = nlohmann::json::parse(json.toStdString());
 					upload_speed_bps_ = static_cast<double>(doc.value("speed_bps", 0ull));

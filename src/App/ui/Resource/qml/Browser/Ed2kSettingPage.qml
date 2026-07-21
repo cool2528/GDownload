@@ -206,7 +206,8 @@ SettingCard {
             control: GTextField {
                 id: serverMetUrlField
                 objectName: "ed2kServerMetUrlField"
-                Layout.preferredWidth: ed2kSettingPage.inputWidth
+                // server.met URL 为长文本，照 Aria2RpcSettingPage 密钥字段做法用 fillWidth 展开容纳
+                Layout.fillWidth: true
                 Layout.preferredHeight: GTheme.sizeDefault
                 text: SettingsManager.qEd2kServerMetUrl
                 placeholderText: qsTr("http://upd.emule-security.org/server.met")
@@ -237,7 +238,7 @@ SettingCard {
         SettingRow {
             Layout.fillWidth: true
             label: qsTr("Max Concurrent Tasks:")
-            hint: qsTr("Maximum number of eD2k downloads running at the same time (1-20)")
+            hint: qsTr("Maximum number of eD2k downloads running at the same time (1-20). Takes effect after restarting the app.")
             control: GSpinBox {
                 id: maxConcurrentTasksSpinBox
                 objectName: "ed2kMaxConcurrentTasksSpinBox"
@@ -317,7 +318,7 @@ SettingCard {
                 { val: maxConcurrentTasksSpinBox.value, old: SettingsManager.qEd2kMaxConcurrentTasks,
                   setter: function (v) { SettingsManager.SetEd2kMaxConcurrentTasks(v) },
                   label: qsTr("MaxConcurrentTasks") }
-            ], qsTr("eD2k settings saved and applied successfully!"))
+            ], qsTr("eD2k settings saved. Some changes take effect after restart."))
         }
     }
 

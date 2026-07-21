@@ -1268,8 +1268,8 @@
     </message>
     <message>
         <location filename="../qml/Browser/Ed2kSettingPage.qml" line="240"/>
-        <source>Maximum number of eD2k downloads running at the same time (1-20)</source>
-        <translation>同时运行的 eD2k 下载任务数上限（1-20）</translation>
+        <source>Maximum number of eD2k downloads running at the same time (1-20). Takes effect after restarting the app.</source>
+        <translation>同时运行的 eD2k 下载任务数上限（1-20）。重启应用后生效。</translation>
     </message>
     <message>
         <location filename="../qml/Browser/Ed2kSettingPage.qml" line="249"/>
@@ -1329,8 +1329,8 @@
     </message>
     <message>
         <location filename="../qml/Browser/Ed2kSettingPage.qml" line="320"/>
-        <source>eD2k settings saved and applied successfully!</source>
-        <translation>eD2k 设置保存并应用成功！</translation>
+        <source>eD2k settings saved. Some changes take effect after restart.</source>
+        <translation>eD2k 设置已保存。部分更改需重启后生效。</translation>
     </message>
     <message>
         <location filename="../qml/Browser/Ed2kSettingPage.qml" line="328"/>

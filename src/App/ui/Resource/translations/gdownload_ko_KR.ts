@@ -1268,8 +1268,8 @@
     </message>
     <message>
         <location filename="../qml/Browser/Ed2kSettingPage.qml" line="240"/>
-        <source>Maximum number of eD2k downloads running at the same time (1-20)</source>
-        <translation>동시에 실행되는 eD2k 다운로드의 최대 개수(1~20)</translation>
+        <source>Maximum number of eD2k downloads running at the same time (1-20). Takes effect after restarting the app.</source>
+        <translation>동시에 실행되는 eD2k 다운로드의 최대 개수(1~20). 앱을 다시 시작하면 적용됩니다.</translation>
     </message>
     <message>
         <location filename="../qml/Browser/Ed2kSettingPage.qml" line="249"/>
@@ -1329,8 +1329,8 @@
     </message>
     <message>
         <location filename="../qml/Browser/Ed2kSettingPage.qml" line="320"/>
-        <source>eD2k settings saved and applied successfully!</source>
-        <translation>eD2k 설정이 성공적으로 저장 및 적용되었습니다!</translation>
+        <source>eD2k settings saved. Some changes take effect after restart.</source>
+        <translation>eD2k 설정이 저장되었습니다. 일부 변경 사항은 다시 시작한 후 적용됩니다.</translation>
     </message>
     <message>
         <location filename="../qml/Browser/Ed2kSettingPage.qml" line="328"/>

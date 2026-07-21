@@ -150,6 +150,8 @@ namespace gdl {
 				int upload_queued_ = 0;
 				int upload_active_ = 0;
 				double total_uploaded_ = 0;
+				// 分享状态每秒采样推送去重：负载与上一帧一致时跳过解析与模型重置(见 OnShareStatePayload)
+				QString last_share_payload_;
 				// 非持有:由 AttachQmlEngine() 记录，生命周期由调用方(mainwindow.cxx/测试用例)保证
 				QQmlEngine* qml_engine_ = nullptr;
 			};
