@@ -464,6 +464,8 @@ class TestBrowserManager : public QObject {
 // Task 7(设置页视觉用例)覆盖 14 个 SettingPage,这些页面读取 30+ 个 qXxx 属性
 // 并调用对应 SetXxx Q_INVOKABLE 保存改动。桩提供全部属性(合理默认值,使页面
 // 渲染出有意义的视觉内容)与全部 SetXxx(空实现,视觉用例不验证保存行为)。
+// Phase 3b Task 8 追加 Ed2kSettingPage 的 8 个 qEd2kXxx 属性 + 8 个 SetEd2kXxx,
+// 使新增的 ed2k 设置页视觉用例(第 15 页)可加载、可渲染。
 class TestSettingsManager : public QObject {
 	Q_OBJECT
 	// 主窗口/通用(已存在属性沿用 Task 6)
@@ -527,6 +529,16 @@ class TestSettingsManager : public QObject {
 
 	// UserAgentSettingPage:UA
 	Q_PROPERTY(QString qUserAgent MEMBER user_agent_ CONSTANT)
+
+	// Ed2kSettingPage(Phase 3b Task 8):eD2k 身份/网络接入/性能
+	Q_PROPERTY(QString qEd2kNickname MEMBER ed2k_nickname_ CONSTANT)
+	Q_PROPERTY(int qEd2kTcpPort MEMBER ed2k_tcp_port_ CONSTANT)
+	Q_PROPERTY(int qEd2kUdpPort MEMBER ed2k_udp_port_ CONSTANT)
+	Q_PROPERTY(bool qEd2kEnableKad MEMBER ed2k_enable_kad_ CONSTANT)
+	Q_PROPERTY(bool qEd2kEnableObfuscation MEMBER ed2k_enable_obfuscation_ CONSTANT)
+	Q_PROPERTY(bool qEd2kAutoConnect MEMBER ed2k_auto_connect_ CONSTANT)
+	Q_PROPERTY(int qEd2kMaxConcurrentTasks MEMBER ed2k_max_concurrent_tasks_ CONSTANT)
+	Q_PROPERTY(QString qEd2kServerMetUrl MEMBER ed2k_server_met_url_ CONSTANT)
 
    public:
 	explicit TestSettingsManager(QObject* parent = nullptr) : QObject(parent) {}
@@ -592,6 +604,16 @@ class TestSettingsManager : public QObject {
 	}
 	Q_INVOKABLE void SetAria2UserAgent(const QString& v) { Q_UNUSED(v); }
 
+	// Ed2kSettingPage setters(空实现,视觉用例不验证保存)
+	Q_INVOKABLE void SetEd2kNickname(const QString& v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetEd2kTcpPort(int v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetEd2kUdpPort(int v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetEd2kEnableKad(bool v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetEd2kEnableObfuscation(bool v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetEd2kAutoConnect(bool v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetEd2kMaxConcurrentTasks(int v) { Q_UNUSED(v); }
+	Q_INVOKABLE void SetEd2kServerMetUrl(const QString& v) { Q_UNUSED(v); }
+
    private:
 	bool remember_window_position_ = false;
 	QSize window_size_ = QSize(1280, 720);
@@ -653,6 +675,16 @@ class TestSettingsManager : public QObject {
 	QString user_agent_ =
 		QStringLiteral("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
 					   "Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0");
+
+	// Ed2kSettingPage(默认值对齐 setting.h Default() 与 Ed2kSettingPage.qml 的 onReset)
+	QString ed2k_nickname_ = QStringLiteral("GDownload");
+	int ed2k_tcp_port_ = 4662;
+	int ed2k_udp_port_ = 4672;
+	bool ed2k_enable_kad_ = false;
+	bool ed2k_enable_obfuscation_ = false;
+	bool ed2k_auto_connect_ = true;
+	int ed2k_max_concurrent_tasks_ = 5;
+	QString ed2k_server_met_url_ = QStringLiteral("http://upd.emule-security.org/server.met");
 };
 
 // ToastManager 桩:记录 ShowXxx 调用,供集成测试验证用户反馈。

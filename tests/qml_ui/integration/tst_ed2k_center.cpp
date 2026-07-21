@@ -34,10 +34,12 @@ class StubBrowserView : public QObject {
 
 // tst_ed2k_center:eD2k 中心页导航入口与 tab 切换的 QML 集成冒烟测试
 //
-// 三个断言点(照 Phase 2b Task 8 计划):
+// 断言点(照 Phase 2b Task 8 计划 + Phase 3b Task 8 扩展):
 //   1) NavigatorView 的 navEd2k 按钮 clicked 后 brower_view.index 变为 3
 //   2) Ed2kCenterPage.qml 能实例化,且 ed2kTabSearch/ed2kTabServers 两个 tab 按钮存在
 //   3) 点击 ed2kTabServers 后 currentTabIndex 变为 1
+//   4) ed2kTabShares 存在,点击后 currentTabIndex 变为 2(Phase 3b 分享 tab)
+//   5) Ed2kSettingPage.qml 能独立实例化(Phase 3b 设置卡片)
 //
 // 结构照抄 tst_navigation.cpp(StubBrowserView + setupIntegrationEngine)。
 //
@@ -109,6 +111,33 @@ class TstEd2kCenter : public QObject {
 		QMetaObject::invokeMethod(serversTab, "clicked");
 
 		QTRY_COMPARE_WITH_TIMEOUT(page->property("currentTabIndex").toInt(), 1, 1000);
+	}
+
+	// 测试点 4:ed2kTabShares 存在,点击后 currentTabIndex 切换到 2(Phase 3b 分享 tab)
+	void sharesTabSwitchesIndex2() {
+		QQmlComponent comp(&engine_, QUrl(QStringLiteral("qrc:/qml/Browser/Ed2kCenterPage.qml")));
+		QVERIFY2(!comp.isError(), qPrintable(comp.errorString()));
+		QScopedPointer<QObject> page(comp.create(engine_.rootContext()));
+		QVERIFY2(!page.isNull(), qPrintable(comp.errorString()));
+
+		auto* sharesTab = page->findChild<QQuickItem*>(QStringLiteral("ed2kTabShares"));
+		QVERIFY2(sharesTab, "未找到 ed2kTabShares");
+
+		QCOMPARE(page->property("currentTabIndex").toInt(), 0);
+
+		QMetaObject::invokeMethod(sharesTab, "clicked");
+
+		QTRY_COMPARE_WITH_TIMEOUT(page->property("currentTabIndex").toInt(), 2, 1000);
+	}
+
+	// 测试点 5:Ed2kSettingPage.qml 能独立实例化(Phase 3b 设置卡片,内嵌于 AdvancedSettingPage)
+	// FakeSettingsManager 已镜像全部 qEd2kXxx 属性(见 support/FakeSettingsManager.h),
+	// 组件创建期读取这些属性求初值不应报错。
+	void settingsPageInstantiates() {
+		QQmlComponent comp(&engine_, QUrl(QStringLiteral("qrc:/qml/Browser/Ed2kSettingPage.qml")));
+		QVERIFY2(!comp.isError(), qPrintable(comp.errorString()));
+		QScopedPointer<QObject> page(comp.create(engine_.rootContext()));
+		QVERIFY2(!page.isNull(), qPrintable(comp.errorString()));
 	}
 
    private:

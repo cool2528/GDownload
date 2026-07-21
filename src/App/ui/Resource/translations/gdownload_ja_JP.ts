@@ -878,6 +878,11 @@
         <source>The eD2k engine failed to start. Check the logs or restart the app.</source>
         <translation>eD2k エンジンの起動に失敗しました。ログを確認するか、アプリを再起動してください。</translation>
     </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kCenterPage.qml" line="157"/>
+        <source>Shares</source>
+        <translation>共有</translation>
+    </message>
 </context>
 <context>
     <name>Ed2kSearchPage</name>
@@ -1111,6 +1116,284 @@
         <location filename="../qml/Browser/Ed2kServerPage.qml" line="23"/>
         <source>Failed to connect: %1</source>
         <translation>接続に失敗しました：%1</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="32"/>
+        <source>Server list updated</source>
+        <translation>サーバーリストを更新しました</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kServerPage.qml" line="34"/>
+        <source>Server list update failed: %1</source>
+        <translation>サーバーリストの更新に失敗しました：%1</translation>
+    </message>
+</context>
+<context>
+    <name>Ed2kSettingPage</name>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="17"/>
+        <source>eD2k Settings</source>
+        <translation>eD2k 設定</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="18"/>
+        <source>Configure eD2k network identity, connectivity, and performance</source>
+        <translation>eD2k ネットワークの識別情報、接続方法、パフォーマンスを設定します</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="30"/>
+        <source>Identity &amp; Network</source>
+        <translation>識別情報とネットワーク</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="38"/>
+        <source>Nickname:</source>
+        <translation>ニックネーム:</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="45"/>
+        <source>GDownload</source>
+        <translation>GDownload</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="46"/>
+        <source>eD2k nickname</source>
+        <translation>eD2k ニックネーム</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="52"/>
+        <source>TCP Port:</source>
+        <translation>TCP ポート:</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="53"/>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="69"/>
+        <source>Takes effect after restarting the app</source>
+        <translation>アプリを再起動すると有効になります</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="62"/>
+        <source>eD2k TCP port</source>
+        <translation>eD2k TCP ポート</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="68"/>
+        <source>UDP Port:</source>
+        <translation>UDP ポート:</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="78"/>
+        <source>eD2k UDP port</source>
+        <translation>eD2k UDP ポート</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="91"/>
+        <source>Enable protocol obfuscation</source>
+        <translation>プロトコル難読化を有効にする</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="100"/>
+        <source>Enable Protocol Obfuscation</source>
+        <translation>プロトコル難読化を有効にする</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="108"/>
+        <source>Obscures eD2k traffic to help bypass ISP throttling. Takes effect after restarting the app.</source>
+        <translation>eD2k のトラフィックを難読化し、ISP によるスロットリングの回避を支援します。アプリを再起動すると有効になります。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="130"/>
+        <source>Network Access</source>
+        <translation>ネットワークアクセス</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="144"/>
+        <source>Enable Kad network</source>
+        <translation>Kad ネットワークを有効にする</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="153"/>
+        <source>Enable Kad Network</source>
+        <translation>Kad ネットワークを有効にする</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="161"/>
+        <source>Serverless peer discovery via Kademlia DHT. Improves source availability. Takes effect after restarting the app.</source>
+        <translation>Kademlia DHT によるサーバーレスのピア探索です。ソースの可用性が向上します。アプリを再起動すると有効になります。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="177"/>
+        <source>Auto connect on startup</source>
+        <translation>起動時に自動接続する</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="186"/>
+        <source>Auto Connect on Startup</source>
+        <translation>起動時に自動接続する</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="194"/>
+        <source>Automatically connect to the best available server when the app starts.</source>
+        <translation>アプリの起動時に、利用可能な最適なサーバーへ自動的に接続します。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="204"/>
+        <source>server.met URL:</source>
+        <translation>server.met の URL:</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="205"/>
+        <source>Used by &apos;Update from URL&apos; on the eD2k Servers page</source>
+        <translation>eD2k サーバーページの「URL から更新」で使用されます</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="212"/>
+        <source>http://upd.emule-security.org/server.met</source>
+        <translation>http://upd.emule-security.org/server.met</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="213"/>
+        <source>eD2k server.met URL</source>
+        <translation>eD2k server.met の URL</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="231"/>
+        <source>Performance</source>
+        <translation>パフォーマンス</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="239"/>
+        <source>Max Concurrent Tasks:</source>
+        <translation>最大同時タスク数:</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="240"/>
+        <source>Maximum number of eD2k downloads running at the same time (1-20)</source>
+        <translation>同時に実行する eD2k ダウンロードの最大数（1～20）</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="249"/>
+        <source>Maximum concurrent eD2k tasks</source>
+        <translation>最大同時 eD2k タスク数</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="281"/>
+        <source>Input fields reset to default values (not saved yet)</source>
+        <translation>入力フィールドがデフォルト値にリセットされる（まだ保存されていない）</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="288"/>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="290"/>
+        <source>TCP and UDP ports must be different</source>
+        <translation>TCP ポートと UDP ポートは異なる値にしてください</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="298"/>
+        <source>Nickname</source>
+        <translation>ニックネーム</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="301"/>
+        <source>TcpPort</source>
+        <translation>TCP ポート</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="304"/>
+        <source>UdpPort</source>
+        <translation>UDP ポート</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="307"/>
+        <source>Obfuscation</source>
+        <translation>難読化</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="310"/>
+        <source>Kad</source>
+        <translation>Kad</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="313"/>
+        <source>AutoConnect</source>
+        <translation>自動接続</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="316"/>
+        <source>ServerMetUrl</source>
+        <translation>server.met の URL</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="319"/>
+        <source>MaxConcurrentTasks</source>
+        <translation>最大同時タスク数</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="320"/>
+        <source>eD2k settings saved and applied successfully!</source>
+        <translation>eD2k の設定が保存され、正常に適用されました。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSettingPage.qml" line="328"/>
+        <source>Shared folders are managed in the eD2k page. Port, identity and network settings take effect after restarting the app.</source>
+        <translation>共有フォルダーは eD2k ページで管理します。ポート、識別情報、ネットワークの設定はアプリを再起動すると有効になります。</translation>
+    </message>
+</context>
+<context>
+    <name>Ed2kSharePage</name>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="38"/>
+        <source>Share operation failed: %1</source>
+        <translation>共有操作に失敗しました：%1</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="77"/>
+        <source>Stop sharing this folder</source>
+        <translation>このフォルダーの共有を停止</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="87"/>
+        <source>Add Folder</source>
+        <translation>フォルダーを追加</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="93"/>
+        <source>Rescan</source>
+        <translation>再スキャン</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="112"/>
+        <source>Upload: %1/s · Queued %2 · Active %3 · Total %4</source>
+        <translation>アップロード: %1/秒 · キュー %2 · アクティブ %3 · 合計 %4</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="142"/>
+        <source>No shared folders. Add a folder to start sharing.</source>
+        <translation>共有フォルダーがありません。フォルダーを追加して共有を開始してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="143"/>
+        <source>Scanning or no files found in shared folders.</source>
+        <translation>スキャン中か、共有フォルダーにファイルが見つかりません。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="179"/>
+        <source>%1 · Uploaded ~%2 · %3 requests</source>
+        <translation>%1 · 約 %2 アップロード済み · リクエスト %3 件</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="187"/>
+        <source>Copy ed2k link</source>
+        <translation>ed2k リンクをコピー</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="190"/>
+        <source>Link copied</source>
+        <translation>リンクをコピーしました</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSharePage.qml" line="197"/>
+        <source>Open containing folder</source>
+        <translation>ファイルの場所を開く</translation>
     </message>
 </context>
 <context>

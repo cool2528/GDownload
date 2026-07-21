@@ -2,9 +2,9 @@ import QtQuick
 import QtTest
 import "qrc:/tests/qml_ui/support"
 
-// 视觉用例:14 个设置页 × 2 主题 = 28 张截图
+// 视觉用例:15 个设置页 × 2 主题 = 30 张截图
 //
-// 覆盖范围(Task 7):
+// 覆盖范围(Task 7 + Phase 3b Task 8):
 //   - BasicSettingPage                 基础设置(主题/语言/行为/路径/代理/剪贴板)
 //   - AdvancedSettingPage              高级设置(容器:索引页,内嵌多个子页)
 //   - Aria2RpcSettingPage              RPC 端口与密钥
@@ -19,8 +19,9 @@ import "qrc:/tests/qml_ui/support"
 //   - UserAgentSettingPage             User-Agent
 //   - SettingsPageView                 设置索引容器(含侧导航 + StackLayout)
 //   - SettingPageTitle                 设置页标题组件
+//   - Ed2kSettingPage                  eD2k 设置(身份/网络接入/性能,Phase 3b)
 //
-// 数据驱动:单 test_all_pages 函数遍历 pages × themes,生成 28 张截图。
+// 数据驱动:单 test_all_pages 函数遍历 pages × themes,生成 30 张截图。
 // 仅 1 个 ctest 用例,视觉覆盖率优先于单页隔离。
 //
 // 依赖:Task 6 已注册 GTheme / BrowserManager / SettingsManager / ToastManager /
@@ -29,7 +30,8 @@ import "qrc:/tests/qml_ui/support"
 // Task 7 扩展了 TestSettingsManager(33 属性 + 35 setter)、TestLanguageManager
 // (3 方法)、TestUtilsToolsManager(SetAutoStart/RelaunchAfterExit/serverList)、
 // TestBrowserManager(SyncTrackersServerlist + sigTrackerUpdateStatus 信号),
-// 使 14 个设置页可加载、可渲染。
+// 使 14 个设置页可加载、可渲染。Phase 3b Task 8 再扩展 TestSettingsManager
+// (+8 个 qEd2kXxx 属性 + 8 个 SetEd2kXxx),使新增的 Ed2kSettingPage 可加载、可渲染。
 TestCase {
     id: testCase
     name: "tst_settings_pages"
@@ -43,7 +45,7 @@ TestCase {
         objectName: "harness"
     }
 
-    // 14 页 × 2 主题:tag 为截图文件名(无后缀),path 为 qrc 内 QML 路径
+    // 15 页 × 2 主题:tag 为截图文件名(无后缀),path 为 qrc 内 QML 路径
     // tag 命名:语义短名 + _light/_dark,与 manifest.jsonl 的 page 字段一致
     property var pages: [
         { tag: "basic",               path: "qrc:/qml/Browser/BasicSettingPage.qml" },
@@ -57,6 +59,7 @@ TestCase {
         { tag: "timeoutretry",        path: "qrc:/qml/Browser/TimeoutRetrySettingPage.qml" },
         { tag: "trackerserver",       path: "qrc:/qml/Browser/TrackerServerSettingPage.qml" },
         { tag: "useragent",           path: "qrc:/qml/Browser/UserAgentSettingPage.qml" },
+        { tag: "ed2k",                path: "qrc:/qml/Browser/Ed2kSettingPage.qml" },
         { tag: "settings_index",      path: "qrc:/qml/Browser/SettingsPageView.qml" },
         { tag: "page_title",          path: "qrc:/qml/Browser/SettingPageTitle.qml" }
     ]
