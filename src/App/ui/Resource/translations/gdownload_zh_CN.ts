@@ -887,6 +887,11 @@
 <context>
     <name>Ed2kSearchPage</name>
     <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="27"/>
+        <source>Kad search is unavailable. Enable Kad in settings, or use Server search instead.</source>
+        <translation>Kad 搜索不可用。请在设置中启用 Kad，或改用服务器搜索。</translation>
+    </message>
+    <message>
         <location filename="../qml/Browser/Ed2kSearchPage.qml" line="21"/>
         <source>Search failed: %1</source>
         <translation>搜索失败：%1</translation>
