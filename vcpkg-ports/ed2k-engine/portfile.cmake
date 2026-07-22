@@ -2,7 +2,7 @@ vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO cool2528/ed2k-engine-cpp
     REF v${VERSION}
-    SHA512 8420f1ccff146a0fe8a136981310a6a9c89bcd097f873f53a17d56ab6750e622f4fe89335e58c1e2e4b40621539d61d6a1abe50af6e30fb927fb90de46bcd0fd
+    SHA512 47b3d5983cbf96aec9522ece9e4f74e166d1bf9ded46dde89f9db5dcc0afdb71df1d1e8a46d9396fb084a5239fb15d22f77322fc0d015421a0eeef5deef77812
     HEAD_REF main
 )
 
