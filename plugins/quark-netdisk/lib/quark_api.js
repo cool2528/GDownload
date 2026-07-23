@@ -39,6 +39,17 @@ function antiCacheParams() {
     return { __dt: String(rnd), __t: String(Date.now()) };
 }
 
+// 弹窗请求提取码;返回用户输入,取消或通道不可用返回 null
+async function promptExtractionCode(message) {
+    try {
+        const code = await gdl.ui.requestVerification({ message: message });
+        return code ? String(code).trim() : null;
+    } catch (e) {
+        gdl.log.info("verification prompt unavailable or cancelled: " + e);
+        return null;
+    }
+}
+
 export class QuarkApi {
     constructor() {
         this.reset();
@@ -118,17 +129,28 @@ export class QuarkApi {
         return doc;
     }
 
-    // 获取分享 token(后续所有分享操作都要带 stoken)
+    // 获取分享 token;返回 {ok:true} 或 {ok:false, code, message}(提取码问题由调用方决策重试)
     async fetchStoken() {
         const resp = await this.request("POST", "/1/clouddrive/share/sharepage/token", {
             json: { pwd_id: this.pwdId, passcode: this.passcode || "" },
         });
-        const doc = this.parseEnvelope(resp, "token");
-        if (!doc || !doc.data || typeof doc.data.stoken !== "string" || !doc.data.stoken) {
-            return false;
+        if (resp.status !== 200) {
+            gdl.log.warn("quark token http " + resp.status);
+            return { ok: false, message: "http " + resp.status };
+        }
+        let doc;
+        try {
+            doc = resp.json();
+        } catch (e) {
+            gdl.log.warn("quark token parse failed: " + e);
+            return { ok: false, message: "bad response" };
+        }
+        if (doc.code !== 0 || !doc.data || typeof doc.data.stoken !== "string" || !doc.data.stoken) {
+            gdl.log.warn("quark token error: " + (doc.message || doc.code));
+            return { ok: false, code: doc.code, message: String(doc.message || "") };
         }
         this.stoken = doc.data.stoken;
-        return true;
+        return { ok: true };
     }
 
     // 列目录(分页聚合);pdirFid 根目录为 "0",子目录为其 fid
@@ -266,8 +288,25 @@ export class QuarkApi {
         this.pwdId = ids.pwdId;
         this.passcode = ids.passcode;
 
-        if (!(await this.fetchStoken())) {
+        let r = await this.fetchStoken();
+        for (let attempt = 0; !r.ok && attempt < 3; attempt++) {
+            // 缺码或 API message 提示提取码问题时进入弹窗补码;其余错误(链接失效等)直接失败
+            const pwdRelated = !this.passcode || /提取码|密码|passcode|pwd/i.test(r.message || "");
+            if (!pwdRelated) break;
+            const tip = (!this.passcode && attempt === 0)
+                ? "This share link requires an extraction code."
+                : "Wrong extraction code, please try again." + (r.message ? " (" + r.message + ")" : "");
+            const code = await promptExtractionCode(tip);
+            if (code === null) {
+                gdl.notify("Parsing cancelled: the share link requires an extraction code.", "warning");
+                return null;
+            }
+            this.passcode = code;
+            r = await this.fetchStoken();
+        }
+        if (!r.ok) {
             gdl.log.warn("quark stoken failed");
+            if (r.message) gdl.notify(r.message, "error");
             return null;
         }
         const files = await this.listDir("0", "/");
