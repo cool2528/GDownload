@@ -37,6 +37,7 @@ namespace gdl {
                 QWaitCondition condition_;
                 bool pending_{false};
                 QString input_;
+                int active_requests_{0};
             };
         }  // namespace netdisk
     }  // namespace ui
