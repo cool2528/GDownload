@@ -1,4 +1,5 @@
 #include "utils.h"
+#include <cmath>
 #include <qdir.h>
 #include <QClipboard>
 #include <QFileInfo>
@@ -88,7 +89,9 @@ namespace gdl {
                     if (SUCCEEDED(CoCreateInstance(CLSID_TaskbarList, nullptr, CLSCTX_INPROC_SERVER, IID_ITaskbarList3,
                                                    (void**)&pTaskbar))) {
                         HWND hwnd = reinterpret_cast<HWND>(nativeWindowHandle);
-                        if (progress >= 1.0) {
+                        // 负值/非有限值表示"无活动任务",与完成态一样清除进度显示;
+                        // 负值走 SetProgressValue 会因 ULONGLONG 下溢显示异常
+                        if (progress >= 1.0 || progress < 0.0 || !std::isfinite(progress)) {
                             pTaskbar->SetProgressState(hwnd, TBPF_NOPROGRESS);
                         }
                         else {
