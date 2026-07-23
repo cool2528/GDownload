@@ -41,6 +41,11 @@ DisableWelcomePage=no
 DisableDirPage=no
 DisableProgramGroupPage=yes
 
+; 多语言配置：自动检测系统 UI 语言并直接使用对应语言安装，不弹出语言选择对话框
+; 若系统语言不在下方 [Languages] 列表中，则回退使用英语（列表中的第一项）
+ShowLanguageDialog=no
+LanguageDetectionMethod=uilanguage
+
 ; 版本信息
 VersionInfoVersion={#MyAppVersion}
 VersionInfoCompany={#MyAppPublisher}
@@ -55,13 +60,54 @@ ArchitecturesInstallIn64BitMode=x64compatible
 LicenseFile=@CMAKE_SOURCE_DIR@\LICENSE.txt
 
 [Languages]
-Name: "english"; MessagesFile: "compiler:Default.isl"
+; 支持的 5 种语言：英语、简体中文、繁体中文、日语、韩语
+; 英语/日语/韩语为 Inno Setup 6 自带翻译（compiler: 前缀），简体/繁体中文为项目内置的第三方翻译文件
+; ShowLanguageDialog=no + LanguageDetectionMethod=uilanguage 会根据系统 UI 语言自动匹配下方某一项，
+; 若系统语言不在此列表中，则回退到列表第一项（英语）
+Name: "english";            MessagesFile: "compiler:Default.isl"
+Name: "japanese";           MessagesFile: "compiler:Languages\Japanese.isl"
+Name: "chinesesimplified";  MessagesFile: "@CMAKE_SOURCE_DIR@\package\languages\ChineseSimplified.isl"
+Name: "chinesetraditional"; MessagesFile: "@CMAKE_SOURCE_DIR@\package\languages\ChineseTraditional.isl"
+Name: "korean";             MessagesFile: "compiler:Languages\Korean.isl"
+
+[CustomMessages]
+; [Tasks] 中两项自定义任务的多语言文案（其余任务描述如 {cm:CreateDesktopIcon} 由 Inno Setup 内置 .isl 提供）
+english.AdvancedGroupDescription=Advanced:
+chinesesimplified.AdvancedGroupDescription=高级：
+chinesetraditional.AdvancedGroupDescription=進階：
+japanese.AdvancedGroupDescription=詳細設定：
+korean.AdvancedGroupDescription=고급:
+
+english.AddToPathDescription=Add to PATH (allows running from command line)
+chinesesimplified.AddToPathDescription=添加到 PATH（允许从命令行运行）
+chinesetraditional.AddToPathDescription=加入 PATH（允許從命令列執行）
+japanese.AddToPathDescription=PATH に追加する（コマンドラインからの実行が可能になります）
+korean.AddToPathDescription=PATH에 추가(명령줄에서 실행 가능)
+
+english.FileAssociationsGroupDescription=File Associations:
+chinesesimplified.FileAssociationsGroupDescription=文件关联：
+chinesetraditional.FileAssociationsGroupDescription=檔案關聯：
+japanese.FileAssociationsGroupDescription=ファイルの関連付け：
+korean.FileAssociationsGroupDescription=파일 연결:
+
+english.AssociateTorrentDescription=Associate .torrent files with {#MyAppName}
+chinesesimplified.AssociateTorrentDescription=将 .torrent 文件与 {#MyAppName} 建立关联
+chinesetraditional.AssociateTorrentDescription=將 .torrent 檔案與 {#MyAppName} 產生關聯
+japanese.AssociateTorrentDescription=.torrent ファイルを {#MyAppName} に関連付ける
+korean.AssociateTorrentDescription=.torrent 파일을 {#MyAppName}에 연결
+
+; [Code] 中 InitializeSetup 检测到旧版本时弹出的确认框文案（%1 = 旧版本号，运行时通过 FmtMessage 替换）
+english.VersionAlreadyInstalledMsg=Version %1 of {#MyAppName} is already installed. Do you want to uninstall it first?
+chinesesimplified.VersionAlreadyInstalledMsg={#MyAppName} 的 %1 版本已安装。是否要先将其卸载？
+chinesetraditional.VersionAlreadyInstalledMsg={#MyAppName} 的 %1 版本已安裝。是否要先將其解除安裝？
+japanese.VersionAlreadyInstalledMsg={#MyAppName} のバージョン %1 は既にインストールされています。先にアンインストールしますか？
+korean.VersionAlreadyInstalledMsg={#MyAppName}의 버전 %1이(가) 이미 설치되어 있습니다. 먼저 제거하시겠습니까?
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-Name: "addtopath"; Description: "Add to PATH (allows running from command line)"; GroupDescription: "Advanced:"; Flags: unchecked
-Name: "associatefiles"; Description: "Associate .torrent files with {#MyAppName}"; GroupDescription: "File Associations:"; Flags: unchecked
+Name: "addtopath"; Description: "{cm:AddToPathDescription}"; GroupDescription: "{cm:AdvancedGroupDescription}"; Flags: unchecked
+Name: "associatefiles"; Description: "{cm:AssociateTorrentDescription}"; GroupDescription: "{cm:FileAssociationsGroupDescription}"; Flags: unchecked
 
 [Files]
 ; 主程序文件
@@ -184,7 +230,7 @@ begin
     if RegQueryStringValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppName}', 'DisplayVersion', OldVersion) or
        RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppName}', 'DisplayVersion', OldVersion) then
     begin
-      if MsgBox('Version ' + OldVersion + ' of {#MyAppName} is already installed. Do you want to uninstall it first?', mbConfirmation, MB_YESNO) = IDYES then
+      if MsgBox(FmtMessage(CustomMessage('VersionAlreadyInstalledMsg'), [OldVersion]), mbConfirmation, MB_YESNO) = IDYES then
       begin
         // 静默卸载旧版本
         Exec(RemoveQuotes(UninstallPath), '/SILENT', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
