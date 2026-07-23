@@ -44,6 +44,14 @@ GDownload 是一款现代化的跨平台下载管理器，使用 C++ 和 Qt 开�
 - 📱 断点续传，随时暂停和恢复
 - 🔗 磁力链接和种子文件支持
 
+### 🔗 eD2k / eMule 网络
+- 🐘 完整的 eD2k / eMule 客户端 —— 下载、搜索、服务器管理、文件分享与 Kad DHT
+- 📥 支持 `ed2k://` 链接下载,多源流水线、上传队列排队等待、断点续传、Kad 源发现
+- 🔍 在 eD2k 服务器与 Kad 网络中搜索文件
+- 🖥️ 服务器管理(连接 / 增删 / 更新 `server.met` / Kad 状态)
+- 📤 文件分享,含上传统计与队列管理
+- ⚙️ 由自研的进程内 eD2k 引擎驱动 —— [**ed2k-engine-cpp**](https://github.com/cool2528/ed2k-engine-cpp)
+
 ### 🎨 现代化界面
 - 🖥️ 跨平台支持 (Windows、macOS、Linux)
 - 🌓 浅色/深色主题自动切换
@@ -155,6 +163,7 @@ GDownload 采用 JS 插件架构，网盘解析功能均以插件形式提供，
 - ⚙️ **核心引擎**: aria2c
 - 🌐 **网络库**: Boost.Asio + Beast (WebSocket)
 - 🔗 **BT 下载**: LibtorrentRasterbar
+- 🐘 **eD2k / eMule**: 自研引擎 —— [ed2k-engine-cpp](https://github.com/cool2528/ed2k-engine-cpp)
 - 💾 **数据存储**: SQLite3
 - 📝 **日志系统**: spdlog
 - 📄 **数据解析**: nlohmann-json, PugiXML
