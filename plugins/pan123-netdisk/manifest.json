@@ -2,7 +2,7 @@
     "manifest_version": 1,
     "name": "pan123-netdisk",
     "display_name": "123 Pan",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "author": "GDownload Official",
     "description": "Parse 123pan share links (anonymous listing, login token for downloads)",
     "homepage": "https://github.com/cool2528/GDownload",
@@ -28,7 +28,7 @@
             "*.123nav.com", "*.123pan.net"
         ],
         "storage": false,
-        "verification_ui": false
+        "verification_ui": true
     },
     "settings": [
         {
