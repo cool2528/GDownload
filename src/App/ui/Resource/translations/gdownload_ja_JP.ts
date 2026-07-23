@@ -2983,6 +2983,20 @@ GNU Affero General Public License v3.0（AGPL-3.0）に基づきライセンス�
     </message>
 </context>
 <context>
+    <name>PluginSettingsForm</name>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsForm.qml" line="102"/>
+        <location filename="../qml/CommonComponents/PluginSettingsForm.qml" line="148"/>
+        <source>How to get this value?</source>
+        <translation>この値の取得方法</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsForm.qml" line="171"/>
+        <source>View full tutorial</source>
+        <translation>詳しいチュートリアルを見る</translation>
+    </message>
+</context>
+<context>
     <name>PostDownloadActionsSettingPage</name>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="16"/>

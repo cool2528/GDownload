@@ -85,6 +85,17 @@ namespace gdl {
 					}
 					item["options"]		 = options;
 					item["defaultValue"] = DefaultJsonToVariant(field.default_json);
+					// 获取引导：steps 按当前语言本地化，url 原样透传
+					QStringList help_steps;
+					QString help_url;
+					if (field.help.has_value()) {
+						for (const auto& step : field.help->LocalizedSteps(locale)) {
+							help_steps.push_back(QString::fromStdString(step));
+						}
+						help_url = QString::fromStdString(field.help->url);
+					}
+					item["helpSteps"] = help_steps;
+					item["helpUrl"]	  = help_url;
 					result.push_back(item);
 				}
 				return result;

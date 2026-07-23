@@ -46,6 +46,12 @@ ColumnLayout {
             required property var modelData
             readonly property string fieldKey: modelData.key
             readonly property string fieldType: modelData.type
+            readonly property var helpSteps: modelData.helpSteps || []
+            readonly property string helpUrl: modelData.helpUrl || ""
+            readonly property bool hasHelp: helpSteps.length > 0 || helpUrl !== ""
+            // 必填且尚未填值时默认展开引导,首次配置直接可见步骤
+            property bool helpExpanded: hasHelp && modelData.required === true
+                                        && String(initialValue()) === ""
 
             Layout.fillWidth: true
             spacing: GTheme.spaceXS
@@ -87,6 +93,22 @@ ColumnLayout {
                     font.pixelSize: GTheme.fontBody
                     font.weight: GTheme.weightMedium
                 }
+                AuroraIcon {
+                    visible: fieldRow.hasHelp
+                    name: "help"
+                    iconSize: GTheme.fontBody
+                    color: helpToggleArea.containsMouse || fieldRow.helpExpanded
+                           ? GTheme.primaryColor : GTheme.textSecondary
+                    Accessible.name: qsTr("How to get this value?")
+
+                    MouseArea {
+                        id: helpToggleArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: fieldRow.helpExpanded = !fieldRow.helpExpanded
+                    }
+                }
                 Item { Layout.fillWidth: true }
             }
 
@@ -103,6 +125,52 @@ ColumnLayout {
                     if (fieldRow.fieldType === "textarea")
                         return textareaEditor
                     return textEditor
+                }
+            }
+
+            // 分步骤获取引导面板(manifest settings[].help 声明,可折叠)
+            Rectangle {
+                visible: fieldRow.helpExpanded && fieldRow.hasHelp
+                Layout.fillWidth: true
+                implicitHeight: helpColumn.implicitHeight + GTheme.spaceMD * 2
+                color: GTheme.fillLighter
+                radius: GTheme.radiusMedium
+
+                ColumnLayout {
+                    id: helpColumn
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.margins: GTheme.spaceMD
+                    spacing: GTheme.spaceXS
+
+                    Text {
+                        text: qsTr("How to get this value?")
+                        textFormat: Text.PlainText
+                        color: GTheme.textPrimary
+                        font.pixelSize: GTheme.fontBody
+                        font.weight: GTheme.weightMedium
+                    }
+
+                    Repeater {
+                        model: fieldRow.helpSteps
+                        delegate: Text {
+                            required property var modelData
+                            required property int index
+                            Layout.fillWidth: true
+                            text: (index + 1) + ". " + modelData
+                            textFormat: Text.PlainText
+                            wrapMode: Text.Wrap
+                            color: GTheme.textSecondary
+                            font.pixelSize: GTheme.fontBody
+                        }
+                    }
+
+                    GButton {
+                        visible: fieldRow.helpUrl !== ""
+                        text: qsTr("View full tutorial")
+                        onClicked: Qt.openUrlExternally(fieldRow.helpUrl)
+                    }
                 }
             }
 

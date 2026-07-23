@@ -2,7 +2,7 @@
     "manifest_version": 1,
     "name": "baidu-netdisk",
     "display_name": "Baidu NetDisk",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "author": "GDownload Official",
     "description": "Parse Baidu netdisk share links (JS rewrite of the native Baidu plugin)",
     "homepage": "https://github.com/cool2528/GDownload",
@@ -36,6 +36,46 @@
                 "zh_TW": { "label": "百度網盤 Cookie", "hint": "貼上登入 pan.baidu.com 後的 Cookie" },
                 "ja_JP": { "label": "Baidu ネットディスク Cookie", "hint": "pan.baidu.com にログイン後の Cookie を貼り付け" },
                 "ko_KR": { "label": "바이두 넷디스크 Cookie", "hint": "pan.baidu.com 로그인 후 Cookie를 붙여넣기" }
+            },
+            "help": {
+                "steps": [
+                    "Open pan.baidu.com in your browser and sign in",
+                    "Press F12 to open DevTools and switch to the Network tab",
+                    "Refresh the page, then click any request sent to pan.baidu.com",
+                    "In Request Headers, find the Cookie header and copy its entire value",
+                    "Paste the value into the field above and save"
+                ],
+                "url": "https://gdownload.uk/docs/guides/baidu-netdisk.html",
+                "locales": {
+                    "zh_CN": { "steps": [
+                        "在浏览器打开 pan.baidu.com 并登录",
+                        "按 F12 打开开发者工具，切换到“网络(Network)”标签",
+                        "刷新页面，点击任意一条发往 pan.baidu.com 的请求",
+                        "在“请求标头(Request Headers)”中找到 Cookie 并复制完整值",
+                        "粘贴到上方输入框并保存"
+                    ] },
+                    "zh_TW": { "steps": [
+                        "在瀏覽器開啟 pan.baidu.com 並登入",
+                        "按 F12 開啟開發者工具，切換到「網路(Network)」標籤",
+                        "重新整理頁面，點擊任意一條發往 pan.baidu.com 的請求",
+                        "在「請求標頭(Request Headers)」中找到 Cookie 並複製完整值",
+                        "貼上到上方輸入框並儲存"
+                    ] },
+                    "ja_JP": { "steps": [
+                        "ブラウザで pan.baidu.com を開いてログイン",
+                        "F12 で開発者ツールを開き「ネットワーク(Network)」タブへ切り替え",
+                        "ページを更新し、pan.baidu.com 宛のリクエストをクリック",
+                        "リクエストヘッダーの Cookie の値をすべてコピー",
+                        "上の入力欄に貼り付けて保存"
+                    ] },
+                    "ko_KR": { "steps": [
+                        "브라우저에서 pan.baidu.com 을 열고 로그인",
+                        "F12 로 개발자 도구를 열고 네트워크(Network) 탭으로 전환",
+                        "페이지를 새로 고친 후 pan.baidu.com 으로 보낸 요청을 클릭",
+                        "요청 헤더(Request Headers)에서 Cookie 값 전체를 복사",
+                        "위 입력란에 붙여넣고 저장"
+                    ] }
+                }
             }
         }
     ],
