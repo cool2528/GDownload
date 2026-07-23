@@ -1,41 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  macOS 托盘图标模板 - Apple 风格专业版
+  macOS 托盘图标模板 - aurora 品牌形状
 
-  设计参考：
-  - Apple 官方应用托盘图标
-  - SF Symbols 设计语言
-  - 2pt 线宽标准
-  - 16x16 画布，14x14 安全区域
+  与 aurora-brand-*.svg / app_icon_1024.svg 同一几何,黑色+透明供系统按主题染色
+  (QML icon.mask 模板模式)。viewBox 沿用 32 系坐标,线宽按 16pt 菜单栏渲染补偿加粗。
 -->
-<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-  <!-- 使用 Apple 风格的圆角和线宽 -->
-  <g id="apple-style-download">
-
-    <!-- 方案1：线条版本（推荐） -->
-    <g id="outline-version">
-      <!-- 下载箭头 -->
-      <path d="M 8 2 L 8 9.5"
-            stroke="black"
-            stroke-width="2"
-            stroke-linecap="round"
-            fill="none"/>
-
-      <!-- 箭头尖端 -->
-      <path d="M 4.5 7 L 8 10.5 L 11.5 7"
-            stroke="black"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            fill="none"/>
-
-      <!-- 底部托盘 -->
-      <path d="M 3 14 L 13 14"
-            stroke="black"
-            stroke-width="2"
-            stroke-linecap="round"
-            fill="none"/>
-    </g>
-
-  </g>
+<svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M5 10.5C7.8 6.2 11.4 4 16 4C20.6 4 24.2 6.2 27 10.5" stroke="black" stroke-width="3.2" stroke-linecap="round"/>
+  <path d="M6 21.5C8.7 25.4 12 27.4 16 27.4C20 27.4 23.3 25.4 26 21.5" stroke="black" stroke-width="3.2" stroke-linecap="round"/>
+  <path d="M16 6.5V19M16 19L11.5 14.5M16 19L20.5 14.5" stroke="black" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M10 22H22" stroke="black" stroke-width="3.2" stroke-linecap="round"/>
 </svg>
