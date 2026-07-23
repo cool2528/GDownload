@@ -266,7 +266,17 @@ namespace gdl {
                 plugin->SetMessageNotifyCallback(
                     [](std::string_view message, const INetDiskDownloadPlugin::MsgType& type) {
                         // 回调发生在 worker 线程，转投 UI 线程展示 toast
-                        const QString msg	= QString::fromUtf8(message.data(), static_cast<int>(message.size()));
+                        QString msg = QString::fromUtf8(message.data(), static_cast<int>(message.size()));
+                        // 插件侧约定的标准英文提示映射为可翻译文本；其余（如网盘 API 原文）原样透传
+                        if (msg == QLatin1String("Parsing cancelled: the share link requires an extraction code.")) {
+                            msg = tr("Parsing cancelled: the share link requires an extraction code.");
+                        }
+                        else if (msg == QLatin1String("Download cancelled: the share link requires an extraction code.")) {
+                            msg = tr("Download cancelled: the share link requires an extraction code.");
+                        }
+                        else if (msg == QLatin1String("Extraction code verification failed.")) {
+                            msg = tr("Extraction code verification failed.");
+                        }
                         auto* toast_manager = &toast::ToastManager::Instance();
                         QMetaObject::invokeMethod(
                             toast_manager,
