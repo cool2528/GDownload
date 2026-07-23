@@ -2,7 +2,7 @@
     "manifest_version": 1,
     "name": "pan123-netdisk",
     "display_name": "123 Pan",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "author": "GDownload Official",
     "description": "Parse 123pan share links (anonymous listing, login token for downloads)",
     "homepage": "https://github.com/cool2528/GDownload",
@@ -43,6 +43,46 @@
                 "zh_TW": { "label": "123雲盤登入 Token", "hint": "可選。瀏覽無需 Token；下載需要登入 Token（從已登入的 123pan 網頁會話取得）" },
                 "ja_JP": { "label": "123pan ログイン Token", "hint": "任意。閲覧は不要；ダウンロードにはログイン Token が必要（ログイン済み 123pan セッションから取得）" },
                 "ko_KR": { "label": "123pan 로그인 Token", "hint": "선택. 탐색은 불필요；다운로드에는 로그인 Token 필요（로그인된 123pan 웹 세션에서 획득）" }
+            },
+            "help": {
+                "steps": [
+                    "Open www.123pan.com in your browser and sign in",
+                    "Press F12 to open DevTools and switch to the Application tab",
+                    "Expand Local Storage and select https://www.123pan.com",
+                    "Click the entry named \"authorToken\" and copy its value",
+                    "Paste the value into the field above and save (a leading \"Bearer\" prefix is fine)"
+                ],
+                "url": "https://gdownload.uk/docs/guides/pan123-netdisk.html",
+                "locales": {
+                    "zh_CN": { "steps": [
+                        "在浏览器打开 www.123pan.com 并登录",
+                        "按 F12 打开开发者工具，切换到“应用(Application)”标签",
+                        "展开 Local Storage，选择 https://www.123pan.com",
+                        "点击名为 authorToken 的条目并复制其值",
+                        "粘贴到上方输入框并保存（带 “Bearer ” 前缀也可以）"
+                    ] },
+                    "zh_TW": { "steps": [
+                        "在瀏覽器開啟 www.123pan.com 並登入",
+                        "按 F12 開啟開發者工具，切換到「應用程式(Application)」標籤",
+                        "展開 Local Storage，選擇 https://www.123pan.com",
+                        "點擊名為 authorToken 的條目並複製其值",
+                        "貼上到上方輸入框並儲存（帶 「Bearer 」 前綴也可以）"
+                    ] },
+                    "ja_JP": { "steps": [
+                        "ブラウザで www.123pan.com を開いてログイン",
+                        "F12 で開発者ツールを開き「アプリケーション(Application)」タブへ切り替え",
+                        "Local Storage を展開し https://www.123pan.com を選択",
+                        "authorToken という名前のエントリをクリックして値をコピー",
+                        "上の入力欄に貼り付けて保存（先頭に \"Bearer\" が付いていても可）"
+                    ] },
+                    "ko_KR": { "steps": [
+                        "브라우저에서 www.123pan.com 을 열고 로그인",
+                        "F12 로 개발자 도구를 열고 애플리케이션(Application) 탭으로 전환",
+                        "Local Storage 를 펼치고 https://www.123pan.com 을 선택",
+                        "authorToken 이라는 항목을 클릭하여 값을 복사",
+                        "위 입력란에 붙여넣고 저장(\"Bearer\" 접두사가 있어도 됩니다)"
+                    ] }
+                }
             }
         }
     ],

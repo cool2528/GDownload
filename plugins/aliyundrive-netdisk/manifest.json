@@ -2,7 +2,7 @@
     "manifest_version": 1,
     "name": "aliyundrive-netdisk",
     "display_name": "Aliyundrive",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "author": "GDownload Official",
     "description": "Parse Aliyundrive (alipan.com) share links via the web share API",
     "homepage": "https://github.com/cool2528/GDownload",
@@ -35,6 +35,51 @@
                 "zh_TW": { "label": "阿里雲盤 refresh_token（網頁端）", "hint": "可選。瀏覽無需；下載需要網頁端 refresh_token（取自 alipan.com localStorage 的 token）" },
                 "ja_JP": { "label": "Aliyundrive refresh_token（Web）", "hint": "任意。閲覧は不要；ダウンロードには Web の refresh_token が必要（alipan.com の localStorage 'token' から取得）" },
                 "ko_KR": { "label": "알리윈드라이브 refresh_token（웹）", "hint": "선택. 탐색은 불필요；다운로드에는 웹 refresh_token 필요（alipan.com localStorage 'token'에서 획득）" }
+            },
+            "help": {
+                "steps": [
+                    "Open www.alipan.com in your browser and sign in",
+                    "Press F12 to open DevTools and switch to the Application tab",
+                    "Expand Local Storage and select https://www.alipan.com",
+                    "Click the entry named \"token\"",
+                    "Copy the value of the refresh_token field inside the JSON (without quotes)",
+                    "Paste the value into the field above and save"
+                ],
+                "url": "https://gdownload.uk/docs/guides/aliyundrive-netdisk.html",
+                "locales": {
+                    "zh_CN": { "steps": [
+                        "在浏览器打开 www.alipan.com 并登录",
+                        "按 F12 打开开发者工具，切换到“应用(Application)”标签",
+                        "展开 Local Storage，选择 https://www.alipan.com",
+                        "点击名为 token 的条目",
+                        "复制 JSON 中 refresh_token 字段的值（不含引号）",
+                        "粘贴到上方输入框并保存"
+                    ] },
+                    "zh_TW": { "steps": [
+                        "在瀏覽器開啟 www.alipan.com 並登入",
+                        "按 F12 開啟開發者工具，切換到「應用程式(Application)」標籤",
+                        "展開 Local Storage，選擇 https://www.alipan.com",
+                        "點擊名為 token 的條目",
+                        "複製 JSON 中 refresh_token 欄位的值（不含引號）",
+                        "貼上到上方輸入框並儲存"
+                    ] },
+                    "ja_JP": { "steps": [
+                        "ブラウザで www.alipan.com を開いてログイン",
+                        "F12 で開発者ツールを開き「アプリケーション(Application)」タブへ切り替え",
+                        "Local Storage を展開し https://www.alipan.com を選択",
+                        "token という名前のエントリをクリック",
+                        "JSON 内の refresh_token フィールドの値をコピー（引用符は含めない）",
+                        "上の入力欄に貼り付けて保存"
+                    ] },
+                    "ko_KR": { "steps": [
+                        "브라우저에서 www.alipan.com 을 열고 로그인",
+                        "F12 로 개발자 도구를 열고 애플리케이션(Application) 탭으로 전환",
+                        "Local Storage 를 펼치고 https://www.alipan.com 을 선택",
+                        "token 이라는 항목을 클릭",
+                        "JSON 안의 refresh_token 필드 값을 복사(따옴표 제외)",
+                        "위 입력란에 붙여넣고 저장"
+                    ] }
+                }
             }
         }
     ],
