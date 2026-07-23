@@ -44,6 +44,14 @@ GDownload is a modern cross-platform download manager built with C++ and Qt. It 
 - 📱 Resume capability - pause and resume anytime
 - 🔗 Magnet links and torrent file support
 
+### 🔗 eD2k / eMule Network
+- 🐘 Full eD2k / eMule client — download, search, server management, file sharing, and Kad DHT
+- 📥 Download from `ed2k://` links with multi-source pipelining, upload-queue waiting, resume, and Kad source discovery
+- 🔍 Search files across eD2k servers and the Kad network
+- 🖥️ Server management (connect / add / remove / update `server.met`, Kad status)
+- 📤 File sharing with upload statistics and queue management
+- ⚙️ Powered by a self-developed in-process eD2k engine — [**ed2k-engine-cpp**](https://github.com/cool2528/ed2k-engine-cpp)
+
 ### 🎨 Modern Interface
 - 🖥️ Cross-platform support (Windows, macOS, Linux)
 - 🌓 Automatic light/dark theme switching
@@ -155,6 +163,7 @@ Want to build a cloud storage plugin for GDownload? Read the [JS Plugin System D
 - ⚙️ **Core Engine**: aria2c
 - 🌐 **Network Library**: Boost.Asio + Beast (WebSocket)
 - 🔗 **BT Download**: LibtorrentRasterbar
+- 🐘 **eD2k / eMule**: Self-developed engine — [ed2k-engine-cpp](https://github.com/cool2528/ed2k-engine-cpp)
 - 💾 **Data Storage**: SQLite3
 - 📝 **Logging**: spdlog
 - 📄 **Data Parsing**: nlohmann-json, PugiXML
