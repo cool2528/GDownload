@@ -1,0 +1,4 @@
+# Shell scripts run in CI (Linux) and local WSL. Force LF so Windows checkouts
+# (core.autocrlf=true) don't rewrite them to CRLF and break bash execution
+# (e.g. `$'\r': command not found`, `set: pipefail: invalid option name`).
+*.sh text eol=lf
