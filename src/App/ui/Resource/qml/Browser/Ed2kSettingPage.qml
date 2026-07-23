@@ -325,7 +325,7 @@ SettingCard {
             tcpPortSpinBox.value = 4662
             udpPortSpinBox.value = 4672
             obfuscationCheckBox.checked = false
-            enableKadCheckBox.checked = false
+            enableKadCheckBox.checked = true
             autoConnectCheckBox.checked = true
             serverMetUrlField.text = "http://upd.emule-security.org/server.met"
             nodesDatUrlField.text = "http://upd.emule-security.org/nodes.dat"
