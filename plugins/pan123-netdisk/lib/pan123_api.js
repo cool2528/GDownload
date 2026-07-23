@@ -81,6 +81,17 @@ function originOf(url) {
     return m ? m[1] : "";
 }
 
+// 弹窗请求提取码;返回用户输入,取消或通道不可用返回 null
+async function promptExtractionCode(message) {
+    try {
+        const code = await gdl.ui.requestVerification({ message: message });
+        return code ? String(code).trim() : null;
+    } catch (e) {
+        gdl.log.info("verification prompt unavailable or cancelled: " + e);
+        return null;
+    }
+}
+
 export class Pan123Api {
     constructor() {
         this.reset();
@@ -169,7 +180,7 @@ export class Pan123Api {
             }
             if (doc.code !== 0) {
                 gdl.log.warn("123 share/get error: " + (doc.message || doc.code));
-                if (doc.message) gdl.notify(doc.message, "error");
+                this.lastError = { code: doc.code, message: String(doc.message || "") };
                 return out.length ? out : null;
             }
             const data = doc.data || {};
@@ -336,9 +347,30 @@ export class Pan123Api {
         const pm = url.match(/[?&#](?:pwd|SharePwd|passcode)=([^&#\s]+)/);
         this.sharePwd = pm ? gdl.utils.urlDecode(pm[1]) : "";
 
-        const files = await this.listDir("0", "/");
+        this.lastError = null;
+        let files = await this.listDir("0", "/");
+        for (let attempt = 0; !files && attempt < 3; attempt++) {
+            // 缺码或错误信息指向分享码时进入弹窗补码
+            const err = this.lastError;
+            const pwdRelated = !this.sharePwd
+                || (err && /分享码|提取码|密码|SharePwd|passcode|pwd/i.test(err.message));
+            if (!pwdRelated) break;
+            const tip = (!this.sharePwd && attempt === 0)
+                ? "This share link requires an extraction code."
+                : "Wrong extraction code, please try again."
+                    + (err && err.message ? " (" + err.message + ")" : "");
+            const code = await promptExtractionCode(tip);
+            if (code === null) {
+                gdl.notify("Parsing cancelled: the share link requires an extraction code.", "warning");
+                return null;
+            }
+            this.sharePwd = code;
+            this.lastError = null;
+            files = await this.listDir("0", "/");
+        }
         if (!files) {
             gdl.log.warn("123 share list failed");
+            if (this.lastError && this.lastError.message) gdl.notify(this.lastError.message, "error");
             return null;
         }
         gdl.log.info("123 parse completed files=" + files.length);

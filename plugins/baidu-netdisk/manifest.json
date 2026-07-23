@@ -2,7 +2,7 @@
     "manifest_version": 1,
     "name": "baidu-netdisk",
     "display_name": "Baidu NetDisk",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "author": "GDownload Official",
     "description": "Parse Baidu netdisk share links (JS rewrite of the native Baidu plugin)",
     "homepage": "https://github.com/cool2528/GDownload",

@@ -57,6 +57,7 @@
         <file>qml/CommonComponents/GDialogShell.qml</file>
         <file>qml/CommonComponents/PluginSettingsForm.qml</file>
         <file>qml/CommonComponents/PluginSettingsDialog.qml</file>
+        <file>qml/CommonComponents/VerificationDialog.qml</file>
         <file>qml/CommonComponents/CloseConfirmDialog.qml</file>
         <file>qml/CommonComponents/DeleteConfirmDialog.qml</file>
         <file>qml/CommonComponents/TaskDialogHeader.qml</file>
