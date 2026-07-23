@@ -25,6 +25,8 @@ add_executable(gdownload_unit_tests
     browser/test_ed2k_shared_model.cpp
     settings/test_aria2_defaults.cpp
     utils/test_relaunch_function.cpp
+    netdisk/test_verification_bridge.cpp
+    ${CMAKE_SOURCE_DIR}/src/App/ui/NetDisk/verification_bridge.cxx
     ${CMAKE_SOURCE_DIR}/src/App/ui/Browser/download_task_model.cxx
     ${CMAKE_SOURCE_DIR}/src/App/ui/Browser/ed2k_link.cxx
     ${CMAKE_SOURCE_DIR}/src/App/ui/Ed2k/ed2k_search_result_model.cxx
@@ -61,6 +63,7 @@ target_include_directories(gdownload_unit_tests
     ${CMAKE_SOURCE_DIR}/src/App/engine
     ${CMAKE_SOURCE_DIR}/src/App/ui/Definitions
     ${CMAKE_SOURCE_DIR}/src/Module/GDLCore
+    ${CMAKE_SOURCE_DIR}/src/Module/plugin
 )
 
 target_compile_definitions(gdownload_unit_tests

@@ -25,6 +25,17 @@ function extractCookieFromString(cookieStr, name) {
     return m ? m[1] : "";
 }
 
+// 弹窗请求提取码;返回用户输入,取消或通道不可用返回 null
+async function promptExtractionCode(message) {
+    try {
+        const code = await gdl.ui.requestVerification({ message: message });
+        return code ? String(code).trim() : null;
+    } catch (e) {
+        gdl.log.info("verification prompt unavailable or cancelled: " + e);
+        return null;
+    }
+}
+
 export class BaiduApi {
     constructor() {
         this.logId = "";
@@ -292,7 +303,7 @@ export class BaiduApi {
             return null;
         }
         const pwdMatch = url.match(/[?&]pwd=([^&]+)/);
-        const pwd = pwdMatch ? pwdMatch[1] : "";
+        let pwd = pwdMatch ? pwdMatch[1] : "";
         const hasPassword = !!pwdMatch;
 
         const initial = await this.fetchInitialPage(url);
@@ -301,15 +312,27 @@ export class BaiduApi {
             return null;
         }
         let newUrl = url;
+        let needVerify = hasPassword || !!pwd;
+        const redirectUrl = this.getRedirectUrl(initial.headers);
         if (hasPassword) {
-            newUrl = this.getRedirectUrl(initial.headers);
-            if (!newUrl) {
+            if (!redirectUrl) {
                 gdl.log.warn("password redirect location missing");
                 return null;
             }
+            newUrl = redirectUrl;
             const redirect = await gdl.http.get(newUrl, { headers: { "User-Agent": UA_WEB } });
             if (redirect.status !== 200 && redirect.status !== 302) {
                 gdl.log.warn("password redirect page failed");
+                return null;
+            }
+        } else if (redirectUrl && redirectUrl.indexOf("share/init") >= 0) {
+            // 链接未携带提取码但分享受保护:改走弹窗补码流程
+            gdl.log.info("baidu share requires extraction code, prompting user");
+            needVerify = true;
+            newUrl = redirectUrl;
+            const redirect = await gdl.http.get(newUrl, { headers: { "User-Agent": UA_WEB } });
+            if (redirect.status !== 200 && redirect.status !== 302) {
+                gdl.log.warn("share init page failed");
                 return null;
             }
         }
@@ -320,10 +343,25 @@ export class BaiduApi {
             return null;
         }
 
-        const needVerify = hasPassword || !!pwd;
-        if (needVerify && !(await this.verifySharePassword(surl, pwd, newUrl))) {
-            gdl.log.warn("password verification failed");
-            return null;
+        if (needVerify) {
+            let verified = pwd ? await this.verifySharePassword(surl, pwd, newUrl) : false;
+            for (let attempt = 0; !verified && attempt < 3; attempt++) {
+                const tip = (attempt === 0 && !pwd)
+                    ? "This share link requires an extraction code."
+                    : "Wrong extraction code, please try again.";
+                const code = await promptExtractionCode(tip);
+                if (code === null) {
+                    gdl.notify("Parsing cancelled: the share link requires an extraction code.", "warning");
+                    return null;
+                }
+                pwd = code;
+                verified = await this.verifySharePassword(surl, pwd, newUrl);
+            }
+            if (!verified) {
+                gdl.log.warn("password verification failed");
+                gdl.notify("Extraction code verification failed.", "error");
+                return null;
+            }
         }
 
         const list = await this.fetchShareFileList(surl, newUrl);

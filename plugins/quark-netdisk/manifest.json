@@ -2,7 +2,7 @@
     "manifest_version": 1,
     "name": "quark-netdisk",
     "display_name": "Quark NetDisk",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "author": "GDownload Official",
     "description": "Parse Quark netdisk share links (transfer-to-drive then direct link)",
     "homepage": "https://github.com/cool2528/GDownload",
@@ -18,7 +18,7 @@
             "*.quark.cn"
         ],
         "storage": false,
-        "verification_ui": false
+        "verification_ui": true
     },
     "settings": [
         {

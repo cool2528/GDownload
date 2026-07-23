@@ -247,6 +247,8 @@ Control {
                 Layout.fillWidth: true
                 Layout.minimumWidth: 0
                 text: root.message
+                // 提示内容可能来自网盘服务端返回的消息，禁用富文本解析以防内容伪装
+                textFormat: Text.PlainText
                 color: root.getTextColor()
                 font.pixelSize: GTheme.fontCaption
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere

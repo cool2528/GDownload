@@ -6,6 +6,7 @@
 #include "PluginMarket/plugin_config_manager.h"
 #include "Settings/settings_manager.h"
 #include "toast/toast_manager.h"
+#include "verification_bridge.h"
 namespace gdl {
     namespace ui {
         namespace netdisk {
@@ -177,6 +178,8 @@ namespace gdl {
             void RegisterTypes(QQmlEngine* engine) {
                 qmlRegisterSingletonInstance<NetWorkDiskManager>(GEXPORT_MODULE_URL, 1, 0, "NetWorkDiskManager",
                                                                  &NetWorkDiskManager::Instance());
+                qmlRegisterSingletonInstance<VerificationBridge>(GEXPORT_MODULE_URL, 1, 0, "VerificationBridge",
+                                                                 &VerificationBridge::Instance());
             }
 
             AsyncTaskWorker::AsyncTaskWorker(QObject* parent) : QThread(parent) {
@@ -256,6 +259,38 @@ namespace gdl {
                     return MakeFailureResult(task->type,
                                              tr("The plugin is no longer available. Check the Plugin Market."));
                 }
+                // 幂等挂接验证输入与消息通知回调（每次任务前设置，兼容插件热重载）
+                plugin->SetVerificationCallback([](INetDiskDownloadPlugin::VerificationCallbackParam& param) {
+                    VerificationBridge::Instance().Request(param);
+                });
+                plugin->SetMessageNotifyCallback(
+                    [](std::string_view message, const INetDiskDownloadPlugin::MsgType& type) {
+                        // 回调发生在 worker 线程，转投 UI 线程展示 toast
+                        const QString msg	= QString::fromUtf8(message.data(), static_cast<int>(message.size()));
+                        auto* toast_manager = &toast::ToastManager::Instance();
+                        QMetaObject::invokeMethod(
+                            toast_manager,
+                            [toast_manager, msg, type]() {
+                                switch (type) {
+                                    case INetDiskDownloadPlugin::MsgType::kError:
+                                        toast_manager->ShowError(msg);
+                                        break;
+                                    case INetDiskDownloadPlugin::MsgType::kWarning:
+                                        toast_manager->ShowWarning(msg);
+                                        break;
+                                    case INetDiskDownloadPlugin::MsgType::kSuccess:
+                                        toast_manager->ShowSuccess(msg);
+                                        break;
+                                    case INetDiskDownloadPlugin::MsgType::kDebug:
+                                        // debug 级别仅记日志场景，不打扰用户
+                                        break;
+                                    default:
+                                        toast_manager->ShowInfo(msg);
+                                        break;
+                                }
+                            },
+                            Qt::QueuedConnection);
+                    });
                 try {
                     switch (task->type) {
                         case NetDiskTaskType::ParseShareUrl: {
