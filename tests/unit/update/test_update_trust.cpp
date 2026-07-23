@@ -221,6 +221,45 @@ TEST(PlatformPackageVerifierTest, SignerPinIsStrictAndFailClosed) {
 	EXPECT_FALSE(SignerPinMatches(hex, hex));
 }
 
+// 本项目为开源免费签名方案(ed25519 更新清单 + AppImage GPG),不购买付费 Windows Authenticode 证书,
+// 因此发布流水线不会再注入 GDOWNLOAD_UPDATE_SIGNER_SPKI_PIN,expected_signer_pin 恒为空字符串。
+// 下面两个用例验证跳过逻辑落在 WinAuthenticodeVerifier::Verify 这一层(而非 SignerPinMatches 本身，
+// 后者作为纯字符串比对函数继续严格 fail-closed，见上面的用例)：
+// 空 pin 时整层 Authenticode 校验被跳过并放行；非空 pin 时未签名的包仍应被严格拒绝。
+#ifdef _WIN32
+TEST(PlatformPackageVerifierTest, EmptyPinSkipsAuthenticodeCheckAndAcceptsUnsignedPackage) {
+	const auto dir = std::filesystem::temp_directory_path() / "gdownload-platform-verifier-empty-pin";
+	std::filesystem::create_directories(dir);
+	const auto package = dir / "package.exe";
+	{ std::ofstream out(package, std::ios::binary); out << "unsigned package that already passed ed25519+sha256"; }
+
+	const auto verifier = CreatePlatformPackageVerifier();
+	ASSERT_NE(verifier, nullptr);
+	// 该包未经任何 Authenticode 签名；expected_signer_pin 为空时应跳过该层校验直接放行，
+	// 而不是像旧的 fail-closed 逻辑那样因“pin 未配置”或“找不到签名”而拒绝。
+	const auto result = verifier->Verify(package, "");
+	EXPECT_TRUE(result.ok) << result.error;
+
+	std::filesystem::remove_all(dir);
+}
+
+TEST(PlatformPackageVerifierTest, NonEmptyPinStillFailsClosedOnUnsignedPackage) {
+	const auto dir = std::filesystem::temp_directory_path() / "gdownload-platform-verifier-nonempty-pin";
+	std::filesystem::create_directories(dir);
+	const auto package = dir / "package.exe";
+	{ std::ofstream out(package, std::ios::binary); out << "unsigned package"; }
+
+	const auto verifier = CreatePlatformPackageVerifier();
+	ASSERT_NE(verifier, nullptr);
+	// 一旦配置了非空 pin(意味着拥有证书、启用了 Authenticode 签名)，未签名的包必须继续被拒绝，
+	// 证明本次改动只放开了“pin 为空”这一种情况，其余场景严格性不变。
+	const auto result = verifier->Verify(package, "sha256:" + std::string(64, 'c'));
+	EXPECT_FALSE(result.ok);
+
+	std::filesystem::remove_all(dir);
+}
+#endif
+
 class FakePlatformPackageVerifier final : public IPlatformPackageVerifier {
    public:
 	PackageVerificationResult Verify(const std::filesystem::path& package,

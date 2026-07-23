@@ -56,7 +56,11 @@ namespace gdl::update {
 		   public:
 			PackageVerificationResult Verify(const std::filesystem::path& package,
 				const std::string& expected_signer_pin) const override {
-				if (expected_signer_pin.empty()) return {false, "update signer pin is not configured"};
+				// 空 pin 表示未做代码签名(本项目为开源自签方案,无付费 Authenticode 证书),
+				// 跳过 Authenticode 签名者校验这一层；更新包的完整性仍由上游 ed25519 签名的更新清单
+				// (校验版本号/下载地址/SHA-256)以及安装前的 SHA-256 完整性校验共同保证。
+				// 若配置了非空 pin(拥有证书),则继续走下方完整的信任链验证 + SPKI 指纹校验,严格 fail-closed。
+				if (expected_signer_pin.empty()) return {true, {}};
 				WINTRUST_FILE_INFO file{}; file.cbStruct = sizeof(file); file.pcwszFilePath = package.c_str();
 				WINTRUST_DATA data{}; data.cbStruct = sizeof(data); data.dwUIChoice = WTD_UI_NONE;
 				data.fdwRevocationChecks = WTD_REVOKE_WHOLECHAIN; data.dwUnionChoice = WTD_CHOICE_FILE;
