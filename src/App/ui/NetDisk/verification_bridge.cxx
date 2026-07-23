@@ -12,10 +12,13 @@ namespace gdl {
             VerificationBridge::VerificationBridge(QObject* parent) : QObject(parent) {}
 
             VerificationBridge::~VerificationBridge() {
-                // 析构时唤醒可能仍在等待的 worker，避免退出阶段悬挂
+                // 唤醒等待中的 worker，并等其完全退出 Request 后才允许销毁，避免释放后访问
                 QMutexLocker locker(&mutex_);
                 pending_ = false;
                 condition_.wakeAll();
+                while (active_requests_ > 0) {
+                    condition_.wait(&mutex_);
+                }
             }
 
             void VerificationBridge::Request(INetDiskDownloadPlugin::VerificationCallbackParam& param) {
@@ -28,6 +31,7 @@ namespace gdl {
                     }
                     pending_ = true;
                     input_.clear();
+                    ++active_requests_;
                 }
                 // 信号在锁外发出，接收方（QML，主线程）经队列投递
                 Q_EMIT verificationRequested(QString::fromStdString(param.message),
@@ -51,6 +55,12 @@ namespace gdl {
                 }
                 if (timed_out) {
                     Q_EMIT requestAborted();
+                }
+                {
+                    // 请求全程（含末尾信号发射）结束后才解除计数，保证析构不会在中途完成
+                    QMutexLocker locker(&mutex_);
+                    --active_requests_;
+                    condition_.wakeAll();
                 }
             }
 

@@ -71,3 +71,28 @@ TEST(VerificationBridgeTest, SubmitWithoutPendingIsIgnored) {
     bridge.Cancel();
     SUCCEED();
 }
+
+TEST(VerificationBridgeTest, ReentrantRequestIsRejectedAsCancel) {
+    auto& bridge = VerificationBridge::Instance();
+    std::atomic<bool> requested{false};
+    QObject receiver;
+    QObject::connect(
+        &bridge, &VerificationBridge::verificationRequested, &receiver,
+        [&](const QString&, const QString&) { requested = true; }, Qt::QueuedConnection);
+
+    INetDiskDownloadPlugin::VerificationCallbackParam first;
+    std::thread worker([&first, &bridge]() { bridge.Request(first); });
+    PumpUntil([&requested]() { return requested.load(); });
+    ASSERT_TRUE(requested.load());
+
+    // 第一个请求挂起期间发起第二个请求：应立即按取消返回，不影响第一个请求
+    INetDiskDownloadPlugin::VerificationCallbackParam second;
+    second.input_result = "stale";
+    std::thread reentrant([&second, &bridge]() { bridge.Request(second); });
+    reentrant.join();
+    EXPECT_TRUE(second.input_result.empty());
+
+    bridge.Submit("abcd");
+    worker.join();
+    EXPECT_EQ(first.input_result, "abcd");
+}
