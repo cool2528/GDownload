@@ -55,7 +55,7 @@ GDownload is a modern cross-platform download manager built with C++ and Qt. It 
 ### 🎨 Modern Interface
 - 🖥️ Cross-platform support (Windows, macOS, Linux)
 - 🌓 Automatic light/dark theme switching
-- 🎯 Element Plus design system
+- 🎯 Aurora UI design system
 - 🌍 Multi-language support (Simplified Chinese, Traditional Chinese, English, 日本語, 한국어)
 - 💫 Smooth animations and interactions
 
@@ -103,7 +103,7 @@ GDownload is a modern cross-platform download manager built with C++ and Qt. It 
 #### Key Features
 - 🔗 **One-Click Capture**: Automatically detect download links on web pages
 - 📋 **Batch Download**: Select multiple links and send them all at once to GDownload
-- 🎨 **Unified Design**: Perfectly matches GDownload's Element Plus interface style
+- 🎨 **Unified Design**: Perfectly matches GDownload's Aurora UI interface style
 - 🔒 **Secure Connection**: Direct WebSocket connection to aria2c via JSON-RPC
 - 🎯 **Smart Filtering**: Filter links by file size, type, and custom rules
 - ⚡ **Works Out-of-the-Box**: Pre-configured with optimal settings
