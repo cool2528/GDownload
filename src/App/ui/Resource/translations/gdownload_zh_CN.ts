@@ -2983,6 +2983,20 @@ Copyright © 2024-2026 GDownload Team
     </message>
 </context>
 <context>
+    <name>PluginSettingsForm</name>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsForm.qml" line="102"/>
+        <location filename="../qml/CommonComponents/PluginSettingsForm.qml" line="148"/>
+        <source>How to get this value?</source>
+        <translation>如何获取该值？</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/PluginSettingsForm.qml" line="171"/>
+        <source>View full tutorial</source>
+        <translation>查看图文教程</translation>
+    </message>
+</context>
+<context>
     <name>PostDownloadActionsSettingPage</name>
     <message>
         <location filename="../qml/Browser/PostDownloadActionsSettingPage.qml" line="16"/>
