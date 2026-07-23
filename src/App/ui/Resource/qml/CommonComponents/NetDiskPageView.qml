@@ -661,6 +661,29 @@ Rectangle {
         parent: Overlay.overlay
     }
 
+    VerificationDialog {
+        id: verificationDialog
+        parent: Overlay.overlay
+        // 用户输码期间暂停 70s 操作超时,关闭后恢复计时
+        onOpened: operationTimeout.stop()
+        onClosed: {
+            if (netDiskPage.isBusy)
+                operationTimeout.restart()
+        }
+    }
+
+    Connections {
+        target: VerificationBridge
+        // 插件请求验证输入:弹出对话框
+        function onVerificationRequested(message, imageBase64) {
+            verificationDialog.openFor(message, imageBase64)
+        }
+        // 桥接层等待超时:收起对话框
+        function onRequestAborted() {
+            verificationDialog.close()
+        }
+    }
+
     Connections {
         target: PluginConfigManager
         // 配置保存/清除后刷新候选插件的 configured 状态
