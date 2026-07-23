@@ -3142,12 +3142,12 @@ Apache License 2.0 に基づきライセンスされています。</translation
     <message>
         <location filename="../../view/mainwindow.cxx" line="158"/>
         <source>The download engine stopped unexpectedly.</source>
-        <translation type="unfinished"></translation>
+        <translation>ダウンロードエンジンが予期せず停止しました。</translation>
     </message>
     <message>
         <location filename="../../view/mainwindow.cxx" line="166"/>
         <source>Download engine is unavailable.</source>
-        <translation type="unfinished"></translation>
+        <translation>ダウンロードエンジンを利用できません。</translation>
     </message>
 </context>
 <context>
@@ -4513,32 +4513,32 @@ Apache License 2.0 に基づきライセンスされています。</translation
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="635"/>
         <source>Failed to retry task: missing task id.</source>
-        <translation type="unfinished"></translation>
+        <translation>タスクの再試行に失敗しました: タスクIDがありません。</translation>
     </message>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="639"/>
         <source>Failed to retry task: stopped task list is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>タスクの再試行に失敗しました: 停止済みタスクリストを利用できません。</translation>
     </message>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="645"/>
         <source>Failed to retry task: task was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>タスクの再試行に失敗しました: タスクが見つかりませんでした。</translation>
     </message>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="649"/>
         <source>Only failed tasks can be retried.</source>
-        <translation type="unfinished"></translation>
+        <translation>失敗したタスクのみ再試行できます。</translation>
     </message>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="655"/>
         <source>Failed to retry task: original download link is unavailable.</source>
-        <translation type="unfinished"></translation>
+        <translation>タスクの再試行に失敗しました: 元のダウンロードリンクを利用できません。</translation>
     </message>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="684"/>
         <source>Retry started, but the old failed task could not be removed from history.</source>
-        <translation type="unfinished"></translation>
+        <translation>再試行を開始しましたが、失敗した古いタスクを履歴から削除できませんでした。</translation>
     </message>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="1270"/>

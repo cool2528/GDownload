@@ -3142,12 +3142,12 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
     <message>
         <location filename="../../view/mainwindow.cxx" line="158"/>
         <source>The download engine stopped unexpectedly.</source>
-        <translation type="unfinished"></translation>
+        <translation>다운로드 엔진이 예기치 않게 중지되었습니다.</translation>
     </message>
     <message>
         <location filename="../../view/mainwindow.cxx" line="166"/>
         <source>Download engine is unavailable.</source>
-        <translation type="unfinished"></translation>
+        <translation>다운로드 엔진을 사용할 수 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -4513,32 +4513,32 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="635"/>
         <source>Failed to retry task: missing task id.</source>
-        <translation type="unfinished"></translation>
+        <translation>작업을 재시도하지 못했습니다: 작업 ID가 없습니다.</translation>
     </message>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="639"/>
         <source>Failed to retry task: stopped task list is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>작업을 재시도하지 못했습니다: 중지된 작업 목록을 사용할 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="645"/>
         <source>Failed to retry task: task was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>작업을 재시도하지 못했습니다: 작업을 찾을 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="649"/>
         <source>Only failed tasks can be retried.</source>
-        <translation type="unfinished"></translation>
+        <translation>실패한 작업만 재시도할 수 있습니다.</translation>
     </message>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="655"/>
         <source>Failed to retry task: original download link is unavailable.</source>
-        <translation type="unfinished"></translation>
+        <translation>작업을 재시도하지 못했습니다: 원본 다운로드 링크를 사용할 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="684"/>
         <source>Retry started, but the old failed task could not be removed from history.</source>
-        <translation type="unfinished"></translation>
+        <translation>재시도가 시작되었지만 이전 실패 작업을 기록에서 제거할 수 없었습니다.</translation>
     </message>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="1270"/>

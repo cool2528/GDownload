@@ -3142,12 +3142,12 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../../view/mainwindow.cxx" line="158"/>
         <source>The download engine stopped unexpectedly.</source>
-        <translation type="unfinished"></translation>
+        <translation>下載引擎意外停止。</translation>
     </message>
     <message>
         <location filename="../../view/mainwindow.cxx" line="166"/>
         <source>Download engine is unavailable.</source>
-        <translation type="unfinished"></translation>
+        <translation>下載引擎無法使用。</translation>
     </message>
 </context>
 <context>
@@ -4513,32 +4513,32 @@ Copyright © 2024 GDownload Team
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="635"/>
         <source>Failed to retry task: missing task id.</source>
-        <translation type="unfinished"></translation>
+        <translation>重試任務失敗：缺少任務 ID。</translation>
     </message>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="639"/>
         <source>Failed to retry task: stopped task list is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>重試任務失敗：已停止的任務清單無法使用。</translation>
     </message>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="645"/>
         <source>Failed to retry task: task was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>重試任務失敗：未找到該任務。</translation>
     </message>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="649"/>
         <source>Only failed tasks can be retried.</source>
-        <translation type="unfinished"></translation>
+        <translation>只有失敗的任務才能重試。</translation>
     </message>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="655"/>
         <source>Failed to retry task: original download link is unavailable.</source>
-        <translation type="unfinished"></translation>
+        <translation>重試任務失敗：原始下載連結無法使用。</translation>
     </message>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="684"/>
         <source>Retry started, but the old failed task could not be removed from history.</source>
-        <translation type="unfinished"></translation>
+        <translation>重試已開始，但舊的失敗任務無法從歷史記錄中移除。</translation>
     </message>
     <message>
         <location filename="../../Browser/browser_manager.cxx" line="1270"/>
