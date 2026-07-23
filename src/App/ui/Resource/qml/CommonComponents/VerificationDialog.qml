@@ -32,6 +32,18 @@ GDialogShell {
         open()
     }
 
+    // 插件侧约定的标准英文提示映射为本地化文本；服务端附加信息（括号后缀）原样保留
+    function localizedMessage(raw) {
+        if (raw.length === 0)
+            return qsTr("This share link requires an extraction code.")
+        var out = raw
+        out = out.replace("This share link requires an extraction code.",
+                          qsTr("This share link requires an extraction code."))
+        out = out.replace("Wrong extraction code, please try again.",
+                          qsTr("Wrong extraction code, please try again."))
+        return out
+    }
+
     function submit() {
         var text = codeInput.text.trim()
         if (text.length === 0)
@@ -55,8 +67,7 @@ GDialogShell {
             spacing: GTheme.spaceMD
 
             Text {
-                text: dialog.message.length > 0 ? dialog.message
-                                                : qsTr("This share link requires an extraction code.")
+                text: dialog.localizedMessage(dialog.message)
                 // 该文本来源于网盘服务端返回的验证提示，禁用富文本解析以防内容伪装
                 textFormat: Text.PlainText
                 color: GTheme.textPrimary

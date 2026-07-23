@@ -2031,12 +2031,12 @@
 <context>
     <name>GMessage</name>
     <message>
-        <location filename="../qml/CommonComponents/GMessage.qml" line="276"/>
+        <location filename="../qml/CommonComponents/GMessage.qml" line="278"/>
         <source>Dismiss notification</source>
         <translation>알림 닫기</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GMessage.qml" line="278"/>
+        <location filename="../qml/CommonComponents/GMessage.qml" line="280"/>
         <source>Dismiss</source>
         <translation>닫기</translation>
     </message>
@@ -4475,27 +4475,33 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
         <translation>클라우드 공유를 계속하려면 추가 입력이 필요합니다</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="59"/>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="38"/>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="41"/>
         <source>This share link requires an extraction code.</source>
         <translation>이 공유 링크에는 추출 코드가 필요합니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="78"/>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="43"/>
+        <source>Wrong extraction code, please try again.</source>
+        <translation>추출 코드가 올바르지 않습니다. 다시 시도하세요.</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="91"/>
         <source>Enter the code here</source>
         <translation>여기에 코드를 입력하세요</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="79"/>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="92"/>
         <source>Verification code</source>
         <translation>인증 코드</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="102"/>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="115"/>
         <source>Cancel</source>
         <translation>취소</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="108"/>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="121"/>
         <source>Confirm</source>
         <translation>확인</translation>
     </message>
@@ -4636,6 +4642,21 @@ Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
         <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="260"/>
         <source>The plugin is no longer available. Check the Plugin Market.</source>
         <translation>플러그인을 더 이상 사용할 수 없습니다. 플러그인 마켓을 확인하세요.</translation>
+    </message>
+    <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="272"/>
+        <source>Parsing cancelled: the share link requires an extraction code.</source>
+        <translation>구문 분석이 취소되었습니다: 이 공유 링크에는 추출 코드가 필요합니다.</translation>
+    </message>
+    <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="275"/>
+        <source>Download cancelled: the share link requires an extraction code.</source>
+        <translation>다운로드가 취소되었습니다: 이 공유 링크에는 추출 코드가 필요합니다.</translation>
+    </message>
+    <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="278"/>
+        <source>Extraction code verification failed.</source>
+        <translation>추출 코드 검증에 실패했습니다.</translation>
     </message>
 </context>
 <context>

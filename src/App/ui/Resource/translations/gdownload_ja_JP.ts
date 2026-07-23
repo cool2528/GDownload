@@ -2031,12 +2031,12 @@
 <context>
     <name>GMessage</name>
     <message>
-        <location filename="../qml/CommonComponents/GMessage.qml" line="276"/>
+        <location filename="../qml/CommonComponents/GMessage.qml" line="278"/>
         <source>Dismiss notification</source>
         <translation>通知を閉じる</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GMessage.qml" line="278"/>
+        <location filename="../qml/CommonComponents/GMessage.qml" line="280"/>
         <source>Dismiss</source>
         <translation>閉じる</translation>
     </message>
@@ -4475,27 +4475,33 @@ Apache License 2.0 に基づきライセンスされています。</translation
         <translation>クラウド共有を続行するには追加入力が必要です</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="59"/>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="38"/>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="41"/>
         <source>This share link requires an extraction code.</source>
         <translation>この共有リンクには抽出コードが必要です。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="78"/>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="43"/>
+        <source>Wrong extraction code, please try again.</source>
+        <translation>抽出コードが正しくありません。もう一度入力してください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="91"/>
         <source>Enter the code here</source>
         <translation>ここにコードを入力</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="79"/>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="92"/>
         <source>Verification code</source>
         <translation>認証コード</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="102"/>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="115"/>
         <source>Cancel</source>
         <translation>キャンセル</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="108"/>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="121"/>
         <source>Confirm</source>
         <translation>確認</translation>
     </message>
@@ -4636,6 +4642,21 @@ Apache License 2.0 に基づきライセンスされています。</translation
         <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="260"/>
         <source>The plugin is no longer available. Check the Plugin Market.</source>
         <translation>このプラグインは利用できなくなりました。プラグインマーケットを確認してください。</translation>
+    </message>
+    <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="272"/>
+        <source>Parsing cancelled: the share link requires an extraction code.</source>
+        <translation>解析をキャンセルしました：この共有リンクには抽出コードが必要です。</translation>
+    </message>
+    <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="275"/>
+        <source>Download cancelled: the share link requires an extraction code.</source>
+        <translation>ダウンロードをキャンセルしました：この共有リンクには抽出コードが必要です。</translation>
+    </message>
+    <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="278"/>
+        <source>Extraction code verification failed.</source>
+        <translation>抽出コードの検証に失敗しました。</translation>
     </message>
 </context>
 <context>
