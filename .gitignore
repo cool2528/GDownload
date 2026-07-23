@@ -148,6 +148,10 @@ src/version.h
 #translations files
 src/App/ui/Resource/translations/*.qm
 /docs/*
+#面向用户的文档破例纳入版本管理(README 会链接它们)
+!/docs/plugin-guides/
+!/docs/JS_PLUGIN_SYSTEM_DESIGN.md
+!/docs/RELEASE_SIGNING.md
 #local design and planning files
 /docs/superpowers/
 #AI files
