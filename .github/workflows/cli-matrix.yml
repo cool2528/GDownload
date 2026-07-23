@@ -28,18 +28,12 @@ jobs:
         env:
           UPDATE_MANIFEST_ED25519_PRIVATE_KEY: ${{ secrets.UPDATE_MANIFEST_ED25519_PRIVATE_KEY }}
           UPDATE_MANIFEST_ED25519_PUBLIC_KEY: ${{ vars.UPDATE_MANIFEST_ED25519_PUBLIC_KEY }}
-          WINDOWS_SIGNING_CERT_PFX_BASE64: ${{ secrets.WINDOWS_SIGNING_CERT_PFX_BASE64 }}
-          WINDOWS_SIGNING_CERT_PASSWORD: ${{ secrets.WINDOWS_SIGNING_CERT_PASSWORD }}
-          UPDATE_WINDOWS_SIGNER_SPKI_SHA256: ${{ secrets.UPDATE_WINDOWS_SIGNER_SPKI_SHA256 }}
           APPIMAGE_GPG_PRIVATE_KEY: ${{ secrets.APPIMAGE_GPG_PRIVATE_KEY }}
           APPIMAGE_GPG_FINGERPRINT: ${{ secrets.APPIMAGE_GPG_FINGERPRINT }}
         run: |
           required=(
             UPDATE_MANIFEST_ED25519_PRIVATE_KEY
             UPDATE_MANIFEST_ED25519_PUBLIC_KEY
-            WINDOWS_SIGNING_CERT_PFX_BASE64
-            WINDOWS_SIGNING_CERT_PASSWORD
-            UPDATE_WINDOWS_SIGNER_SPKI_SHA256
             APPIMAGE_GPG_PRIVATE_KEY
             APPIMAGE_GPG_FINGERPRINT
           )
@@ -49,10 +43,6 @@ jobs:
               exit 1
             fi
           done
-          if [[ ! "${UPDATE_WINDOWS_SIGNER_SPKI_SHA256}" =~ ^sha256:[[:xdigit:]]{64}$ ]]; then
-            echo "UPDATE_WINDOWS_SIGNER_SPKI_SHA256 must use sha256:<64 lowercase-or-uppercase-hex>." >&2
-            exit 1
-          fi
           derived_public_key="$(python3 scripts/update/generate_update_manifest.py public-key \
             --private-key-env UPDATE_MANIFEST_ED25519_PRIVATE_KEY)"
           if [[ "${derived_public_key}" != "${UPDATE_MANIFEST_ED25519_PUBLIC_KEY}" ]]; then
@@ -299,7 +289,6 @@ jobs:
         env:
           RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') }}
           UPDATE_MANIFEST_ED25519_PUBLIC_KEY: ${{ vars.UPDATE_MANIFEST_ED25519_PUBLIC_KEY }}
-          UPDATE_WINDOWS_SIGNER_SPKI_SHA256: ${{ secrets.UPDATE_WINDOWS_SIGNER_SPKI_SHA256 }}
         run: |
           if [ -z "${QTDIR:-}" ]; then
             echo "QTDIR is not set."
@@ -311,7 +300,6 @@ jobs:
           fi
           TRUST_CMAKE_ARGS=(
             "-DGDOWNLOAD_UPDATE_PUBLIC_KEY_BASE64=${UPDATE_MANIFEST_ED25519_PUBLIC_KEY}"
-            "-DGDOWNLOAD_UPDATE_SIGNER_SPKI_PIN=${UPDATE_WINDOWS_SIGNER_SPKI_SHA256}"
           )
           if [[ "${{ matrix.target }}" == "linux" && "${RELEASE_TAG}" == "true" ]]; then
             TRUST_CMAKE_ARGS+=("-DGDOWNLOAD_REQUIRE_APPIMAGE_SIGNATURE=ON")
@@ -412,7 +400,6 @@ jobs:
         shell: cmd
         env:
           UPDATE_MANIFEST_ED25519_PUBLIC_KEY: ${{ vars.UPDATE_MANIFEST_ED25519_PUBLIC_KEY }}
-          UPDATE_WINDOWS_SIGNER_SPKI_SHA256: ${{ secrets.UPDATE_WINDOWS_SIGNER_SPKI_SHA256 }}
         run: |
           if "%QTDIR%"=="" (
             echo QTDIR is not set.
@@ -421,7 +408,7 @@ jobs:
           where cl
           set "CC=cl"
           set "CXX=cl"
-          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\${{ matrix.install_prefix }} -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=%QTDIR% -DGDL_UI_GENERATE_TRANSLATIONS=on -DGDOWNLOAD_UPDATE_PUBLIC_KEY_BASE64=%UPDATE_MANIFEST_ED25519_PUBLIC_KEY% -DGDOWNLOAD_UPDATE_SIGNER_SPKI_PIN=%UPDATE_WINDOWS_SIGNER_SPKI_SHA256% -GNinja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00"
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\${{ matrix.install_prefix }} -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=%QTDIR% -DGDL_UI_GENERATE_TRANSLATIONS=on -DGDOWNLOAD_UPDATE_PUBLIC_KEY_BASE64=%UPDATE_MANIFEST_ED25519_PUBLIC_KEY% -GNinja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00"
           cmake --build build --config Release --parallel
           mkdir windows_pdb
           copy /Y build\Release\bin\*.pdb windows_pdb
@@ -454,42 +441,6 @@ jobs:
             exit 1
           }
           & $iscc /V5 "$env:GITHUB_WORKSPACE\build\release\windows_installer.iss"
-
-      - name: Sign and verify Windows installer
-        if: matrix.target == 'windows' && startsWith(github.ref, 'refs/tags/')
-        shell: pwsh
-        env:
-          WINDOWS_SIGNING_CERT_PFX_BASE64: ${{ secrets.WINDOWS_SIGNING_CERT_PFX_BASE64 }}
-          WINDOWS_SIGNING_CERT_PASSWORD: ${{ secrets.WINDOWS_SIGNING_CERT_PASSWORD }}
-          UPDATE_WINDOWS_SIGNER_SPKI_SHA256: ${{ secrets.UPDATE_WINDOWS_SIGNER_SPKI_SHA256 }}
-        run: |
-          $ErrorActionPreference = "Stop"
-          $installers = Get-ChildItem "$env:GITHUB_WORKSPACE\build\release\GDownloader_windows_*.exe"
-          if ($installers.Count -ne 1) {
-            throw "Expected exactly one Windows installer, found $($installers.Count)."
-          }
-          $pfxPath = Join-Path $env:RUNNER_TEMP "gdownload-release-signing.pfx"
-          try {
-            [IO.File]::WriteAllBytes($pfxPath, [Convert]::FromBase64String($env:WINDOWS_SIGNING_CERT_PFX_BASE64))
-            $signTool = (Get-Command signtool.exe -ErrorAction Stop).Source
-            & $signTool sign /fd SHA256 /f $pfxPath /p $env:WINDOWS_SIGNING_CERT_PASSWORD /tr http://timestamp.digicert.com /td SHA256 $installers[0].FullName
-            if ($LASTEXITCODE -ne 0) { throw "signtool failed to sign the installer." }
-            & $signTool verify /pa /v $installers[0].FullName
-            if ($LASTEXITCODE -ne 0) { throw "signtool failed to verify the installer." }
-            $signature = Get-AuthenticodeSignature -FilePath $installers[0].FullName
-            if ($signature.Status -ne "Valid" -or -not $signature.SignerCertificate) {
-              throw "Windows did not report a valid Authenticode signature."
-            }
-            $spki = $signature.SignerCertificate.PublicKey.ExportSubjectPublicKeyInfo()
-            $actualPin = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($spki)).ToLowerInvariant()
-            $expectedPin = $env:UPDATE_WINDOWS_SIGNER_SPKI_SHA256 -replace '^sha256:', ''
-            if ($actualPin -cne $expectedPin.ToLowerInvariant()) {
-              throw "The Authenticode signer does not match UPDATE_WINDOWS_SIGNER_SPKI_SHA256."
-            }
-          }
-          finally {
-            Remove-Item -LiteralPath $pfxPath -Force -ErrorAction SilentlyContinue
-          }
 
       - name: Collect Windows Installer
         if: matrix.target == 'windows'
