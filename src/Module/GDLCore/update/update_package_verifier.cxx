@@ -1,5 +1,6 @@
 #include "update_package_verifier.h"
 
+#include <algorithm>
 #include <array>
 #include <cctype>
 #include <fstream>
