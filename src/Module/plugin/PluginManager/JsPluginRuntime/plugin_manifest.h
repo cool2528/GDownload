@@ -23,6 +23,21 @@ namespace gdl {
 				std::string hint;
 			};
 
+			// 配置字段的获取引导（settings[].help，可选）
+			struct SettingFieldHelp {
+				std::vector<std::string> steps;	 // 默认（英文）分步骤引导
+				std::string url;				 // 在线图文教程链接（不本地化）
+				std::map<std::string, std::vector<std::string>> locale_steps;  // locale -> 本地化步骤
+
+				const std::vector<std::string>& LocalizedSteps(const std::string& locale) const {
+					auto it = locale_steps.find(locale);
+					if (it != locale_steps.end() && !it->second.empty()) {
+						return it->second;
+					}
+					return steps;
+				}
+			};
+
 			// manifest settings[] 中一个声明式配置字段（设计文档第 2 节）
 			// 宿主按 type 统一渲染表单；role=token 字段的值作为 parseUrl 的 userToken
 			struct SettingField {
@@ -35,6 +50,9 @@ namespace gdl {
 				std::string default_json;			// 缺省值（JSON 序列化文本，空串表示无）
 				std::vector<std::string> options;	// select 的枚举值
 				std::map<std::string, SettingFieldLocale> locales;
+
+				// 获取引导（可空；畸形时解析层直接丢弃，保证不拒载）
+				std::optional<SettingFieldHelp> help;
 
 				std::string LocalizedLabel(const std::string& locale) const {
 					auto it = locales.find(locale);

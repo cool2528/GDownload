@@ -99,6 +99,41 @@ static void TestManifestSettings(const fs::path& root) {
 	CHECK(!LoadWithSettings(root / "bad-required", R"([{ "key": "a", "type": "text", "label": "x", "required": "yes" }])", error));
 	// 12. 非法：options 元素类型错误（数字而非字符串）不得抛异常，应拒绝加载
 	CHECK(!LoadWithSettings(root / "bad-options", R"([{ "key": "a", "type": "select", "label": "x", "options": [1, 2] }])", error));
+
+	// 13. help 引导：全量解析 + locale 回退
+	auto with_help = LoadWithSettings(root / "help-ok", R"([
+		{ "key": "cookie", "type": "textarea", "label": "Cookie",
+		  "help": {
+			"steps": ["Open site", "Copy cookie"],
+			"url": "https://example.com/guide",
+			"locales": { "zh_CN": { "steps": ["打开站点", "复制 Cookie"] } }
+		  } }
+	])", error);
+	CHECK(with_help.has_value());
+	CHECK(with_help->settings[0].help.has_value());
+	CHECK(with_help->settings[0].help->steps.size() == 2);
+	CHECK(with_help->settings[0].help->url == "https://example.com/guide");
+	CHECK(with_help->settings[0].help->LocalizedSteps("zh_CN")[0] == "打开站点");
+	CHECK(with_help->settings[0].help->LocalizedSteps("ja_JP")[0] == "Open site");	 // 缺失回退默认
+
+	// 14. 无 help：optional 为空
+	auto no_help = LoadWithSettings(root / "help-none", R"([{ "key": "a", "type": "text", "label": "x" }])", error);
+	CHECK(no_help.has_value());
+	CHECK(!no_help->settings[0].help.has_value());
+
+	// 15. 畸形 help（steps 元素非字符串）：忽略 help 但不拒载
+	auto bad_help = LoadWithSettings(root / "help-bad", R"([
+		{ "key": "a", "type": "text", "label": "x", "help": { "steps": [1, 2] } }
+	])", error);
+	CHECK(bad_help.has_value());
+	CHECK(!bad_help->settings[0].help.has_value());
+
+	// 16. help 非对象：忽略且不拒载
+	auto str_help = LoadWithSettings(root / "help-str", R"([
+		{ "key": "a", "type": "text", "label": "x", "help": "see docs" }
+	])", error);
+	CHECK(str_help.has_value());
+	CHECK(!str_help->settings[0].help.has_value());
 }
 
 static void TestConfigStore(const fs::path& dir) {

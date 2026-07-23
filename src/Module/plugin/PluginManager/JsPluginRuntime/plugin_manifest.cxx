@@ -207,6 +207,36 @@ namespace gdl {
 								field.locales[it.key()] = std::move(locale_strings);
 							}
 						}
+						// 可选获取引导 help：畸形时整体忽略（不因此拒载插件）
+						if (item.contains("help") && item["help"].is_object()) {
+							const auto& help_json = item["help"];
+							SettingFieldHelp help;
+							try {
+								if (help_json.contains("steps") && help_json["steps"].is_array()) {
+									help.steps = help_json["steps"].get<std::vector<std::string>>();
+								}
+								if (help_json.contains("url") && help_json["url"].is_string()) {
+									help.url = help_json["url"].get<std::string>();
+								}
+								if (help_json.contains("locales") && help_json["locales"].is_object()) {
+									for (auto lit = help_json["locales"].begin(); lit != help_json["locales"].end();
+										 ++lit) {
+										if (!lit.value().is_object()) {
+											continue;
+										}
+										if (lit.value().contains("steps") && lit.value()["steps"].is_array()) {
+											help.locale_steps[lit.key()] =
+												lit.value()["steps"].get<std::vector<std::string>>();
+										}
+									}
+								}
+							} catch (const nlohmann::json::exception&) {
+								help = SettingFieldHelp{};
+							}
+							if (!help.steps.empty() || !help.url.empty()) {
+								field.help = std::move(help);
+							}
+						}
 						manifest.settings.push_back(std::move(field));
 					}
 					if (token_count > 1) {
