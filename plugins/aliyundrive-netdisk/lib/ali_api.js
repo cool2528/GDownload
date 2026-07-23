@@ -18,6 +18,17 @@ const UA =
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) " +
     "Chrome/114.0.0.0 Safari/537.36";
 
+// 弹窗请求提取码;返回用户输入,取消或通道不可用返回 null
+async function promptExtractionCode(message) {
+    try {
+        const code = await gdl.ui.requestVerification({ message: message });
+        return code ? String(code).trim() : null;
+    } catch (e) {
+        gdl.log.info("verification prompt unavailable or cancelled: " + e);
+        return null;
+    }
+}
+
 export class AliApi {
     constructor() {
         this.reset();
@@ -262,31 +273,30 @@ export class AliApi {
         return true;
     }
 
-    // 分享口令 -> share_token(匿名可调)
+    // 分享口令 -> share_token(匿名可调);返回 {ok:true} 或 {ok:false, code, message}
     async fetchShareToken() {
         const resp = await this.postRetry(API_HOST + "/v2/share_link/get_share_token", {
             json: { share_id: this.shareId, share_pwd: this.sharePwd || "" },
             headers: this.baseHeaders(),
             timeout: 15000,
         }, "share_token");
-        if (!resp) return false;
-        if (resp.status !== 200) {
+        if (!resp) return { ok: false, message: "network unreachable" };
+        if (resp.status !== 200 && resp.status !== 400 && resp.status !== 403) {
             gdl.log.warn("ali share_token http " + resp.status);
-            return false;
+            return { ok: false, message: "http " + resp.status };
         }
         let doc;
         try {
             doc = resp.json();
         } catch (e) {
-            return false;
+            return { ok: false, message: "bad response" };
         }
         if (typeof doc.share_token !== "string" || !doc.share_token) {
             gdl.log.warn("ali share_token error: " + (doc.message || doc.code));
-            if (doc.message) gdl.notify(doc.message, "error");
-            return false;
+            return { ok: false, code: String(doc.code || ""), message: String(doc.message || "") };
         }
         this.shareToken = doc.share_token;
-        return true;
+        return { ok: true };
     }
 
     // 列分享目录(分页 marker)
@@ -320,7 +330,7 @@ export class AliApi {
             }
             if (doc.code) {
                 // share_token 过期则重取一次
-                if (String(doc.code).indexOf("ShareLinkTokenInvalid") >= 0 && await this.fetchShareToken()) {
+                if (String(doc.code).indexOf("ShareLinkTokenInvalid") >= 0 && (await this.fetchShareToken()).ok) {
                     guard--;
                     continue;
                 }
@@ -442,8 +452,26 @@ export class AliApi {
         const pm = url.match(/[?&#](?:pwd|share_pwd|passcode)=([^&\s]+)/);
         this.sharePwd = pm ? gdl.utils.urlDecode(pm[1]) : "";
 
-        if (!(await this.fetchShareToken())) {
+        let r = await this.fetchShareToken();
+        for (let attempt = 0; !r.ok && attempt < 3; attempt++) {
+            // 缺码或错误码/信息指向 share_pwd 时进入弹窗补码
+            const errText = (r.code || "") + " " + (r.message || "");
+            const pwdRelated = !this.sharePwd || /sharepwd|share_pwd|password|提取码|密码/i.test(errText);
+            if (!pwdRelated) break;
+            const tip = (!this.sharePwd && attempt === 0)
+                ? "This share link requires an extraction code."
+                : "Wrong extraction code, please try again.";
+            const code = await promptExtractionCode(tip);
+            if (code === null) {
+                gdl.notify("Parsing cancelled: the share link requires an extraction code.", "warning");
+                return null;
+            }
+            this.sharePwd = code;
+            r = await this.fetchShareToken();
+        }
+        if (!r.ok) {
             gdl.log.warn("ali share token failed");
+            if (r.message) gdl.notify(r.message, "error");
             return null;
         }
         const files = await this.listDir("root", "/");
