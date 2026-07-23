@@ -53,6 +53,20 @@ int main(int argc, char** argv) {
 			std::printf("  [notify:%d] %.*s\n", static_cast<int>(type), static_cast<int>(msg.size()), msg.data());
 		});
 
+	// 验证输入回调：控制台读取一行（联调插件缺码弹窗逻辑；空行视为取消）
+	plugin->SetVerificationCallback([](INetDiskDownloadPlugin::VerificationCallbackParam& param) {
+		std::printf("  [verify] %s\n  input code (empty=cancel): ", param.message.c_str());
+		std::fflush(stdout);
+		char buf[256] = {0};
+		if (std::fgets(buf, sizeof(buf), stdin)) {
+			std::string line(buf);
+			while (!line.empty() && (line.back() == '\n' || line.back() == '\r')) {
+				line.pop_back();
+			}
+			param.input_result = line;
+		}
+	});
+
 	std::printf("== ParseUrl ==\n");
 	auto parse = plugin->ParseUrl(url, user_token);
 	if (!parse) {
