@@ -1,7 +1,10 @@
 # GDownload
 
 <p align="center">
-  <img src="src/App/ui/Resource/images/logo/logo.svg" alt="GDownload Logo" width="128" height="128"/>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="src/App/ui/Resource/images/logo/aurora-brand-dark.svg">
+    <img src="src/App/ui/Resource/images/logo/aurora-brand-light.svg" alt="GDownload Logo" width="128" height="128"/>
+  </picture>
 </p>
 
 <p align="center">
@@ -130,6 +133,21 @@ GDownload 是一款现代化的跨平台下载管理器，使用 C++ 和 Qt 开�
 - ✅ 选择链接后一键发送到 GDownload 开始下载
 
 > 📖 **详细文档**: 应用内前往 `设置` → `Lab` 查看完整安装指南和配置说明
+
+## 🔌 插件市场
+
+GDownload 采用 JS 插件架构，网盘解析功能均以插件形式提供，支持沙箱运行和热更新。
+
+### 📖 插件使用教程
+
+- [百度网盘插件配置指南](docs/plugin-guides/baidu-netdisk.md)
+- [夸克网盘插件配置指南](docs/plugin-guides/quark-netdisk.md)
+- [阿里云盘插件配置指南](docs/plugin-guides/aliyundrive-netdisk.md)
+- [123 云盘插件配置指南](docs/plugin-guides/pan123-netdisk.md)
+
+### 🔧 插件开发
+
+想为 GDownload 开发网盘插件？请阅读 [JS 插件系统设计文档](docs/JS_PLUGIN_SYSTEM_DESIGN.md)，了解插件架构、SDK API 和开发规范。
 
 ## 🛠️ 技术栈
 

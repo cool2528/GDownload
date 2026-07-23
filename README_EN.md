@@ -1,7 +1,10 @@
 # GDownload
 
 <p align="center">
-  <img src="src/App/ui/Resource/images/logo/logo.svg" alt="GDownload Logo" width="128" height="128"/>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="src/App/ui/Resource/images/logo/aurora-brand-dark.svg">
+    <img src="src/App/ui/Resource/images/logo/aurora-brand-light.svg" alt="GDownload Logo" width="128" height="128"/>
+  </picture>
 </p>
 
 <p align="center">
@@ -130,6 +133,21 @@ GDownload is a modern cross-platform download manager built with C++ and Qt. It 
 - ✅ Select links and send them to GDownload with one click
 
 > 📖 **Full Documentation**: Go to `Settings` → `Lab` in the app for complete installation guide and configuration details
+
+## 🔌 Plugin Marketplace
+
+GDownload uses a JS plugin architecture — cloud storage parsing features are all delivered as sandboxed, hot-updatable plugins.
+
+### 📖 Plugin Usage Guides
+
+- [Baidu Netdisk Plugin Setup Guide](docs/plugin-guides/baidu-netdisk.md)
+- [Quark Netdisk Plugin Setup Guide](docs/plugin-guides/quark-netdisk.md)
+- [Alibaba Cloud Drive Plugin Setup Guide](docs/plugin-guides/aliyundrive-netdisk.md)
+- [123 Pan Plugin Setup Guide](docs/plugin-guides/pan123-netdisk.md)
+
+### 🔧 Plugin Development
+
+Want to build a cloud storage plugin for GDownload? Read the [JS Plugin System Design Document](docs/JS_PLUGIN_SYSTEM_DESIGN.md) to learn about the plugin architecture, SDK APIs, and development guidelines.
 
 ## 🛠️ Technology Stack
 
