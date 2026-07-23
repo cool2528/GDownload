@@ -57,6 +57,17 @@ function originOf(url) {
     return m ? m[1] : "";
 }
 
+// 弹窗请求提取码;返回用户输入,取消或通道不可用返回 null
+async function promptExtractionCode(message) {
+    try {
+        const code = await gdl.ui.requestVerification({ message: message });
+        return code ? String(code).trim() : null;
+    } catch (e) {
+        gdl.log.info("verification prompt unavailable or cancelled: " + e);
+        return null;
+    }
+}
+
 export class LanzouApi {
     constructor() {
         this.reset();
@@ -188,61 +199,88 @@ export class LanzouApi {
         return { base, form, referer, fileId };
     }
 
-    // 解析单文件真实下载直链
+    // 解析单文件真实下载直链;密码错误时弹窗重试(最多 3 次)
     async resolveDownload(shareUrl, pwd, knownSize, knownName) {
         const page = await this.fetchPage(shareUrl);
         if (!page) {
             gdl.log.warn("lanzou file page unreachable");
             return null;
         }
-        const req = await this.buildAjaxRequest(page, pwd);
-        if (!req) return null;
+        let currentPwd = pwd || this.pwdByUrl[page.url] || "";
+        const hasPwd = /pwdload|passwddiv/.test(page.html);
+        if (hasPwd && !currentPwd) {
+            const code = await promptExtractionCode("This share link requires an extraction code.");
+            if (code === null) {
+                gdl.notify("Download cancelled: the share link requires an extraction code.", "warning");
+                return null;
+            }
+            currentPwd = code;
+            this.pwdByUrl[page.url] = currentPwd;
+        }
 
-        const ajaxUrl = req.base + "/ajaxm.php" + (req.fileId ? "?file=" + req.fileId : "");
-        let resp;
-        try {
-            resp = await gdl.http.post(ajaxUrl, {
-                form: req.form,
-                headers: {
-                    "User-Agent": UA, "Accept-Language": ACCEPT_LANG,
-                    "Referer": req.referer, "X-Requested-With": "XMLHttpRequest",
-                },
-            });
-        } catch (e) {
-            gdl.log.warn("lanzou ajaxm failed: " + e);
-            return null;
-        }
-        if (resp.status !== 200) {
-            gdl.log.warn("lanzou ajaxm http " + resp.status);
-            return null;
-        }
-        let doc;
-        try {
-            doc = resp.json();
-        } catch (e) {
-            gdl.log.warn("lanzou ajaxm parse failed: " + e);
-            return null;
-        }
-        // zt / inf 类型不定(string|number),宽松判断
-        if (String(doc.zt) !== "1" || !doc.dom || !doc.url) {
-            gdl.log.warn("lanzou ajaxm error: " + (doc.inf != null ? doc.inf : doc.zt));
-            return null;
-        }
-        const fileName = (knownName || (typeof doc.inf === "string" ? doc.inf : "") || "")
-            .replace(/\*/g, "_");
-        const relayUrl = String(doc.dom).replace(/\/$/, "") + "/file/" + doc.url;
+        for (let attempt = 0; attempt < 4; attempt++) {
+            const req = await this.buildAjaxRequest(page, currentPwd);
+            if (!req) return null;
 
-        const realUrl = await this.followRelay(relayUrl);
-        if (!realUrl) return null;
+            const ajaxUrl = req.base + "/ajaxm.php" + (req.fileId ? "?file=" + req.fileId : "");
+            let resp;
+            try {
+                resp = await gdl.http.post(ajaxUrl, {
+                    form: req.form,
+                    headers: {
+                        "User-Agent": UA, "Accept-Language": ACCEPT_LANG,
+                        "Referer": req.referer, "X-Requested-With": "XMLHttpRequest",
+                    },
+                });
+            } catch (e) {
+                gdl.log.warn("lanzou ajaxm failed: " + e);
+                return null;
+            }
+            if (resp.status !== 200) {
+                gdl.log.warn("lanzou ajaxm http " + resp.status);
+                return null;
+            }
+            let doc;
+            try {
+                doc = resp.json();
+            } catch (e) {
+                gdl.log.warn("lanzou ajaxm parse failed: " + e);
+                return null;
+            }
+            // zt / inf 类型不定(string|number),宽松判断
+            if (String(doc.zt) !== "1" || !doc.dom || !doc.url) {
+                const info = doc.inf != null ? String(doc.inf) : String(doc.zt);
+                gdl.log.warn("lanzou ajaxm error: " + info);
+                if (hasPwd && /密码|password|pass/i.test(info) && attempt < 3) {
+                    const code = await promptExtractionCode("Wrong extraction code, please try again.");
+                    if (code === null) {
+                        gdl.notify("Download cancelled: the share link requires an extraction code.", "warning");
+                        return null;
+                    }
+                    currentPwd = code;
+                    this.pwdByUrl[page.url] = currentPwd;
+                    continue;
+                }
+                if (info) gdl.notify(info, "error");
+                return null;
+            }
+            const fileName = (knownName || (typeof doc.inf === "string" ? doc.inf : "") || "")
+                .replace(/\*/g, "_");
+            const relayUrl = String(doc.dom).replace(/\/$/, "") + "/file/" + doc.url;
 
-        return {
-            real_url: realUrl,
-            file_name: fileName || "lanzou_file",
-            file_size: knownSize || 0,
-            headers: { "user-agent": UA },
-            options: {},
-            mirrors: [],
-        };
+            const realUrl = await this.followRelay(relayUrl);
+            if (!realUrl) return null;
+
+            return {
+                real_url: realUrl,
+                file_name: fileName || "lanzou_file",
+                file_size: knownSize || 0,
+                headers: { "user-agent": UA },
+                options: {},
+                mirrors: [],
+            };
+        }
+        return null;
     }
 
     // 中转地址 -> 最终 CDN 直链:不跟随重定向,取 302 Location;处理"网络异常"二次验证
@@ -296,11 +334,12 @@ export class LanzouApi {
 
     // ---- 文件夹解析 ----
 
+    // 解析文件夹分享;返回 {ok:true, files} | {ok:false, pwdError}
     async parseFolder(folderUrl, pwd) {
         const page = await this.fetchPage(folderUrl);
         if (!page) {
             gdl.log.warn("lanzou folder page unreachable");
-            return null;
+            return { ok: false, pwdError: false };
         }
         const html = page.html;
         const base = originOf(page.url);
@@ -310,7 +349,7 @@ export class LanzouApi {
         const rawObj = extractDataObject(html);
         if (!rawObj) {
             gdl.log.warn("lanzou folder ajax data not found");
-            return null;
+            return { ok: false, pwdError: false };
         }
         const baseForm = {};
         for (const k of Object.keys(rawObj)) {
@@ -344,7 +383,7 @@ export class LanzouApi {
             const zt = String(doc.zt);
             if (zt === "3") {
                 gdl.log.warn("lanzou folder password error");
-                return null;
+                return { ok: false, pwdError: true };
             }
             const list = Array.isArray(doc.text) ? doc.text : [];
             for (const item of list) {
@@ -365,7 +404,7 @@ export class LanzouApi {
             if (zt === "2" || list.length === 0) break;
             await gdl.utils.sleep(1000); // 分页限频
         }
-        return out;
+        return { ok: true, files: out };
     }
 
     // 蓝奏云 size 是 "1.5 M" 之类字符串,转字节(近似;失败返回 0)
@@ -401,15 +440,37 @@ export class LanzouApi {
         this.pageUrl = page.url;
 
         if (this.isFolderPage(page.html)) {
-            const files = await this.parseFolder(page.url, pwd);
-            if (!files) return null;
-            gdl.log.info("lanzou folder parsed files=" + files.length);
-            return files;
+            let currentPwd = pwd;
+            let r = await this.parseFolder(page.url, currentPwd);
+            for (let attempt = 0; !r.ok && r.pwdError && attempt < 3; attempt++) {
+                const tip = (!currentPwd && attempt === 0)
+                    ? "This share link requires an extraction code."
+                    : "Wrong extraction code, please try again.";
+                const code = await promptExtractionCode(tip);
+                if (code === null) {
+                    gdl.notify("Parsing cancelled: the share link requires an extraction code.", "warning");
+                    return null;
+                }
+                currentPwd = code;
+                r = await this.parseFolder(page.url, currentPwd);
+            }
+            if (!r.ok) return null;
+            gdl.log.info("lanzou folder parsed files=" + r.files.length);
+            return r.files;
         }
 
-        // 单文件:返回一条 FileInfo,直链解析推迟到 getDownloadInfo(直链短时效)
+        // 单文件:密码页且未携带提取码时,先弹窗收集(正确性在 getDownloadInfo 阶段校验)
+        let filePwd = pwd;
+        if (/pwdload|passwddiv/.test(page.html) && !filePwd) {
+            const code = await promptExtractionCode("This share link requires an extraction code.");
+            if (code === null) {
+                gdl.notify("Parsing cancelled: the share link requires an extraction code.", "warning");
+                return null;
+            }
+            filePwd = code;
+        }
         const name = this.extractFileName(page.html);
-        this.pwdByUrl[page.url] = pwd;
+        this.pwdByUrl[page.url] = filePwd;
         gdl.log.info("lanzou single file parsed");
         return [{
             name: name || "lanzou_file",
@@ -424,7 +485,8 @@ export class LanzouApi {
 
     async enterDirectory(info) {
         // 子文件夹:file_id 为子文件夹分享 URL
-        return this.parseFolder(info.file_id, this.pwdByUrl[info.file_id] || "");
+        const r = await this.parseFolder(info.file_id, this.pwdByUrl[info.file_id] || "");
+        return r.ok ? r.files : null;
     }
 
     async getDownloadInfo(info) {
