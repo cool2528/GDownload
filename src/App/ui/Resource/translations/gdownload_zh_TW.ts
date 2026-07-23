@@ -2031,12 +2031,12 @@
 <context>
     <name>GMessage</name>
     <message>
-        <location filename="../qml/CommonComponents/GMessage.qml" line="276"/>
+        <location filename="../qml/CommonComponents/GMessage.qml" line="278"/>
         <source>Dismiss notification</source>
         <translation>關閉通知</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GMessage.qml" line="278"/>
+        <location filename="../qml/CommonComponents/GMessage.qml" line="280"/>
         <source>Dismiss</source>
         <translation>關閉</translation>
     </message>
@@ -4475,27 +4475,33 @@ Copyright © 2024 GDownload Team
         <translation>雲盤分享需要補充輸入才能繼續</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="59"/>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="38"/>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="41"/>
         <source>This share link requires an extraction code.</source>
         <translation>該分享連結需要提取碼。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="78"/>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="43"/>
+        <source>Wrong extraction code, please try again.</source>
+        <translation>提取碼錯誤，請重試。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="91"/>
         <source>Enter the code here</source>
         <translation>在此輸入提取碼</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="79"/>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="92"/>
         <source>Verification code</source>
         <translation>驗證碼</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="102"/>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="115"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="108"/>
+        <location filename="../qml/CommonComponents/VerificationDialog.qml" line="121"/>
         <source>Confirm</source>
         <translation>確認</translation>
     </message>
@@ -4636,6 +4642,21 @@ Copyright © 2024 GDownload Team
         <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="260"/>
         <source>The plugin is no longer available. Check the Plugin Market.</source>
         <translation>外掛已無法使用，請到外掛市集查看。</translation>
+    </message>
+    <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="272"/>
+        <source>Parsing cancelled: the share link requires an extraction code.</source>
+        <translation>已取消解析：該分享連結需要提取碼。</translation>
+    </message>
+    <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="275"/>
+        <source>Download cancelled: the share link requires an extraction code.</source>
+        <translation>已取消下載：該分享連結需要提取碼。</translation>
+    </message>
+    <message>
+        <location filename="../../NetDisk/NetWork_Disk_magager.cxx" line="278"/>
+        <source>Extraction code verification failed.</source>
+        <translation>提取碼驗證失敗。</translation>
     </message>
 </context>
 <context>
