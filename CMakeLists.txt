@@ -308,6 +308,32 @@ elseif(APPLE)
         )
 
         if(NOT CREATE_DMG_RESULT EQUAL 0)
+            # Finder 窗口排版脚本在无 GUI 的会话(SSH/headless)下会 AppleEvent 超时(-1712)。
+            # 清理半成品后用 --skip-jenkins 跳过排版重试:DMG 内容与功能完全一致,仅无图标布局。
+            message(WARNING \"create-dmg failed (\${CREATE_DMG_RESULT}), retrying with --skip-jenkins\")
+            file(GLOB DMG_LEFTOVERS \"\${CMAKE_INSTALL_PREFIX}/rw.*.dmg\")
+            if(DMG_LEFTOVERS)
+                file(REMOVE \${DMG_LEFTOVERS})
+            endif()
+            file(REMOVE \"\${CMAKE_INSTALL_PREFIX}/\${DMG_FILENAME}\")
+            execute_process(
+                COMMAND create-dmg
+                        --volname \"${PROJECT_NAME}\"
+                        --volicon \"${CMAKE_SOURCE_DIR}/package/dmg_icon.icns\"
+                        --window-pos 200 120
+                        --window-size 600 400
+                        --icon-size 128
+                        --icon \"${PROJECT_NAME}.app\" 140 150
+                        --app-drop-link 460 150
+                        --no-internet-enable
+                        --skip-jenkins
+                        \"\${CMAKE_INSTALL_PREFIX}/\${DMG_FILENAME}\"
+                        \"\${DMG_TEMP_DIR}\"
+                RESULT_VARIABLE CREATE_DMG_RESULT
+            )
+        endif()
+
+        if(NOT CREATE_DMG_RESULT EQUAL 0)
             message(FATAL_ERROR \"Failed to create DMG: \${CREATE_DMG_RESULT}\")
         endif()
 
