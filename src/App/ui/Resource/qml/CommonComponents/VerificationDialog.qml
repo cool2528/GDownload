@@ -57,6 +57,8 @@ GDialogShell {
             Text {
                 text: dialog.message.length > 0 ? dialog.message
                                                 : qsTr("This share link requires an extraction code.")
+                // 该文本来源于网盘服务端返回的验证提示，禁用富文本解析以防内容伪装
+                textFormat: Text.PlainText
                 color: GTheme.textPrimary
                 font.pixelSize: GTheme.fontBody
                 wrapMode: Text.WordWrap

@@ -96,3 +96,14 @@ TEST(VerificationBridgeTest, ReentrantRequestIsRejectedAsCancel) {
     worker.join();
     EXPECT_EQ(first.input_result, "abcd");
 }
+
+TEST(VerificationBridgeTest, RequestWithoutReceiverReturnsImmediately) {
+    auto& bridge = VerificationBridge::Instance();
+    // 无任何信号接收者时应立即按取消返回，而不是阻塞等待（前序用例的 receiver 均已随作用域退出而自动断开连接）
+    INetDiskDownloadPlugin::VerificationCallbackParam param;
+    QElapsedTimer timer;
+    timer.start();
+    bridge.Request(param);
+    EXPECT_LT(timer.elapsed(), 1000);
+    EXPECT_TRUE(param.input_result.empty());
+}

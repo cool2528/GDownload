@@ -1,5 +1,6 @@
 #include "verification_bridge.h"
 #include <QDeadlineTimer>
+#include <QMetaMethod>
 
 namespace gdl {
     namespace ui {
@@ -22,6 +23,12 @@ namespace gdl {
             }
 
             void VerificationBridge::Request(INetDiskDownloadPlugin::VerificationCallbackParam& param) {
+                // 无 UI 接收者时（如任务对话框已被 Esc 关闭销毁）直接按取消返回，避免 worker 空等 290 秒导致串行队列阻塞
+                // 注：检查与信号发射之间若接收者恰好消失，仍会退化为原有的 290 秒超时兜底，属可接受的窄窗口
+                if (!isSignalConnected(QMetaMethod::fromSignal(&VerificationBridge::verificationRequested))) {
+                    param.input_result.clear();
+                    return;
+                }
                 {
                     QMutexLocker locker(&mutex_);
                     if (pending_) {
