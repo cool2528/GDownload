@@ -1118,10 +1118,6 @@
         <translation>server.met 地址</translation>
     </message>
     <message>
-        <source>http://upd.emule-security.org/server.met</source>
-        <translation type="vanished">http://upd.emule-security.org/server.met</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/Ed2kServerPage.qml" line="343"/>
         <source>Update</source>
         <translation>更新</translation>
@@ -2136,9 +2132,9 @@
 
 ## License
 
-Copyright © 2024 GDownload Team
+Copyright © 2024-2026 GDownload Team
 
-Licensed under the Apache License 2.0.</source>
+Licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). This is free software, and you are welcome to redistribute it under certain conditions. It comes with ABSOLUTELY NO WARRANTY.</source>
         <translation># GDownload
 
 一款快速、可靠的跨平台下载管理器。
@@ -2168,9 +2164,9 @@ Licensed under the Apache License 2.0.</source>
 
 ## 许可证
 
-Copyright © 2024 GDownload Team
+Copyright © 2024-2026 GDownload Team
 
-基于 Apache License 2.0 许可。</translation>
+基于 GNU Affero 通用公共许可证第 3 版（AGPL-3.0）授权。本软件是自由软件，你可以在符合许可证条件的前提下再分发它。本软件不提供任何形式的担保。</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="184"/>

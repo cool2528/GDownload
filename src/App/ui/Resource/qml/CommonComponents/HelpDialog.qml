@@ -262,9 +262,9 @@ GDialogShell {
 
 ## License
 
-Copyright © 2024 GDownload Team
+Copyright © 2024-2026 GDownload Team
 
-Licensed under the Apache License 2.0.`)
+Licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). This is free software, and you are welcome to redistribute it under certain conditions. It comes with ABSOLUTELY NO WARRANTY.`)
                     }
                 }
             }

@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License"></a>
+  <a href="LICENSE.txt"><img src="https://img.shields.io/badge/license-AGPL%20v3-blue.svg" alt="License"></a>
   <a href="#"><img src="https://img.shields.io/badge/platform-Windows%20|%20macOS%20|%20Linux-lightgrey.svg" alt="Platform"></a>
   <a href="#"><img src="https://img.shields.io/badge/language-C++20-orange.svg" alt="Language"></a>
   <a href="#"><img src="https://img.shields.io/badge/Qt-6.10.1+-green.svg" alt="Qt Version"></a>
@@ -203,7 +203,15 @@ GDownload 是一款现代化的跨平台下载管理器，使用 C++ 和 Qt 开�
 
 ## 📄 开源协议
 
-GDownload 使用 [Apache License 2.0](LICENSE.txt) 开源协议。
+GDownload 使用 [GNU Affero General Public License v3.0](LICENSE.txt)（AGPL-3.0）开源协议。
+
+- ✅ 可以自由使用、修改、分发本软件（包括商业性分发）
+- ⚠️ 分发修改版，或将本软件（及其修改版）作为网络服务对外提供时，必须以相同协议开放完整源代码
+- ⚠️ 必须保留原有版权声明和协议文本
+
+如需在 AGPL-3.0 条款之外使用本项目（例如闭源集成、不希望公开服务端源码的商业场景），请通过 [Issues](https://github.com/cool2528/GDownload/issues) 或邮箱 252858527@qq.com 联系作者洽谈商业授权。
+
+> 说明：v1.0.8 及更早的历史发布版本仍适用其发布时随附的 Apache License 2.0；自此之后的版本适用 AGPL-3.0。
 
 ### 第三方组件
 

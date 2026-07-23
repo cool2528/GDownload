@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License"></a>
+  <a href="LICENSE.txt"><img src="https://img.shields.io/badge/license-AGPL%20v3-blue.svg" alt="License"></a>
   <a href="#"><img src="https://img.shields.io/badge/platform-Windows%20|%20macOS%20|%20Linux-lightgrey.svg" alt="Platform"></a>
   <a href="#"><img src="https://img.shields.io/badge/language-C++20-orange.svg" alt="Language"></a>
   <a href="#"><img src="https://img.shields.io/badge/Qt-6.10.1+-green.svg" alt="Qt Version"></a>
@@ -203,7 +203,15 @@ Contributions are welcome! Feel free to submit a Pull Request or create an Issue
 
 ## 📄 License
 
-GDownload is licensed under the [Apache License 2.0](LICENSE.txt).
+GDownload is licensed under the [GNU Affero General Public License v3.0](LICENSE.txt) (AGPL-3.0).
+
+- ✅ Free to use, modify, and distribute this software (including commercial distribution)
+- ⚠️ If you distribute a modified version, or offer this software (or a modified version) as a network service, you must make the complete source code available under the same license
+- ⚠️ Original copyright notices and the license text must be preserved
+
+For use outside the terms of AGPL-3.0 (e.g., closed-source integration, or commercial scenarios where server-side code cannot be published), please contact the author via [Issues](https://github.com/cool2528/GDownload/issues) or 252858527@qq.com to discuss a commercial license.
+
+> Note: Historical releases up to and including v1.0.8 remain governed by the Apache License 2.0 they shipped with; versions after that are licensed under AGPL-3.0.
 
 ### Third-Party Components
 

@@ -1118,10 +1118,6 @@
         <translation>server.met URL</translation>
     </message>
     <message>
-        <source>http://upd.emule-security.org/server.met</source>
-        <translation type="vanished">http://upd.emule-security.org/server.met</translation>
-    </message>
-    <message>
         <location filename="../qml/Browser/Ed2kServerPage.qml" line="343"/>
         <source>Update</source>
         <translation>업데이트</translation>
@@ -2136,9 +2132,9 @@
 
 ## License
 
-Copyright © 2024 GDownload Team
+Copyright © 2024-2026 GDownload Team
 
-Licensed under the Apache License 2.0.</source>
+Licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). This is free software, and you are welcome to redistribute it under certain conditions. It comes with ABSOLUTELY NO WARRANTY.</source>
         <translation># GDownload
 
 **현대적인 크로스 플랫폼 다운로드 관리자**
@@ -2168,9 +2164,9 @@ Licensed under the Apache License 2.0.</source>
 
 ## 라이선스
 
-Copyright © 2024 GDownload Team
+Copyright © 2024-2026 GDownload Team
 
-Apache License 2.0에 따라 라이선스가 부여됩니다.</translation>
+GNU Affero General Public License v3.0(AGPL-3.0)에 따라 라이선스가 부여됩니다. 본 소프트웨어는 자유 소프트웨어이며, 일정한 조건 하에 재배포할 수 있습니다. 어떠한 보증도 제공되지 않습니다.</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/HelpDialog.qml" line="184"/>
