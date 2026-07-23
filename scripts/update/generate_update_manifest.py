@@ -82,7 +82,11 @@ class PrivateKeyFile:
         self.path = Path(temporary)
         self.temporary_path = self.path
         try:
-            os.fchmod(descriptor, 0o600)
+            # os.fchmod 是 POSIX 专有,Windows 的 Python 没有该函数。加守卫使脚本能在
+            # Windows 本机运行(开发者生成/派生更新签名密钥时),临时文件由 mkstemp 默认
+            # 就限权为 owner-only;Linux/CI 环境仍显式设 0600,行为不变。
+            if hasattr(os, "fchmod"):
+                os.fchmod(descriptor, 0o600)
             os.write(descriptor, private_key_bytes(value))
         finally:
             os.close(descriptor)
