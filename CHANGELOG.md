@@ -1,5 +1,38 @@
 # Changelog
 
+## v2.0.0
+
+### 🚀 Highlights / 亮点
+
+- **Full eD2k / eMule client / 完整 eD2k 客户端** — download, search, server management, file sharing, and Kad DHT, powered by a self-developed in-process engine ([ed2k-engine-cpp](https://github.com/cool2528/ed2k-engine-cpp)). / 自研进程内引擎驱动的下载、搜索、服务器管理、文件分享与 Kad DHT。
+- **Browser extension / 浏览器扩展** — native-messaging host with self-registration (Windows/macOS/Linux) and one-click link capture. / Native Messaging 自注册 + 一键捕获下载链接。
+- **More cloud drives / 更多网盘** — Baidu, Aliyun Drive, Quark, 123 Pan, and Lanzou, plus an online plugin marketplace and development SDK. / 百度、阿里云盘、夸克、123、蓝奏,在线插件市场 + 开发 SDK。
+- **Aurora UI** — a new design system and brand identity. / 全新 Aurora UI 设计系统与品牌标识。
+
+### ✨ eD2k / eMule
+
+- ed2k 链接下载:多源流水线、上传队列排队等待、断点续传、Kad 源发现。
+- 搜索(服务器 + Kad 网络)、服务器管理(连接/增删/更新 server.met/Kad 状态)、文件分享(上传统计 + 队列)。
+- 数据完整性与安全:损坏 part 重下、真 MD4 完成判定、hashset 防伪造、大文件 64 位、单包 DoS 防护。
+
+### ✨ 网盘 / Cloud Drives
+
+- 百度网盘、阿里云盘、夸克、123 网盘、蓝奏云解析;在线插件市场(Git 仓库即注册表 + Ed25519 签名)+ JS 插件开发 SDK。
+
+### ✨ 浏览器扩展 / Browser Extension
+
+- Native Messaging host + 自注册、扩展配对、单实例守卫、外部唤起接管解析。
+
+### ✨ 平台与打包 / Platform & Packaging
+
+- Windows 安装包多语言 + 自动检测系统语言(English / 简体中文 / 繁體中文 / 日本語 / 한국어)。
+- 免费签名方案:ed25519 更新清单签名 + AppImage GPG(不使用付费代码签名)。
+- 跨平台构建修复(Linux `<algorithm>` 缺失、`*.sh` 强制 LF 行尾)。
+
+### 🎨 界面 / UI
+
+- Aurora UI 设计系统 + 品牌 logo;首页"快速开始"新增 eD2k 入口;修正对话框种子 tab 等翻译;侧边栏图标放大。
+
 ## v1.0.8
 
 ### 🚀 Highlights / 亮点
