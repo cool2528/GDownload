@@ -185,7 +185,7 @@ Rectangle {
             Layout.preferredHeight: GTheme.titleBarHeight
             Layout.preferredWidth: 40
             imageSize: Qt.size(16,16)
-            backgroundColor: hovered ? GTheme.fillLight : "transparent"
+            backgroundColor: hovered ? GTheme.fillLight : Qt.alpha(GTheme.fillLight, 0)
             normalImage: GTheme.dark ? "/images/titlebar/windows-minimize-dark.svg" : "/images/titlebar/windows-minimize.svg"
             hoverImage: GTheme.dark ? "/images/titlebar/windows-minimize-dark.svg" : "/images/titlebar/windows-minimize-hover.svg"
             tintColor: "transparent"
@@ -200,7 +200,7 @@ Rectangle {
             Layout.preferredHeight: GTheme.titleBarHeight
             Layout.preferredWidth: 40
             imageSize: Qt.size(16,16)
-            backgroundColor: hovered ? GTheme.fillLight : "transparent"
+            backgroundColor: hovered ? GTheme.fillLight : Qt.alpha(GTheme.fillLight, 0)
             normalImage: GTheme.dark ? "/images/titlebar/windows-maximize-dark.svg" : "/images/titlebar/windows-maximize.svg"
             hoverImage: GTheme.dark ? "/images/titlebar/windows-maximize-dark.svg" : "/images/titlebar/windows-maximize-hover.svg"
             tintColor: "transparent"
@@ -217,7 +217,7 @@ Rectangle {
             Layout.preferredHeight: GTheme.titleBarHeight
             Layout.preferredWidth: 40
             imageSize: Qt.size(16,16)
-            backgroundColor: hovered ? GTheme.fillLight : "transparent"
+            backgroundColor: hovered ? GTheme.fillLight : Qt.alpha(GTheme.fillLight, 0)
             normalImage: GTheme.dark ? "/images/titlebar/windows-restore-dark.svg" : "/images/titlebar/windows-restore.svg"
             hoverImage: GTheme.dark ? "/images/titlebar/windows-restore-dark.svg" : "/images/titlebar/windows-restore-hover.svg"
             tintColor: "transparent"
@@ -231,7 +231,7 @@ Rectangle {
             Layout.preferredHeight: GTheme.titleBarHeight
             Layout.preferredWidth: 40
             imageSize: Qt.size(16,16)
-            backgroundColor: hovered ? GTheme.dangerColor : "transparent"
+            backgroundColor: hovered ? GTheme.dangerColor : Qt.alpha(GTheme.dangerColor, 0)
             normalImage: GTheme.dark ? "/images/titlebar/windows-close-dark.svg" : "/images/titlebar/windows-close.svg"
             hoverImage: GTheme.dark ? "/images/titlebar/windows-close-dark.svg" : "/images/titlebar/windows-close-hover.svg"
             tintColor: "transparent"

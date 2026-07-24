@@ -1141,9 +1141,11 @@ namespace gdl {
 			SETTING_IMP_END(Ed2kUdpPort)
 
 			// Ed2kEnableKad (eD2k 是否启用 Kad 网络,重启应用后生效)
+			// 默认开启:Kad 是无服务器找源的关键途径(LowID/服务器源不足场景),
+			// nodes.dat 可经设置页 URL 自动获取,开箱即用
 			SETTING_IMP_BEGIN(Ed2kEnableKad, CONFIG_KEY_PATH(Ed2kEnableKad), bool)
 			void Default() override {
-				value_ = false;
+				value_ = true;
 			}
 			void Put(const QVariant& value) override {
 				if (value.canConvert<bool>()) {

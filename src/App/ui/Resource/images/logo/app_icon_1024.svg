@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Linux 桌面/AppImage 图标 - 与 app_icon_1024.svg / logo.icns / icon.ico 同源的 aurora 设计 -->
-<svg width="128" height="128" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#1b2438"/>
@@ -11,9 +9,11 @@
       <stop offset="0.35" stop-color="#ffffff" stop-opacity="0"/>
     </linearGradient>
   </defs>
+  <!-- macOS squircle 底板: 824x824 居中, Apple 规范圆角比例 -->
   <rect x="100" y="100" width="824" height="824" rx="186" fill="url(#plate)"/>
   <rect x="100" y="100" width="824" height="824" rx="186" fill="url(#sheen)"/>
   <rect x="103" y="103" width="818" height="818" rx="183" stroke="#ffffff" stroke-opacity="0.07" stroke-width="6" fill="none"/>
+  <!-- aurora 品牌元素: 与 UI 内 aurora-brand-*.svg 同一几何, 居中放大 -->
   <g transform="translate(512 524) scale(24) translate(-16 -15.7)">
     <path d="M5 10.5C7.8 6.2 11.4 4 16 4C20.6 4 24.2 6.2 27 10.5" stroke="#35D8EE" stroke-width="2.5" stroke-linecap="round"/>
     <path d="M6 21.5C8.7 25.4 12 27.4 16 27.4C20 27.4 23.3 25.4 26 21.5" stroke="#A78BFA" stroke-width="2.5" stroke-linecap="round"/>

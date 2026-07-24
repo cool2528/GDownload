@@ -1456,7 +1456,9 @@ namespace gdl {
 						if (doc.contains("totalLength") && doc.contains("completedLength")) {
 							std::int64_t total_length	  = doc["totalLength"].is_string() ? std::stoll(doc["totalLength"].get<std::string>()) : doc["totalLength"].get<std::int64_t>();
 							std::int64_t completed_length = doc["completedLength"].is_string() ? std::stoll(doc["completedLength"].get<std::string>()) : doc["completedLength"].get<std::int64_t>();
-							double progress				  = 0.0;
+							// 无活动任务(total==0)必须发负值清除任务栏/Dock 进度条;
+							// 发 0.0 会被平台层当作"0% 进行中"而常驻空进度条
+							double progress				  = -1.0;
 							if (total_length > 0) {
 								progress = completed_length * 1.0 / total_length;
 							}

@@ -205,7 +205,7 @@ class FakeSettingsManager : public QObject {
 		store_[QStringLiteral("Ed2kNickname")] = QStringLiteral("GDownload");
 		store_[QStringLiteral("Ed2kTcpPort")] = 4662;
 		store_[QStringLiteral("Ed2kUdpPort")] = 4672;
-		store_[QStringLiteral("Ed2kEnableKad")] = false;
+		store_[QStringLiteral("Ed2kEnableKad")] = true;
 		store_[QStringLiteral("Ed2kEnableObfuscation")] = false;
 		store_[QStringLiteral("Ed2kAutoConnect")] = true;
 		store_[QStringLiteral("Ed2kMaxConcurrentTasks")] = 5;
