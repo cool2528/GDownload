@@ -88,10 +88,14 @@ GDownload is a modern cross-platform download manager built with C++ and Qt. It 
 - 🔌 Auto shutdown/hibernate/sleep
 
 ### 🗂️ Cloud Storage Integration
-- 📦 Baidu Netdisk shared link parsing and downloading
-  - ⚠️ Standard speed only (non-accelerated downloads)
-  - 💡 For high-speed downloads, subscribe to Baidu Netdisk official SVIP
-- 🔌 Plugin architecture for easy extension to other cloud storage services
+Parse and download shared links from major cloud drives via the built-in plugin system:
+- 📦 **Baidu Netdisk** — ⚠️ standard speed only; subscribe to Baidu SVIP for high speed
+- ☁️ **Aliyun Drive** — direct-link first, transfer fallback
+- 🐿️ **Quark Netdisk**
+- 📁 **123 Pan**
+- 🌸 **Lanzou Cloud**
+
+> 📖 Per-drive usage guides are in the [Plugin Marketplace](#-plugin-marketplace) section below. The plugin architecture makes adding more cloud drives easy.
 
 ### 🧩 Browser Extension (Experimental)
 
