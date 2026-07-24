@@ -93,6 +93,41 @@ Rectangle {
 
                 Divider { Layout.fillWidth: true }
 
+                // 手动检查更新:有新版走既有 updateAvailable -> UpdateDialog 链路,
+                // 无更新/失败经 checkForUpdatesFinished 回执后 toast 提示
+                SettingRow {
+                    Layout.fillWidth: true
+                    label: qsTr("Check for Updates")
+                    control: GButton {
+                        id: checkUpdateButton
+                        objectName: "checkForUpdatesButton"
+                        Layout.preferredHeight: GTheme.sizeDefault
+                        property bool checking: false
+                        enabled: !checking
+                        text: checking ? qsTr("Checking...") : qsTr("Check Now")
+                        onClicked: {
+                            checking = true
+                            UpdateManager.CheckForUpdates(false)
+                        }
+                        Connections {
+                            target: UpdateManager
+                            function onCheckForUpdatesFinished(hasUpdate, error) {
+                                checkUpdateButton.checking = false
+                                if (hasUpdate) {
+                                    return  // 新版本对话框已由 updateAvailable 弹出
+                                }
+                                if (error.length > 0) {
+                                    ToastManager.ShowError(qsTr("Update check failed: %1").arg(error))
+                                } else {
+                                    ToastManager.ShowSuccess(qsTr("You are using the latest version"))
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Divider { Layout.fillWidth: true }
+
                 // 开机自启动
                 GButtonSwitch {
                     id: autoStart

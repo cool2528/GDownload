@@ -202,67 +202,92 @@
         <translation>自动更新</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="101"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="100"/>
+        <source>Check for Updates</source>
+        <translation>检查更新</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="107"/>
+        <source>Checking...</source>
+        <translation>检查中…</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="107"/>
+        <source>Check Now</source>
+        <translation>立即检查</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="120"/>
+        <source>Update check failed: %1</source>
+        <translation>检查更新失败：%1</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="122"/>
+        <source>You are using the latest version</source>
+        <translation>当前已是最新版本</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="136"/>
         <source>Open at Login</source>
         <translation>开机自启动</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="116"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="151"/>
         <source>Remember Window Position</source>
         <translation>记住窗口位置</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="130"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="165"/>
         <source>Auto Resume Unfinished Download</source>
         <translation>恢复未完成的任务</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="144"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="179"/>
         <source>Show Close Confirmation</source>
         <translation>显示关闭确认</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="154"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="189"/>
         <source>Download Path</source>
         <translation>下载路径</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="155"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="190"/>
         <source>Global download folder</source>
         <translation>全局下载文件夹</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="174"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="209"/>
         <source>Network Proxy</source>
         <translation>网络代理</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="184"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="219"/>
         <source>Enable Global Proxy</source>
         <translation>启用全局代理</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="210"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="245"/>
         <source>Global proxy address</source>
         <translation>全局代理地址</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="220"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="255"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="231"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="266"/>
         <source>Clipboard Monitor</source>
         <translation>剪贴板监控</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="232"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="267"/>
         <source>Automatically detect download links from clipboard</source>
         <translation>自动检测剪贴板中的下载链接</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="241"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="276"/>
         <source>Auto Listen Clipboard Link</source>
         <translation>自动监听剪切板链接</translation>
     </message>

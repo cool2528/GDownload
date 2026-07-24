@@ -63,6 +63,10 @@ namespace gdl {
             // 发现更新信号
             void updateAvailable(UpdateDataInfo* info);
 
+            // 手动检查完成信号(仅非静默检查发射):设置页据此复位按钮状态并提示
+            // "已是最新版本"/"检查失败";hasUpdate 为 true 时 updateAvailable 已弹窗,无需再提示
+            void checkForUpdatesFinished(bool hasUpdate, const QString& error);
+
             // 更新进度信号
             void updateProgress(UpdateProgressData* progress);
 
