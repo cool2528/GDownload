@@ -63,7 +63,9 @@ namespace gdl::cache {
 	class DownloadHistoryCache::Impl {
 	 public:
 		CacheResult<void> Initialize(const String& path) {
-			auto opened = connection_.Open(path, {.busy_timeout_ms = 250, .request_wal = true});
+			// 历史库可能在升级、退出或杀毒软件扫描期间短暂被其他实例占用；
+			// 250ms 在 Windows 上过短，会把可恢复的 SQLITE_BUSY 暴露为删除失败。
+			auto opened = connection_.Open(path, {.busy_timeout_ms = 3000, .request_wal = true});
 			if (opened.HasError()) return opened;
 			auto schema = EnsureSchema(connection_, HistorySchema());
 			if (schema.HasError()) { connection_.Close(); return schema; }

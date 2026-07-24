@@ -3,10 +3,12 @@
 #include <QString>
 #include <QVariantMap>
 
+#include <chrono>
 #include <cstdint>
 #include <filesystem>
 #include <optional>
 #include <system_error>
+#include <thread>
 
 namespace gdl {
 	namespace ui {
@@ -50,23 +52,40 @@ namespace gdl {
 			}
 
 			inline LocalRemovalResult RemoveLocalContent(const QString& path) {
-				std::error_code error_code;
-				const std::uintmax_t removed_count =
-					std::filesystem::remove_all(LocalRemovalFilesystemPath(path), error_code);
-				if (error_code) {
-					return {.status = LocalRemovalStatus::kFailed,
+				if (path.isEmpty()) {
+					return {.status = LocalRemovalStatus::kNotFound,
 							.path = path,
-							.error = QStringLiteral("%1: %2")
-									 .arg(error_code.value())
-									 .arg(QString::fromStdString(error_code.message())),
-							.error_code = error_code.value(),
-							.partial_possible = true};
+							.removed_count = std::uintmax_t{0}};
 				}
 
-				return {.status = removed_count == 0 ? LocalRemovalStatus::kNotFound
-													 : LocalRemovalStatus::kRemoved,
+				constexpr int kMaxAttempts = 3;
+				std::error_code error_code;
+				std::uintmax_t removed_count = 0;
+				for (int attempt = 0; attempt < kMaxAttempts; ++attempt) {
+					error_code.clear();
+					removed_count +=
+						std::filesystem::remove_all(LocalRemovalFilesystemPath(path), error_code);
+					if (!error_code) {
+						return {.status = removed_count == 0 ? LocalRemovalStatus::kNotFound
+																 : LocalRemovalStatus::kRemoved,
+								.path = path,
+								.removed_count = removed_count};
+					}
+
+					// Windows 上的播放器、预览窗格或杀毒软件可能只短暂持有文件句柄。
+					// 以很短的退避重试，避免把可恢复的共享冲突直接暴露给用户。
+					if (attempt + 1 < kMaxAttempts) {
+						std::this_thread::sleep_for(std::chrono::milliseconds(50 * (attempt + 1)));
+					}
+				}
+
+				return {.status = LocalRemovalStatus::kFailed,
 						.path = path,
-						.removed_count = removed_count};
+						.error = QStringLiteral("%1: %2")
+								 .arg(error_code.value())
+								 .arg(QString::fromStdString(error_code.message())),
+						.error_code = error_code.value(),
+						.partial_possible = true};
 			}
 
 		}  // namespace browser

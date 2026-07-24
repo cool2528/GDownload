@@ -224,6 +224,8 @@ namespace gdl {
 				void ClearAllTasks();
 				int GetTaskCount() const;
 				bool ContainsTask(const QString& task_id) const;
+				bool IsTombstoned(const QString& task_id) const;
+				void ClearTombstone(const QString& task_id);
 
 			   Q_SIGNALS:
 				void countChanged();
@@ -233,7 +235,7 @@ namespace gdl {
 				QHash<QString, QString> remove_task_id_;
 				std::deque<QString> remove_order_;  // 墓碑插入顺序，配合上限做 FIFO 淘汰（M2）
 				static constexpr int kMaxTombstones = 512;
-				std::mutex mutex_;
+				mutable std::mutex mutex_;
 			};
 		}  // namespace browser
 	}  // namespace ui

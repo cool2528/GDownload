@@ -45,26 +45,6 @@ namespace gdl {
 					return std::string("http://127.0.0.1:") + rpc_port;
 				}
 
-				QString ExtractAria2RpcErrorMessage(const std::string& body) {
-					try {
-						const nlohmann::json doc = nlohmann::json::parse(body);
-						if (doc.contains("error") && doc["error"].is_object()) {
-							const auto& error = doc["error"];
-							if (error.contains("message") && error["message"].is_string()) {
-								return QString::fromStdString(error["message"].get<std::string>()).trimmed();
-							}
-						}
-					} catch (const std::exception& e) {
-						LOG_ERR("Failed to parse aria2 RPC response: {}", e.what());
-					}
-					return {};
-				}
-
-				bool IsMissingAria2ResultError(const QString& message) {
-					const QString lower = message.toLower();
-					return lower.contains(QStringLiteral("gid")) && lower.contains(QStringLiteral("not found"));
-				}
-
 				StoppedTaskAria2CleanupStatus RemoveAria2DownloadResultByGid(
 					const QString& gid, QString* error_message) {
 					engine::Aria2cHttpClient client(Aria2HttpRpcHost());
@@ -79,11 +59,17 @@ namespace gdl {
 					}
 
 					if (auto res = std::get_if<engine::ErrorResult>(&http_result.Value().result)) {
+						const QString rpc_error = ExtractAria2RpcErrorMessage(res->body);
+						if (IsMissingAria2ResultError(rpc_error)) {
+							return StoppedTaskAria2CleanupStatus::kAlreadyMissing;
+						}
 						if (error_message) {
-							const QString detail = QString::fromStdString(res->err_msg).trimmed();
+							const QString detail = rpc_error.isEmpty()
+								? QString::fromStdString(res->err_msg).trimmed()
+								: rpc_error;
 							*error_message = detail.isEmpty()
-												 ? QStringLiteral("aria2 RPC returned HTTP %1").arg(res->err_code)
-												 : detail;
+								? QStringLiteral("aria2 RPC returned HTTP %1").arg(res->err_code)
+								: detail;
 						}
 						return StoppedTaskAria2CleanupStatus::kFailed;
 					}
@@ -1135,6 +1121,8 @@ namespace gdl {
 							const auto task_id = task_info.task_id();
 							switch (task_info.task_state()) {
 								case TaskState::kActive: {
+									// 同一 GID 已进入新的活动生命周期时，允许它之后重新写入终态历史。
+									stopped_model_->ClearTombstone(task_id);
 									if (active_model_->ContainsTask(task_id)) {
 										active_model_->UpdateTaskById(task_id, task_info);
 									}
@@ -1146,6 +1134,7 @@ namespace gdl {
 									}
 								} break;
 								case TaskState::kWaiting: {
+									stopped_model_->ClearTombstone(task_id);
 									if (waiting_model_->ContainsTask(task_id)) {
 										waiting_model_->UpdateTaskById(task_id, task_info);
 									}
@@ -1157,6 +1146,7 @@ namespace gdl {
 									}
 								} break;
 								case TaskState::kPause: {
+									stopped_model_->ClearTombstone(task_id);
 									if (active_model_->ContainsTask(task_id)) {
 										active_model_->UpdateTaskById(task_id, task_info);
 									}
@@ -1171,6 +1161,12 @@ namespace gdl {
 								case TaskState::kComplete:
 								case TaskState::kRemoved:
 								case TaskState::kError: {
+									// 删除历史条目和 aria2/ed2k 的终态通知可能跨线程交错。
+									// 仅 stopped 模型的墓碑表示该终态历史已被显式移除；active/
+									// waiting 模型的墓碑也会在正常状态迁移时产生，不能用于此判断。
+									if (stopped_model_->IsTombstoned(task_id)) {
+										return;
+									}
 									if (active_model_->ContainsTask(task_id)) {
 										active_model_->RemoveTaskById(task_id);
 									}

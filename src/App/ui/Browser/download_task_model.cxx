@@ -239,6 +239,16 @@ namespace gdl {
 				return false;
 			}
 
+			bool DownloadTaskModel::IsTombstoned(const QString& task_id) const {
+				std::lock_guard lock(mutex_);
+				return remove_task_id_.contains(task_id);
+			}
+
+			void DownloadTaskModel::ClearTombstone(const QString& task_id) {
+				std::lock_guard lock(mutex_);
+				remove_task_id_.remove(task_id);
+			}
+
 		}  // namespace browser
 	}  // namespace ui
 }  // namespace gdl

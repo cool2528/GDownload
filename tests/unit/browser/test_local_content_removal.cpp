@@ -39,6 +39,17 @@ TEST(LocalContentRemovalTest, ReportsMissingPathAsNotFound) {
 	EXPECT_FALSE(result.partial_possible);
 }
 
+TEST(LocalContentRemovalTest, TreatsEmptyPathAsSafeNoOp) {
+	const auto result = RemoveLocalContent(QString());
+
+	EXPECT_EQ(result.status, LocalRemovalStatus::kNotFound);
+	EXPECT_TRUE(result.path.isEmpty());
+	ASSERT_TRUE(result.removed_count.has_value());
+	EXPECT_EQ(result.removed_count.value(), 0);
+	EXPECT_EQ(result.error_code, 0);
+	EXPECT_FALSE(result.partial_possible);
+}
+
 TEST(LocalContentRemovalTest, RemovesRegularFile) {
 	QTemporaryDir temporary_dir;
 	ASSERT_TRUE(temporary_dir.isValid());
