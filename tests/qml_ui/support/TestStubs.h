@@ -684,7 +684,7 @@ class TestSettingsManager : public QObject {
 	QString ed2k_nickname_ = QStringLiteral("GDownload");
 	int ed2k_tcp_port_ = 4662;
 	int ed2k_udp_port_ = 4672;
-	bool ed2k_enable_kad_ = false;
+	bool ed2k_enable_kad_ = true;
 	bool ed2k_enable_obfuscation_ = false;
 	bool ed2k_auto_connect_ = true;
 	int ed2k_max_concurrent_tasks_ = 5;

@@ -262,20 +262,26 @@ Button {
     // 图标有效色:未显式设置则跟随 contentColor
     readonly property color effIconColor: Qt.colorEqual(iconColor, "transparent") ? contentColor : iconColor
 
+    // 悬停填充色(nav/iconOnly/plain 复用);"无背景"态必须用同色 0-alpha 而非 "transparent":
+    // transparent 的 RGB 是黑色,ColorAnimation 在 RGBA 上插值会途经半透明黑,
+    // 浅色主题下表现为 hover 进出时深灰一闪
+    readonly property color navActiveFill: GTheme.dark ? GTheme.fillLight : GTheme.primaryLight(9)
+    readonly property color hoverFill: GTheme.dark ? GTheme.fillBase : GTheme.fillLight
+
     background: Rectangle {
         radius: (variant === "round" || variant === "circle") ? GTheme.radiusRound : (control.isNav ? GTheme.radiusBase : (control.isChip ? GTheme.radiusRound : control.radius))
         implicitHeight: control.implicitH
         implicitWidth: control.isNav ? (GTheme.spaceLG + control.iconSize + GTheme.spaceMD + navText.implicitWidth + GTheme.spaceLG) : (control.iconOnly ? control.implicitH : Math.max(implicitHeight, stdRow.implicitWidth + control.hPadding * 2))
         color: {
             if (control.isNav)
-                return (control.hovered || control.checked) ? (GTheme.dark ? GTheme.fillLight : GTheme.primaryLight(9)) : "transparent";
+                return (control.hovered || control.checked) ? control.navActiveFill : Qt.alpha(control.navActiveFill, 0);
             if (control.iconOnly)
-                return control.checked ? (GTheme.dark ? GTheme.fillLight : GTheme.primaryLight(9))
-                                       : (control.hovered ? (GTheme.dark ? GTheme.fillBase : GTheme.fillLight) : "transparent");
+                return control.checked ? control.navActiveFill
+                                       : (control.hovered ? control.hoverFill : Qt.alpha(control.hoverFill, 0));
             if (!control.enabled)
                 return GTheme.dark ? GTheme.fillBase : GTheme.fillLight;
             if (variant === "plain" || variant === "link")
-                return control.hovered ? (GTheme.dark ? GTheme.fillBase : GTheme.fillLight) : "transparent";
+                return control.hovered ? control.hoverFill : Qt.alpha(control.hoverFill, 0);
             if (control.checked)
                 return currentTheme.bgChecked;
             return control.hovered ? currentTheme.bgHover : currentTheme.bg;

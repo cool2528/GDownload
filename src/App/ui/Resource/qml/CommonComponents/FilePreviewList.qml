@@ -155,7 +155,7 @@ Rectangle {
                 height: root.compactLayout ? GTheme.sizeDefault : GTheme.sizeLarge
                 color: model.isSelected
                        ? (GTheme.dark ? GTheme.fillBase : GTheme.primaryLight(9))
-                       : (rowHover.hovered ? GTheme.fillLighter : "transparent")
+                       : (rowHover.hovered ? GTheme.fillLighter : Qt.alpha(GTheme.fillLighter, 0))
 
                 Behavior on color {
                     ColorAnimation { duration: GTheme.durationFast }
