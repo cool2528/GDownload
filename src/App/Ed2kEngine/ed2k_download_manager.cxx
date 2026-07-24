@@ -105,12 +105,21 @@ struct Ed2kDownloadManager::Impl {
 	std::unique_ptr<boost::asio::steady_timer> sample_timer;
 
 	// 前台请求 in-flight 守卫：引擎契约要求同一 Session 连接上的前台请求
-	// (search/search_more/connect_server/disconnect_server/update_server_met 等)
+	// (search/search_more/connect_server/disconnect_server 等)
 	// 必须串行执行——并发的前台请求会破坏单读者 socket 模型。这里用单个共享标志
 	// 覆盖所有这些方法，进行中直接丢弃新请求；仅在网络线程读写，无需加锁。
 	// RequestServerList/AddServer/RemoveServer/RequestKadStatus 是纯本地操作，
 	// 不经过服务器连接，不受此守卫约束。
 	bool foreground_in_flight = false;
+
+	// server.met 更新独立守卫：引擎 update_server_met 走独立的 HTTPDownload 连接，
+	// 不占用服务器登录 socket，与 connect_server/search 并发是安全的（列表数据的
+	// 消费方 login_with_rotation 在首个挂起点之前就同步消费完 server_met_bytes）。
+	// 若与 foreground_in_flight 共用：启动自动连接在空列表时轮转 8 个内建 fallback
+	// 服务器（每个默认 30s 超时）长期占用守卫，启动自动更新与用户手动"从 URL 更新"
+	// 会被全部静默丢弃——全新安装永远拿不到服务器列表。故仅用独立标志防自身重入；
+	// 重入请求直接忽略（进行中的更新自会发布结果）。仅网络线程读写。
+	bool server_met_in_flight = false;
 
 	// 前台守卫占用期间暂存最新分享目录请求，守卫释放时重放；只保留最新一份。
 	// 启动时 ConnectServer(自动连接)先占用守卫并跨整个网络往返，紧随其后的 SetSharedDirs
@@ -478,7 +487,14 @@ void Ed2kDownloadManager::Search(const std::string& keyword, int file_type, std:
 		return;
 	}
 	boost::asio::post(impl_->runtime.executor(), [this, keyword, file_type, min_size, source] {
+		// 守卫占用/引擎未就绪时发布失败结果而非静默丢弃：UI 的 searching 状态依赖
+		// 结果消息复位，静默丢弃会让用户面对无反馈的"搜索中"直到超时兜底
 		if (!impl_->session || impl_->foreground_in_flight) {
+			if (impl_->pubsub) {
+				impl_->pubsub->Publish(kEd2kSearchResult,
+					SearchErrorToJson(!impl_->session ? "engine not ready"
+													  : "another server operation is in progress, try again shortly"));
+			}
 			return;
 		}
 		impl_->foreground_in_flight = true;
@@ -562,7 +578,13 @@ void Ed2kDownloadManager::SearchMore() {
 		return;
 	}
 	boost::asio::post(impl_->runtime.executor(), [this] {
+		// 同 Search：忙碌/未就绪时发布失败结果，复位 UI 的 searching 状态
 		if (!impl_->session || impl_->foreground_in_flight) {
+			if (impl_->pubsub) {
+				impl_->pubsub->Publish(kEd2kSearchResult,
+					SearchErrorToJson(!impl_->session ? "engine not ready"
+													  : "another server operation is in progress, try again shortly"));
+			}
 			return;
 		}
 		impl_->foreground_in_flight = true;
@@ -641,7 +663,7 @@ void Ed2kDownloadManager::DisconnectServer() {
 	}
 	boost::asio::post(impl_->runtime.executor(), [this] {
 		// disconnect_server() 是同步调用，不挂起协程，但仍需遵守前台请求串行契约：
-		// 若此刻有 search/connect_server/update_server_met 正挂起在同一个 socket 上，
+		// 若此刻有 search/connect_server 正挂起在同一个 socket 上，
 		// 直接断开会破坏对方协程正在使用的连接，因此这里同样检查守卫并丢弃。
 		if (!impl_->session || impl_->foreground_in_flight) {
 			return;
@@ -731,10 +753,22 @@ void Ed2kDownloadManager::UpdateServerMet(const std::string& url) {
 		return;
 	}
 	boost::asio::post(impl_->runtime.executor(), [this, url] {
-		if (!impl_->session || impl_->foreground_in_flight) {
+		// 引擎未就绪也必须发布失败结果：调用方（启动"先更新后连接"链/UI toast）
+		// 依赖"每次请求必有一个结果"来推进后续动作，静默丢弃会卡住整条链
+		if (!impl_->session) {
+			if (impl_->pubsub) {
+				nlohmann::json result;
+				result["ok"] = false;
+				result["error"] = "engine not ready";
+				impl_->pubsub->Publish(kEd2kServerMetResult, result.dump());
+			}
 			return;
 		}
-		impl_->foreground_in_flight = true;
+		// 重入（上一次更新还在进行中）直接忽略：进行中的更新完成时自会发布结果
+		if (impl_->server_met_in_flight) {
+			return;
+		}
+		impl_->server_met_in_flight = true;
 		boost::asio::co_spawn(impl_->runtime.executor(), [this, url]() -> boost::asio::awaitable<void> {
 			try {
 				auto r = co_await impl_->session->update_server_met(url);
@@ -757,7 +791,7 @@ void Ed2kDownloadManager::UpdateServerMet(const std::string& url) {
 					impl_->pubsub->Publish(kEd2kServerMetResult, result.dump());
 				}
 			}
-			ReleaseForegroundGuardLocked();
+			impl_->server_met_in_flight = false;
 			co_return;
 		}, boost::asio::detached);
 	});

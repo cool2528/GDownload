@@ -1,6 +1,7 @@
 #pragma once
 #include "IBrowserManager.h"
 #include <QtQml/qqml.h>
+#include <atomic>
 #include <QHash>
 #include <QObject>
 #include <QVariantMap>
@@ -152,6 +153,11 @@ namespace gdl {
 				engine::Subscription aria2_tracker_update_status_subscription_{nullptr};
 				engine::Ed2kDownloadManager::Subscription ed2k_active_progress_subscription_{nullptr};
 				engine::Ed2kDownloadManager::Subscription ed2k_task_state_subscription_{nullptr};
+				// 启动链订阅:server.met 首个更新结果到达后触发自动连接(见 Init 内注释)
+				engine::Ed2kDownloadManager::Subscription ed2k_server_met_boot_subscription_{nullptr};
+				// 启动链一次性标志:置位后仅首个 server.met 结果触发自动连接;
+				// 回调在引擎网络线程执行,与主线程 Init/UnInit 存在跨线程读写,用原子量
+				std::atomic_bool ed2k_boot_auto_connect_pending_{false};
 				// ed2k 任务最近一次采样信息缓存,用于状态事件(payload 仅含 id/state/error)补全文件名/大小等字段。
 				// 仅在 ed2k 引擎网络线程读写:OnHandleEd2kActiveProgress/OnHandleEd2kTaskState 均由该库内部
 				// 单线程 io_context 串行派发(见 PubSubSystem::Publish 的 post 语义),两者不会并发访问此表,无需加锁。
