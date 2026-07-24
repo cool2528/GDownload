@@ -63,6 +63,20 @@ TEST(DownloadTaskModelTest, ExposesErrorCodeAndMessageRoles) {
 			  QStringLiteral("Resource not found"));
 }
 
+TEST(DownloadTaskModelTest, CanClearStoppedTaskTombstoneForNewLifecycle) {
+	DownloadTaskModel model;
+	DownloadTaskInfo task;
+	task.set_task_id(QStringLiteral("reused-gid"));
+	task.set_task_state(TaskState::kComplete);
+	model.AddTask(task);
+
+	ASSERT_TRUE(model.RemoveTaskById(task.task_id()));
+	ASSERT_TRUE(model.IsTombstoned(task.task_id()));
+
+	model.ClearTombstone(task.task_id());
+	EXPECT_FALSE(model.IsTombstoned(task.task_id()));
+}
+
 TEST(DownloadTaskUtilsTest, ParsesAria2ErrorDetails) {
 	const nlohmann::json object = {
 		{"gid", "failed-gid"},

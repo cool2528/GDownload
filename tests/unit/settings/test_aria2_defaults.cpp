@@ -6,6 +6,8 @@
 #include "config/config_key.h"
 
 using gdl::ui::browser::DecideStoppedTaskDeletionAfterAria2Cleanup;
+using gdl::ui::browser::ExtractAria2RpcErrorMessage;
+using gdl::ui::browser::IsMissingAria2ResultError;
 using gdl::ui::browser::StoppedTaskAria2CleanupStatus;
 using gdl::ui::settings::DefaultBrowserUserAgent;
 
@@ -42,12 +44,14 @@ TEST(Aria2DefaultsTest, UserAgentSettingDefaultsToBrowserUserAgent) {
 	EXPECT_EQ(gdl::ui::settings::UserAgentInstance.Get().toStdString(), DefaultBrowserUserAgent().toStdString());
 }
 
-TEST(StoppedTaskDeleteTest, OrdinaryAria2CleanupFailureBlocksLocalRemoval) {
+TEST(StoppedTaskDeleteTest, OrdinaryAria2CleanupFailureStillRemovesLocalRecord) {
 	const auto decision = DecideStoppedTaskDeletionAfterAria2Cleanup(
 		StoppedTaskAria2CleanupStatus::kFailed, QStringLiteral("connection refused"));
 
-	EXPECT_FALSE(decision.remove_local_task);
+	EXPECT_TRUE(decision.remove_local_task);
 	EXPECT_FALSE(decision.aria2_cleaned);
+	EXPECT_TRUE(decision.show_cleanup_warning);
+	EXPECT_FALSE(decision.warning_message.trimmed().isEmpty());
 }
 
 TEST(StoppedTaskDeleteTest, Aria2CleanupSuccessRemovesLocalTaskWithoutWarning) {
@@ -66,4 +70,13 @@ TEST(StoppedTaskDeleteTest, AlreadyMissingAria2ResultAllowsLocalRemoval) {
 
 	EXPECT_TRUE(decision.remove_local_task);
 	EXPECT_TRUE(decision.aria2_cleaned);
+}
+
+TEST(StoppedTaskDeleteTest, HttpErrorBodyRecognizesMissingAria2Result) {
+	const QString message = ExtractAria2RpcErrorMessage(
+		R"({"id":"missing","jsonrpc":"2.0","error":{"code":1,"message":"GID 0123456789abcdef is not found"}})");
+
+	EXPECT_EQ(message, QStringLiteral("GID 0123456789abcdef is not found"));
+	EXPECT_TRUE(IsMissingAria2ResultError(message));
+	EXPECT_TRUE(IsMissingAria2ResultError(QStringLiteral("GID 0123456789abcdef does not exist")));
 }

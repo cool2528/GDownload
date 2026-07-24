@@ -607,8 +607,9 @@ namespace gdl {
 					}
 				}
 				LOG_ERR("request aria2c method {} fail error {}", method, error_message);
-                result.result = ErrorResult{.err_msg  = error_message,
-                                            .err_code = static_cast<std::int64_t>(reply.status_code)};
+				result.result = ErrorResult{.err_msg  = error_message,
+											.err_code = static_cast<std::int64_t>(reply.status_code),
+											.body     = std::move(reply.text)};
 				return result;
 			}
             result.result	  = SucceedResult{.body = std::move(reply.text)};

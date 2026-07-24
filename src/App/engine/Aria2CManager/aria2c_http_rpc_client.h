@@ -15,6 +15,10 @@ namespace gdl {
 		struct ErrorResult {
 			std::string err_msg;
 			std::int64_t err_code;
+			// 非 2xx RPC 响应的原始正文。aria2 会把 JSON-RPC 错误（例如
+			// "GID ... is not found"）以 HTTP 400 返回，调用方需要正文来
+			// 区分幂等成功与真正的传输/权限错误。
+			std::string body;
 		};
 		struct Response {
 			bool is_succeed{false};
