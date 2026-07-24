@@ -887,143 +887,154 @@
 <context>
     <name>Ed2kSearchPage</name>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="78"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="89"/>
         <source>Kad is not ready. Enable Kad in settings and restart the app, or use Server search.</source>
         <translation>Kad の準備ができていません。設定で Kad を有効にしてアプリを再起動するか、サーバー検索をご利用ください。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="117"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="134"/>
         <source>Kad is not ready. Enable Kad in settings and restart the app.</source>
         <translation>Kad の準備ができていません。設定で Kad を有効にしてアプリを再起動してください。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="31"/>
-        <source>Kad search is unavailable. Enable Kad in settings, or use Server search instead.</source>
-        <translation>Kad 検索は利用できません。設定で Kad を有効にするか、サーバー検索をご利用ください。</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="33"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="42"/>
         <source>Search failed: %1</source>
         <translation>検索に失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="53"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="62"/>
         <source>Enter keywords to search the eD2k network</source>
         <translation>eD2k ネットワークを検索するキーワードを入力してください</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="60"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="69"/>
         <source>Any</source>
         <translation>すべて</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="60"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="69"/>
         <source>Audio</source>
         <translation>オーディオ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="60"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="69"/>
         <source>Video</source>
         <translation>ビデオ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="60"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="69"/>
         <source>Image</source>
         <translation>画像</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="61"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="70"/>
         <source>Program</source>
         <translation>プログラム</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="61"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="70"/>
         <source>Document</source>
         <translation>ドキュメント</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="61"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="70"/>
         <source>Archive</source>
         <translation>アーカイブ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="61"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="70"/>
         <source>CD Image</source>
         <translation>CD イメージ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="66"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="76"/>
         <source>Server</source>
         <translation>サーバー</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="66"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="76"/>
         <source>Kad</source>
         <translation>Kad</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="71"/>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="113"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="76"/>
+        <source>Auto</source>
+        <translation>自動</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="81"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="127"/>
         <source>Searching...</source>
         <translation>検索中…</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="71"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="81"/>
         <source>Search</source>
         <translation>検索</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="115"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="130"/>
+        <source>No server connected. Searches will use the Kad network.</source>
+        <translation>サーバー未接続のため、検索は Kad ネットワークを使用します。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="132"/>
         <source>Not connected to any server</source>
         <translation>どのサーバーにも接続していません</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="118"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="128"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="135"/>
         <source>No results. Try different keywords.</source>
         <translation>結果がありません。別のキーワードをお試しください。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="124"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="40"/>
+        <source>Kad search is unavailable. Kad may still be starting; try again shortly or use Server search.</source>
+        <translation>Kad 検索は現在利用できません。Kad は起動中の可能性があります。しばらくしてから再試行するか、サーバー検索をお試しください。</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="141"/>
         <source>Go to Servers</source>
         <translation>サーバーへ移動</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="162"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="179"/>
         <source>%1 · %2 sources (%3 complete)</source>
         <translation>%1 · ソース %2 件（完全 %3 件）</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="170"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="187"/>
         <source>Copy ed2k link</source>
         <translation>ed2k リンクをコピー</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="173"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="190"/>
         <source>Link copied</source>
         <translation>リンクをコピーしました</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="178"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="195"/>
         <source>Download</source>
         <translation>ダウンロード</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="181"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="198"/>
         <source>Download started</source>
         <translation>ダウンロードを開始しました</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="197"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="214"/>
         <source>Loading...</source>
         <translation>読み込み中…</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="197"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="214"/>
         <source>Load More</source>
         <translation>もっと読み込む</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="183"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="200"/>
         <source>Failed to add download</source>
         <translation>ダウンロードの追加に失敗しました</translation>
     </message>
@@ -2240,6 +2251,16 @@ GNU Affero General Public License v3.0（AGPL-3.0）に基づきライセンス�
     </message>
     <message>
         <location filename="../qml/Browser/HomePage.qml" line="181"/>
+        <source>eD2k</source>
+        <translation>eD2k</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/HomePage.qml" line="182"/>
+        <source>Add eD2k links</source>
+        <translation>eD2k リンクを追加</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/HomePage.qml" line="190"/>
         <source>Cloud Drive</source>
         <translation>クラウドドライブ</translation>
     </message>
@@ -2264,37 +2285,37 @@ GNU Affero General Public License v3.0（AGPL-3.0）に基づきライセンス�
         <translation>トレントファイルをドロップ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="182"/>
+        <location filename="../qml/Browser/HomePage.qml" line="191"/>
         <source>Parse cloud links</source>
         <translation>クラウドリンクを解析</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="193"/>
+        <location filename="../qml/Browser/HomePage.qml" line="202"/>
         <source>Recent activity</source>
         <translation>最近のアクティビティ</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="194"/>
+        <location filename="../qml/Browser/HomePage.qml" line="203"/>
         <source>Your most recently completed downloads.</source>
         <translation>最近完了したダウンロードです。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="202"/>
+        <location filename="../qml/Browser/HomePage.qml" line="211"/>
         <source>No completed downloads yet</source>
         <translation>完了したダウンロードはまだありません</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="203"/>
+        <location filename="../qml/Browser/HomePage.qml" line="212"/>
         <source>Completed files will appear here for quick access.</source>
         <translation>完了したファイルはここに表示され、すぐにアクセスできます。</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="204"/>
+        <location filename="../qml/Browser/HomePage.qml" line="213"/>
         <source>Add download</source>
         <translation>ダウンロードを追加</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="254"/>
+        <location filename="../qml/Browser/HomePage.qml" line="263"/>
         <source>Open</source>
         <translation>開く</translation>
     </message>
@@ -4612,13 +4633,13 @@ GNU Affero General Public License v3.0（AGPL-3.0）に基づきライセンス�
         <translation>再試行を開始しましたが、失敗した古いタスクを履歴から削除できませんでした。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1350"/>
-        <location filename="../../Browser/browser_manager.cxx" line="1413"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1372"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1435"/>
         <source>Download failed. Please check the link or network connection.</source>
         <translation>ダウンロードに失敗しました。リンクまたはネットワーク接続を確認してください。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1351"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1373"/>
         <source>Download failed: %1</source>
         <translation>ダウンロードに失敗しました: %1</translation>
     </message>

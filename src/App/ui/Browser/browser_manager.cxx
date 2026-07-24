@@ -1051,13 +1051,31 @@ namespace gdl {
 							[this](const std::string& msg) { OnHandleEd2kTaskState(msg); });
 					// 重启续传:必须在引擎初始化成功、订阅就绪之后才能重建任务
 					RestoreEd2kDownloadHistory();
-					// 启动自动连接服务器(空 ip = 引擎自动选择)
-					if (ed2k_settings.GetEd2kAutoConnect()) {
-						engine::Ed2kDownloadManager::Instance().ConnectServer(std::string(), 0);
-					}
-					// 自动同步开启时启动刷新服务器列表(引擎运行时下载 server.met)
+					// 启动链:自动同步开启时先刷新 server.met(引擎运行时下载),拿到结果后再自动连接。
+					// 全新安装本地 server.met 为空,直接连接只会在内建 fallback 服务器上逐个耗尽
+					// 每服务器 30s 的超时(最坏约 4 分钟);先更新(秒级)再连接,首连即可用上新列表。
+					// UpdateServerMet 除重入忽略外的所有路径(成功/失败/引擎未就绪)都保证发布结果,
+					// 链条不会悬挂。
 					if (ed2k_settings.GetEd2kAutoSyncSources()) {
-						engine::Ed2kDownloadManager::Instance().UpdateServerMet(ed2k_settings.GetEd2kServerMetUrl().toStdString());
+						if (ed2k_settings.GetEd2kAutoConnect()) {
+							// 订阅必须在触发更新之前建立,避免错过结果。回调跑在引擎网络线程,
+							// ConnectServer 内部会 post 到网络线程,跨线程调用安全。
+							// 一次性原子标志保证仅首个结果触发自动连接;订阅句柄保留到 UnInit
+							// 统一释放,后续用户手动"从 URL 更新"的结果不会再次触发。
+							ed2k_boot_auto_connect_pending_.store(true);
+							ed2k_server_met_boot_subscription_ = engine::Ed2kDownloadManager::Instance()
+								.SubscriptionEd2kMessage(kEd2kServerMetResult, [this](const std::string&) {
+									if (ed2k_boot_auto_connect_pending_.exchange(false)) {
+										engine::Ed2kDownloadManager::Instance().ConnectServer(std::string(), 0);
+									}
+								});
+						}
+						engine::Ed2kDownloadManager::Instance().UpdateServerMet(
+							ed2k_settings.GetEd2kServerMetUrl().toStdString());
+					}
+					else if (ed2k_settings.GetEd2kAutoConnect()) {
+						// 自动同步关闭:保持原行为,直接用本地列表自动连接
+						engine::Ed2kDownloadManager::Instance().ConnectServer(std::string(), 0);
 					}
 				}
 				return true;
@@ -1090,6 +1108,10 @@ namespace gdl {
 				if (ed2k_task_state_subscription_) {
 					engine::Ed2kDownloadManager::Instance().UnSubscribeEd2kMessage(ed2k_task_state_subscription_);
 					ed2k_task_state_subscription_.reset();
+				}
+				if (ed2k_server_met_boot_subscription_) {
+					engine::Ed2kDownloadManager::Instance().UnSubscribeEd2kMessage(ed2k_server_met_boot_subscription_);
+					ed2k_server_met_boot_subscription_.reset();
 				}
 				engine::Ed2kDownloadManager::Instance().ShutdownEngine();
 			}

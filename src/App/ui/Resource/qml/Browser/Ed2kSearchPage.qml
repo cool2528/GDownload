@@ -14,9 +14,18 @@ ColumnLayout {
     signal goToServers()
 
     property var resultModel: Ed2kManager.GetSearchResultModel()
-    // 记录"最近一次实际发起的搜索"所用的来源(0=Server/1=Kad)，供 Load More 可见性判断，
-    // 避免用户在结果展示期间切换下拉框导致 Load More 按钮跟错误的来源联动
+    // 记录"最近一次实际发起的搜索"实际使用的来源(0=Server/1=Kad,Auto 已解析)，
+    // 供 Load More 可见性判断，避免用户在结果展示期间切换下拉框导致按钮跟错误的来源联动
     property int lastSearchSource: 0
+    // 本次点击搜索将实际使用的来源(0=Server/1=Kad)：下拉框选"自动"(index 0)时按
+    // "已连接服务器优先，否则 Kad 就绪走 Kad，两者皆不可用回落服务器(失败提示引导)"解析；
+    // 手动选定(index 1/2)时原样映射。开箱即用的关键：全新安装服务器未连接时 Kad 兜底可搜
+    readonly property int effectiveSource: sourceFilter.currentIndex === 0
+                                           ? (Ed2kManager.serverConnected ? 0
+                                              : (Ed2kManager.kadRunning ? 1 : 0))
+                                           : sourceFilter.currentIndex - 1
+    // 是否已发起过搜索：零结果占位在"从未搜索"时显示来源引导，搜索过则显示"无结果"
+    property bool hasSearched: false
 
     // 进入搜索页时刷新一次 Kad 状态，使"Kad 是否就绪"的判断/提示准确
     Component.onCompleted: Ed2kManager.RefreshKadStatus()
@@ -24,11 +33,11 @@ ColumnLayout {
     Connections {
         target: Ed2kManager
         function onSearchFailed(error) {
-            // Kad 搜索失败多因 Kad 未启用/未就绪(默认关闭,无节点)，
+            // Kad 搜索失败多因 Kad 尚未完成引导(节点未就绪)，
             // 给出明确引导而非透出笼统的引擎错误("connect failed")
             if (root.lastSearchSource === 1) {
                 ToastManager.ShowError(
-                    qsTr("Kad search is unavailable. Enable Kad in settings, or use Server search instead."))
+                    qsTr("Kad search is unavailable. Kad may still be starting; try again shortly or use Server search."))
             } else {
                 ToastManager.ShowError(qsTr("Search failed: %1").arg(error))
             }
@@ -63,7 +72,8 @@ ColumnLayout {
             GComBoBox {
                 id: sourceFilter
                 objectName: "ed2kSearchSource"
-                model: [qsTr("Server"), qsTr("Kad")]
+                // "自动"为默认项:按 effectiveSource 的规则在点击时解析实际来源
+                model: [qsTr("Auto"), qsTr("Server"), qsTr("Kad")]
             }
             GButton {
                 id: searchButton
@@ -71,17 +81,19 @@ ColumnLayout {
                 text: Ed2kManager.searching ? qsTr("Searching...") : qsTr("Search")
                 enabled: !Ed2kManager.searching && keywordInput.text.trim().length > 0
                 onClicked: {
-                    // Kad 源前置就绪检查:Kad 未启用/未生效(通常是启用后未重启)时,
-                    // 直接给明确引导而非发起注定失败的搜索、让用户对着"没有结果"猜。
-                    if (sourceFilter.currentIndex === 1 && !Ed2kManager.kadRunning) {
+                    // Kad 源前置就绪检查(仅用户手动强制 Kad 时可能命中;"自动"只在
+                    // Kad 就绪时才会解析到 Kad):未就绪时直接给明确引导，
+                    // 而非发起注定失败的搜索、让用户对着"没有结果"猜。
+                    if (root.effectiveSource === 1 && !Ed2kManager.kadRunning) {
                         ToastManager.ShowError(
                             qsTr("Kad is not ready. Enable Kad in settings and restart the app, or use Server search."))
                         return
                     }
                     root.resultModel.clear()
-                    root.lastSearchSource = sourceFilter.currentIndex
+                    root.hasSearched = true
+                    root.lastSearchSource = root.effectiveSource
                     Ed2kManager.StartSearch(keywordInput.text, typeFilter.currentIndex, 0,
-                                            sourceFilter.currentIndex)
+                                            root.effectiveSource)
                 }
             }
         }
@@ -110,17 +122,22 @@ ColumnLayout {
                         Layout.alignment: Qt.AlignHCenter
                         font.pixelSize: GTheme.fontBody
                         color: GTheme.textSecondary
+                        // 占位提示跟随解析后的实际来源:自动模式下 Kad 兜底时提示 Kad 搜索可用,
+                        // 避免"未连接服务器"吓退本可直接搜索的用户;已搜索过则统一显示"无结果"
                         text: Ed2kManager.searching ? qsTr("Searching...")
-                              : (!Ed2kManager.serverConnected && sourceFilter.currentIndex === 0)
+                              : root.hasSearched ? qsTr("No results. Try different keywords.")
+                              : (root.effectiveSource === 1 && sourceFilter.currentIndex === 0)
+                                ? qsTr("No server connected. Searches will use the Kad network.")
+                              : (root.effectiveSource === 0 && !Ed2kManager.serverConnected)
                                 ? qsTr("Not connected to any server")
-                              : (sourceFilter.currentIndex === 1 && !Ed2kManager.kadRunning)
+                              : (root.effectiveSource === 1 && !Ed2kManager.kadRunning)
                                 ? qsTr("Kad is not ready. Enable Kad in settings and restart the app.")
                                 : qsTr("No results. Try different keywords.")
                     }
                     GButton {
                         Layout.alignment: Qt.AlignHCenter
                         visible: !Ed2kManager.serverConnected && !Ed2kManager.searching
-                                 && sourceFilter.currentIndex === 0
+                                 && root.effectiveSource === 0
                         text: qsTr("Go to Servers")
                         onClicked: root.goToServers()
                     }

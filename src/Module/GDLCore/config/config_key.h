@@ -95,7 +95,9 @@ namespace gdl {
 			CONFIG_PATH(Ed2kNickname, "ed2k.nickname", "GDownload");
 			CONFIG_PATH(Ed2kTcpPort, "ed2k.tcp-port", "4662");
 			CONFIG_PATH(Ed2kUdpPort, "ed2k.udp-port", "4672");
-			CONFIG_PATH(Ed2kEnableKad, "ed2k.enable-kad", "false");
+			// 默认开启:Kad 是无服务器找源/搜索的关键途径,需与 setting.h Ed2kEnableKad::Default() 保持一致
+			// (config 层在加载时会用本默认值填充缺失 key,setting.h 的 Default() 只在值为空时才生效)
+			CONFIG_PATH(Ed2kEnableKad, "ed2k.enable-kad", "true");
 			CONFIG_PATH(Ed2kEnableObfuscation, "ed2k.enable-obfuscation", "false");
 			CONFIG_PATH(Ed2kAutoConnect, "ed2k.auto-connect", "true");
 			CONFIG_PATH(Ed2kMaxConcurrentTasks, "ed2k.max-concurrent-tasks", "5");

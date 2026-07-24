@@ -887,143 +887,154 @@
 <context>
     <name>Ed2kSearchPage</name>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="78"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="89"/>
         <source>Kad is not ready. Enable Kad in settings and restart the app, or use Server search.</source>
         <translation>Kad가 준비되지 않았습니다. 설정에서 Kad를 활성화하고 앱을 다시 시작하거나 서버 검색을 사용하세요.</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="117"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="134"/>
         <source>Kad is not ready. Enable Kad in settings and restart the app.</source>
         <translation>Kad가 준비되지 않았습니다. 설정에서 Kad를 활성화하고 앱을 다시 시작하세요.</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="31"/>
-        <source>Kad search is unavailable. Enable Kad in settings, or use Server search instead.</source>
-        <translation>Kad 검색을 사용할 수 없습니다. 설정에서 Kad를 활성화하거나 서버 검색을 사용하세요.</translation>
-    </message>
-    <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="33"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="42"/>
         <source>Search failed: %1</source>
         <translation>검색 실패: %1</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="53"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="62"/>
         <source>Enter keywords to search the eD2k network</source>
         <translation>eD2k 네트워크를 검색할 키워드를 입력하세요</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="60"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="69"/>
         <source>Any</source>
         <translation>모두</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="60"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="69"/>
         <source>Audio</source>
         <translation>오디오</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="60"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="69"/>
         <source>Video</source>
         <translation>비디오</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="60"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="69"/>
         <source>Image</source>
         <translation>이미지</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="61"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="70"/>
         <source>Program</source>
         <translation>프로그램</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="61"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="70"/>
         <source>Document</source>
         <translation>문서</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="61"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="70"/>
         <source>Archive</source>
         <translation>압축 파일</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="61"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="70"/>
         <source>CD Image</source>
         <translation>CD 이미지</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="66"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="76"/>
         <source>Server</source>
         <translation>서버</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="66"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="76"/>
         <source>Kad</source>
         <translation>Kad</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="71"/>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="113"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="76"/>
+        <source>Auto</source>
+        <translation>자동</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="81"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="127"/>
         <source>Searching...</source>
         <translation>검색 중…</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="71"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="81"/>
         <source>Search</source>
         <translation>검색</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="115"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="130"/>
+        <source>No server connected. Searches will use the Kad network.</source>
+        <translation>서버에 연결되어 있지 않아 검색은 Kad 네트워크를 사용합니다.</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="132"/>
         <source>Not connected to any server</source>
         <translation>어떤 서버에도 연결되어 있지 않습니다</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="118"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="128"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="135"/>
         <source>No results. Try different keywords.</source>
         <translation>결과가 없습니다. 다른 키워드를 시도해 보세요.</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="124"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="40"/>
+        <source>Kad search is unavailable. Kad may still be starting; try again shortly or use Server search.</source>
+        <translation>Kad 검색을 사용할 수 없습니다. Kad가 아직 시작 중일 수 있으니 잠시 후 다시 시도하거나 서버 검색을 이용하세요.</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="141"/>
         <source>Go to Servers</source>
         <translation>서버로 이동</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="162"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="179"/>
         <source>%1 · %2 sources (%3 complete)</source>
         <translation>%1 · 소스 %2개(완전 %3개)</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="170"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="187"/>
         <source>Copy ed2k link</source>
         <translation>ed2k 링크 복사</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="173"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="190"/>
         <source>Link copied</source>
         <translation>링크가 복사되었습니다</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="178"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="195"/>
         <source>Download</source>
         <translation>다운로드</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="181"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="198"/>
         <source>Download started</source>
         <translation>다운로드가 시작되었습니다</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="197"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="214"/>
         <source>Loading...</source>
         <translation>불러오는 중…</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="197"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="214"/>
         <source>Load More</source>
         <translation>더 불러오기</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="183"/>
+        <location filename="../qml/Browser/Ed2kSearchPage.qml" line="200"/>
         <source>Failed to add download</source>
         <translation>다운로드 추가에 실패했습니다</translation>
     </message>
@@ -2240,6 +2251,16 @@ GNU Affero General Public License v3.0(AGPL-3.0)에 따라 라이선스가 부�
     </message>
     <message>
         <location filename="../qml/Browser/HomePage.qml" line="181"/>
+        <source>eD2k</source>
+        <translation>eD2k</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/HomePage.qml" line="182"/>
+        <source>Add eD2k links</source>
+        <translation>eD2k 링크 추가</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/HomePage.qml" line="190"/>
         <source>Cloud Drive</source>
         <translation>클라우드 드라이브</translation>
     </message>
@@ -2264,37 +2285,37 @@ GNU Affero General Public License v3.0(AGPL-3.0)에 따라 라이선스가 부�
         <translation>토렌트 파일 끌어다 놓기</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="182"/>
+        <location filename="../qml/Browser/HomePage.qml" line="191"/>
         <source>Parse cloud links</source>
         <translation>클라우드 링크 분석</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="193"/>
+        <location filename="../qml/Browser/HomePage.qml" line="202"/>
         <source>Recent activity</source>
         <translation>최근 활동</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="194"/>
+        <location filename="../qml/Browser/HomePage.qml" line="203"/>
         <source>Your most recently completed downloads.</source>
         <translation>가장 최근에 완료된 다운로드입니다.</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="202"/>
+        <location filename="../qml/Browser/HomePage.qml" line="211"/>
         <source>No completed downloads yet</source>
         <translation>아직 완료된 다운로드가 없습니다</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="203"/>
+        <location filename="../qml/Browser/HomePage.qml" line="212"/>
         <source>Completed files will appear here for quick access.</source>
         <translation>완료된 파일이 여기에 표시되어 빠르게 접근할 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="204"/>
+        <location filename="../qml/Browser/HomePage.qml" line="213"/>
         <source>Add download</source>
         <translation>다운로드 추가</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/HomePage.qml" line="254"/>
+        <location filename="../qml/Browser/HomePage.qml" line="263"/>
         <source>Open</source>
         <translation>열기</translation>
     </message>
@@ -4612,13 +4633,13 @@ GNU Affero General Public License v3.0(AGPL-3.0)에 따라 라이선스가 부�
         <translation>재시도가 시작되었지만 이전 실패 작업을 기록에서 제거할 수 없었습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1350"/>
-        <location filename="../../Browser/browser_manager.cxx" line="1413"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1372"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1435"/>
         <source>Download failed. Please check the link or network connection.</source>
         <translation>다운로드 실패. 링크 또는 네트워크 연결을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1351"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1373"/>
         <source>Download failed: %1</source>
         <translation>다운로드 실패: %1</translation>
     </message>
