@@ -102,7 +102,7 @@ Item {
                 Layout.preferredHeight: GTheme.sizeLarge
                 checked: (typeof brower_view !== "undefined") && brower_view.index === 2
                 iconName: "home"
-                imageSize: Qt.size(20, 20)
+                imageSize: Qt.size(24, 24)
                 tintColor: contentColor
                 onClicked: {
                     brower_view.index = 2
@@ -120,7 +120,7 @@ Item {
                 Layout.preferredHeight: GTheme.sizeLarge
                 checked: (typeof brower_view !== "undefined") && brower_view.index === 0 && brower_view.downloadIndex === 0
                 iconName: "download"
-                imageSize: Qt.size(20, 20)
+                imageSize: Qt.size(24, 24)
                 tintColor: contentColor
                 onClicked: {
                     brower_view.index = 0
@@ -140,7 +140,7 @@ Item {
                 Layout.preferredHeight: GTheme.sizeLarge
                 checked: (typeof brower_view !== "undefined") && brower_view.index === 0 && brower_view.downloadIndex === 1
                 iconName: "queue"
-                imageSize: Qt.size(20, 20)
+                imageSize: Qt.size(24, 24)
                 tintColor: contentColor
                 onClicked: {
                     brower_view.index = 0
@@ -160,7 +160,7 @@ Item {
                 Layout.preferredHeight: GTheme.sizeLarge
                 checked: (typeof brower_view !== "undefined") && brower_view.index === 0 && brower_view.downloadIndex === 2
                 iconName: "completed"
-                imageSize: Qt.size(20, 20)
+                imageSize: Qt.size(24, 24)
                 tintColor: contentColor
                 onClicked: {
                     brower_view.index = 0
@@ -180,7 +180,7 @@ Item {
                 Layout.preferredHeight: GTheme.sizeLarge
                 checked: (typeof brower_view !== "undefined") && brower_view.index === 3
                 iconName: "connected"
-                imageSize: Qt.size(20, 20)
+                imageSize: Qt.size(24, 24)
                 tintColor: contentColor
                 onClicked: {
                     brower_view.index = 3
@@ -198,7 +198,7 @@ Item {
                 Layout.preferredWidth: GTheme.sizeLarge
                 Layout.preferredHeight: GTheme.sizeLarge
                 iconName: "add"
-                imageSize: Qt.size(20, 20)
+                imageSize: Qt.size(24, 24)
                 tintColor: contentColor
                 onClicked: {
                     let task = addDownloadTask()
@@ -231,7 +231,7 @@ Item {
                 Layout.preferredHeight: GTheme.sizeLarge
                 checked: (typeof brower_view !== "undefined") && brower_view.index === 1
                 iconName: "settings"
-                imageSize: Qt.size(20, 20)
+                imageSize: Qt.size(24, 24)
                 tintColor: contentColor
                 onClicked: {
                     brower_view.index = 1
@@ -248,7 +248,7 @@ Item {
                 Layout.preferredWidth: GTheme.sizeLarge
                 Layout.preferredHeight: GTheme.sizeLarge
                 iconName: "help"
-                imageSize: Qt.size(20, 20)
+                imageSize: Qt.size(24, 24)
                 tintColor: contentColor
                 onClicked: {
                     let about = showAboutDialog()
