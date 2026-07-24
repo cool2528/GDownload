@@ -30,21 +30,14 @@ namespace gdl {
 				last_error_ = QString::fromStdString(updater_->GetLastError());
 				return false;
 			}
-			// Read last check time
-			QSettings settings;
-			QDateTime last_check = settings.value("update/last_check_time").toDateTime();
-			QDateTime now		 = QDateTime::currentDateTime();
-			// If auto-check is enabled and interval is greater than 0
+			// 自动检查开启且间隔有效时:
+			// 1. 每次启动都在 5 秒后静默检查一次(不再受"距上次检查 >= 间隔"限制,
+			//    发现新版才弹窗,无更新时静默无打扰);
+			// 2. 周期定时器保留,应用长期不重启也能发现新版。
 			if (config.check_interval_hours > 0 && config.enable_auto_check) {
-				// Set timer to check at specified interval
 				check_timer_.setInterval(config.check_interval_hours * 60 * 60 * 1000);
 				check_timer_.start();
-
-				// If never checked before or interval has passed, check immediately
-				if (!last_check.isValid() || last_check.addSecs(config.check_interval_hours * 3600) <= now) {
-					// Use silent mode for automatic check
-					QTimer::singleShot(5000, [this]() { CheckForUpdates(true); });
-				}
+				QTimer::singleShot(5000, this, [this]() { CheckForUpdates(true); });
 			}
 			return true;
 		}
@@ -58,6 +51,10 @@ namespace gdl {
 			// 记录检查时间
 			QSettings settings;
 			settings.setValue("update/last_check_time", QDateTime::currentDateTime());
+			// 清空上一轮残留错误:"成功但无更新"不会写 last_error_,不清空会把
+			// 陈旧错误误判为本轮检查失败(见 checkForUpdatesFinished 的 error 判定)
+			last_error_.clear();
+			updater_->ClearLastError();
 			// 检查更新
 			updater_->CheckForUpdates(
 				[this](bool has_update, const UpdateInfo& info) { onUpdateCheckCompleted(has_update, info); });
@@ -95,6 +92,16 @@ namespace gdl {
 
 		void UpdateManager::onUpdateCheckCompleted(bool has_update, const UpdateInfo& info) {
 			update_available_ = has_update;
+			// 手动检查(非静默)无论结果都发回执:设置页按钮据此复位忙碌态并提示
+			// "已是最新版本"/"检查失败: 原因";静默启动检查不发射,避免误弹提示。
+			// error 非空即本轮检查失败(CheckForUpdates 入口已清空陈旧错误)
+			if (!silent_check_) {
+				const QString error =
+					updater_ ? QString::fromStdString(updater_->GetLastError()) : QString();
+				QMetaObject::invokeMethod(
+					this, [this, has_update, error]() { Q_EMIT checkForUpdatesFinished(has_update, error); },
+					Qt::QueuedConnection);
+			}
 			if (has_update) {
 				latest_update_info_ = info;
 				// 使用 QMetaObject::invokeMethod 确保在主线程中创建对象

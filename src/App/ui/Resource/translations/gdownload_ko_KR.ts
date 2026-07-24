@@ -202,67 +202,92 @@
         <translation>자동 업데이트</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="101"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="100"/>
+        <source>Check for Updates</source>
+        <translation>업데이트 확인</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="107"/>
+        <source>Checking...</source>
+        <translation>확인 중…</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="107"/>
+        <source>Check Now</source>
+        <translation>지금 확인</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="120"/>
+        <source>Update check failed: %1</source>
+        <translation>업데이트 확인 실패: %1</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="122"/>
+        <source>You are using the latest version</source>
+        <translation>현재 최신 버전을 사용 중입니다</translation>
+    </message>
+    <message>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="136"/>
         <source>Open at Login</source>
         <translation>로그인 시 열기</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="116"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="151"/>
         <source>Remember Window Position</source>
         <translation>창 위치 기억하기</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="130"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="165"/>
         <source>Auto Resume Unfinished Download</source>
         <translation>완료되지 않은 다운로드 자동 재개</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="144"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="179"/>
         <source>Show Close Confirmation</source>
         <translation>닫기 확인 표시</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="154"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="189"/>
         <source>Download Path</source>
         <translation>다운로드 경로</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="155"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="190"/>
         <source>Global download folder</source>
         <translation>글로벌 다운로드 폴더</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="174"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="209"/>
         <source>Network Proxy</source>
         <translation>네트워크 프록시</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="184"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="219"/>
         <source>Enable Global Proxy</source>
         <translation>글로벌 프록시 사용</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="210"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="245"/>
         <source>Global proxy address</source>
         <translation>글로벌 프록시 주소</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="220"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="255"/>
         <source>Save</source>
         <translation>저장</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="231"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="266"/>
         <source>Clipboard Monitor</source>
         <translation>클립보드 모니터</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="232"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="267"/>
         <source>Automatically detect download links from clipboard</source>
         <translation>클립보드에서 다운로드 링크 자동 감지</translation>
     </message>
     <message>
-        <location filename="../qml/Browser/BasicSettingPage.qml" line="241"/>
+        <location filename="../qml/Browser/BasicSettingPage.qml" line="276"/>
         <source>Auto Listen Clipboard Link</source>
         <translation>자동 듣기 클립보드 링크</translation>
     </message>
