@@ -3646,7 +3646,7 @@ Copyright © 2024-2026 GDownload Team
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="116"/>
         <source>Torrent</source>
-        <translation>下载</translation>
+        <translation>种子</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="117"/>

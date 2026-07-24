@@ -153,7 +153,7 @@ Item {
 
                     GridLayout {
                         Layout.fillWidth: true
-                        columns: control.compactLayout ? 1 : 3
+                        columns: control.compactLayout ? 1 : 4
                         columnSpacing: GTheme.spaceMD
                         rowSpacing: GTheme.spaceMD
 
@@ -174,6 +174,15 @@ Item {
                             iconName: "cloud-download"
                             accent: "success"
                             onClicked: control.openTaskDialog(1)
+                        }
+                        QuickActionCard {
+                            objectName: "homeAddEd2kAction"
+                            Layout.fillWidth: true
+                            title: qsTr("eD2k")
+                            description: qsTr("Add eD2k links")
+                            iconName: "connected"
+                            accent: "info"
+                            onClicked: control.openTaskDialog(2)
                         }
                         QuickActionCard {
                             objectName: "homeAddCloudAction"

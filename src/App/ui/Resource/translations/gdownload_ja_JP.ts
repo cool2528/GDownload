@@ -3646,7 +3646,7 @@ GNU Affero General Public License v3.0（AGPL-3.0）に基づきライセンス�
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="116"/>
         <source>Torrent</source>
-        <translation>激流</translation>
+        <translation>トレント</translation>
     </message>
     <message>
         <location filename="../qml/CommonComponents/TaskDialogPage.qml" line="117"/>
