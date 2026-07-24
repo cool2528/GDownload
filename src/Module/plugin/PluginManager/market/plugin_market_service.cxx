@@ -217,6 +217,11 @@ namespace gdl {
 				if (!entry.is_directory()) {
 					continue;
 				}
+				// demo-httpbin 是 SDK 验收示例插件, 不在插件市场列表中显示
+				// (与打包时 install 的 PATTERN "demo-httpbin" EXCLUDE 保持一致)
+				if (entry.path().filename() == "demo-httpbin") {
+					continue;
+				}
 				std::string err;
 				auto manifest = plugin::js::LoadManifest(entry.path(), err);
 				if (manifest) {
