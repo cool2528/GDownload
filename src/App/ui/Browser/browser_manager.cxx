@@ -446,7 +446,7 @@ namespace gdl {
 			}
 
 			TaskDeletionResult BrowserManagerImpl::RemoveTaskResult(int page_index, const QString& gid,
-															 bool is_remove_file) {
+															 bool is_remove_file, int removal_attempts) {
 				TaskDeletionResult result{.content_requested = is_remove_file};
 				if (gid.isEmpty()) return result;
 
@@ -515,19 +515,23 @@ namespace gdl {
 
 				// 如果需要删除文件
 				if (is_remove_file && !save_path.isEmpty()) {
-					result.content = RemoveLocalContent(save_path);
-					result.control_file = RemoveLocalContent(cache_file_path);
+					result.content = RemoveLocalContent(save_path, removal_attempts);
+					result.control_file = RemoveLocalContent(cache_file_path, removal_attempts);
 				}
 
 				return result;
 			}
+
+			// 批量删除禁用本地文件删除的重试退避:批量在 UI 线程同步执行,
+			// 多个被占用文件叠加的退避 sleep 会让界面冻结数百毫秒以上
+			constexpr int kBulkRemovalAttempts = 1;
 
 			QVariantMap BrowserManagerImpl::RemoveAllTask(int page_index, bool is_remove_file) {
 				BulkDeletionResult bulk;
 				if (page_index == 0) {
 					if (active_model_) {
 						for (const auto& task : active_model_->GetTaskIds()) {
-							bulk.Add(RemoveTaskResult(page_index, task, is_remove_file));
+							bulk.Add(RemoveTaskResult(page_index, task, is_remove_file, kBulkRemovalAttempts));
 						}
 						return bulk.ToVariantMap();
 					}
@@ -535,7 +539,7 @@ namespace gdl {
 				else if (page_index == 1) {
 					if (waiting_model_) {
 						for (const auto& task : waiting_model_->GetTaskIds()) {
-							bulk.Add(RemoveTaskResult(page_index, task, is_remove_file));
+							bulk.Add(RemoveTaskResult(page_index, task, is_remove_file, kBulkRemovalAttempts));
 						}
 						return bulk.ToVariantMap();
 					}
@@ -686,7 +690,7 @@ namespace gdl {
 			}
 
 			TaskDeletionResult BrowserManagerImpl::RemoveStopTaskResult(const QString& gid,
-															 bool is_remove_file) {
+															 bool is_remove_file, int removal_attempts) {
 				TaskDeletionResult result{.content_requested = is_remove_file};
 				if (gid.isEmpty()) {
 					LOG_ERR("RemoveStopTask failed: missing task id");
@@ -727,12 +731,13 @@ namespace gdl {
 								gid.toStdString(), ed2k_history_result.GetError().Describe());
 					}
 					if (is_remove_file) {
-						result.content = RemoveLocalContent(ed2k_save_path);
+						result.content = RemoveLocalContent(ed2k_save_path, removal_attempts);
 						if (result.content.status == LocalRemovalStatus::kFailed) {
 							LOG_WARN("RemoveStopTask failed to remove downloaded content gid:{} error:{}",
 									 gid.toStdString(), result.content.error.toStdString());
 						}
-						result.control_file = RemoveLocalContent(ed2k_save_path + QStringLiteral(".part.met"));
+						result.control_file =
+							RemoveLocalContent(ed2k_save_path + QStringLiteral(".part.met"), removal_attempts);
 						if (result.control_file.status == LocalRemovalStatus::kFailed) {
 							LOG_WARN("RemoveStopTask failed to remove ed2k control file gid:{} error:{}",
 									 gid.toStdString(), result.control_file.error.toStdString());
@@ -745,11 +750,6 @@ namespace gdl {
 				const auto aria2_cleanup_status = RemoveAria2DownloadResultByGid(gid, &aria2_error);
 				const auto deletion_decision =
 					DecideStoppedTaskDeletionAfterAria2Cleanup(aria2_cleanup_status, aria2_error);
-				if (!deletion_decision.remove_local_task) {
-					LOG_WARN("RemoveStopTask failed during aria2 cleanup gid:{} error:{}", gid.toStdString(),
-							 aria2_error.toStdString());
-					return result;
-				}
 				result.aria2_cleaned = deletion_decision.aria2_cleaned;
 
 				const QString save_path = task->task_save_path();
@@ -773,12 +773,12 @@ namespace gdl {
 							 deletion_decision.warning_message.toStdString());
 				}
 				if (is_remove_file) {
-					result.content = RemoveLocalContent(save_path);
+					result.content = RemoveLocalContent(save_path, removal_attempts);
 					if (result.content.status == LocalRemovalStatus::kFailed) {
 						LOG_WARN("RemoveStopTask failed to remove downloaded content gid:{} error:{}",
 								 gid.toStdString(), result.content.error.toStdString());
 					}
-					result.control_file = RemoveLocalContent(cache_file_path);
+					result.control_file = RemoveLocalContent(cache_file_path, removal_attempts);
 					if (result.control_file.status == LocalRemovalStatus::kFailed) {
 						LOG_WARN("RemoveStopTask failed to remove aria2 control file gid:{} error:{}",
 								 gid.toStdString(), result.control_file.error.toStdString());
@@ -805,7 +805,7 @@ namespace gdl {
 				if (stopped_model_) {
 					auto tasks = stopped_model_->GetTaskIds();
 					for (const auto& task : tasks) {
-						bulk.Add(RemoveStopTaskResult(task, is_remove_file));
+						bulk.Add(RemoveStopTaskResult(task, is_remove_file, kBulkRemovalAttempts));
 					}
 					return bulk.ToVariantMap();
 				}

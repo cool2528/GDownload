@@ -51,16 +51,18 @@ namespace gdl {
 #endif
 			}
 
-			inline LocalRemovalResult RemoveLocalContent(const QString& path) {
+			// max_attempts: 删除尝试次数上限。默认 3 次带退避重试;批量删除在
+			// UI 线程同步执行,传 1 避免每个被占用文件都让界面冻结数百毫秒
+			inline LocalRemovalResult RemoveLocalContent(const QString& path, int max_attempts = 3) {
 				if (path.isEmpty()) {
 					return {.status = LocalRemovalStatus::kNotFound,
 							.path = path,
 							.removed_count = std::uintmax_t{0}};
 				}
 
-				constexpr int kMaxAttempts = 3;
+				const int attempts = max_attempts < 1 ? 1 : max_attempts;
 				std::error_code error_code;
-				for (int attempt = 0; attempt < kMaxAttempts; ++attempt) {
+				for (int attempt = 0; attempt < attempts; ++attempt) {
 					error_code.clear();
 					// remove_all 出错时返回 static_cast<uintmax_t>(-1) 而非部分删除数,
 					// 失败尝试的返回值必须丢弃,否则跨尝试累加会无符号回绕
@@ -75,7 +77,7 @@ namespace gdl {
 
 					// Windows 上的播放器、预览窗格或杀毒软件可能只短暂持有文件句柄。
 					// 以很短的退避重试，避免把可恢复的共享冲突直接暴露给用户。
-					if (attempt + 1 < kMaxAttempts) {
+					if (attempt + 1 < attempts) {
 						std::this_thread::sleep_for(std::chrono::milliseconds(50 * (attempt + 1)));
 					}
 				}

@@ -162,6 +162,24 @@ TEST(LocalContentRemovalTest, ReportsFailureForOpenFile) {
 	EXPECT_TRUE(QFile::exists(file_path));
 }
 
+TEST(LocalContentRemovalTest, SingleAttemptFailsFastForLockedFile) {
+	QTemporaryDir temporary_dir;
+	ASSERT_TRUE(temporary_dir.isValid());
+	QTemporaryFile open_file(temporary_dir.filePath(QStringLiteral("bulk-locked-XXXXXX.bin")));
+	ASSERT_TRUE(open_file.open());
+	const QString file_path = open_file.fileName();
+
+	const auto start = std::chrono::steady_clock::now();
+	const auto result = RemoveLocalContent(file_path, 1);
+	const auto elapsed = std::chrono::steady_clock::now() - start;
+
+	EXPECT_EQ(result.status, LocalRemovalStatus::kFailed);
+	EXPECT_TRUE(result.partial_possible);
+	// 单次尝试不应进入重试退避(默认 3 次尝试至少 sleep 150ms),
+	// 批量删除路径靠它避免每个被占用文件都冻结 UI 线程
+	EXPECT_LT(elapsed, std::chrono::milliseconds(140));
+}
+
 TEST(LocalContentRemovalTest, ReportsAccurateCountWhenRetrySucceedsAfterTransientLock) {
 	QTemporaryDir temporary_dir;
 	ASSERT_TRUE(temporary_dir.isValid());
