@@ -3220,6 +3220,16 @@ GNU Affero General Public License v3.0（AGPL-3.0）に基づきライセンス�
         <source>Download engine is unavailable.</source>
         <translation>ダウンロードエンジンを利用できません。</translation>
     </message>
+    <message>
+        <location filename="../../Browser/stopped_task_delete_utils.h" line="53"/>
+        <source>Task was removed locally, but aria2 cleanup failed.</source>
+        <translation>タスクはローカルで削除されましたが、aria2 のクリーンアップに失敗しました。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/stopped_task_delete_utils.h" line="54"/>
+        <source>Task was removed locally, but aria2 cleanup failed: %1</source>
+        <translation>タスクはローカルで削除されましたが、aria2 のクリーンアップに失敗しました: %1</translation>
+    </message>
 </context>
 <context>
     <name>SettingFormActions</name>
@@ -4565,106 +4575,106 @@ GNU Affero General Public License v3.0（AGPL-3.0）に基づきライセンス�
 <context>
     <name>gdl::ui::browser::BrowserManagerImpl</name>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="208"/>
-        <location filename="../../Browser/browser_manager.cxx" line="215"/>
-        <location filename="../../Browser/browser_manager.cxx" line="941"/>
-        <location filename="../../Browser/browser_manager.cxx" line="948"/>
+        <location filename="../../Browser/browser_manager.cxx" line="194"/>
+        <location filename="../../Browser/browser_manager.cxx" line="201"/>
+        <location filename="../../Browser/browser_manager.cxx" line="927"/>
+        <location filename="../../Browser/browser_manager.cxx" line="934"/>
         <source>Invalid ed2k link: %1</source>
         <translation>ed2k リンクが無効です: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="225"/>
+        <location filename="../../Browser/browser_manager.cxx" line="211"/>
         <source>Invalid download link: %1</source>
         <translation>ダウンロードリンクが無効です: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="238"/>
+        <location filename="../../Browser/browser_manager.cxx" line="224"/>
         <source>Failed to add download task. Please check the link or aria2 connection.</source>
         <translation>ダウンロードタスクの追加に失敗しました。リンクまたは aria2 接続を確認してください。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="239"/>
+        <location filename="../../Browser/browser_manager.cxx" line="225"/>
         <source>Failed to add download task: %1</source>
         <translation>ダウンロードタスクの追加に失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="264"/>
+        <location filename="../../Browser/browser_manager.cxx" line="250"/>
         <source>Torrent file does not exist: %1</source>
         <translation>Torrent ファイルが存在しません: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="270"/>
+        <location filename="../../Browser/browser_manager.cxx" line="256"/>
         <source>Failed to read torrent file: %1</source>
         <translation>Torrent ファイルの読み取りに失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="284"/>
+        <location filename="../../Browser/browser_manager.cxx" line="270"/>
         <source>Failed to add torrent task. Please check the file or aria2 connection.</source>
         <translation>Torrent タスクの追加に失敗しました。ファイルまたは aria2 接続を確認してください。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="285"/>
+        <location filename="../../Browser/browser_manager.cxx" line="271"/>
         <source>Failed to add torrent task: %1</source>
         <translation>Torrent タスクの追加に失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="308"/>
+        <location filename="../../Browser/browser_manager.cxx" line="294"/>
         <source>Metalink file does not exist: %1</source>
         <translation>Metalink ファイルが存在しません: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="314"/>
+        <location filename="../../Browser/browser_manager.cxx" line="300"/>
         <source>Failed to read metalink file: %1</source>
         <translation>Metalink ファイルの読み取りに失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="328"/>
+        <location filename="../../Browser/browser_manager.cxx" line="314"/>
         <source>Failed to add metalink task. Please check the file or aria2 connection.</source>
         <translation>Metalink タスクの追加に失敗しました。ファイルまたは aria2 接続を確認してください。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="329"/>
+        <location filename="../../Browser/browser_manager.cxx" line="315"/>
         <source>Failed to add metalink task: %1</source>
         <translation>Metalink タスクの追加に失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="644"/>
+        <location filename="../../Browser/browser_manager.cxx" line="634"/>
         <source>Failed to retry task: missing task id.</source>
         <translation>タスクの再試行に失敗しました: タスクIDがありません。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="648"/>
+        <location filename="../../Browser/browser_manager.cxx" line="638"/>
         <source>Failed to retry task: stopped task list is not available.</source>
         <translation>タスクの再試行に失敗しました: 停止済みタスクリストを利用できません。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="654"/>
+        <location filename="../../Browser/browser_manager.cxx" line="644"/>
         <source>Failed to retry task: task was not found.</source>
         <translation>タスクの再試行に失敗しました: タスクが見つかりませんでした。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="658"/>
+        <location filename="../../Browser/browser_manager.cxx" line="648"/>
         <source>Only failed tasks can be retried.</source>
         <translation>失敗したタスクのみ再試行できます。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="664"/>
+        <location filename="../../Browser/browser_manager.cxx" line="654"/>
         <source>Failed to retry task: original download link is unavailable.</source>
         <translation>タスクの再試行に失敗しました: 元のダウンロードリンクを利用できません。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="693"/>
+        <location filename="../../Browser/browser_manager.cxx" line="683"/>
         <source>Retry started, but the old failed task could not be removed from history.</source>
         <translation>再試行を開始しましたが、失敗した古いタスクを履歴から削除できませんでした。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1372"/>
-        <location filename="../../Browser/browser_manager.cxx" line="1435"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1368"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1431"/>
         <source>Download failed. Please check the link or network connection.</source>
         <translation>ダウンロードに失敗しました。リンクまたはネットワーク接続を確認してください。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1373"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1369"/>
         <source>Download failed: %1</source>
         <translation>ダウンロードに失敗しました: %1</translation>
     </message>

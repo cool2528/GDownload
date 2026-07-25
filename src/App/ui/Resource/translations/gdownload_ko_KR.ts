@@ -3220,6 +3220,16 @@ GNU Affero General Public License v3.0(AGPL-3.0)에 따라 라이선스가 부�
         <source>Download engine is unavailable.</source>
         <translation>다운로드 엔진을 사용할 수 없습니다.</translation>
     </message>
+    <message>
+        <location filename="../../Browser/stopped_task_delete_utils.h" line="53"/>
+        <source>Task was removed locally, but aria2 cleanup failed.</source>
+        <translation>작업이 로컬에서 삭제되었지만 aria2 정리에 실패했습니다.</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/stopped_task_delete_utils.h" line="54"/>
+        <source>Task was removed locally, but aria2 cleanup failed: %1</source>
+        <translation>작업이 로컬에서 삭제되었지만 aria2 정리에 실패했습니다: %1</translation>
+    </message>
 </context>
 <context>
     <name>SettingFormActions</name>
@@ -4565,106 +4575,106 @@ GNU Affero General Public License v3.0(AGPL-3.0)에 따라 라이선스가 부�
 <context>
     <name>gdl::ui::browser::BrowserManagerImpl</name>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="208"/>
-        <location filename="../../Browser/browser_manager.cxx" line="215"/>
-        <location filename="../../Browser/browser_manager.cxx" line="941"/>
-        <location filename="../../Browser/browser_manager.cxx" line="948"/>
+        <location filename="../../Browser/browser_manager.cxx" line="194"/>
+        <location filename="../../Browser/browser_manager.cxx" line="201"/>
+        <location filename="../../Browser/browser_manager.cxx" line="927"/>
+        <location filename="../../Browser/browser_manager.cxx" line="934"/>
         <source>Invalid ed2k link: %1</source>
         <translation>잘못된 ed2k 링크: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="225"/>
+        <location filename="../../Browser/browser_manager.cxx" line="211"/>
         <source>Invalid download link: %1</source>
         <translation>잘못된 다운로드 링크: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="238"/>
+        <location filename="../../Browser/browser_manager.cxx" line="224"/>
         <source>Failed to add download task. Please check the link or aria2 connection.</source>
         <translation>다운로드 작업을 추가하지 못했습니다. 링크 또는 aria2 연결을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="239"/>
+        <location filename="../../Browser/browser_manager.cxx" line="225"/>
         <source>Failed to add download task: %1</source>
         <translation>다운로드 작업을 추가하지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="264"/>
+        <location filename="../../Browser/browser_manager.cxx" line="250"/>
         <source>Torrent file does not exist: %1</source>
         <translation>토렌트 파일이 없습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="270"/>
+        <location filename="../../Browser/browser_manager.cxx" line="256"/>
         <source>Failed to read torrent file: %1</source>
         <translation>토렌트 파일을 읽지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="284"/>
+        <location filename="../../Browser/browser_manager.cxx" line="270"/>
         <source>Failed to add torrent task. Please check the file or aria2 connection.</source>
         <translation>토렌트 작업을 추가하지 못했습니다. 파일 또는 aria2 연결을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="285"/>
+        <location filename="../../Browser/browser_manager.cxx" line="271"/>
         <source>Failed to add torrent task: %1</source>
         <translation>토렌트 작업을 추가하지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="308"/>
+        <location filename="../../Browser/browser_manager.cxx" line="294"/>
         <source>Metalink file does not exist: %1</source>
         <translation>Metalink 파일이 없습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="314"/>
+        <location filename="../../Browser/browser_manager.cxx" line="300"/>
         <source>Failed to read metalink file: %1</source>
         <translation>Metalink 파일을 읽지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="328"/>
+        <location filename="../../Browser/browser_manager.cxx" line="314"/>
         <source>Failed to add metalink task. Please check the file or aria2 connection.</source>
         <translation>Metalink 작업을 추가하지 못했습니다. 파일 또는 aria2 연결을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="329"/>
+        <location filename="../../Browser/browser_manager.cxx" line="315"/>
         <source>Failed to add metalink task: %1</source>
         <translation>Metalink 작업을 추가하지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="644"/>
+        <location filename="../../Browser/browser_manager.cxx" line="634"/>
         <source>Failed to retry task: missing task id.</source>
         <translation>작업을 재시도하지 못했습니다: 작업 ID가 없습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="648"/>
+        <location filename="../../Browser/browser_manager.cxx" line="638"/>
         <source>Failed to retry task: stopped task list is not available.</source>
         <translation>작업을 재시도하지 못했습니다: 중지된 작업 목록을 사용할 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="654"/>
+        <location filename="../../Browser/browser_manager.cxx" line="644"/>
         <source>Failed to retry task: task was not found.</source>
         <translation>작업을 재시도하지 못했습니다: 작업을 찾을 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="658"/>
+        <location filename="../../Browser/browser_manager.cxx" line="648"/>
         <source>Only failed tasks can be retried.</source>
         <translation>실패한 작업만 재시도할 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="664"/>
+        <location filename="../../Browser/browser_manager.cxx" line="654"/>
         <source>Failed to retry task: original download link is unavailable.</source>
         <translation>작업을 재시도하지 못했습니다: 원본 다운로드 링크를 사용할 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="693"/>
+        <location filename="../../Browser/browser_manager.cxx" line="683"/>
         <source>Retry started, but the old failed task could not be removed from history.</source>
         <translation>재시도가 시작되었지만 이전 실패 작업을 기록에서 제거할 수 없었습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1372"/>
-        <location filename="../../Browser/browser_manager.cxx" line="1435"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1368"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1431"/>
         <source>Download failed. Please check the link or network connection.</source>
         <translation>다운로드 실패. 링크 또는 네트워크 연결을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1373"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1369"/>
         <source>Download failed: %1</source>
         <translation>다운로드 실패: %1</translation>
     </message>
