@@ -77,6 +77,31 @@ TEST(DownloadTaskModelTest, CanClearStoppedTaskTombstoneForNewLifecycle) {
 	EXPECT_FALSE(model.IsTombstoned(task.task_id()));
 }
 
+TEST(DownloadTaskModelTest, ReTombstoneAfterClearSurvivesFifoEviction) {
+	DownloadTaskModel model;
+	DownloadTaskInfo task;
+	task.set_task_id(QStringLiteral("recycled-gid"));
+	task.set_task_state(TaskState::kComplete);
+	model.AddTask(task);
+	ASSERT_TRUE(model.RemoveTaskById(task.task_id()));
+	model.ClearTombstone(task.task_id());
+	model.AddTask(task);
+	ASSERT_TRUE(model.RemoveTaskById(task.task_id()));
+	ASSERT_TRUE(model.IsTombstoned(task.task_id()));
+
+	// 填充 kMaxTombstones-1(=511)个其他墓碑:若 ClearTombstone 在 FIFO 队列中
+	// 留下陈旧条目,重建的墓碑会在淘汰弹出旧条目时被从哈希表误删
+	for (int i = 0; i < 511; ++i) {
+		DownloadTaskInfo other;
+		other.set_task_id(QStringLiteral("other-%1").arg(i));
+		other.set_task_state(TaskState::kComplete);
+		model.AddTask(other);
+		ASSERT_TRUE(model.RemoveTaskById(other.task_id()));
+	}
+
+	EXPECT_TRUE(model.IsTombstoned(QStringLiteral("recycled-gid")));
+}
+
 TEST(DownloadTaskUtilsTest, ParsesAria2ErrorDetails) {
 	const nlohmann::json object = {
 		{"gid", "failed-gid"},

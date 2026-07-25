@@ -246,7 +246,11 @@ namespace gdl {
 
 			void DownloadTaskModel::ClearTombstone(const QString& task_id) {
 				std::lock_guard lock(mutex_);
-				remove_task_id_.remove(task_id);
+				if (remove_task_id_.remove(task_id)) {
+					// 同步移除 FIFO 队列中的对应条目,维持与哈希表一一对应;
+					// 残留陈旧条目会让后续淘汰误删同 id 重建的新墓碑
+					std::erase(remove_order_, task_id);
+				}
 			}
 
 		}  // namespace browser
