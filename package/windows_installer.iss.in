@@ -103,6 +103,13 @@ chinesetraditional.VersionAlreadyInstalledMsg={#MyAppName} 的 %1 版本已安�
 japanese.VersionAlreadyInstalledMsg={#MyAppName} のバージョン %1 は既にインストールされています。先にアンインストールしますか？
 korean.VersionAlreadyInstalledMsg={#MyAppName}의 버전 %1이(가) 이미 설치되어 있습니다. 먼저 제거하시겠습니까?
 
+; [Code] 中交互卸载时询问是否一并删除用户数据的确认框文案（升级流程的静默卸载不弹出、不删除）
+english.RemoveUserDataMsg=Do you also want to delete user data (settings, download history, and plugin data)? Your downloaded files will not be affected.
+chinesesimplified.RemoveUserDataMsg=是否同时删除用户数据（设置、下载记录和插件数据）？已下载的文件不会受影响。
+chinesetraditional.RemoveUserDataMsg=是否同時刪除使用者資料（設定、下載記錄與外掛資料）？已下載的檔案不會受到影響。
+japanese.RemoveUserDataMsg=ユーザーデータ（設定、ダウンロード履歴、プラグインデータ）も削除しますか？ダウンロード済みのファイルには影響しません。
+korean.RemoveUserDataMsg=사용자 데이터(설정, 다운로드 기록, 플러그인 데이터)도 삭제하시겠습니까? 다운로드한 파일은 영향을 받지 않습니다.
+
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
@@ -175,6 +182,25 @@ begin
   end;
 end;
 
+// 交互卸载时是否一并删除用户数据(在 usUninstall 阶段询问,usPostUninstall 阶段执行)
+var
+  RemoveUserData: Boolean;
+
+// 删除应用的用户数据与注册表足迹。
+// 只清配置/历史/插件数据,绝不触碰用户下载目录里的文件。
+procedure DeleteUserDataAndSettings();
+begin
+  // GDLCore 数据目录:gd.toml 配置、下载历史 db、logs、aria2 session、ed2k 数据
+  DelTree(ExpandConstant('{userappdata}\gdownload'), True, True, True);
+  // Qt AppDataLocation(org=gdl/app=gdownload):插件 storage/cookies 等
+  DelTree(ExpandConstant('{userappdata}\gdl\gdownload'), True, True, True);
+  // 组织目录仅在为空时移除,避免误删同组织其他应用的数据
+  RemoveDir(ExpandConstant('{userappdata}\gdl'));
+  // QSettings(NativeFormat)注册表:更新检查时间、目录历史等
+  RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\gdl\gdownload');
+  RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\gdl');
+end;
+
 // 卸载时从 PATH 移除
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
@@ -182,8 +208,29 @@ var
   AppPath: string;
   P: Integer;
 begin
+  // 交互卸载开始前询问是否删除用户数据(默认"否")。
+  // 升级流程通过 /SILENT 静默卸载旧版本,UninstallSilent 为 True,
+  // 此时既不弹窗也不删除,保证升级不丢配置。
+  if CurUninstallStep = usUninstall then
+  begin
+    RemoveUserData := False;
+    if not UninstallSilent then
+    begin
+      if MsgBox(CustomMessage('RemoveUserDataMsg'), mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES then
+        RemoveUserData := True;
+    end;
+  end;
+
   if CurUninstallStep = usPostUninstall then
   begin
+    // 真卸载(非升级)时无条件移除开机自启注册表值,避免残留项指向已删除的程序;
+    // 升级的静默卸载保留该值,使用户的自启设置在新版本中延续
+    if not UninstallSilent then
+      RegDeleteValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Run', 'gdownload');
+
+    if RemoveUserData then
+      DeleteUserDataAndSettings();
+
     AppPath := ExpandConstant('{app}');
 
     // 从系统 PATH 移除
