@@ -36,6 +36,8 @@ namespace gdl {
 						return QVariant::fromValue(task.FormatRemainingTime());
 					case kTaskConnections:
 						return QVariant::fromValue(task.task_connections());
+					case kTaskSources:
+						return QVariant::fromValue(task.task_sources());
                     case kTaskDownloadLink:
                         return QVariant::fromValue(task.task_download_link());
 					case kTaskErrorCode:
@@ -63,6 +65,7 @@ namespace gdl {
 				roles[kTaskProgress]	  = "progress";
 				roles[kTaskRemainingTime] = "remainingTime";
 				roles[kTaskConnections]	  = "connections";
+				roles[kTaskSources]		  = "sources";
                 roles[kTaskDownloadLink]  = "downloadLink";
 				roles[kTaskErrorCode]      = "errorCode";
 				roles[kTaskErrorMessage]   = "errorMessage";
@@ -97,6 +100,12 @@ namespace gdl {
 					case kTaskConnections:
 						if (value.canConvert<qint64>()) {
 							task.set_task_connections(value.toLongLong());
+							changed = true;
+						}
+						break;
+					case kTaskSources:
+						if (value.canConvert<qint64>()) {
+							task.set_task_sources(value.toLongLong());
 							changed = true;
 						}
 						break;
