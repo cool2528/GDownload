@@ -703,6 +703,9 @@ namespace gdl {
                 VersionTools::Version new_version(manifest.version);
                 VersionTools::Version old_version(config_.current_version);
                 if (new_version <= old_version) {
+                    // 本轮检查成功完成(已是最新版):清掉主源失败、fallback 成功
+                    // 场景下残留的错误,避免上层把成功的检查误判为失败
+                    last_error_.clear();
                     if (callback) {
                         callback(false, UpdateInfo{});
                     }

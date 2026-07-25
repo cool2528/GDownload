@@ -211,6 +211,8 @@ namespace gdl {
 
 			std::string GetLastError() { return last_error_; }
 
+			void ClearLastError() { last_error_.clear(); }
+
 		   private:
 			SPUStandardUpdaterController* updater_;
 			SparkleDelegate* delegate_;
@@ -240,6 +242,14 @@ namespace gdl {
 
 		bool MacUpdater::ApplyUpdate(bool restart_app) {
 			return impl_->ApplyUpdate(restart_app);
+		}
+
+		std::string MacUpdater::GetLastError() const {
+			return impl_ ? impl_->GetLastError() : std::string();
+		}
+
+		void MacUpdater::ClearLastError() {
+			if (impl_) impl_->ClearLastError();
 		}
 
 	}  // namespace update
