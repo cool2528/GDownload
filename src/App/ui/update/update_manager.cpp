@@ -4,6 +4,7 @@
 #include <QQmlEngine>
 #include <QSettings>
 #include "Definitions/appDef.h"
+#include "update_check_request.h"
 namespace gdl {
 	namespace update {
 
@@ -47,7 +48,14 @@ namespace gdl {
 				return;
 			}
 
-			silent_check_ = silent;
+			// 合并并发请求:在途时不发起第二次底层检查(并发会交错覆盖静默标志
+			// 与 last_error_),手动请求仅把在途检查升级为非静默,复用其结果发回执
+			const auto decision = CoalesceUpdateCheckRequest(check_in_flight_, silent_check_, silent);
+			silent_check_		= decision.silent;
+			if (!decision.start_new_check) {
+				return;
+			}
+			check_in_flight_ = true;
 			// 记录检查时间
 			QSettings settings;
 			settings.setValue("update/last_check_time", QDateTime::currentDateTime());
@@ -55,9 +63,13 @@ namespace gdl {
 			// 陈旧错误误判为本轮检查失败(见 checkForUpdatesFinished 的 error 判定)
 			last_error_.clear();
 			updater_->ClearLastError();
-			// 检查更新
-			updater_->CheckForUpdates(
-				[this](bool has_update, const UpdateInfo& info) { onUpdateCheckCompleted(has_update, info); });
+			// 检查更新:完成回调可能来自非主线程,先整体转投主线程,
+			// 保证共享状态(check_in_flight_/silent_check_)只在主线程串行读写
+			updater_->CheckForUpdates([this](bool has_update, const UpdateInfo& info) {
+				QMetaObject::invokeMethod(
+					this, [this, has_update, info]() { onUpdateCheckCompleted(has_update, info); },
+					Qt::QueuedConnection);
+			});
 		}
 
 		bool UpdateManager::StartUpdate() {
@@ -91,47 +103,43 @@ namespace gdl {
 		}
 
 		void UpdateManager::onUpdateCheckCompleted(bool has_update, const UpdateInfo& info) {
+			// 恒在主线程执行(CheckForUpdates 已将回调转投主线程)。取本轮合并后
+			// 的静默属性并复位在途标志,后续请求即可发起新一轮检查
+			const bool silent = silent_check_;
+			check_in_flight_  = false;
 			update_available_ = has_update;
 			// 手动检查(非静默)无论结果都发回执:设置页按钮据此复位忙碌态并提示
 			// "已是最新版本"/"检查失败: 原因";静默启动检查不发射,避免误弹提示。
 			// error 非空即本轮检查失败(CheckForUpdates 入口已清空陈旧错误)
-			if (!silent_check_) {
+			if (!silent) {
 				const QString error =
 					updater_ ? QString::fromStdString(updater_->GetLastError()) : QString();
-				QMetaObject::invokeMethod(
-					this, [this, has_update, error]() { Q_EMIT checkForUpdatesFinished(has_update, error); },
-					Qt::QueuedConnection);
+				Q_EMIT checkForUpdatesFinished(has_update, error);
 			}
 			if (has_update) {
 				latest_update_info_ = info;
-				// 使用 QMetaObject::invokeMethod 确保在主线程中创建对象
-				QMetaObject::invokeMethod(
-					this,
-					[this, info]() {
-						// 复用单个信息对象，避免重复检查累积 QObject（M1）
-						if (!update_data_) {
-							update_data_ = new UpdateDataInfo(this);
-						}
-						update_data_->Setversion(QString::fromStdString(info.version));
-						update_data_->Seturl(QString::fromStdString(info.download_url));
-						update_data_->Setrelease_note(QString::fromStdString(info.release_notes));
-						update_data_->Setrelease_date(QString::fromStdString(info.release_date));
+				// 复用单个信息对象，避免重复检查累积 QObject（M1）
+				if (!update_data_) {
+					update_data_ = new UpdateDataInfo(this);
+				}
+				update_data_->Setversion(QString::fromStdString(info.version));
+				update_data_->Seturl(QString::fromStdString(info.download_url));
+				update_data_->Setrelease_note(QString::fromStdString(info.release_notes));
+				update_data_->Setrelease_date(QString::fromStdString(info.release_date));
 
-						// If silent check and not mandatory update, only emit signal
-						if (silent_check_ && !info.is_mandatory && !config_.silent_mode) {
-							Q_EMIT updateAvailable(update_data_);
-							return;
-						}
-						// If mandatory update or silent mode enabled, start update automatically
-						if (info.is_mandatory || config_.silent_mode) {
-							StartUpdate();
-						}
-						else {
-							// Otherwise just emit signal
-							Q_EMIT updateAvailable(update_data_);
-						}
-					},
-					Qt::QueuedConnection);
+				// If silent check and not mandatory update, only emit signal
+				if (silent && !info.is_mandatory && !config_.silent_mode) {
+					Q_EMIT updateAvailable(update_data_);
+					return;
+				}
+				// If mandatory update or silent mode enabled, start update automatically
+				if (info.is_mandatory || config_.silent_mode) {
+					StartUpdate();
+				}
+				else {
+					// Otherwise just emit signal
+					Q_EMIT updateAvailable(update_data_);
+				}
 			}
 		}
 
