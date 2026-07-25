@@ -95,6 +95,9 @@ struct Ed2kDownloadManager::Impl {
 	std::unique_ptr<PubSubSystem<std::string>> pubsub;
 	std::thread worker;  // 跑 runtime.run() 的网络线程
 	std::atomic_bool running{false};
+	// 网络线程的 runtime.run() 是否已自然返回（= io_context 里所有协程都已收敛、无剩余工作）。
+	// ShutdownEngine 用它做"有上限的排空等待"，见那里的注释。
+	std::atomic_bool run_exited{false};
 	Ed2kEngineConfig config;
 
 	// 对外任务 ID("ed2k-<md4>") 与引擎内部 session task id(uint64) 的双向映射
@@ -242,6 +245,9 @@ bool Ed2kDownloadManager::InitEd2kEngine(const Ed2kEngineConfig& config) {
 			} catch (...) {
 				LOG_ERR("ed2k engine network thread exited with unknown exception");
 			}
+			// IoRuntime 不持 work_guard：run() 返回即代表 io_context 里再无待办工作，
+			// 也就代表所有下载协程都已跑完各自的收尾（save_met/discard_met）。
+			impl_->run_exited.store(true, std::memory_order_release);
 		});
 		return true;
 	} catch (const std::exception& e) {
@@ -264,8 +270,7 @@ void Ed2kDownloadManager::ShutdownEngine() {
 	// 修复 Task 2 遗留的 shutdown 顺序 bug：IoRuntime::stop() 直接调用 io_context::stop()，
 	// 不会 drain 队列——如果 stop() 在 "post(session->shutdown)" 之外调用，session->shutdown()
 	// 这个已排队的任务可能被跳过，导致 Session 未优雅关闭。
-	// 现在把"取消采样定时器 + session->shutdown() + runtime.stop()"放进同一个网络线程任务，
-	// 保证严格按此顺序执行，且 stop() 一定在 shutdown() 之后才被调用。
+	// 故"取消采样定时器 + session->shutdown()"放进同一个网络线程任务里严格按序执行。
 	boost::asio::post(impl_->runtime.executor(), [this] {
 		if (impl_->sample_timer) {
 			// cancel 后挂起的 async_wait 会以 operation_aborted 完成（或因 stop() 直接不再触发），
@@ -275,8 +280,27 @@ void Ed2kDownloadManager::ShutdownEngine() {
 		if (impl_->session) {
 			impl_->session->shutdown();
 		}
-		impl_->runtime.stop();
+		// F6：这里不再紧接着 runtime.stop()。shutdown() 只是给各任务置停标志（并关掉服务器/
+		// Kad/监听 socket 促使挂起的 recv 快速出错返回），下载协程还要等自己从在途等待里醒来，
+		// 才会跑到收尾处把块级进度 save_met() 落盘、把已完成任务的 .part.met 删掉。若在同一个
+		// handler 里立刻 stop()，io_context 当场停摆，这些协程再也没有机会恢复——自上次节流
+		// 落盘（每 16 块 ≈ 2.8MiB）以来的进度全部丢失，已下完的任务还会留下 .part.met 垃圾。
 	});
+	// F6：给协程一段**有上限**的排空时间。IoRuntime 不持 work_guard，所以协程全部收敛后
+	// run() 会自然返回（run_exited 置位），此时 join 立即完成——常见情况下这里只等几百毫秒到
+	// 1 秒（采样协程的 1s 定时器是实际下限）。超过上限仍未收敛（例如某个 worker 正卡在一次
+	// 最长可达 30s 的对端 RPC 等待里）才强制 stop()：退出不能被无界地拖住，此时丢失的进度也
+	// 就退化回修复前的水平，不会更差。
+	constexpr auto kShutdownDrainTimeout = std::chrono::seconds(3);
+	const auto drain_deadline = std::chrono::steady_clock::now() + kShutdownDrainTimeout;
+	while (!impl_->run_exited.load(std::memory_order_acquire) &&
+		   std::chrono::steady_clock::now() < drain_deadline) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(20));
+	}
+	if (!impl_->run_exited.load(std::memory_order_acquire)) {
+		LOG_WARN("ed2k engine did not settle within drain timeout, forcing stop");
+		impl_->runtime.stop();  // io_context::stop() 线程安全，可从本线程调用
+	}
 	if (impl_->worker.joinable()) {
 		impl_->worker.join();
 	}
