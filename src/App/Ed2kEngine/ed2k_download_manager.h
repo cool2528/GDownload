@@ -30,6 +30,10 @@ class Ed2kEngine_API Ed2kDownloadManager : public Singleton<Ed2kDownloadManager>
 		bool enable_kad = false;
 		// 是否启用协议混淆(映射引擎 ObfuscationPolicy)
 		bool enable_obfuscation = false;
+		// 本机持久 UserHash(32 位 hex,含 eMule 标记字节)。远端按该 hash 记录上传队列
+		// 等待时间与 credit;必须每安装唯一且跨启动稳定——同 IP 更换 hash 会被对端封禁
+		// 2 小时,全网共享固定 hash 则互相顶替队列记录。空串时引擎回退内置常量(不推荐)。
+		std::string user_hash_hex;
 	};
 
 	~Ed2kDownloadManager();

@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QDir>
 #include <QFile>
+#include <QRandomGenerator>
 #include <QFileInfo>
 #include <QOperatingSystemVersion>
 #include <QProcess>
@@ -105,6 +106,21 @@ namespace gdl {
 					if (state == "queued") return TaskState::kWaiting;
 					LOG_WARN("Unknown ed2k task state: {}", state);
 					return TaskState::kActive;
+				}
+
+				// 非终态任务携带的 error 是"当前为什么还没进展"的状态说明,不是失败原因。引擎给的是
+				// 面向开发者的英文短语,直接摊给用户既难懂也吓人(旧版把 "both client and all sources
+				// are low id" 当失败原因红字显示,用户无从判断该等还是该放弃)。这里翻成可执行的说明。
+				// 只对非失败态生效,失败任务仍原样展示引擎错误,避免掩盖真实故障。
+				QString Ed2kWaitingReasonToHint(const QString& engine_message) {
+					if (engine_message.contains(QStringLiteral("low id"), Qt::CaseInsensitive)) {
+						return QObject::tr("Waiting for a connectable source: this client and all known sources are "
+										   "behind NAT (LowID), so no direct connection is possible yet.");
+					}
+					if (engine_message.contains(QStringLiteral("file not found"), Qt::CaseInsensitive)) {
+						return QObject::tr("Waiting for sources: no peer currently reports having this file.");
+					}
+					return engine_message;
 				}
 
 				// 从 ed2k 任务 ID(格式 "ed2k-<md4hex>")中提取 md4 十六进制串;非法格式返回空串
@@ -983,6 +999,32 @@ namespace gdl {
 				ed2k_config.enable_kad = ed2k_settings.GetEd2kEnableKad();
 				ed2k_config.enable_obfuscation = ed2k_settings.GetEd2kEnableObfuscation();
 				ed2k_config.max_concurrent_tasks = static_cast<std::size_t>(ed2k_settings.GetEd2kMaxConcurrentTasks());
+				// 持久 UserHash:首次生成(随机 16 字节 + eMule 标记字节[5]=0x0E/[14]=0x6F)后存
+				// data_dir/user_hash.dat,跨启动稳定。远端按 hash 记上传队列等待与 credit;
+				// 同 IP 换 hash 会被对端封禁 2 小时,固定共享 hash 则全网互相顶替队列记录。
+				{
+					const QString hash_path = QString::fromStdString(ed2k_config.data_dir) + "/user_hash.dat";
+					QFile hash_file(hash_path);
+					QByteArray hex;
+					if (hash_file.open(QIODevice::ReadOnly)) {
+						hex = hash_file.readAll().trimmed();
+						hash_file.close();
+					}
+					if (hex.size() != 32) {
+						QByteArray raw(16, Qt::Uninitialized);
+						QRandomGenerator::system()->fillRange(reinterpret_cast<quint32*>(raw.data()), 4);
+						raw[5] = static_cast<char>(0x0E);
+						raw[14] = static_cast<char>(0x6F);
+						hex = raw.toHex();
+						if (hash_file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+							hash_file.write(hex);
+							hash_file.close();
+						} else {
+							LOG_WARN("Failed to persist ed2k user hash to {}", hash_path.toStdString());
+						}
+					}
+					ed2k_config.user_hash_hex = hex.toStdString();
+				}
 				// Kad 引导节点:引擎用 data_dir/nodes.dat 做 Kad DHT 种子,但引擎不自建/不下载。
 				// 自动同步开启(ed2k.auto-sync-sources,默认 true)时,每次启动都从设置的 URL 刷新一份,
 				// 保持节点列表新鲜;关闭时退回旧逻辑,仅在文件缺失或为空(仅文件头,<100 字节)时补下载一次。
@@ -1516,7 +1558,16 @@ namespace gdl {
 						task_info.set_task_download_link(
 							BuildEd2kDownloadLink(task_id, task_info.task_file_name(), task_info.task_total_size()));
 						task_info.set_task_save_path(QString::fromStdString(item.value("out_path", std::string())));
-						task_info.set_task_state(Ed2kStateStringToTaskState(item.value("state", std::string())));
+						const TaskState sampled_state =
+							Ed2kStateStringToTaskState(item.value("state", std::string()));
+						task_info.set_task_state(sampled_state);
+						// 等待原因(非失败态的 error)翻成用户能据以决策的说明; 空字符串会清掉上一轮的提示
+						const QString sampled_reason =
+							QString::fromStdString(item.value("error", std::string()));
+						task_info.set_task_error_message(
+							sampled_reason.isEmpty() || sampled_state == TaskState::kError
+								? sampled_reason
+								: Ed2kWaitingReasonToHint(sampled_reason));
 
 						// 缓存最近一次采样,供 OnHandleEd2kTaskState 在仅含 id/state/error 的终态事件中补全字段;
 						// 两个回调同在 ed2k 网络线程单线程串行执行,读写此表无需加锁(详见头文件成员注释)。
@@ -1544,7 +1595,10 @@ namespace gdl {
 					task_info.set_task_state(state);
 					const QString error = QString::fromStdString(doc.value("error", std::string()));
 					if (!error.isEmpty()) {
-						task_info.set_task_error_message(error);
+						// 失败态: 原样展示引擎错误; 非失败态: 这是"还在等什么"的说明, 翻成友好文案
+						task_info.set_task_error_message(state == TaskState::kError
+															 ? error
+															 : Ed2kWaitingReasonToHint(error));
 					}
 					if (task_info.task_download_link().isEmpty()) {
 						task_info.set_task_download_link(BuildEd2kDownloadLink(
