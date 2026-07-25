@@ -265,6 +265,11 @@ Thanks to all developers and users who have contributed to this project!
 - [GitHub](https://github.com/cool2528/GDownload)
 - [Issue Tracking](https://github.com/cool2528/GDownload/issues)
 
+## 🔗 Friendly Links
+
+- [Linux.do](https://linux.do)
+- [V2EX](https://www.v2ex.com)
+
 ## ⚠️ Disclaimer
 
 GDownload is provided solely as a download tool for users to legally download Internet resources. Please comply with local laws and regulations when using this software.

@@ -265,6 +265,11 @@ GDownload 使用 [GNU Affero General Public License v3.0](LICENSE.txt)（AGPL-3.
 - [GitHub](https://github.com/cool2528/GDownload)
 - [问题追踪](https://github.com/cool2528/GDownload/issues)
 
+## 🔗 友情链接
+
+- [Linux.do](https://linux.do)
+- [V2EX](https://www.v2ex.com)
+
 ## ⚠️ 免责声明
 
 GDownload 仅作为下载工具，供用户合法地下载互联网资源，使用过程中请遵守当地法律法规。

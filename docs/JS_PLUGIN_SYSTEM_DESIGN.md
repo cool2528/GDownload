@@ -1,81 +1,95 @@
-# GDownload JS 插件系统设计文档
+# GDownload JS 插件系统设计
 
-> 版本：v2.0（草案）
-> 日期：2026-07-18
-> 状态：待评审
-> 决策：**JS 插件全面替换 C++ 原生插件体系**，不保留双通道
+> 文档版本：v2.1
+> 
+> 更新日期：2026-07-18
+> 
+> 配套文档：[JS 插件系统实施文档](JS_PLUGIN_SYSTEM_IMPLEMENTATION_PLAN.md)
 
----
+本文说明 GDownload 为什么要将网盘插件从 C++ 原生模块迁移到 JavaScript，以及新插件系统的运行方式、接口约定、安全边界和迁移计划。
 
-## 1. 背景与目标
-
-### 1.1 现状
-
-当前插件系统基于 C++ 原生共享库（`.dll/.so/.dylib`）：
-
-- 接口：`INetDiskDownloadPlugin`（`src/Module/plugin/PluginManager/IDownload_Plugin.h`）
-- 加载：`DownloadPluginManager` 扫描应用目录，通过 `PluginLoader`（LoadLibrary/dlopen）加载，SHA-256 校验
-- 唯一实现：`Baidu_Plugin`（百度网盘分享链接解析）
-
-**核心问题：**
-
-| 问题 | 说明 |
-|------|------|
-| 开发门槛高 | 写插件需要 C++ 工具链 + CMake + vcpkg 环境，社区几乎无法贡献 |
-| 分发成本高 | 每个平台单独编译二进制，发版流程重 |
-| 更新滞后 | 网盘 API 频繁变动，二进制插件无法热更新 |
-| 安全风险 | 原生插件拥有完整进程权限，第三方插件不可信 |
-
-### 1.2 决策：全面转向 JS 插件
-
-经评估，网盘解析类插件的工作负载是 **HTTP 请求 + JSON 解析 + 签名计算**，瓶颈在网络 I/O 而非计算，C++ 的性能优势在此场景没有意义。因此决定：
-
-1. **废弃原生插件通道**：移除 `PluginLoader`、C ABI 导出（`CreatePlugin/DestroyPlugin`）、共享库扫描与 SHA-256 白名单机制
-2. **废弃 `Baidu_Plugin` C++ 实现**：用 JS 重写为首个**内置插件**，`BaiduPcsApi` 的逻辑（分享解析 → 转存 → 取直链 → 清理）作为翻译蓝本
-3. **所有插件（内置 + 社区）统一为 JS 脚本**：一份代码全平台运行、热更新、沙箱运行
-4. **`INetDiskDownloadPlugin` 降级为内部抽象**：不再是插件 ABI，仅作为 `JsPluginHost` 与上层（`NetWorkDiskManager`）之间的 C++ 接口，上层代码零改动
-
-### 1.3 目标
-
-1. **一份脚本，全平台运行** —— 插件不再需要编译
-2. **降低贡献门槛** —— 会写 JavaScript 即可写插件
-3. **热更新** —— 插件即文本文件，可在线拉取更新；网盘 API 变动当天可修复
-4. **沙箱安全** —— 插件只能调用宿主暴露的 SDK API，权限声明式管控（比原生插件的"完全信任"模型更安全）
-5. **为插件市场打基础** —— manifest 规范 + Git 注册表机制
-
-### 1.4 非目标（本期不做）
-
-- 不支持 JS 插件直接实现下载传输（下载仍统一交给 aria2c）
-- 不引入 Node.js/V8 级别的完整运行时（体积与安全不可控）
-- 不做旧 .dll 插件的兼容加载（生态中只有官方百度插件，无历史包袱）
+这次改造的重点并不只是更换脚本语言。更重要的是让插件能够跨平台分发、独立更新，并在明确的权限范围内运行。迁移完成后，应用只保留 JS 插件通道，不再兼容旧的原生插件格式。
 
 ---
 
-## 2. 技术选型
+## 1. 为什么要重做插件系统
 
-### 2.1 脚本引擎：QuickJS（quickjs-ng 分支）✅ 已决策
+### 1.1 现状与问题
 
-| 候选 | 结论 | 理由 |
-|------|------|------|
-| **quickjs-ng** | ✅ 选用 | QuickJS 的社区活跃维护分支（原版 Bellard 更新缓慢）；C 实现、~700KB、完整 ES2023（含 async/await、Promise、正则、BigInt）、可静态链接、vcpkg port 即为 ng 分支、Gopeed 已验证同类方案 |
-| LuaJIT | ❌ | 性能好但生态小，网盘解析参考代码（JxPan 等）多为 JS，移植成本高 |
-| V8 | ❌ | ~30MB，构建复杂，杀鸡用牛刀 |
-| 嵌入 Python | ❌ | 依赖管理复杂、启动慢；未来可作为 yt-dlp 适配层单独考虑 |
+当前插件以 C++ 共享库（`.dll`、`.so` 或 `.dylib`）的形式运行：
+
+- 插件接口为 `INetDiskDownloadPlugin`，定义在 `src/Module/plugin/PluginManager/IDownload_Plugin.h`。
+- `DownloadPluginManager` 扫描应用目录，再通过 `PluginLoader`（`LoadLibrary`/`dlopen`）加载插件并进行 SHA-256 校验。
+- 仓库中目前只有一个实际实现：负责解析百度网盘分享链接的 `Baidu_Plugin`。
+
+这套方案可以工作，但不适合继续扩展网盘插件生态：
+
+| 问题     | 说明                                              |
+| ------ | ----------------------------------------------- |
+| 开发门槛高  | 开发者需要准备 C++ 工具链、CMake 和 vcpkg 环境，普通脚本作者很难参与     |
+| 分发成本高  | Windows、macOS 和 Linux 都要分别构建和发布二进制包             |
+| 更新不够及时 | 网盘接口经常变化，而二进制插件通常只能跟随应用版本更新                     |
+| 权限过大   | 原生插件与主程序运行在同一进程，能够访问完整的进程权限，不适合直接运行未经充分审核的第三方代码 |
+
+### 1.2 方案结论
+
+网盘解析插件的大部分工作是发送 HTTP 请求、处理 JSON 和计算签名，耗时主要来自网络 I/O。与原生代码相比，JavaScript 在这个场景中的性能差异不会成为主要瓶颈，却能明显降低开发和发布成本。
+
+因此，新系统采用以下方案：
+
+1. 迁移完成后移除原生插件加载通道，包括 `PluginLoader`、C ABI 导出（`CreatePlugin`/`DestroyPlugin`）、共享库扫描和原有的 SHA-256 白名单机制。
+2. 将 `Baidu_Plugin` 重写为首个内置 JS 插件。现有 `BaiduPcsApi` 中“解析分享链接、转存文件、获取直链、清理临时文件”的流程作为迁移基准。
+3. 内置插件和社区插件使用同一种包格式、同一套 SDK 和同一条加载路径。
+4. 保留 `INetDiskDownloadPlugin` 作为程序内部接口，由 `JsPluginHost` 负责适配，从而尽量减少 `NetWorkDiskManager` 等上层模块的改动。
+
+### 1.3 设计目标
+
+新系统需要达到以下目标：
+
+1. 插件脚本无需编译，同一份代码可以在所有支持的平台上运行。
+2. 插件开发只要求 JavaScript 基础，不再强制开发者搭建完整的 C++ 编译环境。
+3. 插件可以独立于应用版本更新，以便及时跟进第三方网盘接口的变化。
+4. 插件只能使用宿主明确提供的 API，网络、存储和交互能力均由 manifest 声明并由宿主校验。
+5. 插件包格式和元数据能够直接用于后续的插件市场、版本检查和签名验证。
+
+### 1.4 本期不包含的内容
+
+- JS 插件不负责实际的数据传输，下载任务仍统一交给 aria2c。
+- 不引入 Node.js 或 V8 这类完整运行时，以免显著增加安装体积和攻击面。
+- 不提供旧 `.dll` 插件的兼容层。当前只有官方百度插件需要迁移，没有第三方二进制插件的兼容需求。
+
+---
+
+## 2. 技术选择
+
+### 2.1 脚本引擎
+
+脚本引擎选用 **quickjs-ng**。它是 QuickJS 的活跃维护分支，同时保持了较小的体积和较简单的嵌入方式。
+
+| 候选             | 结论  | 主要考量                                                                                                                        |
+| -------------- | --- | --------------------------------------------------------------------------------------------------------------------------- |
+| **quickjs-ng** | 采用  | C 语言实现，体积约 700 KB，可静态链接；支持 ES2023，包括 `async`/`await`、Promise、正则和 BigInt；vcpkg 中的 `quickjs` port 已指向该分支，Gopeed 等同类项目也验证过这一方案 |
+| LuaJIT         | 不采用 | 运行性能较好，但网盘解析相关的现有参考实现大多使用 JavaScript，迁移到 Lua 的成本更高                                                                          |
+| V8             | 不采用 | 运行时和构建体系都明显重于当前需求，会增加约数十 MB 的体积                                                                                             |
+| 嵌入 Python      | 不采用 | 依赖管理和启动成本较高；如果将来需要集成 yt-dlp，可单独设计外部工具适配层                                                                                    |
 
 ### 2.2 依赖引入方式
 
-- vcpkg 添加 `quickjs`（vcpkg 的该 port 对应 quickjs-ng 分支）
-- 若 vcpkg port 版本滞后或跨平台编译有问题，备选方案：以子目录源码形式引入 quickjs-ng（仅数个 .c/.h 文件，无外部依赖）
+首选方案是在 `vcpkg.json` 中添加 `quickjs` 依赖。该 port 当前对应 quickjs-ng 分支，可以直接接入现有构建流程。
+
+如果 port 版本滞后，或在某个平台上无法稳定构建，则改为将 quickjs-ng 源码作为子目录引入。它只有少量 `.c` 和 `.h` 文件，也没有额外的第三方依赖，因此这一备选方案仍然可控。
 
 ---
 
 ## 3. 总体架构
 
+对上层业务而言，插件仍表现为 `INetDiskDownloadPlugin`。变化主要发生在 `DownloadPluginManager` 内部：管理器不再加载共享库，而是读取 manifest，并为每个插件创建一个 `JsPluginHost`。
+
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │                      GDownload 主程序 (C++)                    │
 │                                                              │
-│   UI / NetWorkDiskManager / AsyncTaskWorker    （零改动）      │
+│   UI / NetWorkDiskManager / AsyncTaskWorker   （接口保持稳定） │
 │                        │                                     │
 │                        ▼                                     │
 │   ┌──────────────────────────────────────────────────┐       │
@@ -101,28 +115,19 @@
 └──────────────────────────────────────────────────────────────┘
 ```
 
-### 3.1 关键设计决策
+### 3.1 关键设计说明
 
-1. **JsPluginHost 实现 `INetDiskDownloadPlugin`**
-   每个 JS 插件对应一个 `JsPluginHost` 实例，对上层表现为普通插件。`GetPluginsForUrl`、`GetPluginByName`、验证码回调、消息通知等上层机制全部不变。接口文件中的 C ABI 部分（`CreatePluginFunc/DestroyPluginFunc`）删除。
+1. **保留现有 C++ 抽象。** 每个 JS 插件对应一个 `JsPluginHost` 实例，并继续以 `INetDiskDownloadPlugin` 的形式提供给上层。`GetPluginsForUrl`、`GetPluginByName`、验证码回调和消息通知等调用方式保持不变；接口文件中只删除不再需要的 C ABI 定义（`CreatePluginFunc`/`DestroyPluginFunc`）。
 
-2. **内置插件与社区插件同构**
-   百度网盘等官方插件与社区插件采用完全相同的格式与加载路径，唯一区别：
-   - 内置插件随安装包分发（安装到 `<appdir>/plugins/`），带官方签名
-   - 内置插件的更新走应用更新或市场推送，均可热替换
-   这保证官方插件永远是社区插件的活模板，SDK 能力以官方插件先行验证。
+2. **内置插件与社区插件使用同一种格式。** 百度网盘等官方插件和社区插件都安装到 `<appdir>/plugins/`，使用相同的 manifest、SDK 和加载流程。内置插件随安装包分发并带有官方签名，后续可以通过应用更新或插件市场进行替换。官方插件同时作为 SDK 的参考实现和回归样例。
 
-3. **每插件独立 JSRuntime**
-   QuickJS 的 `JSRuntime` 非线程安全。每个插件独占一个 Runtime + Context，插件之间完全隔离（内存、全局变量互不可见）。单插件内部用互斥锁串行化调用（现有调用本来就发生在 `AsyncTaskWorker` 单工作线程，锁只是兜底）。
+3. **每个插件使用独立的 Runtime。** QuickJS 的 `JSRuntime` 不是线程安全的，因此每个插件独占一组 Runtime 和 Context。不同插件之间不共享内存或全局变量。单个插件的调用再通过互斥锁串行化；当前调用主要发生在 `AsyncTaskWorker` 的工作线程中，这把锁用于防止未来出现并发入口。
 
-4. **同步接口桥接异步 JS**
-   `INetDiskDownloadPlugin` 的方法是同步阻塞语义（在工作线程被调用）。JS 插件方法是 `async` 函数返回 Promise。桥接层实现 `AwaitPromise`：循环执行 QuickJS pending jobs 直至 Promise settle 或超时（默认 60s，可配）。HTTP 请求在宿主侧用 cpr 同步执行，不需要在 JS 侧实现事件循环 I/O。
+4. **由桥接层衔接同步 C++ 接口与异步 JS。** `INetDiskDownloadPlugin` 在工作线程中以同步方式调用，而 JS 插件方法返回 Promise。`AwaitPromise` 会持续执行 QuickJS 的 pending jobs，直到 Promise 完成、失败或超时。默认超时时间为 60 秒，并允许配置。HTTP 请求由宿主通过 cpr 执行，JS 侧不需要维护独立的 I/O 事件循环。
 
-5. **CanHandle 快速路径**
-   URL 匹配优先用 manifest 中的 `url_patterns`（宿主侧通配符匹配），不进入 JS 引擎，避免频繁调用的性能损耗。插件可选实现 `canHandle()` 做二次精确判断。
+5. **URL 匹配走快速路径。** 宿主先使用 manifest 中的 `url_patterns` 做通配符匹配，不必为每次判断都进入 JS 引擎。插件如果需要更精确的规则，可以额外实现 `canHandle()`。
 
-6. **元数据来自 manifest，而非 JS 调用**
-   `GetPluginMetadata()` 直接读 manifest.json，插件未加载/加载失败时也能展示信息（为插件市场 UI 服务）。
+6. **插件元数据以 manifest 为准。** `GetPluginMetadata()` 直接读取 `manifest.json`。即使入口脚本尚未初始化或加载失败，应用仍然可以展示插件名称、版本和错误状态，这也便于后续实现插件市场界面。
 
 ---
 
@@ -170,22 +175,26 @@
 
 字段说明：
 
-| 字段 | 必填 | 说明 |
-|------|------|------|
-| `manifest_version` | ✅ | manifest 格式版本，当前为 1 |
-| `name` | ✅ | 唯一标识（kebab-case），对应 `PluginMetadata.name` |
-| `version` | ✅ | 语义化版本，用于市场更新比对 |
-| `entry` | ✅ | 入口脚本相对路径 |
-| `type` | ✅ | 插件类型，本期仅 `netdisk`；预留 `resolver`、`adapter` |
-| `url_patterns` | ✅ | 通配符 URL 匹配规则（宿主侧快速路由），同时填充 `PluginMetadata.supported_domains` |
-| `permissions.http` | ✅ | 允许访问的域名白名单，`gdl.http` 强制校验 |
-| `permissions.storage` | — | 是否允许持久化存储（默认 false） |
-| `permissions.verification_ui` | — | 是否允许弹出验证码交互（默认 false） |
-| `min_app_version` | — | 最低宿主版本，不满足则拒绝加载 |
+| 字段                            | 必填  | 说明                                                            |
+| ----------------------------- | --- | ------------------------------------------------------------- |
+| `manifest_version`            | ✅   | manifest 格式版本，当前为 1                                           |
+| `name`                        | ✅   | 唯一标识（kebab-case），对应 `PluginMetadata.name`                     |
+| `display_name`                | —   | 面向用户显示的名称                                                     |
+| `version`                     | ✅   | 语义化版本，用于市场更新比对                                                |
+| `author`                      | —   | 插件作者或维护组织                                                     |
+| `description`                 | —   | 插件简介                                                          |
+| `homepage`                    | —   | 项目主页或源码仓库地址                                                   |
+| `entry`                       | ✅   | 入口脚本相对路径                                                      |
+| `type`                        | ✅   | 插件类型，本期仅 `netdisk`；预留 `resolver`、`adapter`                    |
+| `url_patterns`                | ✅   | 通配符 URL 匹配规则（宿主侧快速路由），同时填充 `PluginMetadata.supported_domains` |
+| `permissions.http`            | ✅   | 允许访问的域名白名单，`gdl.http` 强制校验                                    |
+| `permissions.storage`         | —   | 是否允许持久化存储（默认 false）                                           |
+| `permissions.verification_ui` | —   | 是否允许弹出验证码交互（默认 false）                                         |
+| `min_app_version`             | —   | 最低宿主版本，不满足则拒绝加载                                               |
 
 ### 4.3 插件入口约定
 
-入口脚本以 ES Module 形式默认导出插件对象：
+入口文件使用 ES Module，并通过默认导出提供插件对象。下面的示例展示了网盘插件需要实现的最小接口：
 
 ```javascript
 export default {
@@ -213,28 +222,30 @@ export default {
 
 方法与内部 C++ 抽象的映射：
 
-| C++ 接口（INetDiskDownloadPlugin） | JS 插件方法 | 备注 |
-|------|------|------|
-| `CanHandle(url)` | manifest `url_patterns` → 可选 `canHandle(url)` | 快速路径见 3.1-5 |
-| `ParseUrl(url, user_token)` | `async parseUrl(url, userToken)` | 返回 `FileInfo[]` |
-| `EnterDirectory(info)` | `async enterDirectory(fileInfo)` | 返回 `FileInfo[]` |
-| `GetDownloadInfo(info)` | `async getDownloadInfo(fileInfo)` | 返回 `ParseResult[]` |
-| `GetPluginMetadata()` | —（manifest.json 直读） | 不进入 JS |
-| `VerificationCallback` | `await gdl.ui.requestVerification(...)` | 见 5.3 |
-| `MessageNotifyCallback` | `gdl.notify(message, level)` | 见 5.3 |
+| C++ 接口（INetDiskDownloadPlugin） | JS 插件方法                                       | 备注                 |
+| ------------------------------ | --------------------------------------------- | ------------------ |
+| `CanHandle(url)`               | manifest `url_patterns` → 可选 `canHandle(url)` | 先走宿主快速匹配，再由插件做精确判断 |
+| `ParseUrl(url, user_token)`    | `async parseUrl(url, userToken)`              | 返回 `FileInfo[]`    |
+| `EnterDirectory(info)`         | `async enterDirectory(fileInfo)`              | 返回 `FileInfo[]`    |
+| `GetDownloadInfo(info)`        | `async getDownloadInfo(fileInfo)`             | 返回 `ParseResult[]` |
+| `GetPluginMetadata()`          | —（manifest.json 直读）                           | 不进入 JS             |
+| `VerificationCallback`         | `await gdl.ui.requestVerification(...)`       | 见 5.3              |
+| `MessageNotifyCallback`        | `gdl.notify(message, level)`                  | 见 5.3              |
 
 ---
 
-## 5. Host SDK（`gdl.*` API）规范
+## 5. 宿主 API（`gdl.*`）
 
-宿主向每个 JS Context 注入全局对象 `gdl`，这是插件与外界交互的**唯一通道**。沙箱内不提供文件系统、进程、socket 等任何原生能力。
+宿主会向每个 JS Context 注入全局对象 `gdl`。这是插件访问网络、存储和界面能力的唯一入口；沙箱中不提供文件系统、进程或 socket 等原生能力。
 
-### 5.1 网络：`gdl.http`
+### 5.1 网络请求：`gdl.http`
+
+`gdl.http` 提供常用的 GET 和 POST 请求，所有方法都返回 `Promise<Response>`。请求参数由宿主统一编码，并在发送前检查 manifest 中声明的域名权限。
 
 ```javascript
 // 全部返回 Promise<Response>
-const resp = await gdl.http.get(url, options);
-const resp = await gdl.http.post(url, options);
+const getResponse = await gdl.http.get(url, options);
+const postResponse = await gdl.http.post(url, options);
 
 // options:
 {
@@ -261,23 +272,24 @@ const resp = await gdl.http.post(url, options);
 }
 ```
 
-**安全约束：**
-- 请求域名必须命中 manifest `permissions.http` 白名单，否则抛异常
-- 宿主侧实现基于 cpr（项目现有依赖），同步执行后 resolve Promise
-- 单插件并发请求数限制（默认 4），防滥用
+请求需要满足以下限制：
 
-**内容编码容错：** 默认宣告 gzip/deflate 并由 libcurl 自动解压。若因中间代理破坏 gzip 流导致解码失败（`CURLE_BAD_CONTENT_ENCODING`）且插件未显式指定 `accept_encoding`，宿主自动降级为关闭压缩重试一次，插件无需感知。
+- 目标域名必须命中 manifest 的 `permissions.http` 白名单，否则请求会抛出异常。
+- 宿主基于项目现有的 cpr 依赖执行同步请求，再将结果 resolve 为 Promise。
+- 单个插件的并发请求数默认限制为 4，避免插件意外或恶意地占用过多连接。
+
+默认请求会声明支持 gzip/deflate，并由 libcurl 自动解压。如果中间代理破坏了压缩流，导致 `CURLE_BAD_CONTENT_ENCODING`，且插件没有显式设置 `accept_encoding`，宿主会关闭压缩并自动重试一次。插件不需要为这种情况编写额外的兼容逻辑。
 
 #### 5.1.1 Cookie Jar 自动管理
 
-每个插件拥有独立的 Cookie Jar，默认启用，语义对齐浏览器标准（RFC 6265）：
+每个插件拥有独立的 Cookie Jar，默认启用，行为遵循浏览器常用的 RFC 6265 规则：
 
-- **自动入库**：响应中的 `Set-Cookie` 自动解析入 Jar（尊重 Domain / Path / Expires / Max-Age；会话 Cookie 与持久 Cookie 都支持）
-- **自动携带**：发起请求时自动附带匹配域名/路径且未过期的 Cookie
-- **显式优先**：请求 `headers` 中显式指定 `Cookie` 时，显式值与 Jar 合并，同名键以显式值为准
-- **持久化**：持久 Cookie 自动落盘（应用数据目录 `plugin_cookies/<name>.json`，与 `gdl.storage` 分开存储），重启后仍有效；过期 Cookie 加载时自动清理
-- **域名边界**：Jar 只接受/发送 `permissions.http` 白名单内域名的 Cookie，白名单外的 `Set-Cookie` 静默丢弃
-- **按请求关闭**：`options.use_cookie_jar: false` 可对单次请求禁用
+- 响应中的 `Set-Cookie` 会自动解析并存入 Jar，同时遵守 Domain、Path、Expires 和 Max-Age。
+- 发起请求时，宿主会自动附带匹配域名和路径、且尚未过期的 Cookie。
+- 如果请求显式提供了 `Cookie` 头，宿主会将它与 Jar 合并；同名键以显式值为准。
+- 持久 Cookie 会保存到应用数据目录中的 `plugin_cookies/<name>.json`，与 `gdl.storage` 分开管理。应用重启后仍可继续使用，加载时会清理已经过期的 Cookie。
+- Jar 只接受和发送 `permissions.http` 白名单内域名的 Cookie。白名单外的 `Set-Cookie` 会被丢弃。
+- 将 `options.use_cookie_jar` 设为 `false`，可以只对当前请求关闭 Cookie Jar。
 
 ```javascript
 // Cookie 管理 API
@@ -288,9 +300,11 @@ gdl.http.cookies.remove(domain, name)
 gdl.http.cookies.clear(domain)                   // 省略 domain 清空整个 Jar
 ```
 
-典型场景：网盘插件引导用户粘贴登录 Cookie → `setFromString` 注入 → 之后所有请求自动携带并跟随 `Set-Cookie` 刷新，插件代码不再手工拼 Cookie 头。
+例如，网盘插件可以让用户粘贴登录 Cookie，然后调用 `setFromString` 注入。之后的请求会自动携带这些 Cookie，并根据服务端返回的 `Set-Cookie` 进行更新，插件不需要手工拼接请求头。
 
-### 5.2 数据结构（与 C++ 结构体对应）
+### 5.2 数据结构
+
+下面两个对象分别对应 C++ 侧的 `FileInfo` 和 `ParseResult`。桥接层负责在 JS 对象与 C++ 结构体之间进行转换。
 
 ```javascript
 // FileInfo —— 对应 INetDiskDownloadPlugin::FileInfo
@@ -322,10 +336,11 @@ gdl.http.cookies.clear(domain)                   // 省略 domain 清空整个 J
 }
 ```
 
-桥接层负责 JS 对象 ↔ C++ 结构体的双向转换；字段缺失取默认值，类型不匹配记 warning 日志并跳过该字段。
-注意：C++ 侧 `headers`/`options` 为 multimap，JS 侧同名多值用数组表达：`{ "header-name": ["v1", "v2"] }`。
+字段缺失时使用默认值；如果字段类型不匹配，桥接层记录 warning 并跳过该字段。C++ 侧的 `headers` 和 `options` 是 multimap，因此 JS 侧用数组表示同名的多个值，例如 `{ "header-name": ["v1", "v2"] }`。
 
-### 5.3 交互：`gdl.ui` / `gdl.notify`
+### 5.3 用户交互：`gdl.ui` / `gdl.notify`
+
+验证码和消息通知都通过宿主回调完成。插件不能直接创建窗口，也不能访问 Qt UI 对象。
 
 ```javascript
 // 验证码/人机校验 —— 桥接 VerificationCallback
@@ -341,7 +356,9 @@ gdl.notify("Transfer quota exceeded", "warning");
 // level: "success" | "error" | "warning" | "info" | "debug"（对应 MsgType）
 ```
 
-### 5.4 存储：`gdl.storage`
+### 5.4 持久化存储：`gdl.storage`
+
+`gdl.storage` 为每个插件提供隔离的键值存储。使用前必须在 manifest 中声明 `permissions.storage`，单个插件的总容量上限为 1 MB。
 
 ```javascript
 // 需要 permissions.storage；按插件 name 隔离命名空间
@@ -350,9 +367,9 @@ const v = gdl.storage.get("cookie");     // 不存在返回 null
 gdl.storage.remove("cookie");
 ```
 
-宿主侧落地到应用数据目录（每插件一个 JSON 文件或 SQLite 表），大小限额 1MB/插件。
+宿主会将数据保存到应用数据目录，可以使用每插件一个 JSON 文件或 SQLite 表实现。插件之间的命名空间互不相通。
 
-### 5.5 工具：`gdl.crypto` / `gdl.utils`
+### 5.5 加密与通用工具：`gdl.crypto` / `gdl.utils`
 
 ```javascript
 gdl.crypto.md5(str)                       // → hex string
@@ -366,7 +383,7 @@ gdl.utils.urlEncode(str) / urlDecode(str)
 gdl.utils.sleep(ms)                       // → Promise，上限 10s
 ```
 
-基于项目现有 OpenSSL 依赖实现。
+加密函数基于项目现有的 OpenSSL 依赖实现；`sleep` 由宿主调度，并限制最长等待时间为 10 秒。
 
 ### 5.6 日志：`gdl.log`
 
@@ -374,31 +391,35 @@ gdl.utils.sleep(ms)                       // → Promise，上限 10s
 gdl.log.debug("...");  gdl.log.info("...");  gdl.log.warn("...");  gdl.log.error("...");
 ```
 
-输出到 spdlog，统一前缀 `[js-plugin:{name}]`，便于排查。
+日志最终写入 spdlog，并统一使用 `[js-plugin:{name}]` 前缀，方便从主程序日志中定位具体插件。
 
 ---
 
 ## 6. 安全与资源控制
 
-| 维度 | 机制 |
-|------|------|
-| 能力沙箱 | 不注入 `std`/`os` 模块（QuickJS-libc 不链接）；仅暴露 `gdl.*`；无文件/进程/网络原生访问 |
-| 网络白名单 | `permissions.http` 域名校验，通配符仅允许子域（`*.baidu.com`），禁止 `*` 全通配 |
-| 内存限制 | `JS_SetMemoryLimit`：默认 64MB/Runtime |
-| CPU 限制 | `JS_SetInterruptHandler`：单次调用执行超时（默认 60s）强制中断 |
-| 栈限制 | `JS_SetMaxStackSize`：默认 1MB |
-| 完整性 | 内置/市场插件带官方签名；本地手动安装的插件首次加载时提示用户确认 |
-| 隔离性 | 每插件独立 Runtime；插件崩溃（JS 异常）不影响宿主，异常统一捕获转为 `std::nullopt` + notify error |
+插件代码运行在受限的 QuickJS 环境中。宿主不仅控制插件能调用哪些 API，也限制单次调用可以消耗的内存、栈和 CPU 时间。
 
-> 相比旧原生插件"加载即完全信任"的模型，JS 沙箱把插件能力压缩到声明的权限范围内，第三方插件的信任成本大幅降低。旧的 SHA-256 白名单/黑名单机制随原生通道一并移除，由 manifest 签名机制替代。
+| 维度     | 机制                                                                   |
+| ------ | -------------------------------------------------------------------- |
+| 能力沙箱   | 不链接 QuickJS-libc，也不注入 `std`/`os` 模块；只暴露 `gdl.*`，不提供文件、进程或原生网络访问      |
+| 网络白名单  | 校验 `permissions.http`；通配符只允许匹配子域（例如 `*.baidu.com`），不允许使用 `*` 全量放行    |
+| 内存限制   | `JS_SetMemoryLimit`，默认每个 Runtime 限制为 64 MB                           |
+| CPU 限制 | `JS_SetInterruptHandler`，单次调用默认在 60 秒后中断                             |
+| 栈限制    | `JS_SetMaxStackSize`，默认限制为 1 MB                                      |
+| 完整性    | 内置插件和市场插件使用官方签名；本地手动安装的插件首次加载时提示用户确认                                 |
+| 隔离性    | 每个插件使用独立 Runtime。JS 异常会在宿主侧统一捕获，转换为 `std::nullopt` 并发送错误通知，不会直接影响主程序 |
+
+与“加载即完全信任”的原生插件不同，JS 插件只能使用 manifest 声明且宿主实际提供的能力。原有的 SHA-256 白名单/黑名单会随原生通道一起移除，完整性校验改由 manifest 签名机制负责。
 
 ---
 
 ## 7. 加载流程与生命周期
 
+插件的生命周期分为三个阶段：应用启动时发现并校验插件，首次使用时初始化脚本运行时，更新或退出时释放运行时资源。具体流程如下：
+
 ```
 应用启动 → MainWindow::InitNetDiskPlugins()
-  └─ DownloadPluginManager::LoadPlugins(appdir + "/plugins")   （重构后仅此一条路径）
+  └─ DownloadPluginManager::LoadPlugins(appdir + "/plugins")   （迁移后唯一的加载路径）
         ├─ 遍历子目录，读取并校验 manifest.json
         │     ├─ manifest_version / min_app_version 校验
         │     ├─ permissions 解析
@@ -406,60 +427,61 @@ gdl.log.debug("...");  gdl.log.info("...");  gdl.log.warn("...");  gdl.log.error
         ├─ 构造 JsPluginHost（懒初始化：不立即创建 JSRuntime）
         └─ 注册进插件列表
 
-首次实际调用（ParseUrl 等）
+首次实际调用（例如 ParseUrl）
   ├─ 创建 JSRuntime + JSContext，注入 gdl.*
   ├─ 加载并 eval 入口 ES Module，取 default export
   └─ 后续调用复用该 Context
 
-插件更新（市场推送 / 应用更新）
+插件更新（市场推送或应用更新）
   └─ 卸载实例 → 替换 plugins/<name>/ 目录 → 重新加载（热替换，无需重启）
 
-应用退出 / 插件卸载
+应用退出或插件卸载
   └─ JsPluginHost 析构：JS_FreeContext → JS_FreeRuntime
 ```
 
-懒初始化的目的：装了 20 个插件但只用 2 个时，不为闲置插件付出 Runtime 内存成本。
+采用懒初始化后，即使安装了 20 个插件，应用也只会为实际使用到的插件创建 Runtime，从而避免为闲置插件预先占用内存。
 
 ---
 
-## 8. 旧体系移除与百度插件重写
+## 8. 迁移旧体系并重写百度插件
 
 ### 8.1 移除清单
 
-| 移除项 | 说明 |
-|------|------|
-| `PluginManager/loader/plugin_loader.h/.cxx` | LoadLibrary/dlopen 封装，整体删除 |
-| `IDownload_Plugin.h` 中的 C ABI | `CreatePluginFunc` / `DestroyPluginFunc` typedef 删除；接口类本身保留为内部抽象 |
-| `DownloadPluginManager::PluginResourceGuard` | 共享库生命周期管理，由 JsPluginHost 取代 |
-| SHA-256 白名单/黑名单机制（`LoadPluginOptions`） | 由 manifest 签名机制取代 |
-| `Baidu_Plugin/` 整个 C++ 模块 | 逻辑翻译为 JS 后删除源码与构建目标 |
-| 共享库扫描逻辑（`.dll/.so/.dylib` + 文件名含 "Plugin"） | 改为 plugins/ 目录 + manifest.json 扫描 |
+| 移除项                                          | 说明                                                              |
+| -------------------------------------------- | --------------------------------------------------------------- |
+| `PluginManager/loader/plugin_loader.h/.cxx`  | 删除 `LoadLibrary`/`dlopen` 封装                                    |
+| `IDownload_Plugin.h` 中的 C ABI                | 删除 `CreatePluginFunc` / `DestroyPluginFunc` typedef，保留接口类作为内部抽象 |
+| `DownloadPluginManager::PluginResourceGuard` | 删除共享库生命周期管理，改由 `JsPluginHost` 管理脚本运行时                           |
+| SHA-256 白名单/黑名单机制（`LoadPluginOptions`）       | 改为 manifest 签名校验                                                |
+| `Baidu_Plugin/` C++ 模块                       | JS 版本通过回归验证后，删除源码和构建目标                                          |
+| 共享库扫描逻辑（`.dll`/`.so`/`.dylib`）               | 改为扫描 `plugins/` 下的 `manifest.json`                              |
 
 ### 8.2 百度插件 JS 重写
 
-`BaiduPcsApi`（`Baidu_Plugin/baiduApi/baidu_pcs_api.cxx`）是重写蓝本，核心流程逐一翻译：
+`BaiduPcsApi`（`Baidu_Plugin/baiduApi/baidu_pcs_api.cxx`）作为迁移基准。重写时保持业务流程不变，只替换实现所依赖的 API：
 
-| C++ 现有逻辑 | JS 对应实现 |
-|------|------|
-| cpr HTTP 请求（带 Cookie/UA） | `gdl.http.get/post` |
-| boost::url 拼接参数 | `gdl.utils.urlEncode` + 模板字符串 |
-| nlohmann::json 解析 | 原生 `JSON.parse` / `resp.json()` |
-| OpenSSL 签名计算 | `gdl.crypto.*` |
-| 验证码回调 | `await gdl.ui.requestVerification(...)` |
-| 转存→取直链→清理 流程 | `async` 函数顺序编排，逻辑不变 |
+| C++ 现有逻辑                 | JS 对应实现                                 |
+| ------------------------ | --------------------------------------- |
+| cpr HTTP 请求（带 Cookie/UA） | `gdl.http.get/post`                     |
+| boost::url 拼接参数          | `gdl.utils.urlEncode` + 模板字符串           |
+| nlohmann::json 解析        | 原生 `JSON.parse` / `resp.json()`         |
+| OpenSSL 签名计算             | `gdl.crypto.*`                          |
+| 验证码回调                    | `await gdl.ui.requestVerification(...)` |
+| 转存→取直链→清理 流程             | `async` 函数顺序编排，逻辑不变                     |
 
-重写完成的 `plugins/baidu-netdisk/` 同时承担三个角色：
-1. JS SDK 的验收用例（覆盖 http/crypto/storage/ui 全部 API）
-2. 社区插件开发的官方参考模板
-3. 回归基准——重写版必须通过与 C++ 版相同的手工测试用例（分享链解析、目录浏览、单文件/多文件下载、验证码流程）后，才删除 C++ 版源码
+完成后的 `plugins/baidu-netdisk/` 同时承担三项职责：
+
+1. 作为 JS SDK 的验收样例，覆盖 `http`、`crypto`、`storage` 和 `ui` 等主要 API。
+2. 作为社区插件开发时可以直接参考的官方模板。
+3. 作为回归基准。JS 版本必须先通过与 C++ 版本相同的手工用例（分享链接解析、目录浏览、单文件和多文件下载、验证码流程），再删除 C++ 版本源码。
 
 ---
 
-## 9. 插件市场（Phase 3 概要设计）
+## 9. 插件市场（Phase 4 概要）
 
 ### 9.1 注册表
 
-采用 **Git 仓库即注册表**（参考 Gopeed / Claude Code marketplace 模式）：
+插件市场采用“Git 仓库即注册表”的方式。官方维护一个 GitHub 仓库，仓库中的索引文件记录插件元数据、下载地址和签名信息：
 
 ```
 gdownload-plugin-registry/          ← 官方 GitHub 仓库
@@ -468,86 +490,95 @@ gdownload-plugin-registry/          ← 官方 GitHub 仓库
     quark-netdisk/  → 指向独立仓库 release 的 zip 包
 ```
 
-`registry.json` 条目：
+`registry.json` 中每个插件可以包含多个版本。每个版本都带有校验信息和一组下载地址，客户端选择版本后再按顺序尝试这些地址：
 
 ```json
 {
     "name": "quark-netdisk",
-    "version": "1.2.0",
     "description": "...",
-    "download_url": "https://github.com/.../releases/download/v1.2.0/quark-netdisk.zip",
-    "sha256": "...",
-    "signature": "...",
-    "min_app_version": "2.0.0",
-    "verified": true
+    "latest": "1.2.0",
+    "verified": true,
+    "versions": [
+        {
+            "version": "1.2.0",
+            "size": 12345,
+            "sha256": "...",
+            "signature": "...",
+            "download_urls": [
+                "https://github.com/.../releases/download/v1.2.0/quark-netdisk.zip",
+                "https://cdn.jsdelivr.net/gh/.../quark-netdisk-v1.2.0.zip"
+            ],
+            "min_app_version": "2.0.0"
+        }
+    ]
 }
 ```
 
 ### 9.2 客户端功能
 
-- 设置页新增「插件市场」：浏览 / 搜索 / 安装 / 更新 / 卸载 / 启用禁用
-- 安装 = 下载 zip → 校验 sha256 + 签名 → 解压到 `plugins/<name>/` → 热加载
-- 支持添加第三方注册表 URL（默认仅官方源，添加第三方源时给出安全警告）
-- 更新检查：启动时/手动比对 registry 版本号
+客户端需要提供以下能力：
+
+- 在设置页浏览、搜索、安装、更新、卸载插件，并控制插件启用状态。
+- 安装插件时依次下载 zip、校验 SHA-256 和签名、解压到 `plugins/<name>/`，然后热加载插件。
+- 允许用户添加第三方注册表 URL。默认只使用官方源，启用第三方源前显示安全提示。
+- 在应用启动时或用户手动触发时，比较本地版本与注册表中的版本。
 
 ### 9.3 国内镜像加速
 
-GitHub 在国内访问不稳定，registry 与插件包下载均需多源回退：
+考虑到 GitHub 在部分网络环境下访问不稳定，注册表和插件包都需要支持多源回退：
 
-- `registry.json` 中每个插件的下载地址扩展为 `download_urls` 数组（主源 + 镜像源）
-- 内置镜像源链：GitHub Releases（主）→ jsDelivr（`cdn.jsdelivr.net/gh/...`）→ ghproxy 类代理前缀
-- registry 索引本身同样多源：GitHub Raw → jsDelivr → 自建 CDN（可选）
-- 客户端策略：按顺序尝试，单源超时 10s 自动切换；成功源记忆并优先复用；设置页允许用户自定义镜像前缀
-- 完整性保障：无论从哪个镜像下载，都必须通过 sha256 + 签名校验后才安装（镜像不可信也无妨）
+- `registry.json` 中每个插件的下载地址使用 `download_urls` 数组，同时记录主源和镜像源。
+- 默认源顺序为 GitHub Releases、jsDelivr（`cdn.jsdelivr.net/gh/...`）以及可选的自建 CDN 或代理。
+- 注册表索引本身也支持从 GitHub Raw、jsDelivr 和自建 CDN 获取。
+- 客户端按顺序尝试各个源，单个源超时 10 秒后切换；成功的源可以记录下来，并在下次请求时优先使用。设置页允许用户配置自定义镜像前缀。
+- 无论文件来自哪个镜像，安装前都必须通过 SHA-256 和签名校验。镜像只负责传输，不改变信任边界。
 
 ### 9.4 未来扩展的插件类型（预留）
 
-| type | 场景 | 说明 |
-|------|------|------|
-| `netdisk` | 网盘解析 | 本期实现 |
-| `resolver` | 通用链接解析 | 视频页→直链（配合外部工具） |
-| `adapter` | 外部工具适配 | 声明式封装 yt-dlp/BBDown/lux 等 CLI（manifest 描述命令行与输出解析规则） |
+| type       | 场景     | 说明                                                   |
+| ---------- | ------ | ---------------------------------------------------- |
+| `netdisk`  | 网盘解析   | 本期实现                                                 |
+| `resolver` | 通用链接解析 | 视频页→直链（配合外部工具）                                       |
+| `adapter`  | 外部工具适配 | 声明式封装 yt-dlp/BBDown/lux 等 CLI（manifest 描述命令行与输出解析规则） |
 
-### 9.5 已确认决策（2026-07-18 评审）
+### 9.5 当前已确认的决策（截至 2026-07-18）
 
-| 决策项 | 结论 |
-|------|------|
-| 脚本引擎 | quickjs-ng（vcpkg port） |
-| 内置插件混淆 | 不混淆，内置插件即官方开源模板 |
-| 签名算法 | Ed25519，复用 release 签名密钥基础设施 |
-| Cookie Jar | Phase 1 完整实现（见 5.1.1），含持久化与管理 API |
-| 国内镜像 | Phase 4 实现多源回退（见 9.3） |
+| 决策项        | 结论                                   |
+| ---------- | ------------------------------------ |
+| 脚本引擎       | quickjs-ng（vcpkg port）               |
+| 内置插件混淆     | 不混淆，内置插件即官方开源模板                      |
+| 签名算法       | Ed25519，复用 release 签名密钥基础设施          |
+| Cookie Jar | 在 Phase 1 完整实现（见 5.1.1），包括持久化和管理 API |
+| 国内镜像       | 在 Phase 4 实现多源回退（见 9.3）              |
 
 ---
 
 ## 10. 风险与对策
 
-| 风险 | 影响 | 对策 |
-|------|------|------|
-| QuickJS vcpkg port 跨平台编译问题 | 阻塞集成 | 备选：源码子目录引入，QuickJS 无外部依赖，编译极简单 |
-| 同步桥接死锁（JS 内 await 一个永不 settle 的 Promise） | 工作线程卡死 | AwaitPromise 强制超时 + InterruptHandler 兜底 |
-| JS 版百度插件行为回退（重写引入 bug） | 唯一现有功能受损 | 8.2 的回归基准：JS 版通过全部现有测试用例后才删 C++ 版；开发期两版并存于分支 |
-| 网盘 API 变动导致插件失效 | 功能不可用 | 这正是 JS 热更新要解决的问题；市场推送更新 |
-| 恶意插件（第三方源） | 用户 Cookie/Token 泄露 | http 域名白名单 + 权限声明 + 官方源签名审核 + 第三方源警告 |
-| `AwaitPromise` 期间宿主回调重入（验证码 UI） | 死锁/竞态 | 验证码回调本身已是跨线程异步模式（现有 `VerificationCallbackParam` 机制），JS 侧 Promise 挂起等待，不阻塞 UI 线程 |
-| multimap 语义在 JS 对象上的表达 | 头部丢失 | 约定数组值表达多值（见 5.2），转换层做好双向映射 |
+| 风险                              | 影响                   | 对策                                                                  |
+| ------------------------------- | -------------------- | ------------------------------------------------------------------- |
+| QuickJS vcpkg port 跨平台编译问题      | 集成被阻塞                | 优先切换到源码子目录方案；QuickJS 没有额外的第三方依赖，备选构建路径相对简单                          |
+| 同步桥接死锁（JS 中等待永不完成的 Promise）     | 工作线程卡住               | `AwaitPromise` 设置强制超时，并由 `InterruptHandler` 作为最后一道保护                |
+| JS 版百度插件出现行为回退                  | 现有网盘功能受影响            | 以 8.2 节的回归用例为准，全部通过后再删除 C++ 版本；开发阶段允许两版并行对照                         |
+| 网盘 API 发生变化                     | 插件暂时无法解析链接           | 通过插件市场发布修复版本，避免等待主程序发版                                              |
+| 第三方源提供恶意插件                      | 用户 Cookie 或 Token 泄露 | 域名白名单、权限声明、官方源签名审核，以及安装第三方源插件时的安全提示                                 |
+| `AwaitPromise` 期间宿主回调重入（验证码 UI） | 死锁或竞态                | 沿用现有 `VerificationCallbackParam` 的跨线程异步机制；JS Promise 等待结果时不阻塞 UI 线程 |
+| multimap 在 JS 对象中的表达不明确         | 请求头或任务选项丢失           | 统一使用数组表示同名多值，并在转换层进行双向校验（见 5.2）                                     |
 
 ---
 
-## 11. 与现有代码的接触面清单
+## 11. 对现有代码的影响
 
-| 现有代码 | 改动 |
-|------|------|
-| `IDownload_Plugin.h` | 保留接口类（内部抽象）；删除 C ABI typedef |
-| `plugin_manager.h/.cxx` | **重构**：删除共享库加载路径，改为 manifest 扫描 + JsPluginHost 构造；`GetPluginsForUrl` / `GetPluginByName` 对外签名不变 |
-| `PluginManager/loader/` | **删除** |
-| `Baidu_Plugin/` | JS 重写通过回归后**删除**（含 CMake 目标） |
-| `mainwindow.cxx::InitNetDiskPlugins` | 加载路径参数改为 `plugins/` 子目录 |
-| `NetWork_Disk_magager.cxx` | **不改** |
-| `vcpkg.json` | 新增 `quickjs` 依赖 |
-| `src/Module/plugin/` | 新增 `JsPluginRuntime/` 子模块（详见实施文档） |
-| 安装包脚本（NSIS/DMG/AppImage） | 打包 `plugins/baidu-netdisk/`（JS 内置插件） |
+| 现有代码                                 | 改动                                                                                          |
+| ------------------------------------ | ------------------------------------------------------------------------------------------- |
+| `IDownload_Plugin.h`                 | 保留接口类作为内部抽象，删除 C ABI typedef                                                                |
+| `plugin_manager.h/.cxx`              | 删除共享库加载路径，改为扫描 manifest 并构造 `JsPluginHost`；`GetPluginsForUrl` 和 `GetPluginByName` 的对外签名保持不变 |
+| `PluginManager/loader/`              | 删除整个加载器目录                                                                                   |
+| `Baidu_Plugin/`                      | JS 版本通过回归验证后删除源码和 CMake 目标                                                                  |
+| `mainwindow.cxx::InitNetDiskPlugins` | 将插件目录改为 `plugins/` 子目录                                                                      |
+| `NetWork_Disk_magager.cxx`           | 不需要改动                                                                                       |
+| `vcpkg.json`                         | 新增 `quickjs` 依赖                                                                             |
+| `src/Module/plugin/`                 | 新增 `JsPluginRuntime/` 子模块，具体任务见实施文档                                                         |
+| 安装包脚本（NSIS/DMG/AppImage）             | 将 `plugins/baidu-netdisk/` 作为内置 JS 插件打包                                                     |
 
----
 
-*文档更新：2026-07-18 v2.1 —— 评审决策落地：quickjs-ng、Ed25519 签名、Cookie Jar 完整规范（5.1.1）、市场国内镜像方案（9.3）；v2.0 按"全面替换"决策重写；v1.0 双通道方案作废*
