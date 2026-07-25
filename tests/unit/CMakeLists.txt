@@ -15,6 +15,7 @@ add_executable(gdownload_unit_tests
     engine/test_publish_subscribe_system.cpp
     engine/test_tracker_sync_gate.cpp
     update/test_update_config.cpp
+    update/test_update_check_request.cpp
     browser/test_download_url_utils.cpp
     browser/test_download_task_utils.cpp
     browser/test_local_content_removal.cpp

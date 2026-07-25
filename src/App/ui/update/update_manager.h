@@ -88,6 +88,7 @@ namespace gdl {
             UpdateInfo latest_update_info_;
             bool update_available_ = false;
             bool silent_check_	   = false;
+            bool check_in_flight_  = false;  // 是否已有一轮底层检查在途(仅主线程读写)
             QString last_error_;
             bool apply_requested_ = false;
             UpdateProgressData* progress_data_ = nullptr;  // 复用的进度对象（M1）
