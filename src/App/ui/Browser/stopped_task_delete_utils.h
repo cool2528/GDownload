@@ -33,7 +33,6 @@ namespace gdl {
 			}
 
 			struct StoppedTaskDeletionDecision {
-				bool remove_local_task{false};
 				bool aria2_cleaned{false};
 				bool show_cleanup_warning{false};
 				QString warning_message;
@@ -43,12 +42,11 @@ namespace gdl {
 				StoppedTaskAria2CleanupStatus status, const QString& cleanup_error) {
 				if (status == StoppedTaskAria2CleanupStatus::kSucceeded ||
 					status == StoppedTaskAria2CleanupStatus::kAlreadyMissing) {
-					return {.remove_local_task = true, .aria2_cleaned = true};
+					return {.aria2_cleaned = true};
 				}
 
 				const QString detail = cleanup_error.trimmed();
-				return {.remove_local_task = true,
-						.aria2_cleaned = false,
+				return {.aria2_cleaned = false,
 						.show_cleanup_warning = true,
 						.warning_message =
 							detail.isEmpty()

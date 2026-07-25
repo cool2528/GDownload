@@ -48,7 +48,6 @@ TEST(StoppedTaskDeleteTest, OrdinaryAria2CleanupFailureStillRemovesLocalRecord) 
 	const auto decision = DecideStoppedTaskDeletionAfterAria2Cleanup(
 		StoppedTaskAria2CleanupStatus::kFailed, QStringLiteral("connection refused"));
 
-	EXPECT_TRUE(decision.remove_local_task);
 	EXPECT_FALSE(decision.aria2_cleaned);
 	EXPECT_TRUE(decision.show_cleanup_warning);
 	EXPECT_FALSE(decision.warning_message.trimmed().isEmpty());
@@ -58,7 +57,6 @@ TEST(StoppedTaskDeleteTest, Aria2CleanupSuccessRemovesLocalTaskWithoutWarning) {
 	const auto decision = DecideStoppedTaskDeletionAfterAria2Cleanup(
 		StoppedTaskAria2CleanupStatus::kSucceeded, QString());
 
-	EXPECT_TRUE(decision.remove_local_task);
 	EXPECT_TRUE(decision.aria2_cleaned);
 	EXPECT_FALSE(decision.show_cleanup_warning);
 	EXPECT_TRUE(decision.warning_message.isEmpty());
@@ -68,7 +66,6 @@ TEST(StoppedTaskDeleteTest, AlreadyMissingAria2ResultAllowsLocalRemoval) {
 	const auto decision = DecideStoppedTaskDeletionAfterAria2Cleanup(
 		StoppedTaskAria2CleanupStatus::kAlreadyMissing, QStringLiteral("GID not found"));
 
-	EXPECT_TRUE(decision.remove_local_task);
 	EXPECT_TRUE(decision.aria2_cleaned);
 }
 
