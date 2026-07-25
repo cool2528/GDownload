@@ -60,10 +60,11 @@ namespace gdl {
 
 				constexpr int kMaxAttempts = 3;
 				std::error_code error_code;
-				std::uintmax_t removed_count = 0;
 				for (int attempt = 0; attempt < kMaxAttempts; ++attempt) {
 					error_code.clear();
-					removed_count +=
+					// remove_all 出错时返回 static_cast<uintmax_t>(-1) 而非部分删除数,
+					// 失败尝试的返回值必须丢弃,否则跨尝试累加会无符号回绕
+					const std::uintmax_t removed_count =
 						std::filesystem::remove_all(LocalRemovalFilesystemPath(path), error_code);
 					if (!error_code) {
 						return {.status = removed_count == 0 ? LocalRemovalStatus::kNotFound

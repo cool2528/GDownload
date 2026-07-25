@@ -5,8 +5,10 @@
 #include <QTemporaryDir>
 #include <QTemporaryFile>
 
+#include <chrono>
 #include <filesystem>
 #include <system_error>
+#include <thread>
 
 #include "Browser/local_content_removal.h"
 
@@ -158,6 +160,30 @@ TEST(LocalContentRemovalTest, ReportsFailureForOpenFile) {
 	EXPECT_FALSE(result.removed_count.has_value());
 	EXPECT_TRUE(result.partial_possible);
 	EXPECT_TRUE(QFile::exists(file_path));
+}
+
+TEST(LocalContentRemovalTest, ReportsAccurateCountWhenRetrySucceedsAfterTransientLock) {
+	QTemporaryDir temporary_dir;
+	ASSERT_TRUE(temporary_dir.isValid());
+	const QString file_path = temporary_dir.filePath(QStringLiteral("transient-locked.bin"));
+	QFile locked_file(file_path);
+	ASSERT_TRUE(locked_file.open(QIODevice::WriteOnly));
+	ASSERT_EQ(locked_file.write("content"), 7);
+
+	// 模拟杀毒软件/预览窗格短暂占用:首次删除尝试失败,退避间隙内句柄释放后重试成功
+	std::thread release_thread([&locked_file]() {
+		std::this_thread::sleep_for(std::chrono::milliseconds(25));
+		locked_file.close();
+	});
+
+	const auto result = RemoveLocalContent(file_path);
+	release_thread.join();
+
+	EXPECT_EQ(result.status, LocalRemovalStatus::kRemoved);
+	EXPECT_TRUE(result.error.isEmpty());
+	ASSERT_TRUE(result.removed_count.has_value());
+	EXPECT_EQ(result.removed_count.value(), 1);
+	EXPECT_FALSE(QFile::exists(file_path));
 }
 #endif
 
