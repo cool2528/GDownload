@@ -1,5 +1,32 @@
 # Changelog
 
+## v2.1.0
+
+### ✨ 更新体验 / Update Experience
+
+- Check for updates silently on every startup (dialog appears only when a new version exists) and add a manual "Check for Updates" button in Settings with up-to-date / failure feedback. / 每次启动后静默检查更新（发现新版才弹窗），设置页新增手动检查按钮，提示"已是最新版本"或失败原因。
+- Fix concurrent update checks racing each other: the manual check button could stay stuck on "Checking..." forever or pop up a toast it never asked for. / 修复启动自动检查与手动检查并发时按钮永久卡在 "Checking..." 或误弹提示的竞态。
+- Fix false update-check results: a transient primary-server failure with a successful fallback no longer reports "check failed" on Windows, and failed checks on macOS are no longer reported as "up to date". / 修复误报：Windows 主源瞬时失败但备用源成功时不再误报"检查失败"；macOS 检查失败不再被误报为"已是最新版本"。
+
+### 🛠 删除可靠性 / Deletion Reliability
+
+- Make history deletion resilient after the aria2 engine restarts — removed tasks no longer resurrect from late notifications or recycled GIDs. / aria2 引擎重启后删除历史依然可靠，已删任务不再因迟到通知或 GID 复用而"复活"。
+- Fix a counter wraparound that reported a successfully retried deletion as "not found". / 修复删除重试成功却被报告为"未找到"的计数回绕。
+- Bulk deletion no longer retries locked files one by one, avoiding UI freezes when an antivirus briefly holds file handles. / 批量删除不再对被占用文件逐个重试退避，避免杀毒软件短暂占用句柄时界面冻结。
+
+### ✨ eD2k
+
+- Reliable server.met updates and Kad enabled by default. / server.met 更新更可靠，Kad 网络默认开启。
+
+### 📦 安装与卸载 / Installer
+
+- Uninstall can now optionally remove user data (settings, download history and plugin data — downloaded files are never touched), localized in all five installer languages; stale autostart entries are cleaned up; upgrades keep your settings. / 卸载时可选删除用户数据（设置、下载记录、插件数据，不影响已下载文件），提供 5 种语言文案；清理开机自启残留；升级安装不丢配置。
+
+### 🔧 其他 / Misc
+
+- Release notes now contain only the current version's changelog section. / Release Notes 只包含当前版本的变更章节。
+- Faster release builds: vcpkg and sccache caches are kept warm between releases. / 发版构建提速：vcpkg 与 sccache 缓存跨发版保温。
+
 ## v2.0.0
 
 ### 🚀 Highlights / 亮点
