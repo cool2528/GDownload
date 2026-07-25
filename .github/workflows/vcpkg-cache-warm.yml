@@ -1,0 +1,212 @@
+name: Release-Cache-Warm
+
+# 发版缓存保温:GitHub Actions 缓存按 ref 隔离(tag 只能读默认分支的缓存)且
+# 7 天未访问即回收,导致 tag 触发的发版构建几乎必然 vcpkg/sccache 全冷启动
+# (v2.0.0 实测 Windows job 中 vcpkg 冷编译 27 分钟)。本工作流定期在 main 上
+# 恢复并按需重建 4 个发版 triplet 的 vcpkg 二进制缓存与 sccache 编译缓存,
+# 使发版 run 必定命中温热缓存。
+#
+# 注意:构建参数(Qt 版本/triplet/CMake flags)必须与 cli-matrix.yml 的 build
+# job 保持一致,否则 sccache 键不匹配、保温失效;修改任一侧时同步另一侧。
+
+on:
+  schedule:
+    # 每周一、周四 03:00 UTC,间隔不超过 4 天,确保 7 天 TTL 内始终有访问
+    - cron: '0 3 * * 1,4'
+  push:
+    branches:
+      - main
+    paths:
+      - 'vcpkg.json'
+      - 'vcpkg-configuration.json'
+      - 'custom-triplets/**'
+      - 'vcpkg-ports/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  warm:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [linux, macos-arm64, macos-x64, windows]
+        include:
+          - target: linux
+            os: ubuntu-latest
+            qt_version: 6.10.1
+            qt_arch: linux_gcc_64
+            vcpkg_triplet: x64-linux-release
+            cmake_extra: ""
+          - target: macos-arm64
+            os: macos-latest
+            qt_version: 6.10.1
+            qt_arch: clang_64
+            vcpkg_triplet: arm64-osx-release
+            cmake_arch: arm64
+            cmake_extra: "-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang"
+          - target: macos-x64
+            os: macos-latest
+            qt_version: 6.10.1
+            qt_arch: clang_64
+            vcpkg_triplet: x64-osx-release
+            cmake_arch: x86_64
+            cmake_extra: "-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang"
+          - target: windows
+            os: windows-latest
+            qt_version: 6.10.1
+            qt_arch: win64_msvc2022_64
+            vcpkg_triplet: x64-windows-release
+            msvc_arch: x64
+            cmake_extra: ""
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ matrix.qt_version }}
+          arch: ${{ matrix.qt_arch }}
+          modules: qt3d qtimageformats qtwebsockets qt5compat qtshadertools
+
+      - name: Set QTDIR (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          QT_DIR_VALUE="${QT_ROOT_DIR:-}"
+          if [ -z "${QT_DIR_VALUE}" ] && [ -n "${Qt6_DIR:-}" ]; then
+            QT_DIR_VALUE="$(cd "${Qt6_DIR}/../.." && pwd)"
+          fi
+          if [ -z "${QT_DIR_VALUE}" ]; then
+            echo "Neither QT_ROOT_DIR nor Qt6_DIR is set after install-qt-action."
+            exit 1
+          fi
+          echo "QTDIR=${QT_DIR_VALUE}" >> "$GITHUB_ENV"
+
+      - name: Set QTDIR (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          setlocal
+          if "%QT_ROOT_DIR%"=="" (
+            if "%Qt6_DIR%"=="" (
+              echo Neither QT_ROOT_DIR nor Qt6_DIR is defined after install-qt-action.
+              exit /b 1
+            )
+            for %%I in ("%Qt6_DIR%\..\..") do set "QT_ROOT_DIR=%%~fI"
+          )
+          set "QTDIR=%QT_ROOT_DIR%"
+          if "%QTDIR%"=="" (
+            echo QTDIR could not be determined.
+            exit /b 1
+          )
+          echo QTDIR=%QTDIR%>>"%GITHUB_ENV%"
+          endlocal
+
+      - name: Install Linux Dependencies
+        if: matrix.target == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1 libdrm-dev libappimage-dev libxdg-basedir-dev xdg-utils-cxx xdg-utils-cxx-dev mesa-common-dev build-essential libssl-dev autoconf automake libtool wget vim-common desktop-file-utils pkgconf libgpgme-dev libglib2.0-dev libcairo2-dev librsvg2-dev libfuse-dev git libcurl4-openssl-dev argagg-dev libgcrypt20-dev libboost-dev liblzma-dev libzstd-dev zlib1g-dev libarchive-dev libx11-dev libxpm-dev ninja-build libxkbcommon-dev libxkbcommon-x11-0 libxkbcommon-x11-dev xkb-data
+
+      - name: Install macOS Tools
+        if: startsWith(matrix.target, 'macos-')
+        run: |
+          brew install ninja
+
+      - name: Cache vcpkg binary cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ github.workspace }}/vcpkg_installed
+            ~/.cache/vcpkg/archives
+            C:\Users\runneradmin\AppData\Local\vcpkg\archives
+            ~/Library/Caches/vcpkg/archives
+          key: vcpkg-${{ matrix.vcpkg_triplet }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'custom-triplets/**', 'vcpkg-ports/**') }}
+          restore-keys: |
+            vcpkg-${{ matrix.vcpkg_triplet }}-
+            vcpkg-
+
+      - name: Setup vcpkg
+        id: vcpkg
+        uses: johnwason/vcpkg-action@v6
+        env:
+          VCPKG_MAX_CONCURRENCY: 4
+        with:
+          manifest-dir: ${{ github.workspace }}
+          triplet: ${{ matrix.vcpkg_triplet }}
+          extra-args: >-
+            --overlay-triplets=${{ github.workspace }}/custom-triplets
+            --overlay-ports=${{ github.workspace }}/vcpkg-ports
+          token: ${{ github.token }}
+          github-binarycache: true
+          cache-key: vcpkg-${{ matrix.vcpkg_triplet }}
+
+      - name: Setup sccache
+        uses: mozilla/sccache-action@v0.0.10
+
+      - name: Setup MSVC Developer Command Prompt
+        if: matrix.target == 'windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.msvc_arch }}
+
+      # 与 cli-matrix.yml 相同参数做完整 Release 编译:不打包不上传,只为
+      # 把 sccache 编译缓存喂热(tag 发版 run 只能读到 main 上的缓存)
+      - name: Configure & Build (Unix)
+        if: matrix.target != 'windows'
+        env:
+          SCCACHE_GHA_ENABLED: "true"
+          UPDATE_MANIFEST_ED25519_PUBLIC_KEY: ${{ vars.UPDATE_MANIFEST_ED25519_PUBLIC_KEY }}
+        run: |
+          if [ -z "${QTDIR:-}" ]; then
+            echo "QTDIR is not set."
+            exit 1
+          fi
+          EXTRA_CMAKE_ARGS=""
+          if [[ "${{ matrix.target }}" == macos-* ]]; then
+            EXTRA_CMAKE_ARGS="-DCMAKE_OSX_ARCHITECTURES=${{ matrix.cmake_arch }}"
+          fi
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} \
+            -B build \
+            -S ${{ github.workspace }} \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_PREFIX_PATH="${QTDIR}" \
+            -DGDL_UI_GENERATE_TRANSLATIONS=on \
+            -DCMAKE_C_COMPILER_LAUNCHER=sccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=sccache \
+            -GNinja \
+            ${{ matrix.cmake_extra }} \
+            "-DGDOWNLOAD_UPDATE_PUBLIC_KEY_BASE64=${UPDATE_MANIFEST_ED25519_PUBLIC_KEY}" \
+            ${EXTRA_CMAKE_ARGS}
+          cmake --build build --config Release --parallel
+
+      - name: Configure & Build (Windows)
+        if: matrix.target == 'windows'
+        shell: cmd
+        env:
+          SCCACHE_GHA_ENABLED: "true"
+          UPDATE_MANIFEST_ED25519_PUBLIC_KEY: ${{ vars.UPDATE_MANIFEST_ED25519_PUBLIC_KEY }}
+        run: |
+          if "%QTDIR%"=="" (
+            echo QTDIR is not set.
+            exit /b 1
+          )
+          where cl
+          set "CC=cl"
+          set "CXX=cl"
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=%QTDIR% -DGDL_UI_GENERATE_TRANSLATIONS=on -DGDOWNLOAD_UPDATE_PUBLIC_KEY_BASE64=%UPDATE_MANIFEST_ED25519_PUBLIC_KEY% -GNinja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00" -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
+          cmake --build build --config Release --parallel
+
+      - name: Show sccache stats
+        run: sccache --show-stats
