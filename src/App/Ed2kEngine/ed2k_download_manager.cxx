@@ -157,6 +157,14 @@ bool Ed2kDownloadManager::InitEd2kEngine(const Ed2kEngineConfig& config) {
 		scfg.data_dir = std::filesystem::path(config.data_dir);
 		scfg.max_concurrent_tasks = config.max_concurrent_tasks;
 		scfg.enable_kad = config.enable_kad;
+		// 持久 UserHash:远端按 hash 记队列等待/credit,必须每安装唯一且跨启动稳定
+		if (!config.user_hash_hex.empty()) {
+			if (auto parsed = ed2k::UserHash::from_hex(config.user_hash_hex)) {
+				scfg.user_hash = *parsed;
+			}
+		}
+		// 下载编排预算:与引擎 CLI 验证口径一致(300s)。默认 60s 会压缩 setup/排队窗口
+		scfg.task_io_timeout = std::chrono::seconds(300);
 		// preferred：优先使用混淆但不强制，兼容未启用混淆的对端；required 会拒绝所有非混淆连接过于激进
 		scfg.obfuscation = config.enable_obfuscation ? ed2k::peer::ObfuscationPolicy::preferred
 													  : ed2k::peer::ObfuscationPolicy::disabled;
@@ -351,6 +359,10 @@ void Ed2kDownloadManager::ScheduleSampling() {
 				item["speed"] = snap.speed_bps;
 				item["sources"] = snap.known_sources;
 				item["state"] = TaskStateToString(snap.state);
+				// 非终态任务的 error 字段是"当前状态说明"而非失败原因(引擎在等待可用源时会附上
+				// 等待原因但不转失败态)。必须随每次采样一起带上:该原因只在变化时通过状态事件推
+				// 一次,若采样不带,下一秒的采样就把 UI 上的说明冲掉了,用户又变成对着静默任务发懵。
+				item["error"] = snap.error ? snap.error.message() : std::string();
 				// 目标文件完整路径，供上层展示“打开文件位置”及重启续传时反推 save_dir
 				item["out_path"] = snap.out_path.string();
 				arr.push_back(std::move(item));
