@@ -86,8 +86,9 @@ namespace gdl {
             virtual std::string GetLastError() const { return last_error_; }
 
             // 清空最近错误:每轮检查前调用,避免上一轮失败残留的错误
-            // 在本轮"成功但无更新"时被误判为检查失败
-            void ClearLastError() { last_error_.clear(); }
+            // 在本轮"成功但无更新"时被误判为检查失败。
+            // 虚函数:错误不存于基类字段的后端(Mac)需转发清理自己的存储
+            virtual void ClearLastError() { last_error_.clear(); }
 
             // Create platform-specific updater instance
             static std::unique_ptr<AutoUpdater> Create();
