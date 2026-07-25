@@ -122,8 +122,12 @@ namespace gdl {
 				// 外部代码仍无法直接构造(protected 对非派生类不可见),单例约束保持不变
 				explicit BrowserManagerImpl(QObject* parent = nullptr);
 			   private:
-				TaskDeletionResult RemoveTaskResult(int page_index, const QString& gid, bool is_remove_file);
-				TaskDeletionResult RemoveStopTaskResult(const QString& gid, bool is_remove_file);
+				// removal_attempts: 本地文件删除的尝试次数上限,批量删除传 1
+				// 禁用重试退避,避免多个被占用文件叠加冻结 UI 线程
+				TaskDeletionResult RemoveTaskResult(int page_index, const QString& gid, bool is_remove_file,
+													int removal_attempts = 3);
+				TaskDeletionResult RemoveStopTaskResult(const QString& gid, bool is_remove_file,
+														int removal_attempts = 3);
 				void OnHandleAria2Message(const std::string& msg);
                 void OnHandleAria2ActiveProgress(const std::string& msg);
 				void OnHandleTrackerUpdateStatus(const std::string& msg);
