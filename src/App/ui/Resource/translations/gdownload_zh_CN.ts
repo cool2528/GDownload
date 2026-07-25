@@ -1941,47 +1941,47 @@
         <translation>已完成大小</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="549"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="552"/>
         <source>Error %1: %2</source>
         <translation>错误 %1：%2</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="552"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="555"/>
         <source>Download failed</source>
         <translation>下载失败</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="594"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="598"/>
         <source>The task could not be removed.</source>
         <translation>无法移除该任务。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="600"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="604"/>
         <source>Task and downloaded content were removed.</source>
         <translation>任务和已下载内容已移除。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="601"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="605"/>
         <source>Task record was removed.</source>
         <translation>任务记录已移除。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="604"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="608"/>
         <source>The task was removed, but some downloaded content could not be deleted.</source>
         <translation>任务已移除，但部分已下载内容无法删除。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="605"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="609"/>
         <source>The task was removed, but cleanup could not be completed.</source>
         <translation>任务已移除，但清理操作无法完成。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="608"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="612"/>
         <source>Failed to remove the task and downloaded content.</source>
         <translation>移除任务和已下载内容失败。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="609"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="613"/>
         <source>Failed to remove the task.</source>
         <translation>移除任务失败。</translation>
     </message>
@@ -3229,6 +3229,16 @@ Copyright © 2024-2026 GDownload Team
         <location filename="../../Browser/stopped_task_delete_utils.h" line="54"/>
         <source>Task was removed locally, but aria2 cleanup failed: %1</source>
         <translation>任务已在本地删除，但 aria2 清理失败：%1</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="117"/>
+        <source>Waiting for a connectable source: this client and all known sources are behind NAT (LowID), so no direct connection is possible yet.</source>
+        <translation>等待可直连的源：本机与所有已知源都在 NAT 后（LowID），暂时无法建立直连。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="121"/>
+        <source>Waiting for sources: no peer currently reports having this file.</source>
+        <translation>等待源：目前没有节点报告持有该文件。</translation>
     </message>
 </context>
 <context>
@@ -4575,106 +4585,106 @@ Copyright © 2024-2026 GDownload Team
 <context>
     <name>gdl::ui::browser::BrowserManagerImpl</name>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="194"/>
-        <location filename="../../Browser/browser_manager.cxx" line="201"/>
-        <location filename="../../Browser/browser_manager.cxx" line="927"/>
-        <location filename="../../Browser/browser_manager.cxx" line="934"/>
+        <location filename="../../Browser/browser_manager.cxx" line="210"/>
+        <location filename="../../Browser/browser_manager.cxx" line="217"/>
+        <location filename="../../Browser/browser_manager.cxx" line="943"/>
+        <location filename="../../Browser/browser_manager.cxx" line="950"/>
         <source>Invalid ed2k link: %1</source>
         <translation>ed2k 链接无效：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="211"/>
+        <location filename="../../Browser/browser_manager.cxx" line="227"/>
         <source>Invalid download link: %1</source>
         <translation>下载链接无效：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="224"/>
+        <location filename="../../Browser/browser_manager.cxx" line="240"/>
         <source>Failed to add download task. Please check the link or aria2 connection.</source>
         <translation>添加下载任务失败。请检查链接或 aria2 连接。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="225"/>
+        <location filename="../../Browser/browser_manager.cxx" line="241"/>
         <source>Failed to add download task: %1</source>
         <translation>添加下载任务失败：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="250"/>
+        <location filename="../../Browser/browser_manager.cxx" line="266"/>
         <source>Torrent file does not exist: %1</source>
         <translation>种子文件不存在：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="256"/>
+        <location filename="../../Browser/browser_manager.cxx" line="272"/>
         <source>Failed to read torrent file: %1</source>
         <translation>读取种子文件失败：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="270"/>
+        <location filename="../../Browser/browser_manager.cxx" line="286"/>
         <source>Failed to add torrent task. Please check the file or aria2 connection.</source>
         <translation>添加种子任务失败。请检查文件或 aria2 连接。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="271"/>
+        <location filename="../../Browser/browser_manager.cxx" line="287"/>
         <source>Failed to add torrent task: %1</source>
         <translation>添加种子任务失败：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="294"/>
+        <location filename="../../Browser/browser_manager.cxx" line="310"/>
         <source>Metalink file does not exist: %1</source>
         <translation>Metalink 文件不存在：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="300"/>
+        <location filename="../../Browser/browser_manager.cxx" line="316"/>
         <source>Failed to read metalink file: %1</source>
         <translation>读取 Metalink 文件失败：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="314"/>
+        <location filename="../../Browser/browser_manager.cxx" line="330"/>
         <source>Failed to add metalink task. Please check the file or aria2 connection.</source>
         <translation>添加 Metalink 任务失败。请检查文件或 aria2 连接。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="315"/>
+        <location filename="../../Browser/browser_manager.cxx" line="331"/>
         <source>Failed to add metalink task: %1</source>
         <translation>添加 Metalink 任务失败：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="634"/>
+        <location filename="../../Browser/browser_manager.cxx" line="650"/>
         <source>Failed to retry task: missing task id.</source>
         <translation>重试任务失败：缺少任务 ID。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="638"/>
+        <location filename="../../Browser/browser_manager.cxx" line="654"/>
         <source>Failed to retry task: stopped task list is not available.</source>
         <translation>重试任务失败：已停止任务列表不可用。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="644"/>
+        <location filename="../../Browser/browser_manager.cxx" line="660"/>
         <source>Failed to retry task: task was not found.</source>
         <translation>重试任务失败：未找到该任务。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="648"/>
+        <location filename="../../Browser/browser_manager.cxx" line="664"/>
         <source>Only failed tasks can be retried.</source>
         <translation>只有失败的任务才能重试。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="654"/>
+        <location filename="../../Browser/browser_manager.cxx" line="670"/>
         <source>Failed to retry task: original download link is unavailable.</source>
         <translation>重试任务失败：原始下载链接不可用。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="683"/>
+        <location filename="../../Browser/browser_manager.cxx" line="699"/>
         <source>Retry started, but the old failed task could not be removed from history.</source>
         <translation>重试已开始，但旧的失败任务无法从历史记录中移除。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1368"/>
-        <location filename="../../Browser/browser_manager.cxx" line="1431"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1410"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1473"/>
         <source>Download failed. Please check the link or network connection.</source>
         <translation>下载失败。请检查链接或网络连接。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1369"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1411"/>
         <source>Download failed: %1</source>
         <translation>下载失败：%1</translation>
     </message>

@@ -1941,47 +1941,47 @@
         <translation>완료된 크기</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="549"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="552"/>
         <source>Error %1: %2</source>
         <translation>오류 %1: %2</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="552"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="555"/>
         <source>Download failed</source>
         <translation>다운로드 실패</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="594"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="598"/>
         <source>The task could not be removed.</source>
         <translation>작업을 제거할 수 없었습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="600"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="604"/>
         <source>Task and downloaded content were removed.</source>
         <translation>작업과 다운로드된 콘텐츠가 제거되었습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="601"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="605"/>
         <source>Task record was removed.</source>
         <translation>작업 기록이 제거되었습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="604"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="608"/>
         <source>The task was removed, but some downloaded content could not be deleted.</source>
         <translation>작업이 제거되었지만 일부 다운로드된 콘텐츠를 삭제할 수 없었습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="605"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="609"/>
         <source>The task was removed, but cleanup could not be completed.</source>
         <translation>작업이 제거되었지만 정리를 완료할 수 없었습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="608"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="612"/>
         <source>Failed to remove the task and downloaded content.</source>
         <translation>작업과 다운로드된 콘텐츠를 제거하지 못했습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="609"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="613"/>
         <source>Failed to remove the task.</source>
         <translation>작업을 제거하지 못했습니다.</translation>
     </message>
@@ -3229,6 +3229,16 @@ GNU Affero General Public License v3.0(AGPL-3.0)에 따라 라이선스가 부�
         <location filename="../../Browser/stopped_task_delete_utils.h" line="54"/>
         <source>Task was removed locally, but aria2 cleanup failed: %1</source>
         <translation>작업이 로컬에서 삭제되었지만 aria2 정리에 실패했습니다: %1</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="117"/>
+        <source>Waiting for a connectable source: this client and all known sources are behind NAT (LowID), so no direct connection is possible yet.</source>
+        <translation>연결 가능한 소스를 기다리는 중: 이 클라이언트와 알려진 모든 소스가 NAT 뒤(LowID)에 있어 아직 직접 연결할 수 없습니다.</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="121"/>
+        <source>Waiting for sources: no peer currently reports having this file.</source>
+        <translation>소스를 기다리는 중: 현재 이 파일을 보유하고 있다고 알리는 피어가 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -4575,106 +4585,106 @@ GNU Affero General Public License v3.0(AGPL-3.0)에 따라 라이선스가 부�
 <context>
     <name>gdl::ui::browser::BrowserManagerImpl</name>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="194"/>
-        <location filename="../../Browser/browser_manager.cxx" line="201"/>
-        <location filename="../../Browser/browser_manager.cxx" line="927"/>
-        <location filename="../../Browser/browser_manager.cxx" line="934"/>
+        <location filename="../../Browser/browser_manager.cxx" line="210"/>
+        <location filename="../../Browser/browser_manager.cxx" line="217"/>
+        <location filename="../../Browser/browser_manager.cxx" line="943"/>
+        <location filename="../../Browser/browser_manager.cxx" line="950"/>
         <source>Invalid ed2k link: %1</source>
         <translation>잘못된 ed2k 링크: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="211"/>
+        <location filename="../../Browser/browser_manager.cxx" line="227"/>
         <source>Invalid download link: %1</source>
         <translation>잘못된 다운로드 링크: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="224"/>
+        <location filename="../../Browser/browser_manager.cxx" line="240"/>
         <source>Failed to add download task. Please check the link or aria2 connection.</source>
         <translation>다운로드 작업을 추가하지 못했습니다. 링크 또는 aria2 연결을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="225"/>
+        <location filename="../../Browser/browser_manager.cxx" line="241"/>
         <source>Failed to add download task: %1</source>
         <translation>다운로드 작업을 추가하지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="250"/>
+        <location filename="../../Browser/browser_manager.cxx" line="266"/>
         <source>Torrent file does not exist: %1</source>
         <translation>토렌트 파일이 없습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="256"/>
+        <location filename="../../Browser/browser_manager.cxx" line="272"/>
         <source>Failed to read torrent file: %1</source>
         <translation>토렌트 파일을 읽지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="270"/>
+        <location filename="../../Browser/browser_manager.cxx" line="286"/>
         <source>Failed to add torrent task. Please check the file or aria2 connection.</source>
         <translation>토렌트 작업을 추가하지 못했습니다. 파일 또는 aria2 연결을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="271"/>
+        <location filename="../../Browser/browser_manager.cxx" line="287"/>
         <source>Failed to add torrent task: %1</source>
         <translation>토렌트 작업을 추가하지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="294"/>
+        <location filename="../../Browser/browser_manager.cxx" line="310"/>
         <source>Metalink file does not exist: %1</source>
         <translation>Metalink 파일이 없습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="300"/>
+        <location filename="../../Browser/browser_manager.cxx" line="316"/>
         <source>Failed to read metalink file: %1</source>
         <translation>Metalink 파일을 읽지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="314"/>
+        <location filename="../../Browser/browser_manager.cxx" line="330"/>
         <source>Failed to add metalink task. Please check the file or aria2 connection.</source>
         <translation>Metalink 작업을 추가하지 못했습니다. 파일 또는 aria2 연결을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="315"/>
+        <location filename="../../Browser/browser_manager.cxx" line="331"/>
         <source>Failed to add metalink task: %1</source>
         <translation>Metalink 작업을 추가하지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="634"/>
+        <location filename="../../Browser/browser_manager.cxx" line="650"/>
         <source>Failed to retry task: missing task id.</source>
         <translation>작업을 재시도하지 못했습니다: 작업 ID가 없습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="638"/>
+        <location filename="../../Browser/browser_manager.cxx" line="654"/>
         <source>Failed to retry task: stopped task list is not available.</source>
         <translation>작업을 재시도하지 못했습니다: 중지된 작업 목록을 사용할 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="644"/>
+        <location filename="../../Browser/browser_manager.cxx" line="660"/>
         <source>Failed to retry task: task was not found.</source>
         <translation>작업을 재시도하지 못했습니다: 작업을 찾을 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="648"/>
+        <location filename="../../Browser/browser_manager.cxx" line="664"/>
         <source>Only failed tasks can be retried.</source>
         <translation>실패한 작업만 재시도할 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="654"/>
+        <location filename="../../Browser/browser_manager.cxx" line="670"/>
         <source>Failed to retry task: original download link is unavailable.</source>
         <translation>작업을 재시도하지 못했습니다: 원본 다운로드 링크를 사용할 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="683"/>
+        <location filename="../../Browser/browser_manager.cxx" line="699"/>
         <source>Retry started, but the old failed task could not be removed from history.</source>
         <translation>재시도가 시작되었지만 이전 실패 작업을 기록에서 제거할 수 없었습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1368"/>
-        <location filename="../../Browser/browser_manager.cxx" line="1431"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1410"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1473"/>
         <source>Download failed. Please check the link or network connection.</source>
         <translation>다운로드 실패. 링크 또는 네트워크 연결을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1369"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1411"/>
         <source>Download failed: %1</source>
         <translation>다운로드 실패: %1</translation>
     </message>

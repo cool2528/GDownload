@@ -541,10 +541,13 @@ Control {
                         objectName: "taskErrorDetails"
                         Layout.fillWidth: true
                         Layout.minimumWidth: 0
-                        visible: taskCard.failedTask
+                        // 失败任务显示错误原因;未失败但带说明的任务(如 ed2k 等待可用源)也要显示——
+                        // 否则用户面对的是一个毫无进展也没有任何解释的任务,不知道该继续等还是放弃。
+                        visible: taskCard.failedTask || String(model.errorMessage || "").trim().length > 0
                         text: {
                             const code = String(model.errorCode || "").trim()
                             const message = String(model.errorMessage || "").trim()
+                            if (!taskCard.failedTask) return message   // 状态说明,不加 "Error" 前缀
                             if (code.length > 0 && message.length > 0) {
                                 return qsTr("Error %1: %2").arg(code).arg(message)
                             }
@@ -552,7 +555,8 @@ Control {
                             return qsTr("Download failed")
                         }
                         font.pixelSize: GTheme.fontCaption
-                        color: GTheme.textDanger
+                        // 未失败时是中性提示,用次要文本色;失败才用危险色,避免把"正在等待"渲染成故障
+                        color: taskCard.failedTask ? GTheme.textDanger : GTheme.textSecondary
                         wrapMode: Text.Wrap
                         maximumLineCount: 2
                         elide: Text.ElideRight

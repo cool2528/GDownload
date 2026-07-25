@@ -1941,47 +1941,47 @@
         <translation>完了サイズ</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="549"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="552"/>
         <source>Error %1: %2</source>
         <translation>エラー %1: %2</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="552"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="555"/>
         <source>Download failed</source>
         <translation>ダウンロード失敗</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="594"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="598"/>
         <source>The task could not be removed.</source>
         <translation>タスクを削除できませんでした。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="600"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="604"/>
         <source>Task and downloaded content were removed.</source>
         <translation>タスクとダウンロード済みコンテンツが削除されました。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="601"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="605"/>
         <source>Task record was removed.</source>
         <translation>タスクの記録が削除されました。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="604"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="608"/>
         <source>The task was removed, but some downloaded content could not be deleted.</source>
         <translation>タスクは削除されましたが、一部のダウンロード済みコンテンツを削除できませんでした。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="605"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="609"/>
         <source>The task was removed, but cleanup could not be completed.</source>
         <translation>タスクは削除されましたが、クリーンアップを完了できませんでした。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="608"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="612"/>
         <source>Failed to remove the task and downloaded content.</source>
         <translation>タスクとダウンロード済みコンテンツの削除に失敗しました。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="609"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="613"/>
         <source>Failed to remove the task.</source>
         <translation>タスクの削除に失敗しました。</translation>
     </message>
@@ -3229,6 +3229,16 @@ GNU Affero General Public License v3.0（AGPL-3.0）に基づきライセンス�
         <location filename="../../Browser/stopped_task_delete_utils.h" line="54"/>
         <source>Task was removed locally, but aria2 cleanup failed: %1</source>
         <translation>タスクはローカルで削除されましたが、aria2 のクリーンアップに失敗しました: %1</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="117"/>
+        <source>Waiting for a connectable source: this client and all known sources are behind NAT (LowID), so no direct connection is possible yet.</source>
+        <translation>接続可能なソースを待っています: このクライアントと既知のソースがすべて NAT の内側 (LowID) にあるため、まだ直接接続できません。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="121"/>
+        <source>Waiting for sources: no peer currently reports having this file.</source>
+        <translation>ソースを待っています: 現在、このファイルを保持していると報告しているピアはありません。</translation>
     </message>
 </context>
 <context>
@@ -4575,106 +4585,106 @@ GNU Affero General Public License v3.0（AGPL-3.0）に基づきライセンス�
 <context>
     <name>gdl::ui::browser::BrowserManagerImpl</name>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="194"/>
-        <location filename="../../Browser/browser_manager.cxx" line="201"/>
-        <location filename="../../Browser/browser_manager.cxx" line="927"/>
-        <location filename="../../Browser/browser_manager.cxx" line="934"/>
+        <location filename="../../Browser/browser_manager.cxx" line="210"/>
+        <location filename="../../Browser/browser_manager.cxx" line="217"/>
+        <location filename="../../Browser/browser_manager.cxx" line="943"/>
+        <location filename="../../Browser/browser_manager.cxx" line="950"/>
         <source>Invalid ed2k link: %1</source>
         <translation>ed2k リンクが無効です: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="211"/>
+        <location filename="../../Browser/browser_manager.cxx" line="227"/>
         <source>Invalid download link: %1</source>
         <translation>ダウンロードリンクが無効です: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="224"/>
+        <location filename="../../Browser/browser_manager.cxx" line="240"/>
         <source>Failed to add download task. Please check the link or aria2 connection.</source>
         <translation>ダウンロードタスクの追加に失敗しました。リンクまたは aria2 接続を確認してください。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="225"/>
+        <location filename="../../Browser/browser_manager.cxx" line="241"/>
         <source>Failed to add download task: %1</source>
         <translation>ダウンロードタスクの追加に失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="250"/>
+        <location filename="../../Browser/browser_manager.cxx" line="266"/>
         <source>Torrent file does not exist: %1</source>
         <translation>Torrent ファイルが存在しません: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="256"/>
+        <location filename="../../Browser/browser_manager.cxx" line="272"/>
         <source>Failed to read torrent file: %1</source>
         <translation>Torrent ファイルの読み取りに失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="270"/>
+        <location filename="../../Browser/browser_manager.cxx" line="286"/>
         <source>Failed to add torrent task. Please check the file or aria2 connection.</source>
         <translation>Torrent タスクの追加に失敗しました。ファイルまたは aria2 接続を確認してください。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="271"/>
+        <location filename="../../Browser/browser_manager.cxx" line="287"/>
         <source>Failed to add torrent task: %1</source>
         <translation>Torrent タスクの追加に失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="294"/>
+        <location filename="../../Browser/browser_manager.cxx" line="310"/>
         <source>Metalink file does not exist: %1</source>
         <translation>Metalink ファイルが存在しません: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="300"/>
+        <location filename="../../Browser/browser_manager.cxx" line="316"/>
         <source>Failed to read metalink file: %1</source>
         <translation>Metalink ファイルの読み取りに失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="314"/>
+        <location filename="../../Browser/browser_manager.cxx" line="330"/>
         <source>Failed to add metalink task. Please check the file or aria2 connection.</source>
         <translation>Metalink タスクの追加に失敗しました。ファイルまたは aria2 接続を確認してください。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="315"/>
+        <location filename="../../Browser/browser_manager.cxx" line="331"/>
         <source>Failed to add metalink task: %1</source>
         <translation>Metalink タスクの追加に失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="634"/>
+        <location filename="../../Browser/browser_manager.cxx" line="650"/>
         <source>Failed to retry task: missing task id.</source>
         <translation>タスクの再試行に失敗しました: タスクIDがありません。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="638"/>
+        <location filename="../../Browser/browser_manager.cxx" line="654"/>
         <source>Failed to retry task: stopped task list is not available.</source>
         <translation>タスクの再試行に失敗しました: 停止済みタスクリストを利用できません。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="644"/>
+        <location filename="../../Browser/browser_manager.cxx" line="660"/>
         <source>Failed to retry task: task was not found.</source>
         <translation>タスクの再試行に失敗しました: タスクが見つかりませんでした。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="648"/>
+        <location filename="../../Browser/browser_manager.cxx" line="664"/>
         <source>Only failed tasks can be retried.</source>
         <translation>失敗したタスクのみ再試行できます。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="654"/>
+        <location filename="../../Browser/browser_manager.cxx" line="670"/>
         <source>Failed to retry task: original download link is unavailable.</source>
         <translation>タスクの再試行に失敗しました: 元のダウンロードリンクを利用できません。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="683"/>
+        <location filename="../../Browser/browser_manager.cxx" line="699"/>
         <source>Retry started, but the old failed task could not be removed from history.</source>
         <translation>再試行を開始しましたが、失敗した古いタスクを履歴から削除できませんでした。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1368"/>
-        <location filename="../../Browser/browser_manager.cxx" line="1431"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1410"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1473"/>
         <source>Download failed. Please check the link or network connection.</source>
         <translation>ダウンロードに失敗しました。リンクまたはネットワーク接続を確認してください。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1369"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1411"/>
         <source>Download failed: %1</source>
         <translation>ダウンロードに失敗しました: %1</translation>
     </message>
