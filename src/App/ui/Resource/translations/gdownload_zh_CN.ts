@@ -1896,7 +1896,7 @@
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="474"/>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="534"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="545"/>
         <source>Transferred</source>
         <translation>已传输</translation>
     </message>
@@ -1916,72 +1916,77 @@
         <translation>剩余时间</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="499"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="500"/>
         <source>Connections</source>
         <translation>连接数</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="507"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="510"/>
+        <source>Sources</source>
+        <translation>源数</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="518"/>
         <source>Queue</source>
         <translation>队列</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="508"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="519"/>
         <source>Position %1</source>
         <translation>位置 %1</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="517"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="528"/>
         <source>Expected size</source>
         <translation>预期大小</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="525"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="536"/>
         <source>Completed size</source>
         <translation>已完成大小</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="552"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="563"/>
         <source>Error %1: %2</source>
         <translation>错误 %1：%2</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="555"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="566"/>
         <source>Download failed</source>
         <translation>下载失败</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="598"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="609"/>
         <source>The task could not be removed.</source>
         <translation>无法移除该任务。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="604"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="615"/>
         <source>Task and downloaded content were removed.</source>
         <translation>任务和已下载内容已移除。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="605"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="616"/>
         <source>Task record was removed.</source>
         <translation>任务记录已移除。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="608"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="619"/>
         <source>The task was removed, but some downloaded content could not be deleted.</source>
         <translation>任务已移除，但部分已下载内容无法删除。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="609"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="620"/>
         <source>The task was removed, but cleanup could not be completed.</source>
         <translation>任务已移除，但清理操作无法完成。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="612"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="623"/>
         <source>Failed to remove the task and downloaded content.</source>
         <translation>移除任务和已下载内容失败。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="613"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="624"/>
         <source>Failed to remove the task.</source>
         <translation>移除任务失败。</translation>
     </message>
@@ -3189,24 +3194,24 @@ Copyright © 2024-2026 GDownload Team
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="121"/>
+        <location filename="../../Browser/download_task_model.h" line="129"/>
         <source>Unknown</source>
         <translation>未知</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="131"/>
+        <location filename="../../Browser/download_task_model.h" line="139"/>
         <source>h</source>
         <translation>时</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="134"/>
-        <location filename="../../Browser/download_task_model.h" line="138"/>
+        <location filename="../../Browser/download_task_model.h" line="142"/>
+        <location filename="../../Browser/download_task_model.h" line="146"/>
         <source>m</source>
         <translation>分</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="141"/>
-        <location filename="../../Browser/download_task_model.h" line="145"/>
+        <location filename="../../Browser/download_task_model.h" line="149"/>
+        <location filename="../../Browser/download_task_model.h" line="153"/>
         <source>s</source>
         <translation>秒</translation>
     </message>

@@ -76,6 +76,23 @@ std::string SearchResultsToJson(const std::vector<ed2k::server::SearchResultItem
 	return doc.dump();
 }
 
+// 取快照里"此刻真正在连的源数"。
+// 引擎的 TaskSnapshot::active_sources 是 v2.7.4 之后新增的字段, 而 vcpkg overlay port 目前仍钉在
+// v2.7.4, 因此这里按"字段是否存在"探测, 而不是用 ed2k/version.hpp 的 ED2K_VERSION_AT_LEAST ——
+// 引擎版本号只在发版 commit 里 bump, 用本地 worktree 重建出来的测试包版本仍写着 2.7.4 却已经带上
+// 了该字段, 按版本宏判断反而会误判成"没有"。写成泛型 lambda/模板是必需的: 非模板上下文里的
+// if constexpr 两个分支都会被实例化, 缺字段的那侧就会编译失败。
+// port 升到带该字段的引擎版本后, 本函数可以直接换成 snap.active_sources。
+template <class Snapshot>
+std::int64_t ActiveSourcesOf(const Snapshot& snap) {
+	if constexpr (requires { snap.active_sources; }) {
+		return static_cast<std::int64_t>(snap.active_sources);
+	} else {
+		// 旧引擎没有该字段: 退化成已知源数, 即维持引入本改动之前的显示口径
+		return static_cast<std::int64_t>(snap.known_sources);
+	}
+}
+
 std::string SearchErrorToJson(const std::string& error) {
 	nlohmann::json doc;
 	doc["ok"] = false;
@@ -357,7 +374,12 @@ void Ed2kDownloadManager::ScheduleSampling() {
 				item["total"] = snap.total_size;
 				item["done"] = snap.bytes_done;
 				item["speed"] = snap.speed_bps;
+				// sources = 迄今发现的源总数(含已放弃/冷却中的源, 只增不减);
+				// active_sources = 此刻真正在连的源数, 即 UI 上"连接数"的口径。
+				// 二者都由引擎在源集合/活跃 worker 变化时实时回写(见引擎 download::StatsFn);
+				// 此前只有 sources 且它冻结在 dl.run() 启动前那次 GETSOURCES 的数字上。
 				item["sources"] = snap.known_sources;
+				item["active_sources"] = ActiveSourcesOf(snap);
 				item["state"] = TaskStateToString(snap.state);
 				// 非终态任务的 error 字段是"当前状态说明"而非失败原因(引擎在等待可用源时会附上
 				// 等待原因但不转失败态)。必须随每次采样一起带上:该原因只在变化时通过状态事件推
@@ -424,6 +446,7 @@ std::string Ed2kDownloadManager::AddEd2kTask(const std::string& link, const std:
 			item["done"] = static_cast<std::int64_t>(0);
 			item["speed"] = static_cast<std::int64_t>(0);
 			item["sources"] = static_cast<std::int64_t>(0);
+			item["active_sources"] = static_cast<std::int64_t>(0);
 			item["state"] = std::string("queued");
 			item["out_path"] = (dir / link_copy.name).string();
 			nlohmann::json arr = nlohmann::json::array({std::move(item)});

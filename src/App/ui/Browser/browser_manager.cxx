@@ -1554,7 +1554,13 @@ namespace gdl {
 						task_info.set_task_total_size(item.value("total", static_cast<std::int64_t>(0)));
 						task_info.set_task_current_size(item.value("done", static_cast<std::int64_t>(0)));
 						task_info.set_task_download_speed(item.value("speed", static_cast<std::int64_t>(0)));
-						task_info.set_task_connections(item.value("sources", static_cast<std::int64_t>(0)));
+						// "连接数"取 active_sources(此刻真正在连的源), 与 aria2 任务那侧 connections 的
+						// 口径一致; sources(迄今发现的源总数, 含已放弃/冷却中的)另开一个标签展示 ——
+						// 它才是判断服务器周期重问 / Kad 周期查源 / SX2 源交换有没有把源集合做大的依据。
+						// 旧引擎不带 active_sources 时回退到 sources, 即改动前的显示口径。
+						const auto known_sources = item.value("sources", static_cast<std::int64_t>(0));
+						task_info.set_task_connections(item.value("active_sources", known_sources));
+						task_info.set_task_sources(known_sources);
 						task_info.set_task_download_link(
 							BuildEd2kDownloadLink(task_id, task_info.task_file_name(), task_info.task_total_size()));
 						task_info.set_task_save_path(QString::fromStdString(item.value("out_path", std::string())));

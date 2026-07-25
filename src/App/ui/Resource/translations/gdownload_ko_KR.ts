@@ -1896,7 +1896,7 @@
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="474"/>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="534"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="545"/>
         <source>Transferred</source>
         <translation>전송됨</translation>
     </message>
@@ -1916,72 +1916,77 @@
         <translation>예상 시간</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="499"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="500"/>
         <source>Connections</source>
         <translation>연결 수</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="507"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="510"/>
+        <source>Sources</source>
+        <translation>소스 수</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="518"/>
         <source>Queue</source>
         <translation>대기열</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="508"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="519"/>
         <source>Position %1</source>
         <translation>위치 %1</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="517"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="528"/>
         <source>Expected size</source>
         <translation>예상 크기</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="525"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="536"/>
         <source>Completed size</source>
         <translation>완료된 크기</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="552"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="563"/>
         <source>Error %1: %2</source>
         <translation>오류 %1: %2</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="555"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="566"/>
         <source>Download failed</source>
         <translation>다운로드 실패</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="598"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="609"/>
         <source>The task could not be removed.</source>
         <translation>작업을 제거할 수 없었습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="604"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="615"/>
         <source>Task and downloaded content were removed.</source>
         <translation>작업과 다운로드된 콘텐츠가 제거되었습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="605"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="616"/>
         <source>Task record was removed.</source>
         <translation>작업 기록이 제거되었습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="608"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="619"/>
         <source>The task was removed, but some downloaded content could not be deleted.</source>
         <translation>작업이 제거되었지만 일부 다운로드된 콘텐츠를 삭제할 수 없었습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="609"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="620"/>
         <source>The task was removed, but cleanup could not be completed.</source>
         <translation>작업이 제거되었지만 정리를 완료할 수 없었습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="612"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="623"/>
         <source>Failed to remove the task and downloaded content.</source>
         <translation>작업과 다운로드된 콘텐츠를 제거하지 못했습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="613"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="624"/>
         <source>Failed to remove the task.</source>
         <translation>작업을 제거하지 못했습니다.</translation>
     </message>
@@ -3189,24 +3194,24 @@ GNU Affero General Public License v3.0(AGPL-3.0)에 따라 라이선스가 부�
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="121"/>
+        <location filename="../../Browser/download_task_model.h" line="129"/>
         <source>Unknown</source>
         <translation>알 수 없음</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="131"/>
+        <location filename="../../Browser/download_task_model.h" line="139"/>
         <source>h</source>
         <translation>h</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="134"/>
-        <location filename="../../Browser/download_task_model.h" line="138"/>
+        <location filename="../../Browser/download_task_model.h" line="142"/>
+        <location filename="../../Browser/download_task_model.h" line="146"/>
         <source>m</source>
         <translation>m</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="141"/>
-        <location filename="../../Browser/download_task_model.h" line="145"/>
+        <location filename="../../Browser/download_task_model.h" line="149"/>
+        <location filename="../../Browser/download_task_model.h" line="153"/>
         <source>s</source>
         <translation>s</translation>
     </message>
