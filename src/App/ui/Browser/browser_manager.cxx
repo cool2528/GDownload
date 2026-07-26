@@ -1179,7 +1179,19 @@ namespace gdl {
 			}
 
 			DownloadTaskInfo BrowserManagerImpl::DownloadRecordToTaskInfo(const gdl::cache::DownloadRecord& record) {
-				return DownloadTaskInfoFromRecord(record);
+				DownloadTaskInfo info = DownloadTaskInfoFromRecord(record);
+				// 本修复之前落库的 ed2k 完成记录里,downloaded_size 存的是"本轮传输量"而不是文件
+				// 总大小(成因见 OnHandleEd2kTaskState 的注释)。这类记录不会自愈:完成记录此后
+				// 再无更新,重启后原样读回,界面上会一直把一次成功的续传显示成没下完。
+				// 这里在读取侧就地纠正——完成即代表整文件已在盘上,总大小才是权威值。
+				// 【只对 ed2k 链接生效】BT 任务用 select-file 只下部分文件时,downloaded_size 小于
+				// total_size 是真话,一并抹平会伪造进度;kError 记录同样保持原值,续传要靠它。
+				if (info.task_state() == TaskState::kComplete && info.task_total_size() > 0 &&
+					info.task_current_size() != info.task_total_size() &&
+					IsEd2kLink(info.task_download_link())) {
+					info.set_task_current_size(info.task_total_size());
+				}
+				return info;
 			}
 
 			BrowserManagerImpl::BrowserManagerImpl(QObject* parent) : QObject(parent) {
@@ -1641,6 +1653,19 @@ namespace gdl {
 					task_info.set_task_id(task_id);
 					const TaskState state = Ed2kStateStringToTaskState(doc.value("state", std::string()));
 					task_info.set_task_state(state);
+					// 完成态把"已下载"钉成文件总大小。引擎只在整文件 MD4 复验通过后才置 completed,
+					// 此刻盘上就是完整文件,Session 内部也确实把 bytes_done 改成了链接里的 size ——
+					// 但那个权威值到不了桌面端:终态事件的 payload 只有 {id,state,error},而带
+					// bytes_done 的快照通道在 1s 采样里被显式跳过(见 ed2k_download_manager.cxx 的
+					// 终态过滤)。于是这里只能拿到"完成前最后一次采样"的缓存值。
+					// 续传任务尤其致命:引擎的 bytes_done 只累加本轮真正落盘的块,完成时缓存里的数字
+					// 比文件真实大小小整整一个续传起点,界面上就成了"已完成大小 3.23 MB / 已下载
+					// 2.70 MB",用户据此判定下载失败。这一钉同时修好界面与落库的历史记录。
+					// 【严格限定 kComplete】kError/kRemoved 必须保留真实采样值,否则
+					// RestoreEd2kDownloadHistory 会拿一个满值记录去续传,断点语义被破坏。
+					if (state == TaskState::kComplete && task_info.task_total_size() > 0) {
+						task_info.set_task_current_size(task_info.task_total_size());
+					}
 					const QString error = QString::fromStdString(doc.value("error", std::string()));
 					if (!error.isEmpty()) {
 						// 失败态: 原样展示引擎错误; 非失败态: 这是"还在等什么"的说明, 翻成友好文案。
