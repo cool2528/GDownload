@@ -13,6 +13,7 @@ using gdl::ui::browser::DownloadTaskInfoFromAria2Object;
 using gdl::ui::browser::DownloadTaskInfoFromRecord;
 using gdl::ui::browser::DownloadTaskModel;
 using gdl::ui::browser::ShouldRestoreHistoryTask;
+using gdl::ui::browser::StallKind;
 using gdl::ui::browser::TaskState;
 
 DownloadTaskInfo MakeFailedTask() {
@@ -122,14 +123,21 @@ TEST(DownloadTaskModelTest, RawByteSizeRolesReturnUnformattedNumbers) {
 
 namespace {
 constexpr std::int64_t kAichBlock	 = 184320;			  // eD2k 一个 AICH 块
+// 引擎真实的进度推进粒度。桌面端曾经按"一个 AICH 块单独落盘"来推阈值,那是错的:
+//   download.cpp:37    inline constexpr std::size_t kPipelineDepth = 3;
+//   download.cpp:1683  auto batch = st.alloc.next_blocks_for_parts(servable, kPipelineDepth);
+//   c2c_connection.cpp:76  accumulate_blocks 的主循环是 while (!all_done()),要求这一批
+//                          3 个区间全部凑齐才返回(健康的慢速流既不触发 OUTOFPARTREQS
+//                          也不触发 100 秒空闲超时,不会提前 break);
+//   download.cpp:1863  sync_progress() 只在 write_block_async 成功之后调用。
+// 于是 bytes_done 的最小推进单位是一整批 3 × 184320 = 552960 字节。任何按单块粒度
+// 臆造出来的输入都不是引擎会上报的形状,拿它写出来的护栏测的是不可能发生的事。
+constexpr std::int64_t kEngineProgressStep = 3 * kAichBlock;
 constexpr std::int64_t kFileSize	 = 700 * 1024 * 1024;  // 700 MiB
 constexpr std::int64_t kWireSpeed	 = 96 * 1024;		  // 线上 96 KiB/s
 // 引擎的 PART_SIZE。alloc.reset_part() 会把 bytes_done 整整回退这么多 —— 这是真实
 // 的回退量,任何用"每 30 秒退 1.5 MB"之类臆造输入写出来的护栏都不算数。
 constexpr std::int64_t kEd2kPartSize = 9728000;
-// 停滞告警阈值(与 DownloadTaskInfo::kStallWarningMs 同值,测试独立写一份以免实现
-// 改了阈值却因为共用常量而悄悄放过)
-constexpr std::int64_t kStallThresholdMs = 90000;
 
 DownloadTaskInfo MakeEd2kActiveTask() {
 	DownloadTaskInfo task;
@@ -167,6 +175,10 @@ struct StallTimeline {
 	std::int64_t first_stalled_ms{-1};
 	int stalled_to_healthy_transitions{0};  // 告警一旦成立就不该再翻回"健康"
 	int finite_eta_while_stalled{0};		// 报着停滞却同时给出有限 ETA = 自相矛盾
+	// ETA 一旦给得出来就不该再翻回 "Unknown":健康下载上的"有限值 ↔ Unknown"来回闪
+	// 与误报的橙色告警是同一个病根(把批次粒度当成了单块粒度)
+	std::int64_t first_finite_eta_ms{-1};
+	int unknown_eta_after_first_finite{0};
 	double stalled_ratio() const {
 		return samples == 0 ? 0.0 : static_cast<double>(stalled_samples) / samples;
 	}
@@ -199,6 +211,43 @@ StallTimeline RunPartResetLoop(std::int64_t bytes_per_second, int cycles) {
 		}
 		if (was_stalled && !stalled) ++timeline.stalled_to_healthy_transitions;
 		was_stalled = stalled;
+	}
+	return timeline;
+}
+
+// 一次完全健康的慢速下载:线上速率恒定,进度按引擎真实的批次粒度(552960 字节)整块
+// 跳变。任何一个告警都是误报 —— 数据一直在到达,也一直在按引擎自己的节奏落盘。
+StallTimeline RunHealthySlowDownload(std::int64_t bytes_per_second, std::int64_t duration_s) {
+	DownloadTaskModel model;
+	const DownloadTaskInfo base = MakeEd2kActiveTask();
+	model.AddTask(base, 0);
+
+	std::int64_t landed	 = base.task_current_size();
+	std::int64_t pending = 0;
+	StallTimeline timeline;
+	bool was_stalled = false;
+	for (std::int64_t t = 1000; t <= duration_s * 1000; t += 1000) {
+		pending += bytes_per_second;
+		while (pending >= kEngineProgressStep) {
+			pending -= kEngineProgressStep;
+			landed += kEngineProgressStep;
+		}
+		SampleAt(model, base, landed, bytes_per_second, t);
+		const DownloadTaskInfo* live = model.GetTaskById(base.task_id());
+		if (live == nullptr) break;
+		const bool stalled = live->progress_stalled();
+		++timeline.samples;
+		if (stalled) {
+			++timeline.stalled_samples;
+			if (timeline.first_stalled_ms < 0) timeline.first_stalled_ms = t;
+			if (live->remaining_time() >= 0) ++timeline.finite_eta_while_stalled;
+		}
+		if (was_stalled && !stalled) ++timeline.stalled_to_healthy_transitions;
+		was_stalled = stalled;
+
+		const bool eta_known = live->remaining_time() >= 0;
+		if (eta_known && timeline.first_finite_eta_ms < 0) timeline.first_finite_eta_ms = t;
+		if (!eta_known && timeline.first_finite_eta_ms >= 0) ++timeline.unknown_eta_after_first_finite;
 	}
 	return timeline;
 }
@@ -333,33 +382,65 @@ TEST(DownloadTaskModelTest, RepeatedPartResetsAreReportedAsStalledAcrossTheWhole
 	}
 }
 
-// 非回归:真实的慢速单源(5 KiB/s)要 36 秒才凑够一个 184320 字节的块,期间进度一动
-// 不动,但水位在持续上涨 —— 与 part 重置那种"永远涨不过历史水位"有本质区别,去掉
-// 短路之后绝不能把这种健康的慢速下载一起报成停滞。
+// 非回归(本次缺陷的正面):一次完全健康的慢速下载必须全程零告警。
+//
+// 进度按引擎真实的批次粒度推进 —— 一批 3 × 184320 = 552960 字节。5 KiB/s 下 bytes_done
+// 每 108 秒才跳一次,期间纹丝不动;而线上速率来自独立的 wire meter,全程稳定 5 KiB/s。
+// 旧判据是纯墙钟的"90 秒没刷新水位就告警",于是 t=90..107 挂告警、t=108 批次到货撤下,
+// 每 108 秒翻转一次(18/108 ≈ 16.7% 的时间挂着橙色)。误报阈值 = 552960/90 = 6144 B/s:
+// 任何聚合速率低于 6 KiB/s 的下载一律周期性误报。
+//
+// 断言是"零告警",不是"大部分时间没告警" —— 这条下载没有任何一秒是不健康的。
 TEST(DownloadTaskModelTest, SlowButAdvancingDownloadIsNeverReportedAsStalled) {
-	DownloadTaskModel model;
-	const DownloadTaskInfo base = MakeEd2kActiveTask();
-	model.AddTask(base, 0);
+	struct Case {
+		std::int64_t bytes_per_second;
+		std::int64_t duration_s;
+		const char* label;
+	};
+	// 四档常见单源速率。时长都取到能走完至少 6 个完整批次,让"批次间隙"反复出现:
+	// 一批的间隔分别是 540 / 108 / 27 / 11 秒。
+	const Case cases[] = {
+		{1 * 1024, 3600, "1 KiB/s"},
+		{5 * 1024, 1800, "5 KiB/s"},
+		{20 * 1024, 1800, "20 KiB/s"},
+		{50 * 1024, 1800, "50 KiB/s"},
+	};
 
-	constexpr std::int64_t kSlowBps = 5 * 1024;	 // 一个块要 36 秒
-	std::int64_t landed				= base.task_current_size();
-	std::int64_t pending			= 0;
-	for (std::int64_t t = 1000; t <= 1800000; t += 1000) {  // 30 分钟
-		pending += kSlowBps;
-		while (pending >= kAichBlock) {
-			pending -= kAichBlock;
-			landed += kAichBlock;
-		}
-		SampleAt(model, base, landed, kSlowBps, t);
-		const DownloadTaskInfo* live = model.GetTaskById(base.task_id());
-		ASSERT_NE(live, nullptr);
-		ASSERT_FALSE(live->progress_stalled()) << "healthy slow download flagged stalled at t=" << t;
+	for (const auto& c : cases) {
+		const StallTimeline timeline = RunHealthySlowDownload(c.bytes_per_second, c.duration_s);
+		ASSERT_GT(timeline.samples, 0) << c.label;
+		EXPECT_EQ(timeline.stalled_samples, 0)
+			<< c.label << ": healthy download flagged stalled on " << timeline.stalled_samples << "/"
+			<< timeline.samples << " samples (" << timeline.stalled_ratio() * 100.0
+			<< "%), first alarm at " << timeline.first_stalled_ms << " ms";
+		// ETA 也不许在健康下载上"有限值 ↔ Unknown"来回闪:批次间隙里速率窗口一个批次
+		// 都装不下时,旧实现每隔一段就把 ETA 打回 Unknown
+		EXPECT_GE(timeline.first_finite_eta_ms, 0) << c.label << ": ETA never became known";
+		EXPECT_EQ(timeline.unknown_eta_after_first_finite, 0)
+			<< c.label << ": ETA flickered back to Unknown " << timeline.unknown_eta_after_first_finite
+			<< " times after first becoming known";
 	}
+}
 
-	const DownloadTaskInfo* live = model.GetTaskById(base.task_id());
-	ASSERT_NE(live, nullptr);
-	EXPECT_GT(live->progress_rate_bps(), 0);
-	EXPECT_GT(live->remaining_time(), 0);
+// 回归:误报的临界区就在"聚合速率低于 6144 B/s"这一侧(552960 / 90 秒)。旧判据下
+// 速率越低误报占比越高 —— 1 KiB/s 时高达 83% 的时间挂着告警。这一条把临界值两侧都扫一遍。
+TEST(DownloadTaskModelTest, HealthyDownloadBelowTheOldStallCliffIsNeverReportedAsStalled) {
+	// 旧实现的误报阈值:一批 552960 字节 / 90 秒墙钟
+	constexpr std::int64_t kOldFalseAlarmCliffBps = kEngineProgressStep / 90;
+	static_assert(kOldFalseAlarmCliffBps == 6144, "the false-alarm cliff is 6 KiB/s");
+
+	const std::int64_t rates[] = {512, 1024, 2048, 4096, 5120, kOldFalseAlarmCliffBps - 1,
+								  kOldFalseAlarmCliffBps, kOldFalseAlarmCliffBps + 1};
+	for (const std::int64_t bps : rates) {
+		// 至少走完 3 个批次
+		const std::int64_t duration_s = kEngineProgressStep / bps * 3 + 120;
+		const StallTimeline timeline  = RunHealthySlowDownload(bps, duration_s);
+		ASSERT_GT(timeline.samples, 0) << bps << " B/s";
+		EXPECT_EQ(timeline.stalled_samples, 0)
+			<< bps << " B/s: healthy download flagged stalled on " << timeline.stalled_samples << "/"
+			<< timeline.samples << " samples (" << timeline.stalled_ratio() * 100.0
+			<< "%), first alarm at " << timeline.first_stalled_ms << " ms";
+	}
 }
 
 // 暂停期间引擎照样每秒推送快照(ed2k 的 1s 采样只过滤 completed/failed/cancelled,
@@ -410,34 +491,43 @@ TEST(DownloadTaskModelTest, PauseThenResumeIsNeverReportedAsStalled) {
 	}
 }
 
-// 慢速点滴源:每 2 秒才到一个子帧,于是一半的 1 秒采样上线速为 0。判据若逐帧依赖
-// "此刻线上速度 > 0",告警会以 1 秒为周期明灭,用户看到的是闪烁的橙色。
+// 慢速点滴源:每 2 秒才到一个子帧,于是一半的 1 秒采样上线速为 0,平均 5 KiB/s。
+// 判据若逐帧依赖"此刻线上速度 > 0",告警会以 1 秒为周期明灭,用户看到的是闪烁的橙色。
+// 这条时间线上 bytes_done 从头到尾一个字节都没动 —— 是真停滞,必须报,而且报出来之后
+// 不许再翻回"健康"。断言不写死告警出现的时刻(那样等于把阈值抄进测试),只查"一旦
+// 报出就一直挂着"。
 TEST(DownloadTaskModelTest, StallWarningIsSteadyWhenTheWireDeliversInBursts) {
 	DownloadTaskModel model;
 	const DownloadTaskInfo base = MakeEd2kActiveTask();
 	model.AddTask(base, 0);
 
-	int transitions				= 0;
-	int stalled_samples			= 0;
-	int samples_after_threshold = 0;
-	bool was_stalled			= false;
-	for (std::int64_t t = 1000; t <= 240000; t += 1000) {
+	int transitions			   = 0;
+	int healthy_after_stalled  = 0;
+	std::int64_t first_stalled = -1;
+	bool was_stalled		   = false;
+	// 平均 5 KiB/s 的点滴源,跑 20 分钟:足够任何合理的判据(墙钟的或字节的)完成判定
+	for (std::int64_t t = 1000; t <= 1200000; t += 1000) {
 		const std::int64_t wire = (t / 1000) % 2 == 0 ? 10 * 1024 : 0;
 		SampleAt(model, base, base.task_current_size(), wire, t);
 		const DownloadTaskInfo* live = model.GetTaskById(base.task_id());
 		ASSERT_NE(live, nullptr);
 		const bool stalled = live->progress_stalled();
-		if (t > kStallThresholdMs + 30000) {
-			++samples_after_threshold;
-			if (stalled) ++stalled_samples;
+		if (stalled && first_stalled < 0) first_stalled = t;
+		// 第一次翻成"停滞"是应该的,只统计它之后还有没有再翻动
+		if (first_stalled >= 0 && t > first_stalled) {
+			if (!stalled) ++healthy_after_stalled;
 			if (stalled != was_stalled) ++transitions;
 		}
 		was_stalled = stalled;
 	}
 
-	ASSERT_GT(samples_after_threshold, 0);
-	EXPECT_EQ(stalled_samples, samples_after_threshold) << "stall warning flickers with a bursty source";
+	ASSERT_GE(first_stalled, 0) << "a transfer that receives 20 minutes of data and writes none must warn";
+	EXPECT_EQ(healthy_after_stalled, 0) << "stall warning flickers with a bursty source";
 	EXPECT_EQ(transitions, 0);
+	// 线上一直有数据到达,所以走的是"一个字节都没落盘"那一支
+	const DownloadTaskInfo* live = model.GetTaskById(base.task_id());
+	ASSERT_NE(live, nullptr);
+	EXPECT_EQ(static_cast<int>(live->stall_kind()), 1);
 }
 
 // 两种局面在界面上必须说不同的话:
@@ -477,6 +567,66 @@ TEST(DownloadTaskModelTest, StallKindSeparatesNothingLandedFromWrittenThenDiscar
 	EXPECT_TRUE(reset_model.data(reset_row, DownloadTaskModel::kTaskProgressStalled).toBool());
 	EXPECT_EQ(reset_model.data(reset_row, kind_role).toInt(), 2)
 		<< "data did land on disk, it was discarded afterwards";
+}
+
+// 多 part 文件里某个 part 被 reset_part() 作废、其余 part 仍在正常推进:bytes_done 会
+// 一直上涨,只是要花很久才重新涨过历史最高水位(5 KiB/s 下重新挣回一个 PART_SIZE 要
+// 约 32 分钟)。这段时间里净进度相对水位确实 ≤ 0,报停滞是对的,归到"落了盘又被撤销"
+// 也是对的 —— 但绝不能落进"一个字节都没落盘":数据一直在写,那句话是假的。
+// 注意时间判据在这里同样不够用:进度每 108 秒才推进一批,"距上次增长 ≥ 90 秒"在每个
+// 批次间隙里都会成立,只有"自上次增长以来线上收够了一整份预算"才分得开这两种事实。
+TEST(DownloadTaskModelTest, ResetPartWhileOtherPartsAdvanceIsWrittenThenDiscarded) {
+	DownloadTaskModel model;
+	const DownloadTaskInfo base = MakeEd2kActiveTask();
+	model.AddTask(base, 0);
+
+	constexpr std::int64_t kBps = 5 * 1024;
+	std::int64_t landed			= base.task_current_size();
+	std::int64_t pending		= 0;
+	std::int64_t t				= 1000;
+
+	// 先健康地下 20 分钟,把历史水位抬上去
+	for (; t <= 1200000; t += 1000) {
+		pending += kBps;
+		while (pending >= kEngineProgressStep) {
+			pending -= kEngineProgressStep;
+			landed += kEngineProgressStep;
+		}
+		SampleAt(model, base, landed, kBps, t);
+	}
+	const DownloadTaskInfo* live = model.GetTaskById(base.task_id());
+	ASSERT_NE(live, nullptr);
+	ASSERT_FALSE(live->progress_stalled()) << "the healthy warm-up must not warn";
+
+	// 某个 part 的 MD4 没过,被整段作废
+	landed -= kEd2kPartSize;
+	SampleAt(model, base, landed, kBps, t);
+	t += 1000;
+
+	// 其余 part 照常按批推进,但 25 分钟内都涨不回原来的水位
+	int nothing_lands_samples = 0;
+	int stalled_samples		  = 0;
+	int samples				  = 0;
+	for (; t <= 1200000 + 1500000; t += 1000) {
+		pending += kBps;
+		while (pending >= kEngineProgressStep) {
+			pending -= kEngineProgressStep;
+			landed += kEngineProgressStep;
+		}
+		SampleAt(model, base, landed, kBps, t);
+		live = model.GetTaskById(base.task_id());
+		ASSERT_NE(live, nullptr);
+		++samples;
+		if (live->progress_stalled()) ++stalled_samples;
+		if (live->stall_kind() == StallKind::kNothingLands) ++nothing_lands_samples;
+	}
+
+	ASSERT_GT(samples, 0);
+	EXPECT_GT(stalled_samples, 0) << "progress never regains its high-water mark; that must be reported";
+	EXPECT_EQ(nothing_lands_samples, 0)
+		<< "data kept landing on disk; the warning must not claim none of it is being written ("
+		<< nothing_lands_samples << "/" << samples << " samples said so)";
+	EXPECT_EQ(static_cast<int>(live->stall_kind()), 2);
 }
 
 // part 的 MD4 没过时引擎会 reset_part(),bytes_done 回退。此时速率必须变成"未知",
