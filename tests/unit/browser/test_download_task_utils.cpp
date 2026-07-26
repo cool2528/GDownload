@@ -629,6 +629,188 @@ TEST(DownloadTaskModelTest, ResetPartWhileOtherPartsAdvanceIsWrittenThenDiscarde
 	EXPECT_EQ(static_cast<int>(live->stall_kind()), 2);
 }
 
+// ============================================================================
+// 恢复/重试路径的粒度污染:字节预算的"实测粒度"绝不能被续传跳变钉死
+//
+// 引擎在下载开始时 sync_progress()(download.cpp:3443),续传任务的整个已恢复字节数
+// 在一次回调里到达;而桌面侧此前 connecting 阶段的行早已以 current_size = 0 存在了
+// 好几秒(browser_manager 的状态事件建行 + 1Hz 采样都报 done = 0)。于是 0 到 120 MiB
+// 是一次单样本增长。粒度若采信它,预算被钉在 64 MiB 上限、终生不降(粒度只增不减,
+// 只有 Restart 清它,而 Restart 只在暂停/时钟倒流时触发)。
+// 触发人群:RestoreEd2kDownloadHistory(每次启动重加全部 kError 记录)、RetryTask、
+// 手动重加同链接 —— 正是最可能再次卡住、最需要告警的任务。
+// ============================================================================
+
+// 缺陷复现:续传 120 MiB 跳变之后接一个半死源(线上恒 96 KiB/s,每 600 秒才真正落
+// 一批 552960 字节,即 99.2% 的接收被丢弃)。预算必须回到 2 MiB 下限:线上 21 秒即
+// 凑满预算,墙钟 90 秒是更晚的那道门,首告警 = 跳变后 90 秒。若跳变污染了粒度,
+// 预算 = 64 MiB,而每个 600 秒周期线上只到 56.25 MiB,永远凑不够 => 永不告警,
+// 700 MiB 的文件要按 5 个月往后拖,期间界面一直装作一切正常。
+TEST(DownloadTaskModelTest, ResumeJumpMustNotPinTheStallBudgetOnAHalfDeadSource) {
+	DownloadTaskModel model;
+	DownloadTaskInfo base = MakeEd2kActiveTask();
+	base.set_task_current_size(0);
+	model.AddTask(base, 0);
+
+	// 连接阶段:行以 current_size = 0 存在了好几秒
+	std::int64_t t = 1000;
+	for (; t <= 5000; t += 1000) {
+		SampleAt(model, base, 0, 0, t);
+	}
+
+	// 续传同步:整个已恢复的 120 MiB 在一次采样里到达
+	std::int64_t current = 120LL * 1024 * 1024;
+	SampleAt(model, base, current, kWireSpeed, t);
+	const std::int64_t jump_ms = t;
+	t += 1000;
+
+	// 半死源:两小时时间线,每 600 秒落一批,线上恒 96 KiB/s
+	StallTimeline timeline;
+	bool was_stalled = false;
+	for (; t <= jump_ms + 7200000; t += 1000) {
+		if ((t - jump_ms) % 600000 == 0) current += kEngineProgressStep;
+		SampleAt(model, base, current, kWireSpeed, t);
+		const DownloadTaskInfo* live = model.GetTaskById(base.task_id());
+		ASSERT_NE(live, nullptr);
+		const bool stalled = live->progress_stalled();
+		++timeline.samples;
+		if (stalled) {
+			++timeline.stalled_samples;
+			if (timeline.first_stalled_ms < 0) timeline.first_stalled_ms = t;
+			if (live->remaining_time() >= 0) ++timeline.finite_eta_while_stalled;
+		}
+		if (was_stalled && !stalled) ++timeline.stalled_to_healthy_transitions;
+		was_stalled = stalled;
+	}
+
+	ASSERT_GT(timeline.samples, 0);
+	ASSERT_GE(timeline.first_stalled_ms, 0)
+		<< "a resumed task that discards 99% of received bytes never warned in 2 hours";
+	// 新告警仍是纯墙钟 90 秒规则的严格子集:不早于跳变后 90 秒
+	EXPECT_GE(timeline.first_stalled_ms, jump_ms + 90000);
+	EXPECT_LE(timeline.first_stalled_ms, jump_ms + 120000)
+		<< "the stall budget is still inflated by the resume jump";
+	// 每个 600 秒周期里,告警应从第 90 秒挂到批次落地(510/600 = 85%)
+	EXPECT_GE(timeline.stalled_ratio(), 0.7)
+		<< "stalled " << timeline.stalled_samples << "/" << timeline.samples << " samples";
+	// 报着停滞就不许同时给出有限 ETA
+	EXPECT_EQ(timeline.finite_eta_while_stalled, 0);
+}
+
+// 性质:全新任务从 0 起步按批推进,行为与修复前完全一致 —— 粒度 552960、预算落在
+// 2 MiB 下限(552960 x 3 < 2 MiB)。健康爬升段零告警;冻结后线上 21 秒凑满预算,
+// 墙钟 90 秒是更晚的那道门,首告警恰在最后一次推进后 90 秒。
+TEST(DownloadTaskModelTest, FreshTaskFromZeroKeepsTheFloorBudgetBehavior) {
+	DownloadTaskModel model;
+	DownloadTaskInfo base = MakeEd2kActiveTask();
+	base.set_task_current_size(0);
+	model.AddTask(base, 0);
+
+	// 健康推进 10 批:96 KiB/s 下一批约 5.6 秒,取每 6 秒一批
+	std::int64_t current = 0;
+	std::int64_t t		 = 1000;
+	for (; t <= 60000; t += 1000) {
+		if (t % 6000 == 0) current += kEngineProgressStep;
+		SampleAt(model, base, current, kWireSpeed, t);
+		const DownloadTaskInfo* live = model.GetTaskById(base.task_id());
+		ASSERT_NE(live, nullptr);
+		ASSERT_FALSE(live->progress_stalled()) << "healthy ramp-up flagged stalled at t=" << t;
+	}
+	const std::int64_t last_advance_ms = 60000;
+
+	// 冻结:线上照收,一个字节不再落盘
+	std::int64_t first_stalled = -1;
+	for (; t <= last_advance_ms + 300000; t += 1000) {
+		SampleAt(model, base, current, kWireSpeed, t);
+		const DownloadTaskInfo* live = model.GetTaskById(base.task_id());
+		ASSERT_NE(live, nullptr);
+		if (live->progress_stalled()) {
+			first_stalled = t;
+			break;
+		}
+	}
+	ASSERT_GE(first_stalled, 0) << "a frozen download with wire data flowing must warn";
+	EXPECT_GE(first_stalled, last_advance_ms + 90000);
+	EXPECT_LE(first_stalled, last_advance_ms + 100000);
+}
+
+// 性质:只推进过一次就冻结的任务,粒度还测不出来,预算必须落在 2 MiB 下限 ——
+// 保守、告警更快;健康间隙线上只会积到一个粒度(552960 < 2 MiB),不会因此误报。
+TEST(DownloadTaskModelTest, SingleAdvanceThenFreezeAlarmsAtTheFloorBudget) {
+	DownloadTaskModel model;
+	DownloadTaskInfo base = MakeEd2kActiveTask();
+	base.set_task_current_size(0);
+	model.AddTask(base, 0);
+
+	// 起步 10 秒还没有任何推进
+	std::int64_t t = 1000;
+	for (; t <= 10000; t += 1000) {
+		SampleAt(model, base, 0, kWireSpeed, t);
+	}
+	// 仅有的一次推进:一批 552960
+	SampleAt(model, base, kEngineProgressStep, kWireSpeed, t);
+	const std::int64_t only_advance_ms = t;
+	t += 1000;
+
+	// 此后冻结,线上照收
+	std::int64_t first_stalled = -1;
+	for (; t <= only_advance_ms + 300000; t += 1000) {
+		SampleAt(model, base, kEngineProgressStep, kWireSpeed, t);
+		const DownloadTaskInfo* live = model.GetTaskById(base.task_id());
+		ASSERT_NE(live, nullptr);
+		if (live->progress_stalled()) {
+			first_stalled = t;
+			break;
+		}
+	}
+	ASSERT_GE(first_stalled, 0);
+	EXPECT_GE(first_stalled, only_advance_ms + 90000);
+	EXPECT_LE(first_stalled, only_advance_ms + 100000);
+}
+
+// 兜底:粒度已被正确测出之后,下载中途一次荒谬的单样本跳变(断线重连后的整段重
+// 同步、事件线程被饿死把几十批合并进一次采样)也不许被采信 —— 它不是任何合理的
+// 流水线批次(当前一批 552960 字节,8 MiB 已是它的 14 倍,也小于一个 PART_SIZE)。
+// 若被采信,40 MiB x 3 触顶 64 MiB,后续半死源每 600 秒只送 56.25 MiB,永不告警。
+TEST(DownloadTaskModelTest, MidDownloadJumpBeyondAnySaneBatchDoesNotInflateTheBudget) {
+	DownloadTaskModel model;
+	DownloadTaskInfo base = MakeEd2kActiveTask();
+	base.set_task_current_size(0);
+	model.AddTask(base, 0);
+
+	// 先健康地按批下 60 秒,粒度已被正确测出(552960)
+	std::int64_t current = 0;
+	std::int64_t t		 = 1000;
+	for (; t <= 60000; t += 1000) {
+		if (t % 6000 == 0) current += kEngineProgressStep;
+		SampleAt(model, base, current, kWireSpeed, t);
+	}
+
+	// 一次采样里 bytes_done 跳了 40 MiB
+	current += 40LL * 1024 * 1024;
+	SampleAt(model, base, current, kWireSpeed, t);
+	const std::int64_t jump_ms = t;
+	t += 1000;
+
+	// 之后退化成半死源:每 600 秒才落一批,线上恒 96 KiB/s
+	std::int64_t first_stalled = -1;
+	for (; t <= jump_ms + 7200000; t += 1000) {
+		if ((t - jump_ms) % 600000 == 0) current += kEngineProgressStep;
+		SampleAt(model, base, current, kWireSpeed, t);
+		const DownloadTaskInfo* live = model.GetTaskById(base.task_id());
+		ASSERT_NE(live, nullptr);
+		if (live->progress_stalled()) {
+			first_stalled = t;
+			break;
+		}
+	}
+	ASSERT_GE(first_stalled, 0)
+		<< "a half-dead source after a mid-download jump never warned in 2 hours";
+	EXPECT_GE(first_stalled, jump_ms + 90000);
+	EXPECT_LE(first_stalled, jump_ms + 120000)
+		<< "the absurd 40 MiB step was believed as landing granularity";
+}
+
 // part 的 MD4 没过时引擎会 reset_part(),bytes_done 回退。此时速率必须变成"未知",
 // 绝不能拿回退前后的差值算出负速率或荒谬的剩余时间
 TEST(DownloadTaskModelTest, ProgressRollbackMakesTheRateUnknown) {

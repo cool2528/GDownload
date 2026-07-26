@@ -55,9 +55,21 @@ namespace gdl {
 				// 是一批 3 × 184320 = 552960 字节,2 MiB ≈ 3.8 批 —— 即便流水线深度翻到 11
 				// 倍,首次推进之前也不会误报;首次推进之后粒度就被测出来了,与深度无关。
 				static constexpr std::int64_t kMinStallBudgetBytes = 2 * 1024 * 1024;
-				// 预算上限。防止一次异常巨大的推进(例如恢复任务时 bytes_done 一次跳几百 MB)
-				// 把预算抬到永远够不到、从此再也报不出停滞。
+				// 预算上限。粒度污染的两个已知来源(续传跳变、荒谬的单样本增量)都已在
+				// 测量端被拒绝(见 Sample() 里的第一次推进跳过与 kMaxCredibleStepBytes),
+				// 这里只是纵深防御:即便未来出现漏网的污染源,预算至多被抬到 64 MiB,
+				// 告警会变得很慢,但不至于在数学上不可达。
 				static constexpr std::int64_t kMaxStallBudgetBytes = 64 * 1024 * 1024;
+				// 单样本增量的采信上限(只作用于粒度测量,不影响水位/增长时钟)。超过它的
+				// "一次推进"不可能是流水线批次:当前一批是 3 x 184320 = 552960 字节,8 MiB
+				// 已是它的 14 倍余量,同时仍小于一个 PART_SIZE(9,728,000 字节)—— 断线重连
+				// 后的整段重同步、事件线程被饿死后几十批合并进一次采样,形状都是单样本
+				// 几十 MiB,全部落在上限之外,不采信时保留之前测出的粒度。
+				// 【为什么不做衰减】真实的粗粒度(多源并发把几批合进一个采样)是持续存在的
+				// 工况,衰减会让预算周期性跌回下限,在真粗粒度任务上制造周期性误报;而被
+				// 采信的样本已被本上限钳住,最坏预算 = 8 MiB x 3 = 24 MiB,96 KiB/s 的线上
+				// 速率下 4.3 分钟内即可攒够 —— 有界,无需再引入随时间变化的判据。
+				static constexpr std::int64_t kMaxCredibleStepBytes = 8 * 1024 * 1024;
 
 				// wire_speed_bps 是引擎上报的线上到达速率(每秒真值,来自独立的 wire meter)。
 				// 它不参与速率/水位计算,只做两件事:
@@ -95,7 +107,29 @@ namespace gdl {
 							// 顺手把引擎真实的落盘粒度测出来。桌面端不再假设它等于多少个
 							// AICH 块 —— 流水线深度改了、或者多源并发把粒度抬高了,这里
 							// 自动跟着变。
-							progress_step_bytes_ = std::max(progress_step_bytes_, current_size - last_size_);
+							// 【必须跳过基线建立后的第一次推进】恢复/重试的任务先以
+							// current_size = 0 的行存在好几秒(状态事件建行 + 1Hz 采样在
+							// connecting 阶段都报 0),随后引擎在下载开始时 sync_progress(),
+							// 整个已恢复的字节数在一次回调里到达 —— 0 到 120 MiB 是一次
+							// 单样本增长。粒度只增不减,只有 Restart 清它,而 Restart 只在
+							// 暂停/时钟倒流时触发:采信这一跳,预算就被钉在 64 MiB 上限、
+							// 终生不降,半死源(线上照收、几乎不落盘)从此永远报不出停滞。
+							// RestoreEd2kDownloadHistory、RetryTask、手动重加同链接全走
+							// 这条路,恰恰是最可能再次卡住、最需要告警的任务。
+							// 从第二次推进起才测:健康下载的第二批与第一批等值,粒度照样
+							// 测对;只推进过一次就冻结的任务粒度保持 0,预算落在 2 MiB
+							// 下限 —— 更保守、告警更快,且健康间隙线上只积得到一个粒度
+							// (552960 < 2 MiB),不会因此误报。
+							const std::int64_t step_bytes = current_size - last_size_;
+							if (!first_advance_seen_) {
+								first_advance_seen_ = true;
+							}
+							else if (step_bytes <= kMaxCredibleStepBytes) {
+								// 兜底:即便不是第一次推进,单样本几十 MiB 的跳变(断线
+								// 重连后的整段重同步、事件线程被饿死)也不是粒度,不采信,
+								// 保留之前测出的值。取舍见 kMaxCredibleStepBytes 的注释。
+								progress_step_bytes_ = std::max(progress_step_bytes_, step_bytes);
+							}
 						}
 						else if (current_size < last_size_) {
 							// 进度回退只可能来自 alloc.reset_part():之前那段爬升已被整段作废,
@@ -157,6 +191,12 @@ namespace gdl {
 
 				// 判定停滞所需的线上字节量。粒度是测出来的,不是硬编码的引擎常数 ——
 				// 这就是这套判据对流水线深度免疫的地方。
+				// 【压缩传输的方向,如实记录】wire meter 计的是压缩后的线上字节,粒度按
+				// 解压后的落盘字节测:压缩比 r 会让预算需要 r 倍的线上字节/时间才攒够,
+				// 方向是漏报(告警更晚),不是误报 —— 早先"压缩让判据更安全"的说法把
+				// 方向说反了。粒度未被跳变污染时预算落在 2 MiB 下限(粒度不超过约
+				// 700 KiB 时下限起作用),常见压缩比下告警只晚几十秒,可以接受;记下
+				// 方向是为了防止未来把压缩当成安全余量去放宽别的参数。
 				std::int64_t stall_budget_bytes() const {
 					return std::clamp(progress_step_bytes_ * kStallBudgetFactor, kMinStallBudgetBytes,
 									  kMaxStallBudgetBytes);
@@ -195,6 +235,7 @@ namespace gdl {
 					wire_bytes_since_peak_	 = 0;
 					wire_bytes_since_growth_ = 0;
 					progress_step_bytes_	 = 0;
+					first_advance_seen_		 = false;
 					has_wire_activity_		 = false;
 					last_wire_activity_ms_	 = now_ms;
 				}
@@ -210,6 +251,7 @@ namespace gdl {
 				std::int64_t progress_step_bytes_{0};	   // 观测到的最大一次进度推进(引擎落盘粒度)
 				std::int64_t last_wire_activity_ms_{0};	   // 最后一次线上有数据到达的时刻
 				bool started_{false};					   // 是否已有活动态采样
+				bool first_advance_seen_{false};		   // 基线建立后是否已见过第一次推进(它不参与粒度测量)
 				bool has_wire_activity_{false};			   // 本轮窗口里线上是否到达过数据
 			};
 
