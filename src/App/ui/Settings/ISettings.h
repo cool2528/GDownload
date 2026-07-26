@@ -172,6 +172,9 @@ namespace gdl {
 				virtual void	 SetEd2kNodesDatUrl(QString value)  = 0;
 				virtual bool	 GetEd2kAutoSyncSources() const	  = 0;
 				virtual void	 SetEd2kAutoSyncSources(bool value) = 0;
+				// 引擎诊断日志级别(off/error/warn/info/debug/trace),下次启动生效
+				virtual QString GetEd2kDiagLevel() const		  = 0;
+				virtual void	 SetEd2kDiagLevel(QString value)   = 0;
 			};
 
 		}  // namespace settings

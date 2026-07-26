@@ -1302,6 +1302,26 @@ namespace gdl {
 			}
 			SETTING_IMP_END(Ed2kAutoSyncSources)
 
+			// Ed2kDiagLevel (eD2k 引擎诊断日志级别)
+			// 取值: off/error/warn/info/debug/trace,写进 gdownload.log。默认 info——只出里程碑与
+			// 每轮取源汇总(一次下载几十行);用户报"下不动"时改 debug,可看到每个源的完整去向。
+			// trace 是每块/每包级别,只在复现具体协议问题时开,会把日志刷爆。
+			// 注意: config_key.h 的 CONFIG_PATH 默认值先于本处 Default() 生效,两处必须同步修改。
+			SETTING_IMP_BEGIN(Ed2kDiagLevel, CONFIG_KEY_PATH(Ed2kDiagLevel), QString)
+			void Default() override {
+				value_ = "info";
+			}
+			void Put(const QVariant& value) override {
+				value_ = value.toString();
+			}
+			VALUE_TYPE Get() const {
+				return value_;
+			}
+			QString ToString() override {
+				return value_;
+			}
+			SETTING_IMP_END(Ed2kDiagLevel)
+
 		}  // namespace settings
 	}  // namespace ui
 }  // namespace gdl

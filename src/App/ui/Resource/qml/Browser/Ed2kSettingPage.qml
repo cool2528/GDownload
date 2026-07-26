@@ -20,6 +20,15 @@ SettingCard {
     // 页面级布局常量(非设计令牌,spec 2.2/2.3 约定):端口/并发数输入框宽度
     readonly property int inputWidth: 150
 
+    // 诊断级别的持久化取值(写进配置/传给引擎的是这些字符串,不是下拉框的下标)。
+    // 顺序必须与下面 diagLevelComboBox.model 的顺序一一对应。
+    readonly property var diagLevelValues: ["off", "info", "debug", "trace"]
+    // 已保存值 -> 下拉框下标;取值异常(手改配置文件写错)时回落到 "info"。
+    function diagLevelIndexOf(value) {
+        var i = ed2kSettingPage.diagLevelValues.indexOf(value)
+        return i < 0 ? 1 : i
+    }
+
     // ========== 身份与网络 ==========
     ColumnLayout {
         Layout.fillWidth: true
@@ -299,6 +308,22 @@ SettingCard {
                 Accessible.name: qsTr("Maximum concurrent eD2k tasks")
             }
         }
+
+        SettingRow {
+            Layout.fillWidth: true
+            label: qsTr("Diagnostic Log Level:")
+            hint: qsTr("How much eD2k engine detail is written to the log file. Use Detailed when reporting a download that will not start, so the log shows what each source did. Verbose is per-block and will grow the log very quickly. Takes effect after restarting the app.")
+            control: GComBoBox {
+                id: diagLevelComboBox
+                objectName: "ed2kDiagLevelComboBox"
+                Layout.preferredWidth: ed2kSettingPage.inputWidth
+                Layout.preferredHeight: GTheme.sizeDefault
+                Accessible.name: qsTr("eD2k diagnostic log level")
+                // 顺序对应 ed2kSettingPage.diagLevelValues: off / info / debug / trace
+                model: [ qsTr("Off"), qsTr("Normal"), qsTr("Detailed"), qsTr("Verbose") ]
+                currentIndex: ed2kSettingPage.diagLevelIndexOf(SettingsManager.qEd2kDiagLevel)
+            }
+        }
     }
 
     // ========== 操作区:Reset + Save + 状态提示(暂存-保存派,spec 2.3)==========
@@ -317,7 +342,8 @@ SettingCard {
                     serverMetUrlField.text !== SettingsManager.qEd2kServerMetUrl ||
                     nodesDatUrlField.text !== SettingsManager.qEd2kNodesDatUrl ||
                     autoSyncCheckBox.checked !== SettingsManager.qEd2kAutoSyncSources ||
-                    maxConcurrentTasksSpinBox.value !== SettingsManager.qEd2kMaxConcurrentTasks
+                    maxConcurrentTasksSpinBox.value !== SettingsManager.qEd2kMaxConcurrentTasks ||
+                    ed2kSettingPage.diagLevelValues[diagLevelComboBox.currentIndex] !== SettingsManager.qEd2kDiagLevel
 
         onReset: {
             // 重置为默认值(未保存):业务默认值(见 setting.h Default()),非设计令牌
@@ -331,6 +357,7 @@ SettingCard {
             nodesDatUrlField.text = "http://upd.emule-security.org/nodes.dat"
             autoSyncCheckBox.checked = true
             maxConcurrentTasksSpinBox.value = 5
+            diagLevelComboBox.currentIndex = ed2kSettingPage.diagLevelIndexOf("info")
 
             formActions.statusText = qsTr("Input fields reset to default values (not saved yet)")
             formActions.statusColor = GTheme.textSecondary
@@ -376,7 +403,11 @@ SettingCard {
                   label: qsTr("AutoSyncSources") },
                 { val: maxConcurrentTasksSpinBox.value, old: SettingsManager.qEd2kMaxConcurrentTasks,
                   setter: function (v) { SettingsManager.SetEd2kMaxConcurrentTasks(v) },
-                  label: qsTr("MaxConcurrentTasks") }
+                  label: qsTr("MaxConcurrentTasks") },
+                { val: ed2kSettingPage.diagLevelValues[diagLevelComboBox.currentIndex],
+                  old: SettingsManager.qEd2kDiagLevel,
+                  setter: function (v) { SettingsManager.SetEd2kDiagLevel(v) },
+                  label: qsTr("DiagLevel") }
             ], qsTr("eD2k settings saved. Some changes take effect after restart."))
         }
     }
