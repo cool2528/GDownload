@@ -1901,7 +1901,7 @@
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="329"/>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="522"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="525"/>
         <source>Queued</source>
         <translation>대기 중</translation>
     </message>
@@ -1936,98 +1936,98 @@
         <translation>일시 정지</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="474"/>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="559"/>
-        <source>Transferred</source>
-        <translation>전송됨</translation>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="477"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="569"/>
+        <source>Downloaded</source>
+        <translation>다운로드됨</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="475"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="478"/>
         <source>%1 of %2</source>
         <translation>%1 / %2</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="482"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="485"/>
         <source>Speed</source>
         <translation>속도</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="492"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="495"/>
         <source>ETA</source>
         <translation>예상 시간</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="500"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="503"/>
         <source>Connections</source>
         <translation>연결 수</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="510"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="513"/>
         <source>Sources</source>
         <translation>소스 수</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="532"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="535"/>
         <source>Queue</source>
         <translation>대기열</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="533"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="536"/>
         <source>Position %1</source>
         <translation>위치 %1</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="542"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="545"/>
         <source>Expected size</source>
         <translation>예상 크기</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="550"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="553"/>
         <source>Completed size</source>
         <translation>완료된 크기</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="577"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="587"/>
         <source>Error %1: %2</source>
         <translation>오류 %1: %2</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="580"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="590"/>
         <source>Download failed</source>
         <translation>다운로드 실패</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="623"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="633"/>
         <source>The task could not be removed.</source>
         <translation>작업을 제거할 수 없었습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="629"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="639"/>
         <source>Task and downloaded content were removed.</source>
         <translation>작업과 다운로드된 콘텐츠가 제거되었습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="630"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="640"/>
         <source>Task record was removed.</source>
         <translation>작업 기록이 제거되었습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="633"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="643"/>
         <source>The task was removed, but some downloaded content could not be deleted.</source>
         <translation>작업이 제거되었지만 일부 다운로드된 콘텐츠를 삭제할 수 없었습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="634"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="644"/>
         <source>The task was removed, but cleanup could not be completed.</source>
         <translation>작업이 제거되었지만 정리를 완료할 수 없었습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="637"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="647"/>
         <source>Failed to remove the task and downloaded content.</source>
         <translation>작업과 다운로드된 콘텐츠를 제거하지 못했습니다.</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="638"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="648"/>
         <source>Failed to remove the task.</source>
         <translation>작업을 제거하지 못했습니다.</translation>
     </message>
@@ -4744,13 +4744,13 @@ GNU Affero General Public License v3.0(AGPL-3.0)에 따라 라이선스가 부�
         <translation>재시도가 시작되었지만 이전 실패 작업을 기록에서 제거할 수 없었습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1440"/>
-        <location filename="../../Browser/browser_manager.cxx" line="1503"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1452"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1515"/>
         <source>Download failed. Please check the link or network connection.</source>
         <translation>다운로드 실패. 링크 또는 네트워크 연결을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1441"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1453"/>
         <source>Download failed: %1</source>
         <translation>다운로드 실패: %1</translation>
     </message>

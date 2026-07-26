@@ -468,10 +468,13 @@ Control {
                         Layout.fillWidth: true
                         spacing: GTheme.spaceXS
 
+                        // 口径:currentSize 是"这个文件已经拿到手的字节数"(含上一轮续传留在盘上的),
+                        // 不是"本轮传输了多少"。原来的标签"Transferred"读起来是后者,续传任务上二者
+                        // 相差一个续传起点,标签与数值对不上。统一叫"Downloaded",与完成态那条同源。
                         MetaChip {
                             objectName: "activeTransferredMetadata"
                             visible: downloadView.pageType === 0
-                            label: qsTr("Transferred")
+                            label: qsTr("Downloaded")
                             value: qsTr("%1 of %2").arg(model.currentSize).arg(model.totalSize)
                             accentColor: GTheme.textPrimary
                         }
@@ -554,9 +557,16 @@ Control {
                             borderColor: GTheme.borderSuccess
                         }
 
+                        // 完成态默认只留上面那一条"Completed size"。并排两个大小数字一旦不一致,
+                        // 一次成功的下载就会被读成失败——用户正是这样把一次完成的 ed2k 续传判定为
+                        // "没下完"(完成大小 3.23 MB / 已传输 2.70 MB,后者只是本轮传输量)。
+                        // 因此这条只在"已下载"确实少于文件总大小时才出现,那种情况是真的只拿到了一
+                        // 部分(例如 BT 用 select-file 只下了选中的文件),此时它是必要信息。
+                        // 注:两个 role 都是格式化后的字符串,按字符串比较即可判定"看起来是否一致"。
                         MetaChip {
-                            visible: taskCard.completedTask
-                            label: qsTr("Transferred")
+                            objectName: "completedDownloadedMetadata"
+                            visible: taskCard.completedTask && model.currentSize !== model.totalSize
+                            label: qsTr("Downloaded")
                             value: model.currentSize
                             accentColor: GTheme.textPrimary
                         }
