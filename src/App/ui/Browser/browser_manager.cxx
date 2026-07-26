@@ -1557,13 +1557,21 @@ namespace gdl {
 						task_info.set_task_total_size(item.value("total", static_cast<std::int64_t>(0)));
 						task_info.set_task_current_size(item.value("done", static_cast<std::int64_t>(0)));
 						task_info.set_task_download_speed(item.value("speed", static_cast<std::int64_t>(0)));
-						// "连接数"取 active_sources(此刻真正在连的源), 与 aria2 任务那侧 connections 的
-						// 口径一致; sources(迄今发现的源总数, 含已放弃/冷却中的)另开一个标签展示 ——
-						// 它才是判断服务器周期重问 / Kad 周期查源 / SX2 源交换有没有把源集合做大的依据。
-						// 旧引擎不带 active_sources 时回退到 sources, 即改动前的显示口径。
+						// "连接数"必须取 connected_peers —— 此刻真正握着 TCP 连接名额的对端数, 被引擎的
+						// max_peer_connections(默认 20)钳住, 与 aria2 任务那侧 connections 的口径一致。
+						// 【不能用 active_sources】那是 peer_worker 协程数, 把等名额/排队/退避中的源全算
+						// 进去, 实测会显示"连接数 180 多"而同时只有至多 20 条 TCP 连接 —— 这个数字既误导
+						// 用户, 也把排查引到错误方向。
+						// sources(迄今发现的源总数, 含已放弃/冷却中的)与 queued_sources(停在对端上传队列里
+						// 的源数)各自另开标签: 前者是判断服务器周期重问 / Kad 周期查源 / SX2 源交换有没有
+						// 把源集合做大的依据, 后者用来区分"源都在排队"与"源都连不上"这两种表象相同的故障。
+						// 逐级回退保证旧引擎(payload 缺字段)仍显示改动前的口径。
 						const auto known_sources = item.value("sources", static_cast<std::int64_t>(0));
-						task_info.set_task_connections(item.value("active_sources", known_sources));
+						const auto active_sources = item.value("active_sources", known_sources);
+						task_info.set_task_connections(item.value("connected_peers", active_sources));
 						task_info.set_task_sources(known_sources);
+						task_info.set_task_queued_sources(
+							item.value("queued_sources", static_cast<std::int64_t>(0)));
 						task_info.set_task_download_link(
 							BuildEd2kDownloadLink(task_id, task_info.task_file_name(), task_info.task_total_size()));
 						task_info.set_task_save_path(QString::fromStdString(item.value("out_path", std::string())));

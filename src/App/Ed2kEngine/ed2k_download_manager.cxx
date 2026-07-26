@@ -79,13 +79,17 @@ std::string SearchResultsToJson(const std::vector<ed2k::server::SearchResultItem
 	return doc.dump();
 }
 
-// 取快照里"此刻真正在连的源数"。
-// 引擎的 TaskSnapshot::active_sources 是 v2.7.4 之后新增的字段, 而 vcpkg overlay port 目前仍钉在
-// v2.7.4, 因此这里按"字段是否存在"探测, 而不是用 ed2k/version.hpp 的 ED2K_VERSION_AT_LEAST ——
-// 引擎版本号只在发版 commit 里 bump, 用本地 worktree 重建出来的测试包版本仍写着 2.7.4 却已经带上
-// 了该字段, 按版本宏判断反而会误判成"没有"。写成泛型 lambda/模板是必需的: 非模板上下文里的
-// if constexpr 两个分支都会被实例化, 缺字段的那侧就会编译失败。
-// port 升到带该字段的引擎版本后, 本函数可以直接换成 snap.active_sources。
+// === 快照计数字段的兼容读取 ===
+// 引擎的 TaskSnapshot 在 v2.7.4 之后陆续加了 active_sources / connected_peers / queued_sources,
+// 而 vcpkg overlay port 目前仍钉在 v2.7.4(CI 上就是那份旧头), 因此这里一律按"字段是否存在"探测,
+// 而不是用 ed2k/version.hpp 的 ED2K_VERSION_AT_LEAST —— 引擎版本号只在发版 commit 里 bump, 用本地
+// worktree 重建出来的测试包版本仍写着 2.7.4 却已经带上了这些字段, 按版本宏判断反而会误判成"没有"。
+// 写成模板是必需的: 非模板上下文里的 if constexpr 两个分支都会被实例化, 缺字段的那侧就会编译失败。
+// port 升到带这些字段的引擎版本后, 本组函数可以直接换成对应的 snap.xxx。
+
+// 此刻仍有 peer_worker 协程在跑的源数(等名额中/连接中/排队中/传输中/退避中)。
+// 【这不是"连接数"】它可以有一两百个, 其中真正握着 TCP 连接的最多 max_peer_connections(默认 20)。
+// UI 的"连接数"必须用下面的 ConnectedPeersOf, 见引擎 session.hpp / download::DownloadStats 的注释。
 template <class Snapshot>
 std::int64_t ActiveSourcesOf(const Snapshot& snap) {
 	if constexpr (requires { snap.active_sources; }) {
@@ -93,6 +97,29 @@ std::int64_t ActiveSourcesOf(const Snapshot& snap) {
 	} else {
 		// 旧引擎没有该字段: 退化成已知源数, 即维持引入本改动之前的显示口径
 		return static_cast<std::int64_t>(snap.known_sources);
+	}
+}
+
+// 此刻真正持有对端连接名额的数量(被引擎的 max_peer_connections 钳住), 这才是 UI 口径的"连接数"。
+template <class Snapshot>
+std::int64_t ConnectedPeersOf(const Snapshot& snap) {
+	if constexpr (requires { snap.connected_peers; }) {
+		return static_cast<std::int64_t>(snap.connected_peers);
+	} else {
+		// 旧引擎没有该字段: 退化成 worker 数(再往前退化成已知源数), 即维持改动前的显示口径
+		return ActiveSourcesOf(snap);
+	}
+}
+
+// 此刻停在对端上传队列里等放行的源数。它与 connected_peers 一起区分两种完全不同的故障:
+// 排队数高而连接数低 = 源都在排队(等着就好); 二者都低而已知源很多 = 源多但触达不了。
+template <class Snapshot>
+std::int64_t QueuedSourcesOf(const Snapshot& snap) {
+	if constexpr (requires { snap.queued_sources; }) {
+		return static_cast<std::int64_t>(snap.queued_sources);
+	} else {
+		// 旧引擎没有该字段: 报 0, UI 据此隐藏"Queued"标签(而不是显示一个编造出来的数字)
+		return static_cast<std::int64_t>(0);
 	}
 }
 
@@ -435,12 +462,18 @@ void Ed2kDownloadManager::ScheduleSampling() {
 				item["total"] = snap.total_size;
 				item["done"] = snap.bytes_done;
 				item["speed"] = snap.speed_bps;
-				// sources = 迄今发现的源总数(含已放弃/冷却中的源, 只增不减);
-				// active_sources = 此刻真正在连的源数, 即 UI 上"连接数"的口径。
-				// 二者都由引擎在源集合/活跃 worker 变化时实时回写(见引擎 download::StatsFn);
-				// 此前只有 sources 且它冻结在 dl.run() 启动前那次 GETSOURCES 的数字上。
+				// 四个计数各有各的口径, 混用会把用户和排查者一起带偏(见引擎 download::DownloadStats):
+				//   sources          = 迄今发现的源总数(含已放弃/冷却中的源, 只增不减);
+				//   active_sources   = peer_worker 协程数, 【不是连接数】—— 可以上百, 其中大部分
+				//                      在等并发名额/排队/退避; 仅作为旧引擎下 connections 的兜底;
+				//   connected_peers  = 此刻真正持有连接名额的数量(被 max_peer_connections 钳住),
+				//                      这才是 UI 上"连接数"该显示的值;
+				//   queued_sources   = 停在对端上传队列里等放行的源数。
+				// 四者都由引擎在源集合/worker/名额/排队变化时实时回写(见引擎 download::StatsFn)。
 				item["sources"] = snap.known_sources;
 				item["active_sources"] = ActiveSourcesOf(snap);
+				item["connected_peers"] = ConnectedPeersOf(snap);
+				item["queued_sources"] = QueuedSourcesOf(snap);
 				item["state"] = TaskStateToString(snap.state);
 				// 非终态任务的 error 字段是"当前状态说明"而非失败原因(引擎在等待可用源时会附上
 				// 等待原因但不转失败态)。必须随每次采样一起带上:该原因只在变化时通过状态事件推
@@ -508,6 +541,8 @@ std::string Ed2kDownloadManager::AddEd2kTask(const std::string& link, const std:
 			item["speed"] = static_cast<std::int64_t>(0);
 			item["sources"] = static_cast<std::int64_t>(0);
 			item["active_sources"] = static_cast<std::int64_t>(0);
+			item["connected_peers"] = static_cast<std::int64_t>(0);
+			item["queued_sources"] = static_cast<std::int64_t>(0);
 			item["state"] = std::string("queued");
 			item["out_path"] = (dir / link_copy.name).string();
 			nlohmann::json arr = nlohmann::json::array({std::move(item)});

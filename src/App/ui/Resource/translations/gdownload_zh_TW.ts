@@ -1901,6 +1901,7 @@
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="329"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="522"/>
         <source>Queued</source>
         <translation>已排隊</translation>
     </message>
@@ -1936,7 +1937,7 @@
     </message>
     <message>
         <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="474"/>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="545"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="559"/>
         <source>Transferred</source>
         <translation>已傳輸</translation>
     </message>
@@ -1966,67 +1967,67 @@
         <translation>來源數</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="518"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="532"/>
         <source>Queue</source>
         <translation>佇列</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="519"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="533"/>
         <source>Position %1</source>
         <translation>第 %1 位</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="528"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="542"/>
         <source>Expected size</source>
         <translation>預計大小</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="536"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="550"/>
         <source>Completed size</source>
         <translation>已完成大小</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="563"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="577"/>
         <source>Error %1: %2</source>
         <translation>錯誤 %1：%2</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="566"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="580"/>
         <source>Download failed</source>
         <translation>下載失敗</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="609"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="623"/>
         <source>The task could not be removed.</source>
         <translation>無法移除該任務。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="615"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="629"/>
         <source>Task and downloaded content were removed.</source>
         <translation>任務和已下載的內容已移除。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="616"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="630"/>
         <source>Task record was removed.</source>
         <translation>任務記錄已移除。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="619"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="633"/>
         <source>The task was removed, but some downloaded content could not be deleted.</source>
         <translation>任務已移除，但部分已下載的內容無法刪除。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="620"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="634"/>
         <source>The task was removed, but cleanup could not be completed.</source>
         <translation>任務已移除，但清理作業無法完成。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="623"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="637"/>
         <source>Failed to remove the task and downloaded content.</source>
         <translation>無法移除任務和已下載的內容。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="624"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="638"/>
         <source>Failed to remove the task.</source>
         <translation>無法移除任務。</translation>
     </message>

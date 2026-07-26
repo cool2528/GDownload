@@ -502,14 +502,28 @@ Control {
                             accentColor: GTheme.textPrimary
                         }
 
-                        // eD2k 专有:迄今发现的源总数(含已放弃/冷却中的源),与上面"连接数"
-                        // (此刻真正在连的对端)是两个口径。aria2/BT 任务不上报该字段,恒为 0 时隐藏。
+                        // eD2k 专有:迄今发现的源总数(含已放弃/冷却中的源,只增不减),与上面"连接数"
+                        // (此刻真正握着连接的对端)是两个口径。aria2/BT 任务不上报该字段,恒为 0 时隐藏。
                         MetaChip {
                             objectName: "activeSourcesMetadata"
                             visible: taskCard.activeTask && model.sources > 0
                             label: qsTr("Sources")
                             value: String(model.sources)
                             accentColor: GTheme.textPrimary
+                        }
+
+                        // eD2k 专有:此刻停在对端上传队列里等放行的源数。单独显示是因为"源很多但都在
+                        // 排队"和"源很多但都连不上"在只有连接数的时候长得一模一样,而处置完全不同:
+                        // 前者等着就好,后者才需要换源/查网络。用警示色而非成功色——排队不是进展。
+                        // aria2/BT 任务不上报该字段,恒为 0 时隐藏(与 Sources 同一做法)。
+                        MetaChip {
+                            objectName: "activeQueuedMetadata"
+                            visible: taskCard.activeTask && model.queuedSources > 0
+                            label: qsTr("Queued")
+                            value: String(model.queuedSources)
+                            accentColor: GTheme.textWarning
+                            fillColor: GTheme.bgWarning
+                            borderColor: GTheme.borderWarning
                         }
 
                         MetaChip {
