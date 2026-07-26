@@ -1,8 +1,23 @@
 #include "download_task_model.h"
 #include <QJSEngine>
+#include <chrono>
 namespace gdl {
 	namespace ui {
 		namespace browser {
+
+			namespace {
+				// 进度速率必须用单调钟:系统时间被改(NTP 校正、用户手动调表)会让窗口跨度
+				// 变成负数或突然拉长,速率随之算成负值或接近 0,ETA 会莫名其妙地变"未知"。
+				std::int64_t SteadyNowMs() {
+					using namespace std::chrono;
+					return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
+				}
+
+				// now_ms 为负表示"生产路径,取当前时刻";非负值来自单元测试的确定性时间轴
+				std::int64_t ResolveSampleTime(std::int64_t now_ms) {
+					return now_ms < 0 ? SteadyNowMs() : now_ms;
+				}
+			}  // namespace
 
 			DownloadTaskModel::DownloadTaskModel(QObject* parent) : QAbstractListModel(parent) {
 				QJSEngine::setObjectOwnership(this, QJSEngine::CppOwnership);
@@ -46,6 +61,12 @@ namespace gdl {
 						return QVariant::fromValue(task.task_error_code());
 					case kTaskErrorMessage:
 						return QVariant::fromValue(task.task_error_message());
+					case kTaskTotalSizeBytes:
+						return QVariant::fromValue(static_cast<qint64>(task.task_total_size()));
+					case kTaskCurrentSizeBytes:
+						return QVariant::fromValue(static_cast<qint64>(task.task_current_size()));
+					case kTaskProgressStalled:
+						return QVariant::fromValue(task.progress_stalled());
 					default:
 						return QVariant();
 				}
@@ -72,6 +93,9 @@ namespace gdl {
                 roles[kTaskDownloadLink]  = "downloadLink";
 				roles[kTaskErrorCode]      = "errorCode";
 				roles[kTaskErrorMessage]   = "errorMessage";
+				roles[kTaskTotalSizeBytes]   = "totalSizeBytes";
+				roles[kTaskCurrentSizeBytes] = "currentSizeBytes";
+				roles[kTaskProgressStalled]  = "progressStalled";
 				return roles;
 			}
 
@@ -146,7 +170,7 @@ namespace gdl {
 				return false;
 			}
 
-			void DownloadTaskModel::AddTask(const DownloadTaskInfo& task) {
+			void DownloadTaskModel::AddTask(const DownloadTaskInfo& task, std::int64_t now_ms) {
 				{
 					std::lock_guard lock(mutex_);
 					if (remove_task_id_.contains(task.task_id())) {
@@ -156,8 +180,12 @@ namespace gdl {
 						remove_task_id_.remove(task.task_id());
 					}
 				}
+				DownloadTaskInfo seeded = task;
+				// 首次出现即为进度速率窗口的起点。此前没有任何历史,窗口只有一个点,
+				// rate_bps() 返回 0,ETA 显示"Unknown",直到跨度够长才给出估计值。
+				seeded.SampleProgress(ResolveSampleTime(now_ms));
 				beginInsertRows(QModelIndex(), 0, 0);
-				task_lists_.insert(0, task);
+				task_lists_.insert(0, std::move(seeded));
 				endInsertRows();
 				emit countChanged();
 			}
@@ -192,18 +220,25 @@ namespace gdl {
 				return false;
 			}
 
-			bool DownloadTaskModel::UpdateTask(int index, const DownloadTaskInfo& task) {
+			bool DownloadTaskModel::UpdateTask(int index, const DownloadTaskInfo& task, std::int64_t now_ms) {
 				if (index < 0 || index >= task_lists_.size()) return false;
 
-				task_lists_[index] = task;
+				// 每次采样都是引擎 payload 重建出来的一份全新 TaskInfo,自身没有历史;
+				// 进度速率窗口只存在于模型里的旧条目上,必须先接过来再记这一次采样,
+				// 否则窗口永远只有一个点,ETA 恒为"Unknown"。
+				DownloadTaskInfo merged = task;
+				merged.InheritProgressHistoryFrom(task_lists_[index]);
+				merged.SampleProgress(ResolveSampleTime(now_ms));
+				task_lists_[index] = std::move(merged);
 				emit dataChanged(createIndex(index, 0), createIndex(index, 0));
 				return true;
 			}
 
-			bool DownloadTaskModel::UpdateTaskById(const QString& task_id, const DownloadTaskInfo& task) {
+			bool DownloadTaskModel::UpdateTaskById(const QString& task_id, const DownloadTaskInfo& task,
+												   std::int64_t now_ms) {
 				for (int i = 0; i < task_lists_.size(); ++i) {
 					if (task_lists_[i].task_id() == task_id) {
-						return UpdateTask(i, task);
+						return UpdateTask(i, task, now_ms);
 					}
 				}
 				return false;

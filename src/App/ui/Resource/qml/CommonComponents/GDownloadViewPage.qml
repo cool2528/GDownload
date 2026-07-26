@@ -11,7 +11,13 @@ Control {
     property int pageType: -1 // 0 active, 1 waiting, 2 stopped
 
     readonly property int taskCount: downloadListView.count
+    // TaskState 枚举(见 download_task_model.h):0 complete / 1 active / 2 pause /
+    // 3 waiting / 4 error / 5 removed。"停止"页里同时住着完成、失败和被取消三种任务,
+    // 必须按 role 精确区分:把 removed 当成 completed 会给一个残缺文件挂上绿色
+    // "Completed" 徽标和一个"Open"按钮。
+    readonly property int completedTaskState: 0
     readonly property int failedTaskState: 4
+    readonly property int removedTaskState: 5
     readonly property bool compactLayout: width < 680
     readonly property int pagePadding: compactLayout ? GTheme.spaceSM : GTheme.space2XL
     readonly property int taskIconSize: compactLayout ? GTheme.sizeDefault : GTheme.sizeLarge
@@ -159,7 +165,9 @@ Control {
                 required property string section
 
                 objectName: Number(section) === downloadView.failedTaskState
-                            ? "failedSectionHeader" : "completedSectionHeader"
+                            ? "failedSectionHeader"
+                            : (Number(section) === downloadView.removedTaskState
+                               ? "cancelledSectionHeader" : "completedSectionHeader")
                 width: downloadListView.width - downloadListView.leftMargin - downloadListView.rightMargin
                 height: downloadView.pageType === 2 ? GTheme.sizeDefault + GTheme.spaceSM : 0
                 visible: downloadView.pageType === 2
@@ -171,26 +179,37 @@ Control {
                     spacing: GTheme.spaceSM
 
                     AuroraIcon {
-                        name: Number(parent.parent.section) === downloadView.failedTaskState ? "error" : "completed"
+                        name: Number(parent.parent.section) === downloadView.failedTaskState
+                              ? "error"
+                              : (Number(parent.parent.section) === downloadView.removedTaskState
+                                 ? "delete" : "completed")
                         iconSize: GTheme.fontBody
                         color: Number(parent.parent.section) === downloadView.failedTaskState
-                               ? GTheme.dangerColor : GTheme.successColor
+                               ? GTheme.dangerColor
+                               : (Number(parent.parent.section) === downloadView.removedTaskState
+                                  ? GTheme.infoColor : GTheme.successColor)
                     }
 
                     Text {
                         text: Number(parent.parent.section) === downloadView.failedTaskState
-                              ? qsTr("Failed") : qsTr("Completed")
+                              ? qsTr("Failed")
+                              : (Number(parent.parent.section) === downloadView.removedTaskState
+                                 ? qsTr("Cancelled") : qsTr("Completed"))
                         font.pixelSize: GTheme.fontSubtitle
                         font.weight: GTheme.weightDemiBold
                         color: Number(parent.parent.section) === downloadView.failedTaskState
-                               ? GTheme.textDanger : GTheme.textSuccess
+                               ? GTheme.textDanger
+                               : (Number(parent.parent.section) === downloadView.removedTaskState
+                                  ? GTheme.textInfo : GTheme.textSuccess)
                     }
 
                     Rectangle {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 1
                         color: Number(parent.parent.section) === downloadView.failedTaskState
-                               ? GTheme.borderDanger : GTheme.borderSuccess
+                               ? GTheme.borderDanger
+                               : (Number(parent.parent.section) === downloadView.removedTaskState
+                                  ? GTheme.borderInfo : GTheme.borderSuccess)
                     }
                 }
             }
@@ -204,12 +223,18 @@ Control {
                 readonly property bool waitingTask: downloadView.pageType === 1
                 readonly property bool stoppedTask: downloadView.pageType === 2
                 readonly property bool failedTask: stoppedTask && model.taskState === downloadView.failedTaskState
-                readonly property bool completedTask: stoppedTask && !failedTask
+                readonly property bool removedTask: stoppedTask && model.taskState === downloadView.removedTaskState
+                readonly property bool completedTask: stoppedTask && model.taskState === downloadView.completedTaskState
+                // 由 C++ 侧判定(见 DownloadTaskInfo::progress_stalled):线上有数据在到达,
+                // 而进度速率已经连续 90 秒为 0。旧引擎/其它模型不提供该 role 时为 undefined,
+                // 显式比 true 保证退化成"不告警"。
+                readonly property bool transferStalled: model.progressStalled === true
                 readonly property color stateColor: failedTask ? GTheme.dangerColor
                                                                 : (completedTask ? GTheme.successColor
-                                                                                 : (waitingTask ? GTheme.warningColor
-                                                                                                : (pausedTask ? GTheme.infoColor
-                                                                                                              : GTheme.primaryColor)))
+                                                                                 : (removedTask ? GTheme.infoColor
+                                                                                                : (waitingTask ? GTheme.warningColor
+                                                                                                               : (pausedTask ? GTheme.infoColor
+                                                                                                                             : GTheme.primaryColor))))
 
                 function openDeleteDialog() {
                     deleteConfirmDialog.pageType = downloadView.pageType
@@ -248,13 +273,15 @@ Control {
                             radius: GTheme.radiusMedium
                             color: taskCard.failedTask ? GTheme.bgDanger
                                                        : (taskCard.completedTask ? GTheme.bgSuccess
-                                                                                 : (taskCard.waitingTask ? GTheme.bgWarning
-                                                                                                         : GTheme.primaryLight(9)))
+                                                                                 : (taskCard.removedTask ? GTheme.bgInfo
+                                                                                                         : (taskCard.waitingTask ? GTheme.bgWarning
+                                                                                                                                 : GTheme.primaryLight(9))))
                             border.width: 1
                             border.color: taskCard.failedTask ? GTheme.borderDanger
                                                               : (taskCard.completedTask ? GTheme.borderSuccess
-                                                                                        : (taskCard.waitingTask ? GTheme.borderWarning
-                                                                                                                : GTheme.primaryLight(7)))
+                                                                                        : (taskCard.removedTask ? GTheme.borderInfo
+                                                                                                                : (taskCard.waitingTask ? GTheme.borderWarning
+                                                                                                                                        : GTheme.primaryLight(7))))
 
                             Text {
                                 anchors.centerIn: parent
@@ -302,6 +329,9 @@ Control {
                                     if (taskCard.completedTask) {
                                         return qsTr("Saved to %1").arg(model.savePath)
                                     }
+                                    if (taskCard.removedTask) {
+                                        return qsTr("Cancelled before it finished — the file on disk is incomplete.")
+                                    }
                                     if (taskCard.failedTask) {
                                         return qsTr("The transfer stopped before completion.")
                                     }
@@ -328,12 +358,14 @@ Control {
                                                            : (taskCard.pausedTask ? qsTr("Paused")
                                                                                   : (taskCard.waitingTask ? qsTr("Queued")
                                                                                                           : (taskCard.failedTask ? qsTr("Failed")
-                                                                                                                                 : qsTr("Completed"))))
+                                                                                                                                 : (taskCard.removedTask ? qsTr("Cancelled")
+                                                                                                                                                         : qsTr("Completed")))))
                                 iconName: taskCard.activeTask ? "download"
                                                              : (taskCard.pausedTask ? "pause"
                                                                                     : (taskCard.waitingTask ? "queue"
                                                                                                             : (taskCard.failedTask ? "error"
-                                                                                                                                   : "completed")))
+                                                                                                                                   : (taskCard.removedTask ? "delete"
+                                                                                                                                                           : "completed"))))
                                 accentColor: taskCard.stateColor
                                 fillColor: taskCard.failedTask ? GTheme.bgDanger
                                                                : (taskCard.completedTask ? GTheme.bgSuccess
@@ -479,14 +511,18 @@ Control {
                             accentColor: GTheme.textPrimary
                         }
 
+                        // eD2k 引擎上报的是"线上到达的字节",不等于"落盘的字节"。数据在流而
+                        // 一个字节都存不下来时,这个数字依旧是几十 KB/s —— 再配上绿色成功样式
+                        // 就成了一条彻头彻尾的假捷报。此时改用警示色,并由下方 taskStallWarning
+                        // 说明原委。进度正常推进时维持原来的成功色,不制造无谓的紧张。
                         MetaChip {
                             objectName: "activeSpeedMetadata"
                             visible: taskCard.activeTask
                             label: qsTr("Speed")
                             value: model.downloadSpeed
-                            accentColor: GTheme.textSuccess
-                            fillColor: GTheme.bgSuccess
-                            borderColor: GTheme.borderSuccess
+                            accentColor: taskCard.transferStalled ? GTheme.textWarning : GTheme.textSuccess
+                            fillColor: taskCard.transferStalled ? GTheme.bgWarning : GTheme.bgSuccess
+                            borderColor: taskCard.transferStalled ? GTheme.borderWarning : GTheme.borderSuccess
                         }
 
                         MetaChip {
@@ -562,14 +598,46 @@ Control {
                         // "没下完"(完成大小 3.23 MB / 已传输 2.70 MB,后者只是本轮传输量)。
                         // 因此这条只在"已下载"确实少于文件总大小时才出现,那种情况是真的只拿到了一
                         // 部分(例如 BT 用 select-file 只下了选中的文件),此时它是必要信息。
-                        // 注:两个 role 都是格式化后的字符串,按字符串比较即可判定"看起来是否一致"。
+                        // 【必须比原始字节数】currentSize/totalSize 两个 role 是 FormatFileSize
+                        // 的输出,只保留两位小数:10 GB 的任务差 5 MB 也会被舍成同一个字符串,
+                        // 于是唯一能暴露缺口的信息被藏掉。改比 currentSizeBytes/totalSizeBytes。
                         MetaChip {
                             objectName: "completedDownloadedMetadata"
-                            visible: taskCard.completedTask && model.currentSize !== model.totalSize
+                            visible: taskCard.completedTask && model.currentSizeBytes !== model.totalSizeBytes
                             label: qsTr("Downloaded")
                             value: model.currentSize
                             accentColor: GTheme.textPrimary
                         }
+
+                        // 被取消的任务:盘上留下的是半个文件,"取到了多少"是用户决定重试还是
+                        // 删除的唯一依据,不能像完成态那样只报文件总大小。
+                        MetaChip {
+                            objectName: "cancelledDownloadedMetadata"
+                            visible: taskCard.removedTask
+                            label: qsTr("Downloaded")
+                            value: qsTr("%1 of %2").arg(model.currentSize).arg(model.totalSize)
+                            accentColor: GTheme.textInfo
+                            fillColor: GTheme.bgInfo
+                            borderColor: GTheme.borderInfo
+                        }
+                    }
+
+                    // "在收但落不了盘":线上的字节可以永远到不了硬盘 —— 未凑齐的块在空闲超时时
+                    // 被整段丢弃、part 的 MD4 没过就整段重下、间隙帧与完全重叠帧被直接弃掉。
+                    // 修复 ETA 之后这类任务的表象是"Speed 几十 KB/s + ETA Unknown + 进度不动",
+                    // 若不明说,用户只会以为是软件卡了。文案必须点破"在收,但一个字节都存不下来",
+                    // 不能含糊成"下载慢"——两者的处置完全不同。
+                    Text {
+                        objectName: "taskStallWarning"
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 0
+                        visible: taskCard.activeTask && taskCard.transferStalled
+                        text: qsTr("Receiving data, but none of it can be saved: incomplete blocks keep being discarded and downloaded again.")
+                        font.pixelSize: GTheme.fontCaption
+                        color: GTheme.textWarning
+                        wrapMode: Text.Wrap
+                        maximumLineCount: 2
+                        elide: Text.ElideRight
                     }
 
                     Text {

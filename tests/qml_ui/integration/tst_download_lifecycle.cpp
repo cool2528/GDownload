@@ -171,6 +171,8 @@ class TstDownloadLifecycle : public QObject {
 			 {"savePath", "C:/Downloads/emule-windows.exe"}, {"totalSize", "3.23 MB"},
 			 {"currentSize", "3.23 MB"}, {"downloadSpeed", "0 B/s"}, {"progress", 100},
 			 {"remainingTime", "Unknown"}, {"connections", 0},
+			 {"totalSizeBytes", QVariant::fromValue<qint64>(3389035)},
+			 {"currentSizeBytes", QVariant::fromValue<qint64>(3389035)},
 			 {"downloadLink", "ed2k://|file|emule-windows.exe|3389035|3d366ed505b977fc61c9a6ee01e96329|/"},
 			 {"errorCode", ""}, {"errorMessage", ""}},
 		});
@@ -198,6 +200,8 @@ class TstDownloadLifecycle : public QObject {
 			 {"savePath", "C:/Downloads/Bundle"}, {"totalSize", "10.00 GB"},
 			 {"currentSize", "2.00 GB"}, {"downloadSpeed", "0 B/s"}, {"progress", 20},
 			 {"remainingTime", "Unknown"}, {"connections", 0},
+			 {"totalSizeBytes", QVariant::fromValue<qint64>(10737418240LL)},
+			 {"currentSizeBytes", QVariant::fromValue<qint64>(2147483648LL)},
 			 {"downloadLink", "magnet:?xt=urn:btih:0123456789abcdef"}, {"errorCode", ""},
 			 {"errorMessage", ""}},
 		});
@@ -213,6 +217,127 @@ class TstDownloadLifecycle : public QObject {
 
 		QVERIFY(findVisibleItem(root, QStringLiteral("completedSizeMetadata")));
 		QVERIFY(findVisibleItem(root, QStringLiteral("completedDownloadedMetadata")));
+	}
+
+	// 回归:可见性判据不能拿格式化字符串比大小。FormatFileSize 只留两位小数,10 GB 量级上
+	// 5 MB 的缺口会被舍进同一个字符串("10.00 GB" == "10.00 GB"),于是一个真的没下完的
+	// 任务被当成完整的,"Downloaded"这条唯一能暴露缺口的信息被藏掉。必须比较原始字节数。
+	void test_completed_row_keeps_downloaded_chip_when_rounding_hides_the_gap() {
+		TestDownloadTaskModel model;
+		model.setRows({
+			{{"taskId", "complete-rounded"}, {"taskState", 0}, {"fileName", "Archive.bin"},
+			 {"savePath", "C:/Downloads/Archive.bin"}, {"totalSize", "10.00 GB"},
+			 {"currentSize", "10.00 GB"}, {"downloadSpeed", "0 B/s"}, {"progress", 99},
+			 {"remainingTime", "Unknown"}, {"connections", 0},
+			 // 差 5 MB,格式化后两串完全相同
+			 {"totalSizeBytes", QVariant::fromValue<qint64>(10737418240LL)},
+			 {"currentSizeBytes", QVariant::fromValue<qint64>(10732175360LL)},
+			 {"downloadLink", "https://example.com/Archive.bin"}, {"errorCode", ""},
+			 {"errorMessage", ""}},
+		});
+
+		QQuickWindow window;
+		window.resize(820, 400);
+		window.show();
+		QScopedPointer<QObject> page(createPage(window, 2, model));
+		QVERIFY(page);
+		auto* root = qobject_cast<QQuickItem*>(page.data());
+		QVERIFY(root);
+		QTRY_COMPARE_WITH_TIMEOUT(page->property("taskCount").toInt(), 1, 1000);
+
+		QVERIFY2(findVisibleItem(root, QStringLiteral("completedDownloadedMetadata")),
+		         "A rounding-equal but byte-unequal task must still show the Downloaded chip");
+	}
+
+	// 回归:kRemoved(5) 是"用户取消/被移除",不是"已完成"。旧判据 completedTask =
+	// stoppedTask && !failedTask 把它一并算成完成,于是一个取消掉的任务顶着绿色
+	// "Completed" 徽标和一个"Open"按钮 —— 而那个文件根本不完整,点开只会打开半个文件。
+	void test_cancelled_row_is_not_presented_as_completed() {
+		TestDownloadTaskModel model;
+		model.setRows({
+			{{"taskId", "cancelled-1"}, {"taskState", 5}, {"fileName", "Cancelled.iso"},
+			 {"savePath", "C:/Downloads/Cancelled.iso"}, {"totalSize", "2.00 GB"},
+			 {"currentSize", "0.30 GB"}, {"downloadSpeed", "0 B/s"}, {"progress", 15},
+			 {"remainingTime", "Unknown"}, {"connections", 0},
+			 {"totalSizeBytes", QVariant::fromValue<qint64>(2147483648LL)},
+			 {"currentSizeBytes", QVariant::fromValue<qint64>(322122547LL)},
+			 {"downloadLink", "https://example.com/Cancelled.iso"}, {"errorCode", ""},
+			 {"errorMessage", ""}},
+		});
+
+		QQuickWindow window;
+		window.resize(820, 400);
+		window.show();
+		QScopedPointer<QObject> page(createPage(window, 2, model));
+		QVERIFY(page);
+		auto* root = qobject_cast<QQuickItem*>(page.data());
+		QVERIFY(root);
+		QTRY_COMPARE_WITH_TIMEOUT(page->property("taskCount").toInt(), 1, 1000);
+
+		QQuickItem* card = findVisibleItem(root, QStringLiteral("downloadTaskCard"));
+		QVERIFY(card);
+		QVERIFY2(!card->property("completedTask").toBool(),
+		         "A cancelled task must not be classified as completed");
+		QVERIFY2(!findVisibleItem(root, QStringLiteral("btnOpenCompletedTask")),
+		         "A cancelled task must not offer to open its incomplete file");
+	}
+
+	// 引擎的 speed 现在是"线上到达的字节",这些字节可能永远落不了盘(未凑齐的块被丢弃、
+	// part 校验失败整段重下、间隙帧被弃)。此时界面上是"Speed 96 KB/s"配绿色成功样式,
+	// 而进度一动不动 —— 比原来的"Speed 0 B"更具误导性。必须有一句明确的告警。
+	void test_active_row_warns_when_data_arrives_but_nothing_lands() {
+		TestDownloadTaskModel model;
+		model.setRows({
+			{{"taskId", "stalled-1"}, {"taskState", 1}, {"fileName", "Half-dead.rar"},
+			 {"savePath", "C:/Downloads/Half-dead.rar"}, {"totalSize", "700.00 MB"},
+			 {"currentSize", "12.00 MB"}, {"downloadSpeed", "96.00 KB"}, {"progress", 2},
+			 {"remainingTime", "Unknown"}, {"connections", 3},
+			 {"totalSizeBytes", QVariant::fromValue<qint64>(734003200LL)},
+			 {"currentSizeBytes", QVariant::fromValue<qint64>(12582912LL)},
+			 {"progressStalled", true},
+			 {"downloadLink", "ed2k://|file|Half-dead.rar|734003200|3d366ed505b977fc61c9a6ee01e96329|/"}},
+		});
+
+		QQuickWindow window;
+		window.resize(820, 460);
+		window.show();
+		QScopedPointer<QObject> page(createPage(window, 0, model));
+		QVERIFY(page);
+		auto* root = qobject_cast<QQuickItem*>(page.data());
+		QVERIFY(root);
+		QTRY_COMPARE_WITH_TIMEOUT(page->property("taskCount").toInt(), 1, 1000);
+
+		QQuickItem* warning = findVisibleItem(root, QStringLiteral("taskStallWarning"));
+		QVERIFY2(warning, "A transfer that receives data but saves none must say so");
+		const QString text = warning->property("text").toString();
+		QVERIFY2(text.contains(QStringLiteral("saved"), Qt::CaseInsensitive),
+		         qPrintable(QStringLiteral("Stall warning must say nothing is being saved, got: %1").arg(text)));
+	}
+
+	// 反向用例:进度在正常推进时,绝不能弹出停滞告警,否则告警会被当成噪音无视掉。
+	void test_active_row_has_no_stall_warning_while_progress_advances() {
+		TestDownloadTaskModel model;
+		model.setRows({
+			{{"taskId", "healthy-1"}, {"taskState", 1}, {"fileName", "Healthy.rar"},
+			 {"savePath", "C:/Downloads/Healthy.rar"}, {"totalSize", "700.00 MB"},
+			 {"currentSize", "120.00 MB"}, {"downloadSpeed", "96.00 KB"}, {"progress", 17},
+			 {"remainingTime", "1 h 40 m"}, {"connections", 3},
+			 {"totalSizeBytes", QVariant::fromValue<qint64>(734003200LL)},
+			 {"currentSizeBytes", QVariant::fromValue<qint64>(125829120LL)},
+			 {"progressStalled", false},
+			 {"downloadLink", "ed2k://|file|Healthy.rar|734003200|3d366ed505b977fc61c9a6ee01e96329|/"}},
+		});
+
+		QQuickWindow window;
+		window.resize(820, 460);
+		window.show();
+		QScopedPointer<QObject> page(createPage(window, 0, model));
+		QVERIFY(page);
+		auto* root = qobject_cast<QQuickItem*>(page.data());
+		QVERIFY(root);
+		QTRY_COMPARE_WITH_TIMEOUT(page->property("taskCount").toInt(), 1, 1000);
+
+		QVERIFY(!findVisibleItem(root, QStringLiteral("taskStallWarning")));
 	}
 
 	void test_narrow_row_contains_long_name_and_all_visible_actions() {
