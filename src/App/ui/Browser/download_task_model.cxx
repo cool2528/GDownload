@@ -67,6 +67,8 @@ namespace gdl {
 						return QVariant::fromValue(static_cast<qint64>(task.task_current_size()));
 					case kTaskProgressStalled:
 						return QVariant::fromValue(task.progress_stalled());
+					case kTaskProgressStallKind:
+						return QVariant::fromValue(static_cast<int>(task.stall_kind()));
 					default:
 						return QVariant();
 				}
@@ -93,9 +95,10 @@ namespace gdl {
                 roles[kTaskDownloadLink]  = "downloadLink";
 				roles[kTaskErrorCode]      = "errorCode";
 				roles[kTaskErrorMessage]   = "errorMessage";
-				roles[kTaskTotalSizeBytes]   = "totalSizeBytes";
-				roles[kTaskCurrentSizeBytes] = "currentSizeBytes";
-				roles[kTaskProgressStalled]  = "progressStalled";
+				roles[kTaskTotalSizeBytes]    = "totalSizeBytes";
+				roles[kTaskCurrentSizeBytes]  = "currentSizeBytes";
+				roles[kTaskProgressStalled]   = "progressStalled";
+				roles[kTaskProgressStallKind] = "progressStallKind";
 				return roles;
 			}
 

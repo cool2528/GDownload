@@ -225,10 +225,15 @@ Control {
                 readonly property bool failedTask: stoppedTask && model.taskState === downloadView.failedTaskState
                 readonly property bool removedTask: stoppedTask && model.taskState === downloadView.removedTaskState
                 readonly property bool completedTask: stoppedTask && model.taskState === downloadView.completedTaskState
-                // 由 C++ 侧判定(见 DownloadTaskInfo::progress_stalled):线上有数据在到达,
-                // 而进度速率已经连续 90 秒为 0。旧引擎/其它模型不提供该 role 时为 undefined,
-                // 显式比 true 保证退化成"不告警"。
+                // 由 C++ 侧判定(见 DownloadTaskInfo::stall_kind):线上还在收数据,而进度
+                // 已经连续 90 秒越不过历史最高水位。旧引擎/其它模型不提供该 role 时为
+                // undefined,显式比 true 保证退化成"不告警"。
                 readonly property bool transferStalled: model.progressStalled === true
+                // 停滞的形状:1 = 一个字节都没落盘;2 = 落了盘又被整段作废重下。
+                // 两者的文案必须不同 —— 对 2 说"存不下来"是假话(数据存下来了,只是又被
+                // 撤销了),照着这句错误的诊断用户会去查磁盘和权限,查一整晚也查不出东西。
+                readonly property int stallKind: model.progressStallKind === undefined
+                                                 ? 0 : Number(model.progressStallKind)
                 readonly property color stateColor: failedTask ? GTheme.dangerColor
                                                                 : (completedTask ? GTheme.successColor
                                                                                  : (removedTask ? GTheme.infoColor
@@ -622,17 +627,25 @@ Control {
                         }
                     }
 
-                    // "在收但落不了盘":线上的字节可以永远到不了硬盘 —— 未凑齐的块在空闲超时时
-                    // 被整段丢弃、part 的 MD4 没过就整段重下、间隙帧与完全重叠帧被直接弃掉。
-                    // 修复 ETA 之后这类任务的表象是"Speed 几十 KB/s + ETA Unknown + 进度不动",
-                    // 若不明说,用户只会以为是软件卡了。文案必须点破"在收,但一个字节都存不下来",
-                    // 不能含糊成"下载慢"——两者的处置完全不同。
+                    // "长时间没有取得新进展":线上还在收数据,进度却越不过历史最高水位。
+                    // 修复 ETA 之后这类任务的表象是"Speed 几十 KB/s + ETA Unknown + 进度不动
+                    // 或涨了又退",若不明说,用户只会以为是软件卡了。
+                    //
+                    // 两句文案对应两种事实完全不同的局面,共用一句必然说错一半:
+                    //   kind 1 未凑齐的块在空闲超时被整段丢弃(或写盘本身在失败)—— 确实一个
+                    //          字节都没进文件,"none of it is being written" 是实话;
+                    //   kind 2 数据确实写进去了,只是整个 part 的校验没过被作废、正在重下同一段
+                    //          —— 这时说"存不下来"是假话,用户会照着去查磁盘和权限。
+                    // 两句共用同一个中性主句("No progress for a while"),它在两种局面下都成立;
+                    // 后半句才是可区分的补充。
                     Text {
                         objectName: "taskStallWarning"
                         Layout.fillWidth: true
                         Layout.minimumWidth: 0
                         visible: taskCard.activeTask && taskCard.transferStalled
-                        text: qsTr("Receiving data, but none of it can be saved: incomplete blocks keep being discarded and downloaded again.")
+                        text: taskCard.stallKind === 2
+                              ? qsTr("No progress for a while: data is being written, but it keeps failing verification and being downloaded again.")
+                              : qsTr("No progress for a while: data keeps arriving, but none of it is being written to the file.")
                         font.pixelSize: GTheme.fontCaption
                         color: GTheme.textWarning
                         wrapMode: Text.Wrap
