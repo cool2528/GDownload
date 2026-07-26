@@ -3277,14 +3277,34 @@ GNU Affero General Public License v3.0(AGPL-3.0)에 따라 라이선스가 부�
         <translation>작업이 로컬에서 삭제되었지만 aria2 정리에 실패했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="117"/>
+        <location filename="../../Browser/browser_manager.cxx" line="120"/>
+        <source>%1m %2s</source>
+        <translation>%1분 %2초</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="122"/>
+        <source>%1s</source>
+        <translation>%1초</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="130"/>
         <source>Waiting for a connectable source: this client and all known sources are behind NAT (LowID), so no direct connection is possible yet.</source>
         <translation>연결 가능한 소스를 기다리는 중: 이 클라이언트와 알려진 모든 소스가 NAT 뒤(LowID)에 있어 아직 직접 연결할 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="121"/>
+        <location filename="../../Browser/browser_manager.cxx" line="134"/>
         <source>Waiting for sources: no peer currently reports having this file.</source>
         <translation>소스를 기다리는 중: 현재 이 파일을 보유하고 있다고 알리는 피어가 없습니다.</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="141"/>
+        <source>Waiting to re-request sources (anti-ban interval, ~%1 left). This pause is deliberate: asking the same peer again too soon gets us banned. The task resumes on its own.</source>
+        <translation>소스 재요청 대기 중(차단 방지 간격, 약 %1 남음). 의도된 대기입니다. 같은 피어에 너무 빨리 다시 요청하면 차단됩니다. 작업은 자동으로 재개됩니다.</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="146"/>
+        <source>Waiting to re-request sources (anti-ban interval). This pause is deliberate: asking the same peer again too soon gets us banned. The task resumes on its own.</source>
+        <translation>소스 재요청 대기 중(차단 방지 간격). 의도된 대기입니다. 같은 피어에 너무 빨리 다시 요청하면 차단됩니다. 작업은 자동으로 재개됩니다.</translation>
     </message>
 </context>
 <context>
@@ -4631,106 +4651,106 @@ GNU Affero General Public License v3.0(AGPL-3.0)에 따라 라이선스가 부�
 <context>
     <name>gdl::ui::browser::BrowserManagerImpl</name>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="210"/>
-        <location filename="../../Browser/browser_manager.cxx" line="217"/>
-        <location filename="../../Browser/browser_manager.cxx" line="943"/>
-        <location filename="../../Browser/browser_manager.cxx" line="950"/>
+        <location filename="../../Browser/browser_manager.cxx" line="237"/>
+        <location filename="../../Browser/browser_manager.cxx" line="244"/>
+        <location filename="../../Browser/browser_manager.cxx" line="970"/>
+        <location filename="../../Browser/browser_manager.cxx" line="977"/>
         <source>Invalid ed2k link: %1</source>
         <translation>잘못된 ed2k 링크: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="227"/>
+        <location filename="../../Browser/browser_manager.cxx" line="254"/>
         <source>Invalid download link: %1</source>
         <translation>잘못된 다운로드 링크: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="240"/>
+        <location filename="../../Browser/browser_manager.cxx" line="267"/>
         <source>Failed to add download task. Please check the link or aria2 connection.</source>
         <translation>다운로드 작업을 추가하지 못했습니다. 링크 또는 aria2 연결을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="241"/>
+        <location filename="../../Browser/browser_manager.cxx" line="268"/>
         <source>Failed to add download task: %1</source>
         <translation>다운로드 작업을 추가하지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="266"/>
+        <location filename="../../Browser/browser_manager.cxx" line="293"/>
         <source>Torrent file does not exist: %1</source>
         <translation>토렌트 파일이 없습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="272"/>
+        <location filename="../../Browser/browser_manager.cxx" line="299"/>
         <source>Failed to read torrent file: %1</source>
         <translation>토렌트 파일을 읽지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="286"/>
+        <location filename="../../Browser/browser_manager.cxx" line="313"/>
         <source>Failed to add torrent task. Please check the file or aria2 connection.</source>
         <translation>토렌트 작업을 추가하지 못했습니다. 파일 또는 aria2 연결을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="287"/>
+        <location filename="../../Browser/browser_manager.cxx" line="314"/>
         <source>Failed to add torrent task: %1</source>
         <translation>토렌트 작업을 추가하지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="310"/>
+        <location filename="../../Browser/browser_manager.cxx" line="337"/>
         <source>Metalink file does not exist: %1</source>
         <translation>Metalink 파일이 없습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="316"/>
+        <location filename="../../Browser/browser_manager.cxx" line="343"/>
         <source>Failed to read metalink file: %1</source>
         <translation>Metalink 파일을 읽지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="330"/>
+        <location filename="../../Browser/browser_manager.cxx" line="357"/>
         <source>Failed to add metalink task. Please check the file or aria2 connection.</source>
         <translation>Metalink 작업을 추가하지 못했습니다. 파일 또는 aria2 연결을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="331"/>
+        <location filename="../../Browser/browser_manager.cxx" line="358"/>
         <source>Failed to add metalink task: %1</source>
         <translation>Metalink 작업을 추가하지 못했습니다: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="650"/>
+        <location filename="../../Browser/browser_manager.cxx" line="677"/>
         <source>Failed to retry task: missing task id.</source>
         <translation>작업을 재시도하지 못했습니다: 작업 ID가 없습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="654"/>
+        <location filename="../../Browser/browser_manager.cxx" line="681"/>
         <source>Failed to retry task: stopped task list is not available.</source>
         <translation>작업을 재시도하지 못했습니다: 중지된 작업 목록을 사용할 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="660"/>
+        <location filename="../../Browser/browser_manager.cxx" line="687"/>
         <source>Failed to retry task: task was not found.</source>
         <translation>작업을 재시도하지 못했습니다: 작업을 찾을 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="664"/>
+        <location filename="../../Browser/browser_manager.cxx" line="691"/>
         <source>Only failed tasks can be retried.</source>
         <translation>실패한 작업만 재시도할 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="670"/>
+        <location filename="../../Browser/browser_manager.cxx" line="697"/>
         <source>Failed to retry task: original download link is unavailable.</source>
         <translation>작업을 재시도하지 못했습니다: 원본 다운로드 링크를 사용할 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="699"/>
+        <location filename="../../Browser/browser_manager.cxx" line="726"/>
         <source>Retry started, but the old failed task could not be removed from history.</source>
         <translation>재시도가 시작되었지만 이전 실패 작업을 기록에서 제거할 수 없었습니다.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1413"/>
-        <location filename="../../Browser/browser_manager.cxx" line="1476"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1440"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1503"/>
         <source>Download failed. Please check the link or network connection.</source>
         <translation>다운로드 실패. 링크 또는 네트워크 연결을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1414"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1441"/>
         <source>Download failed: %1</source>
         <translation>다운로드 실패: %1</translation>
     </message>

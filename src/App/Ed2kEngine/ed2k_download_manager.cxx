@@ -123,6 +123,34 @@ std::int64_t QueuedSourcesOf(const Snapshot& snap) {
 	}
 }
 
+// 此刻被引擎的反封禁相位闸门挡住的源数。引擎对同一对端两次文件请求之间必须留够
+// peer_reask_interval(生产 600s, 下限来自 eMule 的 MIN_REQUESTTIME=590s, 击穿会被静默封 IP
+// 2 小时), 账本是 Session 级的, 因此用户暂停再恢复之后, 对暂停前刚问过的对端要等满剩余时间。
+// 【为什么必须由引擎显式报, 而不能在这里靠特征猜】被挡住时的快照是 sources>0、active_sources>0、
+// connected_peers==0、queued_sources==0、speed==0, 而"全部 worker 都在重连退避"产生的快照与之
+// 完全相同。猜错就是给用户一个有时正确的自信错误提示。
+template <class Snapshot>
+std::int64_t RequestGatedSourcesOf(const Snapshot& snap) {
+	if constexpr (requires { snap.request_gated_sources; }) {
+		return static_cast<std::int64_t>(snap.request_gated_sources);
+	} else {
+		// 旧引擎没有该字段: 报 0, UI 据此不显示这条提示(退化成改动前的表现)
+		return static_cast<std::int64_t>(0);
+	}
+}
+
+// 距离最早一个被挡住的源解禁还剩多少毫秒(没有源被挡住时为 0)。引擎侧按截止时刻现算, 因此
+// 每次采样拿到的都是新鲜值, UI 可以直接当倒计时显示。
+template <class Snapshot>
+std::int64_t RequestGateRemainingMsOf(const Snapshot& snap) {
+	if constexpr (requires { snap.request_gate_remaining; }) {
+		return static_cast<std::int64_t>(snap.request_gate_remaining.count());
+	} else {
+		// 旧引擎没有该字段: 报 0, UI 退化成不带倒计时的那句提示
+		return static_cast<std::int64_t>(0);
+	}
+}
+
 std::string SearchErrorToJson(const std::string& error) {
 	nlohmann::json doc;
 	doc["ok"] = false;
@@ -474,6 +502,11 @@ void Ed2kDownloadManager::ScheduleSampling() {
 				item["active_sources"] = ActiveSourcesOf(snap);
 				item["connected_peers"] = ConnectedPeersOf(snap);
 				item["queued_sources"] = QueuedSourcesOf(snap);
+				// 反封禁相位闸门的可观测状态(见 RequestGatedSourcesOf 的注释): 前者是"有几个源
+				// 正被刻意挡着", 后者是最早解禁还剩多少毫秒。二者只在闸门生效时非零, UI 据此把
+				// "0 连接 0 速度"这幅与卡死同形的画面解释成一次刻意的等待。
+				item["request_gated_sources"] = RequestGatedSourcesOf(snap);
+				item["request_gate_remaining_ms"] = RequestGateRemainingMsOf(snap);
 				item["state"] = TaskStateToString(snap.state);
 				// 非终态任务的 error 字段是"当前状态说明"而非失败原因(引擎在等待可用源时会附上
 				// 等待原因但不转失败态)。必须随每次采样一起带上:该原因只在变化时通过状态事件推
@@ -543,6 +576,8 @@ std::string Ed2kDownloadManager::AddEd2kTask(const std::string& link, const std:
 			item["active_sources"] = static_cast<std::int64_t>(0);
 			item["connected_peers"] = static_cast<std::int64_t>(0);
 			item["queued_sources"] = static_cast<std::int64_t>(0);
+			item["request_gated_sources"] = static_cast<std::int64_t>(0);
+			item["request_gate_remaining_ms"] = static_cast<std::int64_t>(0);
 			item["state"] = std::string("queued");
 			item["out_path"] = (dir / link_copy.name).string();
 			nlohmann::json arr = nlohmann::json::array({std::move(item)});

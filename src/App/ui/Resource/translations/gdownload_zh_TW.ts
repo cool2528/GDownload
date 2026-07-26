@@ -3277,14 +3277,34 @@ Copyright © 2024-2026 GDownload Team
         <translation>任務已在本地刪除，但 aria2 清理失敗：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="117"/>
+        <location filename="../../Browser/browser_manager.cxx" line="120"/>
+        <source>%1m %2s</source>
+        <translation>%1 分 %2 秒</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="122"/>
+        <source>%1s</source>
+        <translation>%1 秒</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="130"/>
         <source>Waiting for a connectable source: this client and all known sources are behind NAT (LowID), so no direct connection is possible yet.</source>
         <translation>等待可直連的來源：本機與所有已知來源都在 NAT 後方（LowID），暫時無法建立直連。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="121"/>
+        <location filename="../../Browser/browser_manager.cxx" line="134"/>
         <source>Waiting for sources: no peer currently reports having this file.</source>
         <translation>等待來源：目前沒有節點回報持有此檔案。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="141"/>
+        <source>Waiting to re-request sources (anti-ban interval, ~%1 left). This pause is deliberate: asking the same peer again too soon gets us banned. The task resumes on its own.</source>
+        <translation>等待重新請求來源（防封鎖間隔，約剩 %1）。這是刻意的等待：過早再次詢問同一對端會導致我方被封鎖。任務會自行恢復。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="146"/>
+        <source>Waiting to re-request sources (anti-ban interval). This pause is deliberate: asking the same peer again too soon gets us banned. The task resumes on its own.</source>
+        <translation>等待重新請求來源（防封鎖間隔）。這是刻意的等待：過早再次詢問同一對端會導致我方被封鎖。任務會自行恢復。</translation>
     </message>
 </context>
 <context>
@@ -4631,106 +4651,106 @@ Copyright © 2024-2026 GDownload Team
 <context>
     <name>gdl::ui::browser::BrowserManagerImpl</name>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="210"/>
-        <location filename="../../Browser/browser_manager.cxx" line="217"/>
-        <location filename="../../Browser/browser_manager.cxx" line="943"/>
-        <location filename="../../Browser/browser_manager.cxx" line="950"/>
+        <location filename="../../Browser/browser_manager.cxx" line="237"/>
+        <location filename="../../Browser/browser_manager.cxx" line="244"/>
+        <location filename="../../Browser/browser_manager.cxx" line="970"/>
+        <location filename="../../Browser/browser_manager.cxx" line="977"/>
         <source>Invalid ed2k link: %1</source>
         <translation>ed2k 連結無效：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="227"/>
+        <location filename="../../Browser/browser_manager.cxx" line="254"/>
         <source>Invalid download link: %1</source>
         <translation>下載連結無效：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="240"/>
+        <location filename="../../Browser/browser_manager.cxx" line="267"/>
         <source>Failed to add download task. Please check the link or aria2 connection.</source>
         <translation>新增下載任務失敗。請檢查連結或 aria2 連線。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="241"/>
+        <location filename="../../Browser/browser_manager.cxx" line="268"/>
         <source>Failed to add download task: %1</source>
         <translation>新增下載任務失敗：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="266"/>
+        <location filename="../../Browser/browser_manager.cxx" line="293"/>
         <source>Torrent file does not exist: %1</source>
         <translation>種子檔案不存在：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="272"/>
+        <location filename="../../Browser/browser_manager.cxx" line="299"/>
         <source>Failed to read torrent file: %1</source>
         <translation>讀取種子檔案失敗：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="286"/>
+        <location filename="../../Browser/browser_manager.cxx" line="313"/>
         <source>Failed to add torrent task. Please check the file or aria2 connection.</source>
         <translation>新增種子任務失敗。請檢查檔案或 aria2 連線。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="287"/>
+        <location filename="../../Browser/browser_manager.cxx" line="314"/>
         <source>Failed to add torrent task: %1</source>
         <translation>新增種子任務失敗：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="310"/>
+        <location filename="../../Browser/browser_manager.cxx" line="337"/>
         <source>Metalink file does not exist: %1</source>
         <translation>Metalink 檔案不存在：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="316"/>
+        <location filename="../../Browser/browser_manager.cxx" line="343"/>
         <source>Failed to read metalink file: %1</source>
         <translation>讀取 Metalink 檔案失敗：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="330"/>
+        <location filename="../../Browser/browser_manager.cxx" line="357"/>
         <source>Failed to add metalink task. Please check the file or aria2 connection.</source>
         <translation>新增 Metalink 任務失敗。請檢查檔案或 aria2 連線。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="331"/>
+        <location filename="../../Browser/browser_manager.cxx" line="358"/>
         <source>Failed to add metalink task: %1</source>
         <translation>新增 Metalink 任務失敗：%1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="650"/>
+        <location filename="../../Browser/browser_manager.cxx" line="677"/>
         <source>Failed to retry task: missing task id.</source>
         <translation>重試任務失敗：缺少任務 ID。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="654"/>
+        <location filename="../../Browser/browser_manager.cxx" line="681"/>
         <source>Failed to retry task: stopped task list is not available.</source>
         <translation>重試任務失敗：已停止的任務清單無法使用。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="660"/>
+        <location filename="../../Browser/browser_manager.cxx" line="687"/>
         <source>Failed to retry task: task was not found.</source>
         <translation>重試任務失敗：未找到該任務。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="664"/>
+        <location filename="../../Browser/browser_manager.cxx" line="691"/>
         <source>Only failed tasks can be retried.</source>
         <translation>只有失敗的任務才能重試。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="670"/>
+        <location filename="../../Browser/browser_manager.cxx" line="697"/>
         <source>Failed to retry task: original download link is unavailable.</source>
         <translation>重試任務失敗：原始下載連結無法使用。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="699"/>
+        <location filename="../../Browser/browser_manager.cxx" line="726"/>
         <source>Retry started, but the old failed task could not be removed from history.</source>
         <translation>重試已開始，但舊的失敗任務無法從歷史記錄中移除。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1413"/>
-        <location filename="../../Browser/browser_manager.cxx" line="1476"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1440"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1503"/>
         <source>Download failed. Please check the link or network connection.</source>
         <translation>下載失敗。請檢查連結或網路連線。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1414"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1441"/>
         <source>Download failed: %1</source>
         <translation>下載失敗：%1</translation>
     </message>

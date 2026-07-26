@@ -3277,14 +3277,34 @@ GNU Affero General Public License v3.0（AGPL-3.0）に基づきライセンス�
         <translation>タスクはローカルで削除されましたが、aria2 のクリーンアップに失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="117"/>
+        <location filename="../../Browser/browser_manager.cxx" line="120"/>
+        <source>%1m %2s</source>
+        <translation>%1 分 %2 秒</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="122"/>
+        <source>%1s</source>
+        <translation>%1 秒</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="130"/>
         <source>Waiting for a connectable source: this client and all known sources are behind NAT (LowID), so no direct connection is possible yet.</source>
         <translation>接続可能なソースを待っています: このクライアントと既知のソースがすべて NAT の内側 (LowID) にあるため、まだ直接接続できません。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="121"/>
+        <location filename="../../Browser/browser_manager.cxx" line="134"/>
         <source>Waiting for sources: no peer currently reports having this file.</source>
         <translation>ソースを待っています: 現在、このファイルを保持していると報告しているピアはありません。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="141"/>
+        <source>Waiting to re-request sources (anti-ban interval, ~%1 left). This pause is deliberate: asking the same peer again too soon gets us banned. The task resumes on its own.</source>
+        <translation>ソースの再要求を待機中（BAN 回避のための間隔、残り約 %1）。これは意図的な待機です。同じピアへ短時間で再要求すると BAN されます。タスクは自動的に再開します。</translation>
+    </message>
+    <message>
+        <location filename="../../Browser/browser_manager.cxx" line="146"/>
+        <source>Waiting to re-request sources (anti-ban interval). This pause is deliberate: asking the same peer again too soon gets us banned. The task resumes on its own.</source>
+        <translation>ソースの再要求を待機中（BAN 回避のための間隔）。これは意図的な待機です。同じピアへ短時間で再要求すると BAN されます。タスクは自動的に再開します。</translation>
     </message>
 </context>
 <context>
@@ -4631,106 +4651,106 @@ GNU Affero General Public License v3.0（AGPL-3.0）に基づきライセンス�
 <context>
     <name>gdl::ui::browser::BrowserManagerImpl</name>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="210"/>
-        <location filename="../../Browser/browser_manager.cxx" line="217"/>
-        <location filename="../../Browser/browser_manager.cxx" line="943"/>
-        <location filename="../../Browser/browser_manager.cxx" line="950"/>
+        <location filename="../../Browser/browser_manager.cxx" line="237"/>
+        <location filename="../../Browser/browser_manager.cxx" line="244"/>
+        <location filename="../../Browser/browser_manager.cxx" line="970"/>
+        <location filename="../../Browser/browser_manager.cxx" line="977"/>
         <source>Invalid ed2k link: %1</source>
         <translation>ed2k リンクが無効です: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="227"/>
+        <location filename="../../Browser/browser_manager.cxx" line="254"/>
         <source>Invalid download link: %1</source>
         <translation>ダウンロードリンクが無効です: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="240"/>
+        <location filename="../../Browser/browser_manager.cxx" line="267"/>
         <source>Failed to add download task. Please check the link or aria2 connection.</source>
         <translation>ダウンロードタスクの追加に失敗しました。リンクまたは aria2 接続を確認してください。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="241"/>
+        <location filename="../../Browser/browser_manager.cxx" line="268"/>
         <source>Failed to add download task: %1</source>
         <translation>ダウンロードタスクの追加に失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="266"/>
+        <location filename="../../Browser/browser_manager.cxx" line="293"/>
         <source>Torrent file does not exist: %1</source>
         <translation>Torrent ファイルが存在しません: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="272"/>
+        <location filename="../../Browser/browser_manager.cxx" line="299"/>
         <source>Failed to read torrent file: %1</source>
         <translation>Torrent ファイルの読み取りに失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="286"/>
+        <location filename="../../Browser/browser_manager.cxx" line="313"/>
         <source>Failed to add torrent task. Please check the file or aria2 connection.</source>
         <translation>Torrent タスクの追加に失敗しました。ファイルまたは aria2 接続を確認してください。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="287"/>
+        <location filename="../../Browser/browser_manager.cxx" line="314"/>
         <source>Failed to add torrent task: %1</source>
         <translation>Torrent タスクの追加に失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="310"/>
+        <location filename="../../Browser/browser_manager.cxx" line="337"/>
         <source>Metalink file does not exist: %1</source>
         <translation>Metalink ファイルが存在しません: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="316"/>
+        <location filename="../../Browser/browser_manager.cxx" line="343"/>
         <source>Failed to read metalink file: %1</source>
         <translation>Metalink ファイルの読み取りに失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="330"/>
+        <location filename="../../Browser/browser_manager.cxx" line="357"/>
         <source>Failed to add metalink task. Please check the file or aria2 connection.</source>
         <translation>Metalink タスクの追加に失敗しました。ファイルまたは aria2 接続を確認してください。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="331"/>
+        <location filename="../../Browser/browser_manager.cxx" line="358"/>
         <source>Failed to add metalink task: %1</source>
         <translation>Metalink タスクの追加に失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="650"/>
+        <location filename="../../Browser/browser_manager.cxx" line="677"/>
         <source>Failed to retry task: missing task id.</source>
         <translation>タスクの再試行に失敗しました: タスクIDがありません。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="654"/>
+        <location filename="../../Browser/browser_manager.cxx" line="681"/>
         <source>Failed to retry task: stopped task list is not available.</source>
         <translation>タスクの再試行に失敗しました: 停止済みタスクリストを利用できません。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="660"/>
+        <location filename="../../Browser/browser_manager.cxx" line="687"/>
         <source>Failed to retry task: task was not found.</source>
         <translation>タスクの再試行に失敗しました: タスクが見つかりませんでした。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="664"/>
+        <location filename="../../Browser/browser_manager.cxx" line="691"/>
         <source>Only failed tasks can be retried.</source>
         <translation>失敗したタスクのみ再試行できます。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="670"/>
+        <location filename="../../Browser/browser_manager.cxx" line="697"/>
         <source>Failed to retry task: original download link is unavailable.</source>
         <translation>タスクの再試行に失敗しました: 元のダウンロードリンクを利用できません。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="699"/>
+        <location filename="../../Browser/browser_manager.cxx" line="726"/>
         <source>Retry started, but the old failed task could not be removed from history.</source>
         <translation>再試行を開始しましたが、失敗した古いタスクを履歴から削除できませんでした。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1413"/>
-        <location filename="../../Browser/browser_manager.cxx" line="1476"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1440"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1503"/>
         <source>Download failed. Please check the link or network connection.</source>
         <translation>ダウンロードに失敗しました。リンクまたはネットワーク接続を確認してください。</translation>
     </message>
     <message>
-        <location filename="../../Browser/browser_manager.cxx" line="1414"/>
+        <location filename="../../Browser/browser_manager.cxx" line="1441"/>
         <source>Download failed: %1</source>
         <translation>ダウンロードに失敗しました: %1</translation>
     </message>
