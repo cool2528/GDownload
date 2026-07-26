@@ -112,13 +112,40 @@ namespace gdl {
 				// 面向开发者的英文短语,直接摊给用户既难懂也吓人(旧版把 "both client and all sources
 				// are low id" 当失败原因红字显示,用户无从判断该等还是该放弃)。这里翻成可执行的说明。
 				// 只对非失败态生效,失败任务仍原样展示引擎错误,避免掩盖真实故障。
-				QString Ed2kWaitingReasonToHint(const QString& engine_message) {
+				// 把剩余毫秒数排版成人能读的倒计时("4m 12s" / "38s")。向上取整到秒: 剩 300ms 时
+				// 显示 "0s" 会让人以为已经该动了而实际还没到, 显示 "1s" 更接近用户的感受。
+				QString Ed2kGateCountdownText(std::int64_t remaining_ms) {
+					const std::int64_t total_sec = (remaining_ms + 999) / 1000;
+					if (total_sec >= 60) {
+						return QObject::tr("%1m %2s").arg(total_sec / 60).arg(total_sec % 60);
+					}
+					return QObject::tr("%1s").arg(total_sec);
+				}
+
+				// gate_remaining_ms <= 0 表示拿不到倒计时(状态变更事件的 payload 里没有这个字段),
+				// 此时退化成不带倒计时的同一句话, 而不是编一个数字出来。
+				QString Ed2kWaitingReasonToHint(const QString& engine_message,
+												std::int64_t gate_remaining_ms = 0) {
 					if (engine_message.contains(QStringLiteral("low id"), Qt::CaseInsensitive)) {
 						return QObject::tr("Waiting for a connectable source: this client and all known sources are "
 										   "behind NAT (LowID), so no direct connection is possible yet.");
 					}
 					if (engine_message.contains(QStringLiteral("file not found"), Qt::CaseInsensitive)) {
 						return QObject::tr("Waiting for sources: no peer currently reports having this file.");
+					}
+					// 反封禁相位闸门(引擎 errc::request_throttled, 文案含 "anti-ban")。这段等待期间
+					// 连接数/排队数/速度全是 0, 与"卡死"长得一模一样, 所以提示必须明说"这是刻意等待、
+					// 会自己恢复", 否则用户只会去点删除重来 —— 而重来并不能跳过这个间隔。
+					if (engine_message.contains(QStringLiteral("anti-ban"), Qt::CaseInsensitive)) {
+						if (gate_remaining_ms > 0) {
+							return QObject::tr("Waiting to re-request sources (anti-ban interval, ~%1 left). "
+											   "This pause is deliberate: asking the same peer again too soon "
+											   "gets us banned. The task resumes on its own.")
+								.arg(Ed2kGateCountdownText(gate_remaining_ms));
+						}
+						return QObject::tr("Waiting to re-request sources (anti-ban interval). This pause is "
+										   "deliberate: asking the same peer again too soon gets us banned. "
+										   "The task resumes on its own.");
 					}
 					return engine_message;
 				}
@@ -1581,10 +1608,14 @@ namespace gdl {
 						// 等待原因(非失败态的 error)翻成用户能据以决策的说明; 空字符串会清掉上一轮的提示
 						const QString sampled_reason =
 							QString::fromStdString(item.value("error", std::string()));
+						// 反封禁闸门的倒计时随每次采样刷新(引擎按截止时刻现算, 拿到的恒为新鲜值);
+						// 旧引擎的 payload 没有这个字段, 缺省 0 让提示退化成不带倒计时的那句。
+						const auto gate_remaining_ms =
+							item.value("request_gate_remaining_ms", static_cast<std::int64_t>(0));
 						task_info.set_task_error_message(
 							sampled_reason.isEmpty() || sampled_state == TaskState::kError
 								? sampled_reason
-								: Ed2kWaitingReasonToHint(sampled_reason));
+								: Ed2kWaitingReasonToHint(sampled_reason, gate_remaining_ms));
 
 						// 缓存最近一次采样,供 OnHandleEd2kTaskState 在仅含 id/state/error 的终态事件中补全字段;
 						// 两个回调同在 ed2k 网络线程单线程串行执行,读写此表无需加锁(详见头文件成员注释)。
@@ -1612,7 +1643,9 @@ namespace gdl {
 					task_info.set_task_state(state);
 					const QString error = QString::fromStdString(doc.value("error", std::string()));
 					if (!error.isEmpty()) {
-						// 失败态: 原样展示引擎错误; 非失败态: 这是"还在等什么"的说明, 翻成友好文案
+						// 失败态: 原样展示引擎错误; 非失败态: 这是"还在等什么"的说明, 翻成友好文案。
+						// 状态变更事件的 payload 只有 {id,state,error}, 没有倒计时字段 —— 不传第二个
+						// 实参即退化成不带倒计时的文案, 至多一秒后就被带倒计时的采样覆盖。
 						task_info.set_task_error_message(state == TaskState::kError
 															 ? error
 															 : Ed2kWaitingReasonToHint(error));
