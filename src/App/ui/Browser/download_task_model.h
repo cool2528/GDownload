@@ -26,7 +26,8 @@ namespace gdl {
 					  task_current_size_(other.task_current_size_),
 					  task_download_speed_(other.task_download_speed_),
 					  task_connections_(other.task_connections_),
-					  task_sources_(other.task_sources_) {}
+					  task_sources_(other.task_sources_),
+					  task_queued_sources_(other.task_queued_sources_) {}
 
 				DownloadTaskInfo(DownloadTaskInfo&& other) noexcept
 					: task_id_(std::move(other.task_id_)),
@@ -40,7 +41,8 @@ namespace gdl {
 					  task_current_size_(other.task_current_size_),
 					  task_download_speed_(other.task_download_speed_),
 					  task_connections_(other.task_connections_),
-					  task_sources_(other.task_sources_) {}
+					  task_sources_(other.task_sources_),
+					  task_queued_sources_(other.task_queued_sources_) {}
 
 				DownloadTaskInfo& operator=(const DownloadTaskInfo& other) {
 					if (this != &other) {
@@ -56,6 +58,7 @@ namespace gdl {
 						task_download_speed_ = other.task_download_speed_;
 						task_connections_	 = other.task_connections_;
 						task_sources_		 = other.task_sources_;
+						task_queued_sources_ = other.task_queued_sources_;
 					}
 					return *this;
 				}
@@ -74,6 +77,7 @@ namespace gdl {
 						task_download_speed_ = other.task_download_speed_;
 						task_connections_	 = other.task_connections_;
 						task_sources_		 = other.task_sources_;
+						task_queued_sources_ = other.task_queued_sources_;
 					}
 					return *this;
 				}
@@ -89,9 +93,13 @@ namespace gdl {
 				std::int64_t task_current_size() const { return task_current_size_; }
 				std::int64_t task_download_speed() const { return task_download_speed_; }
 				std::int64_t task_connections() const { return task_connections_; }
-				// eD2k 专有:该任务迄今发现的源总数(含已放弃/冷却中的源)。aria2/BT 任务恒为 0,
-				// UI 据此隐藏"Sources"标签。与 task_connections()(此刻真正在连的对端数)是两个口径。
+				// eD2k 专有:该任务迄今发现的源总数(含已放弃/冷却中的源,只增不减)。aria2/BT 任务恒为 0,
+				// UI 据此隐藏"Sources"标签。与 task_connections()(此刻真正握着连接的对端数)是两个口径。
 				std::int64_t task_sources() const { return task_sources_; }
+				// eD2k 专有:此刻停在对端上传队列里等放行的源数。aria2/BT 任务恒为 0,UI 据此隐藏
+				// "Queued"标签。它与 task_connections() 一起区分两种表象相同、处置完全不同的故障:
+				// 排队多而连接少 = 源都在排队(等着就好);二者都少而 task_sources() 很大 = 源多但触达不了。
+				std::int64_t task_queued_sources() const { return task_queued_sources_; }
 
 				void set_task_id(const QString& task_id) { task_id_ = task_id; }
 				void set_task_state(TaskState state) { task_state_ = state; }
@@ -111,6 +119,9 @@ namespace gdl {
 				void set_task_download_speed(std::int64_t download_speed) { task_download_speed_ = download_speed; }
 				void set_task_connections(std::int64_t task_connections) { task_connections_ = task_connections; }
 				void set_task_sources(std::int64_t task_sources) { task_sources_ = task_sources; }
+				void set_task_queued_sources(std::int64_t task_queued_sources) {
+					task_queued_sources_ = task_queued_sources;
+				}
 
 				double progress() const {
 					if (task_total_size_ <= 0) return 0.0;
@@ -192,6 +203,7 @@ namespace gdl {
 				std::int64_t task_download_speed_{0};
 				std::int64_t task_connections_{0};
 				std::int64_t task_sources_{0};
+				std::int64_t task_queued_sources_{0};
 			};
 
 			class DownloadTaskModel : public QAbstractListModel {
@@ -210,6 +222,7 @@ namespace gdl {
 					kTaskRemainingTime,
                     kTaskConnections,
                     kTaskSources,
+                    kTaskQueuedSources,
                     kTaskDownloadLink,
 					kTaskErrorCode,
 					kTaskErrorMessage
