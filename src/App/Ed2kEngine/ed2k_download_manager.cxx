@@ -6,6 +6,8 @@
 #include <filesystem>
 #include <map>
 #include <optional>
+#include <string>
+#include <string_view>
 #include <thread>
 #include <variant>
 
@@ -26,6 +28,7 @@
 #include <ed2k/peer/c2c_connection.hpp>
 #include <ed2k/server/opcodes.hpp>
 #include <ed2k/session/session.hpp>
+#include <ed2k/util/diag.hpp>
 
 #include "ed2k_engine_def.h"
 
@@ -185,6 +188,64 @@ bool Ed2kDownloadManager::InitEd2kEngine(const Ed2kEngineConfig& config) {
 		// preferred：优先使用混淆但不强制，兼容未启用混淆的对端；required 会拒绝所有非混淆连接过于激进
 		scfg.obfuscation = config.enable_obfuscation ? ed2k::peer::ObfuscationPolicy::preferred
 													  : ed2k::peer::ObfuscationPolicy::disabled;
+
+		// 引擎诊断事件 -> 项目日志(%APPDATA%/gdownload/logs/gdownload.log)。
+		// 动机:引擎此前没有任何日志接口,"下不动"只能靠 DownloadStats 那四个计数器倒推,往往要
+		// 反复出安装包让用户实测再从截图猜。接上之后,一份 gdownload.log 就能看出卡在哪一步、
+		// 哪个源、什么错误码。
+		//
+		// 契约(见 ed2k/util/diag.hpp DiagFn):回调在引擎网络线程上同步触发,不得抛异常、不得
+		// 反调引擎方法。这里只做一次字符串拼接后交给 spdlog(它自己带缓冲与线程安全),既不碰
+		// Session 也不碰 Qt 对象,满足契约;整体再裹一层 catch(...) 兜底——诊断绝不该成为下载
+		// 失败的原因。
+		//
+		// 级别不在这里做二次过滤:DiagSink 内部已按 scfg.diag_level 把低于阈值的事件在**构造
+		// 消息之前**就挡掉了(零开销契约),这里再判一次既无收益也拿不到那份节省。
+		scfg.diag_level = ed2k::parse_diag_level(config.diag_level, ed2k::DiagLevel::info);
+		if (scfg.diag_level != ed2k::DiagLevel::off) {
+			// 关键一步:spdlog 自己还有一道级别闸。Release 构建下全局级别是 spdlog 默认的 info
+			// (只有 Debug 构建的 main.cxx 才调 SetLoggerLevel(kDebug)),于是用户把 eD2k 诊断调到
+			// debug 之后,那些 debug 行会被 spdlog 当场丢掉——设置看起来"没生效"。这里按需把全局
+			// 级别下调到刚好能容纳 eD2k 诊断的档位。
+			// 副作用可接受:全仓库 LOG_DBG 调用点只有 9 处,不会淹没日志;且只有用户主动把 eD2k
+			// 诊断调到 debug/trace 时才会发生。只下调、不上调(用不着的时候不去动用户/构建配置
+			// 已经选定的级别)。
+			const auto needed = (scfg.diag_level == ed2k::DiagLevel::trace) ? gdl::LogLevel::kTrace
+							  : (scfg.diag_level == ed2k::DiagLevel::debug) ? gdl::LogLevel::kDebug
+																			: gdl::LogLevel::kInfo;
+			if (static_cast<int>(gdl::GetLoggerLevel()) > static_cast<int>(needed)) {
+				gdl::SetLoggerLevel(needed);
+				LOG_INFO("ed2k diagnostics at '{}' lowered global log level to match", config.diag_level);
+			}
+			scfg.diag = [](ed2k::DiagLevel level, std::string_view category, std::string message) {
+				try {
+					// 前缀与项目里插件子系统的 "[market]" / "[js-plugin]" 写法保持一致,便于
+					// 在 gdownload.log 里按 "[ed2k:peer]" 这样的串直接 grep 出某个子系统。
+					const std::string line =
+						fmt::format("[ed2k:{}] {}", category, message);
+					switch (level) {
+						case ed2k::DiagLevel::trace:
+							gdl::LogMessage(gdl::LogLevel::kTrace, line);
+							break;
+						case ed2k::DiagLevel::debug:
+							gdl::LogMessage(gdl::LogLevel::kDebug, line);
+							break;
+						case ed2k::DiagLevel::warn:
+							gdl::LogMessage(gdl::LogLevel::kWarn, line);
+							break;
+						case ed2k::DiagLevel::error:
+							gdl::LogMessage(gdl::LogLevel::kError, line);
+							break;
+						case ed2k::DiagLevel::info:
+						default:
+							gdl::LogMessage(gdl::LogLevel::kInfo, line);
+							break;
+					}
+				} catch (...) {
+					// 见上:诊断失败一律吞掉,不影响下载。
+				}
+			};
+		}
 
 		// Session 必须在网络线程构造/使用；这里在 worker 线程启动前构造（此时尚无并发），
 		// 之后所有对外访问都需要 post 到 worker 线程执行。

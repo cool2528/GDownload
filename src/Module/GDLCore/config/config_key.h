@@ -105,6 +105,10 @@ namespace gdl {
 			CONFIG_PATH(Ed2kServerMetUrl, "ed2k.server-met-url", "http://upd.emule-security.org/server.met");
 			CONFIG_PATH(Ed2kNodesDatUrl, "ed2k.nodes-dat-url", "http://upd.emule-security.org/nodes.dat");
 			CONFIG_PATH(Ed2kAutoSyncSources, "ed2k.auto-sync-sources", "true");
+			// eD2k 引擎诊断日志级别: off/error/warn/info/debug/trace。默认 info(只出里程碑与每轮
+			// 取源汇总);排查"下不动"时调 debug。需与 setting.h Ed2kDiagLevel::Default() 保持一致
+			// (本层的默认值在加载时填充缺失 key,先于 setting.h 的 Default() 生效)。
+			CONFIG_PATH(Ed2kDiagLevel, "ed2k.diag-level", "info");
 
 			// static function all keys
 			static constexpr auto GetAllKeys() {
@@ -173,7 +177,8 @@ namespace gdl {
 											 Ed2kSharedDirs.get(),
 											 Ed2kServerMetUrl.get(),
 											 Ed2kNodesDatUrl.get(),
-											 Ed2kAutoSyncSources.get()});
+											 Ed2kAutoSyncSources.get(),
+											 Ed2kDiagLevel.get()});
 			}
 			// static function all values
 			static constexpr auto GetAllValues() {
@@ -242,7 +247,8 @@ namespace gdl {
 											 Ed2kSharedDirs.val(),
 											 Ed2kServerMetUrl.val(),
 											 Ed2kNodesDatUrl.val(),
-											 Ed2kAutoSyncSources.val()});
+											 Ed2kAutoSyncSources.val(),
+											 Ed2kDiagLevel.val()});
 			}
 		};
 	}  // namespace config

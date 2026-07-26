@@ -34,6 +34,12 @@ class Ed2kEngine_API Ed2kDownloadManager : public Singleton<Ed2kDownloadManager>
 		// 等待时间与 credit;必须每安装唯一且跨启动稳定——同 IP 更换 hash 会被对端封禁
 		// 2 小时,全网共享固定 hash 则互相顶替队列记录。空串时引擎回退内置常量(不推荐)。
 		std::string user_hash_hex;
+		// 引擎诊断日志级别: "off" / "error" / "warn" / "info" / "debug" / "trace"。
+		// 引擎侧的诊断事件(取源 / setup 竞速 / 每个 peer 的生命周期 / 并发名额 / 防封禁账本 /
+		// 块与 MD4 校验)会以该级别为下限转发进 gdownload.log。默认 info: 只出里程碑与每轮取源
+		// 汇总,一次下载几十行。用户报"下不动"时改 debug(每个源一两行,一次下载几百行);
+		// trace 是每块/每包级别,只在复现具体协议问题时开。无法识别的取值按 info 处理。
+		std::string diag_level = "info";
 	};
 
 	~Ed2kDownloadManager();

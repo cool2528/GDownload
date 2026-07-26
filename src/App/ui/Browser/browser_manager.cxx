@@ -999,6 +999,9 @@ namespace gdl {
 				ed2k_config.enable_kad = ed2k_settings.GetEd2kEnableKad();
 				ed2k_config.enable_obfuscation = ed2k_settings.GetEd2kEnableObfuscation();
 				ed2k_config.max_concurrent_tasks = static_cast<std::size_t>(ed2k_settings.GetEd2kMaxConcurrentTasks());
+				// 引擎诊断日志级别(off/error/warn/info/debug/trace)。默认 info;用户报"下不动"时
+				// 在 eD2k 设置页改成 debug,重启后 gdownload.log 里就有每个源的完整去向。
+				ed2k_config.diag_level = ed2k_settings.GetEd2kDiagLevel().toStdString();
 				// 持久 UserHash:首次生成(随机 16 字节 + eMule 标记字节[5]=0x0E/[14]=0x6F)后存
 				// data_dir/user_hash.dat,跨启动稳定。远端按 hash 记上传队列等待与 credit;
 				// 同 IP 换 hash 会被对端封禁 2 小时,固定共享 hash 则全网互相顶替队列记录。
