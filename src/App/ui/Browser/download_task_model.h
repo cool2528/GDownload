@@ -10,77 +10,100 @@ namespace gdl {
 
             enum class TaskState : int { kComplete = 0, kActive, kPause, kWaiting, kError, kRemoved };
 
+			// 进度速率估计器:对 task_current_size(即引擎的 bytes_done)自身做时间差分,
+			// 得到"真正落盘的速率"。它与引擎上报的 task_download_speed(线上到达的字节)
+			// 是两个不同的量,绝不能互相顶替:
+			//   * 线上到达的字节可能永远落不了盘 —— accumulate_blocks 空闲超时会把未凑齐的
+			//     区间整段丢弃、part 的 MD4 没过会 reset_part 整段重下、consume_block 对
+			//     间隙帧与完全重叠帧直接弃帧(而线上计量发生在 consume_block 之前);
+			//   * 所以拿线上速率当分母去算"进度剩余 / 速率",分子分母不同源,压缩传输下连
+			//     量纲都不匹配(分母是压缩后字节、分子是解压后字节),算出来的 ETA 每秒都
+			//     差不多、永不收敛,把一个真卡住的任务粉饰成"马上就好"。
+			class ProgressRateTracker {
+			   public:
+				// 滑动窗口长度。eD2k 的 bytes_done 以 AICH 块(184320 字节)为粒度跳变,
+				// 常见单源速率 5-50 KiB/s ⇒ 4-37 秒才落一个块。窗口若短于最慢那一端的
+				// 单块间隔,绝大多数窗口里一个块都没落,进度速率会被算成 0,ETA 会在
+				// "某个值"和"未知"之间每秒抖动。取 45 秒:比 37 秒的最坏单块间隔多出
+				// 约 20% 余量,同时短到真停滞能在一分钟内反映出来。aria2/BT 的进度每秒
+				// 都在推进,窗口再长也只是把速率抹平一点,不改变 ETA 的量级。
+				static constexpr std::int64_t kWindowMs = 45000;
+				// 起步保护:窗口刚建立时跨度太短,eD2k 落下的第一个块会被算成"瞬时
+				// 180 KiB/s",ETA 先给一个乐观得离谱的值。跨度不足 3 秒时一律报"未知"。
+				static constexpr std::int64_t kMinSpanMs = 3000;
+
+				void Sample(std::int64_t current_size, std::int64_t now_ms) {
+					// 时间倒流只可能来自换了时钟源或测试;此时窗口里的跨度全不可信,整段作废。
+					// 【进度回退不走这条路】part 的 MD4 没过会 reset_part() 把 bytes_done 打回
+					// 去,那不是"没有信息",恰恰是最该被记下来的一次倒退 —— 见下面的水位判据。
+					if (samples_.empty() || now_ms < latest_ms_) {
+						Restart(current_size, now_ms);
+						return;
+					}
+					// 只有真正刷新历史最高水位才算"前进过"。若按"比上一次采样大"来算,
+					// 一个反复 reset_part 的任务会在每次重下的爬升段不断刷新这个时刻,
+					// 于是整夜原地踏步也永远报不出停滞 —— 而那正是最该报的一种。
+					if (current_size > peak_size_) {
+						peak_size_		 = current_size;
+						last_advance_ms_ = now_ms;
+					}
+					latest_ms_ = now_ms;
+					samples_.push_back(Point{now_ms, current_size});
+					// 保留至少两个点;丢弃早于窗口起点的历史(最多多留一个采样间隔)
+					while (samples_.size() > 2 && now_ms - samples_.front().ms > kWindowMs) {
+						samples_.pop_front();
+					}
+				}
+
+				// 返回 0 表示"暂时给不出可信估计":样本不足、跨度太短,或窗口内的净增量
+				// 不为正 —— 包含一次 part 回退的窗口正属于后者,此时 ETA 必须报"未知",
+				// 而不是拿回退前后的差值算出一个负数或荒谬的值。
+				std::int64_t rate_bps() const {
+					if (samples_.size() < 2) return 0;
+					const std::int64_t span = samples_.back().ms - samples_.front().ms;
+					if (span < kMinSpanMs) return 0;
+					const std::int64_t delta = samples_.back().size - samples_.front().size;
+					if (delta <= 0) return 0;
+					return delta * 1000 / span;
+				}
+
+				// 进度自最后一次刷新最高水位以来停滞了多久(以最近一次采样的时刻为准)
+				std::int64_t stalled_ms() const {
+					if (samples_.empty()) return 0;
+					return latest_ms_ - last_advance_ms_;
+				}
+
+				bool has_samples() const { return !samples_.empty(); }
+
+			   private:
+				struct Point {
+					std::int64_t ms{0};
+					std::int64_t size{0};
+				};
+
+				void Restart(std::int64_t current_size, std::int64_t now_ms) {
+					samples_.clear();
+					samples_.push_back(Point{now_ms, current_size});
+					peak_size_		 = current_size;
+					last_advance_ms_ = now_ms;
+					latest_ms_		 = now_ms;
+				}
+
+				std::deque<Point> samples_;
+				std::int64_t peak_size_{0};		   // 迄今观察到的最高进度(水位)
+				std::int64_t last_advance_ms_{0};  // 最后一次刷新水位的时刻
+				std::int64_t latest_ms_{0};
+			};
+
 			class DownloadTaskInfo {
 			   public:
 				DownloadTaskInfo() = default;
-
-				DownloadTaskInfo(const DownloadTaskInfo& other)
-					: task_id_(other.task_id_),
-					  task_state_(other.task_state_),
-					  task_file_name_(other.task_file_name_),
-					  task_save_path_(other.task_save_path_),
-					  task_download_link_(other.task_download_link_),
-					  task_error_code_(other.task_error_code_),
-					  task_error_message_(other.task_error_message_),
-					  task_total_size_(other.task_total_size_),
-					  task_current_size_(other.task_current_size_),
-					  task_download_speed_(other.task_download_speed_),
-					  task_connections_(other.task_connections_),
-					  task_sources_(other.task_sources_),
-					  task_queued_sources_(other.task_queued_sources_) {}
-
-				DownloadTaskInfo(DownloadTaskInfo&& other) noexcept
-					: task_id_(std::move(other.task_id_)),
-					  task_state_(other.task_state_),
-					  task_file_name_(std::move(other.task_file_name_)),
-					  task_save_path_(std::move(other.task_save_path_)),
-					  task_download_link_(std::move(other.task_download_link_)),
-					  task_error_code_(std::move(other.task_error_code_)),
-					  task_error_message_(std::move(other.task_error_message_)),
-					  task_total_size_(other.task_total_size_),
-					  task_current_size_(other.task_current_size_),
-					  task_download_speed_(other.task_download_speed_),
-					  task_connections_(other.task_connections_),
-					  task_sources_(other.task_sources_),
-					  task_queued_sources_(other.task_queued_sources_) {}
-
-				DownloadTaskInfo& operator=(const DownloadTaskInfo& other) {
-					if (this != &other) {
-						task_id_			 = other.task_id_;
-						task_state_			 = other.task_state_;
-						task_file_name_		 = other.task_file_name_;
-						task_save_path_		 = other.task_save_path_;
-						task_download_link_	 = other.task_download_link_;
-						task_error_code_		 = other.task_error_code_;
-						task_error_message_	 = other.task_error_message_;
-						task_total_size_	 = other.task_total_size_;
-						task_current_size_	 = other.task_current_size_;
-						task_download_speed_ = other.task_download_speed_;
-						task_connections_	 = other.task_connections_;
-						task_sources_		 = other.task_sources_;
-						task_queued_sources_ = other.task_queued_sources_;
-					}
-					return *this;
-				}
-
-				DownloadTaskInfo& operator=(DownloadTaskInfo&& other) noexcept {
-					if (this != &other) {
-						task_id_			 = std::move(other.task_id_);
-						task_state_			 = other.task_state_;
-						task_file_name_		 = std::move(other.task_file_name_);
-						task_save_path_		 = std::move(other.task_save_path_);
-						task_download_link_	 = std::move(other.task_download_link_);
-						task_error_code_		 = std::move(other.task_error_code_);
-						task_error_message_	 = std::move(other.task_error_message_);
-						task_total_size_	 = other.task_total_size_;
-						task_current_size_	 = other.task_current_size_;
-						task_download_speed_ = other.task_download_speed_;
-						task_connections_	 = other.task_connections_;
-						task_sources_		 = other.task_sources_;
-						task_queued_sources_ = other.task_queued_sources_;
-					}
-					return *this;
-				}
+				// 拷贝/移动一律用编译器生成版本。这里原本是手写的四件套,逐个成员罗列 ——
+				// 新增成员时漏写一个不会报错,只会在运行期丢字段,这个类的成员还在持续增加。
+				DownloadTaskInfo(const DownloadTaskInfo&)				 = default;
+				DownloadTaskInfo(DownloadTaskInfo&&) noexcept			 = default;
+				DownloadTaskInfo& operator=(const DownloadTaskInfo&)	 = default;
+				DownloadTaskInfo& operator=(DownloadTaskInfo&&) noexcept = default;
 
 				QString task_id() const { return task_id_; }
 				TaskState task_state() const { return task_state_; }
@@ -123,15 +146,51 @@ namespace gdl {
 					task_queued_sources_ = task_queued_sources;
 				}
 
+				// 记一次进度采样。桌面端每秒收一次引擎快照,每次都重建一份全新的 TaskInfo,
+				// 因此历史窗口必须先从旧条目继承过来(见 DownloadTaskModel::UpdateTask)。
+				void SampleProgress(std::int64_t now_ms) {
+					progress_tracker_.Sample(task_current_size_, now_ms);
+				}
+				void InheritProgressHistoryFrom(const DownloadTaskInfo& previous) {
+					progress_tracker_ = previous.progress_tracker_;
+				}
+
+				// 进度速率:current_size 自身的时间差分,与线上速率(task_download_speed)分开
+				std::int64_t progress_rate_bps() const { return progress_tracker_.rate_bps(); }
+
+				// 停滞告警阈值。eD2k 最慢的常见单源(5 KiB/s)要 37 秒才凑够一个 184320 字节
+				// 的块,几十秒不涨完全可能只是"下得慢",阈值必须显著高于它,否则天天误报、
+				// 告警立刻被当噪音无视。取 90 秒:约为最坏单块间隔的 2.4 倍;同时略低于引擎
+				// accumulate_blocks 的 100 秒空闲超时(超时会把未凑齐的缓冲整段丢弃,半死源
+				// 每轮白流约 540 KiB),用户因此能在"白流一整轮"的时间尺度内看到警示。
+				static constexpr std::int64_t kStallWarningMs = 90000;
+
+				// "正在收数据,但一个字节都存不下来"。这是修复后仍必须一眼看得出的真卡住:
+				// 线上有速率(所以不是没源)、进度速率为 0 且已经持续超过阈值。
+				bool progress_stalled() const {
+					if (task_state_ != TaskState::kActive) return false;
+					if (task_download_speed_ <= 0) return false;  // 线上没数据 = 没源,是另一种故障
+					if (task_total_size_ > 0 && task_current_size_ >= task_total_size_) return false;
+					if (progress_tracker_.rate_bps() > 0) return false;	 // 进度在涨,再慢也不是停滞
+					return progress_tracker_.stalled_ms() >= kStallWarningMs;
+				}
+
 				double progress() const {
 					if (task_total_size_ <= 0) return 0.0;
 					return (static_cast<double>(task_current_size_) / task_total_size_) * 100.0;
 				}
 
+				// 剩余时间 = 进度剩余字节 / 进度速率。分子分母必须同源:分子是"还差多少字节
+				// 落盘",分母就只能是"每秒有多少字节落盘",不能用引擎上报的线上速率顶替。
+				// 进度速率给不出可信值(样本不足、或窗口内一个字节都没落盘)时返回 -1,
+				// 界面显示"Unknown" —— 这是修复前就有的诚实行为,必须保留。
 				int remaining_time() const {
-					if (task_download_speed_ <= 0) return -1;  // 返回-1表示无法计算
-					std::int64_t remaining_size = task_total_size_ - task_current_size_;
-					return static_cast<int>(remaining_size / task_download_speed_);
+					if (task_total_size_ <= 0) return -1;
+					const std::int64_t remaining_size = task_total_size_ - task_current_size_;
+					if (remaining_size <= 0) return 0;
+					const std::int64_t rate = progress_tracker_.rate_bps();
+					if (rate <= 0) return -1;  // 返回-1表示无法计算
+					return static_cast<int>(remaining_size / rate);
 				}
 
 				QString FormatRemainingTime() const {
@@ -204,6 +263,7 @@ namespace gdl {
 				std::int64_t task_connections_{0};
 				std::int64_t task_sources_{0};
 				std::int64_t task_queued_sources_{0};
+				ProgressRateTracker progress_tracker_;
 			};
 
 			class DownloadTaskModel : public QAbstractListModel {
@@ -225,7 +285,14 @@ namespace gdl {
                     kTaskQueuedSources,
                     kTaskDownloadLink,
 					kTaskErrorCode,
-					kTaskErrorMessage
+					kTaskErrorMessage,
+					// 未经格式化的原始字节数。QML 的可见性判据不能拿 FormatFileSize 的输出
+					// 比大小:它只保留两位小数,10 GB 量级上能把 5 MB 的缺口舍成同一个字符串,
+					// 于是一个真的没下完的任务会被当成完整的。
+					kTaskTotalSizeBytes,
+					kTaskCurrentSizeBytes,
+					// "在收但落不了盘":线上有数据到达而进度长时间为 0
+					kTaskProgressStalled
 				};
 
 			   public:
@@ -236,11 +303,14 @@ namespace gdl {
 				QHash<int, QByteArray> roleNames() const override;
 				bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
-				void AddTask(const DownloadTaskInfo& task);
+				// now_ms 为进度采样时刻(毫秒)。生产路径传 -1,表示"取单调钟当前时刻";
+				// 单元测试传确定值,才能在不真等 45 秒的前提下覆盖进度速率与停滞判据。
+				void AddTask(const DownloadTaskInfo& task, std::int64_t now_ms = -1);
 				bool RemoveTask(int index);
 				bool RemoveTaskById(const QString& task_id);
-				bool UpdateTask(int index, const DownloadTaskInfo& task);
-				bool UpdateTaskById(const QString& task_id, const DownloadTaskInfo& task);
+				bool UpdateTask(int index, const DownloadTaskInfo& task, std::int64_t now_ms = -1);
+				bool UpdateTaskById(const QString& task_id, const DownloadTaskInfo& task,
+									std::int64_t now_ms = -1);
 				DownloadTaskInfo* GetTask(int index);
 				DownloadTaskInfo* GetTaskById(const QString& task_id);
 				QStringList GetTaskIds() const;

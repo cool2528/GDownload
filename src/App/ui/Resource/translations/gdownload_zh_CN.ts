@@ -1838,221 +1838,239 @@
 <context>
     <name>GDownloadViewPage</name>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="117"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="123"/>
         <source>No active downloads</source>
         <translation>没有活动下载</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="118"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="124"/>
         <source>No waiting downloads</source>
         <translation>没有等待中的下载</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="119"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="125"/>
         <source>No stopped downloads</source>
         <translation>没有已停止的下载</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="124"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="130"/>
         <source>Completed and failed downloads will appear here.</source>
         <translation>已完成和失败的下载将显示在此处。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="125"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="131"/>
         <source>Add a download to begin building your queue.</source>
         <translation>添加下载以开始构建队列。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="182"/>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="330"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="195"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="360"/>
         <source>Failed</source>
         <translation>失败</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="182"/>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="331"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="197"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="362"/>
         <source>Completed</source>
         <translation>已完成</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="306"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="197"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="361"/>
+        <source>Cancelled</source>
+        <translation>已取消</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="333"/>
+        <source>Cancelled before it finished — the file on disk is incomplete.</source>
+        <translation>下载未完成即被取消 —— 磁盘上的文件是残缺的。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="336"/>
         <source>The transfer stopped before completion.</source>
         <translation>传输在完成前停止。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="309"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="339"/>
         <source>Downloading now</source>
         <translation>正在下载</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="309"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="339"/>
         <source>Paused — resume when ready</source>
         <translation>已暂停 — 准备好后可恢复</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="327"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="357"/>
         <source>Downloading</source>
         <translation>下载中</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="328"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="358"/>
         <source>Paused</source>
         <translation>已暂停</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="329"/>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="525"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="359"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="561"/>
         <source>Queued</source>
         <translation>排队中</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="358"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="390"/>
         <source>Remove</source>
         <translation>移除</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="393"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="425"/>
         <source>Open</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="405"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="437"/>
         <source>Retry</source>
         <translation>重试</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="417"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="449"/>
         <source>Start</source>
         <translation>开始</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="429"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="461"/>
         <source>Resume</source>
         <translation>恢复</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="441"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="473"/>
         <source>Pause</source>
         <translation>暂停</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="477"/>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="569"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="509"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="607"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="617"/>
         <source>Downloaded</source>
         <translation>已下载</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="478"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="510"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="618"/>
         <source>%1 of %2</source>
         <translation>%1 / %2</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="485"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="521"/>
         <source>Speed</source>
         <translation>速度</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="495"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="531"/>
         <source>ETA</source>
         <translation>剩余时间</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="503"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="539"/>
         <source>Connections</source>
         <translation>连接数</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="513"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="549"/>
         <source>Sources</source>
         <translation>源数</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="535"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="571"/>
         <source>Queue</source>
         <translation>队列</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="536"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="572"/>
         <source>Position %1</source>
         <translation>位置 %1</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="545"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="581"/>
         <source>Expected size</source>
         <translation>预期大小</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="553"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="589"/>
         <source>Completed size</source>
         <translation>已完成大小</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="587"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="635"/>
+        <source>Receiving data, but none of it can be saved: incomplete blocks keep being discarded and downloaded again.</source>
+        <translation>正在接收数据，但没有一个字节能存下来：未凑齐的数据块被反复丢弃并重新下载。</translation>
+    </message>
+    <message>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="655"/>
         <source>Error %1: %2</source>
         <translation>错误 %1：%2</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="590"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="658"/>
         <source>Download failed</source>
         <translation>下载失败</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="633"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="701"/>
         <source>The task could not be removed.</source>
         <translation>无法移除该任务。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="639"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="707"/>
         <source>Task and downloaded content were removed.</source>
         <translation>任务和已下载内容已移除。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="640"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="708"/>
         <source>Task record was removed.</source>
         <translation>任务记录已移除。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="643"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="711"/>
         <source>The task was removed, but some downloaded content could not be deleted.</source>
         <translation>任务已移除，但部分已下载内容无法删除。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="644"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="712"/>
         <source>The task was removed, but cleanup could not be completed.</source>
         <translation>任务已移除，但清理操作无法完成。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="647"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="715"/>
         <source>Failed to remove the task and downloaded content.</source>
         <translation>移除任务和已下载内容失败。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="648"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="716"/>
         <source>Failed to remove the task.</source>
         <translation>移除任务失败。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="120"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="126"/>
         <source>No downloads</source>
         <translation>没有下载</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="263"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="290"/>
         <source>FILE</source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="300"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="327"/>
         <source>Ready to start when a download slot is available.</source>
         <translation>下载位可用时即可开始。</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="303"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="330"/>
         <source>Saved to %1</source>
         <translation>已保存到 %1</translation>
     </message>
     <message>
-        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="376"/>
+        <location filename="../qml/CommonComponents/GDownloadViewPage.qml" line="408"/>
         <source>Link copied to clipboard</source>
         <translation>链接复制到剪贴板</translation>
     </message>
@@ -3235,24 +3253,24 @@ Copyright © 2024-2026 GDownload Team
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="140"/>
+        <location filename="../../Browser/download_task_model.h" line="199"/>
         <source>Unknown</source>
         <translation>未知</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="150"/>
+        <location filename="../../Browser/download_task_model.h" line="209"/>
         <source>h</source>
         <translation>时</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="153"/>
-        <location filename="../../Browser/download_task_model.h" line="157"/>
+        <location filename="../../Browser/download_task_model.h" line="212"/>
+        <location filename="../../Browser/download_task_model.h" line="216"/>
         <source>m</source>
         <translation>分</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="160"/>
-        <location filename="../../Browser/download_task_model.h" line="164"/>
+        <location filename="../../Browser/download_task_model.h" line="219"/>
+        <location filename="../../Browser/download_task_model.h" line="223"/>
         <source>s</source>
         <translation>秒</translation>
     </message>

@@ -350,6 +350,12 @@ class TestDownloadTaskModel : public QAbstractListModel {
 		kTaskDownloadLink,
 		kTaskErrorCode,
 		kTaskErrorMessage,
+		// 与生产模型对齐:未经格式化的原始字节数,供 QML 做数值比较(格式化字符串
+		// 只有两位小数,10 GB 量级上能把 5 MB 的差值舍没)
+		kTaskTotalSizeBytes,
+		kTaskCurrentSizeBytes,
+		// 线上有数据在流但一个字节都落不了盘
+		kTaskProgressStalled,
 	};
 
 	explicit TestDownloadTaskModel(QObject* parent = nullptr) : QAbstractListModel(parent) {}
@@ -378,7 +384,10 @@ class TestDownloadTaskModel : public QAbstractListModel {
 			{kTaskConnections, "connections"},
 			{kTaskDownloadLink, "downloadLink"},
 			{kTaskErrorCode, "errorCode"},
-			{kTaskErrorMessage, "errorMessage"}};
+			{kTaskErrorMessage, "errorMessage"},
+			{kTaskTotalSizeBytes, "totalSizeBytes"},
+			{kTaskCurrentSizeBytes, "currentSizeBytes"},
+			{kTaskProgressStalled, "progressStalled"}};
 	}
 
 	void setRows(const QList<QVariantMap>& rows) {
