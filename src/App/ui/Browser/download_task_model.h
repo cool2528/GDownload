@@ -10,6 +10,15 @@ namespace gdl {
 
             enum class TaskState : int { kComplete = 0, kActive, kPause, kWaiting, kError, kRemoved };
 
+			// 停滞的两种形状。它们的界面文案必须不同 —— 说错了比不说更糟:
+			//   kNothingLands         一个字节都没落盘。引擎 accumulate_blocks 的空闲超时会把
+			//                         未凑齐的区间整段丢弃,或磁盘写入本身在失败;此时 bytes_done
+			//                         纹丝不动,"none of it can be saved" 是实话。
+			//   kWrittenThenDiscarded 数据确实落了盘,只是整个 part 的 MD4 没过被 alloc.reset_part()
+			//                         作废、正在重下同一个 part;此时 bytes_done 涨了又退,说
+			//                         "存不下来"是假话 —— 存下来了,只是又被撤销了。
+			enum class StallKind : int { kNone = 0, kNothingLands = 1, kWrittenThenDiscarded = 2 };
+
 			// 进度速率估计器:对 task_current_size(即引擎的 bytes_done)自身做时间差分,
 			// 得到"真正落盘的速率"。它与引擎上报的 task_download_speed(线上到达的字节)
 			// 是两个不同的量,绝不能互相顶替:
@@ -32,27 +41,55 @@ namespace gdl {
 				// 180 KiB/s",ETA 先给一个乐观得离谱的值。跨度不足 3 秒时一律报"未知"。
 				static constexpr std::int64_t kMinSpanMs = 3000;
 
-				void Sample(std::int64_t current_size, std::int64_t now_ms) {
+				// wire_speed_bps 是引擎上报的线上到达速率。它不参与速率/水位计算,只用来
+				// 记住"最近一次线上还有数据到达是什么时候" —— 判断"在收但收不出进展"必须
+				// 知道确实还在收,而这件事不能逐帧去问:慢速点滴源(例如每 2 秒一个子帧)
+				// 有一半的 1 秒采样速度恰好为 0,逐帧判据会让告警以 1 秒为周期明灭。
+				void Sample(std::int64_t current_size, std::int64_t wire_speed_bps, std::int64_t now_ms) {
 					// 时间倒流只可能来自换了时钟源或测试;此时窗口里的跨度全不可信,整段作废。
 					// 【进度回退不走这条路】part 的 MD4 没过会 reset_part() 把 bytes_done 打回
 					// 去,那不是"没有信息",恰恰是最该被记下来的一次倒退 —— 见下面的水位判据。
 					if (samples_.empty() || now_ms < latest_ms_) {
 						Restart(current_size, now_ms);
-						return;
 					}
-					// 只有真正刷新历史最高水位才算"前进过"。若按"比上一次采样大"来算,
-					// 一个反复 reset_part 的任务会在每次重下的爬升段不断刷新这个时刻,
-					// 于是整夜原地踏步也永远报不出停滞 —— 而那正是最该报的一种。
-					if (current_size > peak_size_) {
-						peak_size_		 = current_size;
-						last_advance_ms_ = now_ms;
+					else {
+						// 只有真正刷新历史最高水位才算"前进过"。若按"比上一次采样大"来算,
+						// 一个反复 reset_part 的任务会在每次重下的爬升段不断刷新这个时刻,
+						// 于是整夜原地踏步也永远报不出停滞 —— 而那正是最该报的一种。
+						if (current_size > peak_size_) {
+							peak_size_		  = current_size;
+							last_advance_ms_  = now_ms;
+							moved_below_peak_ = false;
+						}
+						else if (current_size != last_size_) {
+							// 没越过水位,但数值确实动了 —— 只可能是"落了盘又被整段作废"。
+							// 这一位是区分两种停滞文案的唯一依据。
+							moved_below_peak_ = true;
+						}
+						last_size_ = current_size;
+						latest_ms_ = now_ms;
+						samples_.push_back(Point{now_ms, current_size});
+						// 保留至少两个点;丢弃早于窗口起点的历史(最多多留一个采样间隔)
+						while (samples_.size() > 2 && now_ms - samples_.front().ms > kWindowMs) {
+							samples_.pop_front();
+						}
 					}
-					latest_ms_ = now_ms;
-					samples_.push_back(Point{now_ms, current_size});
-					// 保留至少两个点;丢弃早于窗口起点的历史(最多多留一个采样间隔)
-					while (samples_.size() > 2 && now_ms - samples_.front().ms > kWindowMs) {
-						samples_.pop_front();
+					if (wire_speed_bps > 0) {
+						has_wire_activity_	   = true;
+						last_wire_activity_ms_ = now_ms;
 					}
+				}
+
+				// 任务离开活动态(暂停/等待/终态)时调用。暂停期间引擎照样每秒推快照,
+				// 那些平样本既不代表"下载没进展",也不该被算进速率窗口:算进去的话,
+				// 一次完全健康的恢复会在瞬间满足"停滞 90 秒以上"而弹出告警,恢复后的
+				// 45 秒里速率还会被暂停期的平样本稀释成零头,ETA 随之虚高数倍。
+				// 直接把窗口整段作废,恢复时从恢复那一刻重新起算 —— 速率短暂地报"未知"
+				// 是诚实的,拿暂停期的样本算出来的速率不是。
+				void Suspend() {
+					samples_.clear();
+					has_wire_activity_ = false;
+					moved_below_peak_  = false;
 				}
 
 				// 返回 0 表示"暂时给不出可信估计":样本不足、跨度太短,或窗口内的净增量
@@ -75,6 +112,18 @@ namespace gdl {
 
 				bool has_samples() const { return !samples_.empty(); }
 
+				// 自最后一次刷新水位以来,进度数值动过但始终没越过水位 —— 即"落了盘又被
+				// 整段作废重下"。恒定不动的白流不会置位。
+				bool moved_below_peak() const { return moved_below_peak_; }
+
+				// 最近 grace_ms 毫秒内线上是否还有数据到达。用窗口而非逐帧判断,避免点滴
+				// 源把告警抖成闪烁;从头到尾一个字节都没来过时恒为 false ——"没有源"是
+				// 另一种故障,不能套用"在收但收不出进展"的文案。
+				bool wire_active_within(std::int64_t grace_ms) const {
+					if (!has_wire_activity_ || samples_.empty()) return false;
+					return latest_ms_ - last_wire_activity_ms_ <= grace_ms;
+				}
+
 			   private:
 				struct Point {
 					std::int64_t ms{0};
@@ -84,15 +133,23 @@ namespace gdl {
 				void Restart(std::int64_t current_size, std::int64_t now_ms) {
 					samples_.clear();
 					samples_.push_back(Point{now_ms, current_size});
-					peak_size_		 = current_size;
-					last_advance_ms_ = now_ms;
-					latest_ms_		 = now_ms;
+					peak_size_			   = current_size;
+					last_size_			   = current_size;
+					last_advance_ms_	   = now_ms;
+					latest_ms_			   = now_ms;
+					moved_below_peak_	   = false;
+					has_wire_activity_	   = false;
+					last_wire_activity_ms_ = now_ms;
 				}
 
 				std::deque<Point> samples_;
 				std::int64_t peak_size_{0};		   // 迄今观察到的最高进度(水位)
+				std::int64_t last_size_{0};		   // 上一次采样的进度值(用于识别"动过但没过水位")
 				std::int64_t last_advance_ms_{0};  // 最后一次刷新水位的时刻
 				std::int64_t latest_ms_{0};
+				std::int64_t last_wire_activity_ms_{0};	 // 最后一次线上有数据到达的时刻
+				bool has_wire_activity_{false};			 // 本轮窗口里线上是否到达过数据
+				bool moved_below_peak_{false};
 			};
 
 			class DownloadTaskInfo {
@@ -149,7 +206,15 @@ namespace gdl {
 				// 记一次进度采样。桌面端每秒收一次引擎快照,每次都重建一份全新的 TaskInfo,
 				// 因此历史窗口必须先从旧条目继承过来(见 DownloadTaskModel::UpdateTask)。
 				void SampleProgress(std::int64_t now_ms) {
-					progress_tracker_.Sample(task_current_size_, now_ms);
+					// 只有活动态的采样才算数。暂停/等待中的任务引擎照样每秒推快照(ed2k 的
+					// 1s 采样只过滤 completed/failed/cancelled,paused 照发;BrowserManager 的
+					// kPause 分支把行留在 active_model_ 并走 UpdateTaskById),那些平样本
+					// 与"下载没进展"完全是两回事,记进窗口会把一次健康的恢复直接判成停滞。
+					if (task_state_ != TaskState::kActive) {
+						progress_tracker_.Suspend();
+						return;
+					}
+					progress_tracker_.Sample(task_current_size_, task_download_speed_, now_ms);
 				}
 				void InheritProgressHistoryFrom(const DownloadTaskInfo& previous) {
 					progress_tracker_ = previous.progress_tracker_;
@@ -165,15 +230,33 @@ namespace gdl {
 				// 每轮白流约 540 KiB),用户因此能在"白流一整轮"的时间尺度内看到警示。
 				static constexpr std::int64_t kStallWarningMs = 90000;
 
-				// "正在收数据,但一个字节都存不下来"。这是修复后仍必须一眼看得出的真卡住:
-				// 线上有速率(所以不是没源)、进度速率为 0 且已经持续超过阈值。
-				bool progress_stalled() const {
-					if (task_state_ != TaskState::kActive) return false;
-					if (task_download_speed_ <= 0) return false;  // 线上没数据 = 没源,是另一种故障
-					if (task_total_size_ > 0 && task_current_size_ >= task_total_size_) return false;
-					if (progress_tracker_.rate_bps() > 0) return false;	 // 进度在涨,再慢也不是停滞
-					return progress_tracker_.stalled_ms() >= kStallWarningMs;
+				// 线上"最近还在收数据"的宽限期。慢速点滴源(每 2 秒一个子帧)有一半的 1 秒
+				// 采样速度为 0,逐帧要求"此刻速度 > 0"会让告警以 1 秒为周期明灭;取 30 秒,
+				// 既盖得住这种抖动,又能在源真的全掉线后半分钟内把这条文案撤下来 ——
+				// "一个源都没有"是另一种故障,自有它自己的说明文字。
+				static constexpr std::int64_t kWireIdleGraceMs = 30000;
+
+				// "长时间没有取得新进展"。判据只认历史最高水位:进度当下在不在涨完全不能
+				// 说明问题 —— reset_part() 之后重下同一个 part,进度会连着涨 190-2000 秒
+				// (整整一个 PART_SIZE = 9,728,000 字节),远长于 45 秒的速率窗口,于是窗口
+				// 整段落在爬升段内、rate_bps() 恒为正。用"进度在涨"当短路条件,等于把这种
+				// 最该报的停滞彻底屏蔽掉(引擎 download.hpp 的 ProgressFn 注释明文禁止过)。
+				//
+				// 反过来,健康的慢速下载不会被误伤:5 KiB/s 单源要 36 秒才凑够一个 184320
+				// 字节的块,但每落一个块水位就抬高一次,停滞时钟随之清零,永远够不到 90 秒。
+				StallKind stall_kind() const {
+					if (task_state_ != TaskState::kActive) return StallKind::kNone;
+					if (task_total_size_ > 0 && task_current_size_ >= task_total_size_) {
+						return StallKind::kNone;
+					}
+					// 线上一个字节都不来 = 没有源,是另一种故障,不套用这条文案
+					if (!progress_tracker_.wire_active_within(kWireIdleGraceMs)) return StallKind::kNone;
+					if (progress_tracker_.stalled_ms() < kStallWarningMs) return StallKind::kNone;
+					return progress_tracker_.moved_below_peak() ? StallKind::kWrittenThenDiscarded
+																: StallKind::kNothingLands;
 				}
+
+				bool progress_stalled() const { return stall_kind() != StallKind::kNone; }
 
 				double progress() const {
 					if (task_total_size_ <= 0) return 0.0;
@@ -188,6 +271,10 @@ namespace gdl {
 					if (task_total_size_ <= 0) return -1;
 					const std::int64_t remaining_size = task_total_size_ - task_current_size_;
 					if (remaining_size <= 0) return 0;
+					// 已经判定为长时间没有新进展时,窗口里那点涨幅是重下同一个 part 的爬升,
+					// 它最终会被整段作废。拿它算出来的 ETA 每轮都一样、永不收敛(实测恒定
+					// 在 "9h39m"),与旁边那句"没有新进展"直接打架。此时只能报"未知"。
+					if (progress_stalled()) return -1;
 					const std::int64_t rate = progress_tracker_.rate_bps();
 					if (rate <= 0) return -1;  // 返回-1表示无法计算
 					return static_cast<int>(remaining_size / rate);
@@ -291,8 +378,11 @@ namespace gdl {
 					// 于是一个真的没下完的任务会被当成完整的。
 					kTaskTotalSizeBytes,
 					kTaskCurrentSizeBytes,
-					// "在收但落不了盘":线上有数据到达而进度长时间为 0
-					kTaskProgressStalled
+					// "长时间没有取得新进展":线上还在收数据,但进度越不过历史最高水位
+					kTaskProgressStalled,
+					// 停滞的形状(StallKind):一个字节都没落盘 / 落了盘又被整段作废重下。
+					// 两者的处置和文案都不同,不能混成一句话
+					kTaskProgressStallKind
 				};
 
 			   public:

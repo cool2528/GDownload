@@ -354,8 +354,10 @@ class TestDownloadTaskModel : public QAbstractListModel {
 		// 只有两位小数,10 GB 量级上能把 5 MB 的差值舍没)
 		kTaskTotalSizeBytes,
 		kTaskCurrentSizeBytes,
-		// 线上有数据在流但一个字节都落不了盘
+		// 长时间没有取得新进展(线上仍在收数据,但进度越不过历史最高水位)
 		kTaskProgressStalled,
+		// 停滞的形状:1 = 一个字节都没落盘;2 = 落了盘又被整段作废重下
+		kTaskProgressStallKind,
 	};
 
 	explicit TestDownloadTaskModel(QObject* parent = nullptr) : QAbstractListModel(parent) {}
@@ -387,7 +389,8 @@ class TestDownloadTaskModel : public QAbstractListModel {
 			{kTaskErrorMessage, "errorMessage"},
 			{kTaskTotalSizeBytes, "totalSizeBytes"},
 			{kTaskCurrentSizeBytes, "currentSizeBytes"},
-			{kTaskProgressStalled, "progressStalled"}};
+			{kTaskProgressStalled, "progressStalled"},
+			{kTaskProgressStallKind, "progressStallKind"}};
 	}
 
 	void setRows(const QList<QVariantMap>& rows) {

@@ -285,6 +285,7 @@ class TstDownloadLifecycle : public QObject {
 	// 引擎的 speed 现在是"线上到达的字节",这些字节可能永远落不了盘(未凑齐的块被丢弃、
 	// part 校验失败整段重下、间隙帧被弃)。此时界面上是"Speed 96 KB/s"配绿色成功样式,
 	// 而进度一动不动 —— 比原来的"Speed 0 B"更具误导性。必须有一句明确的告警。
+	// 这一条是"一个字节都没落盘"(progressStallKind = 1),说"存不下来"是实话。
 	void test_active_row_warns_when_data_arrives_but_nothing_lands() {
 		TestDownloadTaskModel model;
 		model.setRows({
@@ -294,7 +295,7 @@ class TstDownloadLifecycle : public QObject {
 			 {"remainingTime", "Unknown"}, {"connections", 3},
 			 {"totalSizeBytes", QVariant::fromValue<qint64>(734003200LL)},
 			 {"currentSizeBytes", QVariant::fromValue<qint64>(12582912LL)},
-			 {"progressStalled", true},
+			 {"progressStalled", true}, {"progressStallKind", 1},
 			 {"downloadLink", "ed2k://|file|Half-dead.rar|734003200|3d366ed505b977fc61c9a6ee01e96329|/"}},
 		});
 
@@ -310,8 +311,48 @@ class TstDownloadLifecycle : public QObject {
 		QQuickItem* warning = findVisibleItem(root, QStringLiteral("taskStallWarning"));
 		QVERIFY2(warning, "A transfer that receives data but saves none must say so");
 		const QString text = warning->property("text").toString();
-		QVERIFY2(text.contains(QStringLiteral("saved"), Qt::CaseInsensitive),
-		         qPrintable(QStringLiteral("Stall warning must say nothing is being saved, got: %1").arg(text)));
+		// 中性的主句:说的是"没有取得新进展",这在两种停滞形状下都成立
+		QVERIFY2(text.contains(QStringLiteral("progress"), Qt::CaseInsensitive),
+		         qPrintable(QStringLiteral("Stall warning must lead with the fact that progress stopped, got: %1").arg(text)));
+		// 可区分的补充:这一种确实一个字节都没写进文件
+		QVERIFY2(text.contains(QStringLiteral("none of it"), Qt::CaseInsensitive),
+		         qPrintable(QStringLiteral("Stall warning must say nothing is being written, got: %1").arg(text)));
+	}
+
+	// 另一种停滞:数据确实落了盘,只是整个 part 的 MD4 没过被作废、正在重下同一个 part。
+	// 对这一种说 "none of it can be saved" 是假话 —— 数据存下来了,只是又被撤销了。
+	// 文案必须能把两者分开,否则用户会照着一句错误的诊断去排查磁盘/权限问题。
+	void test_active_row_says_written_data_keeps_being_discarded() {
+		TestDownloadTaskModel model;
+		model.setRows({
+			{{"taskId", "stalled-2"}, {"taskState", 1}, {"fileName", "Rewritten.rar"},
+			 {"savePath", "C:/Downloads/Rewritten.rar"}, {"totalSize", "700.00 MB"},
+			 {"currentSize", "18.00 MB"}, {"downloadSpeed", "50.00 KB"}, {"progress", 3},
+			 {"remainingTime", "Unknown"}, {"connections", 3},
+			 {"totalSizeBytes", QVariant::fromValue<qint64>(734003200LL)},
+			 {"currentSizeBytes", QVariant::fromValue<qint64>(18874368LL)},
+			 {"progressStalled", true}, {"progressStallKind", 2},
+			 {"downloadLink", "ed2k://|file|Rewritten.rar|734003200|3d366ed505b977fc61c9a6ee01e96329|/"}},
+		});
+
+		QQuickWindow window;
+		window.resize(820, 460);
+		window.show();
+		QScopedPointer<QObject> page(createPage(window, 0, model));
+		QVERIFY(page);
+		auto* root = qobject_cast<QQuickItem*>(page.data());
+		QVERIFY(root);
+		QTRY_COMPARE_WITH_TIMEOUT(page->property("taskCount").toInt(), 1, 1000);
+
+		QQuickItem* warning = findVisibleItem(root, QStringLiteral("taskStallWarning"));
+		QVERIFY2(warning, "A transfer that keeps re-downloading the same part must say so");
+		const QString text = warning->property("text").toString();
+		QVERIFY2(text.contains(QStringLiteral("progress"), Qt::CaseInsensitive),
+		         qPrintable(QStringLiteral("Stall warning must lead with the fact that progress stopped, got: %1").arg(text)));
+		QVERIFY2(!text.contains(QStringLiteral("none of it"), Qt::CaseInsensitive),
+		         qPrintable(QStringLiteral("Data did land on disk; the warning must not claim none of it can be saved, got: %1").arg(text)));
+		QVERIFY2(text.contains(QStringLiteral("again"), Qt::CaseInsensitive),
+		         qPrintable(QStringLiteral("The warning must say the same data is being downloaded again, got: %1").arg(text)));
 	}
 
 	// 反向用例:进度在正常推进时,绝不能弹出停滞告警,否则告警会被当成噪音无视掉。
