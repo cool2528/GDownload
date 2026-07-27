@@ -3258,24 +3258,24 @@ GNU Affero General Public License v3.0（AGPL-3.0）に基づきライセンス�
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="419"/>
+        <location filename="../../Browser/download_task_model.h" line="431"/>
         <source>Unknown</source>
         <translation>不明</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="429"/>
+        <location filename="../../Browser/download_task_model.h" line="441"/>
         <source>h</source>
         <translation>h</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="432"/>
-        <location filename="../../Browser/download_task_model.h" line="436"/>
+        <location filename="../../Browser/download_task_model.h" line="444"/>
+        <location filename="../../Browser/download_task_model.h" line="448"/>
         <source>m</source>
         <translation>m</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="439"/>
-        <location filename="../../Browser/download_task_model.h" line="443"/>
+        <location filename="../../Browser/download_task_model.h" line="451"/>
+        <location filename="../../Browser/download_task_model.h" line="455"/>
         <source>s</source>
         <translation>s</translation>
     </message>
