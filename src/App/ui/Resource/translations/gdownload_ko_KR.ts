@@ -3258,24 +3258,24 @@ GNU Affero General Public License v3.0(AGPL-3.0)에 따라 라이선스가 부�
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="286"/>
+        <location filename="../../Browser/download_task_model.h" line="419"/>
         <source>Unknown</source>
         <translation>알 수 없음</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="296"/>
+        <location filename="../../Browser/download_task_model.h" line="429"/>
         <source>h</source>
         <translation>h</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="299"/>
-        <location filename="../../Browser/download_task_model.h" line="303"/>
+        <location filename="../../Browser/download_task_model.h" line="432"/>
+        <location filename="../../Browser/download_task_model.h" line="436"/>
         <source>m</source>
         <translation>m</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="306"/>
-        <location filename="../../Browser/download_task_model.h" line="310"/>
+        <location filename="../../Browser/download_task_model.h" line="439"/>
+        <location filename="../../Browser/download_task_model.h" line="443"/>
         <source>s</source>
         <translation>s</translation>
     </message>

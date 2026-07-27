@@ -3258,24 +3258,24 @@ Copyright © 2024-2026 GDownload Team
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="286"/>
+        <location filename="../../Browser/download_task_model.h" line="419"/>
         <source>Unknown</source>
         <translation>未知</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="296"/>
+        <location filename="../../Browser/download_task_model.h" line="429"/>
         <source>h</source>
         <translation>時</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="299"/>
-        <location filename="../../Browser/download_task_model.h" line="303"/>
+        <location filename="../../Browser/download_task_model.h" line="432"/>
+        <location filename="../../Browser/download_task_model.h" line="436"/>
         <source>m</source>
         <translation>分</translation>
     </message>
     <message>
-        <location filename="../../Browser/download_task_model.h" line="306"/>
-        <location filename="../../Browser/download_task_model.h" line="310"/>
+        <location filename="../../Browser/download_task_model.h" line="439"/>
+        <location filename="../../Browser/download_task_model.h" line="443"/>
         <source>s</source>
         <translation>秒</translation>
     </message>
