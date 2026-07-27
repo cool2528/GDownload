@@ -334,6 +334,38 @@ TEST(DownloadTaskModelTest, StallIsNotReportedWithinOneSlowBlockInterval) {
 	EXPECT_FALSE(live->progress_stalled());
 }
 
+// 采样断层后的恢复不得闪一次停滞告警。aria2 的暂停路径不保留活动行(暂停期间一次采样都
+// 没有,Suspend 无人触发),系统睡眠同形。修复前:恢复的首个采样把整个中断时长记成
+// ms_since_peak(直接越过 90 秒下限),中断前攒下的线上积分又恰好凑满字节预算,一次完全
+// 健康的恢复就在首个采样点被判成停滞,告警闪一次、直到下个水位推进才撤。
+// 时间线构造:阶段一 79 秒慢速健康(30 KiB/s,水位在 t=1000 后不再推进,线上积分攒到约
+// 2.3 MiB > 2 MiB 预算下限,但 ms_since_peak 未到 90 秒 —— 中断前不告警);阶段二观测
+// 中断 300 秒;阶段三恢复采样 —— 修复前首采样即告警,修复后断层触发基线重建,不告警。
+TEST(DownloadTaskModelTest, ResumeAfterSamplingGapDoesNotFlashStallWarning) {
+	DownloadTaskModel model;
+	const DownloadTaskInfo base = MakeEd2kActiveTask();
+	model.AddTask(base, 0);
+	const std::int64_t kWire   = 30 * 1024;
+	const std::int64_t advanced = base.task_current_size() + kEngineProgressStep;
+	SampleAt(model, base, advanced, kWire, 1000);  // 一次推进建立水位
+	for (std::int64_t t = 2000; t <= 80000; t += 1000) {
+		SampleAt(model, base, advanced, kWire, t);
+	}
+	{
+		const DownloadTaskInfo* live = model.GetTaskById(base.task_id());
+		ASSERT_NE(live, nullptr);
+		ASSERT_FALSE(live->progress_stalled()) << "precondition: no warning before the gap";
+	}
+	// 观测中断 300 秒(无任何采样调用),随后恢复。
+	for (std::int64_t t = 380000; t <= 385000; t += 1000) {
+		SampleAt(model, base, advanced, kWire, t);
+		const DownloadTaskInfo* live = model.GetTaskById(base.task_id());
+		ASSERT_NE(live, nullptr);
+		EXPECT_FALSE(live->progress_stalled())
+			<< "healthy resume after a sampling gap must not flash a stall warning at t=" << t;
+	}
+}
+
 // 线上一个字节都没来 = "没有源",与"在收但存不下"是两种完全不同的故障,不能混用同一句告警
 TEST(DownloadTaskModelTest, StallIsNotReportedWhenNothingArrivesOnTheWire) {
 	DownloadTaskModel model;
