@@ -1653,15 +1653,22 @@ namespace gdl {
 					task_info.set_task_id(task_id);
 					const TaskState state = Ed2kStateStringToTaskState(doc.value("state", std::string()));
 					task_info.set_task_state(state);
-					// 完成态把"已下载"钉成文件总大小。引擎只在整文件 MD4 复验通过后才置 completed,
-					// 此刻盘上就是完整文件,Session 内部也确实把 bytes_done 改成了链接里的 size ——
-					// 但那个权威值到不了桌面端:终态事件的 payload 只有 {id,state,error},而带
-					// bytes_done 的快照通道在 1s 采样里被显式跳过(见 ed2k_download_manager.cxx 的
-					// 终态过滤)。于是这里只能拿到"完成前最后一次采样"的缓存值。
-					// 续传任务尤其致命:引擎的 bytes_done 只累加本轮真正落盘的块,完成时缓存里的数字
-					// 比文件真实大小小整整一个续传起点,界面上就成了"已完成大小 3.23 MB / 已下载
-					// 2.70 MB",用户据此判定下载失败。这一钉同时修好界面与落库的历史记录。
-					// 【严格限定 kComplete】kError/kRemoved 必须保留真实采样值,否则
+					// 引擎 v2.10.0 起终态事件自带字节数快照(事件发出那一刻 PartFile 块级记账的
+					// 真值), 不再依赖"完成前最后一次采样"的缓存 —— 失败任务的采样可能停在几秒前,
+					// 缓存值系统性偏高; 续传完成任务的缓存只含本轮落盘量, 又系统性偏低。真值一到
+					// 直接采用(禁 clamp: bytes_done 语义可回退、恒 <= total); total_size 一并采用,
+					// 覆盖"重启后缓存为空、total 缺失"的场景。字段缺失(旧引擎)时保持原缓存值。
+					{
+						const std::int64_t ev_total = doc.value("total_size", std::int64_t{-1});
+						const std::int64_t ev_done	= doc.value("bytes_done", std::int64_t{-1});
+						if (ev_total > 0) task_info.set_task_total_size(ev_total);
+						if (ev_done >= 0) task_info.set_task_current_size(ev_done);
+					}
+					// 完成态兜底钉总大小(引擎只在整文件 MD4 复验通过后才置 completed, 此刻盘上就是
+					// 完整文件)。v2.10.0 的事件真值本就满足 bytes_done == total, 这一钉只在字段缺失
+					// (旧引擎)时兜住旧缺陷: 续传完成的缓存值比文件真实大小小整整一个续传起点,
+					// 界面上"已完成大小 3.23 MB / 已下载 2.70 MB"会被用户判定为下载失败。
+					// 【严格限定 kComplete】kError/kRemoved 必须保留真实值,否则
 					// RestoreEd2kDownloadHistory 会拿一个满值记录去续传,断点语义被破坏。
 					if (state == TaskState::kComplete && task_info.task_total_size() > 0) {
 						task_info.set_task_current_size(task_info.task_total_size());

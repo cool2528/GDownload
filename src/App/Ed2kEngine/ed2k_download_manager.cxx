@@ -336,6 +336,12 @@ bool Ed2kDownloadManager::InitEd2kEngine(const Ed2kEngineConfig& config) {
 				payload["id"] = it->second;
 				payload["state"] = TaskStateToString(task_event->state);
 				payload["error"] = task_event->error ? task_event->error.message() : std::string();
+				// 引擎 v2.10.0 起终态事件自带字节数快照(事件发出那一刻 PartFile 块级记账的真值)。
+				// 透传给上层, 让失败/完成态显示的"已传输"不再依赖上一次周期采样的缓存值 ——
+				// 失败任务的采样可能停在几秒前, 数字系统性偏高。消费方禁 clamp(bytes_done 语义
+				// 可回退、恒 <= total)。
+				payload["bytes_done"] = task_event->bytes_done;
+				payload["total_size"] = task_event->total_size;
 				if (impl_->pubsub) {
 					impl_->pubsub->Publish(kEd2kTaskState, payload.dump());
 				}
