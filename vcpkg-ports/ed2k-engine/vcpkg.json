@@ -1,6 +1,6 @@
 {
   "name": "ed2k-engine",
-  "version": "2.9.0",
+  "version": "2.10.0",
   "description": "Self-implemented eD2k/eMule protocol engine (ed2k::core)",
   "homepage": "https://github.com/cool2528/ed2k-engine-cpp",
   "license": "MIT",
