@@ -48,6 +48,17 @@ namespace gdl {
 				// 到达量",把一次卡顿伪造成停滞的证据。
 				static constexpr std::int64_t kMaxIntegrationStepMs = 5000;
 
+				// 采样断层上限。活动态采样是 1Hz,相邻两次相隔超过它,说明观测被中断过:
+				// aria2 的暂停路径不保留活动行(暂停期间 SampleProgress 一次都不会被调用,
+				// Suspend() 也就无人触发)、系统睡眠、界面线程长时间被饿死,形状相同。
+				// 中断期间窗口里的水位时钟与线上积分全都陈旧 —— 恢复后的第一次采样会把
+				// 整个中断时长记成"距上次推进的时间"(ms_since_peak 直接越过 90 秒下限),
+				// 暂停前攒下的线上积分又可能恰好凑满预算,一次完全健康的恢复就这样在首个
+				// 采样点被判成停滞,告警闪一次、直到下个水位推进才撤。视同 Suspend:整段
+				// 作废,从恢复那一刻重建基线。真停滞的任务始终留在活动行里被 1Hz 采样,
+				// 不会产生断层,不受本条影响。
+				static constexpr std::int64_t kSampleGapResetMs = 10000;
+
 				// 停滞的字节预算 = 观测到的落盘粒度 × 该系数。取 3:健康的下载每收满一个
 				// 粒度必定推进一次,留 3 倍余量足以吸收线上重传/弃帧带来的浪费。
 				static constexpr std::int64_t kStallBudgetFactor = 3;
@@ -80,9 +91,10 @@ namespace gdl {
 				//      判据的分母,取代了原来的纯墙钟计时。
 				void Sample(std::int64_t current_size, std::int64_t wire_speed_bps, std::int64_t now_ms) {
 					// 时间倒流只可能来自换了时钟源或测试;此时窗口里的跨度全不可信,整段作废。
+					// 采样断层(> kSampleGapResetMs)同样作废 —— 理由见该常量的注释。
 					// 【进度回退不走这条路】part 的 MD4 没过会 reset_part() 把 bytes_done 打回
 					// 去,那不是"没有信息",恰恰是最该被记下来的一次倒退 —— 见下面的水位判据。
-					if (!started_ || now_ms < latest_ms_) {
+					if (!started_ || now_ms < latest_ms_ || now_ms - latest_ms_ > kSampleGapResetMs) {
 						Restart(current_size, now_ms);
 					}
 					else {
