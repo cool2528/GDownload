@@ -59,12 +59,29 @@ std::string TaskStateToString(ed2k::session::TaskState state) {
 	return "unknown";
 }
 
-// 把一批搜索结果序列化为 kEd2kSearchResult 的 JSON payload
-std::string SearchResultsToJson(const std::vector<ed2k::server::SearchResultItem>& items, bool append) {
+// 多服务器搜索收尾信号：不带条目，只用来把 UI 的“搜索中”状态复位。
+// more/done 这对字段的分工：首屏 payload 带 more=true 表示“后面还有追加批次，先别复位”，
+// 本条带 done=true 表示“全部服务器已收尾，可以复位了”。
+std::string SearchDoneToJson() {
+	nlohmann::json doc;
+	doc["ok"] = true;
+	doc["error"] = std::string();
+	doc["append"] = true;                       // 不重置模型
+	doc["done"] = true;
+	doc["items"] = nlohmann::json::array();
+	return doc.dump();
+}
+
+// 把一批搜索结果序列化为 kEd2kSearchResult 的 JSON payload。
+// more=true 只用在“首屏”那条上：告诉 UI 后台还会陆续送来追加批次，此刻**不要**复位
+// “搜索中”状态、也不要下“没有结果”的结论(首屏为空但其余服务器有货是常态)。
+std::string SearchResultsToJson(const std::vector<ed2k::server::SearchResultItem>& items, bool append,
+								bool more = false) {
 	nlohmann::json doc;
 	doc["ok"] = true;
 	doc["error"] = std::string();
 	doc["append"] = append;
+	doc["more"] = more;
 	nlohmann::json arr = nlohmann::json::array();
 	for (const auto& item : items) {
 		nlohmann::json j;
@@ -313,6 +330,27 @@ bool Ed2kDownloadManager::InitEd2kEngine(const Ed2kEngineConfig& config) {
 			try {
 				const auto* task_event = std::get_if<ed2k::session::TaskStateEvent>(&event);
 				if (!task_event) {
+					// 多服务器搜索的增量结果：search() 只返回已登录那台服务器的结果，其余服务器由
+					// 引擎后台并发搜索，每答完一台就来一个本事件。eD2k 每台服务器的文件名索引互相
+					// 独立，只看首屏会漏掉绝大部分结果(引擎侧实测：52 条 vs 全网并集 724 条)，所以
+					// 这些批次必须以 append=true 追加进列表，而不是替换。
+					// final 批不带条目，转成一条 done=true 的空 payload：UI 靠它把“搜索中”状态
+					// 复位。**不能**在首屏那条上就复位 —— 追加批次要 10~20 秒后才陆续到，
+					// 首屏为空时界面会先闪一下“没有结果”，过一会儿结果又冒出来，看着像坏的。
+					// 引擎侧保证 multi_server_search 开着且 search() 成功返回时必定有且仅有
+					// 一个 final(即使没有别的服务器可问)，所以这条信号可以放心依赖。
+					if (const auto* sr = std::get_if<ed2k::session::SearchResultsEvent>(&event)) {
+						if (!impl_->pubsub) return;
+						if (sr->final) {
+							impl_->pubsub->Publish(kEd2kSearchResult, SearchDoneToJson());
+						} else if (!sr->items.empty()) {
+							// more=true：这是中间批次，后面还有(至少还有那条 done)。不带它的话
+							// UI 会以为搜索已终结而复位状态，下一批就被它的防迟到守卫丢掉。
+							impl_->pubsub->Publish(kEd2kSearchResult,
+								SearchResultsToJson(sr->items, true, /*more=*/true));
+						}
+						return;
+					}
 					// 服务器状态事件：连接后服务器身份/用户数/文件数快照
 					if (const auto* srv = std::get_if<ed2k::session::ServerStateEvent>(&event)) {
 						nlohmann::json doc;
@@ -752,8 +790,12 @@ void Ed2kDownloadManager::Search(const std::string& keyword, int file_type, std:
 						filters.min_size = min_size > 0 ? static_cast<std::uint64_t>(min_size) : 0;
 						auto r = co_await impl_->session->search(keyword, filters);
 						if (impl_->pubsub) {
+							// more=true：引擎的多服务器搜索腿随后会送来追加批次，最后以一个
+							// done=true 收尾。这里恒为 true —— SessionConfig::multi_server_search
+							// 我们没有关过(默认开)，引擎侧对该配置保证必有一个 final。
 							impl_->pubsub->Publish(kEd2kSearchResult,
-								r ? SearchResultsToJson(r.value(), false) : SearchErrorToJson(r.error().message()));
+								r ? SearchResultsToJson(r.value(), false, /*more=*/true)
+								  : SearchErrorToJson(r.error().message()));
 						}
 					}
 				} catch (const std::exception& e) {
