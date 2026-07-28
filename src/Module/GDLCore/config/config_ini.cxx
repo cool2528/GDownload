@@ -1,5 +1,6 @@
 #include "config_ini.h"
 #include <cctype>
+#include <chrono>
 #include <filesystem>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -95,8 +96,15 @@ namespace gdl {
 		}  // namespace
 
 		ApplicationConfig::~ApplicationConfig() {
+			// 顺序要紧：先把后台写入线程停掉并 join，否则它会在成员被销毁之后继续访问
+			// toml_root_/config_file_path_。StopWriter 内部只用 writer_mutex_，不碰 mutex_。
+			try {
+				StopWriter();
+			} catch (...) {
+			}
 			// 程序退出阶段 spdlog 可能已析构，且其他线程可能仍持有锁。
-			// 用 try_lock 避免死锁，通过无日志 helper 尽力原子保存。
+			// 用 try_lock 避免死锁，通过无日志 helper 尽力原子保存 —— 这也是异步路径的兜底：
+			// 最后一次 Put 若还没被写入线程取走，在这里同步补上。
 			try {
 				std::unique_lock lock(mutex_, std::defer_lock);
 				if (lock.try_lock()) {
@@ -239,8 +247,17 @@ namespace gdl {
 
 		bool ApplicationConfig::Save() {
 			try {
-				std::unique_lock lock(mutex_);
-				const auto result = detail::SaveTomlAtomically(config_file_path_, toml_root_);
+				// 快照在锁内取，文件 I/O 在**锁外**做。
+				// 旧实现整段持 mutex_ 的独占锁，于是一次 fsync 会把所有读配置的线程(Get 用共享锁)
+				// 一起挡住 —— 那是 UI 卡顿的第二个放大器，不是主因但同样要去掉。
+				toml::table snapshot;
+				String path;
+				{
+					std::shared_lock lock(mutex_);
+					snapshot = toml_root_;
+					path	 = config_file_path_;
+				}
+				const auto result = detail::SaveTomlAtomically(path, snapshot);
 				if (!result) {
 					LOG_ERR("Failed to save TOML configuration at atomic replacement stage {}: {}",
 							result.GetError().Code(), result.GetError().what());
@@ -251,6 +268,69 @@ namespace gdl {
 				return false;
 			}
 			return true;
+		}
+
+		void ApplicationConfig::ScheduleSave() {
+			{
+				std::lock_guard lock(writer_mutex_);
+				if (writer_stop_) {
+					return;   // 已在收尾：由 StopWriter 的最后一次同步保存兜底
+				}
+				dirty_ = true;
+				if (!writer_thread_.joinable()) {
+					writer_thread_ = std::thread([this] { WriterLoop(); });
+				}
+			}
+			writer_cv_.notify_one();
+		}
+
+		void ApplicationConfig::WriterLoop() {
+			for (;;) {
+				{
+					std::unique_lock lock(writer_mutex_);
+					writer_cv_.wait(lock, [this] { return dirty_ || writer_stop_; });
+					if (writer_stop_ && !dirty_) {
+						return;
+					}
+					// 合并窗口：一次拖动会连着改窗口位置与尺寸两项，设置页更是一连串写入。
+					// 等一小段再落盘，把它们并成一次原子替换 —— 既省掉重复的 fsync，
+					// 也避免把磁盘队列填满。250ms 对"设置不丢"没有实际影响：进程退出走
+					// StopWriter 的同步保存，崩溃场景本来就不保证。
+					writer_cv_.wait_for(lock, std::chrono::milliseconds(250),
+										[this] { return writer_stop_; });
+					dirty_ = false;
+				}
+				// 不持任何调度锁做文件 I/O。Save() 内部只在取快照时短暂加 mutex_ 的共享锁。
+				Save();
+				{
+					std::lock_guard lock(writer_mutex_);
+					if (writer_stop_ && !dirty_) {
+						return;
+					}
+				}
+			}
+		}
+
+		void ApplicationConfig::StopWriter() {
+			{
+				std::lock_guard lock(writer_mutex_);
+				writer_stop_ = true;
+			}
+			writer_cv_.notify_all();
+			if (writer_thread_.joinable()) {
+				try {
+					writer_thread_.join();
+				} catch (...) {
+				}
+			}
+		}
+
+		bool ApplicationConfig::FlushNow() {
+			{
+				std::lock_guard lock(writer_mutex_);
+				dirty_ = false;   // 本次由调用方同步完成，避免写入线程再写一遍
+			}
+			return Save();
 		}
 
 		bool ApplicationConfig::EnsureConfigFileExists() {
