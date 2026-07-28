@@ -158,6 +158,61 @@ TEST(UpdateUrlPolicyTest, RedirectDecisionRejectsUntrustedTargets) {
 		RedirectDecision::kReject);
 }
 
+TEST(UpdateUrlPolicyTest, AllowedHostsCoverGithubReleaseAssetDomains) {
+	// GitHub 释放资产实际会 302 到 release-assets.githubusercontent.com（新域），
+	// 白名单必须同时覆盖新旧资产域，否则重定向被拒、更新永远失败
+	const auto hosts = BuildAllowedDownloadHosts(false);
+
+	EXPECT_TRUE(ValidateDownloadUrl(
+		"https://github.com/cool2528/GDownload/releases/download/v2.2.0/GDownloader_windows_2.2.0.exe", hosts));
+	EXPECT_TRUE(ValidateDownloadUrl(
+		"https://release-assets.githubusercontent.com/github-production-release-asset/857242284/blob?sig=abc", hosts));
+	EXPECT_TRUE(ValidateDownloadUrl("https://objects.githubusercontent.com/release-asset/app.exe", hosts));
+	EXPECT_TRUE(ValidateDownloadUrl("https://gdownload.uk/update/app.exe", hosts));
+	// 未开启加速时镜像域不放行
+	EXPECT_FALSE(ValidateDownloadUrl("https://gh-proxy.com/https://github.com/app.exe", hosts));
+}
+
+TEST(UpdateUrlPolicyTest, MirrorEnabledAdditionallyAllowsMirrorHost) {
+	const auto hosts = BuildAllowedDownloadHosts(true);
+
+	EXPECT_TRUE(ValidateDownloadUrl(
+		"https://gh-proxy.com/https://github.com/cool2528/GDownload/releases/download/v2.2.0/app.exe", hosts));
+	EXPECT_TRUE(ValidateDownloadUrl("https://github.com/app.exe", hosts));
+	EXPECT_FALSE(ValidateDownloadUrl("https://evil.example/app.exe", hosts));
+}
+
+TEST(UpdateUrlPolicyTest, ResolveDownloadUrlAppliesMirrorPrefixOnlyToGithubResources) {
+	const std::string github_url =
+		"https://github.com/cool2528/GDownload/releases/download/v2.2.0/app.exe";
+
+	// 开启加速且为 GitHub 资源时加镜像前缀
+	EXPECT_EQ(ResolveDownloadUrl(github_url, true), "https://gh-proxy.com/" + github_url);
+	// 未开启加速原样返回
+	EXPECT_EQ(ResolveDownloadUrl(github_url, false), github_url);
+	// 已带前缀不重复加
+	EXPECT_EQ(ResolveDownloadUrl("https://gh-proxy.com/" + github_url, true),
+		"https://gh-proxy.com/" + github_url);
+	// 非 GitHub 资源不加前缀
+	EXPECT_EQ(ResolveDownloadUrl("https://gdownload.uk/update/app.exe", true),
+		"https://gdownload.uk/update/app.exe");
+	// host 之外出现 github.com 字样不触发前缀（严格按 host 判定）
+	EXPECT_EQ(ResolveDownloadUrl("https://evil.example/?u=github.com", true),
+		"https://evil.example/?u=github.com");
+	// 空 URL 原样返回
+	EXPECT_EQ(ResolveDownloadUrl("", true), "");
+}
+
+TEST(RedirectChainControllerTest, FollowsGithubRedirectToReleaseAssetsHost) {
+	// 复刻线上真实重定向：github.com -> release-assets.githubusercontent.com
+	RedirectChainController chain(
+		"https://github.com/cool2528/GDownload/releases/download/v2.2.0/app.exe",
+		BuildAllowedDownloadHosts(false));
+	const auto result = chain.Follow(
+		"https://release-assets.githubusercontent.com/github-production-release-asset/857242284/blob?sig=abc");
+	EXPECT_EQ(result.decision, RedirectChainDecision::kFollow);
+}
+
 TEST(RedirectChainControllerTest, ResolvesRelativeRedirectAndValidatesTarget) {
 	RedirectChainController chain("https://github.com/releases/latest/app.exe", {"github.com"});
 	const auto result = chain.Follow("../download/app.exe");
