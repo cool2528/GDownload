@@ -211,6 +211,15 @@ elseif(WIN32)
         set(INSTALLER_BIN_DIR "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin")
     endif()
     file(TO_NATIVE_PATH "${INSTALLER_BIN_DIR}" INSTALLER_BIN_DIR)
+    # tests/qml_ui 把 Qt6Test/Qt6QuickTest/qoffscreen 与 17 个测试二进制**直接部署进上面这个
+    # 目录**(见 tests/qml_ui/CMakeLists.txt 的 _qml_ui_out), 而这里是递归打包。.iss 里已按名字
+    # 把它们排除掉, 但那是黑名单, 新增测试目标若不按 qml_ui_ 命名就会漏网 —— 所以这里再提醒一次:
+    # 发版包请用 BUILD_TESTS=OFF 的干净构建树打。
+    if(BUILD_TESTS)
+        message(WARNING
+            "BUILD_TESTS=ON: 测试二进制与 Qt Test DLL 会落在安装包的打包目录里。"
+            ".iss 已按名字排除已知的那批, 但发版包仍建议用 BUILD_TESTS=OFF 的构建树生成。")
+    endif()
     configure_file(
         ${CMAKE_SOURCE_DIR}/package/windows_installer.iss.in
         ${CMAKE_BINARY_DIR}/release/windows_installer.iss

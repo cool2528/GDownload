@@ -117,10 +117,23 @@ Name: "addtopath"; Description: "{cm:AddToPathDescription}"; GroupDescription: "
 Name: "associatefiles"; Description: "{cm:AssociateTorrentDescription}"; GroupDescription: "{cm:FileAssociationsGroupDescription}"; Flags: unchecked
 
 [Files]
-; 主程序文件
-Source: "@INSTALLER_BIN_DIR@\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-; 排除 PDB 调试文件
-Source: "@INSTALLER_BIN_DIR@\*"; DestDir: "{app}"; Excludes: "*.pdb,*.lib,*.exp"; Flags: ignoreversion recursesubdirs createallsubdirs
+; 主程序文件。**只能有这一条 Source**：此前是两条(一条不带 Excludes、一条带)，第一条把所有
+; 文件都收进去了，第二条的排除永远不生效 —— .lib/.exp 因此一直躺在安装包里。
+;
+; Excludes 的两类内容：
+;   1. 链接期产物(.pdb/.lib/.exp/.ilk)：运行不需要。
+;   2. 测试产物：tests/qml_ui 把 Qt6Test.dll / Qt6QuickTest.dll / platforms\qoffscreen.dll 和
+;      17 个 qml_ui_* 测试二进制**直接部署进本目录**(见 tests/qml_ui/CMakeLists.txt 的
+;      _qml_ui_out，它等于 CMAKE_RUNTIME_OUTPUT_DIRECTORY/$<CONFIG>，正是这里打包的目录)。
+;      它们与主程序共用目录是有意为之(测试要靠主程序已部署好的那批运行时 DLL)，所以不能靠
+;      挪走输出目录来解决，只能在打包这一步按名字挡掉。
+;      BUILD_TESTS=OFF 的构建里这些文件根本不存在，Excludes 是空转，不影响正常发版。
+;      注意这是**黑名单**：往 tests/qml_ui 里加新的测试目标时，若命名不以 qml_ui_ 开头，
+;      记得同步补到这里。
+;   注:测试截图产物在 <build>/test_artifacts/ 下，不在本目录，无需排除。
+Source: "@INSTALLER_BIN_DIR@\*"; DestDir: "{app}"; \
+    Excludes: "*.pdb,*.lib,*.exp,*.ilk,qml_ui_*,Qt6Test.dll,Qt6Testd.dll,Qt6QuickTest.dll,Qt6QuickTestd.dll,platforms\qoffscreen.dll,platforms\qoffscreend.dll"; \
+    Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 ; 开始菜单快捷方式
