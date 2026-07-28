@@ -121,36 +121,25 @@ find "$ARM64_APP" -type f | while read -r ARM64_FILE; do
     fi
 done
 
-# 重新进行 ad-hoc 签名
-# lipo 操作可能会破坏原有的签名，导致在 ARM64 macOS 上无法���行
-echo "重新对 Universal Bundle 进行 ad-hoc 签名..."
+# 重新进行 ad-hoc 深度签名
+# lipo 产生的新二进制没有有效签名, 必须整体重签。此前的逐类手签存在多处遗漏
+# (Autoupdate/Updater.app/XPC 服务/engine 等辅助可执行未覆盖, framework 主二进制
+# 只认 Versions/A 而 Sparkle 是 Versions/B), 且所有 codesign 错误被静默吞掉,
+# 产出的 Universal 包签名损坏, Sparkle 更新校验必拒。
+# 前提: 输入 bundle 的符号链接结构必须完好(artifact 需经 tar 包裹传输),
+# 否则 codesign 会因 "bundle format is ambiguous" 失败。
+echo "重新对 Universal Bundle 进行 ad-hoc 深度签名..."
+ENTITLEMENTS="$(cd "$(dirname "$0")/.." && pwd)/package/entitlements.plist"
+if [ -f "$ENTITLEMENTS" ]; then
+    codesign --force --deep --sign - --timestamp=none --options runtime \
+        --entitlements "$ENTITLEMENTS" "$UNIVERSAL_APP"
+else
+    echo "警告: 未找到 entitlements ($ENTITLEMENTS), 不带 entitlements 签名"
+    codesign --force --deep --sign - --timestamp=none --options runtime "$UNIVERSAL_APP"
+fi
 
-# 对所有动态库进行签名（需要先签名dylib，因为framework可能依赖它们）
-find "$UNIVERSAL_APP/Contents/Frameworks" -name "*.dylib" -type f | while read -r dylib; do
-    echo "签名 dylib: $(basename "$dylib")"
-    codesign --force --sign - "$dylib" 2>&1 | grep -v "replacing existing signature" || true
-done
-
-# 对框架进行签名（从最深层开始）
-find "$UNIVERSAL_APP/Contents/Frameworks" -name "*.framework" -type d | sort -r | while read -r framework; do
-    framework_name=$(basename "$framework" .framework)
-    # 签名framework内的主要二进制文件
-    if [ -f "$framework/Versions/A/$framework_name" ]; then
-        echo "签名 framework: $framework_name"
-        codesign --force --sign - "$framework/Versions/A/$framework_name" 2>&1 | grep -v "replacing existing signature" || true
-    elif [ -f "$framework/$framework_name" ]; then
-        echo "签名 framework: $framework_name"
-        codesign --force --sign - "$framework/$framework_name" 2>&1 | grep -v "replacing existing signature" || true
-    fi
-done
-
-# 对插件进行签名
-find "$UNIVERSAL_APP/Contents/PlugIns" -name "*.dylib" -type f | while read -r plugin; do
-    codesign --force --sign - "$plugin" 2>&1 | grep -v "replacing existing signature" || true
-done
-
-# 最后对整个应用签名
-echo "签名整个应用..."
-codesign --force --sign - "$UNIVERSAL_APP" 2>&1 | grep -v "replacing existing signature" || true
+# 签名完整性硬断言: 失败必须让 CI 变红, 绝不放行签名损坏的包
+echo "验证签名完整性..."
+codesign --verify --deep --strict "$UNIVERSAL_APP"
 
 echo "Universal Binary 创建成功: $UNIVERSAL_APP"

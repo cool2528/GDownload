@@ -523,12 +523,21 @@ jobs:
             ${{ github.workspace }}/${{ matrix.install_prefix }}
           if-no-files-found: warn
 
+      # 必须先 tar 包裹再上传: upload-artifact 的 zip 传输会把 framework 内的
+      # 符号链接解引用成实体拷贝, 摊平 Versions 结构, 使合并后的 Universal 包
+      # 无法产生自洽的 Apple 签名(Sparkle 更新校验必拒)
+      - name: Pack Architecture App (macOS only)
+        if: startsWith(matrix.target, 'macos-')
+        run: |
+          tar -czf ${{ matrix.artifact_name }}.tar.gz \
+            -C ${{ github.workspace }}/${{ matrix.install_prefix }} GDownload.app
+
       - name: Upload Architecture Artifact (macOS only)
         if: startsWith(matrix.target, 'macos-')
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: ${{ github.workspace }}/${{ matrix.install_prefix }}/GDownload.app
+          path: ${{ matrix.artifact_name }}.tar.gz
           retention-days: 1
 
       - name: Upload Release Artifact
@@ -555,13 +564,20 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: macos-arm64-app
-          path: build-arm64/GDownload.app
+          path: artifacts/arm64
 
       - name: Download x64 Build
         uses: actions/download-artifact@v4
         with:
           name: macos-x64-app
-          path: build-x64/GDownload.app
+          path: artifacts/x64
+
+      # tar 解包还原符号链接与可执行权限(对应 build 侧的 tar 包裹上传)
+      - name: Unpack Architecture Apps
+        run: |
+          mkdir -p build-arm64 build-x64
+          tar -xzf artifacts/arm64/macos-arm64-app.tar.gz -C build-arm64
+          tar -xzf artifacts/x64/macos-x64-app.tar.gz -C build-x64
 
       - name: Merge Universal Binary
         run: |
@@ -579,6 +595,13 @@ jobs:
 
           echo "验证所有 .dylib 文件:"
           find GDownload.app -name "*.dylib" -exec sh -c 'echo "{}"; lipo -info "{}"' \;
+
+          echo "验证 Sparkle 安装组件(缺失会导致应用内更新启动安装器失败):"
+          test -L GDownload.app/Contents/Frameworks/Sparkle.framework/Updater.app
+          test -e GDownload.app/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app/Contents/MacOS/Updater
+
+          echo "验证签名完整性(损坏会被 Sparkle 更新校验拒绝):"
+          codesign --verify --deep --strict GDownload.app
 
       - name: Create DMG
         run: |
