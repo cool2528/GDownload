@@ -1,5 +1,43 @@
 # Changelog
 
+## v2.2.0
+
+### 🔍 eD2k 搜索 / eD2k Search
+
+- **Search now asks every server in your list instead of just the one you are connected to.** Each eD2k server keeps its own independent filename index, so searching a single server returned only a small slice of what is out there. Measured on a real 8-server list with the keyword `ubuntu`: the connected server returned 52 results, the union across all eight was **724**. Results from the first server appear as fast as before; the rest are fetched in the background and appended as each server answers. / **搜索改为向服务器列表里的每一台发起,而不只是当前连接的那一台。** eD2k 每台服务器的文件名索引互相独立,只搜一台会系统性漏掉绝大部分结果。真实 8 台服务器实测(关键词 `ubuntu`):已连接那台 52 条,八台并集 **724 条**。首屏结果出现的速度不变,其余服务器的结果在后台陆续追加。
+- The result list keeps showing "searching" until every server has answered, so a slow server can no longer make an in-progress search look like it found nothing. / 搜索期间界面持续显示"搜索中"直到全部服务器答完,不会再出现"先说没有结果、十几秒后结果又冒出来"。
+
+### ⬇️ eD2k 下载 / eD2k Downloads
+
+引擎从 2.7.4 升级到 2.12.1,期间完成了一轮针对 eMule/aMule 线协议的全面对齐(122 项审计结论)。用户可感知的部分: / The engine moved from 2.7.4 to 2.12.1, which included a full wire-protocol alignment pass against eMule/aMule (122 audited findings). What you can notice:
+
+- **Files whose size is an exact multiple of 9,728,000 bytes can now complete.** They previously re-downloaded the last chunk forever. / **大小恰好是 9,728,000 字节整数倍的文件现在能下完了** —— 此前最后一块会无限重下。
+- **Small files (≤180 KB) with an AICH hash in the link no longer always fail.** / **链接里带 AICH 校验的小文件(≤180 KB)不再必然失败。**
+- **Sources are now discovered from every known server, not one.** UDP source queries also went to the wrong port before, so that whole leg returned nothing. / **取源改为询问全部已知服务器**;此前 UDP 取源还发错了端口,那条通路一个源都拿不回来。
+- **We no longer get silently banned by servers for asking too often**, and queue positions survive a dropped connection instead of sending you back to the end of the line. / **不再因请求过频被服务器静默封禁**,排队位置也不会因掉线而回到队尾。
+- **Uploads no longer leak slots**, and when our turn comes in someone's queue the slot is actually taken. / **上传槽不再泄漏**;在别人队列里轮到我们时,槽位现在真的会被领走。
+- **Download speed no longer reads 0 while data is arriving**, and progress no longer exceeds what is actually on disk. / **下载中速度不再显示为 0**,进度也不会超过磁盘上真实写入的量。
+- **Disk write failures are now reported instead of silently mislabelled.** / **磁盘写入失败会如实报出**,不再被静默误判成其他原因。
+- Setup now races sources in parallel and an unresponsive server no longer stalls the start of every download. / 启动阶段改为并行竞速探测源,单台服务器无响应不再拖住所有下载的启动。
+- Each install now gets a persistent, properly marked eD2k UserHash. / 每次安装拥有持久且带标识的 eD2k UserHash。
+
+### 📊 进度与状态显示 / Progress & Status
+
+- Fix stalled-download false alarms: the detector now looks at bytes actually received on the wire, so a healthy slow download is no longer reported as stalled, and pausing or resuming no longer triggers a spurious warning. / 修复"停滞"误报:判据改用线上真实收到的字节数,健康的慢速下载不再被误判;暂停与恢复也不再触发一次假警报。
+- ETA is computed from progress rate, and "receiving but cannot write to disk" is now surfaced as its own state. / ETA 改用进度速率计算;"在收但落不了盘"作为独立状态显示出来。
+- Completed tasks show the file's total size instead of the bytes transferred in the last session. / 已完成任务显示文件总大小,而不是最后一轮的传输量。
+- The connection count shows real connections, with queued sources counted separately; waiting caused by the anti-ban interval is shown as a deliberate wait rather than silence. / "连接数"显示真实连接数,排队数单独计;因防封禁间隔而等待会显示成一次刻意的等待,而不是毫无反馈。
+- You can open the engine diagnostic log from the UI. / 可以从界面直接打开引擎诊断日志。
+
+### 📦 安装包 / Installer
+
+- **Fix an installer that installed successfully but produced an app that would not start**, when built with the Visual Studio generator. The packaging path did not account for the extra configuration subdirectory that multi-config generators add, so everything landed one level too deep while the shortcut pointed at the top level. CI builds (Ninja) were never affected. / **修复用 Visual Studio 生成器打出的安装包"安装成功却点不开"**:多配置生成器会在产物目录下多加一层配置子目录,打包路径没考虑到,内容全被装深了一层,而快捷方式指向顶层。CI 用的 Ninja 构建不受影响。
+- Link-time artifacts (`.lib` / `.exp` / `.pdb`) and test binaries are no longer shipped in the installer. The exclusion rule existed but never took effect. / 安装包不再包含链接期产物(`.lib` / `.exp` / `.pdb`)与测试二进制 —— 排除规则本来就写了,但一直没生效。
+
+### 📖 文档 / Docs
+
+- Windows packaging instructions rewritten: the standard preset cannot be used for packaging, and the reason is now documented. / 重写 Windows 打包步骤:常用预设不能用于打包,原因已写明。
+
 ## v2.1.0
 
 ### ✨ 更新体验 / Update Experience
