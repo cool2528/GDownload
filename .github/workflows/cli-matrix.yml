@@ -266,10 +266,10 @@ jobs:
           github-binarycache: true
           cache-key: vcpkg-${{ matrix.vcpkg_triplet }}
 
-      # sccache 编译缓存:缓存由 Release-Cache-Warm 工作流在 main 上定期喂热,
-      # tag 触发的发版 run 按 Actions 缓存规则可读取默认分支的缓存
-      - name: Setup sccache
-        uses: mozilla/sccache-action@v0.0.10
+      # 有意不用 sccache(GHA 后端): 它把每个编译对象存成独立缓存条目, 一次全量
+      # 构建刷出上千个碎片, 在 10GB 仓库共享配额下按 LRU 把 vcpkg-* 大缓存全部
+      # 逐出 —— v2.2.1 发版实测保温缓存上午灌完下午被挤光, Setup vcpkg 全量
+      # 冷编 26 分钟。vcpkg binary cache 才是发版提速的大头, 必须独占配额。
 
       - name: Download AppImage Tools
         if: matrix.target == 'linux'
@@ -317,7 +317,6 @@ jobs:
         if: matrix.target != 'windows'
         env:
           RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') }}
-          SCCACHE_GHA_ENABLED: "true"
           UPDATE_MANIFEST_ED25519_PUBLIC_KEY: ${{ vars.UPDATE_MANIFEST_ED25519_PUBLIC_KEY }}
         run: |
           if [ -z "${QTDIR:-}" ]; then
@@ -341,8 +340,6 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_PREFIX_PATH="${QTDIR}" \
             -DGDL_UI_GENERATE_TRANSLATIONS=on \
-            -DCMAKE_C_COMPILER_LAUNCHER=sccache \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=sccache \
             -GNinja \
             ${{ matrix.cmake_extra }} \
             "${TRUST_CMAKE_ARGS[@]}" \
@@ -431,7 +428,6 @@ jobs:
         if: matrix.target == 'windows'
         shell: cmd
         env:
-          SCCACHE_GHA_ENABLED: "true"
           UPDATE_MANIFEST_ED25519_PUBLIC_KEY: ${{ vars.UPDATE_MANIFEST_ED25519_PUBLIC_KEY }}
         run: |
           if "%QTDIR%"=="" (
@@ -441,7 +437,7 @@ jobs:
           where cl
           set "CC=cl"
           set "CXX=cl"
-          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\${{ matrix.install_prefix }} -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=%QTDIR% -DGDL_UI_GENERATE_TRANSLATIONS=on -DGDOWNLOAD_UPDATE_PUBLIC_KEY_BASE64=%UPDATE_MANIFEST_ED25519_PUBLIC_KEY% -GNinja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00" -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\${{ matrix.install_prefix }} -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=%QTDIR% -DGDL_UI_GENERATE_TRANSLATIONS=on -DGDOWNLOAD_UPDATE_PUBLIC_KEY_BASE64=%UPDATE_MANIFEST_ED25519_PUBLIC_KEY% -GNinja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00"
           cmake --build build --config Release --parallel
           mkdir windows_pdb
           copy /Y build\Release\bin\*.pdb windows_pdb
