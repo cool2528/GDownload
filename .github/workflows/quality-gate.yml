@@ -85,35 +85,24 @@ jobs:
           github-binarycache: true
           cache-key: vcpkg-x64-windows-debug
 
-      - name: Setup sccache
-        uses: mozilla/sccache-action@v0.0.10
-
+      # 有意不用 sccache(GHA 后端): 其按编译对象产生的上千碎片缓存条目会在
+      # 10GB 仓库共享配额下把 vcpkg-* 大缓存 LRU 逐出(v2.2.1 发版实测), 导致
+      # 发版构建全量冷编。/Z7(Embedded)与 CMP0141 设置保留, 与历史构建保持一致
       - name: Setup MSVC Developer Command Prompt
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
 
-      # MSVC 默认 Debug 调试信息格式为 /Zi(独立 PDB),sccache 无法缓存这类
-      # 编译调用;切到 /Z7(嵌入式,CMAKE_MSVC_DEBUG_INFORMATION_FORMAT=Embedded)
-      # 使编译可被缓存。该抽象需要 CMP0141=NEW(项目 cmake_minimum_required 3.18
-      # 时默认 OLD),通过 CMAKE_POLICY_DEFAULT_CMP0141 显式启用,仅影响 CI 测试构建
       - name: Configure Debug tests
         shell: cmd
-        env:
-          SCCACHE_GHA_ENABLED: "true"
         run: |
           where cl
           set "CC=cl"
           set "CXX=cl"
-          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=%QTDIR% -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00" -DBUILD_TESTS=ON -DGDL_UI_GENERATE_TRANSLATIONS=OFF -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_POLICY_DEFAULT_CMP0141=NEW -DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=Embedded
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=%QTDIR% -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00" -DBUILD_TESTS=ON -DGDL_UI_GENERATE_TRANSLATIONS=OFF -DCMAKE_POLICY_DEFAULT_CMP0141=NEW -DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=Embedded
 
       - name: Build Debug
-        env:
-          SCCACHE_GHA_ENABLED: "true"
         run: cmake --build build --config Debug --parallel
-
-      - name: Show sccache stats
-        run: sccache --show-stats
 
       - name: Run tests
         run: ctest --test-dir build -C Debug --output-on-failure

@@ -1,13 +1,16 @@
 name: Release-Cache-Warm
 
 # 发版缓存保温:GitHub Actions 缓存按 ref 隔离(tag 只能读默认分支的缓存)且
-# 7 天未访问即回收,导致 tag 触发的发版构建几乎必然 vcpkg/sccache 全冷启动
+# 7 天未访问即回收,导致 tag 触发的发版构建几乎必然 vcpkg 全冷启动
 # (v2.0.0 实测 Windows job 中 vcpkg 冷编译 27 分钟)。本工作流定期在 main 上
-# 恢复并按需重建 4 个发版 triplet 的 vcpkg 二进制缓存与 sccache 编译缓存,
-# 使发版 run 必定命中温热缓存。
+# 恢复并按需重建 4 个发版 triplet 的 vcpkg 二进制缓存,使发版 run 必定命中。
+#
+# 有意不保温 sccache(GHA 后端): 它按编译对象产生上千个碎片缓存条目, 在 10GB
+# 仓库共享配额下按 LRU 把 vcpkg-* 大缓存逐出 —— v2.2.1 发版实测保温缓存
+# 当天即被挤光, 净效果为负。vcpkg binary cache 必须独占配额。
 #
 # 注意:构建参数(Qt 版本/triplet/CMake flags)必须与 cli-matrix.yml 的 build
-# job 保持一致,否则 sccache 键不匹配、保温失效;修改任一侧时同步另一侧。
+# job 保持一致,否则 vcpkg ABI 键不匹配、保温失效;修改任一侧时同步另一侧。
 
 on:
   schedule:
@@ -152,21 +155,18 @@ jobs:
           github-binarycache: true
           cache-key: vcpkg-${{ matrix.vcpkg_triplet }}
 
-      - name: Setup sccache
-        uses: mozilla/sccache-action@v0.0.10
-
       - name: Setup MSVC Developer Command Prompt
         if: matrix.target == 'windows'
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.msvc_arch }}
 
-      # 与 cli-matrix.yml 相同参数做完整 Release 编译:不打包不上传,只为
-      # 把 sccache 编译缓存喂热(tag 发版 run 只能读到 main 上的缓存)
+      # 与 cli-matrix.yml 相同参数做完整 Release 编译:不打包不上传。vcpkg
+      # 依赖已在 Setup vcpkg 阶段编译并写入 binary cache;这里的项目编译兼做
+      # 四平台可编译性的定期回归探测
       - name: Configure & Build (Unix)
         if: matrix.target != 'windows'
         env:
-          SCCACHE_GHA_ENABLED: "true"
           UPDATE_MANIFEST_ED25519_PUBLIC_KEY: ${{ vars.UPDATE_MANIFEST_ED25519_PUBLIC_KEY }}
         run: |
           if [ -z "${QTDIR:-}" ]; then
@@ -183,8 +183,6 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_PREFIX_PATH="${QTDIR}" \
             -DGDL_UI_GENERATE_TRANSLATIONS=on \
-            -DCMAKE_C_COMPILER_LAUNCHER=sccache \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=sccache \
             -GNinja \
             ${{ matrix.cmake_extra }} \
             "-DGDOWNLOAD_UPDATE_PUBLIC_KEY_BASE64=${UPDATE_MANIFEST_ED25519_PUBLIC_KEY}" \
@@ -195,7 +193,6 @@ jobs:
         if: matrix.target == 'windows'
         shell: cmd
         env:
-          SCCACHE_GHA_ENABLED: "true"
           UPDATE_MANIFEST_ED25519_PUBLIC_KEY: ${{ vars.UPDATE_MANIFEST_ED25519_PUBLIC_KEY }}
         run: |
           if "%QTDIR%"=="" (
@@ -205,8 +202,5 @@ jobs:
           where cl
           set "CC=cl"
           set "CXX=cl"
-          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=%QTDIR% -DGDL_UI_GENERATE_TRANSLATIONS=on -DGDOWNLOAD_UPDATE_PUBLIC_KEY_BASE64=%UPDATE_MANIFEST_ED25519_PUBLIC_KEY% -GNinja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00" -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -B build -S %GITHUB_WORKSPACE% -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=%QTDIR% -DGDL_UI_GENERATE_TRANSLATIONS=on -DGDOWNLOAD_UPDATE_PUBLIC_KEY_BASE64=%UPDATE_MANIFEST_ED25519_PUBLIC_KEY% -GNinja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0A00"
           cmake --build build --config Release --parallel
-
-      - name: Show sccache stats
-        run: sccache --show-stats
