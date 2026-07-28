@@ -62,8 +62,6 @@ namespace gdl {
 					return {InstallationStatus::kSucceeded, 0, {}};
 				}
 			};
-            constexpr const char* kGithubMirrorPrefix = "https://gh-proxy.com/";
-
             std::string NormalizeReleaseNotes(std::string raw) {
                 auto replace_all = [](std::string& s, const std::string& from, const std::string& to) {
                     size_t pos = 0;
@@ -80,30 +78,6 @@ namespace gdl {
                 return raw;
             }
 
-            std::string ApplyGithubMirrorIfNeeded(const std::string& original_url) {
-                if (original_url.empty()) {
-                    return original_url;
-                }
-
-                const bool enable_mirror =
-                    gdl::config::GetValue(std::string(config::Keys::EnableGithubAccelerate.get())).AsBool();
-                if (!enable_mirror) {
-                    return original_url;
-                }
-
-                if (original_url.rfind(kGithubMirrorPrefix, 0) == 0) {
-                    return original_url;
-                }
-
-                const bool is_github_resource =
-                    original_url.find("github.com") != std::string::npos ||
-                    original_url.find("githubusercontent.com") != std::string::npos;
-                if (!is_github_resource) {
-                    return original_url;
-                }
-
-                return std::string(kGithubMirrorPrefix) + original_url;
-            }
             // 流式计算文件 SHA-256，返回小写十六进制；失败返回空（S2）
             QString ComputeFileSha256(const QString& path) {
                 QFile f(path);
@@ -316,8 +290,12 @@ namespace gdl {
             QFileInfo file_info(update_package_path_);
 
             // Start download
-			const std::vector<std::string> allowed_download_hosts{"github.com", "objects.githubusercontent.com", "gdownload.uk"};
-			const auto actual_download_url = update_info_.download_url;
+			// 开启 GitHub 加速时改写为镜像 URL 并放行镜像域；
+			// 入口校验、重定向链、下载完成终验必须使用同一份白名单
+			const bool use_github_mirror =
+				gdl::config::GetValue(std::string(config::Keys::EnableGithubAccelerate.get())).AsBool();
+			const auto allowed_download_hosts = BuildAllowedDownloadHosts(use_github_mirror);
+			const auto actual_download_url = ResolveDownloadUrl(update_info_.download_url, use_github_mirror);
 			if (!ValidateDownloadUrl(actual_download_url, allowed_download_hosts)) {
 				last_error_ = "Update download URL is not allowed";
 				update_in_progress_ = false;
@@ -334,6 +312,8 @@ namespace gdl {
             // Set timeout
             request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysNetwork);
             request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::UserVerifiedRedirectPolicy);
+            // 30 秒内无任何字节传输即中止：连接挂死时给出明确失败而非永远停在 0KB
+            request.setTransferTimeout(30000);
 
             // Open file for writing
             QIODevice::OpenMode open_mode = QIODevice::WriteOnly | QIODevice::Truncate;
@@ -417,7 +397,7 @@ namespace gdl {
 				reply->deleteLater();
 				return;
             });
-            QObject::connect(reply, &QNetworkReply::finished, [this, reply, alive = alive_]() {
+            QObject::connect(reply, &QNetworkReply::finished, [this, reply, alive = alive_, allowed_download_hosts]() {
                 if (!alive->load()) {
                     reply->deleteLater();
                     return;
@@ -462,12 +442,21 @@ namespace gdl {
                         reply->deleteLater();
                         return;
                 }
-				const std::vector<std::string> allowed_download_hosts{"github.com", "objects.githubusercontent.com", "gdownload.uk"};
+				// 终验最终 URL：与入口校验、重定向链共用同一份白名单（值捕获自 StartUpdate）
 				if (!ValidateDownloadUrl(reply->url().toString().toStdString(), allowed_download_hosts)) {
 					last_error_ = "Update download redirect target is not allowed";
 					update_in_progress_ = false;
 					download_file_.close();
 					QFile::remove(update_package_path_);
+					// 失败必须通知 UI，否则界面永远停留在下载中状态
+					bool expected = false;
+					if (download_failed_notified_.compare_exchange_strong(expected, true) && progress_callback_) {
+						UpdateProgress progress;
+						progress.stage		= UpdateProgress::Stage::kFailed;
+						progress.percentage = 0;
+						progress.message	= "Download failed: " + last_error_;
+						progress_callback_(progress);
+					}
 					reply->deleteLater();
 					return;
 				}
