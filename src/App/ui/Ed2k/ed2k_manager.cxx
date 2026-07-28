@@ -248,16 +248,51 @@ namespace gdl {
 			}
 
 			void Ed2kManager::OnSearchPayload(const QString& json) {
-				// 防迟到守卫：搜索超时兜底(OnSearchTimeout)已把 searching_ 复位为 false 并
-				// 上抛 searchFailed；此后引擎才送达的迟到结果直接丢弃，不再重置模型/复位状态。
+				nlohmann::json doc;
+				try {
+					doc = nlohmann::json::parse(json.toStdString());
+				} catch (const std::exception& e) {
+					LOG_ERR("Failed to parse ed2k search payload: {}", e.what());
+					// 解析失败也必须复位，否则 UI 永远停在“搜索中”等不到任何后续消息。
+					if (searching_) {
+						search_timeout_timer_.stop();
+						searching_ = false;
+						Q_EMIT searchingChanged();
+					}
+					return;
+				}
+				// 多服务器搜索的一次搜索会产生**多条** payload：
+				//   ① 首屏(append=false, more=true)  —— 已登录那台服务器的结果，约 1~5s 到；
+				//   ② 追加(append=true)   —— 每有一台服务器答完就来一批，10~20s 内陆续到；
+				//   ③ 收尾(done=true)     —— 全部服务器收尾，此时才复位“搜索中”。
+				//
+				// 两条都不能省：
+				// - **追加批次必须绕过防迟到守卫**。若沿用“!searching_ 就丢弃”，首屏一到就复位了
+				//   searching_，之后每一批追加都被当成迟到结果丢掉 —— 表现是引擎日志里明明有
+				//   `multi-server search: ... K new item(s)`，界面却一条不显示。
+				// - **首屏不能复位 searching_**。首屏为空但其余服务器有货是常态(各服务器索引互相
+				//   独立)，一复位界面就先闪一下“没有结果”，十几秒后结果又冒出来，看着像坏的。
+				// 过期批次由引擎侧按搜索代次拦掉，能到这里的都属于当前这次搜索。
+				const bool append = doc.value("append", false);
+				const bool more = doc.value("more", false);
+				const bool done = doc.value("done", false);
+				// 防迟到守卫：搜索超时兜底(OnSearchTimeout)已把 searching_ 复位为 false 并上抛
+				// searchFailed；此后引擎才送达的迟到结果直接丢弃，不再重置模型/复位状态。
 				if (!searching_) {
 					return;
 				}
-				search_timeout_timer_.stop();
-				searching_ = false;
-				Q_EMIT searchingChanged();
+				// 判据只看 more：**只有**明确预告“后面还有批次”的 payload 才保持“搜索中”，
+				// 其余一律复位(收尾信号 / Kad 搜索 / 加载更多 / 错误 payload 都不带 more)。
+				// 不能改用 append 判断：“加载更多”送的也是 append=true，但它是终态。
+				if (!more) {
+					search_timeout_timer_.stop();
+					searching_ = false;
+					Q_EMIT searchingChanged();
+				}
+				if (done) {
+					return;   // 收尾信号不带条目，复位完就结束
+				}
 				try {
-					const auto doc = nlohmann::json::parse(json.toStdString());
 					if (!doc.value("ok", false)) {
 						Q_EMIT searchFailed(QString::fromStdString(doc.value("error", std::string())));
 						return;
