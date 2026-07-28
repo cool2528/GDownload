@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.2.1
+
+### 🔄 自动更新 / Auto-Update
+
+- **Fix in-app update downloads hanging forever at "0 KB".** Three stacked faults: a security-hardening refactor dropped the call that applies the GitHub mirror, so the "GitHub accelerated download" toggle silently did nothing; the download-host allowlist predated GitHub moving release assets to `release-assets.githubusercontent.com`, so even a healthy direct connection was aborted at the redirect; and the download had no transfer timeout, so a dead connection kept the dialog at 0 KB forever instead of failing. The toggle works again, the allowlist covers GitHub's current asset domain, and a transfer with no data for 30 seconds now fails with a visible error you can retry. / **修复应用内更新下载永远停在 "0KB"。** 三个叠加故障：一次安全加固重构丢掉了应用 GitHub 镜像的调用，"启用 GitHub 加速下载"开关静默失效；下载域白名单早于 GitHub 将 release 资产迁移到 `release-assets.githubusercontent.com`，即使直连正常也会在重定向处被中止；下载请求没有传输超时，连接挂死时界面永远停在 0KB 而不报错。现在开关恢复生效，白名单覆盖 GitHub 当前资产域，30 秒无数据传输会明确报错并可重试。
+- A rejected redirect target now reports a download failure instead of silently leaving the dialog in the downloading state. / 重定向目标被拒时如实提示下载失败，不再静默停留在下载中状态。
+
 ## v2.2.0
 
 ### ⚡ 界面卡顿 / UI Responsiveness
