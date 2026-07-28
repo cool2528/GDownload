@@ -118,9 +118,9 @@ Name: "associatefiles"; Description: "{cm:AssociateTorrentDescription}"; GroupDe
 
 [Files]
 ; 主程序文件
-Source: "@CMAKE_BINARY_DIR@\release\bin\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "@INSTALLER_BIN_DIR@\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; 排除 PDB 调试文件
-Source: "@CMAKE_BINARY_DIR@\release\bin\*"; DestDir: "{app}"; Excludes: "*.pdb,*.lib,*.exp"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "@INSTALLER_BIN_DIR@\*"; DestDir: "{app}"; Excludes: "*.pdb,*.lib,*.exp"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 ; 开始菜单快捷方式

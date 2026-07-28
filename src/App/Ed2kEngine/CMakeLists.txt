@@ -28,9 +28,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE Advapi32)
-    # 注意：不要定义 UNICODE/_UNICODE —— ed2k 引擎头文件里有同名常量
-    # ed2k::server::srvflag::UNICODE，会被预处理器宏原样替换导致语法错误。
-    # 本库当前不直接调用 Win32 TCHAR 系 API，无需这两个宏。
+    # 这里原本有一条"不要定义 UNICODE/_UNICODE"的禁令：引擎公开头里曾有同名常量
+    # ed2k::server::srvflag::UNICODE，会被预处理器宏原样替换成语法错误。
+    # 引擎已把那两个常量改名为 srvflag::UTF8 / udpflag::UTF8（eMule 对 UDP 侧同一能力位就叫
+    # SRV_UDPFLG_SUPPORTUTF8），禁令随之解除 —— 本目标现在可以正常定义这两个宏。
+    # 之所以仍然不定义：本库不直接调用 Win32 TCHAR 系 API，加了没有收益。
 else()
     target_compile_options(${PROJECT_NAME} PRIVATE -fvisibility=hidden)
     target_compile_definitions(${PROJECT_NAME} PRIVATE

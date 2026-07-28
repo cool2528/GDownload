@@ -161,14 +161,29 @@ cmake --build --preset windows-debug-user   # Windows
 #### 生成安装包
 
 ```powershell
-# 构建 Release 版本
-cmake --preset windows-msvc-user
-cmake --build build --config Release
+# 注意:不要用 windows-msvc-user 预设打包 —— 它把 CMAKE_BUILD_TYPE 钉成 Debug,
+# 而 .iss 的生成需要一个 Release 语义的配置。用独立的构建目录显式指定:
+cmake -S . -B build-rel -G "Visual Studio 17 2022" -A x64 `
+  -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" `
+  -DCMAKE_PREFIX_PATH="$env:QTDIR" `
+  -DCMAKE_BUILD_TYPE=Release
+cmake --build build-rel --config Release --parallel
 
-# 使用 Inno Setup 生成安装程序
-# 确保已安装 Inno Setup: choco install innosetup
-"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" build\release\windows_installer.iss
+# 使用 Inno Setup 生成安装程序(确保已安装:choco install innosetup)
+"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" build-rel\release\windows_installer.iss
+
+# 产物:build-rel\release\GDownloader_windows_<版本>.exe
 ```
+
+> **为什么不能直接用预设**
+>
+> `.iss` 的生成条件里要求配置是 Release,而 Visual Studio 是**多配置生成器**:
+> `CMAKE_BUILD_TYPE` 在 configure 阶段就固定了,`--build --config Release` 只影响构建阶段、
+> 不会改变它。所以用 `windows-msvc-user`(它钉了 `CMAKE_BUILD_TYPE=Debug`)时 `.iss` 根本不会生成。
+>
+> 另外两类生成器的产物布局不同,`.iss` 里的打包源路径由 CMake 按生成器自动计算:
+> 单配置(Ninja,CI 用的就是它)产物在 `<build>/<类型>/bin`;多配置(VS)会在其后**再加一层**
+> `Release`。这一点无需手工干预,但如果你手动改 `.iss`,记得两种布局都要照顾到。
 
 ---
 

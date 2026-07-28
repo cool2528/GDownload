@@ -161,14 +161,31 @@ cmake --build --preset windows-debug-user   # Windows
 #### Creating Installer
 
 ```powershell
-# Build Release version
-cmake --preset windows-msvc-user
-cmake --build build --config Release
+# Do NOT use the windows-msvc-user preset for packaging — it pins CMAKE_BUILD_TYPE to Debug,
+# while generating the .iss requires a Release configuration. Use a separate build directory:
+cmake -S . -B build-rel -G "Visual Studio 17 2022" -A x64 `
+  -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" `
+  -DCMAKE_PREFIX_PATH="$env:QTDIR" `
+  -DCMAKE_BUILD_TYPE=Release
+cmake --build build-rel --config Release --parallel
 
-# Generate installer with Inno Setup
-# Make sure Inno Setup is installed: choco install innosetup
-"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" build\release\windows_installer.iss
+# Generate the installer with Inno Setup (install it first: choco install innosetup)
+"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" build-rel\release\windows_installer.iss
+
+# Output: build-rel\release\GDownloader_windows_<version>.exe
 ```
+
+> **Why the preset does not work here**
+>
+> Generating the `.iss` is gated on a Release configuration, but Visual Studio is a
+> **multi-config generator**: `CMAKE_BUILD_TYPE` is fixed at configure time and
+> `--build --config Release` only affects the build step. With `windows-msvc-user`
+> (which pins `CMAKE_BUILD_TYPE=Debug`) the `.iss` is never generated.
+>
+> The two generator families also lay out artifacts differently, so the packaging source path
+> inside the `.iss` is computed by CMake per generator: single-config (Ninja, which CI uses)
+> puts them in `<build>/<type>/bin`, while multi-config (VS) appends **one more** `Release`
+> level. This needs no manual intervention — but if you hand-edit the `.iss`, cover both layouts.
 
 ---
 
