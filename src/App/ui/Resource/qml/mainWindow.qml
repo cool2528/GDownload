@@ -22,17 +22,7 @@ FramelessWindow{
     FramelessHelper.onReady: {
         FramelessHelper.titleBarItem = title_bar;
         FramelessHelper.moveWindowToDesktopCenter()
-        // 以尺寸有效性作为“已初始化”判据：旧逻辑用 x>0||y>0，
-        // 当窗口停在屏幕左上角(0,0)时条件为 false 导致位置/尺寸都不恢复；
-        // 同时对尺寸做下限保护，避免保存的 (0,0) 把窗口设为不可见。
-        if(SettingsManager.qRememberWindowPosition
-           && SettingsManager.qWindowSize.width > 100
-           && SettingsManager.qWindowSize.height > 100){
-            mainWindow.x = SettingsManager.qWindowPosition.x
-            mainWindow.y = SettingsManager.qWindowPosition.y
-            mainWindow.width = SettingsManager.qWindowSize.width
-            mainWindow.height = SettingsManager.qWindowSize.height
-        }
+        restoreSavedGeometry()
         // --silent 静默启动：不显示主窗口，仅驻留系统托盘（供 host launch 静默唤起）
         if (typeof gAppStartSilent === "undefined" || !gAppStartSilent) {
             mainWindow.visible = true;
@@ -40,6 +30,51 @@ FramelessWindow{
         if(Qt.platform.os === "osx"){
             UtilsToolsManager.HideMacOsxWindowStandardButtons(mainWindow)
         }
+    }
+
+    // 恢复上次的窗口几何。调用点在 moveWindowToDesktopCenter() 之后：凡是这里决定“不恢复”的
+    // 情形，都会保留居中的结果。
+    function restoreSavedGeometry(){
+        if(!SettingsManager.qRememberWindowPosition) return
+
+        var sz = SettingsManager.qWindowSize
+        // 尺寸下限保护：保存成 (0,0) 会把窗口设为不可见。
+        if(sz.width <= 100 || sz.height <= 100) return
+        mainWindow.width = sz.width
+        mainWindow.height = sz.height
+
+        var pos = SettingsManager.qWindowPosition
+        // 【位置从没保存过时保持居中】首次启动配置里 general.window-position 是空串
+        // (config_key.h 的默认值)，解析不出 "x,y" 两段就退回 Setting 的 Default()
+        // = QPoint(0,0)(setting.h 的 WindowPosition)。旧逻辑只用尺寸判“是否已初始化”，
+        // 于是这个 (0,0) 被当成“保存过的位置”写回去，把上面 moveWindowToDesktopCenter()
+        // 的结果覆盖掉 —— 首次启动窗口贴在桌面左上角就是这么来的。
+        // 代价：用户特意把窗口摆在正好 (0,0) 时，下次启动会变成居中。这是可接受的退化，
+        // 而且比“新装用户第一次打开就贴边”好得多。
+        if(pos.x === 0 && pos.y === 0) return
+
+        // 保存的位置可能来自已经拔掉的显示器，直接用会让窗口落在所有屏幕之外、无法操作。
+        // 只要标题栏那一条还有一部分落在某块屏幕上就认为可用。
+        if(!geometryVisibleOnSomeScreen(pos, sz)) return
+
+        mainWindow.x = pos.x
+        mainWindow.y = pos.y
+    }
+
+    // 判断给定几何是否还有可抓取的部分留在某块屏幕内(以标题栏高度为准)。
+    function geometryVisibleOnSomeScreen(pos, sz){
+        var screens = Qt.application.screens
+        if(!screens || screens.length === 0) return true   // 取不到屏幕信息时不阻拦恢复
+        var grabH = Math.max(24, title_bar ? title_bar.height : 32)
+        for(var i = 0; i < screens.length; ++i){
+            var s = screens[i]
+            var ix = Math.max(pos.x, s.virtualX)
+            var iy = Math.max(pos.y, s.virtualY)
+            var ax = Math.min(pos.x + sz.width,  s.virtualX + s.width)
+            var ay = Math.min(pos.y + grabH,     s.virtualY + s.height)
+            if(ax - ix > 80 && ay - iy > 8) return true
+        }
+        return false
     }
 
     function onWindowResize(){
