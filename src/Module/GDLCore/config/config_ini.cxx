@@ -3,6 +3,8 @@
 #include <chrono>
 #include <filesystem>
 #include <fstream>
+#include <limits>
+#include <unordered_map>
 #include <nlohmann/json.hpp>
 #include <random>
 #include <sstream>
@@ -94,6 +96,46 @@ namespace gdl {
 				return secret;
 			}
 		}  // namespace
+
+		std::optional<std::string> ValidateIntegerConfigValue(std::string_view key_path,
+			const std::string& current, const std::string& def) {
+			if (!IsIntegerString(current)) return def;
+
+			long long value = 0;
+			try {
+				value = std::stoll(current);
+			} catch (...) {
+				// 溢出等解析失败按非法处理
+				return def;
+			}
+
+			// 合法区间表:对齐 aria2c 启动参数的硬性约束(越界会导致 aria2c 直接拒绝
+			// 启动,引擎从此永远起不来)与设置页 SpinBox 取值域;表外整数配置仅要求非负
+			struct IntegerRange {
+				long long min;
+				long long max;
+			};
+			static const std::unordered_map<std::string_view, IntegerRange> kRanges{
+				{Keys::Split.get(), {1, 64}},
+				{Keys::MaxConnectionPerServer.get(), {1, 64}},
+				{Keys::MaxConcurrentDownloads.get(), {1, 64}},
+				{Keys::Timeout.get(), {1, 600}},
+				{Keys::ConnectTimeout.get(), {1, 600}},
+				{Keys::RetryWait.get(), {0, 600}},
+				{Keys::MinSplitSize.get(), {1, 1024}},
+				{Keys::ListenPort.get(), {1, 65535}},
+				{Keys::RpcListenPort.get(), {1, 65535}},
+				{Keys::DhtListenPort.get(), {1, 65535}},
+				{Keys::Ed2kTcpPort.get(), {1, 65535}},
+				{Keys::Ed2kUdpPort.get(), {1, 65535}},
+			};
+
+			const auto it	   = kRanges.find(key_path);
+			const auto minimum = it != kRanges.end() ? it->second.min : 0;
+			const auto maximum = it != kRanges.end() ? it->second.max : std::numeric_limits<long long>::max();
+			if (value < minimum || value > maximum) return def;
+			return std::nullopt;
+		}
 
 		ApplicationConfig::~ApplicationConfig() {
 			// 顺序要紧：先把后台写入线程停掉并 join，否则它会在成员被销毁之后继续访问
@@ -550,10 +592,9 @@ namespace gdl {
 				return std::nullopt;
 			}
 			if (IsIntegerString(def)) {
-				if (!IsIntegerString(cur)) {
-					return def;
-				}
-				return std::nullopt;
+				// 格式与范围双重校验:线上出过配置存了 aria2c.split=0、"是整数就放行"
+				// 后 aria2c 拒绝启动导致引擎永远起不来的事故
+				return ValidateIntegerConfigValue(key_path, cur, def);
 			}
 			if (cur.empty() && !def.empty()) {
 				return def;

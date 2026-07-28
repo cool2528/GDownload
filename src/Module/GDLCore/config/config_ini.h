@@ -7,10 +7,12 @@
 #include <optional>
 #include <shared_mutex>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <type_traits>
 #include <vector>
 #include <toml++/toml.h>
+#include "export.h"
 #include "globalTypes.h"
 #include "singleton.hpp"
 namespace gdl {
@@ -63,6 +65,12 @@ namespace gdl {
 				}
 			}
 		}  // namespace detail
+
+		// 整数型配置的加载期校验:格式非法或越界时返回应回写的默认值,合法返回 nullopt。
+		// 范围表对齐 aria2c 启动参数的硬性约束(如 split 必须 >=1,越界 aria2c 会直接
+		// 拒绝启动,引擎从此永远起不来)与设置页取值域;表外整数配置仅要求非负。
+		GDLCore_API std::optional<std::string> ValidateIntegerConfigValue(std::string_view key_path,
+			const std::string& current, const std::string& def);
 
 		class ApplicationConfig : public Singleton<ApplicationConfig> {
 			SINGLETON_DECLARE(ApplicationConfig)
