@@ -139,6 +139,9 @@ Thumbs.db
 CMakeUserPresets.json
 !extra/win32/ia32/engine/aria2c.exe
 !extra/win32/x64/engine/aria2c.exe
+# Sparkle 安装进度工具是 framework 必需组件, 不能被 *.app 规则吞掉
+# (缺它 Sparkle 启动安装器必失败: "Cannot retrieve path for auxiliary tool: Updater.app")
+!Sparkle/Sparkle.framework/**/Updater.app
 src/version.h
 .vs/*
 

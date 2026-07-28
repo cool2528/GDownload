@@ -241,9 +241,11 @@ elseif(APPLE)
     ")
 
     # 添加签名步骤
+    # 签名失败必须 FATAL: 带损坏/缺失签名的包一旦发布, Sparkle 更新校验会拒装
+    # ("The app failed Apple Code Signing checks"), 不能放行到 DMG 环节
     install(CODE "
        execute_process(
-           COMMAND codesign --force --deep --sign - 
+           COMMAND codesign --force --deep --sign -
                    --timestamp=none
                    --options runtime
                    --entitlements ${CMAKE_SOURCE_DIR}/package/entitlements.plist
@@ -251,7 +253,7 @@ elseif(APPLE)
            RESULT_VARIABLE CODESIGN_RESULT
        )
        if(NOT CODESIGN_RESULT EQUAL 0)
-           message(WARNING \"Code signing failed with error: \${CODESIGN_RESULT}\")
+           message(FATAL_ERROR \"Code signing failed with error: \${CODESIGN_RESULT}\")
        endif()
    ")
 
@@ -275,20 +277,35 @@ elseif(APPLE)
             message(WARNING \"DMG icon not found, will use default icon\")
         endif()
 
-        # 创建临时目录
+        # 重建临时目录, 清掉上次 install 的残留, 避免陈旧文件混进 DMG
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} -E remove_directory \"\${DMG_TEMP_DIR}\"
+        )
         execute_process(
             COMMAND ${CMAKE_COMMAND} -E make_directory \"\${DMG_TEMP_DIR}\"
         )
 
         # 复制应用到临时目录
+        # 必须用 ditto 而非 cmake -E copy_directory: 后者会把 framework 里的符号链接
+        # 解引用成实体拷贝, 摊平 Versions 结构, 使刚签好的 resource seal 失配
+        # (Sparkle 校验报 invalid resource directory, 自动更新拒装)
         execute_process(
-            COMMAND ${CMAKE_COMMAND} -E copy_directory
+            COMMAND ditto
                     \${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app
                     \"\${DMG_TEMP_DIR}/${PROJECT_NAME}.app\"
             RESULT_VARIABLE COPY_RESULT
         )
         if(NOT COPY_RESULT EQUAL 0)
             message(FATAL_ERROR \"Failed to copy application to DMG directory\")
+        endif()
+
+        # 对进 DMG 的最终副本做签名完整性断言, 同时拦住\"签名本身坏\"与\"拷贝破坏签名\"两类回归
+        execute_process(
+            COMMAND codesign --verify --deep --strict \"\${DMG_TEMP_DIR}/${PROJECT_NAME}.app\"
+            RESULT_VARIABLE VERIFY_RESULT
+        )
+        if(NOT VERIFY_RESULT EQUAL 0)
+            message(FATAL_ERROR \"Code signature of DMG payload is invalid (\${VERIFY_RESULT}); refusing to package a broken app\")
         endif()
 
         # 创建 DMG（使用简化的参数）
