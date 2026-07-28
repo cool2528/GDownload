@@ -1407,8 +1407,22 @@ namespace gdl {
 							LOG_INFO("OnHandleAria2Message  object {}", result.dump());
 						}
 						else if (result.is_string()) {
-							// string
-							LOG_DBG("OnHandleAria2Message  string {}", result.dump());
+							// addUri / addTorrent / addMetalink 的应答体就是新任务的 gid。
+							// 此前这里只打一条 debug 日志把它丢掉，于是新任务要等下一轮周期轮询
+							// (1s 定时器，且每轮回调里还有两次同步 HTTP RPC，实际周期更长)才可能
+							// 出现在列表里 —— 用户实测点了添加要等 5~10 秒才看到那一行。
+							// 而 aria2 侧实测 **32ms** 就把任务置为 active，延迟全在这条通路上。
+							// 收到 gid 就立刻查一次状态并推给列表，添加即可见。
+							//
+							// 这条分支也会收到 pause/remove 等方法返回的 gid，一并刷新那一行是对的：
+							// 走的是同一套 UpdateTaskById/状态迁移，拿到的就是该任务此刻的真实状态。
+							const std::string gid = result.get<std::string>();
+							if (!gid.empty()) {
+								auto task = Aria2QueryByGidTaskInfo(gid);
+								if (!task.task_id().isEmpty()) {
+									Q_EMIT sigUpdateTasksMessage(task);
+								}
+							}
 						}
 						else if (result.is_number()) {
 							// number
