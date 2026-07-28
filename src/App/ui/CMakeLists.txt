@@ -192,8 +192,25 @@ if(APPLE)
     )
 elseif(WIN32)
     if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.rc)
-    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    # 生成条件不能只看 CMAKE_BUILD_TYPE: 多配置生成器(Visual Studio)下它在 configure 阶段可以是
+    # 任意值(常见是预设里钉的 Debug), 而 `--build --config Release` 只影响构建阶段 —— 只判它等于
+    # "Release" 的话, 用 VS 生成器时这个 .iss 永远不会生成, 打包步骤直接卡死在"文件不存在"。
+    # CI 用的是 Ninja 单配置 + -DCMAKE_BUILD_TYPE=Release, 走第一个条件, 行为与改动前完全一致。
+    if(CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_CONFIGURATION_TYPES)
     set(EXECUTABLE ${PROJECT_NAME}.exe)
+    # 安装包要打包的产物目录。这里必须按生成器分别算, 因为两类生成器的输出布局不同:
+    #   单配置(Ninja, CI 用的就是它): 产物就在 CMAKE_RUNTIME_OUTPUT_DIRECTORY, 即 <build>/<类型>/bin
+    #   多配置(Visual Studio):        MSBuild 会在该目录之后**再追加一层** $<CONFIG>,
+    #                                 即 <build>/<类型>/bin/Release
+    # 此前 .iss 里写死 <build>\release\bin, 在 VS 下会把整个 Release\ 子目录当普通内容递归打包
+    # (Flags 里有 recursesubdirs), 装出来的程序在 {app}\Release\GDownload.exe, 而快捷方式指向
+    # {app}\GDownload.exe —— 安装能成功, 但装完点不开。
+    if(CMAKE_CONFIGURATION_TYPES)
+        set(INSTALLER_BIN_DIR "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin/Release")
+    else()
+        set(INSTALLER_BIN_DIR "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin")
+    endif()
+    file(TO_NATIVE_PATH "${INSTALLER_BIN_DIR}" INSTALLER_BIN_DIR)
     configure_file(
         ${CMAKE_SOURCE_DIR}/package/windows_installer.iss.in
         ${CMAKE_BINARY_DIR}/release/windows_installer.iss
