@@ -596,8 +596,13 @@ namespace gdl {
 			rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 			doc_.Accept(writer);
 			const std::string body = buffer.GetString();
+            // 本地回环 RPC 必须直连：libcurl 默认尊重 http_proxy/all_proxy 环境变量，
+            // 会把 127.0.0.1 的请求也发给代理（代理失联时每个请求卡至 TCP 超时，状态轮询全瘫）。
+            // 代理显式置空串可彻底禁用（含环境变量）；本地 RPC 毫秒级响应，5 秒超时兜底防挂死
             auto reply			   = cpr::Post(cpr::Url(host_ + "/jsonrpc"), cpr::Body(body),
-                                               cpr::Header{{"Content-Type", "application/json"}});
+                                               cpr::Header{{"Content-Type", "application/json"}},
+                                               cpr::Proxies{{"http", ""}, {"https", ""}},
+                                               cpr::Timeout(5000));
 			if (reply.status_code != 200) {
 				std::string error_message = reply.error.message;
 				if (error_message.empty()) {

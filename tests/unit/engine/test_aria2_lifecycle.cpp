@@ -263,7 +263,7 @@ class FakeRpcClientBackend final : public detail::IAria2RpcClientBackend {
 
 TEST(Aria2LifecycleContractTest, DefaultTimingIsBounded) {
 	constexpr Aria2LifecycleTiming timing;
-	EXPECT_EQ(timing.readiness_timeout, std::chrono::milliseconds(5000));
+	EXPECT_EQ(timing.readiness_timeout, std::chrono::milliseconds(10000));
 	EXPECT_EQ(timing.readiness_poll_interval, std::chrono::milliseconds(50));
 	EXPECT_EQ(timing.shutdown_grace_period, std::chrono::milliseconds(2000));
 	EXPECT_EQ(timing.liveness_check_interval, std::chrono::milliseconds(1000));

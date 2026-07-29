@@ -366,6 +366,12 @@ namespace gdl {
 			CloseHandle(hProcess);
 			return true;
 #else
+			// 已退出未回收的僵尸子进程 kill(pid,0) 仍返回 0，会骗过存活检查：
+			// 先无阻塞 waitpid 尝试回收，回收成功即判死；非子进程（ECHILD）落回 kill 探测
+			const pid_t reaped = ::waitpid(static_cast<pid_t>(pid), nullptr, WNOHANG);
+			if (reaped == static_cast<pid_t>(pid)) {
+				return false;
+			}
 			return ::kill(static_cast<pid_t>(pid), 0) == 0;
 #endif
 		}
