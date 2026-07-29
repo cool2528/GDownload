@@ -32,7 +32,9 @@ namespace gdl::engine {
 	};
 
 	struct Aria2LifecycleTiming {
-		std::chrono::milliseconds readiness_timeout{5000};
+		// websocket 首连若撞上 aria2c 尚未监听（竞态），重连间隔为 2s；
+		// 10s 窗口容纳约 5 次重试，避免慢速机器上引擎被误判失败而遭误杀
+		std::chrono::milliseconds readiness_timeout{10000};
 		std::chrono::milliseconds readiness_poll_interval{50};
 		std::chrono::milliseconds shutdown_grace_period{2000};
 		std::chrono::milliseconds liveness_check_interval{1000};

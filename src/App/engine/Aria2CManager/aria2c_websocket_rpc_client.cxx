@@ -69,6 +69,8 @@ namespace gdl {
 				doc.AddMember("params", params, alloc);
 				doc.AddMember("id", rapidjson::Value(std::to_string(++id).c_str(), alloc), alloc);
 				if (!websocket || !websocket->isConnected()) {
+					// 断连期的 RPC 静默丢弃曾使"添加任务无反应"在日志中完全不可见，落 WARN 便于现场诊断
+					LOG_WARN("aria2 rpc dropped, websocket not connected: {}", method);
 					return MakeFail(static_cast<std::int64_t>(gdl::ErrorType::kUnknownError));
 				}
 				rapidjson::StringBuffer buffer;
