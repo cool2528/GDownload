@@ -22,6 +22,7 @@ extern char** environ;
 #endif
 #include <algorithm>
 #include <cctype>
+#include <cwchar>
 #include <filesystem>
 #include <fstream>
 #include <string_view>
@@ -141,8 +142,39 @@ namespace gdl {
 				return pids;
 			}
 		}  // namespace detail
+
+		std::vector<String> FilterEnvEntries(const std::vector<String>& entries,
+											 const std::vector<String>& exclude_names) {
+			if (exclude_names.empty()) return entries;
+			auto to_lower = [](String value) {
+				std::transform(value.begin(), value.end(), value.begin(),
+							   [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+				return value;
+			};
+			std::vector<String> lower_names;
+			lower_names.reserve(exclude_names.size());
+			for (const auto& name : exclude_names) {
+				lower_names.push_back(to_lower(name));
+			}
+			std::vector<String> result;
+			result.reserve(entries.size());
+			for (const auto& entry : entries) {
+				const auto eq = entry.find('=');
+				// 无键名的条目不参与匹配，原样保留
+				if (eq == String::npos || eq == 0) {
+					result.push_back(entry);
+					continue;
+				}
+				const auto key = to_lower(entry.substr(0, eq));
+				if (std::find(lower_names.begin(), lower_names.end(), key) == lower_names.end()) {
+					result.push_back(entry);
+				}
+			}
+			return result;
+		}
+
 		int64_t Execute(const String_View& command, const std::vector<String>& arguments,
-						 const String_View& working_directory) {
+						 const String_View& working_directory, const std::vector<String>& exclude_env) {
 			std::int64_t pid{-1};
 			const String command_string(command);
 			const String working_directory_string(working_directory);
@@ -165,8 +197,31 @@ namespace gdl {
 				command_line += L" " + detail::QuoteWindowsArgument(gdl::encoding::Utf8ToWString(args.data()));
 			}
 			std::wstring working_directory_w = gdl::encoding::Utf8ToWString(working_directory_string);
+			// 需要剥离环境变量时构建过滤后的环境块；否则传 nullptr 完整继承父进程环境
+			std::wstring environment_block;
+			LPVOID environment_ptr = nullptr;
+			DWORD creation_flags   = 0;
+			if (!exclude_env.empty()) {
+				LPWCH raw_env = GetEnvironmentStringsW();
+				if (raw_env != nullptr) {
+					std::vector<String> entries;
+					for (LPCWSTR cursor = raw_env; *cursor != L'\0'; cursor += wcslen(cursor) + 1) {
+						entries.push_back(gdl::encoding::WStringToUtf8(cursor));
+					}
+					FreeEnvironmentStringsW(raw_env);
+					for (const auto& entry : FilterEnvEntries(entries, exclude_env)) {
+						environment_block += gdl::encoding::Utf8ToWString(entry);
+						environment_block.push_back(L'\0');
+					}
+					// 环境块以双 null 结尾（空块亦需两个终结符）
+					environment_block.push_back(L'\0');
+					environment_ptr = environment_block.data();
+					creation_flags |= CREATE_UNICODE_ENVIRONMENT;
+				}
+			}
 			BOOL ret =
-				CreateProcess(application_name.data(), command_line.data(), nullptr, nullptr, FALSE, 0, nullptr,
+				CreateProcess(application_name.data(), command_line.data(), nullptr, nullptr, FALSE, creation_flags,
+							   environment_ptr,
 							   working_directory_w.empty() ? nullptr : working_directory_w.data(), &si, &pi);
 			if (!ret) {
 				LOG_ERR("CreateProcessW failed: {}", GetLastError());
@@ -194,7 +249,25 @@ namespace gdl {
 			if (!working_directory_string.empty()) {
 				posix_spawn_file_actions_addchdir_np(&actions, working_directory_string.c_str());
 			}
-			int ret = posix_spawn(&native_pid, command_string.c_str(), &actions, &attr, argv.data(), environ);
+			// 需要剥离环境变量时构建过滤后的 envp；否则直接继承父进程环境。
+			// filtered_env 的生命周期须覆盖 posix_spawn 调用，envp 仅持有其内部指针
+			std::vector<String> filtered_env;
+			std::vector<char*> envp;
+			char** spawn_env = environ;
+			if (!exclude_env.empty()) {
+				std::vector<String> entries;
+				for (char** env = environ; env != nullptr && *env != nullptr; ++env) {
+					entries.emplace_back(*env);
+				}
+				filtered_env = FilterEnvEntries(entries, exclude_env);
+				envp.reserve(filtered_env.size() + 1);
+				for (auto& entry : filtered_env) {
+					envp.push_back(entry.data());
+				}
+				envp.push_back(nullptr);
+				spawn_env = envp.data();
+			}
+			int ret = posix_spawn(&native_pid, command_string.c_str(), &actions, &attr, argv.data(), spawn_env);
 
 			posix_spawn_file_actions_destroy(&actions);
 			posix_spawnattr_destroy(&attr);

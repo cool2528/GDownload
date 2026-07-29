@@ -137,6 +137,7 @@ register_target(gdownload_cache_tests)
 add_executable(gdownload_aria2_lifecycle_tests
     engine/test_aria2_lifecycle.cpp
     engine/test_aria2_options_json.cpp
+    engine/test_process_env_filter.cpp
 )
 target_link_libraries(gdownload_aria2_lifecycle_tests PRIVATE
     GTest::gtest
