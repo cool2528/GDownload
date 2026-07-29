@@ -155,7 +155,10 @@ FramelessWindow{
     SystemTrayIcon {
         id: systemTray
         icon.mask: Qt.platform.os === "osx"  // 仅 macOS 启用 mask 自动适配主题;Windows/Linux 保留彩色图标(Q4)
-        icon.source: Qt.platform.os === "osx" ? "qrc:/images/logo/tray_template_apple.svg" : "qrc:/images/logo/icon.ico"
+        // Linux 用 SVG：AppImage 内 ICO 解码不可依赖（qico 插件），曾致托盘 "No Icon set" 无图标
+        icon.source: Qt.platform.os === "osx" ? "qrc:/images/logo/tray_template_apple.svg"
+                   : Qt.platform.os === "linux" ? "qrc:/images/logo/logo.svg"
+                   : "qrc:/images/logo/icon.ico"
         visible: true
         tooltip: "GDownload"
 
