@@ -244,6 +244,8 @@ namespace gdl {
 			std::atomic_bool engine_is_runing_{false};
 			std::atomic_bool uninited_{false};
 			std::atomic_bool daily_task_timer_is_runing{false};
+			// websocket 是否曾成功连接：用于区分启动时序竞态与运行期真实断连
+			std::atomic_bool ws_ever_connected_{false};
 			boost::asio::executor_work_guard<boost::asio::io_context::executor_type> work_;
 			DailyTaskTimer daily_task_timer_;
 			AsyncTimer update_aria2c_tasks_timer_;

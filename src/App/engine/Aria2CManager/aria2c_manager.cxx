@@ -112,6 +112,7 @@ namespace gdl {
 				// 按连接状态分派：首次连接才启动每日 tracker 同步，重连/正常关闭不再误报 WARN（B6）
 				switch (state) {
 					case State::kConnected:
+						ws_ever_connected_.store(true);
 						if (!daily_task_timer_is_runing.load()) {
 							LOG_DBG("start daily_task_timer");
 							daily_task_timer_.Start([this] { DispatchMagnetServerSync(); });
@@ -125,7 +126,14 @@ namespace gdl {
 						LOG_INFO("websocket closed: {}", msg);
 						break;
 					case State::kError:
-						LOG_WARN("websocket error: {}", msg);
+						// 启动阶段 aria2c 尚未监听 RPC 端口时的首连失败属预期时序竞态，
+						// 降为 DBG 避免误判引擎启动失败；曾成功连接后的错误保持 WARN
+						if (ws_ever_connected_.load()) {
+							LOG_WARN("websocket error: {}", msg);
+						}
+						else {
+							LOG_DBG("websocket connect attempt failed during startup: {}", msg);
+						}
 						break;
 				}
 			});
@@ -710,6 +718,8 @@ namespace gdl {
 				LOG_ERR("Failed to initialise aria2c, startup error: {}", static_cast<int>(startup.error));
 				return false;
 			}
+			// 就绪信息以 INFO 落日志：release 下缺少可见的成功标记曾导致启动竞态 WARN 被误判为启动失败
+			LOG_INFO("aria2c engine ready, pid: {}", startup.pid);
 
 			// Initialize ETag cache database.
 			InitializeETagCache();

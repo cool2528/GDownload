@@ -26,7 +26,12 @@ namespace gdl::engine {
 
 	int64_t Aria2ProcessLifecycleAdapter::Execute(const String_View& command,
 		const std::vector<String>& arguments) {
-		return process::Execute(command, arguments);
+		// aria2c 仅支持 HTTP 代理且启动时会解析这些环境变量：socks 等格式会触发
+		// "unrecognized proxy format" 启动告警，http 格式则绕过应用内代理设置静默生效。
+		// 代理策略统一由应用设置经 --all-proxy 参数下发，子进程剥离环境代理变量（大小写变体均剔除）
+		static const std::vector<String> kProxyEnvVars = {"http_proxy", "https_proxy", "ftp_proxy",
+														  "all_proxy", "no_proxy"};
+		return process::Execute(command, arguments, "", kProxyEnvVars);
 	}
 
 	bool Aria2ProcessLifecycleAdapter::IsAlive(int64_t pid) {
