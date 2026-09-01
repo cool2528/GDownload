@@ -1,0 +1,30 @@
+#include <windows.h>
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION    @GDLVR_FILEVERSION_COMMA@
+ PRODUCTVERSION @GDLVR_PRODUCTVERSION_COMMA@
+ FILEFLAGSMASK  0x3fL
+ FILEFLAGS      0x0L
+ FILEOS         VOS_NT_WINDOWS32
+ FILETYPE       @GDLVR_FILE_TYPE_VALUE@
+ FILESUBTYPE    0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "CompanyName",      "@GDLVR_COMPANY_NAME@"
+            VALUE "FileDescription",  "@GDLVR_FILE_DESCRIPTION@"
+            VALUE "FileVersion",      "@GDLVR_FILEVERSION_STR@"
+            VALUE "InternalName",     "@GDLVR_TARGET_NAME@"
+            VALUE "OriginalFilename", "@GDLVR_ORIGINAL_FILENAME@"
+            VALUE "ProductName",      "@GDLVR_PRODUCT_NAME@"
+            VALUE "ProductVersion",   "@GDLVR_PRODUCTVERSION_STR@"
+            VALUE "LegalCopyright",   "@GDLVR_COPYRIGHT@"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 1252
+    END
+END

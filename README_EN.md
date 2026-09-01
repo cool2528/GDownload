@@ -270,6 +270,16 @@ Thanks to all developers and users who have contributed to this project!
 - [Linux.do](https://linux.do)
 - [V2EX](https://www.v2ex.com)
 
+## 🔏 Code signing policy
+
+Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+
+- **Committers and reviewers**: [@cool2528](https://github.com/cool2528) (repository owner)
+- **Approvers**: [@cool2528](https://github.com/cool2528)
+- **Privacy policy**: This program will not transfer any information to any other networked systems unless specifically requested by the user or the person installing or operating it. The in-app update check only contacts GitHub Releases for version information and can be disabled in the settings.
+
+Windows installers and the main binaries are signed automatically via GitHub Actions using SignPath.io. The signing service verifies that binaries were built from this repository's source code and CI configuration (Trusted Build System). See [docs/SIGNPATH_SETUP.md](docs/SIGNPATH_SETUP.md) for details.
+
 ## ⚠️ Disclaimer
 
 GDownload is provided solely as a download tool for users to legally download Internet resources. Please comply with local laws and regulations when using this software.
