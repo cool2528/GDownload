@@ -147,7 +147,7 @@ Inno Setup 安装包的 PE 元数据由 `.iss` 的 `VersionInfoVersion={#MyAppVe
 
 ## 7. 首次签名验证
 
-1. 推一个测试 tag（如 `v9.9.9-test`）触发 `CLI-All-Platforms`。
+1. 推一个测试 tag（如 `v0.9.9`；必须纯 `vN.N.N` 格式——带后缀的 tag 会让版本解析失败，且务必选一个比现有正式版本号小的号，避免应用内更新检查把测试版当作新版本推送给用户）触发 `CLI-All-Platforms`。
 2. 观察 Windows job：`Resolve SignPath signing inputs` 应输出 enabled；两条 `Submit ... signing request` 步骤会等待批准。
 3. 登录 app.signpath.io → Signing Requests，分别批准两条请求（检查 CI 来源、artifact 摘要）。
 4. CI 取回签名产物并自动验签（`Get-AuthenticodeSignature` Status 必须为 Valid，否则 job 失败）。
