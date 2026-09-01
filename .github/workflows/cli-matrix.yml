@@ -474,9 +474,6 @@ jobs:
             Write-Host "SignPath signing disabled: set secret SIGNPATH_API_TOKEN and vars SIGNPATH_ORGANIZATION_ID / SIGNPATH_SIGNING_POLICY_SLUG to enable."
           }
           "SIGNPATH_ENABLED=$(if ($enabled) { 'true' } else { 'false' })" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          # tag 名去掉 v 前缀得到版本号,供 SignPath artifact 配置的 ${version} 元数据校验使用
-          $version = $env:GITHUB_REF_NAME -replace '^v', ''
-          "SIGNPATH_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Package stage-1 binaries for signing (Windows)
         if: matrix.target == 'windows' && env.SIGNPATH_ENABLED == 'true'
@@ -532,8 +529,6 @@ jobs:
           # 阶段 1 需要在 SignPath 后台人工批准(Approver),超时留足审批时间
           wait-for-completion-timeout-in-seconds: 1200
           output-artifact-directory: '${{ runner.temp }}/signstage1-signed'
-          parameters: |
-            version: "${{ env.SIGNPATH_VERSION }}"
 
       - name: Verify and apply stage-1 signatures (Windows)
         if: matrix.target == 'windows' && env.SIGNPATH_ENABLED == 'true'
@@ -613,8 +608,6 @@ jobs:
           # 阶段 2 同样需要人工批准;两次批准都完成后才会继续发布
           wait-for-completion-timeout-in-seconds: 1200
           output-artifact-directory: '${{ runner.temp }}/signstage2-signed'
-          parameters: |
-            version: "${{ env.SIGNPATH_VERSION }}"
 
       - name: Verify and apply stage-2 signature (Windows)
         if: matrix.target == 'windows' && env.SIGNPATH_ENABLED == 'true'
