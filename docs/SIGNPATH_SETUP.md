@@ -115,11 +115,8 @@
 
 ```xml
 <artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
-  <parameters>
-    <parameter name="version" required="true" />
-  </parameters>
   <zip-file>
-    <pe-file-set product-name="GDownload" product-version="${version}">
+    <pe-file-set product-name="GDownload">
       <include path="*.exe" />
       <include path="*.dll" />
       <for-each>
@@ -130,16 +127,15 @@
 </artifact-configuration>
 ```
 
-说明：`<pe-file-set>` + `<for-each>` 对 zip 内全部 exe/dll 逐一签名；元素上的 `product-name`/`product-version` 属性是 **file metadata restrictions**（官方语法），每次签名时强制校验文件元数据——ProductName 必须为 `GDownload`、ProductVersion 必须与 CI 传入的 `version` 参数（tag 去掉 v 前缀）一致。这正是 Foundation "Set all product name/product version attributes and enforce using file metadata restrictions" 要求的落地。
+说明：`<pe-file-set>` + `<for-each>` 对 zip 内全部 exe/dll 逐一签名；元素上的 `product-name` 属性是 **file metadata restrictions**（官方语法），每次签名时强制校验文件元数据 ProductName=GDownload。这正是 Foundation "Set all product name attributes and enforce using file metadata restrictions" 要求的落地。
+
+> 订阅限制：Free trial 不支持 artifact 配置的 `<parameters>`（用户自定义参数）功能，因此暂用静态 `product-name` 校验，ProductVersion 一致性由构建系统保证（全项目统一 APP_VERSION）。Foundation 审核通过升级订阅后，可恢复 `product-version="${version}"` 参数化校验（CI 已预留 version 传参通道，见 git 历史）。
 
 ### windows-installer（阶段 2：安装包本体）
 
 ```xml
 <artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
-  <parameters>
-    <parameter name="version" required="true" />
-  </parameters>
-  <pe-file product-name="GDownload" product-version="${version}">
+  <pe-file product-name="GDownload">
     <authenticode-sign />
   </pe-file>
 </artifact-configuration>
