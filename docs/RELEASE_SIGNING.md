@@ -4,9 +4,10 @@ GDownload 采用**免费签名方案**,不购买付费代码签名证书:
 
 - ✅ **ed25519 更新清单签名** —— 保护自动更新不被篡改(免费自生成)
 - ✅ **AppImage GPG 签名** —— Linux 包完整性校验(免费自生成)
-- ❌ **不做 Windows / macOS 代码签名** —— 用户首次运行时系统会提示"未知发布者",点击继续即可(开源项目常见做法)
+- ✅ **Windows Authenticode 代码签名** —— 经 SignPath.io 自动化签名,证书由 SignPath Foundation 免费提供给开源项目(接入流程与平台配置见 [SIGNPATH_SETUP.md](SIGNPATH_SETUP.md))
+- ❌ **不做 macOS 代码签名** —— 需要付费 Apple Developer 账号,不在免费方案内
 
-更新链的安全由两层保证:ed25519 签名的更新清单(校验版本号 / 下载地址 / SHA-256)+ 下载包的 SHA-256 完整性校验。
+更新链的安全由两层保证:ed25519 签名的更新清单(校验版本号 / 下载地址 / SHA-256)+ 下载包的 SHA-256 完整性校验;SignPath 接入后,Windows 更新包还可选启用 Authenticode 信任链 + SPKI 指纹锁定(见 SIGNPATH_SETUP.md 第 8 节)。
 
 ## 一、需要配置的 Secrets 与 Variables
 

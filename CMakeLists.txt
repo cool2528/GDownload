@@ -46,6 +46,13 @@ set(CURRENT_VERSION_BUILD ${BUILD})
 set(CURRENT_VERSION_COMMIT ${COMMIT})
 set(APP_VERSION "${CURRENT_VERSION_MAJOR}.${CURRENT_VERSION_MINOR}.${CURRENT_VERSION_BUILD}")
 
+# 统一产品元数据:Windows 版本资源与打包脚本共用。
+# SignPath 代码签名要求所有被签名文件携带一致的 ProductName/ProductVersion 元数据。
+set(PRODUCT_DISPLAY_NAME "GDownload")
+set(PRODUCT_COMPANY_NAME "GDownload Team")
+set(PRODUCT_COPYRIGHT "Copyright (C) 2024-2025 The GDownload Authors")
+include(${CMAKE_SOURCE_DIR}/cmake/windows_version_resource.cmake)
+
 # 设置vcpkg的manifest模式
 set(VCPKG_MANIFEST_MODE ON)
 # 设置vcpkg的overlay ports路径
@@ -153,6 +160,18 @@ endif()
 # 安装规则
 if(WIN32)
     get_property(PROJECT_TARGETS GLOBAL PROPERTY PROJECT_TARGETS)
+
+    # 为全部自有 DLL 附加版本信息资源(主程序 exe 由 src/App/ui 的模板提供)。
+    # 代码签名要求所有被签名文件携带一致的 ProductName/ProductVersion 元数据,
+    # 缺失会导致这些 DLL 无法纳入 SignPath 签名范围。
+    gdl_configure_windows_version_resources(GDLCore
+        FILE_DESCRIPTION "${PRODUCT_DISPLAY_NAME} Core Library")
+    gdl_configure_windows_version_resources(Engine
+        FILE_DESCRIPTION "${PRODUCT_DISPLAY_NAME} Download Engine")
+    gdl_configure_windows_version_resources(Ed2kEngine
+        FILE_DESCRIPTION "${PRODUCT_DISPLAY_NAME} eMule (ed2k) Engine")
+    gdl_configure_windows_version_resources(PluginManager
+        FILE_DESCRIPTION "${PRODUCT_DISPLAY_NAME} Plugin Manager")
 
     # Windows 安装规则
     install(TARGETS ${PROJECT_TARGETS}

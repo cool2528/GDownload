@@ -155,6 +155,7 @@ src/App/ui/Resource/translations/*.qm
 !/docs/plugin-guides/
 !/docs/JS_PLUGIN_SYSTEM_DESIGN.md
 !/docs/RELEASE_SIGNING.md
+!/docs/SIGNPATH_SETUP.md
 #local design and planning files
 /docs/superpowers/
 #AI files
