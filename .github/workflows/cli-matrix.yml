@@ -8,6 +8,10 @@ on:
 
 permissions:
   contents: write
+  # SignPath GitHub 连接器需要以 GITHUB_TOKEN 读取工作流运行信息与构建产物
+  # (artifact)。声明 permissions 后未列出的权限全部归零,缺 actions:read 会导致
+  # 提交签名请求时报 "Could not authorize against GitHub API"
+  actions: read
 
 # 并发控制:按 ref(tag / 手动触发)分组,重复触发同一 ref 时取消旧运行,
 # 避免重复占用 runner。按 ref 分组而非全局,确保不同 tag 的发布互不打断,
