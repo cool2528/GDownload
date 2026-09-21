@@ -534,6 +534,25 @@ jobs:
           wait-for-completion-timeout-in-seconds: 1200
           output-artifact-directory: '${{ runner.temp }}/signstage1-signed'
 
+      # ===== 测试证书信任(仅 test-signing 联调期需要) =====
+      # test-signing 绑的是自签测试证书,runner 默认不信任其根,Get-AuthenticodeSignature
+      # 会返回 UnknownError,导致下面两步验签失败。把仓库内的测试证书公钥(仅公钥,无私钥)
+      # 导入受信任根与受信任发布者后即可通过。切到 release-signing(证书由公共 CA 签发)时
+      # 本步骤自动跳过,验签恢复为严格信任链校验。
+      - name: Trust SignPath test certificate (test-signing only)
+        if: matrix.target == 'windows' && env.SIGNPATH_ENABLED == 'true' && vars.SIGNPATH_SIGNING_POLICY_SLUG == 'test-signing'
+        shell: pwsh
+        run: |
+          $certPath = Join-Path $env:GITHUB_WORKSPACE '.github/signpath/test-certificate.cer'
+          if (-not (Test-Path -LiteralPath $certPath)) {
+            throw "SignPath test certificate not found: $certPath"
+          }
+          $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 $certPath
+          Write-Host "Trusting test certificate: $($cert.Subject) [$($cert.Thumbprint)]"
+          Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\Root | Out-Null
+          Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\TrustedPublisher | Out-Null
+          Write-Host "Imported test certificate into LocalMachine\Root and LocalMachine\TrustedPublisher."
+
       - name: Verify and apply stage-1 signatures (Windows)
         if: matrix.target == 'windows' && env.SIGNPATH_ENABLED == 'true'
         shell: pwsh
