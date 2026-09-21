@@ -6,6 +6,21 @@
 - 申请入口：https://signpath.org/apply （SignPath Foundation，非营利基金会）
 - 签名平台：https://app.signpath.io （SignPath.io，证书私钥托管于其 HSM）
 
+## 0. 当前状态（2026-09-21 检查点）
+
+| 项 | 值 |
+| --- | --- |
+| 组织 | `GDownload [OSS]`，Organization ID `280b6178-383a-4ef1-8b27-454530091b77`，订阅 **OSS subscription** |
+| 项目 | `GDownload`（slug `GDownload`，大小写不敏感，CI 里的 `gdownload` 可匹配），Repository URL `https://github.com/cool2528/GDownload.git` |
+| 签名策略 | `test-signing` = **VALID**（绑 `Test certificate 2026`，自签测试证书，Submitters 含 CI 用户 `CI builds`，无审批）<br>`release-signing` = **INVALID**（绑 `Release certificate 2026`，HSM 私钥，**CSR 仍 PENDING**，待 CA 签发后自动转 VALID；Submitters 含 `CI builds`，审批 Approvers = 项目负责人、Required approvals = 1） |
+| Artifact 配置 | `windows-binaries`、`windows-installer`（均以 **Custom** XML 创建，见第 6 节） |
+| 受信任构建系统 | 组织级 `GitHub.com` ACTIVE，基金会已关联到项目（Trusted Build System usages 可见 `GDownload` + 两条策略） |
+| CI 用户 | `CI builds`（基金会创建，通知邮箱已确认）；**API Token 由管理员在用户详情页生成**（CI 用户无法登录 Web 界面） |
+| 仓库 secret/vars | `SIGNPATH_ORGANIZATION_ID` = 上述新组织 ID；`SIGNPATH_SIGNING_POLICY_SLUG` = `test-signing`（联调期）；`SIGNPATH_API_TOKEN` = `CI builds` 的 token |
+| 联调顺序 | 先用 `test-signing` 跑通端到端（免审批），待 `Release certificate 2026` 签发后切 `release-signing` 做正式发版 |
+
+> 注意：审核通过后 SignPath 会**新建一个 OSS 组织**（本例 `GDownload [OSS]`），与申请阶段自建的 Free trial 组织（本例 `06b3e63a-...`）**不是同一个组织**，组织 ID 必须同步更新到仓库 var，且旧组织里的证书/项目/artifact 配置都不会带过来。
+
 ## 1. 两种角色的区别
 
 | 站点 | 角色 | 用途 |
@@ -86,15 +101,16 @@
 
 提交后等待基金会审核（无官方时限，社区经验数天至数周）。期间**仓库侧改造可先行合并**，不影响现有发版。
 
-### 步骤 C：审核通过后的平台配置（审核邮件会附带证书与说明）
+### 步骤 C：审核通过后的平台配置（基金会完成大部分，2026-09-21 实测）
 
-1. **添加受信任构建系统**：组织设置 → Trusted Build Systems → 选择预置的 `GitHub.com`；按提示安装 **SignPath GitHub App** 并授权访问 `cool2528/GDownload`。
-2. **导入证书**：组织 → Certificates → Add（按审核邮件指引，选 Foundation 提供的证书）。
-3. **创建项目**：组织 → Projects → Add project：
-   - Name: `GDownload`，Slug 必须为 `gdownload`（CI 中已写死）。
-4. **创建签名策略**：项目 → Signing Policies，建议先建一条 `test-signing`（不要求批准或测试用），正式发布策略 slug 需与仓库 var 一致（建议 `release-signing`）。
-5. **创建 artifact 配置**：项目 → Artifact Configurations，导入以下两份（见第 6 节）。
-6. **创建 API Token**：右上角用户菜单 → API Tokens → Add，Scope 选 **Submit signing requests**，绑定项目与策略。生成后立即写入仓库 secret `SIGNPATH_API_TOKEN`（只显示一次）。
+基金会审核通过后会替你完成：新建 OSS 订阅组织并邀请项目负责人为 **Global administrator**、创建 **CI 用户 `CI builds`**（含通知邮箱确认）、导入证书、创建项目与两条签名策略、关联 `GitHub.com` 受信任构建系统。项目侧只需补齐以下几步：
+
+1. **确认组织与项目**：切到 OSS 组织（右上角组织切换器），`Projects` 里应看到 `GDownload`；`Signing Policies` 两条策略中 `test-signing` 应为 VALID（`release-signing` 在 `Release certificate 2026` 的 CSR 签发前保持 INVALID，属正常）。
+2. **创建 artifact 配置**：项目 → Artifact Configurations → **Add** → Name/Slug 分别填 `windows-binaries`、`windows-installer`（全小写，CI 中写死）→ Artifact configuration 选 **Custom** → 粘贴第 6 节的 XML。两个都要建，缺一个对应阶段就会失败。
+3. **确认策略 Submitters**：两条策略的 Submitters 必须包含 CI 用户 `CI builds`（`test-signing` 无审批即可提交；`release-signing` 另需勾选 **Use approval process**、Approvers 填审批人、Required approvals = 1，这是 Foundation 的强制要求：每次发版必须人工批准）。
+4. **生成 CI 用户 API Token**：ADMINISTRATION → Users and Groups → 点 `CI builds` → **API Token** 区块 → Generate/Regenerate。CI 用户不能登录 Web 界面，只能由管理员在用户详情页为它生成；token 只显示一次。
+5. **写入仓库 secret**：`gh secret set SIGNPATH_API_TOKEN -R cool2528/GDownload`（交互粘贴，不要写进脚本或提交到仓库）。
+6. **（可选，联调期）下载测试证书公钥**：`Certificates` → `Test certificate 2026` → Download，把 `.cer` 存为仓库内 `.github/signpath/test-certificate.cer`——CI 用 `test-signing` 联调时需要它来让 runner 信任自签测试证书（见第 7 节）。
 
 ### 步骤 D：仓库 secret/vars 配置
 
@@ -146,6 +162,8 @@ Inno Setup 安装包的 PE 元数据由 `.iss` 的 `VersionInfoVersion={#MyAppVe
 阶段 1 与阶段 2 各产生一条签名请求；使用测试策略（test-signing）时无需批准，正式发布策略必须由 Approver 在 app.signpath.io 后台各批准一次。
 
 ## 7. 首次签名验证
+
+> **测试证书的信任问题**：`test-signing` 绑的是自签测试证书，GitHub runner 默认不信任其根，`Get-AuthenticodeSignature` 会返回 `UnknownError`，导致验签步骤失败。因此用 `test-signing` 联调时，CI 会先把仓库内 `.github/signpath/test-certificate.cer`（测试证书**公钥**，非私钥）导入 runner 的 `LocalMachine\Root` 与 `TrustedPublisher` 再验签。切到 `release-signing` 后证书由公共 CA 签发，走严格校验、无需导入。
 
 1. 推一个测试 tag（如 `v0.9.9`；必须纯 `vN.N.N` 格式——带后缀的 tag 会让版本解析失败，且务必选一个比现有正式版本号小的号，避免应用内更新检查把测试版当作新版本推送给用户）触发 `CLI-All-Platforms`。
 2. 观察 Windows job：`Resolve SignPath signing inputs` 应输出 enabled；两条 `Submit ... signing request` 步骤会等待批准。
