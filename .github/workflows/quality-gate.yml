@@ -61,9 +61,10 @@ jobs:
 
       # 与 cli-matrix.yml / vcpkg-cache-warm.yml 使用同一个缓存目录与后端,
       # 这样 Debug CI、Release 发版、定时预热三者能互相命中缓存。
-      # 注意: 只列保存时确实存在的路径, 否则 actions/cache 会整包放弃保存。
-      - name: Cache vcpkg binary cache
-        uses: actions/cache@v4
+      # 注意: 只列保存时确实存在的路径, 否则缓存会整包放弃保存;
+      # 恢复/保存拆两步, 见 cli-matrix.yml 中该步骤的说明。
+      - name: Restore vcpkg binary cache
+        uses: actions/cache/restore@v4
         with:
           path: ${{ github.workspace }}/vcpkg_cache
           key: vcpkg-x64-windows-debug-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'custom-triplets/**', 'vcpkg-ports/**') }}
@@ -87,6 +88,16 @@ jobs:
           github-binarycache: false
           disable-cache: true
           cache-key: vcpkg-x64-windows-debug
+
+      # 依赖编译完立刻保存。本工作流后面还有易失败的 QML 测试编译(z-applocal 并行
+      # 复制 DLL 竞态), 若不在此处落盘, 依赖冷编的 40 多分钟会随作业失败一起丢掉。
+      - name: Save vcpkg binary cache
+        if: always()
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ github.workspace }}/vcpkg_cache
+          key: vcpkg-x64-windows-debug-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'custom-triplets/**', 'vcpkg-ports/**') }}
 
       # 有意不用 sccache(GHA 后端): 其按编译对象产生的上千碎片缓存条目会在
       # 10GB 仓库共享配额下把 vcpkg-* 大缓存 LRU 逐出(v2.2.1 发版实测), 导致

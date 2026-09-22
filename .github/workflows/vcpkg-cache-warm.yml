@@ -128,9 +128,9 @@ jobs:
           brew install ninja
 
       # 与 cli-matrix.yml 保持完全一致的缓存路径与后端配置, 否则预热出来的缓存不会被
-      # 正式构建命中。详见 cli-matrix.yml 中该步骤的说明。
-      - name: Cache vcpkg binary cache
-        uses: actions/cache@v4
+      # 正式构建命中。详见 cli-matrix.yml 中该步骤的说明(含「恢复/保存拆两步」的原因)。
+      - name: Restore vcpkg binary cache
+        uses: actions/cache/restore@v4
         with:
           path: ${{ github.workspace }}/vcpkg_cache
           key: vcpkg-${{ matrix.vcpkg_triplet }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'custom-triplets/**', 'vcpkg-ports/**') }}
@@ -154,6 +154,15 @@ jobs:
           github-binarycache: false
           disable-cache: true
           cache-key: vcpkg-${{ matrix.vcpkg_triplet }}
+
+      # 依赖编译完立刻保存, 不依赖后续项目编译是否成功(预热工作流的意义就在于只灌缓存)。
+      - name: Save vcpkg binary cache
+        if: always()
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ github.workspace }}/vcpkg_cache
+          key: vcpkg-${{ matrix.vcpkg_triplet }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'custom-triplets/**', 'vcpkg-ports/**') }}
 
       - name: Setup MSVC Developer Command Prompt
         if: matrix.target == 'windows'

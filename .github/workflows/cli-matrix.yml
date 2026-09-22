@@ -244,13 +244,16 @@ jobs:
 
       # vcpkg 二进制缓存: files 后端把编译好的依赖包按 ABI 哈希存成 zip, 复用时直接解包,
       # 不再重新编译 (本项目 103 个依赖, 冷编约 26 分钟)。
-      # 两个约束:
+      # 三个约束:
       #   1. 路径必须与下面 Setup vcpkg 的 VCPKG_BINARY_SOURCES 指向同一目录;
-      #   2. 只能列「保存时确实存在」的路径 —— 只要有一个路径不存在, actions/cache 会
-      #      整包放弃保存 (历史问题: 曾列了不存在的 ${{ github.workspace }}/vcpkg_installed,
-      #      导致缓存从未存上, 每次构建都全量冷编)。
-      - name: Cache vcpkg binary cache
-        uses: actions/cache@v4
+      #   2. 只能列「保存时确实存在」的路径 —— 只要有一个路径不存在, 缓存会整包放弃保存
+      #      (历史问题: 曾列了不存在的 ${{ github.workspace }}/vcpkg_installed, 导致缓存
+      #      从未存上, 每次构建都全量冷编);
+      #   3. 恢复与保存拆成两步 —— actions/cache 的 post 步骤是 post-if: success(),
+      #      即「作业失败就不保存缓存」。依赖编译在 Setup vcpkg 阶段就完成了, 之后的
+      #      项目编译失败不该让这 26 分钟白费, 所以保存步骤紧跟 Setup vcpkg 且带 if: always()。
+      - name: Restore vcpkg binary cache
+        uses: actions/cache/restore@v4
         with:
           path: ${{ github.workspace }}/vcpkg_cache
           key: vcpkg-${{ matrix.vcpkg_triplet }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'custom-triplets/**', 'vcpkg-ports/**') }}
@@ -282,6 +285,16 @@ jobs:
           # 缓存统一由上面的 actions/cache 管理, 以支持 restore-keys 部分命中。
           disable-cache: true
           cache-key: vcpkg-${{ matrix.vcpkg_triplet }}
+
+      # 依赖已全部编译完, 立刻落盘缓存 —— 即使后面的项目编译失败也不会丢掉这 26 分钟。
+      # continue-on-error: 同名键已存在时 save 会报错(cache 不可变), 属正常情况。
+      - name: Save vcpkg binary cache
+        if: always()
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ github.workspace }}/vcpkg_cache
+          key: vcpkg-${{ matrix.vcpkg_triplet }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'custom-triplets/**', 'vcpkg-ports/**') }}
 
       # 有意不用 sccache(GHA 后端): 它把每个编译对象存成独立缓存条目, 一次全量
       # 构建刷出上千个碎片, 在 10GB 仓库共享配额下按 LRU 把 vcpkg-* 大缓存全部
