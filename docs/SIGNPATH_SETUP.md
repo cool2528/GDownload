@@ -159,8 +159,18 @@
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <!--
+    Inno Setup 把 Setup 版本资源写进预分配的固定宽度缓冲, 不足部分用空格填充, 且无法通过 .iss 指令关闭:
+      ProductName / CompanyName / FileDescription = 60 字符
+      ProductVersion / OriginalFilename           = 50 字符
+      FileVersion                                 = 20 字符
+      LegalCopyright                              = 100 字符
+    SignPath 的 file metadata restriction 是精确字符串比较 (实测不 trim),
+    因此这里必须写成 "GDownload" + 51 个空格 (共 60 字符)。
+    用 &#32; 字符引用表达空格: 既不会被编辑器裁剪, 又能在源码里直接看见。
+  -->
   <zip-file>
-    <pe-file path="*.exe" product-name="GDownload">
+    <pe-file path="*.exe" product-name="GDownload&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;">
       <authenticode-sign />
     </pe-file>
   </zip-file>
@@ -169,7 +179,18 @@
 
 > ⚠️ **根元素必须是 `<zip-file>`**：`actions/upload-artifact` 上传的任何产物（哪怕只指定了一个 `.exe`）在 SignPath 侧都是 **zip 容器**，根元素写成 `<pe-file>` 会因「artifact 本身不是 PE 文件」而处理失败。阶段 1 的报错已从侧面证实这一点（SignPath 能在 zip 根目录下匹配到 4 个 DLL）。
 
-Inno Setup 安装包的 PE 元数据由 `.iss` 的 `VersionInfoVersion={#MyAppVersion}` 等生成（ProductName 取 AppName = GDownload），与元数据校验一致。
+Inno Setup 安装包的 PE 元数据由 `.iss` 的 `VersionInfoVersion={#MyAppVersion}` 等生成（ProductName 取 AppName = GDownload）。
+
+> ⚠️ **Inno Setup 的版本资源带尾部空格填充**（2026-09-22 实测踩到）。`GDownloader_windows_0.9.9.exe` 的原始字节（偏移 0xD21A0）为 `GDownload` + 51 个空格 + `00 00`，即 **ProductName 恒为 60 字符**。对照实验证明这是 Inno 的行为而非 .NET 的显示行为：
+> | 生成方式 | ProductName 长度 |
+> | --- | --- |
+> | rc.exe（阶段 1 的 5 个文件） | 9（无填充） |
+> | Inno Setup（安装包） | 60（固定，AppName 长度 1/9/30/65 均得到 60） |
+>
+> Inno 官方文档无任何指令可关闭该填充（[VersionInfoProductName](https://jrsoftware.org/ishelp/topic_setup_versioninfoproductname.htm) 只说明默认取 `AppName`）。因此在 SignPath 侧只能按实际值（60 字符）写限制，否则报
+> `Processing error: The file has an unexpected product name 'GDownload'.`（报错信息会 trim 尾部空格，看起来与配置值一模一样，极易误判）。
+>
+> 若将来 Inno 更改缓冲宽度（如升级到 Inno 7），签名会**立即失败并报同样的错**，届时按上文方法重新测量实际长度并更新 `product-name` 即可。更彻底的做法是在 CI 里把安装包的版本资源重写为无填充值（可参考 `UpdateResource` Win32 API），但那会改动安装包本身，需先验证 Inno 的自校验行为，暂不采用。
 
 阶段 1 与阶段 2 各产生一条签名请求；使用测试策略（test-signing）时无需批准，正式发布策略必须由 Approver 在 app.signpath.io 后台各批准一次。
 
