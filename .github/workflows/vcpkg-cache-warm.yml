@@ -127,14 +127,12 @@ jobs:
         run: |
           brew install ninja
 
+      # 与 cli-matrix.yml 保持完全一致的缓存路径与后端配置, 否则预热出来的缓存不会被
+      # 正式构建命中。详见 cli-matrix.yml 中该步骤的说明。
       - name: Cache vcpkg binary cache
         uses: actions/cache@v4
         with:
-          path: |
-            ${{ github.workspace }}/vcpkg_installed
-            ~/.cache/vcpkg/archives
-            C:\Users\runneradmin\AppData\Local\vcpkg\archives
-            ~/Library/Caches/vcpkg/archives
+          path: ${{ github.workspace }}/vcpkg_cache
           key: vcpkg-${{ matrix.vcpkg_triplet }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'custom-triplets/**', 'vcpkg-ports/**') }}
           restore-keys: |
             vcpkg-${{ matrix.vcpkg_triplet }}-
@@ -145,6 +143,7 @@ jobs:
         uses: johnwason/vcpkg-action@v6
         env:
           VCPKG_MAX_CONCURRENCY: 4
+          VCPKG_BINARY_SOURCES: 'clear;files,${{ github.workspace }}/vcpkg_cache,readwrite'
         with:
           manifest-dir: ${{ github.workspace }}
           triplet: ${{ matrix.vcpkg_triplet }}
@@ -152,7 +151,8 @@ jobs:
             --overlay-triplets=${{ github.workspace }}/custom-triplets
             --overlay-ports=${{ github.workspace }}/vcpkg-ports
           token: ${{ github.token }}
-          github-binarycache: true
+          github-binarycache: false
+          disable-cache: true
           cache-key: vcpkg-${{ matrix.vcpkg_triplet }}
 
       - name: Setup MSVC Developer Command Prompt
