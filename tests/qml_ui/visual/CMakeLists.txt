@@ -27,9 +27,9 @@ target_compile_features(qml_ui_visual PRIVATE cxx_std_20)
 # main.moc 供 #include "main.moc" 使用;resource_qml.qrc / resource_icons.qrc
 # 通过 AUTORCC 由 rcc 编译为 qrc_*.cpp 链入二进制,使 qrc:/qml/... 路径可解析
 set_target_properties(qml_ui_visual PROPERTIES AUTOMOC ON AUTORCC ON)
-# 关闭 vcpkg applocal:运行时 DLL 由主程序部署到同一共享目录,避免并行 z-applocal 竞争
-# 测试所需 Qt DLL(含 Qt6QuickTest)由父级 qml_ui_test_dlls 目标统一部署一次
-set_target_properties(qml_ui_visual PROPERTIES VS_GLOBAL_VcpkgApplocalDeps false)
+# vcpkg applocal 已由父目录 tests/qml_ui/CMakeLists.txt 的 set(VCPKG_APPLOCAL_DEPS OFF)
+# 统一关闭(此处原先写的是 VS_GLOBAL_VcpkgApplocalDeps, 那只对 VS 生成器有效、对 Ninja 无效)。
+# 测试所需 Qt DLL(含 Qt6QuickTest)由父级 qml_ui_test_dlls 目标统一部署一次。
 
 add_test(NAME qml_ui_visual
     COMMAND qml_ui_visual -input ${CMAKE_CURRENT_SOURCE_DIR} -platform offscreen
