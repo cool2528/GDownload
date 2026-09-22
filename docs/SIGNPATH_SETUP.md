@@ -19,6 +19,8 @@
 | 仓库 secret/vars | `SIGNPATH_ORGANIZATION_ID` = 上述新组织 ID；`SIGNPATH_SIGNING_POLICY_SLUG` = `test-signing`（联调期）；`SIGNPATH_API_TOKEN` = `CI builds` 的 token |
 | 联调顺序 | 先用 `test-signing` 跑通端到端（免审批），待 `Release certificate 2026` 签发后切 `release-signing` 做正式发版 |
 
+> **2026-09-22 首次端到端联调结果**：认证链路已通（`CI builds` 的 token 有效，签名请求成功提交并拿到 request id，此前 "Could not authorize" 的根因确认修复）；阶段 1 请求在处理阶段失败，原因是 artifact 配置 `<include>` 缺少 `max-matches="unbounded"`，同时发现 `windows-installer` 根元素应改为 `<zip-file>` —— 两处均已按第 6 节修正。另：CI 的 vcpkg 二进制缓存实际长期失效（`x-gha` 后端被 vcpkg 移除 + `actions/cache` 路径写错），导致每次 Windows 构建全量冷编约 26 分钟。
+
 > 注意：审核通过后 SignPath 会**新建一个 OSS 组织**（本例 `GDownload [OSS]`），与申请阶段自建的 Free trial 组织（本例 `06b3e63a-...`）**不是同一个组织**，组织 ID 必须同步更新到仓库 var，且旧组织里的证书/项目/artifact 配置都不会带过来。
 
 ## 1. 两种角色的区别
@@ -130,11 +132,12 @@
 ### windows-binaries（阶段 1：zip 包内的自有 PE 文件）
 
 ```xml
+<?xml version="1.0" encoding="utf-8"?>
 <artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
   <zip-file>
     <pe-file-set product-name="GDownload">
-      <include path="*.exe" />
-      <include path="*.dll" />
+      <include path="*.exe" max-matches="unbounded" />
+      <include path="*.dll" max-matches="unbounded" />
       <for-each>
         <authenticode-sign />
       </for-each>
@@ -145,19 +148,28 @@
 
 说明：`<pe-file-set>` + `<for-each>` 对 zip 内全部 exe/dll 逐一签名；元素上的 `product-name` 属性是 **file metadata restrictions**（官方语法），每次签名时强制校验文件元数据 ProductName=GDownload。这正是 Foundation "Set all product name attributes and enforce using file metadata restrictions" 要求的落地。
 
+> ⚠️ **`max-matches="unbounded"` 不能省**：`<include>` 默认语义是「**必须且只能匹配到 1 个文件**」。本项目 `*.dll` 会匹配到 4 个自有 DLL（GDLCore / Engine / Ed2kEngine / PluginManager），漏写该属性时签名请求会直接失败：
+> `Processing error: Expected path to match exactly 1 item, but found 4.`（2026-09-22 首次联调实测踩到，报错会指明 artifact 配置的行号）。
+> 官方语法见 [Artifact Configuration Examples](https://docs.signpath.io/artifact-configuration/examples#metadata-restrictions)。
+
 > 订阅限制：Free trial 不支持 artifact 配置的 `<parameters>`（用户自定义参数）功能，因此暂用静态 `product-name` 校验，ProductVersion 一致性由构建系统保证（全项目统一 APP_VERSION）。Foundation 审核通过升级订阅后，可恢复 `product-version="${version}"` 参数化校验（CI 已预留 version 传参通道，见 git 历史）。
 
 ### windows-installer（阶段 2：安装包本体）
 
 ```xml
+<?xml version="1.0" encoding="utf-8"?>
 <artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
-  <pe-file product-name="GDownload">
-    <authenticode-sign />
-  </pe-file>
+  <zip-file>
+    <pe-file path="*.exe" product-name="GDownload">
+      <authenticode-sign />
+    </pe-file>
+  </zip-file>
 </artifact-configuration>
 ```
 
-Inno Setup 安装包的 PE 元数据由 `.iss` 的 `VersionInfoVersion={#MyAppVersion}` 等生成（ProductName 取 AppName = GDownload），与 `${version}` 校验一致。
+> ⚠️ **根元素必须是 `<zip-file>`**：`actions/upload-artifact` 上传的任何产物（哪怕只指定了一个 `.exe`）在 SignPath 侧都是 **zip 容器**，根元素写成 `<pe-file>` 会因「artifact 本身不是 PE 文件」而处理失败。阶段 1 的报错已从侧面证实这一点（SignPath 能在 zip 根目录下匹配到 4 个 DLL）。
+
+Inno Setup 安装包的 PE 元数据由 `.iss` 的 `VersionInfoVersion={#MyAppVersion}` 等生成（ProductName 取 AppName = GDownload），与元数据校验一致。
 
 阶段 1 与阶段 2 各产生一条签名请求；使用测试策略（test-signing）时无需批准，正式发布策略必须由 Approver 在 app.signpath.io 后台各批准一次。
 
