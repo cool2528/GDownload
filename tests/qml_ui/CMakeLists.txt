@@ -10,11 +10,9 @@ find_package(Qt6 REQUIRED COMPONENTS Test QuickTest Qml Quick)
 # 必须在 add_subdirectory 之前设置: vcpkg toolchain 覆写的 add_executable 在创建目标
 # 时读取该变量, 而它是目录作用域变量, 会自动传递给子目录(已用最小工程实测确认)。
 #
-# 为什么这里能关、tests/ 不能关: applocal 只复制**目标自身导入**的 DLL。本目录下的
-# QtTest 用例额外依赖只有 Qt 测试 DLL(Qt6Test/Qt6QuickTest/offscreen 平台插件), 已由
-# 下方 qml_ui_test_dlls 目标统一部署, 所以关掉 applocal 不缺任何东西; 而 tests/ 下的
-# gtest 用例额外依赖 gtest/gmock/sqlite3/libcrypto, 主程序并不导入它们, 关掉就会缺失
-# (实测: 会表现为测试进程零输出超时, 详见 tests/CMakeLists.txt 的说明)。
+# 本目录与 tests/ 一样关闭 applocal(根因见 tests/CMakeLists.txt: 并行 z-applocal 竞态)。
+# 这里额外需要的 Qt 测试 DLL(Qt6Test / Qt6QuickTest / offscreen 平台插件)由下方
+# qml_ui_test_dlls 目标统一部署, 因此关掉 applocal 不会缺任何依赖。
 #
 # 历史教训(踩过两个坑, 勿再重试):
 #   1) set_target_properties(<tgt> PROPERTIES VS_GLOBAL_VcpkgApplocalDeps false)

@@ -127,12 +127,14 @@ Name: "associatefiles"; Description: "{cm:AssociateTorrentDescription}"; GroupDe
 ;      _qml_ui_out，它等于 CMAKE_RUNTIME_OUTPUT_DIRECTORY/$<CONFIG>，正是这里打包的目录)。
 ;      它们与主程序共用目录是有意为之(测试要靠主程序已部署好的那批运行时 DLL)，所以不能靠
 ;      挪走输出目录来解决，只能在打包这一步按名字挡掉。
+;      gtest.dll / gtest_main.dll / gmock.dll 同理：由 tests/CMakeLists.txt 的
+;      deploy_test_runtime_dlls 目标部署进同一目录(测试专属，主程序不导入)，也必须挡掉。
 ;      BUILD_TESTS=OFF 的构建里这些文件根本不存在，Excludes 是空转，不影响正常发版。
 ;      注意这是**黑名单**：往 tests/qml_ui 里加新的测试目标时，若命名不以 qml_ui_ 开头，
 ;      记得同步补到这里。
 ;   注:测试截图产物在 <build>/test_artifacts/ 下，不在本目录，无需排除。
 Source: "@INSTALLER_BIN_DIR@\*"; DestDir: "{app}"; \
-    Excludes: "*.pdb,*.lib,*.exp,*.ilk,qml_ui_*,Qt6Test.dll,Qt6Testd.dll,Qt6QuickTest.dll,Qt6QuickTestd.dll,platforms\qoffscreen.dll,platforms\qoffscreend.dll"; \
+    Excludes: "*.pdb,*.lib,*.exp,*.ilk,qml_ui_*,Qt6Test.dll,Qt6Testd.dll,Qt6QuickTest.dll,Qt6QuickTestd.dll,platforms\qoffscreen.dll,platforms\qoffscreend.dll,gtest.dll,gtest_main.dll,gmock.dll"; \
     Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
