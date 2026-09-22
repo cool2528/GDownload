@@ -1,6 +1,14 @@
 # 测试框架配置
 cmake_minimum_required(VERSION 3.18)
 
+# 关闭本目录树内所有测试目标的 vcpkg applocal, 必须在 add_subdirectory 之前设置
+# (vcpkg toolchain 覆写的 add_executable 在创建目标时读取该变量)。
+# 目的: applocal 是挂在每个可执行目标上的 POST_BUILD 拷贝命令, 并行构建时多个测试
+# 目标会同时向同一输出目录复制同一批依赖 DLL, 触发 permission denied 竞态。
+# 测试运行所需的 vcpkg/Qt DLL 由主程序 gdownload 部署到同一共享输出目录,
+# ctest 在全量构建完成后运行, 届时 DLL 已就绪。详见 tests/qml_ui/CMakeLists.txt 的说明。
+set(VCPKG_APPLOCAL_DEPS OFF)
+
 # 查找必要的包
 find_package(GTest CONFIG REQUIRED)
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Test)

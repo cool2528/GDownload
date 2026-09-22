@@ -4,6 +4,24 @@ cmake_minimum_required(VERSION 3.18)
 # 使用说明与已知限制见 tests/qml_ui/README.md
 find_package(Qt6 REQUIRED COMPONENTS Test QuickTest Qml Quick)
 
+# ============================================================================
+# 关闭本目录树内所有测试目标的 vcpkg applocal。
+#
+# 必须在 add_subdirectory 之前设置: vcpkg toolchain 覆写的 add_executable 在创建目标
+# 时读取该变量, 而它是目录作用域变量, 会自动传递给子目录(已用最小工程实测确认)。
+#
+# 历史教训(踩过两个坑, 勿再重试):
+#   1) set_target_properties(<tgt> PROPERTIES VS_GLOBAL_VcpkgApplocalDeps false)
+#      —— 只对 Visual Studio 生成器(MSBuild)生效, 对 CI 用的 Ninja 完全无效;
+#      vcpkg 官方 toolchain 并未提供 per-target 的 applocal 开关。
+#   2) -DX_VCPKG_APPLOCAL_DEPS_SERIALIZED=ON
+#      —— 它给 applocal 命令加 USES_TERMINAL, 但 Ninja 会把 POST_BUILD 内联进链接边,
+#      实测生成的 build.ninja 不产生 console pool, 等于没加。
+# 两个坑都导致 CI 并行构建时多个测试目标同时向 build/Debug/bin 复制同一批依赖 DLL:
+#   open_for_read(".../Debug/bin\Qt6Networkd.dll"): permission denied
+# ============================================================================
+set(VCPKG_APPLOCAL_DEPS OFF)
+
 add_subdirectory(support)
 add_subdirectory(visual)
 add_subdirectory(integration)
