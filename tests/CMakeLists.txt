@@ -1,13 +1,14 @@
 # 测试框架配置
 cmake_minimum_required(VERSION 3.18)
 
-# 关闭本目录树内所有测试目标的 vcpkg applocal, 必须在 add_subdirectory 之前设置
-# (vcpkg toolchain 覆写的 add_executable 在创建目标时读取该变量)。
-# 目的: applocal 是挂在每个可执行目标上的 POST_BUILD 拷贝命令, 并行构建时多个测试
-# 目标会同时向同一输出目录复制同一批依赖 DLL, 触发 permission denied 竞态。
-# 测试运行所需的 vcpkg/Qt DLL 由主程序 gdownload 部署到同一共享输出目录,
-# ctest 在全量构建完成后运行, 届时 DLL 已就绪。详见 tests/qml_ui/CMakeLists.txt 的说明。
-set(VCPKG_APPLOCAL_DEPS OFF)
+# 注意: 本目录树**不能**关闭 vcpkg applocal(set(VCPKG_APPLOCAL_DEPS OFF))。
+# 这里的用例链接 vcpkg 的共享库 gtest/gmock(gtest.dll / gtest_main.dll / gmock.dll),
+# 以及 sqlite3.dll、libcrypto-3-x64.dll —— 这些主程序 gdownload 并不导入, 因此不会被
+# 主程序的 applocal 复制到共享输出目录; 一旦关闭本目录的 applocal, 这些 DLL 就没人复制,
+# 测试进程会在加载阶段弹模态错误框, 在无人值守的 CI 上表现为「零输出超时」(已实际踩到:
+# 6 个 gtest 用例全部 ***Timeout, 而同批产物里 19 个 QtTest 用例正常通过)。
+# tests/qml_ui 可以安全关闭 —— 它的额外依赖只有 Qt 测试 DLL, 且已由 qml_ui_test_dlls
+# 目标统一部署, 而那里正是并行 z-applocal 竞态的发生地。详见 tests/qml_ui/CMakeLists.txt。
 
 # 查找必要的包
 find_package(GTest CONFIG REQUIRED)
