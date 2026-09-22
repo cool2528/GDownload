@@ -242,14 +242,17 @@ jobs:
           path: tools
           key: appimage-tools-${{ runner.os }}-${{ hashFiles('.github/workflows/cli-matrix.yml') }}
 
+      # vcpkg 二进制缓存: files 后端把编译好的依赖包按 ABI 哈希存成 zip, 复用时直接解包,
+      # 不再重新编译 (本项目 103 个依赖, 冷编约 26 分钟)。
+      # 两个约束:
+      #   1. 路径必须与下面 Setup vcpkg 的 VCPKG_BINARY_SOURCES 指向同一目录;
+      #   2. 只能列「保存时确实存在」的路径 —— 只要有一个路径不存在, actions/cache 会
+      #      整包放弃保存 (历史问题: 曾列了不存在的 ${{ github.workspace }}/vcpkg_installed,
+      #      导致缓存从未存上, 每次构建都全量冷编)。
       - name: Cache vcpkg binary cache
         uses: actions/cache@v4
         with:
-          path: |
-            ${{ github.workspace }}/vcpkg_installed
-            ~/.cache/vcpkg/archives
-            C:\Users\runneradmin\AppData\Local\vcpkg\archives
-            ~/Library/Caches/vcpkg/archives
+          path: ${{ github.workspace }}/vcpkg_cache
           key: vcpkg-${{ matrix.vcpkg_triplet }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'custom-triplets/**', 'vcpkg-ports/**') }}
           restore-keys: |
             vcpkg-${{ matrix.vcpkg_triplet }}-
@@ -260,6 +263,10 @@ jobs:
         uses: johnwason/vcpkg-action@v6
         env:
           VCPKG_MAX_CONCURRENCY: 4
+          # 必须显式指定 files 后端。vcpkg 官方已移除 x-gha 后端, 而本 action 的
+          # github-binarycache=true 恰好注入 "clear;x-gha,readwrite", 等于完全没有
+          # 二进制缓存(日志警告 "The 'x-gha' binary caching backend has been removed")。
+          VCPKG_BINARY_SOURCES: 'clear;files,${{ github.workspace }}/vcpkg_cache,readwrite'
         with:
           manifest-dir: ${{ github.workspace }}
           triplet: ${{ matrix.vcpkg_triplet }}
@@ -267,7 +274,13 @@ jobs:
             --overlay-triplets=${{ github.workspace }}/custom-triplets
             --overlay-ports=${{ github.workspace }}/vcpkg-ports
           token: ${{ github.token }}
-          github-binarycache: true
+          # false: 走 action 自带的 file 缓存分支(设置 VCPKG_DEFAULT_BINARY_CACHE 并建目录,
+          # 保证缓存目录在保存阶段一定存在)。
+          github-binarycache: false
+          # true: 关掉 action 自己那套 pat-s/always-upload-cache(无 restore-keys, 且会把
+          # 整个 vcpkg 仓库也缓存一份, 与上面的 actions/cache 重复占用配额)。
+          # 缓存统一由上面的 actions/cache 管理, 以支持 restore-keys 部分命中。
+          disable-cache: true
           cache-key: vcpkg-${{ matrix.vcpkg_triplet }}
 
       # 有意不用 sccache(GHA 后端): 它把每个编译对象存成独立缓存条目, 一次全量
