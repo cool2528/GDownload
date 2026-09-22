@@ -6,7 +6,7 @@
 - 申请入口：https://signpath.org/apply （SignPath Foundation，非营利基金会）
 - 签名平台：https://app.signpath.io （SignPath.io，证书私钥托管于其 HSM）
 
-## 0. 当前状态（2026-09-21 检查点）
+## 0. 当前状态（2026-09-22 检查点）
 
 | 项 | 值 |
 | --- | --- |
@@ -18,8 +18,26 @@
 | CI 用户 | `CI builds`（基金会创建，通知邮箱已确认）；**API Token 由管理员在用户详情页生成**（CI 用户无法登录 Web 界面） |
 | 仓库 secret/vars | `SIGNPATH_ORGANIZATION_ID` = 上述新组织 ID；`SIGNPATH_SIGNING_POLICY_SLUG` = `test-signing`（联调期）；`SIGNPATH_API_TOKEN` = `CI builds` 的 token |
 | 联调顺序 | 先用 `test-signing` 跑通端到端（免审批），待 `Release certificate 2026` 签发后切 `release-signing` 做正式发版 |
+| 端到端联调 | ✅ **已完成**（2026-09-22，`test-signing`；两阶段签名 + 验签 + 回填全通，详见下方说明） |
+| 待办 1 | `SIGNPATH_SIGNER_SPKI_PIN` 仓库变量**尚未设置** —— 必须等 `Release certificate 2026` 签发后，用**正式证书**计算（不能用测试证书的指纹），否则更新包验签会失败 |
+| 待办 2 | `Release certificate 2026` 签发（`release-signing` 转 VALID）后，把仓库 var `SIGNPATH_SIGNING_POLICY_SLUG` 从 `test-signing` 切到 `release-signing` |
+| 待办 3 | 可选加固：给 `release-signing` 启用 `Require trusted build system` + `Verify origin policy`（需先确认 tag 构建下的分支语义） |
 
-> **2026-09-22 首次端到端联调结果**：认证链路已通（`CI builds` 的 token 有效，签名请求成功提交并拿到 request id，此前 "Could not authorize" 的根因确认修复）；阶段 1 请求在处理阶段失败，原因是 artifact 配置 `<include>` 缺少 `max-matches="unbounded"`，同时发现 `windows-installer` 根元素应改为 `<zip-file>` —— 两处均已按第 6 节修正。另：CI 的 vcpkg 二进制缓存实际长期失效（`x-gha` 后端被 vcpkg 移除 + `actions/cache` 路径写错），导致每次 Windows 构建全量冷编约 26 分钟。
+> **2026-09-22 端到端联调结果：全部通过 ✅**（run [35610734542](https://github.com/cool2528/GDownload/actions/runs/35610734542) 第 4 次尝试，Windows 任务 31 个步骤全绿，Release 资产全部产出）
+>
+> 认证链路已通（`CI builds` 的 token 有效，此前 "Could not authorize" 的根因确认修复）。三个失败点均已定位并修复：
+>
+> | # | 失败现象 | 根因 | 修复 |
+> | --- | --- | --- | --- |
+> | 1 | 阶段 1 `Expected path to match exactly 1 item, but found 4` | `<include>` 默认语义是「必须且只能匹配 1 个文件」 | 两处 `<include>` 补 `max-matches="unbounded"` |
+> | 2 | 阶段 2 处理失败 | GitHub artifact 是 zip 容器，根元素写成了 `<pe-file>` | 根元素改为 `<zip-file>` |
+> | 3 | 阶段 2 `The file has an unexpected product name 'GDownload'` | Inno Setup 版本资源是固定宽度填充（ProductName 恒 60 字符），SignPath 精确比较且不 trim | `product-name` 按实际值写满 60 字符（用 `&#32;` 表达尾部空格） |
+>
+> 验证证据：阶段 1 请求 `d6e6d5a0-b002-4c8c-956a-8e24d36b9e2c`、阶段 2 请求 `81de00e5-ab55-4c46-be00-90483f203791`；CI 日志 `Installer signed (signer: CN=Test certificate for 'GDownload [OSS]')`；对 Release 资产 `GDownloader_windows_0.9.9.exe` 本地验签得到 `Signer = CN=Test certificate for 'GDownload [OSS]'`、指纹 `09939CE498F605F155E65A7464B3930CA98AAE0A`、RFC3161 时间戳 `CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1`、`SignatureType = Authenticode`。其中 `Status = UnknownError`（"证书链…在不受信任的根证书中终止"）属**预期**：自签测试证书未加入本机信任链，CI 上导入信任根后拿到的是 `Valid`。
+>
+> ⚠️ **测试 tag 会劫持更新器端点**：`create-release` 步骤硬编码 `prerelease: false`，任何 tag 都会创建**正式** release 并成为 GitHub 的 `releases/latest` —— 而应用更新器读的正是 `https://api.github.com/repos/cool2528/gdownload/releases/latest`。因此联调 tag 必须用**低于当前正式版本**的纯 `N.N.N` 号（本例 `v0.9.9`，版本比较可挡住降级），并在验证后**立即删除 release + tag**（`gh release delete <tag> --cleanup-tag`）。
+>
+> 另：本次顺带定位并修复了 CI 的 vcpkg 二进制缓存长期失效问题（`x-gha` 后端已被 vcpkg 移除 + `actions/cache` 路径写错导致整包放弃保存），三个工作流（`cli-matrix.yml` / `vcpkg-cache-warm.yml` / `quality-gate.yml`）已统一改用 `files` 后端，详见各工作流内注释。
 
 > 注意：审核通过后 SignPath 会**新建一个 OSS 组织**（本例 `GDownload [OSS]`），与申请阶段自建的 Free trial 组织（本例 `06b3e63a-...`）**不是同一个组织**，组织 ID 必须同步更新到仓库 var，且旧组织里的证书/项目/artifact 配置都不会带过来。
 
