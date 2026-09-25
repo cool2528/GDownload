@@ -58,6 +58,9 @@ jobs:
   create-release:
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
+    outputs:
+      # 预发布 tag 不生成更新清单，见 release-update-manifests 作业
+      prerelease: ${{ steps.release_channel.outputs.prerelease }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -106,6 +109,28 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           rm -f "$RELEASE_BODY_FILE"
 
+      - name: Determine release channel
+        id: release_channel
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          # semver 预发布 = 修订号之后带 "-" 后缀(如 v2.3.0-beta.1 / v2.3.0-rc1)。
+          # 后缀要求以字母开头，与 cmake/get_version.cmake 的正则保持一致，
+          # 以免把 describe 的提交计数(v2.2.1-5-gxxxxxxx)当成后缀。
+          #
+          # 判定为预发布的效果：
+          #   1) release 标为 prerelease，不进入 GitHub 的 releases/latest，
+          #      因此不会推送给普通用户的自动更新（之前 prerelease 写死 false，
+          #      发测试版会抢占 releases/latest，v0.9.9 就出过这个问题）；
+          #   2) release-update-manifests 作业整个跳过，不生成更新清单。
+          if [[ "${TAG_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-[A-Za-z] ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+            echo "Tag ${TAG_NAME} 判定为预发布版本，不生成更新清单"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+            echo "Tag ${TAG_NAME} 判定为正式版本"
+          fi
+
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v2
@@ -113,7 +138,7 @@ jobs:
           name: GDownload ${{ github.ref_name }} autobuild
           body: ${{ steps.release_body.outputs.body }}
           draft: false
-          prerelease: false
+          prerelease: ${{ steps.release_channel.outputs.prerelease }}
           generate_release_notes: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -833,12 +858,14 @@ jobs:
 
   # 只消费 Windows exe 与 Linux AppImage,不依赖 macOS Universal 合并,
   # 与 merge-macos-universal 并行以缩短发版关键路径
+  # 预发布版本不生成更新清单: 清单是"有新版本可用"的信号, 不能推给普通用户
   release-update-manifests:
-    needs: [build]
+    needs: [build, create-release]
     if: |
       !cancelled() &&
       startsWith(github.ref, 'refs/tags/') &&
-      needs.build.result == 'success'
+      needs.build.result == 'success' &&
+      needs.create-release.outputs.prerelease != 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
