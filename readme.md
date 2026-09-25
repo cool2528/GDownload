@@ -270,7 +270,7 @@ GDownload 使用 [GNU Affero General Public License v3.0](LICENSE.txt)（AGPL-3.
 - [Linux.do](https://linux.do)
 - [V2EX](https://www.v2ex.com)
 
-## 🔏 Code signing policy（代码签名政策）
+## 🔏 Code signing policy
 
 Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
 
