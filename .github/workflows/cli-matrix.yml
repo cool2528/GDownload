@@ -694,20 +694,48 @@ jobs:
       - name: Restore staging into build tree
         shell: pwsh
         run: |
-          # 还原成 Inno 与签名步骤期望的目录结构(build/Release/bin 为打包源目录)
+          # upload-artifact 会把所列路径的**公共父目录**剥掉, 因此上传 build/Release/bin
+          # 与 build/release/windows_installer.iss 后, 包内结构是:
+          #     Release/bin/...               (公共父目录 build 被剥离)
+          #     Release/windows_installer.iss
+          # 注意 Windows 大小写不敏感, build/release 与 build/Release 合并成同一个 Release/。
+          #
+          # 还原目标必须与 iss 内写死的绝对路径一致(configure 时固化):
+          #     OutputDir  = $GITHUB_WORKSPACE/build\release
+          #     Source     = $GITHUB_WORKSPACE\build\Release\bin\*
+          # 所以这里还原到 build/Release/bin 与 build/release/, 不能随意换位置。
           $staging = Join-Path $env:GITHUB_WORKSPACE 'windows-staging'
           if (-not (Test-Path -LiteralPath $staging)) { throw "Staging artifact not found: $staging" }
-          $binSrc = Join-Path $staging 'build/Release/bin'
-          if (-not (Test-Path -LiteralPath $binSrc)) { throw "Signed input directory not found: $binSrc" }
+          $binSrc = Join-Path $staging 'Release/bin'
+          if (-not (Test-Path -LiteralPath $binSrc)) {
+            # 兜底: 万一 upload-artifact 的剥离规则变化, 就按名字找 bin 目录
+            $found = Get-ChildItem -Path $staging -Recurse -Directory -Filter 'bin' |
+              Where-Object { Test-Path (Join-Path $_.FullName 'gdownload.exe') } |
+              Select-Object -First 1
+            if (-not $found) { throw "Signed input directory not found under $staging" }
+            $binSrc = $found.FullName
+            Write-Warning "Expected $staging/Release/bin; using discovered $binSrc instead"
+          }
+          $issSrc = Get-ChildItem -Path $staging -Recurse -File -Filter 'windows_installer.iss' |
+            Select-Object -First 1
+          if (-not $issSrc) { throw "Installer script (windows_installer.iss) not found under $staging" }
+
+          # 还原到 iss 内写死的绝对路径所要求的位置
           $binDst = Join-Path $env:GITHUB_WORKSPACE 'build/Release/bin'
           New-Item -ItemType Directory -Force -Path $binDst | Out-Null
           Copy-Item -Path (Join-Path $binSrc '*') -Destination $binDst -Recurse -Force
-          $issSrc = Join-Path $staging 'build/release/windows_installer.iss'
-          if (-not (Test-Path -LiteralPath $issSrc)) { throw "Installer script not found: $issSrc" }
           $issDst = Join-Path $env:GITHUB_WORKSPACE 'build/release'
           New-Item -ItemType Directory -Force -Path $issDst | Out-Null
-          Copy-Item -LiteralPath $issSrc -Destination $issDst -Force
-          Write-Host "Restored staging:"
+          Copy-Item -LiteralPath $issSrc.FullName -Destination $issDst -Force
+
+          # iss 里是 configure 时固化的绝对路径, 这里校验与本 runner 的工作目录一致,
+          # 否则 ISCC 会在错误的位置找源文件/输出
+          $issText = Get-Content -LiteralPath (Join-Path $issDst 'windows_installer.iss') -Raw
+          $expectedBin = (Join-Path $env:GITHUB_WORKSPACE 'build\Release\bin')
+          if ($issText -notlike "*$expectedBin*") {
+            throw "windows_installer.iss 内的源目录与本 runner 工作目录不匹配(期望包含 $expectedBin);configure 固化的路径为: $(([regex]::Match($issText,'Source: "([^"]+)"')).Groups[1].Value)"
+          }
+          Write-Host "Restored staging into $binDst:"
           Get-ChildItem -Path $binDst -File | ForEach-Object { Write-Host "  $($_.Name)" }
 
       - name: Package stage-1 binaries for signing (Windows)
