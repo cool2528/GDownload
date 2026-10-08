@@ -530,108 +530,33 @@ jobs:
           }
           "SIGNPATH_ENABLED=$(if ($enabled) { 'true' } else { 'false' })" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Package stage-1 binaries for signing (Windows)
-        if: matrix.target == 'windows' && env.SIGNPATH_ENABLED == 'true'
-        shell: pwsh
-        run: |
-          # Inno Setup 的打包源目录(src/App/ui CMakeLists 的 INSTALLER_BIN_DIR,
-          # Ninja 单配置 = build/Release/bin),签名必须回填到这里才会进安装包
-          $binDir = Join-Path $env:GITHUB_WORKSPACE 'build/Release/bin'
-          if (-not (Test-Path -LiteralPath $binDir)) { throw "Packaging directory not found: $binDir" }
-          $stageDir = Join-Path $env:RUNNER_TEMP 'signpath-stage1'
-          Remove-Item -Recurse -Force $stageDir -ErrorAction SilentlyContinue
-          New-Item -ItemType Directory -Force -Path $stageDir | Out-Null
-          # 自有 PE 文件清单:主程序 + 本仓库构建的 DLL。
-          # 第三方组件(aria2c.exe、Qt/Boost/OpenSSL 等运行时)按 SignPath Foundation
-          # 条款不由本项目签名,允许以未签名形态包含在安装包内。
-          # 注意:无需手动打 zip —— upload-artifact 会把本目录内容打包为 GitHub artifact,
-          # SignPath 侧 artifact 配置(windows-binaries)的根元素 <zip-file> 直接描述其内容。
-          $ownBinaries = @('gdownload.exe', 'GDLCore.dll', 'Engine.dll', 'Ed2kEngine.dll', 'PluginManager.dll')
-          $staged = @()
-          foreach ($name in $ownBinaries) {
-            $source = Join-Path $binDir $name
-            if (Test-Path -LiteralPath $source) {
-              Copy-Item -LiteralPath $source -Destination $stageDir
-              $staged += $name
-            } else {
-              Write-Warning "Expected own binary not found in install prefix: $name"
-            }
-          }
-          if ($staged.Count -eq 0) { throw "No own binaries found under $binDir" }
-          Write-Host "Staged $($staged.Count) own binaries for signing: $($staged -join ', ')"
-
-      - name: Upload stage-1 artifact for signing
-        id: upload_signstage1
+      - name: Upload unsigned Windows staging for signing job
+        # 构建与签名分离: 签名请求要等人批准(可达数十分钟), 不该让昂贵的编译 runner
+        # 一直干等。本步骤把签名所需输入交给 sign-windows 作业后本腿即结束;
+        # 审批超时只需重跑 sign-windows, 不必重编 26 分钟。
+        #   build/Release/bin                    Inno 打包源目录(待签的自有 PE 文件)
+        #   build/release/windows_installer.iss  打包脚本(configure 阶段生成)
         if: matrix.target == 'windows' && env.SIGNPATH_ENABLED == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: gdownload-signstage1-windows-${{ github.run_id }}
-          path: ${{ runner.temp }}/signpath-stage1
+          name: gdownload-windows-staging-${{ github.run_id }}
+          path: |
+            build/Release/bin
+            build/release/windows_installer.iss
           retention-days: 1
           if-no-files-found: error
 
-      - name: Submit stage-1 signing request (SignPath)
-        if: matrix.target == 'windows' && env.SIGNPATH_ENABLED == 'true'
-        uses: signpath/github-action-submit-signing-request@v2
-        with:
-          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
-          organization-id: '${{ vars.SIGNPATH_ORGANIZATION_ID }}'
-          project-slug: 'gdownload'
-          signing-policy-slug: '${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}'
-          artifact-configuration-slug: 'windows-binaries'
-          github-artifact-id: '${{ steps.upload_signstage1.outputs.artifact-id }}'
-          wait-for-completion: true
-          # 阶段 1 需要在 SignPath 后台人工批准(Approver),超时留足审批时间
-          wait-for-completion-timeout-in-seconds: 1200
-          output-artifact-directory: '${{ runner.temp }}/signstage1-signed'
-
-      # ===== 测试证书信任(仅 test-signing 联调期需要) =====
-      # test-signing 绑的是自签测试证书,runner 默认不信任其根,Get-AuthenticodeSignature
-      # 会返回 UnknownError,导致下面两步验签失败。把仓库内的测试证书公钥(仅公钥,无私钥)
-      # 导入受信任根与受信任发布者后即可通过。切到 release-signing(证书由公共 CA 签发)时
-      # 本步骤自动跳过,验签恢复为严格信任链校验。
-      - name: Trust SignPath test certificate (test-signing only)
-        if: matrix.target == 'windows' && env.SIGNPATH_ENABLED == 'true' && vars.SIGNPATH_SIGNING_POLICY_SLUG == 'test-signing'
-        shell: pwsh
-        run: |
-          $certPath = Join-Path $env:GITHUB_WORKSPACE '.github/signpath/test-certificate.cer'
-          if (-not (Test-Path -LiteralPath $certPath)) {
-            throw "SignPath test certificate not found: $certPath"
-          }
-          $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 $certPath
-          Write-Host "Trusting test certificate: $($cert.Subject) [$($cert.Thumbprint)]"
-          Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\Root | Out-Null
-          Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\TrustedPublisher | Out-Null
-          Write-Host "Imported test certificate into LocalMachine\Root and LocalMachine\TrustedPublisher."
-
-      - name: Verify and apply stage-1 signatures (Windows)
-        if: matrix.target == 'windows' && env.SIGNPATH_ENABLED == 'true'
-        shell: pwsh
-        run: |
-          $signedDir = Join-Path $env:RUNNER_TEMP 'signstage1-signed'
-          # 与打包步骤一致:回填目标是 Inno Setup 的打包源目录
-          $binDir = Join-Path $env:GITHUB_WORKSPACE 'build/Release/bin'
-          $signedFiles = Get-ChildItem -Path $signedDir -Recurse -File |
-            Where-Object { $_.Extension -in '.exe', '.dll' }
-          if (-not $signedFiles) { throw "SignPath returned no signed PE files" }
-          $applied = 0
-          foreach ($file in $signedFiles) {
-            $target = Join-Path $binDir $file.Name
-            # 忽略签名服务返回的打包容器等非成员文件,只回填构建产物清单内的文件
-            if (-not (Test-Path -LiteralPath $target)) { continue }
-            $signature = Get-AuthenticodeSignature -FilePath $file.FullName
-            if ($signature.Status -ne 'Valid') {
-              throw "Signature verification failed for $($file.Name): $($signature.Status) $($signature.StatusMessage)"
-            }
-            Copy-Item -LiteralPath $file.FullName -Destination $target -Force
-            $applied++
-            Write-Host "Applied signed $($file.Name) (signer: $($signature.SignerCertificate.Subject))"
-          }
-          if ($applied -eq 0) { throw "No signed file matched the staged binaries" }
-          Write-Host "Applied $applied signed binaries back to the Inno packaging directory."
-
+      # ===== 签名与打包已移交 sign-windows 作业 =====
+      # SignPath 启用时, 阶段1 签名 -> Inno 打包 -> 阶段2 签名 -> 安装包发布 全部在
+      # sign-windows 作业执行(见下方该作业)。原因是签名请求需要人工批准, 可能等待
+      # 数十分钟, 不应让本编译 runner 空耗; 分离后审批超时可单独重跑 sign-windows。
+      # 本腿只负责编译并上传未签名产物(gdownload-windows-staging-*)。
+      #
+      # 未启用 SignPath 时(缺 secret/vars)仍需在本腿产出未签名安装包, 保持既有行为。
+      # 未启用 SignPath 时(缺 secret/vars)在本腿直接产出未签名安装包, 保持既有行为;
+      # 启用时这三步由 sign-windows 作业在签名完成后执行。
       - name: Install Inno Setup
-        if: matrix.target == 'windows'
+        if: matrix.target == 'windows' && env.SIGNPATH_ENABLED != 'true'
         run: |
           choco install innosetup -y --no-progress
           # 验证安装
@@ -644,7 +569,7 @@ jobs:
         shell: pwsh
 
       - name: Build Windows Installer
-        if: matrix.target == 'windows'
+        if: matrix.target == 'windows' && env.SIGNPATH_ENABLED != 'true'
         shell: pwsh
         run: |
           # 直接使用绝对路径调用 ISCC (Inno Setup Compiler)
@@ -655,54 +580,8 @@ jobs:
           }
           & $iscc /V5 "$env:GITHUB_WORKSPACE\build\release\windows_installer.iss"
 
-      # ===== SignPath 代码签名(阶段 2:安装包本体) =====
-      # 阶段 1 回填的已签名二进制已打进安装包;这里把安装包整体再签一次,
-      # 签名后的文件原地覆盖 build\release 下的产物,由 Collect/Upload 步骤正常发布。
-      - name: Upload stage-2 installer artifact for signing
-        id: upload_signstage2
-        if: matrix.target == 'windows' && env.SIGNPATH_ENABLED == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: gdownload-signstage2-windows-${{ github.run_id }}
-          path: build/release/GDownloader_windows_*.exe
-          retention-days: 1
-          if-no-files-found: error
-
-      - name: Submit stage-2 signing request (SignPath)
-        if: matrix.target == 'windows' && env.SIGNPATH_ENABLED == 'true'
-        uses: signpath/github-action-submit-signing-request@v2
-        with:
-          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
-          organization-id: '${{ vars.SIGNPATH_ORGANIZATION_ID }}'
-          project-slug: 'gdownload'
-          signing-policy-slug: '${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}'
-          artifact-configuration-slug: 'windows-installer'
-          github-artifact-id: '${{ steps.upload_signstage2.outputs.artifact-id }}'
-          wait-for-completion: true
-          # 阶段 2 同样需要人工批准;两次批准都完成后才会继续发布
-          wait-for-completion-timeout-in-seconds: 1200
-          output-artifact-directory: '${{ runner.temp }}/signstage2-signed'
-
-      - name: Verify and apply stage-2 signature (Windows)
-        if: matrix.target == 'windows' && env.SIGNPATH_ENABLED == 'true'
-        shell: pwsh
-        run: |
-          $signedDir = Join-Path $env:RUNNER_TEMP 'signstage2-signed'
-          $signedFiles = Get-ChildItem -Path $signedDir -Recurse -File -Filter 'GDownloader_windows_*.exe'
-          if (-not $signedFiles) { throw "SignPath returned no signed installer" }
-          $unsigned = Get-ChildItem -Path (Join-Path $env:GITHUB_WORKSPACE 'build/release') -Filter 'GDownloader_windows_*.exe' |
-            Select-Object -First 1
-          if (-not $unsigned) { throw "Unsigned installer not found under build/release" }
-          $signed = $signedFiles | Select-Object -First 1
-          $signature = Get-AuthenticodeSignature -FilePath $signed.FullName
-          if ($signature.Status -ne 'Valid') {
-            throw "Installer signature verification failed: $($signature.Status) $($signature.StatusMessage)"
-          }
-          Copy-Item -LiteralPath $signed.FullName -Destination $unsigned.FullName -Force
-          Write-Host "Installer signed (signer: $($signature.SignerCertificate.Subject)) and replaced $($unsigned.Name)."
-
       - name: Collect Windows Installer
-        if: matrix.target == 'windows'
+        if: matrix.target == 'windows' && env.SIGNPATH_ENABLED != 'true'
         shell: pwsh
         run: |
           $releaseDir = Join-Path $env:GITHUB_WORKSPACE "release_artifacts/windows"
@@ -767,7 +646,11 @@ jobs:
           retention-days: 1
 
       - name: Upload Release Artifact
-        if: startsWith(github.ref, 'refs/tags/') && matrix.release_glob != ''
+        # Windows 腿启用 SignPath 时不在此发布: 安装包要等 sign-windows 作业签完才发布,
+        # 否则会把未签名安装包先发上去。linux/macos 腿条件不受影响。
+        if: |
+          startsWith(github.ref, 'refs/tags/') && matrix.release_glob != '' &&
+          !(matrix.target == 'windows' && env.SIGNPATH_ENABLED == 'true')
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -775,6 +658,249 @@ jobs:
           file_glob: true
           file: ${{ matrix.release_glob }}
           overwrite: true
+
+  # ===== Windows 签名与打包(构建与签名分离) =====
+  # SignPath 的生产证书签名请求需要人工批准(Open Source 项目使用 Foundation 证书的
+  # 既定行为), 等待时间不可控。若把签名放在 build 作业里, 编译 runner 会在等待期间
+  # 空耗, 且审批超时会导致整条发版失败、26 分钟编译白费。
+  #
+  # 因此把 阶段1 签名 -> Inno 打包 -> 阶段2 签名 -> 发布 独立成本作业:
+  #   - 输入来自 build 的 windows 腿(gdownload-windows-staging-*)。
+  #   - 审批超时只需重跑本作业, 不必重新编译。
+  #   - 本作业不使用任何第三方构建产物, 全部步骤仍在 GitHub 托管 runner 上,
+  #     满足 SignPath 对 OSS 项目的 origin verification 要求。
+  sign-windows:
+    needs: [build, create-release]
+    if: |
+      !cancelled() &&
+      startsWith(github.ref, 'refs/tags/') &&
+      needs.build.result == 'success' &&
+      vars.SIGNPATH_ORGANIZATION_ID != '' &&
+      vars.SIGNPATH_SIGNING_POLICY_SLUG != ''
+    runs-on: windows-latest
+    # 两次人工审批各留 60 分钟, 加上构建与打包开销, 上限远高于默认 360 分钟无必要,
+    # 这里显式声明以便日后调整审批窗口时有单一可见位置。
+    timeout-minutes: 240
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download unsigned Windows staging
+        uses: actions/download-artifact@v4
+        with:
+          name: gdownload-windows-staging-${{ github.run_id }}
+          path: windows-staging
+
+      - name: Restore staging into build tree
+        shell: pwsh
+        run: |
+          # 还原成 Inno 与签名步骤期望的目录结构(build/Release/bin 为打包源目录)
+          $staging = Join-Path $env:GITHUB_WORKSPACE 'windows-staging'
+          if (-not (Test-Path -LiteralPath $staging)) { throw "Staging artifact not found: $staging" }
+          $binSrc = Join-Path $staging 'build/Release/bin'
+          if (-not (Test-Path -LiteralPath $binSrc)) { throw "Signed input directory not found: $binSrc" }
+          $binDst = Join-Path $env:GITHUB_WORKSPACE 'build/Release/bin'
+          New-Item -ItemType Directory -Force -Path $binDst | Out-Null
+          Copy-Item -Path (Join-Path $binSrc '*') -Destination $binDst -Recurse -Force
+          $issSrc = Join-Path $staging 'build/release/windows_installer.iss'
+          if (-not (Test-Path -LiteralPath $issSrc)) { throw "Installer script not found: $issSrc" }
+          $issDst = Join-Path $env:GITHUB_WORKSPACE 'build/release'
+          New-Item -ItemType Directory -Force -Path $issDst | Out-Null
+          Copy-Item -LiteralPath $issSrc -Destination $issDst -Force
+          Write-Host "Restored staging:"
+          Get-ChildItem -Path $binDst -File | ForEach-Object { Write-Host "  $($_.Name)" }
+
+      - name: Package stage-1 binaries for signing (Windows)
+        shell: pwsh
+        run: |
+          # Inno Setup 的打包源目录(src/App/ui CMakeLists 的 INSTALLER_BIN_DIR,
+          # Ninja 单配置 = build/Release/bin),签名必须回填到这里才会进安装包
+          $binDir = Join-Path $env:GITHUB_WORKSPACE 'build/Release/bin'
+          if (-not (Test-Path -LiteralPath $binDir)) { throw "Packaging directory not found: $binDir" }
+          $stageDir = Join-Path $env:RUNNER_TEMP 'signpath-stage1'
+          Remove-Item -Recurse -Force $stageDir -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force -Path $stageDir | Out-Null
+          # 自有 PE 文件清单:主程序 + 本仓库构建的 DLL。
+          # 第三方组件(aria2c.exe、Qt/Boost/OpenSSL 等运行时)按 SignPath Foundation
+          # 条款不由本项目签名,允许以未签名形态包含在安装包内。
+          # 注意:无需手动打 zip —— upload-artifact 会把本目录内容打包为 GitHub artifact,
+          # SignPath 侧 artifact 配置(windows-binaries)的根元素 <zip-file> 直接描述其内容。
+          $ownBinaries = @('gdownload.exe', 'GDLCore.dll', 'Engine.dll', 'Ed2kEngine.dll', 'PluginManager.dll')
+          $staged = @()
+          foreach ($name in $ownBinaries) {
+            $source = Join-Path $binDir $name
+            if (Test-Path -LiteralPath $source) {
+              Copy-Item -LiteralPath $source -Destination $stageDir
+              $staged += $name
+            } else {
+              Write-Warning "Expected own binary not found in install prefix: $name"
+            }
+          }
+          if ($staged.Count -eq 0) { throw "No own binaries found under $binDir" }
+          Write-Host "Staged $($staged.Count) own binaries for signing: $($staged -join ', ')"
+
+      - name: Upload stage-1 artifact for signing
+        id: upload_signstage1
+        uses: actions/upload-artifact@v4
+        with:
+          name: gdownload-signstage1-windows-${{ github.run_id }}
+          path: ${{ runner.temp }}/signpath-stage1
+          retention-days: 1
+          if-no-files-found: error
+
+      - name: Submit stage-1 signing request (SignPath)
+        uses: signpath/github-action-submit-signing-request@v2
+        with:
+          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
+          organization-id: '${{ vars.SIGNPATH_ORGANIZATION_ID }}'
+          project-slug: 'gdownload'
+          signing-policy-slug: '${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}'
+          artifact-configuration-slug: 'windows-binaries'
+          github-artifact-id: '${{ steps.upload_signstage1.outputs.artifact-id }}'
+          wait-for-completion: true
+          # 生产证书的签名请求需要人工批准(Foundation 证书的既定行为)。
+          # 60 分钟是审批窗口: 超时只会让本作业失败, 重跑本作业即可, 不影响已完成的编译。
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: '${{ runner.temp }}/signstage1-signed'
+
+      # ===== 测试证书信任(仅 test-signing 联调期需要) =====
+      # test-signing 绑的是自签测试证书,runner 默认不信任其根,Get-AuthenticodeSignature
+      # 会返回 UnknownError,导致下面两步验签失败。把仓库内的测试证书公钥(仅公钥,无私钥)
+      # 导入受信任根与受信任发布者后即可通过。切到 release-signing(证书由公共 CA 签发)时
+      # 本步骤自动跳过,验签恢复为严格信任链校验。
+      - name: Trust SignPath test certificate (test-signing only)
+        if: vars.SIGNPATH_SIGNING_POLICY_SLUG == 'test-signing'
+        shell: pwsh
+        run: |
+          $certPath = Join-Path $env:GITHUB_WORKSPACE '.github/signpath/test-certificate.cer'
+          if (-not (Test-Path -LiteralPath $certPath)) {
+            throw "SignPath test certificate not found: $certPath"
+          }
+          $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 $certPath
+          Write-Host "Trusting test certificate: $($cert.Subject) [$($cert.Thumbprint)]"
+          Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\Root | Out-Null
+          Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\TrustedPublisher | Out-Null
+          Write-Host "Imported test certificate into LocalMachine\Root and LocalMachine\TrustedPublisher."
+
+      - name: Verify and apply stage-1 signatures (Windows)
+        shell: pwsh
+        run: |
+          $signedDir = Join-Path $env:RUNNER_TEMP 'signstage1-signed'
+          # 与打包步骤一致:回填目标是 Inno Setup 的打包源目录
+          $binDir = Join-Path $env:GITHUB_WORKSPACE 'build/Release/bin'
+          $signedFiles = Get-ChildItem -Path $signedDir -Recurse -File |
+            Where-Object { $_.Extension -in '.exe', '.dll' }
+          if (-not $signedFiles) { throw "SignPath returned no signed PE files" }
+          $applied = 0
+          foreach ($file in $signedFiles) {
+            $target = Join-Path $binDir $file.Name
+            # 忽略签名服务返回的打包容器等非成员文件,只回填构建产物清单内的文件
+            if (-not (Test-Path -LiteralPath $target)) { continue }
+            $signature = Get-AuthenticodeSignature -FilePath $file.FullName
+            if ($signature.Status -ne 'Valid') {
+              throw "Signature verification failed for $($file.Name): $($signature.Status) $($signature.StatusMessage)"
+            }
+            Copy-Item -LiteralPath $file.FullName -Destination $target -Force
+            $applied++
+            Write-Host "Applied signed $($file.Name) (signer: $($signature.SignerCertificate.Subject))"
+          }
+          if ($applied -eq 0) { throw "No signed file matched the staged binaries" }
+          Write-Host "Applied $applied signed binaries back to the Inno packaging directory."
+
+      - name: Install Inno Setup
+        run: |
+          choco install innosetup -y --no-progress
+          if (Test-Path "C:\Program Files (x86)\Inno Setup 6\ISCC.exe") {
+            Write-Host "Inno Setup installed at: C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          } else {
+            Write-Host "Inno Setup not found in default location"
+            Get-ChildItem "C:\Program Files*" -Recurse -Filter "ISCC.exe" -ErrorAction SilentlyContinue
+          }
+        shell: pwsh
+
+      - name: Build Windows Installer
+        shell: pwsh
+        run: |
+          # 直接使用绝对路径调用 ISCC (Inno Setup Compiler)
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            Write-Error "ISCC not found at $iscc"
+            exit 1
+          }
+          & $iscc /V5 "$env:GITHUB_WORKSPACE\build\release\windows_installer.iss"
+
+      # ===== SignPath 代码签名(阶段 2:安装包本体) =====
+      # 阶段 1 回填的已签名二进制已打进安装包;这里把安装包整体再签一次,
+      # 签名后的文件原地覆盖 build\release 下的产物,随后发布。
+      - name: Upload stage-2 installer artifact for signing
+        id: upload_signstage2
+        uses: actions/upload-artifact@v4
+        with:
+          name: gdownload-signstage2-windows-${{ github.run_id }}
+          path: build/release/GDownloader_windows_*.exe
+          retention-days: 1
+          if-no-files-found: error
+
+      - name: Submit stage-2 signing request (SignPath)
+        uses: signpath/github-action-submit-signing-request@v2
+        with:
+          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
+          organization-id: '${{ vars.SIGNPATH_ORGANIZATION_ID }}'
+          project-slug: 'gdownload'
+          signing-policy-slug: '${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}'
+          artifact-configuration-slug: 'windows-installer'
+          github-artifact-id: '${{ steps.upload_signstage2.outputs.artifact-id }}'
+          wait-for-completion: true
+          # 阶段 2 同样需要人工批准;两次批准都完成后才会发布安装包
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: '${{ runner.temp }}/signstage2-signed'
+
+      - name: Verify and apply stage-2 signature (Windows)
+        shell: pwsh
+        run: |
+          $signedDir = Join-Path $env:RUNNER_TEMP 'signstage2-signed'
+          $signedFiles = Get-ChildItem -Path $signedDir -Recurse -File -Filter 'GDownloader_windows_*.exe'
+          if (-not $signedFiles) { throw "SignPath returned no signed installer" }
+          $unsigned = Get-ChildItem -Path (Join-Path $env:GITHUB_WORKSPACE 'build/release') -Filter 'GDownloader_windows_*.exe' |
+            Select-Object -First 1
+          if (-not $unsigned) { throw "Unsigned installer not found under build/release" }
+          $signed = $signedFiles | Select-Object -First 1
+          $signature = Get-AuthenticodeSignature -FilePath $signed.FullName
+          if ($signature.Status -ne 'Valid') {
+            throw "Installer signature verification failed: $($signature.Status) $($signature.StatusMessage)"
+          }
+          Copy-Item -LiteralPath $signed.FullName -Destination $unsigned.FullName -Force
+          Write-Host "Installer signed (signer: $($signature.SignerCertificate.Subject)) and replaced $($unsigned.Name)."
+
+      - name: Publish signed Windows installer
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+          file_glob: true
+          file: build/release/GDownloader_windows_*.exe
+          overwrite: true
+
+      - name: Summarize signing result
+        if: always()
+        shell: pwsh
+        run: |
+          # 审批人需要知道进度卡在哪、去哪点批准,把这些写进作业摘要(Summary 页面可见)
+          $policy = '${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}'
+          $lines = @(
+            '## SignPath signing (Windows)',
+            '',
+            "Policy: ``$policy``",
+            '',
+            'Two **manual approvals** are required in the SignPath UI for production',
+            'certificate signing (stage 1: own binaries, stage 2: installer).',
+            '',
+            'Approve at: https://app.signpath.io/Web/' + '${{ vars.SIGNPATH_ORGANIZATION_ID }}' + '/SigningRequests',
+            '',
+            'Each stage waits up to 3600s. If a stage times out, re-run **this job only** -',
+            'the build artifacts are reused, no recompilation is needed.'
+          )
+          $lines | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
 
   merge-macos-universal:
     needs: build
