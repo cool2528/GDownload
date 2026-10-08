@@ -735,7 +735,7 @@ jobs:
           if ($issText -notlike "*$expectedBin*") {
             throw "windows_installer.iss 内的源目录与本 runner 工作目录不匹配(期望包含 $expectedBin);configure 固化的路径为: $(([regex]::Match($issText,'Source: "([^"]+)"')).Groups[1].Value)"
           }
-          Write-Host "Restored staging into $binDst:"
+          Write-Host "Restored staging into ${binDst}"
           Get-ChildItem -Path $binDst -File | ForEach-Object { Write-Host "  $($_.Name)" }
 
       - name: Package stage-1 binaries for signing (Windows)
