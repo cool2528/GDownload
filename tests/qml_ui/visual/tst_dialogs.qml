@@ -267,6 +267,34 @@ TestCase {
         }
     }
 
+    function test_help_license_and_about_tabs() {
+        var comp = Qt.createComponent("qrc:/qml/CommonComponents/HelpDialog.qml")
+        verify(comp.status === Component.Ready, comp.errorString())
+        var dlg = comp.createObject(harness)
+        verify(dlg !== null)
+        testCase.currentDialog = dlg
+        dlg.parent = harness
+        dlg.modal = false
+        dlg.open()
+        tryCompare(dlg, "opened", true)
+
+        var repeater = findChild(dlg, "helpTabRepeater")
+        var navigation = findChild(dlg, "helpTabNavigation")
+        var pages = findChild(dlg, "helpPages")
+        verify(repeater !== null && navigation !== null && pages !== null)
+        compare(repeater.count, 2)
+        compare(pages.count, 2)
+        compare(pages.currentIndex, 0)
+        compare(repeater.itemAt(0).text, "License")
+        compare(repeater.itemAt(1).text, "About")
+        mouseClick(repeater.itemAt(1))
+        compare(navigation.currentIndex, 1)
+        compare(pages.currentIndex, 1)
+        mouseClick(repeater.itemAt(0))
+        compare(pages.currentIndex, 0)
+        cleanupDialog()
+    }
+
     function captureUpdateState(theme, state, tag) {
         harness.themeMode = theme
         testCase.width = 620

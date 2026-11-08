@@ -1,5 +1,19 @@
 # Changelog
 
+## v2.2.2
+
+### Downloads and Settings / 下载与设置
+
+- Preserve unfinished eD2k tasks across restarts, including their destination, progress and paused state. Removed tasks stay removed. / 修复 eD2k 暂停后退出重启丢失任务，保留保存位置、进度与暂停状态，已删除任务不再恢复。
+- Keep restored paused eD2k tasks from opening connections before being paused, and fix an engine shutdown crash when outstanding login coroutines are destroyed. / 修复恢复暂停任务时提前启动连接的竞态，以及登录协程未排空时退出程序触发的引擎析构崩溃。
+- Restore the custom Tracker source Remove button in light and dark themes and keep it visible beside long URLs in narrow windows. / 修复 Tracker 自定义源删除按钮在浅色主题下隐形及窄窗口中越界的问题。
+- The About dialog now contains only License and About; the retired payment page, image resources and related messages have been removed. / 关于对话框仅保留许可证与关于页面，移除旧付款页面、图片资源和相关文案。
+
+### Release Packaging / 发布打包
+
+- Ship unsigned Windows installers while the SignPath production certificate is pending. Production signing is opt-in and test certificates are excluded from release builds. Ed25519 update-manifest signatures, package SHA-256 checks and Linux GPG signatures remain enabled. / SignPath 生产证书待签发期间发布未签名 Windows 安装包，生产签名显式开启，发布流程排除测试证书；保留更新清单 Ed25519、下载包 SHA-256 与 Linux GPG 校验。
+- Wait for Windows signing to finish or be explicitly skipped before generating update manifests. / 更新清单等待 Windows 签名成功或明确跳过后再生成，避免产物上传竞态。
+
 ## v2.2.1
 
 ### 🔄 自动更新 / Auto-Update

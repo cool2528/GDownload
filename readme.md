@@ -278,7 +278,7 @@ Free code signing provided by [SignPath.io](https://signpath.io), certificate by
 - **Approvers（签名批准者）**: [@cool2528](https://github.com/cool2528)
 - **Privacy policy（隐私政策）**: 本程序不会向其他网络系统传输任何信息，除非是用户或安装、操作本程序的人明确请求的行为；应用内的更新检查仅访问 GitHub Releases 获取版本信息，可在设置中关闭自动检查。
 
-Windows 安装包与程序主二进制通过 GitHub Actions 使用 SignPath.io 完成自动化签名，签名服务会校验二进制确由本仓库的源代码与 CI 配置构建（Trusted Build System）。接入与验证流程见 [docs/SIGNPATH_SETUP.md](docs/SIGNPATH_SETUP.md)。
+SignPath 生产证书尚待签发，本次 Windows 发布为未签名安装包和程序，不使用测试证书。生产签名默认关闭，待正式证书就绪后再显式启用；更新清单的 Ed25519 签名和下载包 SHA-256 校验保持启用。接入与验证流程见 [docs/SIGNPATH_SETUP.md](docs/SIGNPATH_SETUP.md)。
 
 ## ⚠️ 免责声明
 

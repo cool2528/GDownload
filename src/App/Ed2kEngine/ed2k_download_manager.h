@@ -51,7 +51,8 @@ class Ed2kEngine_API Ed2kDownloadManager : public Singleton<Ed2kDownloadManager>
 	bool EngineIsRunning() const;
 
 	// Task 4 实现：返回 "ed2k-<hash>" 任务 ID；link 为完整 ed2k:// 字符串
-	std::string AddEd2kTask(const std::string& link, const std::string& save_dir);
+	std::string AddEd2kTask(const std::string& link, const std::string& save_dir, bool paused = false,
+							std::uint64_t generation = 0);
 	bool PauseTask(const std::string& task_id);
 	bool UnpauseTask(const std::string& task_id);
 	bool RemoveTask(const std::string& task_id, bool delete_files);
@@ -89,6 +90,7 @@ class Ed2kEngine_API Ed2kDownloadManager : public Singleton<Ed2kDownloadManager>
 	explicit Ed2kDownloadManager();
 	// 安排下一次 1s 采样（内部递归重排，网络线程执行）
 	void ScheduleSampling();
+	void PublishTaskProgressLocked();
 	// 仅在网络线程调用：序列化当前服务器列表并发布 kEd2kServerList
 	void PublishServerListLocked();
 	// 仅在网络线程调用：序列化当前上传统计与分享文件列表并发布 kEd2kShareState

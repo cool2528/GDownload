@@ -77,6 +77,13 @@ if(Python3_Interpreter_FOUND)
         TIMEOUT 60
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     )
+    add_test(NAME ReleaseSigningPolicyTests
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/scripts/test_release_signing_policy.py
+    )
+    set_tests_properties(ReleaseSigningPolicyTests PROPERTIES
+        TIMEOUT 60
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
 endif()
 
 # 添加自定义测试目标

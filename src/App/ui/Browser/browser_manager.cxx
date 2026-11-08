@@ -1,5 +1,8 @@
-﻿#include "browser_manager.h"
+#include "browser_manager.h"
 #include <QApplication>
+#include <QCoreApplication>
+#include <QEvent>
+#include <QThread>
 #include <QDir>
 #include <QFile>
 #include <QRandomGenerator>
@@ -237,9 +240,8 @@ namespace gdl {
 								Q_EMIT sigErrorMessage(tr("Invalid ed2k link: %1").arg(url_str));
 								continue;
 							}
-							const auto id = engine::Ed2kDownloadManager::Instance().AddEd2kTask(
-								canonical_url.toStdString(), save_dir.toStdString());
-							if (id.empty()) {
+							const bool added = SubmitEd2kTask(canonical_url, save_dir, options.value(QStringLiteral("pause")).toString() == QStringLiteral("true"));
+							if (!added) {
 								LOG_WARN("Failed to add ed2k download task: {}", url_str.toStdString());
 								Q_EMIT sigErrorMessage(tr("Invalid ed2k link: %1").arg(url_str));
 							}
@@ -410,6 +412,7 @@ namespace gdl {
 
 			bool BrowserManagerImpl::ForcePauseTask(int page_index, const QString& gid) {
 				if (gid.isEmpty()) return false;
+				if (gid.startsWith(QStringLiteral("ed2k-"))) return PauseTask(page_index, gid);
 				if (page_index == 0) {
 					if (active_model_) {
 						return engine::Aria2cDownloadManager::Instance()
@@ -431,6 +434,7 @@ namespace gdl {
 			}
 
 			bool BrowserManagerImpl::ForcePauseAllTask() {
+				engine::Ed2kDownloadManager::Instance().PauseAll();
 				return engine::Aria2cDownloadManager::Instance()
 					.CallAria2cMethod(engine::Aria2Method::kForcePauseAll)
 					.IsOk();
@@ -498,6 +502,10 @@ namespace gdl {
 					const bool removed =
 						engine::Ed2kDownloadManager::Instance().RemoveTask(gid.toStdString(), is_remove_file);
 					if (!removed) return result;
+					ForgetEd2kTask(gid);
+					const auto deleted = gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
+					result.history_cleaned = deleted.IsOk();
+					if (deleted.HasError()) LOG_ERR("Failed to delete ed2k history {}: {}", gid.toStdString(), deleted.GetError().Describe());
 					if (active_model_) {
 						active_model_->RemoveTaskById(gid);
 					}
@@ -598,6 +606,7 @@ namespace gdl {
 
 			bool BrowserManagerImpl::ForceRemoveTask(const QString& gid) {
 				if (gid.isEmpty()) return false;
+				if (gid.startsWith(QStringLiteral("ed2k-"))) return RemoveTaskResult(0, gid, false).task_removed;
 				const auto res = engine::Aria2cDownloadManager::Instance()
 									 .CallAria2cMethod(engine::Aria2Method::kForceRemove, gid.toStdString())
 									 .IsOk();
@@ -700,6 +709,8 @@ namespace gdl {
 				if (!AddHttpTask(request->urls, request->options)) {
 					return false;
 				}
+				// ed2k 重试复用相同哈希 ID，提交已 upsert 新生命周期，不能再删掉新记录。
+				if (gid.startsWith(QStringLiteral("ed2k-"))) return true;
 				const auto history_remove_result =
 					gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(gid.toStdString());
 				const bool history_removed = history_remove_result.IsOk();
@@ -759,6 +770,7 @@ namespace gdl {
 						engine::Ed2kDownloadManager::Instance().RemoveTask(gid.toStdString(), false);
 					}
 					const QString ed2k_save_path = task->task_save_path();
+					ForgetEd2kTask(gid);
 					if (!stopped_model_->RemoveTaskById(gid)) {
 						LOG_ERR("RemoveStopTask failed to remove stopped model entry gid:{}", gid.toStdString());
 						return result;
@@ -952,6 +964,46 @@ namespace gdl {
 				return links;
 			}
 
+			bool BrowserManagerImpl::SubmitEd2kTask(const QString& link, const QString& save_dir, bool paused,
+												 const DownloadTaskInfo* restored) {
+				if (shutting_down_) return false;
+				const auto entry = ParseEd2kLink(link);
+				if (!entry.valid) return false;
+				const QString id = QStringLiteral("ed2k-") + entry.md4_hex.toLower();
+				// 同一文件的重复提交沿用现有生命周期，不覆盖暂停状态和已记录的进度。
+				if (ed2k_generations_.contains(id) &&
+					(active_model_->ContainsTask(id) || waiting_model_->ContainsTask(id))) return true;
+				const auto generation = ++next_ed2k_generation_;
+				const auto submitted = engine::Ed2kDownloadManager::Instance().AddEd2kTask(
+					link.toStdString(), save_dir.toStdString(), paused, generation);
+				if (submitted.empty()) return false;
+				ed2k_generations_[id] = generation;
+				DownloadTaskInfo info = restored ? *restored : DownloadTaskInfo{};
+				info.set_task_id(id);
+				info.set_task_file_name(entry.name);
+				info.set_task_total_size(entry.size);
+				info.set_task_download_link(link);
+				info.set_task_save_path(QDir(save_dir).filePath(entry.name));
+				info.set_task_state(paused ? TaskState::kPause : TaskState::kWaiting);
+				info.set_task_download_speed(0);
+				info.set_task_connections(0);
+				info.set_task_error_message({});
+				ed2k_task_cache_[id] = info;
+				if (restored) ed2k_restored_progress_.insert(id);
+				stopped_model_->RemoveTaskById(id);
+				stopped_model_->ClearTombstone(id);
+				// 创建入口立即写入现有历史库，不等待首次采样或 Qt 队列，覆盖添加后立即退出。
+				ApplyTaskUpdate(info);
+				return true;
+			}
+
+			void BrowserManagerImpl::ForgetEd2kTask(const QString& task_id) {
+				// 先撤销代际再删库，已排队的旧采样/终态事件随后到达也不会复活任务。
+				ed2k_generations_.remove(task_id);
+				ed2k_task_cache_.remove(task_id);
+				ed2k_restored_progress_.remove(task_id);
+			}
+
 			bool BrowserManagerImpl::AddEd2kTask(const QVariantList& links, const QVariantMap& options) {
 				QString save_dir = options.value(QStringLiteral("dir")).toString().trimmed();
 				if (save_dir.isEmpty()) {
@@ -970,9 +1022,8 @@ namespace gdl {
 						Q_EMIT sigErrorMessage(tr("Invalid ed2k link: %1").arg(link_str));
 						continue;
 					}
-					const auto id = engine::Ed2kDownloadManager::Instance().AddEd2kTask(
-						canonical_link.toStdString(), save_dir.toStdString());
-					if (id.empty()) {
+					const bool added = SubmitEd2kTask(canonical_link, save_dir, options.value(QStringLiteral("pause")).toString() == QStringLiteral("true"));
+					if (!added) {
 						LOG_WARN("Failed to add ed2k download task: {}", link_str.toStdString());
 						Q_EMIT sigErrorMessage(tr("Invalid ed2k link: %1").arg(link_str));
 					}
@@ -1140,6 +1191,12 @@ namespace gdl {
 			}
 
 			void BrowserManagerImpl::UnInit() {
+				if (shutting_down_) return;
+				// 先等待网络线程收敛，再消费退出前已经转投的任务事件；此时历史库仍然打开。
+				ed2k_boot_auto_connect_pending_.store(false);
+				engine::Ed2kDownloadManager::Instance().ShutdownEngine();
+				QCoreApplication::sendPostedEvents(this, QEvent::MetaCall);
+				shutting_down_ = true;
 				if (aria2_responce_subcription_) {
 					engine::Aria2cDownloadManager::Instance().UnSubscribeAria2Message(aria2_responce_subcription_);
 					aria2_responce_subcription_.reset();
@@ -1171,7 +1228,6 @@ namespace gdl {
 					engine::Ed2kDownloadManager::Instance().UnSubscribeEd2kMessage(ed2k_server_met_boot_subscription_);
 					ed2k_server_met_boot_subscription_.reset();
 				}
-				engine::Ed2kDownloadManager::Instance().ShutdownEngine();
 			}
 
 			gdl::cache::DownloadRecord BrowserManagerImpl::DownloadTaskInfoToRecord(const DownloadTaskInfo& info) {
@@ -1194,6 +1250,110 @@ namespace gdl {
 				return info;
 			}
 
+			void BrowserManagerImpl::ApplyTaskUpdate(const DownloadTaskInfo& task_info) {
+				try {
+					const auto task_id = task_info.task_id();
+					if (shutting_down_) return;
+					const bool ed2k = task_id.startsWith(QStringLiteral("ed2k-"));
+					if (ed2k && !ed2k_generations_.contains(task_id)) return;
+					if (stopped_model_->IsTombstoned(task_id) &&
+						(task_info.task_state() == TaskState::kComplete || task_info.task_state() == TaskState::kError ||
+						 task_info.task_state() == TaskState::kRemoved)) return;
+					if (ed2k && task_info.task_state() != TaskState::kRemoved) {
+						auto record = DownloadTaskInfoToRecord(task_info);
+						const auto previous = gdl::cache::DownloadHistoryCache::Instance().GetRecord(record.task_id);
+						if (previous.IsOk() && previous.Value()) record.created_time = previous.Value()->created_time;
+						if (task_info.task_state() != TaskState::kComplete && task_info.task_state() != TaskState::kError)
+							record.completed_time = 0;
+						const auto saved = gdl::cache::DownloadHistoryCache::Instance().AddRecord(record);
+						if (saved.HasError()) LOG_ERR("Failed to persist ed2k task {}: {}", record.task_id, saved.GetError().Describe());
+					}
+					switch (task_info.task_state()) {
+						case TaskState::kActive: {
+							// 同一 GID 已进入新的活动生命周期时，允许它之后重新写入终态历史。
+							stopped_model_->ClearTombstone(task_id);
+							if (active_model_->ContainsTask(task_id)) {
+								active_model_->UpdateTaskById(task_id, task_info);
+							}
+							else {
+								active_model_->AddTask(task_info);
+							}
+							if (waiting_model_->ContainsTask(task_id)) {
+								waiting_model_->RemoveTaskById(task_id);
+							}
+						} break;
+						case TaskState::kWaiting: {
+							stopped_model_->ClearTombstone(task_id);
+							if (waiting_model_->ContainsTask(task_id)) {
+								waiting_model_->UpdateTaskById(task_id, task_info);
+							}
+							else {
+								waiting_model_->AddTask(task_info);
+							}
+							if (active_model_->ContainsTask(task_id)) {
+								active_model_->RemoveTaskById(task_id);
+							}
+						} break;
+						case TaskState::kPause: {
+							stopped_model_->ClearTombstone(task_id);
+							if (active_model_->ContainsTask(task_id)) {
+								active_model_->UpdateTaskById(task_id, task_info);
+							}
+							else {
+								active_model_->AddTask(task_info);
+							}
+
+							if (waiting_model_->ContainsTask(task_id)) {
+								waiting_model_->RemoveTaskById(task_id);
+							}
+						} break;
+						case TaskState::kComplete:
+						case TaskState::kRemoved:
+						case TaskState::kError: {
+							// 删除历史条目和 aria2/ed2k 的终态通知可能跨线程交错。
+							// 仅 stopped 模型的墓碑表示该终态历史已被显式移除；active/
+							// waiting 模型的墓碑也会在正常状态迁移时产生，不能用于此判断。
+							if (stopped_model_->IsTombstoned(task_id)) {
+								return;
+							}
+							if (active_model_->ContainsTask(task_id)) {
+								active_model_->RemoveTaskById(task_id);
+							}
+							if (waiting_model_->ContainsTask(task_id)) {
+								waiting_model_->RemoveTaskById(task_id);
+							}
+							if (stopped_model_->ContainsTask(task_id)) {
+								stopped_model_->UpdateTaskById(task_id, task_info);
+								gdl::cache::DownloadRecord record = DownloadTaskInfoToRecord(task_info);
+								const auto update_result = ed2k ? gdl::cache::CacheResult<void>::Success() :
+									gdl::cache::DownloadHistoryCache::Instance().UpdateRecord(record);
+								if (update_result.HasError()) {
+									LOG_ERR("Failed to UPDATE record to history cache {} error:{}", record.save_path,
+											update_result.GetError().Describe());
+								}
+							}
+							else {
+								stopped_model_->AddTask(task_info);
+								gdl::cache::DownloadRecord record = DownloadTaskInfoToRecord(task_info);
+								const auto add_result = ed2k ? gdl::cache::CacheResult<void>::Success() :
+									gdl::cache::DownloadHistoryCache::Instance().AddRecord(record);
+								if (add_result.HasError()) {
+									LOG_ERR("Failed to add record to history cache {} error:{}", record.save_path,
+											add_result.GetError().Describe());
+								}
+							}
+
+						} break;
+
+						default:
+							LOG_WARN("Unknown task state:{}", static_cast<int>(task_info.task_state()));
+							break;
+					}
+				} catch (std::exception& e) {
+					LOG_ERR("{}", e.what());
+				} catch (...) {}
+			}
+
 			BrowserManagerImpl::BrowserManagerImpl(QObject* parent) : QObject(parent) {
 				active_model_  = std::make_unique<DownloadTaskModel>();
 				waiting_model_ = std::make_unique<DownloadTaskModel>();
@@ -1201,92 +1361,7 @@ namespace gdl {
 				connect(
 					this, &BrowserManagerImpl::sigUpdateTasksMessage, this,
 					[this](const DownloadTaskInfo& task_info) {
-						try {
-							const auto task_id = task_info.task_id();
-							switch (task_info.task_state()) {
-								case TaskState::kActive: {
-									// 同一 GID 已进入新的活动生命周期时，允许它之后重新写入终态历史。
-									stopped_model_->ClearTombstone(task_id);
-									if (active_model_->ContainsTask(task_id)) {
-										active_model_->UpdateTaskById(task_id, task_info);
-									}
-									else {
-										active_model_->AddTask(task_info);
-									}
-									if (waiting_model_->ContainsTask(task_id)) {
-										waiting_model_->RemoveTaskById(task_id);
-									}
-								} break;
-								case TaskState::kWaiting: {
-									stopped_model_->ClearTombstone(task_id);
-									if (waiting_model_->ContainsTask(task_id)) {
-										waiting_model_->UpdateTaskById(task_id, task_info);
-									}
-									else {
-										waiting_model_->AddTask(task_info);
-									}
-									if (active_model_->ContainsTask(task_id)) {
-										active_model_->RemoveTaskById(task_id);
-									}
-								} break;
-								case TaskState::kPause: {
-									stopped_model_->ClearTombstone(task_id);
-									if (active_model_->ContainsTask(task_id)) {
-										active_model_->UpdateTaskById(task_id, task_info);
-									}
-									else {
-										active_model_->AddTask(task_info);
-									}
-
-									if (waiting_model_->ContainsTask(task_id)) {
-										waiting_model_->RemoveTaskById(task_id);
-									}
-								} break;
-								case TaskState::kComplete:
-								case TaskState::kRemoved:
-								case TaskState::kError: {
-									// 删除历史条目和 aria2/ed2k 的终态通知可能跨线程交错。
-									// 仅 stopped 模型的墓碑表示该终态历史已被显式移除；active/
-									// waiting 模型的墓碑也会在正常状态迁移时产生，不能用于此判断。
-									if (stopped_model_->IsTombstoned(task_id)) {
-										return;
-									}
-									if (active_model_->ContainsTask(task_id)) {
-										active_model_->RemoveTaskById(task_id);
-									}
-									if (waiting_model_->ContainsTask(task_id)) {
-										waiting_model_->RemoveTaskById(task_id);
-									}
-									if (stopped_model_->ContainsTask(task_id)) {
-										stopped_model_->UpdateTaskById(task_id, task_info);
-										gdl::cache::DownloadRecord record = DownloadTaskInfoToRecord(task_info);
-										const auto update_result =
-											gdl::cache::DownloadHistoryCache::Instance().UpdateRecord(record);
-										if (update_result.HasError()) {
-											LOG_ERR("Failed to UPDATE record to history cache {} error:{}", record.save_path,
-													update_result.GetError().Describe());
-										}
-									}
-									else {
-										stopped_model_->AddTask(task_info);
-										gdl::cache::DownloadRecord record = DownloadTaskInfoToRecord(task_info);
-										const auto add_result =
-											gdl::cache::DownloadHistoryCache::Instance().AddRecord(record);
-										if (add_result.HasError()) {
-											LOG_ERR("Failed to add record to history cache {} error:{}", record.save_path,
-													add_result.GetError().Describe());
-										}
-									}
-
-								} break;
-
-								default:
-									LOG_WARN("Unknown task state:{}", static_cast<int>(task_info.task_state()));
-									break;
-							}
-						} catch (std::exception& e) {
-							LOG_ERR("{}", e.what());
-						} catch (...) {}
+						ApplyTaskUpdate(task_info);
 					},
 					Qt::QueuedConnection);
 
@@ -1323,6 +1398,15 @@ namespace gdl {
 				}
 				for (const auto& record : records_result.Value()) {
 					DownloadTaskInfo info = DownloadRecordToTaskInfo(record);
+					if (IsEd2kLink(info.task_download_link()) &&
+						(info.task_state() == TaskState::kActive || info.task_state() == TaskState::kWaiting ||
+						 info.task_state() == TaskState::kPause)) {
+						info.set_task_download_speed(0);
+						info.set_task_connections(0);
+						auto* model = info.task_state() == TaskState::kWaiting ? waiting_model_.get() : active_model_.get();
+						if (!model->ContainsTask(info.task_id())) model->AddTask(info);
+						continue;
+					}
 					if (stopped_model_ && !stopped_model_->ContainsTask(info.task_id())) {
 						if (ShouldRestoreHistoryTask(info, QFile::exists(info.task_save_path()))) {
 							stopped_model_->AddTask(info);
@@ -1338,47 +1422,20 @@ namespace gdl {
 					}
 				}
 			}
-			// 重启续传:ed2k 引擎在进程内运行,没有像 aria2c 那样依赖外部进程 --save-session/
-			// --input-file 的会话续传机制,Session 重建后 id_to_session 映射为空、之前的任务需要
-			// 显式重新调用 AddEd2kTask 才能被重新纳入调度——引擎内部按 md4 定位同名 .part.met
-			// 实现真正的断点续传(不会从 0 重新下载已有分片)。
-			// 只处理 kError:kRemoved 代表用户已主动移除任务,不应自动复活;kComplete 已完成无需处理;
-			// kActive/kWaiting/kPause 这几个非终态从不写入历史缓存(参见 sigUpdateTasksMessage 中
-			// 落库逻辑只在 kComplete/kRemoved/kError 分支触发),因此这里能观察到的"非 complete"
-			// 记录事实上只有 kError 一种。
-			// 调用时机:必须晚于 ed2k 引擎 InitEd2kEngine 成功(AddEd2kTask 依赖 Session 已在跑)。
-			void BrowserManagerImpl::RestoreEd2kDownloadHistory() const {
-				const auto records_result = gdl::cache::DownloadHistoryCache::Instance().GetRecords();
-				if (records_result.HasError()) {
-					// 错误已由 InitDownloadHistoryCache 记录过一次,这里不重复打日志
-					return;
-				}
-				for (const auto& record : records_result.Value()) {
-					if (record.state != gdl::cache::DownloadState::kError) continue;
-					const QString link = QString::fromStdString(record.download_url);
-					if (!IsEd2kLink(link)) continue;
-
-					// save_path 存的是完整目标文件路径,反推所在目录作为 save_dir;取不到时退回默认下载目录
-					QString save_dir = QFileInfo(QString::fromStdString(record.save_path)).path();
-					if (save_dir.isEmpty() || save_dir == QStringLiteral(".")) {
-						save_dir = settings::Settings::Instance().GetDir();
-					}
-					const auto task_id = engine::Ed2kDownloadManager::Instance().AddEd2kTask(
-						record.download_url, save_dir.toStdString());
-					if (task_id.empty()) {
+			// 任务清单沿用历史库；引擎 .part.met 负责块级断点。恢复不删除原记录，失败也可再次启动。
+			void BrowserManagerImpl::RestoreEd2kDownloadHistory() {
+				const auto records = gdl::cache::DownloadHistoryCache::Instance().GetRecords();
+				if (records.HasError()) return;
+				for (const auto& record : records.Value()) {
+					const auto state = record.state;
+					if (state == gdl::cache::DownloadState::kComplete || state == gdl::cache::DownloadState::kRemoved) continue;
+					const QString link = CanonicalizeEd2kLink(QString::fromStdString(record.download_url));
+					if (link.isEmpty()) continue;
+					QString dir = QFileInfo(QString::fromStdString(record.save_path)).path();
+					if (dir.isEmpty() || dir == QStringLiteral(".")) dir = settings::Settings::Instance().GetDir();
+					const auto info = DownloadRecordToTaskInfo(record);
+					if (!SubmitEd2kTask(link, dir, state == gdl::cache::DownloadState::kPause, &info))
 						LOG_WARN("Failed to restore ed2k task on restart: {}", record.download_url);
-						continue;
-					}
-					// 恢复成功:task_id 由链接的 md4 确定性生成,与旧记录的 task_id 相同;移除旧的失败态
-					// 展示条目与历史记录,避免和即将到来的新状态事件重复——与 RetryTask 的既有约定一致。
-					if (stopped_model_) {
-						stopped_model_->RemoveTaskById(QString::fromStdString(task_id));
-					}
-					const auto delete_result = gdl::cache::DownloadHistoryCache::Instance().DeleteRecord(task_id);
-					if (delete_result.HasError()) {
-						LOG_ERR("Failed to remove resumed ed2k record from history cache task_id:{} error:{}",
-								task_id, delete_result.GetError().Describe());
-					}
 				}
 			}
 
@@ -1593,16 +1650,21 @@ namespace gdl {
 			}
 
 			// 1s 采样的活动任务进度数组:[{id,name,total,done,speed,sources,state}, ...]
-			// 与 OnHandleAria2ActiveProgress 一样在 ed2k 引擎网络线程回调,经 Qt::QueuedConnection
-			// 的 sigUpdateTasksMessage 转发到主线程,构造函数里既有的 lambda 负责落 model + 历史。
+			// 网络线程仅转投消息，QObject 线程统一解析并更新模型及历史库。
 			void BrowserManagerImpl::OnHandleEd2kActiveProgress(const std::string& msg) {
+				if (QThread::currentThread() != thread()) {
+					QMetaObject::invokeMethod(this, [this, msg] { OnHandleEd2kActiveProgress(msg); }, Qt::QueuedConnection);
+					return;
+				}
+				if (shutting_down_) return;
 				try {
 					const nlohmann::json doc = nlohmann::json::parse(msg);
 					if (!doc.is_array()) return;
 					for (const auto& item : doc) {
 						if (!item.is_object() || !item.contains("id") || !item["id"].is_string()) continue;
 						const QString task_id = QString::fromStdString(item["id"].get<std::string>());
-						if (task_id.isEmpty()) continue;
+						if (task_id.isEmpty() || !ed2k_generations_.contains(task_id) ||
+							ed2k_generations_.value(task_id) != item.value("generation", std::uint64_t{0})) continue;
 
 						DownloadTaskInfo task_info;
 						task_info.set_task_id(task_id);
@@ -1631,6 +1693,10 @@ namespace gdl {
 						const TaskState sampled_state =
 							Ed2kStateStringToTaskState(item.value("state", std::string()));
 						task_info.set_task_state(sampled_state);
+						if (ed2k_restored_progress_.contains(task_id)) {
+							if (item.value("state", std::string()) == "downloading") ed2k_restored_progress_.remove(task_id);
+							else task_info.set_task_current_size(ed2k_task_cache_.value(task_id).task_current_size());
+						}
 						// 等待原因(非失败态的 error)翻成用户能据以决策的说明; 空字符串会清掉上一轮的提示
 						const QString sampled_reason =
 							QString::fromStdString(item.value("error", std::string()));
@@ -1644,9 +1710,9 @@ namespace gdl {
 								: Ed2kWaitingReasonToHint(sampled_reason, gate_remaining_ms));
 
 						// 缓存最近一次采样,供 OnHandleEd2kTaskState 在仅含 id/state/error 的终态事件中补全字段;
-						// 两个回调同在 ed2k 网络线程单线程串行执行,读写此表无需加锁(详见头文件成员注释)。
+						// 两个回调在 QObject 线程串行执行，避免与添加、删除和恢复交错访问缓存。
 						ed2k_task_cache_[task_id] = task_info;
-						Q_EMIT sigUpdateTasksMessage(task_info);
+						ApplyTaskUpdate(task_info);
 					}
 				} catch (const std::exception& e) {
 					LOG_ERR("{}", e.what())
@@ -1657,11 +1723,17 @@ namespace gdl {
 
 			// 单任务状态变更事件:{id,state,error}。payload 不含文件名/大小,从采样缓存补全后再转发。
 			void BrowserManagerImpl::OnHandleEd2kTaskState(const std::string& msg) {
+				if (QThread::currentThread() != thread()) {
+					QMetaObject::invokeMethod(this, [this, msg] { OnHandleEd2kTaskState(msg); }, Qt::QueuedConnection);
+					return;
+				}
+				if (shutting_down_) return;
 				try {
 					const nlohmann::json doc = nlohmann::json::parse(msg);
 					if (!doc.is_object() || !doc.contains("id") || !doc["id"].is_string()) return;
 					const QString task_id = QString::fromStdString(doc["id"].get<std::string>());
-					if (task_id.isEmpty()) return;
+					if (task_id.isEmpty() || !ed2k_generations_.contains(task_id) ||
+						ed2k_generations_.value(task_id) != doc.value("generation", std::uint64_t{0})) return;
 
 					DownloadTaskInfo task_info = ed2k_task_cache_.value(task_id);
 					task_info.set_task_id(task_id);
@@ -1676,7 +1748,9 @@ namespace gdl {
 						const std::int64_t ev_total = doc.value("total_size", std::int64_t{-1});
 						const std::int64_t ev_done	= doc.value("bytes_done", std::int64_t{-1});
 						if (ev_total > 0) task_info.set_task_total_size(ev_total);
-						if (ev_done >= 0) task_info.set_task_current_size(ev_done);
+						if (ev_done >= 0 && (!ed2k_restored_progress_.contains(task_id) ||
+							state == TaskState::kComplete || state == TaskState::kError || state == TaskState::kRemoved))
+							task_info.set_task_current_size(ev_done);
 					}
 					// 完成态兜底钉总大小(引擎只在整文件 MD4 复验通过后才置 completed, 此刻盘上就是
 					// 完整文件)。v2.10.0 的事件真值本就满足 bytes_done == total, 这一钉只在字段缺失
@@ -1688,6 +1762,7 @@ namespace gdl {
 						task_info.set_task_current_size(task_info.task_total_size());
 					}
 					const QString error = QString::fromStdString(doc.value("error", std::string()));
+					task_info.set_task_error_message({});
 					if (!error.isEmpty()) {
 						// 失败态: 原样展示引擎错误; 非失败态: 这是"还在等什么"的说明, 翻成友好文案。
 						// 状态变更事件的 payload 只有 {id,state,error}, 没有倒计时字段 —— 不传第二个
@@ -1701,14 +1776,11 @@ namespace gdl {
 							task_id, task_info.task_file_name(), task_info.task_total_size()));
 					}
 
-					// 终态之后该任务不会再出现在采样数组中,清理缓存避免无界增长;非终态则刷新缓存内容
-					if (state == TaskState::kComplete || state == TaskState::kError || state == TaskState::kRemoved) {
-						ed2k_task_cache_.remove(task_id);
-					}
-					else {
-						ed2k_task_cache_[task_id] = task_info;
-					}
-					Q_EMIT sigUpdateTasksMessage(task_info);
+					// 保留终态元数据直到删除或新代际覆盖，迟到事件仍可补齐字段。
+					ed2k_task_cache_[task_id] = task_info;
+					ApplyTaskUpdate(task_info);
+					if (state == TaskState::kComplete || state == TaskState::kError || state == TaskState::kRemoved)
+						ForgetEd2kTask(task_id);
 				} catch (const std::exception& e) {
 					LOG_ERR("{}", e.what())
 				} catch (...) {

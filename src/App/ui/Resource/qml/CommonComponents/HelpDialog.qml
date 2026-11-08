@@ -3,8 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import gdl.sdk
 
-// Aurora help/about surface. The two-tab contract and manager calls
-// are preserved while the layout now stacks safely in narrow windows.
+// 关于与许可证共用现有对话框，并在窄窗口中纵向排列标签页。
 GDialogShell {
     id: helpDialog
     objectName: "helpDialog"
@@ -37,6 +36,7 @@ GDialogShell {
             columnSpacing: GTheme.spaceSM
 
             Repeater {
+                objectName: "helpTabRepeater"
                 model: [
                     { name: qsTr("License"), icon: "code" },
                     { name: qsTr("About"), icon: "info" }
@@ -74,17 +74,18 @@ GDialogShell {
 
         QtObject {
             id: tabNavigation
+            objectName: "helpTabNavigation"
             property int currentIndex: 0
         }
 
         StackLayout {
+            objectName: "helpPages"
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.leftMargin: helpDialog.narrowLayout ? GTheme.spaceLG : GTheme.space2XL
             Layout.rightMargin: helpDialog.narrowLayout ? GTheme.spaceLG : GTheme.space2XL
             Layout.bottomMargin: GTheme.spaceLG
             currentIndex: tabNavigation.currentIndex
-
 
             GCard {
                 outlined: true

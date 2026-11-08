@@ -1,0 +1,70 @@
+--- a/include/ed2k/session/session.hpp
++++ b/include/ed2k/session/session.hpp
+@@ -262,7 +262,7 @@
+   Session(const Session&) = delete;
+   Session& operator=(const Session&) = delete;
+   // 契约: 所有方法必须在网络线程(rt.executor())上调用
+-  std::uint64_t add_download(const Ed2kFileLink& link, const std::filesystem::path& save_dir);
++  std::uint64_t add_download(const Ed2kFileLink& link, const std::filesystem::path& save_dir, bool paused = false);
+   bool pause(std::uint64_t id);                       // queued/connecting/downloading → paused
+   bool resume(std::uint64_t id);                      // paused/failed → queued(重新排队, .part.met 续传)
+   bool cancel(std::uint64_t id, bool remove_files);   // 任意态 → 移除任务; remove_files 删数据+met(延迟到协程退出后)
+--- a/src/session/session.cpp
++++ b/src/session/session.cpp
+@@ -2159,15 +2159,17 @@
+   if(impl_->share_udp_) impl_->share_udp_->close();
+ }
+ 
+-std::uint64_t Session::add_download(const Ed2kFileLink& link, const std::filesystem::path& save_dir){
++std::uint64_t Session::add_download(const Ed2kFileLink& link, const std::filesystem::path& save_dir, bool paused){
+   if(link.size == 0 || link.name.empty()) return 0;
+   TaskEntry t;
+   t.id = impl_->next_id++;
+   t.link = link;
+   t.out_path = save_dir / link.name;
++  // 恢复暂停任务时必须在 pump/co_spawn 之前确定初始状态，协程可能内联执行。
++  if(paused) t.state = TaskState::paused;
+   auto id = t.id;
+   impl_->tasks.emplace(id, std::move(t));
+-  impl_->emit(TaskStateEvent{id, TaskState::queued, {}, 0, link.size});
++  impl_->emit(TaskStateEvent{id, paused ? TaskState::paused : TaskState::queued, {}, 0, link.size});
+   impl_->pump();
+   return id;
+ }
+--- a/src/app/server_session.cpp
++++ b/src/app/server_session.cpp
+@@ -99,7 +99,7 @@
+ // 单网络线程模型: 从"判定 winner 是否已有"到"落位/关闭"之间没有挂起点, 无并发竞争。
+ boost::asio::awaitable<void>
+ login_race_attempt(std::shared_ptr<LoginRaceState> st, std::size_t idx, ServerTarget t){
+-  // 收尾 RAII(P1 健壮性): 销毁本分支连接槽位 + 发 done 令牌, 覆盖正常返回与 co_await 抛出
++  // 收尾 RAII 只销毁本分支连接槽位；完成令牌在恢复执行路径显式发送。覆盖 co_await 抛出
+   // (bad_alloc 等)两种退出 —— 手动写在协程尾部的收尾在异常路径上会被跳过, 外层"等分支归零"
+   // 就永远等不齐。槽位 reset 的语义: 胜者槽位此时是 moved-from 空壳, 缺省析构安全(但绝不能对
+   // moved-from 的 ServerConnection 调 close()——其 impl_ 已为空); 置空后外层的"取消所有在途
+@@ -108,9 +108,9 @@
+     std::shared_ptr<LoginRaceState> st; std::size_t idx;
+     ~BranchDone(){
+       st->conns[idx].reset();
+-      st->done.try_send(boost::system::error_code{}, static_cast<int>(idx));
+     }
+   } branch_done{st, idx};
++  try {
+   auto& conn = *st->conns[idx];
+   auto r = st->proxy
+     ? co_await conn.connect_and_login_via_proxy(*st->proxy, t.ip, t.port, st->params, st->timeout)
+@@ -121,6 +121,14 @@
+     if(!r.has_value()) st->last_error = r.error();
+     conn.close();   // 幂等; 迟到的成功者也在此断开
+   }
++  } catch (...) {
++    st->last_error = make_error_code(errc::io_error);
++    if(st->conns[idx]) st->conns[idx]->close();
++  }
++  // 仅正常恢复执行的分支发送完成通知；io_context 析构直接销毁协程帧时，
++  // channel service 可能已关闭，析构器触发 try_send 会访问已销毁的服务。
++  st->conns[idx].reset();
++  st->done.try_send(boost::system::error_code{}, static_cast<int>(idx));
+ }
+ 
+ // 首批并发窗口大小: 首批 8 个同时发起, 之后每有一个分支失败立即补入下一个候选(滑动

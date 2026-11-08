@@ -4,6 +4,7 @@ vcpkg_from_github(
     REF v${VERSION}
     SHA512 6116339d820fadd51341a94a67da35e0c53f347748146bd632398b49a25756be38aaf8f49c3b41d5304c824eff6bd5341ff0d14e9554e97bd2e7f39e4b25a079
     HEAD_REF main
+    PATCHES fix-paused-submit-and-shutdown.patch
 )
 
 # 引擎大部分类未标导出宏(ED2K_EXPORT)，其自身 CLI/测试一直静态链接 ed2k_core。

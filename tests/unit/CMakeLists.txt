@@ -184,3 +184,46 @@ set_tests_properties(UpdateTrustTests PROPERTIES
     WORKING_DIRECTORY $<TARGET_FILE_DIR:gdownload_update_trust_tests>
 )
 register_target(gdownload_update_trust_tests)
+
+# 直接运行真实 Browser/SQLite/ed2k 管道，不启动应用的联网初始化链。
+add_executable(gdownload_ed2k_persistence_tests
+    browser/test_ed2k_persistence.cpp
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Browser/browser_manager.cxx
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Browser/browser_manager.h
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Browser/download_task_model.cxx
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Browser/ed2k_link.cxx
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Settings/settings_manager.cxx
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Parser/file_parser.cxx
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Parser/file_preview_model.cxx
+    ${CMAKE_SOURCE_DIR}/src/App/ui/toast/toast_manager.cpp
+    ${CMAKE_SOURCE_DIR}/src/App/ui/utils/utils.cxx
+)
+find_package(cpr CONFIG REQUIRED)
+find_package(LibtorrentRasterbar CONFIG REQUIRED)
+find_package(pugixml CONFIG REQUIRED)
+find_package(RapidJSON CONFIG REQUIRED)
+find_package(boost_beast CONFIG REQUIRED)
+target_link_libraries(gdownload_ed2k_persistence_tests PRIVATE
+    GTest::gtest GTest::gtest_main Qt6::Core Qt6::Gui Qt6::Qml Qt6::Widgets
+    GDLCore Engine Ed2kEngine PluginManager cpr::cpr LibtorrentRasterbar::torrent-rasterbar pugixml::pugixml
+    Boost::asio Boost::beast rapidjson nlohmann_json::nlohmann_json
+)
+target_include_directories(gdownload_ed2k_persistence_tests PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/App/ui
+    ${CMAKE_SOURCE_DIR}/src/App/ui/Definitions
+    ${CMAKE_SOURCE_DIR}/src/App/engine
+    ${CMAKE_SOURCE_DIR}/src/App/Ed2kEngine
+    ${CMAKE_SOURCE_DIR}/src/Module
+    ${CMAKE_SOURCE_DIR}/src/Module/GDLCore
+    ${CMAKE_SOURCE_DIR}/src/Module/plugin
+)
+target_compile_definitions(gdownload_ed2k_persistence_tests PRIVATE GDL_UTILS_DISABLE_QML_INTEGRATION)
+set_target_properties(gdownload_ed2k_persistence_tests PROPERTIES AUTOMOC ON)
+if(WIN32)
+    target_link_libraries(gdownload_ed2k_persistence_tests PRIVATE Advapi32)
+endif()
+add_test(NAME Ed2kPersistenceTests COMMAND gdownload_ed2k_persistence_tests)
+set_tests_properties(Ed2kPersistenceTests PROPERTIES TIMEOUT 60
+    WORKING_DIRECTORY $<TARGET_FILE_DIR:gdownload_ed2k_persistence_tests>)
+register_target(gdownload_ed2k_persistence_tests)

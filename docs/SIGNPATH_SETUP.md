@@ -6,7 +6,15 @@
 - 申请入口：https://signpath.org/apply （SignPath Foundation，非营利基金会）
 - 签名平台：https://app.signpath.io （SignPath.io，证书私钥托管于其 HSM）
 
-## 0. 当前状态（2026-09-22 检查点）
+## 0. 当前状态（2026-11-08）
+
+生产证书仍待签发，本次维护版本发布未签名 Windows 安装包与程序。仓库变量 `SIGNPATH_ENABLED=false`；未设置该变量时同样默认关闭。CI 的 `resolve-windows-signing` 作业统一决定构建、打包与签名分支，不提交 SignPath 请求、不导入测试证书，且未签名构建的 `GDOWNLOAD_UPDATE_SIGNER_SPKI_PIN` 固定为空。Ed25519 更新清单签名、SHA-256 下载校验与 Linux GPG 签名保持启用。
+
+正式证书签发后，先配置生产证书的 `SIGNPATH_SIGNER_SPKI_PIN`，将策略设为 `release-signing`，最后显式设置 `SIGNPATH_ENABLED=true`。启用开关但缺少生产输入时构建直接报错；`test-signing` 不用于发布。
+
+以下为接入联调的历史记录，不代表当前发布已获得生产签名。
+
+### 2026-09-22 联调检查点
 
 | 项 | 值 |
 | --- | --- |
@@ -91,7 +99,7 @@
        → 验签 → 原地覆盖 → 后续发布步骤不变
 ```
 
-开关机制：只有当仓库同时配置了 `SIGNPATH_API_TOKEN`（secret）与 `SIGNPATH_ORGANIZATION_ID`、`SIGNPATH_SIGNING_POLICY_SLUG`（vars）时签名步骤才生效；缺失时输出提示并空转，发版行为与接入前完全一致。因此本改动可先行合入，不影响现有发版。
+开关机制：仅 tag 发布且 `SIGNPATH_ENABLED=true` 时进入生产签名；同时要求 `SIGNPATH_API_TOKEN`（secret）、`SIGNPATH_ORGANIZATION_ID`、`SIGNPATH_SIGNING_POLICY_SLUG=release-signing` 和合法的生产 `SIGNPATH_SIGNER_SPKI_PIN`。开关缺省或为 false 时直接打包未签名安装包，所有签名请求跳过。
 
 第三方二进制（aria2c.exe、Qt/SSL 运行时 DLL 等）**不在签名范围**：Foundation 条款只允许签自有构建产物，上游未签名文件允许包含在安装包内（已安装文件由阶段 2 的安装包签名整体覆盖保护）。
 

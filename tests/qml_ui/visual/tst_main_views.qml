@@ -32,6 +32,15 @@ TestCase {
         objectName: "harness"
     }
 
+    function cleanup() {
+        // 先卸载场景并处理延迟删除,再回收 JS 包装对象;下一用例才切换主题和创建新场景。
+        // 避免连续截图的旧对象跨用例滞留,在大壳层创建期间触发回收并访问失效上下文。
+        harness.load("")
+        compare(harness.loadedItem, null)
+        wait(20)
+        gc()
+    }
+
     function init() {
         // 每个用例前重置主题与默认尺寸
         harness.themeMode = "light"

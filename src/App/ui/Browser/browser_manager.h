@@ -3,6 +3,7 @@
 #include <QtQml/qqml.h>
 #include <atomic>
 #include <QHash>
+#include <QSet>
 #include <QObject>
 #include <QVariantMap>
 #include "Aria2CManager/aria2c_http_rpc_client.h"
@@ -131,13 +132,18 @@ namespace gdl {
 				void OnHandleAria2Message(const std::string& msg);
                 void OnHandleAria2ActiveProgress(const std::string& msg);
 				void OnHandleTrackerUpdateStatus(const std::string& msg);
-				// ed2k 事件转发:两者均在 ed2k 引擎网络线程回调,遵循与 aria2 相同的跨线程 Q_EMIT 模式
+				// ed2k 事件转发：网络回调通过 invokeMethod 投递到 QObject 线程。
 				void OnHandleEd2kActiveProgress(const std::string& msg);
 				void OnHandleEd2kTaskState(const std::string& msg);
 				void InitDownloadHistoryCache() const;
-				// 重启续传:对历史记录中状态为失败(kError)的 ed2k 任务重新调用 AddEd2kTask,
+				// 重启恢复未完成及失败任务，暂停任务保持暂停，
 				// 依赖引擎 .part.met 实现断点续传;须在 ed2k 引擎初始化成功之后调用
-				void RestoreEd2kDownloadHistory() const;
+				void RestoreEd2kDownloadHistory();
+				bool SubmitEd2kTask(const QString& link, const QString& save_dir, bool paused,
+								   const DownloadTaskInfo* restored = nullptr);
+				void ApplyTaskUpdate(const DownloadTaskInfo& task_info);
+				void ForgetEd2kTask(const QString& task_id);
+				friend class BrowserPersistenceTestPeer;
 				static gdl::cache::DownloadRecord DownloadTaskInfoToRecord(const DownloadTaskInfo& info);
 				static DownloadTaskInfo DownloadRecordToTaskInfo(const gdl::cache::DownloadRecord& record);
 				static DownloadTaskInfo Aria2QueryByGidTaskInfo(const std::string& gid);
@@ -162,10 +168,12 @@ namespace gdl {
 				// 启动链一次性标志:置位后仅首个 server.met 结果触发自动连接;
 				// 回调在引擎网络线程执行,与主线程 Init/UnInit 存在跨线程读写,用原子量
 				std::atomic_bool ed2k_boot_auto_connect_pending_{false};
-				// ed2k 任务最近一次采样信息缓存,用于状态事件(payload 仅含 id/state/error)补全文件名/大小等字段。
-				// 仅在 ed2k 引擎网络线程读写:OnHandleEd2kActiveProgress/OnHandleEd2kTaskState 均由该库内部
-				// 单线程 io_context 串行派发(见 PubSubSystem::Publish 的 post 语义),两者不会并发访问此表,无需加锁。
+				// ed2k 回调先转投 QObject 线程，缓存、代际及模型/落库在同一线程串行修改。
 				QHash<QString, DownloadTaskInfo> ed2k_task_cache_;
+				QHash<QString, std::uint64_t> ed2k_generations_;
+				QSet<QString> ed2k_restored_progress_;
+				std::uint64_t next_ed2k_generation_{0};
+				bool shutting_down_{false};
 				bool engine_available_{true};
 				QString engine_unavailable_message_;
 			};

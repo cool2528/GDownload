@@ -195,6 +195,8 @@ struct Ed2kDownloadManager::Impl {
 	// 对外任务 ID("ed2k-<md4>") 与引擎内部 session task id(uint64) 的双向映射
 	std::map<std::string, std::uint64_t> id_to_session;
 	std::map<std::uint64_t, std::string> session_to_id;
+	std::map<std::string, std::uint64_t> generations;
+	bool shutting_down_tasks = false;
 
 	// 1s 采样定时器，仅在网络线程上 arm/cancel
 	std::unique_ptr<boost::asio::steady_timer> sample_timer;
@@ -366,12 +368,15 @@ bool Ed2kDownloadManager::InitEd2kEngine(const Ed2kEngineConfig& config) {
 					}
 					return;
 				}
+				// 关停只停止网络活动，不把用户任务改写为 cancelled 历史。
+				if (impl_->shutting_down_tasks) return;
 				auto it = impl_->session_to_id.find(task_event->task_id);
 				if (it == impl_->session_to_id.end()) {
 					return;
 				}
 				nlohmann::json payload;
 				payload["id"] = it->second;
+				payload["generation"] = impl_->generations[it->second];
 				payload["state"] = TaskStateToString(task_event->state);
 				payload["error"] = task_event->error ? task_event->error.message() : std::string();
 				// 引擎 v2.10.0 起终态事件自带字节数快照(事件发出那一刻 PartFile 块级记账的真值)。
@@ -463,6 +468,9 @@ void Ed2kDownloadManager::ShutdownEngine() {
 			impl_->sample_timer->cancel();
 		}
 		if (impl_->session) {
+			// 所有此前提交的添加/暂停已执行，先发布最终真值，再抑制 shutdown 的取消回声。
+			try { PublishTaskProgressLocked(); } catch (...) {}
+			impl_->shutting_down_tasks = true;
 			impl_->session->shutdown();
 		}
 		// F6：这里不再紧接着 runtime.stop()。shutdown() 只是给各任务置停标志（并关掉服务器/
@@ -512,57 +520,7 @@ void Ed2kDownloadManager::ScheduleSampling() {
 			return;
 		}
 		try {
-			auto snapshots = impl_->session->query_all();
-			nlohmann::json arr = nlohmann::json::array();
-			for (const auto& snap : snapshots) {
-				// 终态转换已由状态事件单独通知,采样只报告未完结任务的进度;
-				// 终态任务随后会被事件回调 post 的清理任务移出引擎,这里过滤掉
-				// 清理生效前的窗口期,避免上层重复收到终态数据
-				if (snap.state == ed2k::session::TaskState::completed ||
-					snap.state == ed2k::session::TaskState::failed ||
-					snap.state == ed2k::session::TaskState::cancelled) {
-					continue;
-				}
-				auto id_it = impl_->session_to_id.find(snap.id);
-				if (id_it == impl_->session_to_id.end()) {
-					// 尚未记录映射（理论上 add_download 已同步写入，防御性跳过）
-					continue;
-				}
-				nlohmann::json item;
-				item["id"] = id_it->second;
-				item["name"] = snap.name;
-				item["total"] = snap.total_size;
-				item["done"] = snap.bytes_done;
-				item["speed"] = snap.speed_bps;
-				// 四个计数各有各的口径, 混用会把用户和排查者一起带偏(见引擎 download::DownloadStats):
-				//   sources          = 迄今发现的源总数(含已放弃/冷却中的源, 只增不减);
-				//   active_sources   = peer_worker 协程数, 【不是连接数】—— 可以上百, 其中大部分
-				//                      在等并发名额/排队/退避; 仅作为旧引擎下 connections 的兜底;
-				//   connected_peers  = 此刻真正持有连接名额的数量(被 max_peer_connections 钳住),
-				//                      这才是 UI 上"连接数"该显示的值;
-				//   queued_sources   = 停在对端上传队列里等放行的源数。
-				// 四者都由引擎在源集合/worker/名额/排队变化时实时回写(见引擎 download::StatsFn)。
-				item["sources"] = snap.known_sources;
-				item["active_sources"] = ActiveSourcesOf(snap);
-				item["connected_peers"] = ConnectedPeersOf(snap);
-				item["queued_sources"] = QueuedSourcesOf(snap);
-				// 反封禁相位闸门的可观测状态(见 RequestGatedSourcesOf 的注释): 前者是"有几个源
-				// 正被刻意挡着", 后者是最早解禁还剩多少毫秒。二者只在闸门生效时非零, UI 据此把
-				// "0 连接 0 速度"这幅与卡死同形的画面解释成一次刻意的等待。
-				item["request_gated_sources"] = RequestGatedSourcesOf(snap);
-				item["request_gate_remaining_ms"] = RequestGateRemainingMsOf(snap);
-				item["state"] = TaskStateToString(snap.state);
-				// 非终态任务的 error 字段是"当前状态说明"而非失败原因(引擎在等待可用源时会附上
-				// 等待原因但不转失败态)。必须随每次采样一起带上:该原因只在变化时通过状态事件推
-				// 一次,若采样不带,下一秒的采样就把 UI 上的说明冲掉了,用户又变成对着静默任务发懵。
-				item["error"] = snap.error ? snap.error.message() : std::string();
-				// 目标文件完整路径，供上层展示“打开文件位置”及重启续传时反推 save_dir
-				item["out_path"] = snap.out_path.string();
-				arr.push_back(std::move(item));
-			}
-			if (impl_->pubsub) {
-				impl_->pubsub->Publish(kEd2kActiveProgress, arr.dump());
-			}
+			PublishTaskProgressLocked();
 			PublishShareStateLocked();
 		} catch (const std::exception&) {
 			// 单次采样失败不应中断定时器重排
@@ -571,7 +529,63 @@ void Ed2kDownloadManager::ScheduleSampling() {
 	});
 }
 
-std::string Ed2kDownloadManager::AddEd2kTask(const std::string& link, const std::string& save_dir) {
+void Ed2kDownloadManager::PublishTaskProgressLocked() {
+	auto snapshots = impl_->session->query_all();
+	nlohmann::json arr = nlohmann::json::array();
+	for (const auto& snap : snapshots) {
+		// 终态转换已由状态事件单独通知,采样只报告未完结任务的进度;
+		// 终态任务随后会被事件回调 post 的清理任务移出引擎,这里过滤掉
+		// 清理生效前的窗口期,避免上层重复收到终态数据
+		if (snap.state == ed2k::session::TaskState::completed ||
+			snap.state == ed2k::session::TaskState::failed ||
+			snap.state == ed2k::session::TaskState::cancelled) {
+			continue;
+		}
+		auto id_it = impl_->session_to_id.find(snap.id);
+		if (id_it == impl_->session_to_id.end()) {
+			// 尚未记录映射（理论上 add_download 已同步写入，防御性跳过）
+			continue;
+		}
+		nlohmann::json item;
+		item["id"] = id_it->second;
+		item["generation"] = impl_->generations[id_it->second];
+		item["name"] = snap.name;
+		item["total"] = snap.total_size;
+		item["done"] = snap.bytes_done;
+		item["speed"] = snap.speed_bps;
+		// 四个计数各有各的口径, 混用会把用户和排查者一起带偏(见引擎 download::DownloadStats):
+		//   sources          = 迄今发现的源总数(含已放弃/冷却中的源, 只增不减);
+		//   active_sources   = peer_worker 协程数, 【不是连接数】—— 可以上百, 其中大部分
+		//                      在等并发名额/排队/退避; 仅作为旧引擎下 connections 的兜底;
+		//   connected_peers  = 此刻真正持有连接名额的数量(被 max_peer_connections 钳住),
+		//                      这才是 UI 上"连接数"该显示的值;
+		//   queued_sources   = 停在对端上传队列里等放行的源数。
+		// 四者都由引擎在源集合/worker/名额/排队变化时实时回写(见引擎 download::StatsFn)。
+		item["sources"] = snap.known_sources;
+		item["active_sources"] = ActiveSourcesOf(snap);
+		item["connected_peers"] = ConnectedPeersOf(snap);
+		item["queued_sources"] = QueuedSourcesOf(snap);
+		// 反封禁相位闸门的可观测状态(见 RequestGatedSourcesOf 的注释): 前者是"有几个源
+		// 正被刻意挡着", 后者是最早解禁还剩多少毫秒。二者只在闸门生效时非零, UI 据此把
+		// "0 连接 0 速度"这幅与卡死同形的画面解释成一次刻意的等待。
+		item["request_gated_sources"] = RequestGatedSourcesOf(snap);
+		item["request_gate_remaining_ms"] = RequestGateRemainingMsOf(snap);
+		item["state"] = TaskStateToString(snap.state);
+		// 非终态任务的 error 字段是"当前状态说明"而非失败原因(引擎在等待可用源时会附上
+		// 等待原因但不转失败态)。必须随每次采样一起带上:该原因只在变化时通过状态事件推
+		// 一次,若采样不带,下一秒的采样就把 UI 上的说明冲掉了,用户又变成对着静默任务发懵。
+		item["error"] = snap.error ? snap.error.message() : std::string();
+		// 目标文件完整路径，供上层展示“打开文件位置”及重启续传时反推 save_dir
+		item["out_path"] = snap.out_path.string();
+		arr.push_back(std::move(item));
+	}
+	if (impl_->pubsub) {
+		impl_->pubsub->Publish(kEd2kActiveProgress, arr.dump());
+	}
+}
+
+std::string Ed2kDownloadManager::AddEd2kTask(const std::string& link, const std::string& save_dir, bool paused,
+													 std::uint64_t generation) {
 	// 与其它对外方法一致：引擎未初始化或已关闭时直接失败，避免把任务 post 到不再运行的
 	// io_context 上——那样会返回一个看似有效但永不入队的 task_id，破坏"失败返回空"契约。
 	if (!impl_->running.load()) {
@@ -591,7 +605,7 @@ std::string Ed2kDownloadManager::AddEd2kTask(const std::string& link, const std:
 	std::string task_id = "ed2k-" + file->hash.to_hex();
 	auto link_copy = *file;
 	auto dir = std::filesystem::path(save_dir);
-	boost::asio::post(impl_->runtime.executor(), [this, task_id, link_copy = std::move(link_copy), dir]() mutable {
+	boost::asio::post(impl_->runtime.executor(), [this, task_id, link_copy = std::move(link_copy), dir, paused, generation]() mutable {
 		if (!impl_->session) {
 			return;
 		}
@@ -600,18 +614,20 @@ std::string Ed2kDownloadManager::AddEd2kTask(const std::string& link, const std:
 		if (impl_->id_to_session.count(task_id) > 0) {
 			return;
 		}
-		std::uint64_t session_id = impl_->session->add_download(link_copy, dir);
+		// 初始暂停直接传入引擎，避免 add_download 内联调度先触发登录连接。
+		std::uint64_t session_id = impl_->session->add_download(link_copy, dir, paused);
+		impl_->generations[task_id] = generation;
 		impl_->id_to_session[task_id] = session_id;
 		impl_->session_to_id[session_id] = task_id;
 
 		// 立即发布一条合成的初始快照(queued 态,元数据取自链接本身),不等首次 1s 采样:
 		// 否则任务在首次采样前进入终态(无服务器/端口被占时常见)时,上层只收到仅含
 		// {id,state,error} 的状态事件,采样缓存为空导致落库记录 name/size/link 全空——
-		// 恢复场景下旧记录已删,等于一次失败就把任务永久弄丢。同时这也让 UI 在添加后
-		// 立刻显示带文件名的等待条目。
+		// 初始快照补齐字段，同时让 UI 在添加后立刻显示带文件名的等待或暂停条目。
 		try {
 			nlohmann::json item;
 			item["id"] = task_id;
+			item["generation"] = generation;
 			item["name"] = link_copy.name;
 			item["total"] = static_cast<std::int64_t>(link_copy.size);
 			item["done"] = static_cast<std::int64_t>(0);
@@ -622,7 +638,7 @@ std::string Ed2kDownloadManager::AddEd2kTask(const std::string& link, const std:
 			item["queued_sources"] = static_cast<std::int64_t>(0);
 			item["request_gated_sources"] = static_cast<std::int64_t>(0);
 			item["request_gate_remaining_ms"] = static_cast<std::int64_t>(0);
-			item["state"] = std::string("queued");
+			item["state"] = std::string(paused ? "paused" : "queued");
 			item["out_path"] = (dir / link_copy.name).string();
 			nlohmann::json arr = nlohmann::json::array({std::move(item)});
 			if (impl_->pubsub) {

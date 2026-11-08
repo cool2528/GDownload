@@ -278,7 +278,7 @@ Free code signing provided by [SignPath.io](https://signpath.io), certificate by
 - **Approvers**: [@cool2528](https://github.com/cool2528)
 - **Privacy policy**: This program will not transfer any information to any other networked systems unless specifically requested by the user or the person installing or operating it. The in-app update check only contacts GitHub Releases for version information and can be disabled in the settings.
 
-Windows installers and the main binaries are signed automatically via GitHub Actions using SignPath.io. The signing service verifies that binaries were built from this repository's source code and CI configuration (Trusted Build System). See [docs/SIGNPATH_SETUP.md](docs/SIGNPATH_SETUP.md) for details.
+The SignPath production certificate is pending. This Windows release ships unsigned installers and application binaries; test certificates are not used for releases. Production signing is disabled by default until the production certificate is ready and explicitly enabled. Ed25519 update-manifest signatures and package SHA-256 checks remain enabled. See [docs/SIGNPATH_SETUP.md](docs/SIGNPATH_SETUP.md) for details.
 
 ## ⚠️ Disclaimer
 

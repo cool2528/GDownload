@@ -54,6 +54,37 @@ jobs:
             exit 1
           fi
 
+  # 生产证书就绪前默认发布未签名 Windows 包；测试策略不用于发布。
+  resolve-windows-signing:
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.signing.outputs.enabled }}
+    steps:
+      - name: Resolve production signing policy
+        id: signing
+        shell: pwsh
+        env:
+          SIGNPATH_ENABLED: ${{ vars.SIGNPATH_ENABLED }}
+          SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+          SIGNPATH_ORGANIZATION_ID: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          SIGNPATH_SIGNING_POLICY_SLUG: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          SIGNPATH_SIGNER_SPKI_PIN: ${{ vars.SIGNPATH_SIGNER_SPKI_PIN }}
+          IS_TAG: ${{ startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          $enabled = $env:IS_TAG -eq 'true' -and $env:SIGNPATH_ENABLED -eq 'true'
+          if ($enabled) {
+            if ($env:SIGNPATH_SIGNING_POLICY_SLUG -ne 'release-signing' -or
+                [string]::IsNullOrWhiteSpace($env:SIGNPATH_API_TOKEN) -or
+                [string]::IsNullOrWhiteSpace($env:SIGNPATH_ORGANIZATION_ID) -or
+                $env:SIGNPATH_SIGNER_SPKI_PIN -notmatch '^sha256:[0-9a-fA-F]{64}$') {
+              throw 'Production signing requires release-signing, an API token, organization ID and production SPKI pin.'
+            }
+          }
+          "enabled=$($enabled.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+          if (-not $enabled) {
+            Write-Host 'Windows release signing is disabled; build the unsigned installer without SignPath requests.'
+          }
+
   # 创建 Release（只运行一次，避免重复创建）
   create-release:
     if: startsWith(github.ref, 'refs/tags/')
@@ -144,12 +175,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build:
-    needs: [create-release, validate-release-inputs]
+    needs: [create-release, validate-release-inputs, resolve-windows-signing]
     if: |
       !cancelled() &&
+      needs.resolve-windows-signing.result == 'success' &&
       (needs.create-release.result == 'success' || needs.create-release.result == 'skipped') &&
       (needs.validate-release-inputs.result == 'success' || needs.validate-release-inputs.result == 'skipped')
     runs-on: ${{ matrix.os }}
+    env:
+      SIGNPATH_ENABLED: ${{ needs.resolve-windows-signing.outputs.enabled }}
     strategy:
       fail-fast: false
       matrix:
@@ -484,10 +518,8 @@ jobs:
         shell: cmd
         env:
           UPDATE_MANIFEST_ED25519_PUBLIC_KEY: ${{ vars.UPDATE_MANIFEST_ED25519_PUBLIC_KEY }}
-          # 可选:SignPath 签名接入后,把签名者 SPKI SHA-256(sha256:<hex>)配置为
-          # 仓库 var SIGNPATH_SIGNER_SPKI_PIN,更新器将对下载包执行 Authenticode
-          # 信任链校验并锁定签名者指纹;未配置(空值)时保持既有行为(仅校验更新清单)
-          SIGNPATH_SIGNER_SPKI_PIN: ${{ vars.SIGNPATH_SIGNER_SPKI_PIN }}
+          # 仅生产签名生效时编入证书 pin；未签名包仍验证 Ed25519 清单和 SHA-256。
+          SIGNPATH_SIGNER_SPKI_PIN: ${{ needs.resolve-windows-signing.outputs.enabled == 'true' && vars.SIGNPATH_SIGNER_SPKI_PIN || '' }}
         run: |
           if "%QTDIR%"=="" (
             echo QTDIR is not set.
@@ -505,31 +537,7 @@ jobs:
           del /S /Q build\Release\bin\*.exp
           cmake --install build --config Release
 
-      # ===== SignPath 代码签名(阶段 1:自有二进制) =====
-      # 仅 tag 发版且仓库配置了 SIGNPATH_API_TOKEN(secret) 与 SIGNPATH_ORGANIZATION_ID /
-      # SIGNPATH_SIGNING_POLICY_SLUG(vars) 时启用;任一缺失时所有签名步骤空转,
-      # 发版流程与未接入 SignPath 前完全一致。
-      # 设计见 docs/SIGNPATH_SETUP.md:先签 Inno Setup 打包源目录(build\Release\bin,
-      # 即 INSTALLER_BIN_DIR)下的自有 PE 文件(gdownload.exe 与自有 DLL,第三方运行时
-      # 不在签名范围),回填后由 Inno Setup 打包,安装包本体再走下方"阶段 2"签名。
-      - name: Resolve SignPath signing inputs (Windows)
-        if: matrix.target == 'windows' && startsWith(github.ref, 'refs/tags/')
-        shell: pwsh
-        env:
-          SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
-          SIGNPATH_ORGANIZATION_ID: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
-          SIGNPATH_SIGNING_POLICY_SLUG: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
-        run: |
-          $enabled = -not [string]::IsNullOrWhiteSpace($env:SIGNPATH_API_TOKEN) -and
-            -not [string]::IsNullOrWhiteSpace($env:SIGNPATH_ORGANIZATION_ID) -and
-            -not [string]::IsNullOrWhiteSpace($env:SIGNPATH_SIGNING_POLICY_SLUG)
-          if ($enabled) {
-            Write-Host "SignPath signing enabled (stage 1 + stage 2)."
-          } else {
-            Write-Host "SignPath signing disabled: set secret SIGNPATH_API_TOKEN and vars SIGNPATH_ORGANIZATION_ID / SIGNPATH_SIGNING_POLICY_SLUG to enable."
-          }
-          "SIGNPATH_ENABLED=$(if ($enabled) { 'true' } else { 'false' })" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-
+      # 签名决策只从 resolve-windows-signing 作业读取，构建与签名分支保持一致。
       - name: Upload unsigned Windows staging for signing job
         # 构建与签名分离: 签名请求要等人批准(可达数十分钟), 不该让昂贵的编译 runner
         # 一直干等。本步骤把签名所需输入交给 sign-windows 作业后本腿即结束;
@@ -546,15 +554,7 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
-      # ===== 签名与打包已移交 sign-windows 作业 =====
-      # SignPath 启用时, 阶段1 签名 -> Inno 打包 -> 阶段2 签名 -> 安装包发布 全部在
-      # sign-windows 作业执行(见下方该作业)。原因是签名请求需要人工批准, 可能等待
-      # 数十分钟, 不应让本编译 runner 空耗; 分离后审批超时可单独重跑 sign-windows。
-      # 本腿只负责编译并上传未签名产物(gdownload-windows-staging-*)。
-      #
-      # 未启用 SignPath 时(缺 secret/vars)仍需在本腿产出未签名安装包, 保持既有行为。
-      # 未启用 SignPath 时(缺 secret/vars)在本腿直接产出未签名安装包, 保持既有行为;
-      # 启用时这三步由 sign-windows 作业在签名完成后执行。
+      # 未启用生产签名时直接打包，不提交请求、不导入测试证书。
       - name: Install Inno Setup
         if: matrix.target == 'windows' && env.SIGNPATH_ENABLED != 'true'
         run: |
@@ -670,13 +670,12 @@ jobs:
   #   - 本作业不使用任何第三方构建产物, 全部步骤仍在 GitHub 托管 runner 上,
   #     满足 SignPath 对 OSS 项目的 origin verification 要求。
   sign-windows:
-    needs: [build, create-release]
+    needs: [build, create-release, resolve-windows-signing]
     if: |
       !cancelled() &&
       startsWith(github.ref, 'refs/tags/') &&
       needs.build.result == 'success' &&
-      vars.SIGNPATH_ORGANIZATION_ID != '' &&
-      vars.SIGNPATH_SIGNING_POLICY_SLUG != ''
+      needs.resolve-windows-signing.outputs.enabled == 'true'
     runs-on: windows-latest
     # 两次人工审批各留 60 分钟, 加上构建与打包开销, 上限远高于默认 360 分钟无必要,
     # 这里显式声明以便日后调整审批窗口时有单一可见位置。
@@ -790,25 +789,6 @@ jobs:
           # 60 分钟是审批窗口: 超时只会让本作业失败, 重跑本作业即可, 不影响已完成的编译。
           wait-for-completion-timeout-in-seconds: 3600
           output-artifact-directory: '${{ runner.temp }}/signstage1-signed'
-
-      # ===== 测试证书信任(仅 test-signing 联调期需要) =====
-      # test-signing 绑的是自签测试证书,runner 默认不信任其根,Get-AuthenticodeSignature
-      # 会返回 UnknownError,导致下面两步验签失败。把仓库内的测试证书公钥(仅公钥,无私钥)
-      # 导入受信任根与受信任发布者后即可通过。切到 release-signing(证书由公共 CA 签发)时
-      # 本步骤自动跳过,验签恢复为严格信任链校验。
-      - name: Trust SignPath test certificate (test-signing only)
-        if: vars.SIGNPATH_SIGNING_POLICY_SLUG == 'test-signing'
-        shell: pwsh
-        run: |
-          $certPath = Join-Path $env:GITHUB_WORKSPACE '.github/signpath/test-certificate.cer'
-          if (-not (Test-Path -LiteralPath $certPath)) {
-            throw "SignPath test certificate not found: $certPath"
-          }
-          $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 $certPath
-          Write-Host "Trusting test certificate: $($cert.Subject) [$($cert.Thumbprint)]"
-          Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\Root | Out-Null
-          Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\TrustedPublisher | Out-Null
-          Write-Host "Imported test certificate into LocalMachine\Root and LocalMachine\TrustedPublisher."
 
       - name: Verify and apply stage-1 signatures (Windows)
         shell: pwsh
@@ -1010,15 +990,17 @@ jobs:
           file: GDownload-Universal.dmg
           overwrite: true
 
+  # 等待 Windows 签名作业成功或明确跳过后再消费 exe，避免签名与清单下载竞态。
   # 只消费 Windows exe 与 Linux AppImage,不依赖 macOS Universal 合并,
   # 与 merge-macos-universal 并行以缩短发版关键路径
   # 预发布版本不生成更新清单: 清单是"有新版本可用"的信号, 不能推给普通用户
   release-update-manifests:
-    needs: [build, create-release]
+    needs: [build, create-release, sign-windows]
     if: |
       !cancelled() &&
       startsWith(github.ref, 'refs/tags/') &&
       needs.build.result == 'success' &&
+      (needs.sign-windows.result == 'success' || needs.sign-windows.result == 'skipped') &&
       needs.create-release.outputs.prerelease != 'true'
     runs-on: ubuntu-latest
     steps:

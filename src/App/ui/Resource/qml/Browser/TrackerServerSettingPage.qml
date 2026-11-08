@@ -265,6 +265,9 @@ SettingCard {
     // ========== 自定义源区域 ==========
     ColumnLayout {
         Layout.fillWidth: true
+        Layout.minimumWidth: 0
+        // 其他源分组的最小宽度也不应把本区域推到卡片可视范围之外。
+        Layout.maximumWidth: trackServerPage.availableWidth
         spacing: GTheme.spaceSM
 
         Text {
@@ -288,9 +291,11 @@ SettingCard {
 
             Rectangle {
                 id: customSourceRow
+                objectName: "customTrackerSourceRow"
                 required property string modelData
 
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 implicitHeight: customRowLayout.implicitHeight + GTheme.spaceSM * 2
                 radius: GTheme.radiusBase
                 color: GTheme.fillLighter
@@ -305,7 +310,11 @@ SettingCard {
                     spacing: GTheme.spaceSM
 
                     Text {
+                        objectName: "customTrackerSourceUrl"
                         Layout.fillWidth: true
+                        // URL 只占按钮之外的剩余宽度,长地址在此省略而不参与行的首选宽度。
+                        Layout.minimumWidth: 0
+                        Layout.preferredWidth: 0
                         text: customSourceRow.modelData
                         font.pixelSize: GTheme.fontCaption
                         color: GTheme.textRegular
@@ -313,8 +322,11 @@ SettingCard {
                     }
 
                     GButton {
+                        objectName: "removeCustomTrackerSourceButton"
+                        // 实心 danger 配色在暗亮表面上均清晰可辨,保留完整文字与点击区域。
                         buttonType: "danger"
-                        variant: "link"
+                        Layout.minimumWidth: implicitWidth
+                        Layout.fillWidth: false
                         size: "small"
                         text: qsTr("Remove")
                         Accessible.name: qsTr("Remove custom tracker source")
@@ -332,7 +344,9 @@ SettingCard {
 
             GTextField {
                 id: customSourceInput
+                objectName: "customTrackerSourceInput"
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 placeholderText: qsTr("https://example.com/trackers.txt")
                 Accessible.name: qsTr("Custom tracker source URL")
                 onTextEdited: {

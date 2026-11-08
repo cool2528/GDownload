@@ -4,7 +4,7 @@ GDownload 采用**免费签名方案**,不购买付费代码签名证书:
 
 - ✅ **ed25519 更新清单签名** —— 保护自动更新不被篡改(免费自生成)
 - ✅ **AppImage GPG 签名** —— Linux 包完整性校验(免费自生成)
-- ✅ **Windows Authenticode 代码签名** —— 经 SignPath.io 自动化签名,证书由 SignPath Foundation 免费提供给开源项目(接入流程与平台配置见 [SIGNPATH_SETUP.md](SIGNPATH_SETUP.md))
+- **Windows Authenticode 代码签名暂未启用** —— SignPath 生产证书仍待签发，本次发布未签名安装包；`SIGNPATH_ENABLED=false`，测试证书不用于发布。生产证书就绪后的接入流程见 [SIGNPATH_SETUP.md](SIGNPATH_SETUP.md)。
 - ❌ **不做 macOS 代码签名** —— 需要付费 Apple Developer 账号,不在免费方案内
 
 更新链的安全由两层保证:ed25519 签名的更新清单(校验版本号 / 下载地址 / SHA-256)+ 下载包的 SHA-256 完整性校验;SignPath 接入后,Windows 更新包还可选启用 Authenticode 信任链 + SPKI 指纹锁定(见 SIGNPATH_SETUP.md 第 8 节)。
@@ -77,9 +77,10 @@ gpg --armor --export-secret-keys <FINGERPRINT>
 - 若私钥泄露,需重新生成、更新 secrets/variable,并同步更新已发布客户端所信任的公钥
 - 版本号由 git tag 驱动(`cmake/get_version.cmake` 解析 `v<major>.<minor>.<build>`)
 
-## 五、为何不做 Windows / macOS 代码签名
+## 五、Windows 生产证书签发前的发布策略
 
-- Windows Authenticode 证书需向 CA 付费购买;macOS 公证需 Apple Developer 账号($99/年)
-- 作为开源项目,"未做代码签名 + 强更新完整性校验"是常见且合理的取舍
-- 更新验证代码(`src/Module/GDLCore/update/platform_package_verifier.cxx`)在未配置签名者 pin(空值)时跳过 Windows Authenticode 校验,更新完整性由 ed25519 清单 + SHA-256 共同保证
-- 若将来获得证书:在 CI 恢复 `WINDOWS_SIGNING_CERT_PFX_BASE64` / `WINDOWS_SIGNING_CERT_PASSWORD` / `UPDATE_WINDOWS_SIGNER_SPKI_SHA256` 三个 secret,并回填 `-DGDOWNLOAD_UPDATE_SIGNER_SPKI_PIN` 编译参数,即可自动恢复完整的 Authenticode 签名者 pinning
+- `SIGNPATH_ENABLED` 未设置或为 `false` 时，Windows 构建直接打包未签名安装包，不提交 SignPath 请求，也不导入测试证书。
+- 未签名构建的 `GDOWNLOAD_UPDATE_SIGNER_SPKI_PIN` 固定为空；更新完整性继续由 Ed25519 清单和 SHA-256 校验保证。
+- 生产证书签发后配置 `SIGNPATH_API_TOKEN`、`SIGNPATH_ORGANIZATION_ID`、`SIGNPATH_SIGNING_POLICY_SLUG=release-signing` 和生产证书的 `SIGNPATH_SIGNER_SPKI_PIN`，最后显式设 `SIGNPATH_ENABLED=true`。
+- `resolve-windows-signing` 是构建与签名作业共用的唯一开关；输入不全时启用签名会报错。更新清单作业等待签名作业成功或明确跳过后才下载产物。
+- macOS 公证仍需要 Apple Developer 账号；当前策略不因本次 Windows 调整而改变。
