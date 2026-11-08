@@ -2,3 +2,5 @@
 # (core.autocrlf=true) don't rewrite them to CRLF and break bash execution
 # (e.g. `$'\r': command not found`, `set: pipefail: invalid option name`).
 *.sh text eol=lf
+# Unified diff context lines intentionally contain one space on blank lines.
+*.patch text eol=lf whitespace=-blank-at-eol
